@@ -44,7 +44,7 @@ export class GameService {
   async getGame(id: string): Promise<Result<GameWithStats | null, AppError>> {
     try {
       const game = await this.db.game.findUnique({
-        where: { id },
+        where: { code: id },
         include: GAME_INCLUDE,
       });
 
@@ -90,7 +90,7 @@ export class GameService {
   ): Promise<Result<GameStatistics, AppError>> {
     try {
       const game = await this.db.game.findUnique({
-        where: { id: gameId },
+        where: { code: gameId },
       });
 
       if (!game) {
@@ -109,13 +109,13 @@ export class GameService {
         await Promise.all([
           // Total players
           this.db.player.count({
-            where: { gameId },
+            where: { game: gameId },
           }),
 
           // Active players (last 30 days)
           this.db.player.count({
             where: {
-              gameId,
+              game: gameId,
               lastEvent: {
                 gte: thirtyDaysAgo,
               },
@@ -124,7 +124,7 @@ export class GameService {
 
           // Aggregate statistics
           this.db.player.aggregate({
-            where: { gameId },
+            where: { game: gameId },
             _sum: {
               kills: true,
               deaths: true,
@@ -137,12 +137,12 @@ export class GameService {
           // Top 5 players
           this.db.player.findMany({
             where: {
-              gameId,
+              game: gameId,
               hideRanking: false,
             },
             include: {
-              clan: true,
-              country: true,
+              clanData: true,
+              countryData: true,
             },
             orderBy: {
               skill: "desc",
@@ -154,9 +154,9 @@ export class GameService {
       const gameStatistics: GameStatistics = {
         totalPlayers,
         activePlayers,
-        totalKills: stats._sum.kills || 0,
-        totalDeaths: stats._sum.deaths || 0,
-        averageSkill: Math.round(stats._avg.skill || 1000),
+        totalKills: stats._sum?.kills || 0,
+        totalDeaths: stats._sum?.deaths || 0,
+        averageSkill: Math.round(stats._avg?.skill || 1000),
         topPlayers,
       };
 

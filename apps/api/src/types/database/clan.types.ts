@@ -4,7 +4,7 @@ import type { Clan, Game, Player, Prisma } from "@repo/database/client";
  * Clan entity with all related data loaded
  */
 export interface ClanWithRelations extends Clan {
-  readonly game: Game;
+  readonly gameData: Game;
   readonly players: readonly Player[];
   readonly _count: {
     readonly players: number;

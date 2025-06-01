@@ -13,8 +13,8 @@ import type { SortInput } from "../common/pagination.types";
  */
 export interface PlayerWithRelations extends Player {
   readonly gameData: Game;
-  readonly clan: Clan | null;
-  readonly country: Country | null;
+  readonly clanData: Clan | null;
+  readonly countryData: Country | null;
   readonly uniqueIds: readonly PlayerUniqueId[];
 }
 

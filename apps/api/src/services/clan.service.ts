@@ -1,6 +1,5 @@
-import type { PrismaClient } from "@repo/database/client";
+import type { Clan, PrismaClient } from "@repo/database/client";
 import type {
-  ClanWithRelations,
   ClanWithAverageSkill,
   ClanStatistics,
   ClanFilters,
@@ -24,7 +23,7 @@ export class ClanService {
    */
   async getClans(
     filters: ClanFilters = {}
-  ): Promise<Result<readonly ClanWithRelations[], AppError>> {
+  ): Promise<Result<readonly Clan[], AppError>> {
     try {
       const whereClause = this.buildClanWhereClause(filters);
 
@@ -48,12 +47,10 @@ export class ClanService {
   /**
    * Get a single clan by ID
    */
-  async getClan(
-    id: string
-  ): Promise<Result<ClanWithRelations | null, AppError>> {
+  async getClan(id: string): Promise<Result<Clan | null, AppError>> {
     try {
       const clan = await this.db.clan.findUnique({
-        where: { id },
+        where: { clanId: id },
         include: CLAN_WITH_ALL_PLAYERS_INCLUDE,
       });
 
@@ -92,7 +89,7 @@ export class ClanService {
       }
 
       const stats = await this.db.player.aggregate({
-        where: { clanId },
+        where: { clan: clan.clanId },
         _sum: {
           kills: true,
           deaths: true,
@@ -103,22 +100,32 @@ export class ClanService {
       });
 
       const topPlayer = await this.db.player.findFirst({
-        where: { clanId },
+        where: { clan: clan.clanId },
         orderBy: {
           skill: "desc",
         },
       });
 
-      const totalKills = stats._sum.kills || 0;
-      const totalDeaths = stats._sum.deaths || 0;
+      const totalKills = stats?._sum?.kills || 0;
+      const totalDeaths = stats?._sum?.deaths || 0;
       const killDeathRatio =
         totalDeaths > 0 ? totalKills / totalDeaths : totalKills;
 
       const clanStatistics: ClanStatistics = {
-        clan,
+        clan: {
+          ...clan,
+          gameData: {
+            code: clan.game,
+            name: clan.game,
+            realGame: clan.game,
+            hidden: false,
+          },
+          players: [],
+          _count: { players: 0 },
+        },
         totalKills,
         totalDeaths,
-        averageSkill: Math.round(stats._avg.skill || 1000),
+        averageSkill: Math.round(stats?._avg?.skill || 1000),
         topPlayer,
         killDeathRatio: Math.round(killDeathRatio * 100) / 100,
       };
@@ -144,7 +151,7 @@ export class ClanService {
     try {
       const clans = await this.db.clan.findMany({
         where: {
-          gameId,
+          game: gameId,
           hidden: false,
           players: {
             some: {}, // Only clans with at least one player
@@ -157,7 +164,7 @@ export class ClanService {
       const clansWithAvgSkill = await Promise.all(
         clans.map(async (clan): Promise<ClanWithAverageSkill> => {
           const avgSkill = await this.db.player.aggregate({
-            where: { clanId: clan.id },
+            where: { clan: clan.clanId, game: gameId },
             _avg: {
               skill: true,
             },
@@ -165,7 +172,13 @@ export class ClanService {
 
           return {
             ...clan,
-            averageSkill: Math.round(avgSkill._avg.skill || 1000),
+            gameData: {
+              code: clan.game,
+              name: clan.game,
+              realGame: clan.game,
+              hidden: false,
+            },
+            averageSkill: Math.round(avgSkill._avg?.skill || 1000),
           };
         })
       );

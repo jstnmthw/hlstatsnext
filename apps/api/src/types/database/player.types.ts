@@ -12,7 +12,7 @@ import type { SortInput } from "../common/pagination.types";
  * Player entity with all related data loaded
  */
 export interface PlayerWithRelations extends Player {
-  readonly game: Game;
+  readonly gameData: Game;
   readonly clan: Clan | null;
   readonly country: Country | null;
   readonly uniqueIds: readonly PlayerUniqueId[];
@@ -56,7 +56,7 @@ export interface PlayerFilters {
  * Player statistics with calculated values
  */
 export interface PlayerStatistics {
-  readonly player: PlayerWithRelations;
+  readonly player: Player;
   readonly killDeathRatio: number;
   readonly accuracy: number;
   readonly headshotRatio: number;

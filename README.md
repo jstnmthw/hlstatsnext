@@ -29,6 +29,11 @@ pnpm install
 cp .env.example .env
 ```
 
+4. Start development server:
+```bash
+pnpm dev
+```
+
 ## Development
 
 This project uses [Turborepo](https://turbo.build/) to manage the monorepo workspace. Here are the main commands you'll use:

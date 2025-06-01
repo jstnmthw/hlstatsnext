@@ -58,8 +58,8 @@ pnpm test
 .
 ├── apps/
 │   ├── web/          # Next.js frontend application
-│   ├── api/          # Node.js GraphQL API
-│   └── daemon/       # Node.js daemon for game server monitoring
+│   ├── api/          # Node.js GraphQL Yoga API
+│   └── daemon/       # Pearl daemon for game server monitoring
 ├── packages/
 │   ├── ui/           # Shared UI components
 │   ├── config/       # Shared configuration

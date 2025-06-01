@@ -8,28 +8,32 @@ project aims to modernize and enhance the proven concepts of HLstatsX:CE.
 
 ## Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - pnpm (recommended) or npm
 
 ## Getting Started
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/jstnmthw/hlstatsnext.com.git
 cd hlstatsnext.com
 ```
 
 2. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 3. Set up your environment variables:
+
 ```bash
 cp .env.example .env
 ```
 
 4. Start development server:
+
 ```bash
 pnpm dev
 ```

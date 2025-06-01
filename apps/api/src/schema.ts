@@ -22,4 +22,4 @@ export const typeDefs = /* GraphQL */ `
   #   serverStatus: ServerStatus
   #   playerUpdate: Player
   # }
-`; 
+`;

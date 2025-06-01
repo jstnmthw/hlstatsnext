@@ -5,6 +5,7 @@ GraphQL API server for HLStatsX Next.js application built with GraphQL Yoga.
 ## Overview
 
 This application provides:
+
 - GraphQL API with type-safe schema
 - Real-time subscriptions for live updates
 - Database integration via `@repo/database`
@@ -14,6 +15,7 @@ This application provides:
 ## Setup
 
 1. Copy environment configuration:
+
 ```bash
 cp env.example .env
 ```
@@ -23,6 +25,7 @@ cp env.example .env
 3. Ensure database is set up (from `@repo/database` package).
 
 4. Start development server:
+
 ```bash
 pnpm dev
 ```
@@ -43,6 +46,7 @@ pnpm dev
 ## Development Phases
 
 ### Phase 1.4: GraphQL API Foundation ✅
+
 - [x] Set up GraphQL Yoga server
 - [x] Basic schema with health check
 - [x] Database context integration
@@ -51,11 +55,13 @@ pnpm dev
 - [ ] Error handling and validation
 
 ### Phase 2.1: Game Server Monitoring Daemon
+
 - [ ] Real-time server status subscriptions
 - [ ] Player statistics updates
 - [ ] Game event streaming
 
 ### Phase 3.1: Authentication and Authorization System
+
 - [ ] JWT-based authentication
 - [ ] Role-based permissions
 - [ ] Session management
@@ -115,4 +121,4 @@ subscription {
 - **Database**: Prisma ORM via `@repo/database`
 - **Real-time**: GraphQL subscriptions
 - **Authentication**: JWT with role-based access
-- **Monitoring**: Performance and health tracking 
+- **Monitoring**: Performance and health tracking

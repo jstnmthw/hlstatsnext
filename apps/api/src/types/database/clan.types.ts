@@ -1,4 +1,4 @@
-import type { Clan, Game, Player } from "@repo/database/client";
+import type { Clan, Game, Player, Prisma } from "@repo/database/client";
 
 /**
  * Clan entity with all related data loaded
@@ -39,6 +39,40 @@ export interface ClanFilters {
   readonly search?: string;
   readonly hasPlayers?: boolean;
 }
+
+/**
+ * Business logic input for clan creation
+ * This maintains the existing API for business logic
+ */
+export interface CreateClanInput {
+  readonly tag: string;
+  readonly name: string;
+  readonly gameId: string;
+  readonly homepage?: string;
+  readonly mapRegion?: string;
+  readonly hidden?: boolean;
+}
+
+/**
+ * Business logic input for clan updates
+ * This maintains the existing API for business logic
+ */
+export interface UpdateClanInput {
+  readonly tag?: string;
+  readonly name?: string;
+  readonly homepage?: string;
+  readonly mapRegion?: string;
+  readonly hidden?: boolean;
+}
+
+// Re-export Prisma-generated types for direct database operations
+export type PrismaClanCreateInput = Prisma.ClanCreateInput;
+export type PrismaClanUncheckedCreateInput = Prisma.ClanUncheckedCreateInput;
+export type PrismaClanUpdateInput = Prisma.ClanUpdateInput;
+export type PrismaClanUncheckedUpdateInput = Prisma.ClanUncheckedUpdateInput;
+export type PrismaClanCreateManyInput = Prisma.ClanCreateManyInput;
+export type PrismaClanUpdateManyMutationInput =
+  Prisma.ClanUpdateManyMutationInput;
 
 /**
  * Clan include configuration for Prisma queries
@@ -94,26 +128,3 @@ export const CLAN_CONSTRAINTS = {
     MAX_LENGTH: 128,
   },
 } as const;
-
-/**
- * Clan creation input
- */
-export interface CreateClanInput {
-  readonly tag: string;
-  readonly name: string;
-  readonly gameId: string;
-  readonly homepage?: string;
-  readonly mapRegion?: string;
-  readonly hidden?: boolean;
-}
-
-/**
- * Clan update input
- */
-export interface UpdateClanInput {
-  readonly tag?: string;
-  readonly name?: string;
-  readonly homepage?: string;
-  readonly mapRegion?: string;
-  readonly hidden?: boolean;
-}

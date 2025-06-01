@@ -1,4 +1,4 @@
-import type { Game, Player } from "@repo/database/client";
+import type { Game, Player, Prisma } from "@repo/database/client";
 
 /**
  * Game entity with aggregated statistics
@@ -21,6 +21,15 @@ export interface GameStatistics {
   readonly averageSkill: number;
   readonly topPlayers: readonly Player[];
 }
+
+// Re-export Prisma-generated types for direct database operations
+export type PrismaGameCreateInput = Prisma.GameCreateInput;
+export type PrismaGameUncheckedCreateInput = Prisma.GameUncheckedCreateInput;
+export type PrismaGameUpdateInput = Prisma.GameUpdateInput;
+export type PrismaGameUncheckedUpdateInput = Prisma.GameUncheckedUpdateInput;
+export type PrismaGameCreateManyInput = Prisma.GameCreateManyInput;
+export type PrismaGameUpdateManyMutationInput =
+  Prisma.GameUpdateManyMutationInput;
 
 /**
  * Game include configuration for Prisma queries

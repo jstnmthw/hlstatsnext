@@ -4,6 +4,7 @@ import type {
   Clan,
   Country,
   PlayerUniqueId,
+  Prisma,
 } from "@repo/database/client";
 import type { SortInput } from "../common/pagination.types";
 
@@ -63,7 +64,8 @@ export interface PlayerStatistics {
 }
 
 /**
- * Player creation input
+ * Business logic input for creating a player with Steam ID
+ * This is a domain-specific input that extends Prisma's basic create input
  */
 export interface CreatePlayerInput {
   readonly lastName: string;
@@ -80,7 +82,8 @@ export interface CreatePlayerInput {
 }
 
 /**
- * Player statistics update input
+ * Business logic input for updating player statistics
+ * This is a domain-specific input for stat updates
  */
 export interface UpdatePlayerStatsInput {
   readonly steamId: string;
@@ -96,6 +99,17 @@ export interface UpdatePlayerStatsInput {
   readonly connectionTime?: number;
   readonly lastEvent?: number;
 }
+
+// Re-export Prisma-generated types for direct database operations
+export type PrismaPlayerCreateInput = Prisma.PlayerCreateInput;
+export type PrismaPlayerUncheckedCreateInput =
+  Prisma.PlayerUncheckedCreateInput;
+export type PrismaPlayerUpdateInput = Prisma.PlayerUpdateInput;
+export type PrismaPlayerUncheckedUpdateInput =
+  Prisma.PlayerUncheckedUpdateInput;
+export type PrismaPlayerCreateManyInput = Prisma.PlayerCreateManyInput;
+export type PrismaPlayerUpdateManyMutationInput =
+  Prisma.PlayerUpdateManyMutationInput;
 
 /**
  * Player query parameters for database operations

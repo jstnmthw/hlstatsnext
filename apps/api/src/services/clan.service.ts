@@ -50,7 +50,7 @@ export class ClanService {
   async getClan(id: string): Promise<Result<Clan | null, AppError>> {
     try {
       const clan = await this.db.clan.findUnique({
-        where: { clanId: id },
+        where: { clanId: Number(id) },
         include: CLAN_WITH_ALL_PLAYERS_INCLUDE,
       });
 
@@ -117,8 +117,8 @@ export class ClanService {
           gameData: {
             code: clan.game,
             name: clan.game,
-            realGame: clan.game,
-            hidden: false,
+            realgame: clan.game,
+            hidden: "0",
           },
           players: [],
           _count: { players: 0 },
@@ -152,7 +152,7 @@ export class ClanService {
       const clans = await this.db.clan.findMany({
         where: {
           game: gameId,
-          hidden: false,
+          hidden: 0,
           players: {
             some: {}, // Only clans with at least one player
           },
@@ -175,8 +175,8 @@ export class ClanService {
             gameData: {
               code: clan.game,
               name: clan.game,
-              realGame: clan.game,
-              hidden: false,
+              realgame: clan.game,
+              hidden: "0",
             },
             averageSkill: Math.round(avgSkill._avg?.skill || 1000),
           };

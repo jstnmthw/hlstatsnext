@@ -23,10 +23,10 @@ import {
   GraphQLSortDirectionMap,
 } from "./types/graphql/resolvers.types";
 import type {
-  PlayerWithRelations,
   GameWithStats,
-  ClanWithRelations,
   ClanWithAverageSkill,
+  Player,
+  Clan,
 } from "./types/database";
 import { isSuccess } from "./types/common";
 
@@ -40,13 +40,6 @@ interface GraphQLGame extends Omit<GameWithStats, "_count"> {
 
 /**
  * GraphQL clan response type that matches the schema
- */
-interface GraphQLClan extends Omit<ClanWithRelations, "_count"> {
-  playerCount: number;
-}
-
-/**
- * GraphQL clan with average skill response type
  */
 interface GraphQLClanWithAvgSkill extends Omit<ClanWithAverageSkill, "_count"> {
   playerCount: number;
@@ -183,7 +176,7 @@ export const resolvers = {
       _parent: unknown,
       args: PlayerQueryArgs,
       context: Context
-    ): Promise<PlayerWithRelations | null> => {
+    ): Promise<Player | null> => {
       const result = await context.services.player.getPlayer(args.id);
 
       if (!isSuccess(result)) {
@@ -197,7 +190,7 @@ export const resolvers = {
       _parent: unknown,
       args: PlayerBySteamIdQueryArgs,
       context: Context
-    ): Promise<PlayerWithRelations | null> => {
+    ): Promise<Player | null> => {
       const result = await context.services.player.getPlayerBySteamId(
         args.steamId,
         args.gameId
@@ -230,7 +223,7 @@ export const resolvers = {
       _parent: unknown,
       args: TopPlayersQueryArgs,
       context: Context
-    ): Promise<readonly PlayerWithRelations[]> => {
+    ): Promise<readonly Player[]> => {
       const result = await context.services.player.getTopPlayers(
         args.gameId,
         args.limit
@@ -248,26 +241,21 @@ export const resolvers = {
       _parent: unknown,
       args: ClansQueryArgs,
       context: Context
-    ): Promise<GraphQLClan[]> => {
+    ): Promise<Clan[]> => {
       const result = await context.services.clan.getClans(args.filters);
 
       if (!isSuccess(result)) {
         throw new Error(result.error.message);
       }
 
-      return result.data.map(
-        (clan): GraphQLClan => ({
-          ...clan,
-          playerCount: clan._count.players,
-        })
-      );
+      return result.data as Clan[];
     },
 
     clan: async (
       _parent: unknown,
       args: ClanQueryArgs,
       context: Context
-    ): Promise<GraphQLClan | null> => {
+    ): Promise<Clan | null> => {
       const result = await context.services.clan.getClan(args.id);
 
       if (!isSuccess(result)) {
@@ -277,10 +265,7 @@ export const resolvers = {
       const clan = result.data;
       if (!clan) return null;
 
-      return {
-        ...clan,
-        playerCount: clan._count.players,
-      };
+      return clan;
     },
 
     clanStats: async (
@@ -336,7 +321,7 @@ export const resolvers = {
       context: Context
     ) => {
       return context.db.country.findUnique({
-        where: { id: args.id },
+        where: { flag: args.id },
       });
     },
   },
@@ -346,7 +331,7 @@ export const resolvers = {
       _parent: unknown,
       args: CreatePlayerMutationArgs,
       context: Context
-    ): Promise<PlayerWithRelations> => {
+    ): Promise<Player> => {
       const result = await context.services.player.createPlayer(args.input);
 
       if (!isSuccess(result)) {
@@ -360,7 +345,7 @@ export const resolvers = {
       _parent: unknown,
       args: UpdatePlayerStatsMutationArgs,
       context: Context
-    ): Promise<PlayerWithRelations> => {
+    ): Promise<Player> => {
       const result = await context.services.player.updatePlayerStats(
         args.input.steamId,
         args.input.gameId,

@@ -79,14 +79,14 @@ model Player {
   lastAddress String? // Last known IP address
   city        String?
   state       String?
-  countryId   String?
-  country     Country? @relation(fields: [countryId], references: [flag])
-  latitude    Float?   @db.Float
-  longitude   Float?   @db.Float
+  country     String?
+  countryData Country? @relation(fields: [country], references: [flag])
+  lat         Float?   @db.Float
+  lng         Float?   @db.Float
 
   // Clan relationship (optional)
-  clanId String?
-  clan   Clan?   @relation(fields: [clanId], references: [clanId])
+  clan     String?
+  clanData Clan?   @relation(fields: [clan], references: [clanId])
 
   // Core statistics
   skill     Int @default(1000) // ELO-style rating
@@ -131,7 +131,7 @@ model Player {
   @@index([game, skill], name: "game_skill_idx")
   @@index([game, kills], name: "game_kills_idx")
   @@index([hideRanking], name: "hide_ranking_idx")
-  @@index([clanId], name: "clan_idx")
+  @@index([clan], name: "clan_idx")
   @@index([lastEvent], name: "last_event_idx")
   @@map("hlstats_Players")
 }

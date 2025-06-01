@@ -14,7 +14,6 @@ async function main() {
         name: "Team Fortress Classic",
         realGame: "tfc",
         hidden: false,
-        legacyCode: "tfc",
       },
     }),
     db.game.upsert({
@@ -25,7 +24,6 @@ async function main() {
         name: "Team Fortress 2",
         realGame: "tf2",
         hidden: false,
-        legacyCode: "tf",
       },
     }),
     db.game.upsert({
@@ -36,7 +34,6 @@ async function main() {
         name: "Counter-Strike: Source",
         realGame: "css",
         hidden: false,
-        legacyCode: "css",
       },
     }),
     db.game.upsert({
@@ -47,7 +44,6 @@ async function main() {
         name: "Counter-Strike: Global Offensive",
         realGame: "csgo",
         hidden: false,
-        legacyCode: "csgo",
       },
     }),
     db.game.upsert({
@@ -58,7 +54,6 @@ async function main() {
         name: "Counter-Strike 2",
         realGame: "cs2",
         hidden: false,
-        legacyCode: "cs2",
       },
     }),
     db.game.upsert({
@@ -69,7 +64,6 @@ async function main() {
         name: "Left 4 Dead 2",
         realGame: "l4d",
         hidden: false,
-        legacyCode: "l4d2",
       },
     }),
   ]);
@@ -80,44 +74,44 @@ async function main() {
   console.log("🌍 Seeding countries...");
   const countries = await Promise.all([
     db.country.upsert({
-      where: { code: "US" },
+      where: { flag: "US" },
       update: {},
-      create: { code: "US", name: "United States" },
+      create: { flag: "US", name: "United States" },
     }),
     db.country.upsert({
-      where: { code: "CA" },
+      where: { flag: "CA" },
       update: {},
-      create: { code: "CA", name: "Canada" },
+      create: { flag: "CA", name: "Canada" },
     }),
     db.country.upsert({
-      where: { code: "GB" },
+      where: { flag: "GB" },
       update: {},
-      create: { code: "GB", name: "United Kingdom" },
+      create: { flag: "GB", name: "United Kingdom" },
     }),
     db.country.upsert({
-      where: { code: "DE" },
+      where: { flag: "DE" },
       update: {},
-      create: { code: "DE", name: "Germany" },
+      create: { flag: "DE", name: "Germany" },
     }),
     db.country.upsert({
-      where: { code: "FR" },
+      where: { flag: "FR" },
       update: {},
-      create: { code: "FR", name: "France" },
+      create: { flag: "FR", name: "France" },
     }),
     db.country.upsert({
-      where: { code: "AU" },
+      where: { flag: "AU" },
       update: {},
-      create: { code: "AU", name: "Australia" },
+      create: { flag: "AU", name: "Australia" },
     }),
     db.country.upsert({
-      where: { code: "JP" },
+      where: { flag: "JP" },
       update: {},
-      create: { code: "JP", name: "Japan" },
+      create: { flag: "JP", name: "Japan" },
     }),
     db.country.upsert({
-      where: { code: "BR" },
+      where: { flag: "BR" },
       update: {},
-      create: { code: "BR", name: "Brazil" },
+      create: { flag: "BR", name: "Brazil" },
     }),
   ]);
 
@@ -189,9 +183,9 @@ async function main() {
 
     // Create sample players with realistic data
     console.log("👥 Seeding players...");
-    const usCountry = countries.find((c) => c.code === "US");
-    const caCountry = countries.find((c) => c.code === "CA");
-    const gbCountry = countries.find((c) => c.code === "GB");
+    const usCountry = countries.find((c) => c.flag === "US");
+    const caCountry = countries.find((c) => c.flag === "CA");
+    const gbCountry = countries.find((c) => c.flag === "GB");
 
     const redClan = clans.find((c) => c.tag === "[RED]");
     const bluClan = clans.find((c) => c.tag === "[BLU]");
@@ -204,8 +198,8 @@ async function main() {
           lastName: "HeavyWeaponsGuy",
           fullName: "Heavy Weapons Guy",
           game: tfGame.code,
-          countryId: usCountry?.flag,
-          clanId: redClan?.clanId,
+          country: usCountry?.flag,
+          clan: redClan?.clanId,
           skill: 1250,
           kills: 1500,
           deaths: 800,
@@ -225,8 +219,8 @@ async function main() {
           lastName: "Scout",
           fullName: "The Scout",
           game: tfGame.code,
-          countryId: usCountry?.flag,
-          clanId: redClan?.clanId,
+          country: usCountry?.flag,
+          clan: redClan?.clanId,
           skill: 1180,
           kills: 980,
           deaths: 650,
@@ -246,8 +240,8 @@ async function main() {
           lastName: "Sniper",
           fullName: "The Sniper",
           game: tfGame.code,
-          countryId: gbCountry?.flag,
-          clanId: bluClan?.clanId,
+          country: gbCountry?.flag,
+          clan: bluClan?.clanId,
           skill: 1350,
           kills: 1200,
           deaths: 400,
@@ -267,7 +261,7 @@ async function main() {
           lastName: "Pyro",
           fullName: "The Pyro",
           game: tfGame.code,
-          countryId: caCountry?.flag,
+          country: caCountry?.flag,
           skill: 1050,
           kills: 750,
           deaths: 890,
@@ -296,7 +290,7 @@ async function main() {
         },
         update: {},
         create: {
-          playerId: players[0].playerid,
+          playerId: players[0].playerId,
           uniqueId: "STEAM_0:0:12345678",
           game: tfGame.code,
           legacyPlayerId: 1,
@@ -311,7 +305,7 @@ async function main() {
         },
         update: {},
         create: {
-          playerId: players[1].playerid,
+          playerId: players[1].playerId,
           uniqueId: "STEAM_0:1:87654321",
           game: tfGame.code,
           legacyPlayerId: 2,
@@ -326,7 +320,7 @@ async function main() {
         },
         update: {},
         create: {
-          playerId: players[2].playerid,
+          playerId: players[2].playerId,
           uniqueId: "STEAM_0:0:11223344",
           game: tfGame.code,
           legacyPlayerId: 3,
@@ -341,7 +335,7 @@ async function main() {
         },
         update: {},
         create: {
-          playerId: players[3].playerid,
+          playerId: players[3].playerId,
           uniqueId: "STEAM_0:1:44332211",
           game: tfGame.code,
           legacyPlayerId: 4,

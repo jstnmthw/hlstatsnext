@@ -34,7 +34,6 @@ export class PlayerService {
     try {
       const player = await this.db.player.findUnique({
         where: { playerId: id },
-        include: PLAYER_INCLUDE,
       });
 
       return success(player);
@@ -283,8 +282,8 @@ export class PlayerService {
           email: data.email,
           homepage: data.homepage,
           game: data.gameId,
-          clanId: data.clanId,
-          countryId: data.countryId,
+          clan: data.clanId,
+          country: data.countryId,
           city: data.city,
           state: data.state,
           lastAddress: data.lastAddress,

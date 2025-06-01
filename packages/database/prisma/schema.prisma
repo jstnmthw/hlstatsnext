@@ -15,7 +15,6 @@ datasource db {
 // Phase 1.3: Database Design and Prisma Setup - Essential Player relationships
 
 model Game {
-  id       String  @id @default(cuid())
   code     String  @unique // e.g., "tf", "css", "csgo"
   name     String // e.g., "Team Fortress 2"
   realGame String // Engine type: "tf", "css", etc.
@@ -25,38 +24,26 @@ model Game {
   players Player[]
   clans   Clan[]
 
-  // Legacy compatibility
-  legacyCode String? @unique // Preserve original code for migration
-
-  // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("games")
+  @@map("hlstats_Games")
 }
 
 model Country {
-  id   String @id @default(cuid())
-  code String @unique // ISO country code: "US", "CA", etc.
   name String // "United States", "Canada"
+  flag String @unique // "US", "CA", etc.
 
   // Relationships
   players Player[]
 
-  // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("countries")
+  @@map("hlstats_Countries")
 }
 
 model Clan {
-  id        String  @id @default(cuid())
+  clanId    String  @id @default(cuid())
   tag       String // Clan tag like "[TAG]"
   name      String // Full clan name
   homepage  String? // Optional clan website
-  gameId    String
-  game      Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  game      String
+  gameData  Game    @relation(fields: [game], references: [code], onDelete: Cascade)
   hidden    Boolean @default(false)
   mapRegion String? // Geographic region
 
@@ -71,12 +58,12 @@ model Clan {
   updatedAt DateTime @updatedAt
 
   // Constraints
-  @@unique([gameId, tag]) // Unique tag per game
-  @@map("clans")
+  @@unique([game, tag]) // Unique tag per game
+  @@map("hlstats_Clans")
 }
 
 model Player {
-  id String @id @default(cuid())
+  playerId String @id @default(cuid())
 
   // Identity
   lastName String // Current display name
@@ -85,21 +72,21 @@ model Player {
   homepage String? // Optional homepage
 
   // Game relationship
-  gameId String
-  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  game     String
+  gameData Game   @relation(fields: [game], references: [code], onDelete: Cascade)
 
   // Location data
   lastAddress String? // Last known IP address
   city        String?
   state       String?
   countryId   String?
-  country     Country? @relation(fields: [countryId], references: [id])
+  country     Country? @relation(fields: [countryId], references: [flag])
   latitude    Float?   @db.Float
   longitude   Float?   @db.Float
 
   // Clan relationship (optional)
   clanId String?
-  clan   Clan?   @relation(fields: [clanId], references: [id])
+  clan   Clan?   @relation(fields: [clanId], references: [clanId])
 
   // Core statistics
   skill     Int @default(1000) // ELO-style rating
@@ -141,20 +128,20 @@ model Player {
   updatedAt DateTime @updatedAt
 
   // Indexes for performance
-  @@index([gameId, skill], name: "game_skill_idx")
-  @@index([gameId, kills], name: "game_kills_idx")
+  @@index([game, skill], name: "game_skill_idx")
+  @@index([game, kills], name: "game_kills_idx")
   @@index([hideRanking], name: "hide_ranking_idx")
   @@index([clanId], name: "clan_idx")
   @@index([lastEvent], name: "last_event_idx")
-  @@map("players")
+  @@map("hlstats_Players")
 }
 
 model PlayerUniqueId {
   id       String  @id @default(cuid())
   playerId String
-  player   Player  @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  player   Player  @relation(fields: [playerId], references: [playerId], onDelete: Cascade)
   uniqueId String // Steam ID, Discord ID, etc.
-  gameId   String // Which game this ID is for
+  game     String // Which game this ID is for
   mergeId  String? // For account merging functionality
 
   // Legacy compatibility  
@@ -165,7 +152,7 @@ model PlayerUniqueId {
   updatedAt DateTime @updatedAt
 
   // Constraints - unique ID per game
-  @@unique([uniqueId, gameId], name: "unique_id_per_game")
+  @@unique([uniqueId, game], name: "unique_id_per_game")
   @@index([playerId], name: "player_idx")
-  @@map("player_unique_ids")
+  @@map("hlstats_PlayerUniqueIds")
 }

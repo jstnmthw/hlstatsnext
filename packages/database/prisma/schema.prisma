@@ -11,14 +11,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Modern schema design based on legacy HLStatsX database
-// Phase 1.3: Database Design and Prisma Setup - Essential Player relationships
+// Legacy HLStatsX database schema - exact mirror for compatibility
+// DO NOT MODIFY - Must match existing database structure exactly
 
 model Game {
-  code     String  @unique // e.g., "tf", "css", "csgo"
-  name     String // e.g., "Team Fortress 2"
-  realGame String // Engine type: "tf", "css", etc.
-  hidden   Boolean @default(false)
+  code     String @id // Primary key, e.g., "tf", "css", "csgo"
+  name     String @db.VarChar(128) // e.g., "Team Fortress 2"
+  hidden   String @default("0") @db.VarChar(1) // enum('0','1') in MySQL
+  realgame String @default("hl2mp") @db.VarChar(32) // Engine type: "tf", "css", etc.
 
   // Relationships
   players Player[]
@@ -28,8 +28,8 @@ model Game {
 }
 
 model Country {
-  name String // "United States", "Canada"
-  flag String @unique // "US", "CA", etc.
+  flag String @id @db.VarChar(16) // "US", "CA", etc.
+  name String @db.VarChar(50) // "United States", "Canada"
 
   // Relationships
   players Player[]
@@ -38,121 +38,104 @@ model Country {
 }
 
 model Clan {
-  clanId    String  @id @default(cuid())
-  tag       String // Clan tag like "[TAG]"
-  name      String // Full clan name
-  homepage  String? // Optional clan website
-  game      String
-  gameData  Game    @relation(fields: [game], references: [code], onDelete: Cascade)
-  hidden    Boolean @default(false)
-  mapRegion String? // Geographic region
+  clanId    Int    @id @default(autoincrement()) @db.UnsignedInt
+  tag       String @default("") @db.VarChar(64) // Clan tag like "[TAG]"
+  name      String @default("") @db.VarChar(128) // Full clan name
+  homepage  String @default("") @db.VarChar(64) // Clan website
+  game      String @default("") @db.VarChar(32)
+  gameData  Game   @relation(fields: [game], references: [code], onDelete: Cascade)
+  hidden    Int    @default(0) @db.UnsignedTinyInt // tinyint(3) unsigned
+  mapregion String @default("") @db.VarChar(128) // Geographic region
 
   // Relationships
   players Player[]
 
-  // Legacy compatibility
-  legacyId Int? @unique // Preserve original clan ID for migration
-
-  // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
   // Constraints
-  @@unique([game, tag]) // Unique tag per game
+  @@unique([game, tag], name: "game_tag") // Unique tag per game
+  @@index([game], name: "game")
   @@map("hlstats_Clans")
 }
 
 model Player {
-  playerId String @id @default(cuid())
+  playerId Int @id @default(autoincrement()) @db.UnsignedInt
+
+  // Event tracking
+  last_event        Int @default(0) @db.Int
+  connection_time   Int @default(0) @db.UnsignedInt
+  last_skill_change Int @default(0) @db.Int
 
   // Identity
-  lastName String // Current display name
-  fullName String? // Optional full/real name
-  email    String? // Optional email
-  homepage String? // Optional homepage
-
-  // Game relationship
-  game     String
-  gameData Game   @relation(fields: [game], references: [code], onDelete: Cascade)
+  lastName    String  @default("") @db.VarChar(64) // Current display name
+  lastAddress String  @default("") @db.VarChar(32) // Last known IP address
+  fullName    String? @db.VarChar(128) // Optional full/real name
+  email       String? @db.VarChar(64) // Optional email
+  homepage    String? @db.VarChar(64) // Optional homepage
+  icq         Int?    @db.UnsignedInt // Legacy ICQ number
 
   // Location data
-  lastAddress String? // Last known IP address
-  city        String?
-  state       String?
-  country     String?
-  countryData Country? @relation(fields: [country], references: [flag])
-  lat         Float?   @db.Float
-  lng         Float?   @db.Float
+  city    String @default("") @db.VarChar(64)
+  state   String @default("") @db.VarChar(64)
+  country String @default("") @db.VarChar(64)
+  flag    String @default("") @db.VarChar(16)
+  lat     Float? @db.Float
+  lng     Float? @db.Float
 
-  // Clan relationship (optional)
-  clan     String?
-  clanData Clan?   @relation(fields: [clan], references: [clanId])
+  // Country relationship
+  countryData Country? @relation(fields: [flag], references: [flag])
+
+  // Clan relationship
+  clan     Int   @default(0) @db.UnsignedInt
+  clanData Clan? @relation(fields: [clan], references: [clanId])
 
   // Core statistics
-  skill     Int @default(1000) // ELO-style rating
   kills     Int @default(0) @db.UnsignedInt
   deaths    Int @default(0) @db.UnsignedInt
   suicides  Int @default(0) @db.UnsignedInt
+  skill     Int @default(1000) @db.UnsignedInt // ELO-style rating
   shots     Int @default(0) @db.UnsignedInt
   hits      Int @default(0) @db.UnsignedInt
-  headshots Int @default(0) @db.UnsignedInt
   teamkills Int @default(0) @db.UnsignedInt
+  headshots Int @default(0) @db.UnsignedInt
 
   // Streaks and activity
-  killStreak  Int @default(0)
-  deathStreak Int @default(0)
-  activity    Int @default(100) // Activity level 0-100
+  kill_streak  Int @default(0) @db.Int
+  death_streak Int @default(0) @db.Int
+  activity     Int @default(100) @db.Int
+
+  // Game relationship
+  game     String @db.VarChar(32)
+  gameData Game   @relation(fields: [game], references: [code], onDelete: Cascade)
 
   // Player preferences
-  hideRanking   Boolean @default(false)
-  displayEvents Boolean @default(true)
-  blockAvatar   Boolean @default(false)
-
-  // Game tracking
-  connectionTime  Int @default(0) @db.UnsignedInt // Total connection time
-  lastEvent       Int @default(0) // Timestamp of last event
-  lastSkillChange Int @default(0) // Timestamp of last skill change
+  hideranking   Int @default(0) @db.UnsignedInt // int(1) unsigned
+  displayEvents Int @default(1) @db.UnsignedInt // int(1) unsigned
+  blockavatar   Int @default(0) @db.UnsignedInt // int(1) unsigned
 
   // Additional fields
-  icq    Int? @db.UnsignedInt // Legacy ICQ number
-  mmrank Int? @db.TinyInt // Matchmaking rank
+  mmrank     Int? @db.TinyInt // Matchmaking rank
+  createdate Int  @default(0) @db.Int
 
   // Relationships
   uniqueIds PlayerUniqueId[]
 
-  // Legacy compatibility
-  legacyId Int? @unique // Preserve original player ID for migration
-
-  // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
   // Indexes for performance
-  @@index([game, skill], name: "game_skill_idx")
-  @@index([game, kills], name: "game_kills_idx")
-  @@index([hideRanking], name: "hide_ranking_idx")
-  @@index([clan], name: "clan_idx")
-  @@index([lastEvent], name: "last_event_idx")
+  @@index([clan, playerId], name: "playerclan")
+  @@index([skill], name: "skill")
+  @@index([game], name: "game")
+  @@index([kills], name: "kills")
+  @@index([hideranking], name: "hideranking")
   @@map("hlstats_Players")
 }
 
 model PlayerUniqueId {
-  id       String  @id @default(cuid())
-  playerId String
-  player   Player  @relation(fields: [playerId], references: [playerId], onDelete: Cascade)
-  uniqueId String // Steam ID, Discord ID, etc.
-  game     String // Which game this ID is for
-  mergeId  String? // For account merging functionality
+  playerId Int    @db.UnsignedInt
+  player   Player @relation(fields: [playerId], references: [playerId], onDelete: Cascade)
+  uniqueId String @default("") @db.VarChar(64) // Steam ID, Discord ID, etc.
+  game     String @default("") @db.VarChar(32) // Which game this ID is for
+  merge    Int?   @db.UnsignedInt // For account merging functionality
 
-  // Legacy compatibility  
-  legacyPlayerId Int? // Original player ID for migration reference
-
-  // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Constraints - unique ID per game
-  @@unique([uniqueId, game], name: "unique_id_per_game")
-  @@index([playerId], name: "player_idx")
+  // Constraints - unique ID per game (PRIMARY KEY in legacy)
+  @@id([uniqueId, game])
+  @@index([playerId], name: "playerId")
   @@map("hlstats_PlayerUniqueIds")
 }

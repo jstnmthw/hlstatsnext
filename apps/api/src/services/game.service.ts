@@ -20,7 +20,7 @@ export class GameService {
   ): Promise<Result<readonly GameWithStats[], AppError>> {
     try {
       const games = await this.db.game.findMany({
-        where: includeHidden ? {} : { hidden: false },
+        where: includeHidden ? {} : { hidden: "0" },
         include: GAME_INCLUDE,
         orderBy: {
           name: "asc",
@@ -116,7 +116,7 @@ export class GameService {
           this.db.player.count({
             where: {
               game: gameId,
-              lastEvent: {
+              last_event: {
                 gte: thirtyDaysAgo,
               },
             },
@@ -138,7 +138,7 @@ export class GameService {
           this.db.player.findMany({
             where: {
               game: gameId,
-              hideRanking: false,
+              hideranking: 0,
             },
             include: {
               clanData: true,

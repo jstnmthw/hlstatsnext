@@ -12,8 +12,8 @@ async function main() {
       create: {
         code: "tfc",
         name: "Team Fortress Classic",
-        realGame: "tfc",
-        hidden: false,
+        realgame: "tfc",
+        hidden: "0",
       },
     }),
     db.game.upsert({
@@ -22,8 +22,8 @@ async function main() {
       create: {
         code: "tf2",
         name: "Team Fortress 2",
-        realGame: "tf2",
-        hidden: false,
+        realgame: "tf2",
+        hidden: "0",
       },
     }),
     db.game.upsert({
@@ -32,8 +32,8 @@ async function main() {
       create: {
         code: "css",
         name: "Counter-Strike: Source",
-        realGame: "css",
-        hidden: false,
+        realgame: "css",
+        hidden: "0",
       },
     }),
     db.game.upsert({
@@ -42,8 +42,8 @@ async function main() {
       create: {
         code: "csgo",
         name: "Counter-Strike: Global Offensive",
-        realGame: "csgo",
-        hidden: false,
+        realgame: "csgo",
+        hidden: "0",
       },
     }),
     db.game.upsert({
@@ -52,8 +52,8 @@ async function main() {
       create: {
         code: "cs2",
         name: "Counter-Strike 2",
-        realGame: "cs2",
-        hidden: false,
+        realgame: "cs2",
+        hidden: "0",
       },
     }),
     db.game.upsert({
@@ -62,8 +62,8 @@ async function main() {
       create: {
         code: "l4d2",
         name: "Left 4 Dead 2",
-        realGame: "l4d",
-        hidden: false,
+        realgame: "l4d",
+        hidden: "0",
       },
     }),
   ]);
@@ -126,55 +126,51 @@ async function main() {
   if (tfGame && tf2Game && cssGame) {
     const clans = await Promise.all([
       db.clan.upsert({
-        where: { legacyId: 1 },
+        where: { clanId: 1 },
         update: {},
         create: {
           tag: "[BLK]",
           name: "BLK Team Fortress Classic",
           homepage: "https://blkteam.example.com",
           game: tfGame.code,
-          hidden: false,
-          mapRegion: "North America",
-          legacyId: 1,
+          hidden: 0,
+          mapregion: "North America",
         },
       }),
       db.clan.upsert({
-        where: { legacyId: 2 },
+        where: { clanId: 2 },
         update: {},
         create: {
           tag: "[RED]",
           name: "RED Team Fortress 2",
           homepage: "https://redteam.example.com",
           game: tf2Game.code,
-          hidden: false,
-          mapRegion: "North America",
-          legacyId: 1,
+          hidden: 0,
+          mapregion: "North America",
         },
       }),
       db.clan.upsert({
-        where: { legacyId: 2 },
+        where: { clanId: 3 },
         update: {},
         create: {
           tag: "[BLU]",
           name: "BLU Team Fortress",
           homepage: "https://bluteam.example.com",
           game: tfGame.code,
-          hidden: false,
-          mapRegion: "Europe",
-          legacyId: 2,
+          hidden: 0,
+          mapregion: "Europe",
         },
       }),
       db.clan.upsert({
-        where: { legacyId: 3 },
+        where: { clanId: 4 },
         update: {},
         create: {
           tag: "[CT]",
           name: "Counter-Terrorists",
           homepage: "https://ctteam.example.com",
           game: cssGame.code,
-          hidden: false,
-          mapRegion: "North America",
-          legacyId: 3,
+          hidden: 0,
+          mapregion: "North America",
         },
       }),
     ]);
@@ -192,7 +188,7 @@ async function main() {
 
     const players = await Promise.all([
       db.player.upsert({
-        where: { legacyId: 1 },
+        where: { playerId: 1 },
         update: {},
         create: {
           lastName: "HeavyWeaponsGuy",
@@ -206,14 +202,13 @@ async function main() {
           headshots: 45,
           shots: 8000,
           hits: 3200,
-          connectionTime: 86400, // 24 hours
+          connection_time: 86400, // 24 hours
           city: "San Francisco",
           state: "California",
-          legacyId: 1,
         },
       }),
       db.player.upsert({
-        where: { legacyId: 2 },
+        where: { playerId: 2 },
         update: {},
         create: {
           lastName: "Scout",
@@ -227,14 +222,13 @@ async function main() {
           headshots: 12,
           shots: 5500,
           hits: 2100,
-          connectionTime: 72000, // 20 hours
+          connection_time: 72000, // 20 hours
           city: "Boston",
           state: "Massachusetts",
-          legacyId: 2,
         },
       }),
       db.player.upsert({
-        where: { legacyId: 3 },
+        where: { playerId: 3 },
         update: {},
         create: {
           lastName: "Sniper",
@@ -248,14 +242,13 @@ async function main() {
           headshots: 800, // High headshot ratio for sniper
           shots: 2000,
           hits: 1400,
-          connectionTime: 94000, // 26+ hours
+          connection_time: 94000, // 26+ hours
           city: "London",
           state: "England",
-          legacyId: 3,
         },
       }),
       db.player.upsert({
-        where: { legacyId: 4 },
+        where: { playerId: 4 },
         update: {},
         create: {
           lastName: "Pyro",
@@ -268,10 +261,9 @@ async function main() {
           headshots: 5, // Low headshots for pyro
           shots: 4000,
           hits: 2800,
-          connectionTime: 45000, // 12.5 hours
+          connection_time: 45000, // 12.5 hours
           city: "Toronto",
           state: "Ontario",
-          legacyId: 4,
         },
       }),
     ]);
@@ -283,7 +275,7 @@ async function main() {
     const playerUniqueIds = await Promise.all([
       db.playerUniqueId.upsert({
         where: {
-          unique_id_per_game: {
+          uniqueId_game: {
             uniqueId: "STEAM_0:0:12345678",
             game: tfGame.code,
           },
@@ -293,12 +285,11 @@ async function main() {
           playerId: players[0].playerId,
           uniqueId: "STEAM_0:0:12345678",
           game: tfGame.code,
-          legacyPlayerId: 1,
         },
       }),
       db.playerUniqueId.upsert({
         where: {
-          unique_id_per_game: {
+          uniqueId_game: {
             uniqueId: "STEAM_0:1:87654321",
             game: tfGame.code,
           },
@@ -308,12 +299,11 @@ async function main() {
           playerId: players[1].playerId,
           uniqueId: "STEAM_0:1:87654321",
           game: tfGame.code,
-          legacyPlayerId: 2,
         },
       }),
       db.playerUniqueId.upsert({
         where: {
-          unique_id_per_game: {
+          uniqueId_game: {
             uniqueId: "STEAM_0:0:11223344",
             game: tfGame.code,
           },
@@ -323,12 +313,11 @@ async function main() {
           playerId: players[2].playerId,
           uniqueId: "STEAM_0:0:11223344",
           game: tfGame.code,
-          legacyPlayerId: 3,
         },
       }),
       db.playerUniqueId.upsert({
         where: {
-          unique_id_per_game: {
+          uniqueId_game: {
             uniqueId: "STEAM_0:1:44332211",
             game: tfGame.code,
           },
@@ -338,7 +327,6 @@ async function main() {
           playerId: players[3].playerId,
           uniqueId: "STEAM_0:1:44332211",
           game: tfGame.code,
-          legacyPlayerId: 4,
         },
       }),
     ]);

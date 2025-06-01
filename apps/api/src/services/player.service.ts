@@ -33,7 +33,7 @@ export class PlayerService {
   async getPlayer(id: string): Promise<Result<Player | null, AppError>> {
     try {
       const player = await this.db.player.findUnique({
-        where: { playerId: id },
+        where: { playerId: Number(id) },
       });
 
       return success(player);
@@ -134,7 +134,7 @@ export class PlayerService {
       const players = await this.db.player.findMany({
         where: {
           game: gameId,
-          hideRanking: false,
+          hideranking: 0,
         },
         include: PLAYER_INCLUDE,
         orderBy: {
@@ -193,7 +193,7 @@ export class PlayerService {
             skill: {
               gt: player.skill,
             },
-            hideRanking: false,
+            hideranking: 0,
           },
         })) + 1;
 
@@ -250,7 +250,7 @@ export class PlayerService {
         where: { playerId: existingPlayer.playerId },
         data: {
           ...stats,
-          lastSkillChange: stats.skill
+          last_skill_change: stats.skill
             ? Math.floor(Date.now() / 1000)
             : undefined,
         },
@@ -282,7 +282,7 @@ export class PlayerService {
           email: data.email,
           homepage: data.homepage,
           game: data.gameId,
-          clan: data.clanId,
+          clan: Number(data.clanId),
           country: data.countryId,
           city: data.city,
           state: data.state,

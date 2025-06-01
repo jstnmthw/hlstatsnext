@@ -85,8 +85,6 @@ export type CountrySelect = Prisma.CountrySelect;
 // Re-export commonly used Prisma utility types
 export type StringFilter = Prisma.StringFilter;
 export type IntFilter = Prisma.IntFilter;
-export type BoolFilter = Prisma.BoolFilter;
-export type DateTimeFilter = Prisma.DateTimeFilter;
 export type StringNullableFilter = Prisma.StringNullableFilter;
 export type IntNullableFilter = Prisma.IntNullableFilter;
 export type FloatNullableFilter = Prisma.FloatNullableFilter;

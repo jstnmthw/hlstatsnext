@@ -39,3 +39,4 @@ yarn-error.log*
 
 # Generated Prisma files
 packages/database/generated
+ref/

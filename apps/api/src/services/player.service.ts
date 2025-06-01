@@ -1,6 +1,5 @@
-import type { PrismaClient } from "@repo/database/client";
+import type { Player, PrismaClient } from "@repo/database/client";
 import type {
-  PlayerWithRelations,
   PlayerFilters,
   PlayerSortInput,
   PlayerStatistics,
@@ -31,12 +30,10 @@ export class PlayerService {
   /**
    * Get a single player by ID with all relations
    */
-  async getPlayer(
-    id: string
-  ): Promise<Result<PlayerWithRelations | null, AppError>> {
+  async getPlayer(id: string): Promise<Result<Player | null, AppError>> {
     try {
       const player = await this.db.player.findUnique({
-        where: { id },
+        where: { playerId: id },
         include: PLAYER_INCLUDE,
       });
 
@@ -57,7 +54,7 @@ export class PlayerService {
   async getPlayerBySteamId(
     steamId: string,
     gameId?: string
-  ): Promise<Result<PlayerWithRelations | null, AppError>> {
+  ): Promise<Result<Player | null, AppError>> {
     try {
       const whereClause = {
         uniqueIds: {
@@ -91,7 +88,7 @@ export class PlayerService {
     filters: PlayerFilters = {},
     sort: PlayerSortInput = { field: PlayerSortField.SKILL, direction: "desc" },
     pagination: PaginationInput = {}
-  ): Promise<Result<PaginatedResponse<PlayerWithRelations>, AppError>> {
+  ): Promise<Result<PaginatedResponse<Player>, AppError>> {
     try {
       const paginationConfig = createPaginationConfig(pagination);
       const whereClause = this.buildPlayerWhereClause(filters);
@@ -133,11 +130,11 @@ export class PlayerService {
   async getTopPlayers(
     gameId: string,
     limit: number = 10
-  ): Promise<Result<readonly PlayerWithRelations[], AppError>> {
+  ): Promise<Result<readonly Player[], AppError>> {
     try {
       const players = await this.db.player.findMany({
         where: {
-          gameId,
+          game: gameId,
           hideRanking: false,
         },
         include: PLAYER_INCLUDE,
@@ -193,7 +190,7 @@ export class PlayerService {
       const rank =
         (await this.db.player.count({
           where: {
-            gameId: player.gameId,
+            game: player.game,
             skill: {
               gt: player.skill,
             },
@@ -227,7 +224,7 @@ export class PlayerService {
     steamId: string,
     gameId: string,
     stats: UpdatePlayerStatsInput
-  ): Promise<Result<PlayerWithRelations, AppError>> {
+  ): Promise<Result<Player, AppError>> {
     try {
       // Find player by Steam ID
       const existingPlayerResult = await this.getPlayerBySteamId(
@@ -251,7 +248,7 @@ export class PlayerService {
 
       // Update player statistics
       const updatedPlayer = await this.db.player.update({
-        where: { id: existingPlayer.id },
+        where: { playerId: existingPlayer.playerId },
         data: {
           ...stats,
           lastSkillChange: stats.skill
@@ -277,7 +274,7 @@ export class PlayerService {
    */
   async createPlayer(
     data: CreatePlayerInput
-  ): Promise<Result<PlayerWithRelations, AppError>> {
+  ): Promise<Result<Player, AppError>> {
     try {
       const player = await this.db.player.create({
         data: {
@@ -285,7 +282,7 @@ export class PlayerService {
           fullName: data.fullName,
           email: data.email,
           homepage: data.homepage,
-          gameId: data.gameId,
+          game: data.gameId,
           clanId: data.clanId,
           countryId: data.countryId,
           city: data.city,
@@ -294,7 +291,7 @@ export class PlayerService {
           uniqueIds: {
             create: {
               uniqueId: data.steamId,
-              gameId: data.gameId,
+              game: data.gameId,
             },
           },
         },
@@ -321,7 +318,7 @@ export class PlayerService {
     const where: Record<string, unknown> = {};
 
     if (filters.gameId) {
-      where.gameId = filters.gameId;
+      where.game = filters.gameId;
     }
 
     if (filters.clanId) {

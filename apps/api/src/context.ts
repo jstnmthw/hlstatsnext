@@ -1,4 +1,4 @@
-import { db } from '@repo/database/client';
+import { db } from "@repo/database/client";
 
 export interface Context {
   db: typeof db;
@@ -16,4 +16,4 @@ export function createContext(): Context {
     // - Role-based permissions
     // - Audit logging setup
   };
-} 
+}

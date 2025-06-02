@@ -16,7 +16,7 @@ export class GameService {
    * Get all games with player and clan counts
    */
   async getGames(
-    includeHidden: boolean = false
+    includeHidden: boolean = false,
   ): Promise<Result<readonly GameWithStats[], AppError>> {
     try {
       const games = await this.db.game.findMany({
@@ -63,7 +63,7 @@ export class GameService {
    * Get a game by code
    */
   async getGameByCode(
-    code: string
+    code: string,
   ): Promise<Result<GameWithStats | null, AppError>> {
     try {
       const game = await this.db.game.findUnique({
@@ -86,7 +86,7 @@ export class GameService {
    * Get game statistics summary
    */
   async getGameStats(
-    gameId: string
+    gameId: string,
   ): Promise<Result<GameStatistics, AppError>> {
     try {
       const game = await this.db.game.findUnique({

@@ -22,7 +22,7 @@ export class ClanService {
    * Get all clans with filters
    */
   async getClans(
-    filters: ClanFilters = {}
+    filters: ClanFilters = {},
   ): Promise<Result<readonly Clan[], AppError>> {
     try {
       const whereClause = this.buildClanWhereClause(filters);
@@ -69,7 +69,7 @@ export class ClanService {
    * Get clan statistics
    */
   async getClanStats(
-    clanId: string
+    clanId: string,
   ): Promise<Result<ClanStatistics, AppError>> {
     try {
       const clanResult = await this.getClan(clanId);
@@ -146,7 +146,7 @@ export class ClanService {
    */
   async getTopClans(
     gameId: string,
-    limit: number = 10
+    limit: number = 10,
   ): Promise<Result<readonly ClanWithAverageSkill[], AppError>> {
     try {
       const clans = await this.db.clan.findMany({
@@ -180,7 +180,7 @@ export class ClanService {
             },
             averageSkill: Math.round(avgSkill._avg?.skill || 1000),
           };
-        })
+        }),
       );
 
       // Sort by average skill and return top clans

@@ -52,7 +52,7 @@ export class PlayerService {
    */
   async getPlayerBySteamId(
     steamId: string,
-    gameId?: string
+    gameId?: string,
   ): Promise<Result<Player | null, AppError>> {
     try {
       const whereClause = {
@@ -86,7 +86,7 @@ export class PlayerService {
   async getPlayers(
     filters: PlayerFilters = {},
     sort: PlayerSortInput = { field: PlayerSortField.SKILL, direction: "desc" },
-    pagination: PaginationInput = {}
+    pagination: PaginationInput = {},
   ): Promise<Result<PaginatedResponse<Player>, AppError>> {
     try {
       const paginationConfig = createPaginationConfig(pagination);
@@ -106,7 +106,7 @@ export class PlayerService {
 
       const paginationMetadata = createPaginationMetadata(
         total,
-        paginationConfig
+        paginationConfig,
       );
 
       return success({
@@ -128,7 +128,7 @@ export class PlayerService {
    */
   async getTopPlayers(
     gameId: string,
-    limit: number = 10
+    limit: number = 10,
   ): Promise<Result<readonly Player[], AppError>> {
     try {
       const players = await this.db.player.findMany({
@@ -158,7 +158,7 @@ export class PlayerService {
    * Get player statistics summary
    */
   async getPlayerStats(
-    playerId: string
+    playerId: string,
   ): Promise<Result<PlayerStatistics, AppError>> {
     try {
       const playerResult = await this.getPlayer(playerId);
@@ -222,13 +222,13 @@ export class PlayerService {
   async updatePlayerStats(
     steamId: string,
     gameId: string,
-    stats: UpdatePlayerStatsInput
+    stats: UpdatePlayerStatsInput,
   ): Promise<Result<Player, AppError>> {
     try {
       // Find player by Steam ID
       const existingPlayerResult = await this.getPlayerBySteamId(
         steamId,
-        gameId
+        gameId,
       );
 
       if (!existingPlayerResult.success) {
@@ -272,7 +272,7 @@ export class PlayerService {
    * Create a new player
    */
   async createPlayer(
-    data: CreatePlayerInput
+    data: CreatePlayerInput,
   ): Promise<Result<Player, AppError>> {
     try {
       const player = await this.db.player.create({
@@ -312,7 +312,7 @@ export class PlayerService {
    * Build where clause for player filtering
    */
   private buildPlayerWhereClause(
-    filters: PlayerFilters
+    filters: PlayerFilters,
   ): Record<string, unknown> {
     const where: Record<string, unknown> = {};
 

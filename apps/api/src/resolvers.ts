@@ -62,7 +62,7 @@ export const resolvers = {
     games: async (
       _parent: unknown,
       args: GamesQueryArgs,
-      context: Context
+      context: Context,
     ): Promise<GraphQLGame[]> => {
       const result = await context.services.game.getGames(args.includeHidden);
 
@@ -75,14 +75,14 @@ export const resolvers = {
           ...game,
           playerCount: game._count.players,
           clanCount: game._count.clans,
-        })
+        }),
       );
     },
 
     game: async (
       _parent: unknown,
       args: GameQueryArgs,
-      context: Context
+      context: Context,
     ): Promise<GraphQLGame | null> => {
       const result = await context.services.game.getGame(args.id);
 
@@ -103,7 +103,7 @@ export const resolvers = {
     gameByCode: async (
       _parent: unknown,
       args: GameByCodeQueryArgs,
-      context: Context
+      context: Context,
     ): Promise<GraphQLGame | null> => {
       const result = await context.services.game.getGameByCode(args.code);
 
@@ -124,7 +124,7 @@ export const resolvers = {
     gameStats: async (
       _parent: unknown,
       args: GameStatsQueryArgs,
-      context: Context
+      context: Context,
     ) => {
       const result = await context.services.game.getGameStats(args.gameId);
 
@@ -139,7 +139,7 @@ export const resolvers = {
     players: async (
       _parent: unknown,
       args: PlayersQueryArgs,
-      context: Context
+      context: Context,
     ) => {
       const sort = args.sort
         ? {
@@ -157,7 +157,7 @@ export const resolvers = {
       const result = await context.services.player.getPlayers(
         args.filters,
         sort,
-        args.pagination
+        args.pagination,
       );
 
       if (!isSuccess(result)) {
@@ -175,7 +175,7 @@ export const resolvers = {
     player: async (
       _parent: unknown,
       args: PlayerQueryArgs,
-      context: Context
+      context: Context,
     ): Promise<Player | null> => {
       const result = await context.services.player.getPlayer(args.id);
 
@@ -189,11 +189,11 @@ export const resolvers = {
     playerBySteamId: async (
       _parent: unknown,
       args: PlayerBySteamIdQueryArgs,
-      context: Context
+      context: Context,
     ): Promise<Player | null> => {
       const result = await context.services.player.getPlayerBySteamId(
         args.steamId,
-        args.gameId
+        args.gameId,
       );
 
       if (!isSuccess(result)) {
@@ -206,10 +206,10 @@ export const resolvers = {
     playerStats: async (
       _parent: unknown,
       args: PlayerStatsQueryArgs,
-      context: Context
+      context: Context,
     ) => {
       const result = await context.services.player.getPlayerStats(
-        args.playerId
+        args.playerId,
       );
 
       if (!isSuccess(result)) {
@@ -222,11 +222,11 @@ export const resolvers = {
     topPlayers: async (
       _parent: unknown,
       args: TopPlayersQueryArgs,
-      context: Context
+      context: Context,
     ): Promise<readonly Player[]> => {
       const result = await context.services.player.getTopPlayers(
         args.gameId,
-        args.limit
+        args.limit,
       );
 
       if (!isSuccess(result)) {
@@ -240,7 +240,7 @@ export const resolvers = {
     clans: async (
       _parent: unknown,
       args: ClansQueryArgs,
-      context: Context
+      context: Context,
     ): Promise<Clan[]> => {
       const result = await context.services.clan.getClans(args.filters);
 
@@ -254,7 +254,7 @@ export const resolvers = {
     clan: async (
       _parent: unknown,
       args: ClanQueryArgs,
-      context: Context
+      context: Context,
     ): Promise<Clan | null> => {
       const result = await context.services.clan.getClan(args.id);
 
@@ -271,7 +271,7 @@ export const resolvers = {
     clanStats: async (
       _parent: unknown,
       args: ClanStatsQueryArgs,
-      context: Context
+      context: Context,
     ) => {
       const result = await context.services.clan.getClanStats(args.clanId);
 
@@ -285,11 +285,11 @@ export const resolvers = {
     topClans: async (
       _parent: unknown,
       args: TopClansQueryArgs,
-      context: Context
+      context: Context,
     ): Promise<GraphQLClanWithAvgSkill[]> => {
       const result = await context.services.clan.getTopClans(
         args.gameId,
-        args.limit
+        args.limit,
       );
 
       if (!isSuccess(result)) {
@@ -300,7 +300,7 @@ export const resolvers = {
         (clan): GraphQLClanWithAvgSkill => ({
           ...clan,
           playerCount: clan._count.players,
-        })
+        }),
       );
     },
 
@@ -308,7 +308,7 @@ export const resolvers = {
     countries: async (
       _parent: unknown,
       _args: Record<string, never>,
-      context: Context
+      context: Context,
     ) => {
       return context.db.country.findMany({
         orderBy: { name: "asc" },
@@ -318,7 +318,7 @@ export const resolvers = {
     country: async (
       _parent: unknown,
       args: CountryQueryArgs,
-      context: Context
+      context: Context,
     ) => {
       return context.db.country.findUnique({
         where: { flag: args.id },
@@ -330,7 +330,7 @@ export const resolvers = {
     createPlayer: async (
       _parent: unknown,
       args: CreatePlayerMutationArgs,
-      context: Context
+      context: Context,
     ): Promise<Player> => {
       const result = await context.services.player.createPlayer(args.input);
 
@@ -344,12 +344,12 @@ export const resolvers = {
     updatePlayerStats: async (
       _parent: unknown,
       args: UpdatePlayerStatsMutationArgs,
-      context: Context
+      context: Context,
     ): Promise<Player> => {
       const result = await context.services.player.updatePlayerStats(
         args.input.steamId,
         args.input.gameId,
-        args.input
+        args.input,
       );
 
       if (!isSuccess(result)) {

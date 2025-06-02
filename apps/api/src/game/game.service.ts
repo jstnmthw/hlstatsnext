@@ -3,8 +3,12 @@ import type {
   GameWithStats,
   GameStatistics,
 } from "../types/database/game.types";
+import {
+  GAME_INCLUDE,
+  ACTIVITY_TIMEFRAMES,
+} from "../types/database/game.types";
 import type { Result, AppError } from "../types/common";
-import { success, failure, GAME_INCLUDE, ACTIVITY_TIMEFRAMES } from "../types";
+import { success, failure } from "../types";
 
 /**
  * Service class for handling game-related operations

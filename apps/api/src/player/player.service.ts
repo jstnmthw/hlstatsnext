@@ -6,6 +6,10 @@ import type {
   CreatePlayerInput,
   UpdatePlayerStatsInput,
 } from "../types/database/player.types";
+import {
+  PLAYER_INCLUDE,
+  PlayerSortField,
+} from "../types/database/player.types";
 import type {
   Result,
   AppError,
@@ -17,8 +21,6 @@ import {
   failure,
   createPaginationConfig,
   createPaginationMetadata,
-  PLAYER_INCLUDE,
-  PlayerSortField,
 } from "../types";
 
 /**
@@ -249,10 +251,16 @@ export class PlayerService {
       const updatedPlayer = await this.db.player.update({
         where: { playerId: existingPlayer.playerId },
         data: {
-          ...stats,
-          last_skill_change: stats.skill
-            ? Math.floor(Date.now() / 1000)
-            : undefined,
+          kills: stats.kills,
+          deaths: stats.deaths,
+          suicides: stats.suicides,
+          shots: stats.shots,
+          hits: stats.hits,
+          headshots: stats.headshots,
+          teamkills: stats.teamkills,
+          skill: stats.skill,
+          connection_time: stats.connectionTime,
+          last_event: stats.lastEvent,
         },
         include: PLAYER_INCLUDE,
       });
@@ -278,12 +286,12 @@ export class PlayerService {
       const player = await this.db.player.create({
         data: {
           lastName: data.lastName,
+          game: data.gameId,
           fullName: data.fullName,
           email: data.email,
           homepage: data.homepage,
-          game: data.gameId,
-          clan: Number(data.clanId),
-          country: data.countryId,
+          clan: data.clanId ? Number(data.clanId) : undefined,
+          flag: data.countryId,
           city: data.city,
           state: data.state,
           lastAddress: data.lastAddress,
@@ -321,31 +329,33 @@ export class PlayerService {
     }
 
     if (filters.clanId) {
-      where.clanId = filters.clanId;
+      where.clan = Number(filters.clanId);
     }
 
     if (filters.countryId) {
-      where.countryId = filters.countryId;
+      where.flag = filters.countryId;
     }
 
     if (typeof filters.hideRanking === "boolean") {
-      where.hideRanking = filters.hideRanking;
+      where.hideranking = filters.hideRanking ? 1 : 0;
     }
 
-    if (filters.minSkill !== undefined || filters.maxSkill !== undefined) {
-      where.skill = {};
-      if (filters.minSkill !== undefined) {
-        (where.skill as Record<string, unknown>).gte = filters.minSkill;
-      }
-      if (filters.maxSkill !== undefined) {
-        (where.skill as Record<string, unknown>).lte = filters.maxSkill;
-      }
+    if (filters.minSkill !== undefined) {
+      where.skill = {
+        ...((where.skill as object) || {}),
+        gte: filters.minSkill,
+      };
+    }
+
+    if (filters.maxSkill !== undefined) {
+      where.skill = {
+        ...((where.skill as object) || {}),
+        lte: filters.maxSkill,
+      };
     }
 
     if (filters.minKills !== undefined) {
-      where.kills = {
-        gte: filters.minKills,
-      };
+      where.kills = { gte: filters.minKills };
     }
 
     if (filters.search) {

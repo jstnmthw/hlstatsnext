@@ -4,13 +4,12 @@ import type {
   ClanStatistics,
   ClanFilters,
 } from "../types/database/clan.types";
-import type { Result, AppError } from "../types/common";
 import {
-  success,
-  failure,
   CLAN_INCLUDE,
   CLAN_WITH_ALL_PLAYERS_INCLUDE,
-} from "../types";
+} from "../types/database/clan.types";
+import type { Result, AppError } from "../types/common";
+import { success, failure } from "../types";
 
 /**
  * Service class for handling clan-related operations
@@ -185,7 +184,10 @@ export class ClanService {
 
       // Sort by average skill and return top clans
       const topClans = clansWithAvgSkill
-        .sort((a, b) => b.averageSkill - a.averageSkill)
+        .sort(
+          (a: ClanWithAverageSkill, b: ClanWithAverageSkill) =>
+            b.averageSkill - a.averageSkill,
+        )
         .slice(0, Math.min(limit, 50)); // Cap at 50 for performance
 
       return success(topClans);

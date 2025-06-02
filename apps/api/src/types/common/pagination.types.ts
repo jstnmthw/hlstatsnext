@@ -67,12 +67,12 @@ export const DEFAULT_PAGINATION = {
  * Utility function to create pagination config
  */
 export function createPaginationConfig(
-  input: PaginationInput
+  input: PaginationInput,
 ): PaginationConfig {
   const page = Math.max(1, input.page ?? DEFAULT_PAGINATION.PAGE);
   const limit = Math.min(
     Math.max(1, input.limit ?? DEFAULT_PAGINATION.LIMIT),
-    DEFAULT_PAGINATION.MAX_LIMIT
+    DEFAULT_PAGINATION.MAX_LIMIT,
   );
   const skip = (page - 1) * limit;
 
@@ -84,7 +84,7 @@ export function createPaginationConfig(
  */
 export function createPaginationMetadata(
   total: number,
-  config: PaginationConfig
+  config: PaginationConfig,
 ): PaginationMetadata {
   const totalPages = Math.ceil(total / config.limit);
   const hasNextPage = config.page < totalPages;

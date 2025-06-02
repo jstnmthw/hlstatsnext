@@ -26,7 +26,7 @@ export type GraphQLResolver<
   parent: TParent,
   args: TArgs,
   context: Context,
-  info?: unknown
+  info?: unknown,
 ) => Promise<TResult> | TResult;
 
 /**

@@ -11,19 +11,19 @@
   },
   "dependencies": {
     "@repo/database": "workspace:*",
-    "@graphql-tools/schema": "^10.0.2",
-    "graphql": "^16.8.1",
-    "graphql-yoga": "^5.1.1",
+    "@graphql-tools/schema": "^10.0.23",
+    "graphql": "^16.11.0",
+    "graphql-yoga": "^5.13.5",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.1"
+    "dotenv": "^16.5.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/cors": "^2.8.17",
-    "@types/node": "^22.8.4",
+    "@types/cors": "^2.8.18",
+    "@types/node": "^22.15.29",
     "tsx": "^4.7.0",
-    "eslint": "^9.27.0",
-    "typescript": "5.8.2"
+    "eslint": "^9.28.0",
+    "typescript": "5.8.3"
   }
 }

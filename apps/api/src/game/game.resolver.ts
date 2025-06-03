@@ -11,7 +11,8 @@ import { isSuccess } from "../types/common";
 /**
  * GraphQL game response type that matches the schema
  */
-export interface GraphQLGame extends Omit<GameWithStats, "_count"> {
+export interface GraphQLGame extends Omit<GameWithStats, "_count" | "code"> {
+  id: string;
   playerCount: number;
   clanCount: number;
 }
@@ -35,6 +36,7 @@ export const gameResolvers = {
       return result.data.map(
         (game): GraphQLGame => ({
           ...game,
+          id: game.code,
           playerCount: game._count.players,
           clanCount: game._count.clans,
         }),
@@ -57,6 +59,7 @@ export const gameResolvers = {
 
       return {
         ...game,
+        id: game.code,
         playerCount: game._count.players,
         clanCount: game._count.clans,
       };
@@ -78,6 +81,7 @@ export const gameResolvers = {
 
       return {
         ...game,
+        id: game.code,
         playerCount: game._count.players,
         clanCount: game._count.clans,
       };

@@ -1,6 +1,5 @@
 services:
   daemon:
-    image: hlstatsnext/daemon
     container_name: hlstatsnext-daemon
     build:
       dockerfile: docker/daemon/Dockerfile
@@ -64,8 +63,8 @@ services:
     networks:
       - default
     environment:
-      - UID=${UID:-1000}
-      - GID=${GID:-1000}
+      - UID=${USER_ID:-1000}
+      - GID=${GROUP_ID:-1000}
       - GAME=cs
       - LGSM_GAMESERVER=csserver
     volumes:
@@ -81,8 +80,8 @@ services:
     networks:
       - default
     environment:
-      - UID=${UID:-1000}
-      - GID=${GID:-1000}
+      - UID=${USER_ID:-1000}
+      - GID=${GROUP_ID:-1000}
       - GAME=cs
       - LGSM_GAMESERVER=csserver
     volumes:

@@ -11,7 +11,7 @@ RUN set -eux; \
     gzip -d /GeoLite2-City.mmdb.gz;
 
 # Copy scripts and set permissions
-COPY ./scripts /scripts
+COPY ../../apps/daemon/scripts /scripts
 RUN set -eux; \
     mv -v /GeoLiteCity.dat /scripts/GeoLiteCity/GeoLiteCity.dat; \
     mv -v /GeoLite2-City.mmdb /scripts/GeoLiteCity/GeoLite2-City.mmdb; \

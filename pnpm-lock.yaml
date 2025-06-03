@@ -29,6 +29,15 @@ importers:
       '@graphql-tools/schema':
         specifier: ^10.0.23
         version: 10.0.23(graphql@16.11.0)
+      '@pothos/core':
+        specifier: ^4.6.2
+        version: 4.6.2(graphql@16.11.0)
+      '@pothos/plugin-prisma':
+        specifier: ^4.8.2
+        version: 4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3)
+      '@pothos/plugin-relay':
+        specifier: ^4.4.2
+        version: 4.4.2(@pothos/core@4.6.2(graphql@16.11.0))(graphql@16.11.0)
       '@repo/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -2738,6 +2747,14 @@ snapshots:
       graphql: 16.11.0
       typescript: 5.8.2
 
+  '@pothos/plugin-prisma@4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3)':
+    dependencies:
+      '@pothos/core': 4.6.2(graphql@16.11.0)
+      '@prisma/client': 6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3)
+      '@prisma/generator-helper': 6.8.2
+      graphql: 16.11.0
+      typescript: 5.8.3
+
   '@pothos/plugin-relay@4.4.2(@pothos/core@4.6.2(graphql@16.11.0))(graphql@16.11.0)':
     dependencies:
       '@pothos/core': 4.6.2(graphql@16.11.0)
@@ -2747,6 +2764,11 @@ snapshots:
     optionalDependencies:
       prisma: 6.8.2(typescript@5.8.2)
       typescript: 5.8.2
+
+  '@prisma/client@6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3)':
+    optionalDependencies:
+      prisma: 6.8.2(typescript@5.8.3)
+      typescript: 5.8.3
 
   '@prisma/config@6.8.2':
     dependencies:
@@ -4065,6 +4087,14 @@ snapshots:
       '@prisma/engines': 6.8.2
     optionalDependencies:
       typescript: 5.8.2
+
+  prisma@6.8.2(typescript@5.8.3):
+    dependencies:
+      '@prisma/config': 6.8.2
+      '@prisma/engines': 6.8.2
+    optionalDependencies:
+      typescript: 5.8.3
+    optional: true
 
   prop-types@15.8.1:
     dependencies:

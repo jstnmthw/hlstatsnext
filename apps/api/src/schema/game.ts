@@ -19,13 +19,13 @@ const Game = builder.prismaObject("Game", {
       resolve: (game) => game.hidden === "1",
     }),
 
-    // Automatically expose relations with full Prisma support
-    players: t.relation("players"),
-    clans: t.relation("clans"),
-
-    // Expose relation counts
+    // Expose relation counts (these work without defining the related objects)
     playerCount: t.relationCount("players"),
     clanCount: t.relationCount("clans"),
+
+    // Note: Actual relations commented out until Player/Clan objects are defined
+    // players: t.relation("players"),
+    // clans: t.relation("clans"),
   }),
 });
 

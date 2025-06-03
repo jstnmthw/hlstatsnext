@@ -21,5 +21,29 @@ export const builder = new SchemaBuilder<{
 
 // Add base types
 builder.queryType({});
-builder.mutationType({});
-builder.subscriptionType({});
+
+// Add mutation type with a placeholder field
+builder.mutationType({
+  fields: (t) => ({
+    // Placeholder mutation - will be replaced with actual mutations later
+    _placeholder: t.string({
+      resolve: () => "Mutations will be implemented in future phases",
+    }),
+  }),
+});
+
+// Add subscription type with a placeholder field
+builder.subscriptionType({
+  fields: (t) => ({
+    // Placeholder subscription - will be replaced with actual subscriptions later
+    _placeholder: t.string({
+      subscribe: () => {
+        // Simple async generator that yields once
+        return (async function* () {
+          yield "Subscriptions will be implemented in future phases";
+        })();
+      },
+      resolve: (value) => value,
+    }),
+  }),
+});

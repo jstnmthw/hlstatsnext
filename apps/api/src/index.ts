@@ -1,15 +1,7 @@
 import { createYoga } from "graphql-yoga";
 import { createServer } from "node:http";
-import { makeExecutableSchema } from "@graphql-tools/schema";
-import { typeDefs } from "./schema";
-import { resolvers } from "./resolvers";
+import { schema } from "./pothos-schema";
 import { createContext } from "./context";
-
-// Create executable schema
-const schema = makeExecutableSchema({
-  typeDefs,
-  resolvers,
-});
 
 // Create GraphQL Yoga server
 const yoga = createYoga({
@@ -35,11 +27,11 @@ const port = process.env.PORT || 4000;
 
 server.listen(port, () => {
   console.log(
-    `🚀 GraphQL API server ready at http://localhost:${port}/graphql`,
+    `🚀 GraphQL API server ready at http://localhost:${port}/graphql`
   );
   if (process.env.NODE_ENV !== "production") {
     console.log(
-      `📊 GraphiQL interface available at http://localhost:${port}/graphql`,
+      `📊 GraphiQL interface available at http://localhost:${port}/graphql`
     );
   }
 });

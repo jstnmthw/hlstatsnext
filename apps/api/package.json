@@ -15,7 +15,10 @@
     "graphql": "^16.11.0",
     "graphql-yoga": "^5.13.5",
     "cors": "^2.8.5",
-    "dotenv": "^16.5.0"
+    "dotenv": "^16.5.0",
+    "@pothos/core": "^4.6.2",
+    "@pothos/plugin-prisma": "^4.8.2",
+    "@pothos/plugin-relay": "^4.4.2"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

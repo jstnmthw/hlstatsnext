@@ -30,6 +30,7 @@
   },
   "exports": {
     "./client": "./src/index.ts",
-    "./seed": "./src/seed.ts"
+    "./seed": "./src/seed.ts",
+    "./generated/graphql": "./generated/graphql/pothos-types.ts"
   }
 }

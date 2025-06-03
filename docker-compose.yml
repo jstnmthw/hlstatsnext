@@ -1,0 +1,84 @@
+services:
+  daemon:
+    image: hlstatsnext/daemon
+    build:
+      dockerfile: docker/daemon/Dockerfile
+      context: .
+      target: dev
+    ports:
+      - 27500:27500/udp
+    networks:
+      default:
+        ipv4_address: 10.5.0.50
+    depends_on:
+      - db
+    command:
+      - --ip=0.0.0.0
+      - --port=27500
+      - --db-host=${DB_HOST:-db:3306}
+      - --db-name=${DB_NAME:-hlstatsnext}
+      - --db-username=${DB_USER:-hlstatsnext}
+      - --db-password=${DB_PASS:-hlstatsnext}
+      - --nodns-resolveip
+      - --debug
+
+  db:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root}
+      - MYSQL_USER=${DB_USER:-hlstatsnext}
+      - MYSQL_PASSWORD=${DB_PASS:-hlstatsnext}
+      - MYSQL_DATABASE=${DB_NAME:-hlstatsnext}
+    volumes:
+      - db-volume:/var/lib/mysql
+      - ./packages/database/src/sql/install.sql:/docker-entrypoint-initdb.d/01-install.sql:ro
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+    ports:
+      - 3306:3306
+    networks:
+      - default
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${DB_ROOT_PASSWORD:-root}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cs1:
+    image: gameservermanagers/gameserver:cs
+    container_name: cs1
+    networks:
+      - default
+    environment:
+      - UID=${UID:-1000}
+      - GID=${GID:-1000}
+      - GAME=cs
+      - LGSM_GAMESERVER=csserver
+    volumes:
+      - ./servers/cs1:/data
+    ports:
+      - "27015:27015/udp"
+      - "27015:27015/tcp"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: game_network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1
+
+volumes:
+  db-volume:

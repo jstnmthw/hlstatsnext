@@ -1,6 +1,6 @@
 # @repo/database
 
-Shared database package for HLStatsX Next.js application using Prisma ORM.
+Shared database package for HLStatsNext Next.js application using Prisma ORM.
 
 ## Overview
 

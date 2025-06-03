@@ -1,6 +1,6 @@
 # API Server
 
-GraphQL API server for HLStatsX Next.js application built with GraphQL Yoga.
+GraphQL API server for HLStatsNext built with GraphQL Yoga.
 
 ## Overview
 

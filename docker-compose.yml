@@ -1,6 +1,7 @@
 services:
   daemon:
     image: hlstatsnext/daemon
+    container_name: hlstatsnext-daemon
     build:
       dockerfile: docker/daemon/Dockerfile
       context: .
@@ -21,9 +22,11 @@ services:
       - --db-password=${DB_PASS:-hlstatsnext}
       - --nodns-resolveip
       - --debug
+    restart: unless-stopped
 
   db:
     image: mysql:5.7
+    container_name: hlstatsnext-db
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root}
       - MYSQL_USER=${DB_USER:-hlstatsnext}
@@ -38,6 +41,7 @@ services:
     networks:
       - default
     command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
     healthcheck:
       test:
         [
@@ -56,7 +60,7 @@ services:
 
   cs1:
     image: gameservermanagers/gameserver:cs
-    container_name: cs1
+    container_name: hlstatsnext-cs-1
     networks:
       - default
     environment:
@@ -65,15 +69,32 @@ services:
       - GAME=cs
       - LGSM_GAMESERVER=csserver
     volumes:
-      - ./servers/cs1:/data
+      - ./servers/cs-1:/data
     ports:
       - "27015:27015/udp"
       - "27015:27015/tcp"
     restart: unless-stopped
 
+  cs2:
+    image: gameservermanagers/gameserver:cs
+    container_name: hlstatsnext-cs-2
+    networks:
+      - default
+    environment:
+      - UID=${UID:-1000}
+      - GID=${GID:-1000}
+      - GAME=cs
+      - LGSM_GAMESERVER=csserver
+    volumes:
+      - ./servers/cs-2:/data
+    ports:
+      - "27016:27015/udp"
+      - "27016:27015/tcp"
+    restart: unless-stopped
+
 networks:
   default:
-    name: game_network
+    name: hlstatsnext-network
     driver: bridge
     ipam:
       config:

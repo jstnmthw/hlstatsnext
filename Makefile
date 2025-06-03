@@ -19,11 +19,11 @@ NC := \033[0m # No Color
 
 # Declare all targets as phony
 .PHONY: help restart up down build logs status clean \
-        daemon\:restart daemon\:logs daemon\:shell \
-        db\:reset db\:logs db\:shell db\:backup \
-        cs1\:restart cs1\:details cs1\:logs cs1\:shell cs1\:stop cs1\:start \
-        cs2\:restart cs2\:details cs2\:logs cs2\:shell cs2\:stop cs2\:start \
-        prune network\:create network\:remove
+        daemon-restart daemon-logs daemon-shell \
+        db-reset db-logs db-shell db-backup \
+        cs1-restart cs1-details cs1-logs cs1-shell cs1-stop cs1-start \
+        cs2-restart cs2-details cs2-logs cs2-shell cs2-stop cs2-start \
+        prune
 
 # Help target - shows available commands
 help:
@@ -41,31 +41,31 @@ help:
 	@echo "  make status             - Show status of all containers"
 	@echo ""
 	@echo "$(YELLOW)CS1 Server Commands:$(NC)"
-	@echo "  make cs1:restart        - Restart CS1 server (linuxgsm csserver restart)"
-	@echo "  make cs1:details        - Show CS1 server details (linuxgsm csserver details)"
-	@echo "  make cs1:start          - Start CS1 server (linuxgsm csserver start)"
-	@echo "  make cs1:stop           - Stop CS1 server (linuxgsm csserver stop)"
-	@echo "  make cs1:logs           - Show CS1 container logs"
-	@echo "  make cs1:shell          - Access CS1 container shell"
+	@echo "  make cs1-restart        - Restart CS1 server (linuxgsm csserver restart)"
+	@echo "  make cs1-details        - Show CS1 server details (linuxgsm csserver details)"
+	@echo "  make cs1-start          - Start CS1 server (linuxgsm csserver start)"
+	@echo "  make cs1-stop           - Stop CS1 server (linuxgsm csserver stop)"
+	@echo "  make cs1-logs           - Show CS1 container logs"
+	@echo "  make cs1-shell          - Access CS1 container shell"
 	@echo ""
 	@echo "$(YELLOW)CS2 Server Commands:$(NC)"
-	@echo "  make cs2:restart        - Restart CS2 server (linuxgsm csserver restart)"
-	@echo "  make cs2:details        - Show CS2 server details (linuxgsm csserver details)"
-	@echo "  make cs2:start          - Start CS2 server (linuxgsm csserver start)"
-	@echo "  make cs2:stop           - Stop CS2 server (linuxgsm csserver stop)"
-	@echo "  make cs2:logs           - Show CS2 container logs"
-	@echo "  make cs2:shell          - Access CS2 container shell"
+	@echo "  make cs2-restart        - Restart CS2 server (linuxgsm csserver restart)"
+	@echo "  make cs2-details        - Show CS2 server details (linuxgsm csserver details)"
+	@echo "  make cs2-start          - Start CS2 server (linuxgsm csserver start)"
+	@echo "  make cs2-stop           - Stop CS2 server (linuxgsm csserver stop)"
+	@echo "  make cs2-logs           - Show CS2 container logs"
+	@echo "  make cs2-shell          - Access CS2 container shell"
 	@echo ""
 	@echo "$(YELLOW)Daemon Commands:$(NC)"
-	@echo "  make daemon:restart     - Restart the daemon container"
-	@echo "  make daemon:logs        - Show daemon container logs"
-	@echo "  make daemon:shell       - Access daemon container shell"
+	@echo "  make daemon-restart     - Restart the daemon container"
+	@echo "  make daemon-logs        - Show daemon container logs"
+	@echo "  make daemon-shell       - Access daemon container shell"
 	@echo ""
 	@echo "$(YELLOW)Database Commands:$(NC)"
-	@echo "  make db:reset           - Restart the database server"
-	@echo "  make db:logs            - Show database container logs"
-	@echo "  make db:shell           - Access database container shell"
-	@echo "  make db:backup          - Create database backup"
+	@echo "  make db-reset           - Restart the database server"
+	@echo "  make db-logs            - Show database container logs"
+	@echo "  make db-shell           - Access database container shell"
+	@echo "  make db-backup          - Create database backup"
 	@echo ""
 	@echo "$(YELLOW)Utility Commands:$(NC)"
 	@echo "  make clean              - Remove stopped containers and unused images"
@@ -110,30 +110,30 @@ status:
 # CS1 SERVER COMMANDS
 # ===========================================
 
-cs1\:restart:
+cs1-restart:
 	@echo "$(GREEN)Restarting CS1 server...$(NC)"
 	@docker exec -u linuxgsm $(CS1_CONTAINER) ./csserver restart
 	@echo "$(GREEN)✓ CS1 server restarted$(NC)"
 
-cs1\:details:
+cs1-details:
 	@echo "$(GREEN)Getting CS1 Server Details...$(NC)"
 	@docker exec -u linuxgsm $(CS1_CONTAINER) ./csserver details
 
-cs1\:start:
+cs1-start:
 	@echo "$(GREEN)Starting CS1 server...$(NC)"
 	@docker exec -u linuxgsm $(CS1_CONTAINER) ./csserver start
 	@echo "$(GREEN)✓ CS1 server started$(NC)"
 
-cs1\:stop:
+cs1-stop:
 	@echo "$(YELLOW)Stopping CS1 server...$(NC)"
 	@docker exec -u linuxgsm $(CS1_CONTAINER) ./csserver stop
 	@echo "$(GREEN)✓ CS1 server stopped$(NC)"
 
-cs1\:logs:
+cs1-logs:
 	@echo "$(GREEN)CS1 Container Logs:$(NC)"
 	@docker logs -f $(CS1_CONTAINER)
 
-cs1\:shell:
+cs1-shell:
 	@echo "$(GREEN)Accessing CS1 container shell...$(NC)"
 	@docker exec -it -u linuxgsm $(CS1_CONTAINER) /bin/bash
 
@@ -141,30 +141,30 @@ cs1\:shell:
 # CS2 SERVER COMMANDS
 # ===========================================
 
-cs2\:restart:
+cs2-restart:
 	@echo "$(GREEN)Restarting CS2 server...$(NC)"
 	@docker exec -u linuxgsm $(CS2_CONTAINER) ./csserver restart
 	@echo "$(GREEN)✓ CS2 server restarted$(NC)"
 
-cs2\:details:
+cs2-details:
 	@echo "$(GREEN)Getting CS2 Server Details...$(NC)"
 	@docker exec -u linuxgsm $(CS2_CONTAINER) ./csserver details
 
-cs2\:start:
+cs2-start:
 	@echo "$(GREEN)Starting CS2 server...$(NC)"
 	@docker exec -u linuxgsm $(CS2_CONTAINER) ./csserver start
 	@echo "$(GREEN)✓ CS2 server started$(NC)"
 
-cs2\:stop:
+cs2-stop:
 	@echo "$(YELLOW)Stopping CS2 server...$(NC)"
 	@docker exec -u linuxgsm $(CS2_CONTAINER) ./csserver stop
 	@echo "$(GREEN)✓ CS2 server stopped$(NC)"
 
-cs2\:logs:
+cs2-logs:
 	@echo "$(GREEN)CS2 Container Logs:$(NC)"
 	@docker logs -f $(CS2_CONTAINER)
 
-cs2\:shell:
+cs2-shell:
 	@echo "$(GREEN)Accessing CS2 container shell...$(NC)"
 	@docker exec -it -u linuxgsm $(CS2_CONTAINER) /bin/bash
 
@@ -172,16 +172,16 @@ cs2\:shell:
 # DAEMON COMMANDS
 # ===========================================
 
-daemon\:restart:
+daemon-restart:
 	@echo "$(GREEN)Restarting daemon container...$(NC)"
 	@docker restart $(DAEMON_CONTAINER)
 	@echo "$(GREEN)✓ Daemon container restarted$(NC)"
 
-daemon\:logs:
+daemon-logs:
 	@echo "$(GREEN)Daemon Container Logs:$(NC)"
 	@docker logs -f $(DAEMON_CONTAINER)
 
-daemon\:shell:
+daemon-shell:
 	@echo "$(GREEN)Accessing daemon container shell...$(NC)"
 	@docker exec -it $(DAEMON_CONTAINER) /bin/bash
 
@@ -189,20 +189,20 @@ daemon\:shell:
 # DATABASE COMMANDS
 # ===========================================
 
-db\:reset:
+db-reset:
 	@echo "$(YELLOW)Restarting database server...$(NC)"
 	@docker restart $(DB_CONTAINER)
 	@echo "$(GREEN)✓ Database server restarted$(NC)"
 
-db\:logs:
+db-logs:
 	@echo "$(GREEN)Database Container Logs:$(NC)"
 	@docker logs -f $(DB_CONTAINER)
 
-db\:shell:
+db-shell:
 	@echo "$(GREEN)Accessing database container shell...$(NC)"
 	@docker exec -it $(DB_CONTAINER) /bin/bash
 
-db\:backup:
+db-backup:
 	@echo "$(GREEN)Creating database backup...$(NC)"
 	@mkdir -p ./backups
 	@docker exec $(DB_CONTAINER) mysqldump -u root -proot hlstatsnext > ./backups/hlstatsnext_$(shell date +%Y%m%d_%H%M%S).sql

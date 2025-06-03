@@ -1,6 +1,6 @@
-# HLStatsX Next.js 15 Development Plan
+# HLStatsNext Next.js 15 Development Plan
 
-This document outlines the complete development strategy for building a modern HLStatsX replacement using Next.js 15, GraphQL, and Prisma ORM in a fresh Turbo Repo. The approach prioritizes essential data first, followed by admin features, extended functionality, and finally polishing for optimal user experience.
+This document outlines the complete development strategy for building a modern HLStatsX replacement using Next.js 15 called HLStatsNext, GraphQL, and Prisma ORM in a fresh Turbo Repo. The approach prioritizes essential data first, followed by admin features, extended functionality, and finally polishing for optimal user experience.
 
 ## Core Principles
 
@@ -42,7 +42,7 @@ This document outlines the complete development strategy for building a modern H
 ### Turbo Repo Structure
 
 ```
-hlstatsx-next/
+hlstatsnext/
 ├── apps/
 │   ├── web/              # Next.js 15 frontend application
 │   ├── api/              # GraphQL API server

@@ -6,6 +6,31 @@ based games. While the original HLstatsX:CE used a Perl daemon and PHP frontend,
 HLStatsNext is being completely refactored with Next.js (Turbo), Node.js for GraphQL. This
 project aims to modernize and enhance the proven concepts of HLstatsX:CE.
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [Development](#development)
+- [Docker Management](#docker-management)
+  - [Quick Start with Docker](#quick-start-with-docker)
+  - [Main Docker Commands](#main-docker-commands)
+  - [Docker Services Overview](#docker-services-overview)
+  - [Network Configuration](#network-configuration)
+  - [Environment Variables](#environment-variables)
+  - [Service Details](#service-details)
+  - [Game Server Management](#game-server-management)
+  - [Database Management](#database-management)
+  - [Daemon Management](#daemon-management)
+  - [Utility Commands](#utility-commands)
+  - [Volumes and Data Persistence](#volumes-and-data-persistence)
+- [Project Structure](#project-structure)
+- [Adding Your Own Game Servers](#adding-your-own-game-servers)
+- [Port Reference](#port-reference)
+- [Features](#features)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
 ## Prerequisites
 
 - Node.js 18+

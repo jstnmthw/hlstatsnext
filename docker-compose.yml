@@ -69,7 +69,7 @@ services:
       - GAME=cs
       - LGSM_GAMESERVER=csserver
     volumes:
-      - ./servers/cs-1:/data
+      - ./servers/cs1:/data
     ports:
       - "27015:27015/udp"
       - "27015:27015/tcp"
@@ -86,7 +86,7 @@ services:
       - GAME=cs
       - LGSM_GAMESERVER=csserver
     volumes:
-      - ./servers/cs-2:/data
+      - ./servers/cs2:/data
     ports:
       - "27016:27015/udp"
       - "27016:27015/tcp"

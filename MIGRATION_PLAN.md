@@ -77,7 +77,6 @@ hlstatsnext/
 **Technical Requirements**:
 
 ```json
-// turbo.json
 {
   "globalDependencies": ["**/.env.*local"],
   "pipeline": {

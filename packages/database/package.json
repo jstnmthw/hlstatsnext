@@ -18,6 +18,9 @@
     "prisma": "^6.0.1"
   },
   "devDependencies": {
+    "@pothos/core": "^4.6.2",
+    "@pothos/plugin-prisma": "^4.8.2",
+    "@pothos/plugin-relay": "^4.4.2",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.8.4",
@@ -29,4 +32,4 @@
     "./client": "./src/index.ts",
     "./seed": "./src/seed.ts"
   }
-} 
+}

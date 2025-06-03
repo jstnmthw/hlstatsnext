@@ -11,6 +11,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator pothos {
+  provider  = "prisma-pothos-types"
+  clientOut = "../generated"
+  output    = "../generated/graphql/pothos-types.ts"
+}
+
 // Legacy HLStatsX database schema - exact mirror for compatibility
 // DO NOT MODIFY - Must match existing database structure exactly
 

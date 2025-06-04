@@ -1,7 +1,7 @@
 ---
 description: 
-globs: *.tsx,*.ts,*.js,*.mjs
-alwaysApply: false
+globs: 
+alwaysApply: true
 ---
 # Next.js 15 SSR Standards
 

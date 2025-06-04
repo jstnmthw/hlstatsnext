@@ -1,10 +1,11 @@
 # HLStatsNext
 
-HLStatsNext is a modern rewrite of HLstatsX Community Edition, building upon
-its foundation as a real-time stats and ranking system for Source engine
-based games. While the original HLstatsX:CE used a Perl daemon and PHP frontend,
-HLStatsNext is being completely refactored with Next.js (Turbo), Node.js for GraphQL. This
-project aims to modernize and enhance the proven concepts of HLstatsX:CE.
+HLStatsNext is a modern rewrite of HLstatsX Community Edition, building upon its
+foundation as a real-time stats and ranking system for Half Life engine
+based games. While the original HLstatsX:CE used dated PHP for frontend & backend,
+HLStatsNext is being completely refactored using Turbo Monorepo with Next.js for
+frontend and, Yoga GraphQL for backend. This project aims to modernize and
+enhance the proven concepts of HLstatsX:CE.
 
 ## Table of Contents
 

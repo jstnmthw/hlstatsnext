@@ -1,5 +1,9 @@
 import { builder } from "../builder";
 import type { Player, Prisma } from "@repo/database/client";
+import {
+  handleGraphQLResult,
+  handleGraphQLResultNullable,
+} from "../utils/graphql-result-handler";
 
 // Define Player object using Prisma plugin
 const Player = builder.prismaObject("Player", {
@@ -318,21 +322,19 @@ builder.queryField("playerStats", (t) =>
     },
     resolve: async (_parent, args, context) => {
       const result = await context.services.player.getPlayerStats(args.id);
+      const data = handleGraphQLResultNullable(result);
 
-      if (!result.success) {
-        if (result.error.type === "NOT_FOUND") {
-          return null;
-        }
-        throw new Error(result.error.message);
+      if (!data) {
+        return null;
       }
 
       // Ensure the returned data matches our GraphQL type structure
       return {
-        player: result.data.player,
-        killDeathRatio: result.data.killDeathRatio,
-        accuracy: result.data.accuracy,
-        headshotRatio: result.data.headshotRatio,
-        rank: result.data.rank,
+        player: data.player,
+        killDeathRatio: data.killDeathRatio,
+        accuracy: data.accuracy,
+        headshotRatio: data.headshotRatio,
+        rank: data.rank,
       };
     },
   })
@@ -360,12 +362,7 @@ builder.mutationField("createPlayer", (t) =>
       };
 
       const result = await context.services.player.createPlayer(cleanedInput);
-
-      if (!result.success) {
-        throw new Error(result.error.message);
-      }
-
-      return result.data;
+      return handleGraphQLResult(result);
     },
   })
 );
@@ -397,11 +394,7 @@ builder.mutationField("updatePlayerStats", (t) =>
         }
       );
 
-      if (!result.success) {
-        throw new Error(result.error.message);
-      }
-
-      return result.data;
+      return handleGraphQLResult(result);
     },
   })
 );

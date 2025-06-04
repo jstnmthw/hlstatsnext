@@ -1,5 +1,6 @@
 import { builder } from "../builder";
 import { Player } from "./player";
+import { handleGraphQLResult } from "../utils/graphql-result-handler";
 
 // Define Game object using Prisma plugin - automatically maps all Prisma fields
 const Game = builder.prismaObject("Game", {
@@ -95,12 +96,7 @@ builder.queryField("gameStats", (t) =>
     },
     resolve: async (_parent, args, context) => {
       const result = await context.services.game.getGameStats(args.gameId);
-
-      if (!result.success) {
-        throw new Error(result.error.message);
-      }
-
-      return result.data;
+      return handleGraphQLResult(result);
     },
   })
 );

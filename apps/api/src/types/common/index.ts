@@ -23,9 +23,7 @@ export type {
   PaginatedResponse,
 } from "./pagination.types";
 
-export {
-  SortDirection,
-  DEFAULT_PAGINATION,
-  createPaginationConfig,
-  createPaginationMetadata,
-} from "./pagination.types";
+export { SortDirection, DEFAULT_PAGINATION } from "./pagination.types";
+
+// GraphQL error handling
+export * from "./graphql-errors.types";

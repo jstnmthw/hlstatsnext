@@ -2,6 +2,9 @@ import { builder } from "./builder";
 
 // Import schema types
 import "./schema/game";
+import "./schema/country";
+import "./schema/player";
+import "./schema/clan";
 
 // Define HealthStatus type
 const HealthStatus = builder.objectRef<{

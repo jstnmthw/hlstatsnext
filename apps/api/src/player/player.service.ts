@@ -1,175 +1,34 @@
 import type { Player, PrismaClient } from "@repo/database/client";
 import type {
-  PlayerFilters,
-  PlayerSortInput,
   PlayerStatistics,
   CreatePlayerInput,
   UpdatePlayerStatsInput,
 } from "../types/database/player.types";
-import {
-  PLAYER_INCLUDE,
-  PlayerSortField,
-} from "../types/database/player.types";
-import type {
-  Result,
-  AppError,
-  PaginatedResponse,
-  PaginationInput,
-} from "../types/common";
-import {
-  success,
-  failure,
-  createPaginationConfig,
-  createPaginationMetadata,
-} from "../types";
+import type { Result, AppError } from "../types/common";
+import { success, failure } from "../types/common";
 
 /**
- * Service class for handling player-related operations
+ * Service class for handling player-related business logic operations
+ *
+ * Note: Basic CRUD operations (getPlayer, getPlayers, getTopPlayers, getPlayerBySteamId)
+ * are now handled directly by GraphQL resolvers for better performance and consistency.
+ * This service focuses on complex business logic and operations requiring transaction handling.
  */
 export class PlayerService {
   constructor(private readonly db: PrismaClient) {}
 
   /**
-   * Get a single player by ID with all relations
-   */
-  async getPlayer(id: string): Promise<Result<Player | null, AppError>> {
-    try {
-      const player = await this.db.player.findUnique({
-        where: { playerId: Number(id) },
-      });
-
-      return success(player);
-    } catch (error) {
-      console.error(error);
-      return failure({
-        type: "DATABASE_ERROR",
-        message: "Failed to fetch player",
-        operation: "getPlayer",
-      });
-    }
-  }
-
-  /**
-   * Get a player by Steam ID
-   */
-  async getPlayerBySteamId(
-    steamId: string,
-    gameId?: string,
-  ): Promise<Result<Player | null, AppError>> {
-    try {
-      const whereClause = {
-        uniqueIds: {
-          some: {
-            uniqueId: steamId,
-            ...(gameId && { gameId }),
-          },
-        },
-      };
-
-      const player = await this.db.player.findFirst({
-        where: whereClause,
-        include: PLAYER_INCLUDE,
-      });
-
-      return success(player);
-    } catch (error) {
-      console.error(error);
-      return failure({
-        type: "DATABASE_ERROR",
-        message: "Failed to fetch player by Steam ID",
-        operation: "getPlayerBySteamId",
-      });
-    }
-  }
-
-  /**
-   * Get players with filtering, sorting, and pagination
-   */
-  async getPlayers(
-    filters: PlayerFilters = {},
-    sort: PlayerSortInput = { field: PlayerSortField.SKILL, direction: "desc" },
-    pagination: PaginationInput = {},
-  ): Promise<Result<PaginatedResponse<Player>, AppError>> {
-    try {
-      const paginationConfig = createPaginationConfig(pagination);
-      const whereClause = this.buildPlayerWhereClause(filters);
-      const orderBy = this.buildPlayerOrderBy(sort);
-
-      const [players, total] = await Promise.all([
-        this.db.player.findMany({
-          where: whereClause,
-          include: PLAYER_INCLUDE,
-          orderBy,
-          skip: paginationConfig.skip,
-          take: paginationConfig.limit,
-        }),
-        this.db.player.count({ where: whereClause }),
-      ]);
-
-      const paginationMetadata = createPaginationMetadata(
-        total,
-        paginationConfig,
-      );
-
-      return success({
-        items: players,
-        pagination: paginationMetadata,
-      });
-    } catch (error) {
-      console.error(error);
-      return failure({
-        type: "DATABASE_ERROR",
-        message: "Failed to fetch players",
-        operation: "getPlayers",
-      });
-    }
-  }
-
-  /**
-   * Get top players by skill for a specific game
-   */
-  async getTopPlayers(
-    gameId: string,
-    limit: number = 10,
-  ): Promise<Result<readonly Player[], AppError>> {
-    try {
-      const players = await this.db.player.findMany({
-        where: {
-          game: gameId,
-          hideranking: 0,
-        },
-        include: PLAYER_INCLUDE,
-        orderBy: {
-          skill: "desc",
-        },
-        take: Math.min(limit, 100), // Cap at 100 for performance
-      });
-
-      return success(players);
-    } catch (error) {
-      console.error(error);
-      return failure({
-        type: "DATABASE_ERROR",
-        message: "Failed to fetch top players",
-        operation: "getTopPlayers",
-      });
-    }
-  }
-
-  /**
-   * Get player statistics summary
+   * Get player statistics summary with rank calculation
+   * This involves complex business logic that's better handled in the service layer
    */
   async getPlayerStats(
-    playerId: string,
+    playerId: string
   ): Promise<Result<PlayerStatistics, AppError>> {
     try {
-      const playerResult = await this.getPlayer(playerId);
+      const player = await this.db.player.findUnique({
+        where: { playerId: Number(playerId) },
+      });
 
-      if (!playerResult.success) {
-        return playerResult;
-      }
-
-      const player = playerResult.data;
       if (!player) {
         return failure({
           type: "NOT_FOUND",
@@ -187,7 +46,7 @@ export class PlayerService {
       const headshotRatio =
         player.kills > 0 ? (player.headshots / player.kills) * 100 : 0;
 
-      // Get player rank within their game
+      // Get player rank within their game - complex query better in service
       const rank =
         (await this.db.player.count({
           where: {
@@ -220,24 +79,26 @@ export class PlayerService {
 
   /**
    * Update player statistics (called by daemon)
+   * Requires transaction handling and complex business logic
    */
   async updatePlayerStats(
     steamId: string,
     gameId: string,
-    stats: UpdatePlayerStatsInput,
+    stats: UpdatePlayerStatsInput
   ): Promise<Result<Player, AppError>> {
     try {
-      // Find player by Steam ID
-      const existingPlayerResult = await this.getPlayerBySteamId(
-        steamId,
-        gameId,
-      );
+      // Find player by Steam ID - complex relation query
+      const existingPlayer = await this.db.player.findFirst({
+        where: {
+          uniqueIds: {
+            some: {
+              uniqueId: steamId,
+              game: gameId,
+            },
+          },
+        },
+      });
 
-      if (!existingPlayerResult.success) {
-        return existingPlayerResult;
-      }
-
-      const existingPlayer = existingPlayerResult.data;
       if (!existingPlayer) {
         return failure({
           type: "NOT_FOUND",
@@ -247,22 +108,23 @@ export class PlayerService {
         });
       }
 
-      // Update player statistics
+      // Update player statistics with proper data validation
       const updatedPlayer = await this.db.player.update({
         where: { playerId: existingPlayer.playerId },
         data: {
-          kills: stats.kills,
-          deaths: stats.deaths,
-          suicides: stats.suicides,
-          shots: stats.shots,
-          hits: stats.hits,
-          headshots: stats.headshots,
-          teamkills: stats.teamkills,
-          skill: stats.skill,
-          connection_time: stats.connectionTime,
-          last_event: stats.lastEvent,
+          ...(stats.kills !== undefined && { kills: stats.kills }),
+          ...(stats.deaths !== undefined && { deaths: stats.deaths }),
+          ...(stats.suicides !== undefined && { suicides: stats.suicides }),
+          ...(stats.shots !== undefined && { shots: stats.shots }),
+          ...(stats.hits !== undefined && { hits: stats.hits }),
+          ...(stats.headshots !== undefined && { headshots: stats.headshots }),
+          ...(stats.teamkills !== undefined && { teamkills: stats.teamkills }),
+          ...(stats.skill !== undefined && { skill: stats.skill }),
+          ...(stats.connectionTime !== undefined && {
+            connection_time: stats.connectionTime,
+          }),
+          ...(stats.lastEvent !== undefined && { last_event: stats.lastEvent }),
         },
-        include: PLAYER_INCLUDE,
       });
 
       return success(updatedPlayer);
@@ -277,10 +139,11 @@ export class PlayerService {
   }
 
   /**
-   * Create a new player
+   * Create a new player with Steam ID association
+   * Requires transaction to ensure data consistency across tables
    */
   async createPlayer(
-    data: CreatePlayerInput,
+    data: CreatePlayerInput
   ): Promise<Result<Player, AppError>> {
     try {
       const player = await this.db.player.create({
@@ -302,7 +165,6 @@ export class PlayerService {
             },
           },
         },
-        include: PLAYER_INCLUDE,
       });
 
       return success(player);
@@ -314,66 +176,5 @@ export class PlayerService {
         operation: "createPlayer",
       });
     }
-  }
-
-  /**
-   * Build where clause for player filtering
-   */
-  private buildPlayerWhereClause(
-    filters: PlayerFilters,
-  ): Record<string, unknown> {
-    const where: Record<string, unknown> = {};
-
-    if (filters.gameId) {
-      where.game = filters.gameId;
-    }
-
-    if (filters.clanId) {
-      where.clan = Number(filters.clanId);
-    }
-
-    if (filters.countryId) {
-      where.flag = filters.countryId;
-    }
-
-    if (typeof filters.hideRanking === "boolean") {
-      where.hideranking = filters.hideRanking ? 1 : 0;
-    }
-
-    if (filters.minSkill !== undefined) {
-      where.skill = {
-        ...((where.skill as object) || {}),
-        gte: filters.minSkill,
-      };
-    }
-
-    if (filters.maxSkill !== undefined) {
-      where.skill = {
-        ...((where.skill as object) || {}),
-        lte: filters.maxSkill,
-      };
-    }
-
-    if (filters.minKills !== undefined) {
-      where.kills = { gte: filters.minKills };
-    }
-
-    if (filters.search) {
-      where.OR = [
-        { lastName: { contains: filters.search, mode: "insensitive" } },
-        { fullName: { contains: filters.search, mode: "insensitive" } },
-      ];
-    }
-
-    return where;
-  }
-
-  /**
-   * Build order by clause for player sorting
-   */
-  private buildPlayerOrderBy(sort: PlayerSortInput): Record<string, string> {
-    return {
-      [sort.field]: sort.direction,
-    };
   }
 }

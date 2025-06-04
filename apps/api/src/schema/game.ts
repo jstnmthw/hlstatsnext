@@ -1,5 +1,5 @@
 import { builder } from "../builder";
-import type { Player } from "@repo/database/client";
+import { Player } from "./player";
 
 // Define Game object using Prisma plugin - automatically maps all Prisma fields
 const Game = builder.prismaObject("Game", {
@@ -20,13 +20,13 @@ const Game = builder.prismaObject("Game", {
       resolve: (game) => game.hidden === "1",
     }),
 
-    // Expose relation counts (these work without defining the related objects)
+    // Relation counts
     playerCount: t.relationCount("players"),
     clanCount: t.relationCount("clans"),
 
-    // Note: Actual relations commented out until Player/Clan objects are defined
-    // players: t.relation("players"),
-    // clans: t.relation("clans"),
+    // Relations
+    players: t.relation("players"),
+    clans: t.relation("clans"),
   }),
 });
 
@@ -47,7 +47,7 @@ GameStatistics.implement({
     totalKills: t.exposeInt("totalKills"),
     totalDeaths: t.exposeInt("totalDeaths"),
     averageSkill: t.exposeInt("averageSkill"),
-    // topPlayers: t.expose("topPlayers", { type: [Player] }), // Enable when Player type is available
+    topPlayers: t.expose("topPlayers", { type: [Player] }),
   }),
 });
 
@@ -104,3 +104,5 @@ builder.queryField("gameStats", (t) =>
     },
   })
 );
+
+export { Game };

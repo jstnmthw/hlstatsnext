@@ -405,3 +405,5 @@ builder.mutationField("updatePlayerStats", (t) =>
     },
   })
 );
+
+export { Player };

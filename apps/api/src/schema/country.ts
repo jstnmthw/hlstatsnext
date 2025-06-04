@@ -46,3 +46,5 @@ builder.queryField("country", (t) =>
     },
   })
 );
+
+export { Country };

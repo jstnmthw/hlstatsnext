@@ -27,36 +27,63 @@ const Clan = builder.prismaObject("Clan", {
     // Players relation
     players: t.relation("players"), // Enable when Player type is defined
 
-    // Computed fields
+    // Simple computed fields
     isHidden: t.boolean({
       resolve: (clan) => clan.hidden === 1,
     }),
   }),
 });
 
-// Query to get all clans with filtering
+// Input type for clan filtering
+const ClanFiltersInput = builder.inputType("ClanFiltersInput", {
+  fields: (t) => ({
+    gameId: t.string({ required: false }),
+    includeHidden: t.boolean({ defaultValue: false }),
+    search: t.string({ required: false }),
+    hasPlayers: t.boolean({ required: false }),
+  }),
+});
+
+// Enhanced query to get all clans with comprehensive filtering
 builder.queryField("clans", (t) =>
   t.prismaField({
     type: [Clan],
     args: {
-      gameId: t.arg.string({ required: false }),
-      includeHidden: t.arg.boolean({ defaultValue: false }),
+      filters: t.arg({ type: ClanFiltersInput, required: false }),
+      limit: t.arg.int({ defaultValue: 50 }),
+      offset: t.arg.int({ defaultValue: 0 }),
     },
     resolve: async (query, _parent, args, context) => {
       const whereClause: Prisma.ClanWhereInput = {};
+      const filters = args.filters;
 
-      if (args.gameId) {
-        whereClause.game = args.gameId;
+      if (filters?.gameId) {
+        whereClause.game = filters.gameId;
       }
 
-      if (!args.includeHidden) {
+      if (!filters?.includeHidden) {
         whereClause.hidden = 0;
+      }
+
+      if (filters?.hasPlayers) {
+        whereClause.players = {
+          some: {},
+        };
+      }
+
+      if (filters?.search) {
+        whereClause.OR = [
+          { name: { contains: filters.search } },
+          { tag: { contains: filters.search } },
+        ];
       }
 
       return context.db.clan.findMany({
         ...query,
         where: whereClause,
         orderBy: [{ name: "asc" }],
+        take: Math.min(args.limit ?? 50, 100), // Cap at 100
+        skip: args.offset ?? 0,
       });
     },
   })
@@ -84,27 +111,4 @@ builder.queryField("clan", (t) =>
   })
 );
 
-// Query to get top clans for a game
-builder.queryField("topClans", (t) =>
-  t.prismaField({
-    type: [Clan],
-    args: {
-      gameId: t.arg.string({ required: true }),
-      limit: t.arg.int({ defaultValue: 10 }),
-    },
-    resolve: async (query, _parent, args, context) => {
-      return context.db.clan.findMany({
-        ...query,
-        where: {
-          game: args.gameId,
-          hidden: 0,
-          players: {
-            some: {}, // Only clans with at least one player
-          },
-        },
-        orderBy: [{ name: "asc" }],
-        take: Math.min(args.limit ?? 10, 50),
-      });
-    },
-  })
-);
+export { Clan };

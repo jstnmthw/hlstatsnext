@@ -1,83 +1,34 @@
-import type { Clan, PrismaClient } from "@repo/database/client";
+import type { PrismaClient } from "@repo/database/client";
 import type {
   ClanWithAverageSkill,
   ClanStatistics,
-  ClanFilters,
-} from "../types/database/clan.types";
-import {
-  CLAN_INCLUDE,
-  CLAN_WITH_ALL_PLAYERS_INCLUDE,
 } from "../types/database/clan.types";
 import type { Result, AppError } from "../types/common";
 import { success, failure } from "../types";
 
 /**
- * Service class for handling clan-related operations
+ * Service class for handling clan-related business logic
+ * Only contains methods with complex business logic not handled by GraphQL schema
  */
 export class ClanService {
   constructor(private readonly db: PrismaClient) {}
 
   /**
-   * Get all clans with filters
-   */
-  async getClans(
-    filters: ClanFilters = {},
-  ): Promise<Result<readonly Clan[], AppError>> {
-    try {
-      const whereClause = this.buildClanWhereClause(filters);
-
-      const clans = await this.db.clan.findMany({
-        where: whereClause,
-        include: CLAN_INCLUDE,
-        orderBy: [{ name: "asc" }],
-      });
-
-      return success(clans);
-    } catch (error) {
-      console.error(error);
-      return failure({
-        type: "DATABASE_ERROR",
-        message: "Failed to fetch clans",
-        operation: "getClans",
-      });
-    }
-  }
-
-  /**
-   * Get a single clan by ID
-   */
-  async getClan(id: string): Promise<Result<Clan | null, AppError>> {
-    try {
-      const clan = await this.db.clan.findUnique({
-        where: { clanId: Number(id) },
-        include: CLAN_WITH_ALL_PLAYERS_INCLUDE,
-      });
-
-      return success(clan);
-    } catch (error) {
-      console.error(error);
-      return failure({
-        type: "DATABASE_ERROR",
-        message: "Failed to fetch clan",
-        operation: "getClan",
-      });
-    }
-  }
-
-  /**
-   * Get clan statistics
+   * Get clan statistics - Complex business logic for statistical calculations
    */
   async getClanStats(
-    clanId: string,
+    clanId: string
   ): Promise<Result<ClanStatistics, AppError>> {
     try {
-      const clanResult = await this.getClan(clanId);
+      const clan = await this.db.clan.findUnique({
+        where: { clanId: Number(clanId) },
+        include: {
+          players: {
+            orderBy: { skill: "desc" },
+          },
+        },
+      });
 
-      if (!clanResult.success) {
-        return clanResult;
-      }
-
-      const clan = clanResult.data;
       if (!clan) {
         return failure({
           type: "NOT_FOUND",
@@ -120,7 +71,7 @@ export class ClanService {
             hidden: "0",
           },
           players: [],
-          _count: { players: 0 },
+          _count: { players: clan.players.length },
         },
         totalKills,
         totalDeaths,
@@ -141,11 +92,11 @@ export class ClanService {
   }
 
   /**
-   * Get top clans by average skill for a game
+   * Get top clans by average skill - Complex business logic for ranking
    */
   async getTopClans(
     gameId: string,
-    limit: number = 10,
+    limit: number = 10
   ): Promise<Result<readonly ClanWithAverageSkill[], AppError>> {
     try {
       const clans = await this.db.clan.findMany({
@@ -156,38 +107,39 @@ export class ClanService {
             some: {}, // Only clans with at least one player
           },
         },
-        include: CLAN_INCLUDE,
+        include: {
+          players: {
+            select: { skill: true },
+          },
+        },
       });
 
-      // Calculate average skill for each clan
-      const clansWithAvgSkill = await Promise.all(
-        clans.map(async (clan): Promise<ClanWithAverageSkill> => {
-          const avgSkill = await this.db.player.aggregate({
-            where: { clan: clan.clanId, game: gameId },
-            _avg: {
-              skill: true,
-            },
-          });
+      // Calculate average skill for each clan - this is business logic
+      const clansWithAvgSkill = clans.map((clan): ClanWithAverageSkill => {
+        const totalSkill = clan.players.reduce(
+          (sum, player) => sum + player.skill,
+          0
+        );
+        const averageSkill =
+          clan.players.length > 0 ? totalSkill / clan.players.length : 1000;
 
-          return {
-            ...clan,
-            gameData: {
-              code: clan.game,
-              name: clan.game,
-              realgame: clan.game,
-              hidden: "0",
-            },
-            averageSkill: Math.round(avgSkill._avg?.skill || 1000),
-          };
-        }),
-      );
+        return {
+          ...clan,
+          gameData: {
+            code: clan.game,
+            name: clan.game,
+            realgame: clan.game,
+            hidden: "0",
+          },
+          players: [], // Don't expose all players in listing
+          _count: { players: clan.players.length },
+          averageSkill: Math.round(averageSkill),
+        };
+      });
 
-      // Sort by average skill and return top clans
+      // Sort by average skill and return top clans - business logic
       const topClans = clansWithAvgSkill
-        .sort(
-          (a: ClanWithAverageSkill, b: ClanWithAverageSkill) =>
-            b.averageSkill - a.averageSkill,
-        )
+        .sort((a, b) => b.averageSkill - a.averageSkill)
         .slice(0, Math.min(limit, 50)); // Cap at 50 for performance
 
       return success(topClans);
@@ -199,35 +151,5 @@ export class ClanService {
         operation: "getTopClans",
       });
     }
-  }
-
-  /**
-   * Build where clause for clan filtering
-   */
-  private buildClanWhereClause(filters: ClanFilters): Record<string, unknown> {
-    const where: Record<string, unknown> = {};
-
-    if (filters.gameId) {
-      where.gameId = filters.gameId;
-    }
-
-    if (typeof filters.hidden === "boolean") {
-      where.hidden = filters.hidden;
-    }
-
-    if (filters.hasPlayers) {
-      where.players = {
-        some: {},
-      };
-    }
-
-    if (filters.search) {
-      where.OR = [
-        { name: { contains: filters.search, mode: "insensitive" } },
-        { tag: { contains: filters.search, mode: "insensitive" } },
-      ];
-    }
-
-    return where;
   }
 }

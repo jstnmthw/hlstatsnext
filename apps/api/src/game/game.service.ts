@@ -1,96 +1,20 @@
 import type { PrismaClient } from "@repo/database/client";
-import type {
-  GameWithStats,
-  GameStatistics,
-} from "../types/database/game.types";
-import {
-  GAME_INCLUDE,
-  ACTIVITY_TIMEFRAMES,
-} from "../types/database/game.types";
+import type { GameStatistics } from "../types/database/game.types";
+import { ACTIVITY_TIMEFRAMES } from "../types/database/game.types";
 import type { Result, AppError } from "../types/common";
 import { success, failure } from "../types";
 
 /**
- * Service class for handling game-related operations
+ * Service class for handling game-related business logic operations
  */
 export class GameService {
   constructor(private readonly db: PrismaClient) {}
 
   /**
-   * Get all games with player and clan counts
-   */
-  async getGames(
-    includeHidden: boolean = false,
-  ): Promise<Result<readonly GameWithStats[], AppError>> {
-    try {
-      const games = await this.db.game.findMany({
-        where: includeHidden ? {} : { hidden: "0" },
-        include: GAME_INCLUDE,
-        orderBy: {
-          name: "asc",
-        },
-      });
-
-      return success(games);
-    } catch (error) {
-      console.error(error);
-      return failure({
-        type: "DATABASE_ERROR",
-        message: "Failed to fetch games",
-        operation: "getGames",
-      });
-    }
-  }
-
-  /**
-   * Get a single game by ID
-   */
-  async getGame(id: string): Promise<Result<GameWithStats | null, AppError>> {
-    try {
-      const game = await this.db.game.findUnique({
-        where: { code: id },
-        include: GAME_INCLUDE,
-      });
-
-      return success(game);
-    } catch (error) {
-      console.error(error);
-      return failure({
-        type: "DATABASE_ERROR",
-        message: "Failed to fetch game",
-        operation: "getGame",
-      });
-    }
-  }
-
-  /**
-   * Get a game by code
-   */
-  async getGameByCode(
-    code: string,
-  ): Promise<Result<GameWithStats | null, AppError>> {
-    try {
-      const game = await this.db.game.findUnique({
-        where: { code },
-        include: GAME_INCLUDE,
-      });
-
-      return success(game);
-    } catch (error) {
-      console.error(error);
-      return failure({
-        type: "DATABASE_ERROR",
-        message: "Failed to fetch game by code",
-        operation: "getGameByCode",
-      });
-    }
-  }
-
-  /**
-   * Get game statistics summary
+   * Get game statistics summary - Complex business logic not suitable for schema resolvers
    */
   async getGameStats(
-    gameId: string,
+    gameId: string
   ): Promise<Result<GameStatistics, AppError>> {
     try {
       const game = await this.db.game.findUnique({

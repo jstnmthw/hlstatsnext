@@ -1,4 +1,5 @@
 import { builder } from "../builder";
+import type { Player } from "@repo/database/client";
 
 // Define Game object using Prisma plugin - automatically maps all Prisma fields
 const Game = builder.prismaObject("Game", {
@@ -26,6 +27,27 @@ const Game = builder.prismaObject("Game", {
     // Note: Actual relations commented out until Player/Clan objects are defined
     // players: t.relation("players"),
     // clans: t.relation("clans"),
+  }),
+});
+
+// Define GameStatistics type for complex queries
+const GameStatistics = builder.objectRef<{
+  totalPlayers: number;
+  activePlayers: number;
+  totalKills: number;
+  totalDeaths: number;
+  averageSkill: number;
+  topPlayers: readonly Player[];
+}>("GameStatistics");
+
+GameStatistics.implement({
+  fields: (t) => ({
+    totalPlayers: t.exposeInt("totalPlayers"),
+    activePlayers: t.exposeInt("activePlayers"),
+    totalKills: t.exposeInt("totalKills"),
+    totalDeaths: t.exposeInt("totalDeaths"),
+    averageSkill: t.exposeInt("averageSkill"),
+    // topPlayers: t.expose("topPlayers", { type: [Player] }), // Enable when Player type is available
   }),
 });
 
@@ -60,6 +82,25 @@ builder.queryField("game", (t) =>
         ...query,
         where: { code: args.id },
       });
+    },
+  })
+);
+
+// Query to get game statistics using the service for complex business logic
+builder.queryField("gameStats", (t) =>
+  t.field({
+    type: GameStatistics,
+    args: {
+      gameId: t.arg.string({ required: true }),
+    },
+    resolve: async (_parent, args, context) => {
+      const result = await context.services.game.getGameStats(args.gameId);
+
+      if (!result.success) {
+        throw new Error(result.error.message);
+      }
+
+      return result.data;
     },
   })
 );

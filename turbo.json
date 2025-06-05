@@ -21,6 +21,9 @@
     "clean": {
       "cache": false
     },
+    "db:fresh": {
+      "cache": false
+    },
     "db:generate": {
       "cache": false
     },

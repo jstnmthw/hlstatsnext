@@ -12,6 +12,7 @@
     "db:push": "turbo run db:push",
     "db:migrate": "turbo run db:migrate",
     "db:seed": "turbo run db:seed",
+    "db:fresh": "turbo run db:fresh",
     "db:studio": "turbo run db:studio"
   },
   "devDependencies": {

@@ -8,6 +8,7 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "tsx src/seed.ts",
+    "db:fresh": "tsx src/reset.ts",
     "build": "tsc",
     "dev": "tsc --watch",
     "check-types": "tsc --noEmit",
@@ -33,6 +34,7 @@
   "exports": {
     "./client": "./src/index.ts",
     "./seed": "./src/seed.ts",
+    "./reset": "./src/reset.ts",
     "./generated/graphql": "./generated/graphql/pothos-types.ts"
   }
 }

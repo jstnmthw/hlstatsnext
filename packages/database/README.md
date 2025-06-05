@@ -35,6 +35,7 @@ pnpm db:generate
 - `pnpm db:migrate` - Create and apply migrations (production)
 - `pnpm db:studio` - Open Prisma Studio for database browsing
 - `pnpm db:seed` - Seed database with development data
+- `pnpm db:fresh` - Reset development data (clears Players, PlayerUniqueIds, Clans while preserving initial seeded data like Games and Countries)
 
 ## Usage
 

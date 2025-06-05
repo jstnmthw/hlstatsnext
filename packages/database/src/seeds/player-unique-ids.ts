@@ -22,9 +22,8 @@ export async function seedPlayerUniqueIds() {
     );
   }
 
-  // Get available games for cross-game IDs
+  // Get available games for cross-game IDs (all games)
   const availableGames = await db.game.findMany({
-    where: { hidden: "0" },
     select: { code: true, name: true },
   });
 

@@ -9,9 +9,8 @@ export async function seedPlayers() {
   const config = getSeedConfig();
   const { count, clanDistribution } = config.players;
 
-  // Get available games
+  // Get available games (all games for random distribution)
   const availableGames = await db.game.findMany({
-    where: { hidden: "0" },
     select: { code: true, name: true },
   });
 

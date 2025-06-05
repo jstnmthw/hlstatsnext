@@ -18,14 +18,15 @@
     "prisma": "^6.0.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.8.0",
     "@pothos/core": "^4.6.2",
     "@pothos/plugin-prisma": "^4.8.2",
     "@pothos/plugin-relay": "^4.4.2",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.8.4",
-    "tsx": "^4.7.0",
     "eslint": "^9.27.0",
+    "tsx": "^4.7.0",
     "typescript": "5.8.2"
   },
   "exports": {

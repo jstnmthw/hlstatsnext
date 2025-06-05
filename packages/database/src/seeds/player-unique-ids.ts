@@ -1,24 +1,18 @@
+import { faker } from "@faker-js/faker";
 import { db } from "../index";
+import { getSeedConfig } from "./config";
+import { generateSteamId } from "./utils";
 
 export async function seedPlayerUniqueIds() {
   console.log("🆔 Seeding player unique IDs...");
 
-  // Get games that should already exist
-  const tfGame = await db.game.findFirst({ where: { code: "tfc" } });
-  const tf2Game = await db.game.findFirst({ where: { code: "tf" } });
-  const cssGame = await db.game.findFirst({ where: { code: "css" } });
+  const config = getSeedConfig();
+  const { additionalIdsPerPlayer, multiGamePlayersPercentage } =
+    config.playerUniqueIds;
 
-  if (!tfGame || !tf2Game || !cssGame) {
-    throw new Error(
-      "Required games not found. Please ensure Games are seeded first."
-    );
-  }
-
-  // Get players that should already exist
+  // Get all existing players
   const players = await db.player.findMany({
-    where: {
-      playerId: { in: [1, 2, 3, 4, 5, 6, 7, 8] },
-    },
+    select: { playerId: true, game: true, lastName: true },
     orderBy: { playerId: "asc" },
   });
 
@@ -28,23 +22,29 @@ export async function seedPlayerUniqueIds() {
     );
   }
 
-  const steamIds = [
-    "STEAM_0:0:12345678", // HeavyWeaponsGuy
-    "STEAM_0:1:87654321", // Scout
-    "STEAM_0:0:11223344", // Sniper
-    "STEAM_0:1:44332211", // Pyro
-    "STEAM_0:0:55667788", // HeadHunter
-    "STEAM_0:1:99887766", // RushB
-    "STEAM_0:0:13579246", // Medic
-    "STEAM_0:1:24681357", // SoloPlayer
-  ];
+  // Get available games for cross-game IDs
+  const availableGames = await db.game.findMany({
+    where: { hidden: "0" },
+    select: { code: true, name: true },
+  });
 
-  const playerUniqueIds = await Promise.all(
-    players.map(async (player, index) => {
-      const steamId = steamIds[index];
-      if (!steamId) {
-        throw new Error(`No Steam ID available for player ${player.playerId}`);
-      }
+  console.log(
+    `🎮 Creating Steam IDs for ${players.length} players across ${availableGames.length} games`
+  );
+
+  const multiGamePlayers = Math.round(
+    players.length * (multiGamePlayersPercentage || 0.3)
+  );
+  const additionalIds = additionalIdsPerPlayer || 2;
+
+  console.log(`🔄 ${multiGamePlayers} players will have cross-game Steam IDs`);
+
+  const playerUniqueIds = [];
+
+  // Create primary Steam ID for each player in their main game
+  const primaryIds = await Promise.all(
+    players.map(async (player) => {
+      const steamId = generateSteamId();
 
       return db.playerUniqueId.upsert({
         where: {
@@ -63,57 +63,90 @@ export async function seedPlayerUniqueIds() {
     })
   );
 
-  // Add some additional Steam IDs for players who might play multiple games
-  const additionalIds = await Promise.all([
-    // HeavyWeaponsGuy also plays TF2
-    db.playerUniqueId.upsert({
-      where: {
-        uniqueId_game: {
-          uniqueId: "STEAM_0:0:12345678",
-          game: tf2Game.code,
-        },
-      },
-      update: {},
-      create: {
-        playerId: 1, // HeavyWeaponsGuy
-        uniqueId: "STEAM_0:0:12345678",
-        game: tf2Game.code,
-      },
-    }),
-    // Scout also plays CSS
-    db.playerUniqueId.upsert({
-      where: {
-        uniqueId_game: {
-          uniqueId: "STEAM_0:1:87654321",
-          game: cssGame.code,
-        },
-      },
-      update: {},
-      create: {
-        playerId: 2, // Scout
-        uniqueId: "STEAM_0:1:87654321",
-        game: cssGame.code,
-      },
-    }),
-    // HeadHunter also plays TFC
-    db.playerUniqueId.upsert({
-      where: {
-        uniqueId_game: {
-          uniqueId: "STEAM_0:0:55667788",
-          game: tfGame.code,
-        },
-      },
-      update: {},
-      create: {
-        playerId: 5, // HeadHunter
-        uniqueId: "STEAM_0:0:55667788",
-        game: tfGame.code,
-      },
-    }),
-  ]);
+  playerUniqueIds.push(...primaryIds);
+  console.log(`✅ Created ${primaryIds.length} primary Steam IDs`);
 
-  const totalIds = playerUniqueIds.length + additionalIds.length;
-  console.log(`✅ Created ${totalIds} player unique IDs`);
+  // Create additional Steam IDs for multi-game players
+  const additionalUniqueIds = [];
+  const selectedMultiGamePlayers = faker.helpers.arrayElements(
+    players,
+    multiGamePlayers
+  );
 
-  return { playerUniqueIds, additionalIds };
+  for (const player of selectedMultiGamePlayers) {
+    // Get games different from the player's main game
+    const otherGames = availableGames.filter(
+      (game) => game.code !== player.game
+    );
+
+    if (otherGames.length === 0) continue;
+
+    // Select random number of additional games (up to additionalIds limit)
+    const numAdditionalGames = Math.min(
+      faker.number.int({ min: 1, max: additionalIds }),
+      otherGames.length
+    );
+
+    const selectedGames = faker.helpers.arrayElements(
+      otherGames,
+      numAdditionalGames
+    );
+
+    for (const game of selectedGames) {
+      const steamId = generateSteamId();
+
+      additionalUniqueIds.push(
+        db.playerUniqueId.upsert({
+          where: {
+            uniqueId_game: {
+              uniqueId: steamId,
+              game: game.code,
+            },
+          },
+          update: {},
+          create: {
+            playerId: player.playerId,
+            uniqueId: steamId,
+            game: game.code,
+          },
+        })
+      );
+    }
+  }
+
+  if (additionalUniqueIds.length > 0) {
+    const additionalResults = await Promise.all(additionalUniqueIds);
+    playerUniqueIds.push(...additionalResults);
+    console.log(
+      `🔄 Created ${additionalResults.length} additional cross-game Steam IDs`
+    );
+  }
+
+  const totalIds = playerUniqueIds.length;
+  console.log(`✅ Created ${totalIds} total Steam IDs`);
+
+  // Log distribution stats
+  const gameStats = new Map<string, number>();
+  for (const uniqueId of playerUniqueIds) {
+    const currentCount = gameStats.get(uniqueId.game) || 0;
+    gameStats.set(uniqueId.game, currentCount + 1);
+  }
+
+  console.log("📈 Steam ID distribution by game:");
+  for (const [game, count] of gameStats.entries()) {
+    const gameName = availableGames.find((g) => g.code === game)?.name || game;
+    const percentage = Math.round((count / totalIds) * 100);
+    console.log(
+      `   ${game} (${gameName}): ${count} Steam IDs (${percentage}%)`
+    );
+  }
+
+  return {
+    playerUniqueIds: primaryIds,
+    additionalIds:
+      additionalUniqueIds.length > 0
+        ? await Promise.all(additionalUniqueIds)
+        : [],
+    totalCreated: totalIds,
+  };
 }

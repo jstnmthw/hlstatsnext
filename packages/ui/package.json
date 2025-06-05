@@ -18,7 +18,8 @@
     "check-types": "tsc --noEmit",
     "dev:styles": "tailwindcss -i ./src/styles.css -o ./dist/index.css --watch",
     "dev:components": "tsc --watch",
-    "lint": "eslint src --max-warnings 0"
+    "lint": "eslint src --max-warnings 0",
+    "clean": "rm -rf node_modules"
   },
   "peerDependencies": {
     "react": "^19"

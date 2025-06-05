@@ -1,11 +1,7 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
-  "globalEnv": [
-    "NODE_ENV",
-    "FRONTEND_URL",
-    "PORT"
-  ],
+  "globalEnv": ["NODE_ENV", "FRONTEND_URL", "PORT"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -21,6 +17,9 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "clean": {
+      "cache": false
     },
     "db:generate": {
       "cache": false

@@ -11,7 +11,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "check-types": "tsc --noEmit",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf node_modules"
   },
   "dependencies": {
     "@prisma/client": "^6.0.1",

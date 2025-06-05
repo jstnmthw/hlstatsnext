@@ -7,7 +7,8 @@
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "check-types": "tsc --noEmit",
-    "lint": "eslint src/ --max-warnings 0"
+    "lint": "eslint src/ --max-warnings 0",
+    "clean": "rm -rf node_modules"
   },
   "dependencies": {
     "@repo/database": "workspace:*",

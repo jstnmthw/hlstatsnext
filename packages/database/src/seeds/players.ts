@@ -7,7 +7,7 @@ export async function seedPlayers() {
   console.log("👥 Seeding players...");
 
   const config = getSeedConfig();
-  const { count, clanDistribution, gamesDistribution } = config.players;
+  const { count, clanDistribution } = config.players;
 
   // Get available games
   const availableGames = await db.game.findMany({
@@ -32,11 +32,11 @@ export async function seedPlayers() {
   });
 
   console.log(
-    `📊 Creating ${count} players with ${availableClans.length} clans available`
+    `📊 Creating ${count} players randomly across ${availableGames.length} games with ${availableClans.length} clans available`
   );
 
-  const gameDistribution = gamesDistribution || {};
   const clanDist = clanDistribution || { withClan: 0.7, withoutClan: 0.3 };
+  const gameCodes = availableGames.map((g) => g.code);
 
   // Calculate how many players should have clans
   const playersWithClan = Math.round(count * clanDist.withClan);
@@ -55,26 +55,8 @@ export async function seedPlayers() {
     const batchPlayers = [];
 
     for (let j = i; j < batchEnd; j++) {
-      // Select game based on distribution or randomly
-      let selectedGame: string;
-      if (Object.keys(gameDistribution).length > 0) {
-        const gameCodes = availableGames.map((g) => g.code);
-        const weights = gameCodes.map((code) => gameDistribution[code] || 0.1);
-        const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-        let random = faker.number.float({ min: 0, max: totalWeight });
-
-        selectedGame = gameCodes[0] || "css"; // fallback
-        for (let k = 0; k < gameCodes.length; k++) {
-          random -= weights[k]!;
-          if (random <= 0) {
-            selectedGame = gameCodes[k]!;
-            break;
-          }
-        }
-      } else {
-        const gameCodes = availableGames.map((g) => g.code);
-        selectedGame = gameCodes[0] || "css"; // fallback if no games
-      }
+      // Select random game
+      const selectedGame = faker.helpers.arrayElement(gameCodes) || "css";
 
       // Determine if player should have a clan
       const shouldHaveClan = j < playersWithClan;
@@ -144,7 +126,13 @@ export async function seedPlayers() {
     }
   }
 
-  console.log(`✅ Created ${players.length} players`);
+  console.log(`✅ Created ${players.length} players (expected: ${count})`);
+
+  if (players.length !== count) {
+    console.log(
+      `⚠️ Player count mismatch: created ${players.length}, expected ${count}`
+    );
+  }
 
   // Log distribution stats
   const gameStats = new Map<string, number>();

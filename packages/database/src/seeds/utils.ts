@@ -1,127 +1,154 @@
 import { faker } from "@faker-js/faker";
+import type { Prisma } from "../index";
 
-export interface GameStats {
-  skill: number;
-  kills: number;
-  deaths: number;
-  headshots: number;
-  shots: number;
-  hits: number;
-  connection_time: number;
-}
+// Type for game statistics
+type GameStats = Pick<
+  Prisma.PlayerCreateInput,
+  | "skill"
+  | "kills"
+  | "deaths"
+  | "headshots"
+  | "shots"
+  | "hits"
+  | "connection_time"
+>;
 
-export interface PlayerData {
-  lastName: string;
-  fullName?: string;
-  email?: string;
-  homepage?: string;
-  city: string;
-  state: string;
-  country: string;
-  lat: number;
-  lng: number;
-  last_event: number;
-  createdate: number;
-}
-
-// Game-specific stat generators
-const GAME_STAT_PROFILES = {
-  css: {
-    // Counter-Strike: Source
-    skillRange: [800, 2000],
-    killDeathRatio: [0.8, 2.5],
-    headshotPercentage: [0.15, 0.45],
-    accuracyPercentage: [0.25, 0.55],
-  },
-  csgo: {
-    // Counter-Strike: Global Offensive
-    skillRange: [600, 1800],
-    killDeathRatio: [0.7, 2.2],
-    headshotPercentage: [0.2, 0.5],
-    accuracyPercentage: [0.3, 0.6],
-  },
-  tf: {
-    // Team Fortress 2
-    skillRange: [900, 1600],
-    killDeathRatio: [0.9, 2.0],
-    headshotPercentage: [0.05, 0.25], // Lower headshots due to variety of classes
-    accuracyPercentage: [0.2, 0.5],
-  },
-  tfc: {
-    // Team Fortress Classic
-    skillRange: [950, 1700],
-    killDeathRatio: [0.8, 2.1],
-    headshotPercentage: [0.08, 0.3],
-    accuracyPercentage: [0.22, 0.52],
-  },
-  dods: {
-    // Day of Defeat: Source
-    skillRange: [850, 1550],
-    killDeathRatio: [0.75, 1.8],
-    headshotPercentage: [0.12, 0.35],
-    accuracyPercentage: [0.28, 0.48],
-  },
-} as const;
-
+/**
+ * Generate game-specific statistics based on game type
+ */
 export function generateGameStats(gameCode: string): GameStats {
-  const profile =
-    GAME_STAT_PROFILES[gameCode as keyof typeof GAME_STAT_PROFILES] ||
-    GAME_STAT_PROFILES.css;
-
-  const skill = faker.number.int({
-    min: profile.skillRange[0],
-    max: profile.skillRange[1],
-  });
-
-  const kills = faker.number.int({ min: 100, max: 5000 });
-  const kdRatio = faker.number.float({
-    min: profile.killDeathRatio[0],
-    max: profile.killDeathRatio[1],
-    fractionDigits: 2,
-  });
-  const deaths = Math.max(1, Math.round(kills / kdRatio));
-
-  const headshotPercentage = faker.number.float({
-    min: profile.headshotPercentage[0],
-    max: profile.headshotPercentage[1],
-    fractionDigits: 3,
-  });
-  const headshots = Math.round(kills * headshotPercentage);
-
-  const accuracyPercentage = faker.number.float({
-    min: profile.accuracyPercentage[0],
-    max: profile.accuracyPercentage[1],
-    fractionDigits: 3,
-  });
-  const hits = faker.number.int({ min: kills * 2, max: kills * 8 });
-  const shots = Math.round(hits / accuracyPercentage);
-
-  const connection_time = faker.number.int({ min: 3600, max: 500000 }); // 1 hour to ~138 hours
-
-  return {
-    skill,
-    kills,
-    deaths,
-    headshots,
-    shots,
-    hits,
-    connection_time,
-  };
+  switch (gameCode) {
+    case "css": // Counter-Strike: Source
+      return generateCSSourceStats();
+    case "tf": // Team Fortress 2
+      return generateTF2Stats();
+    case "tfc": // Team Fortress Classic
+      return generateTFCStats();
+    default:
+      return generateDefaultStats();
+  }
 }
 
-export function generatePlayerData(): PlayerData {
-  const firstName = faker.person.firstName();
-  const lastName = faker.internet.username();
-  const fullName = faker.datatype.boolean()
-    ? `${firstName} "${lastName}" ${faker.person.lastName()}`
+function generateCSSourceStats(): GameStats {
+  const skill = faker.number.int({ min: 800, max: 2000 });
+  const kills = faker.number.int({ min: 100, max: 5000 });
+  const kdRatio = faker.number.float({ min: 0.8, max: 2.5 });
+  const deaths = Math.round(kills / kdRatio);
+
+  // CS players typically have higher headshot rates
+  const headshotRate = faker.number.float({ min: 0.15, max: 0.45 });
+  const headshots = Math.round(kills * headshotRate);
+
+  // Accuracy for CS
+  const accuracy = faker.number.float({ min: 0.25, max: 0.55 });
+  const shots = Math.round((kills / accuracy) * 2);
+  const hits = Math.round(shots * accuracy);
+
+  const connection_time = faker.number.int({ min: 3600, max: 500000 });
+
+  return { skill, kills, deaths, headshots, shots, hits, connection_time };
+}
+
+function generateTF2Stats(): GameStats {
+  const skill = faker.number.int({ min: 900, max: 1600 });
+  const kills = faker.number.int({ min: 80, max: 4000 });
+  const kdRatio = faker.number.float({ min: 0.9, max: 2.0 });
+  const deaths = Math.round(kills / kdRatio);
+
+  // TF2 has lower headshot rates due to class variety
+  const headshotRate = faker.number.float({ min: 0.05, max: 0.25 });
+  const headshots = Math.round(kills * headshotRate);
+
+  const accuracy = faker.number.float({ min: 0.2, max: 0.5 });
+  const shots = Math.round((kills / accuracy) * 1.8);
+  const hits = Math.round(shots * accuracy);
+
+  const connection_time = faker.number.int({ min: 2400, max: 400000 });
+
+  return { skill, kills, deaths, headshots, shots, hits, connection_time };
+}
+
+function generateTFCStats(): GameStats {
+  const skill = faker.number.int({ min: 950, max: 1700 });
+  const kills = faker.number.int({ min: 90, max: 3500 });
+  const kdRatio = faker.number.float({ min: 0.8, max: 2.1 });
+  const deaths = Math.round(kills / kdRatio);
+
+  const headshotRate = faker.number.float({ min: 0.08, max: 0.3 });
+  const headshots = Math.round(kills * headshotRate);
+
+  const accuracy = faker.number.float({ min: 0.22, max: 0.52 });
+  const shots = Math.round((kills / accuracy) * 1.9);
+  const hits = Math.round(shots * accuracy);
+
+  const connection_time = faker.number.int({ min: 1800, max: 350000 });
+
+  return { skill, kills, deaths, headshots, shots, hits, connection_time };
+}
+
+function generateDefaultStats(): GameStats {
+  const skill = faker.number.int({ min: 800, max: 1800 });
+  const kills = faker.number.int({ min: 50, max: 3000 });
+  const kdRatio = faker.number.float({ min: 0.7, max: 2.2 });
+  const deaths = Math.round(kills / kdRatio);
+
+  const headshotRate = faker.number.float({ min: 0.1, max: 0.35 });
+  const headshots = Math.round(kills * headshotRate);
+
+  const accuracy = faker.number.float({ min: 0.18, max: 0.48 });
+  const shots = Math.round((kills / accuracy) * 2.2);
+  const hits = Math.round(shots * accuracy);
+
+  const connection_time = faker.number.int({ min: 1200, max: 300000 });
+
+  return { skill, kills, deaths, headshots, shots, hits, connection_time };
+}
+
+// Type for clan data
+type ClanData = Pick<
+  Prisma.ClanCreateInput,
+  "tag" | "name" | "homepage" | "mapregion"
+>;
+
+/**
+ * Generate realistic clan data
+ */
+export function generateClanData(): ClanData {
+  // Generate unique tag with random word + number to avoid duplicates
+  const word = faker.lorem.word({ length: { min: 2, max: 4 } }).toUpperCase();
+  const number = faker.number.int({ min: 1, max: 999 });
+  const tag = `[${word}${number}]`;
+
+  const name = faker.company.name();
+  const homepage = faker.datatype.boolean(0.4)
+    ? faker.internet.url()
     : undefined;
+  const mapregion = faker.location.country();
 
-  const city = faker.location.city();
-  const state = faker.location.state();
-  const country = faker.location.country();
-  const lat = faker.location.latitude();
-  const lng = faker.location.longitude();
+  return { tag, name, homepage, mapregion };
+}
 
+// Type for player data
+type PlayerData = Pick<
+  Prisma.PlayerCreateInput,
+  | "lastName"
+  | "fullName"
+  | "email"
+  | "homepage"
+  | "city"
+  | "state"
+  | "lat"
+  | "lng"
+  | "last_event"
+  | "createdate"
+>;
+
+/**
+ * Generate realistic player data
+ */
+export function generatePlayerData(): PlayerData {
+  const lastName = faker.internet.username();
+  const fullName = faker.person.fullName();
   const email = faker.datatype.boolean(0.7)
     ? faker.internet.email()
     : undefined;
@@ -129,21 +156,23 @@ export function generatePlayerData(): PlayerData {
     ? faker.internet.url()
     : undefined;
 
-  const createdate =
-    faker.date
-      .between({
-        from: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // 1 year ago
-        to: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-      })
-      .getTime() / 1000;
+  const city = faker.location.city();
+  const state = faker.location.state();
+  const lat = faker.location.latitude();
+  const lng = faker.location.longitude();
 
-  const last_event =
+  // Player creation date (within last 2 years) - as timestamp
+  const createdate = Math.floor(faker.date.past({ years: 2 }).getTime() / 1000);
+
+  // Last event (between creation and now) - as timestamp
+  const last_event = Math.floor(
     faker.date
       .between({
         from: new Date(createdate * 1000),
         to: new Date(),
       })
-      .getTime() / 1000;
+      .getTime() / 1000
+  );
 
   return {
     lastName,
@@ -152,108 +181,20 @@ export function generatePlayerData(): PlayerData {
     homepage,
     city,
     state,
-    country,
     lat,
     lng,
-    last_event: Math.floor(last_event),
-    createdate: Math.floor(createdate),
+    last_event,
+    createdate,
   };
 }
 
-export function generateClanData(): {
-  tag: string;
-  name: string;
-  homepage?: string;
-  mapregion: string;
-} {
-  const tag = `[${faker.string.alpha({ length: { min: 2, max: 4 }, casing: "upper" })}]`;
-  const name = faker.company.name();
-  const homepage = faker.datatype.boolean(0.4)
-    ? faker.internet.url()
-    : undefined;
-
-  const regions = [
-    "North America",
-    "Europe",
-    "Asia",
-    "South America",
-    "Oceania",
-    "Africa",
-  ];
-  const mapregion = faker.helpers.arrayElement(regions);
-
-  return {
-    tag,
-    name,
-    homepage,
-    mapregion,
-  };
-}
-
+/**
+ * Generate valid Steam ID
+ */
 export function generateSteamId(): string {
-  const universe = 0; // Always 0 for Steam
-  const accountType = faker.datatype.boolean() ? 0 : 1; // 0 or 1
-  const accountId = faker.number.int({ min: 1000000, max: 999999999 });
+  const universe = 0; // Public universe
+  const accountType = faker.datatype.boolean() ? 0 : 1; // Even/odd
+  const accountId = faker.number.int({ min: 1, max: 999999999 });
 
   return `STEAM_${universe}:${accountType}:${accountId}`;
-}
-
-export function weightedRandomChoice<T>(items: T[], weights: number[]): T {
-  if (items.length !== weights.length || items.length === 0) {
-    throw new Error(
-      "Items and weights arrays must have the same length and not be empty"
-    );
-  }
-
-  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-  let random = faker.number.float({ min: 0, max: totalWeight });
-
-  for (let i = 0; i < items.length; i++) {
-    random -= weights[i]!;
-    if (random <= 0) {
-      return items[i]!;
-    }
-  }
-
-  return items[items.length - 1]!; // Fallback
-}
-
-export function distributeByPercentages<T>(
-  items: T[],
-  total: number,
-  distribution: Record<string, number>,
-  getKey: (item: T) => string
-): T[] {
-  const result: T[] = [];
-  const remainingItems = [...items];
-
-  if (remainingItems.length === 0) {
-    return result;
-  }
-
-  for (const [key, percentage] of Object.entries(distribution)) {
-    const count = Math.round(total * percentage);
-    const matchingItems = remainingItems.filter((item) => getKey(item) === key);
-
-    for (let i = 0; i < count && matchingItems.length > 0; i++) {
-      const randomIndex = faker.number.int({
-        min: 0,
-        max: matchingItems.length - 1,
-      });
-      const randomItem = matchingItems[randomIndex]!; // We know this exists due to length check
-      result.push(randomItem);
-    }
-  }
-
-  // Fill remaining slots with random items
-  while (result.length < total && remainingItems.length > 0) {
-    const randomIndex = faker.number.int({
-      min: 0,
-      max: remainingItems.length - 1,
-    });
-    const randomItem = remainingItems[randomIndex]!; // We know this exists due to length check
-    result.push(randomItem);
-  }
-
-  return result.slice(0, total);
 }

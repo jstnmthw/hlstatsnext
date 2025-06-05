@@ -114,11 +114,18 @@ export async function seedPlayerUniqueIds() {
     }
   }
 
+  let additionalResults: Awaited<
+    ReturnType<typeof db.playerUniqueId.upsert>
+  >[] = [];
   if (additionalUniqueIds.length > 0) {
-    const additionalResults = await Promise.all(additionalUniqueIds);
+    additionalResults = await Promise.all(additionalUniqueIds);
     playerUniqueIds.push(...additionalResults);
     console.log(
       `🔄 Created ${additionalResults.length} additional cross-game Steam IDs`
+    );
+  } else {
+    console.log(
+      "🔄 No additional cross-game Steam IDs created (all players in same game or no other games available)"
     );
   }
 
@@ -143,10 +150,7 @@ export async function seedPlayerUniqueIds() {
 
   return {
     playerUniqueIds: primaryIds,
-    additionalIds:
-      additionalUniqueIds.length > 0
-        ? await Promise.all(additionalUniqueIds)
-        : [],
+    additionalIds: additionalResults,
     totalCreated: totalIds,
   };
 }

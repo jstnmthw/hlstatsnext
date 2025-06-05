@@ -1,7 +1,6 @@
 export interface SeedConfig {
   clans: {
     count: number;
-    gamesDistribution?: Record<string, number>; // game code -> percentage (0-1)
   };
   players: {
     count: number;
@@ -9,7 +8,6 @@ export interface SeedConfig {
       withClan: number; // percentage (0-1) of players that should have a clan
       withoutClan: number; // percentage (0-1) of players without clan
     };
-    gamesDistribution?: Record<string, number>; // game code -> percentage (0-1)
   };
   playerUniqueIds: {
     additionalIdsPerPlayer?: number; // how many additional Steam IDs per player (for cross-game play)
@@ -20,25 +18,12 @@ export interface SeedConfig {
 export const DEFAULT_SEED_CONFIG: SeedConfig = {
   clans: {
     count: 20,
-    gamesDistribution: {
-      css: 0.4, // 40% Counter-Strike
-      tf: 0.3, // 30% Team Fortress 2
-      tfc: 0.2, // 20% Team Fortress Classic
-      csgo: 0.1, // 10% CS:GO
-    },
   },
   players: {
     count: 500,
     clanDistribution: {
       withClan: 0.7, // 70% of players have a clan
       withoutClan: 0.3, // 30% are solo players
-    },
-    gamesDistribution: {
-      css: 0.35, // 35% Counter-Strike
-      tf: 0.25, // 25% Team Fortress 2
-      tfc: 0.15, // 15% Team Fortress Classic
-      csgo: 0.15, // 15% CS:GO
-      dods: 0.1, // 10% Day of Defeat
     },
   },
   playerUniqueIds: {

@@ -7,7 +7,7 @@ export async function seedClans() {
   console.log("🏰 Seeding clans...");
 
   const config = getSeedConfig();
-  const { count, gamesDistribution } = config.clans;
+  const { count } = config.clans;
 
   // Get available games
   const availableGames = await db.game.findMany({
@@ -20,11 +20,9 @@ export async function seedClans() {
   }
 
   console.log(
-    `📊 Creating ${count} clans distributed across ${availableGames.length} games`
+    `📊 Creating ${count} clans randomly distributed across ${availableGames.length} games`
   );
 
-  // Determine game distribution
-  const gameDistribution = gamesDistribution || {};
   const gameCodes = availableGames.map((g) => g.code);
 
   // Create clans in batches for better performance
@@ -36,24 +34,8 @@ export async function seedClans() {
     const batchClans = [];
 
     for (let j = i; j < batchEnd; j++) {
-      // Select game based on distribution or randomly
-      let selectedGame: string;
-      if (Object.keys(gameDistribution).length > 0 && gameCodes.length > 0) {
-        const weights = gameCodes.map((code) => gameDistribution[code] || 0.1);
-        const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-        let random = faker.number.float({ min: 0, max: totalWeight });
-
-        selectedGame = gameCodes[0]!; // We know this exists due to length check
-        for (let k = 0; k < gameCodes.length; k++) {
-          random -= weights[k]!;
-          if (random <= 0) {
-            selectedGame = gameCodes[k]!;
-            break;
-          }
-        }
-      } else {
-        selectedGame = gameCodes[0] || "css"; // fallback
-      }
+      // Select random game
+      const selectedGame = faker.helpers.arrayElement(gameCodes) || "css";
 
       const clanData = generateClanData();
 
@@ -64,7 +46,7 @@ export async function seedClans() {
           create: {
             tag: clanData.tag,
             name: clanData.name,
-            homepage: clanData.homepage,
+            homepage: clanData.homepage ?? undefined,
             game: selectedGame,
             hidden: 0,
             mapregion: clanData.mapregion,

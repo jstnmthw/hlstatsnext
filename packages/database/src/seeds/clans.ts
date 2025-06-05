@@ -5,7 +5,7 @@ export async function seedClans() {
 
   // Get games that should already exist
   const tfGame = await db.game.findFirst({ where: { code: "tfc" } });
-  const tf2Game = await db.game.findFirst({ where: { code: "tf2" } });
+  const tf2Game = await db.game.findFirst({ where: { code: "tf" } });
   const cssGame = await db.game.findFirst({ where: { code: "css" } });
 
   if (!tfGame || !tf2Game || !cssGame) {

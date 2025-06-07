@@ -1,6 +1,7 @@
 import SchemaBuilder from "@pothos/core";
 import PrismaPlugin from "@pothos/plugin-prisma";
 import RelayPlugin from "@pothos/plugin-relay";
+import WithInputPlugin from "@pothos/plugin-with-input";
 import { db } from "@repo/database/client";
 import type PrismaTypes from "@repo/database/generated/graphql";
 import type { Context } from "./context";
@@ -9,10 +10,14 @@ export const builder = new SchemaBuilder<{
   Context: Context;
   PrismaTypes: PrismaTypes;
 }>({
-  plugins: [PrismaPlugin, RelayPlugin],
+  plugins: [PrismaPlugin, RelayPlugin, WithInputPlugin],
   prisma: {
     client: db,
-    // Use where clauses from prismaClient for @pothos/plugin-prisma
+    // defaults to false, uses /// comments from prisma schema as descriptions
+    // for object types, relations and exposed fields.
+    // descriptions can be omitted by setting description to false
+    exposeDescriptions: true,
+    // use where clause from prismaRelatedConnection for totalCount (defaults to true)
     filterConnectionTotalCount: true,
     // warn when not using a query parameter correctly
     onUnusedQuery: process.env.NODE_ENV === "production" ? null : "warn",

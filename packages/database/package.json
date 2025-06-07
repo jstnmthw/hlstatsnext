@@ -16,8 +16,8 @@
     "clean": "rm -rf node_modules"
   },
   "dependencies": {
-    "@prisma/client": "^6.0.1",
-    "prisma": "^6.0.1"
+    "@prisma/client": "^6.9.0",
+    "prisma": "^6.9.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.8.0",

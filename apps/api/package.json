@@ -18,7 +18,6 @@
     "@pothos/plugin-with-input": "^4.1.1",
     "@repo/database": "workspace:*",
     "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
     "graphql": "^16.11.0",
     "graphql-yoga": "^5.13.5"
   },
@@ -27,6 +26,7 @@
     "@repo/typescript-config": "workspace:*",
     "@types/cors": "^2.8.18",
     "@types/node": "^22.15.29",
+    "dotenv": "^16.5.0",
     "eslint": "^9.28.0",
     "tsx": "^4.7.0",
     "typescript": "5.8.3"

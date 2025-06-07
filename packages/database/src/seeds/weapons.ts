@@ -29,5 +29,5 @@ export async function seedWeapons() {
     skipDuplicates: true,
   });
 
-  log(`✚ Created ${result.count} weapons.`);
+  log(`✔ Created ${result.count} weapons.`);
 }

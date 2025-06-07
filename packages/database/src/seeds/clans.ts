@@ -28,5 +28,5 @@ export async function seedClans() {
     skipDuplicates: true,
   });
 
-  log(`✚ Created ${result.count} clans.`);
+  log(`✔ Created ${result.count} clans.`);
 }

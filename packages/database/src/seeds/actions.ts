@@ -30,5 +30,5 @@ export async function seedActions() {
     skipDuplicates: true,
   });
 
-  log(`✚ Created ${result.count} actions.`);
+  log(`✔ Created ${result.count} actions.`);
 }

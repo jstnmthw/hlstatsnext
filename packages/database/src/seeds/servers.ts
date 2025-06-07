@@ -30,5 +30,5 @@ export async function seedServers() {
     skipDuplicates: true,
   });
 
-  log(`✚ Created ${result.count} servers.`);
+  log(`✔ Created ${result.count} servers.`);
 }

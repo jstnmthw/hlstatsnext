@@ -49,5 +49,5 @@ export async function seedPlayerUniqueIds() {
     skipDuplicates: true,
   });
 
-  log(`✚ Created ${uniqueIds.length} player unique IDs.`);
+  log(`✔ Created ${uniqueIds.length} player unique IDs.`);
 }

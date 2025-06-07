@@ -28,5 +28,5 @@ export async function seedAwards() {
     skipDuplicates: true,
   });
 
-  log(`✚ Created ${result.count} awards.`);
+  log(`✔ Created ${result.count} awards.`);
 }

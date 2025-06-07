@@ -28,5 +28,5 @@ export async function seedTeams() {
     skipDuplicates: true,
   });
 
-  log(`✚ Created ${result.count} teams.`);
+  log(`✔ Created ${result.count} teams.`);
 }

@@ -2,7 +2,7 @@ type LogType = "info" | "warning" | "error" | "success" | "step";
 
 const icons = {
   info: "ℹ",
-  warning: "⚠️",
+  warning: "⚠",
   error: "✖",
   success: "✔",
   step: "▸",

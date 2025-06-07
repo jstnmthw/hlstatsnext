@@ -4,74 +4,82 @@ import {
   seedPlayers,
   seedPlayerUniqueIds,
   getSeedConfig,
+  seedServers,
 } from "./seeds";
+import { log, logError, logStep, logSuccess, logInfo } from "./seeds/logger";
 
 async function main() {
-  console.log("🌱 Starting database seeding...");
-  console.log("🔍 Assuming Games and Countries are already seeded");
+  logStep("🌱 Starting database seeding...");
 
   // Show current configuration
   const config = getSeedConfig();
   const env = process.env.NODE_ENV || "development";
-  console.log(`⚙️ Using ${env} configuration:`);
-  console.log(`   Clans: ${config.clans.count}`);
-  console.log(`   Players: ${config.players.count}`);
-  console.log(
-    `   Multi-game players: ${Math.round((config.playerUniqueIds.multiGamePlayersPercentage || 0.3) * 100)}%`
+  logInfo(`Using ${env} configuration:`);
+  log(`  Clans: ${config.clans.count}`);
+  log(`  Players: ${config.players.count}`);
+  log(
+    `  Multi-game players: ${Math.round(
+      config.playerUniqueIds.multiGamePlayersPercentage * 100
+    )}%`
   );
+  log(`  Servers: ${config.servers.count}`);
 
   try {
-    // Verify required data exists
-    const gameCount = await db.game.count();
-    const countryCount = await db.country.count();
-
-    if (gameCount === 0) {
-      throw new Error("No games found. Please seed Games first.");
-    }
-
-    if (countryCount === 0) {
-      throw new Error("No countries found. Please seed Countries first.");
-    }
-
-    console.log(`✅ Found ${gameCount} games and ${countryCount} countries`);
-
     const startTime = Date.now();
 
-    // Seed in dependency order: Clans → Players → PlayerUniqueIds
-    console.log("\n🏰 Step 1: Seeding clans...");
+    // Seed in dependency order
+    logStep("Step 1: Seeding core data (Games, Countries)...");
+    // await seedGames();
+    // await seedCountries();
+
+    logStep("Step 2: Seeding game-specific data (Servers, Teams, etc.)...");
+    await seedServers();
+    // await seedTeams();
+    // await seedWeapons();
+    // await seedActions();
+    // await seedRanks();
+    // await seedAwards();
+
+    logStep("Step 3: Seeding community data (Clans, Players)...");
     await seedClans();
-
-    console.log("\n👥 Step 2: Seeding players...");
     await seedPlayers();
-
-    console.log("\n🆔 Step 3: Seeding player unique IDs...");
     await seedPlayerUniqueIds();
 
     const duration = Math.round((Date.now() - startTime) / 1000);
-    console.log(
-      `\n🎉 Database seeding completed successfully in ${duration}s!`
-    );
+    logSuccess(`🎉 Database seeding completed successfully in ${duration}s!`);
 
     // Show final stats
     const finalStats = await Promise.all([
+      db.game.count(),
+      db.country.count(),
+      db.server.count(),
+      db.team.count(),
+      db.weapon.count(),
       db.clan.count(),
       db.player.count(),
       db.playerUniqueId.count(),
     ]);
 
-    console.log("\n📊 Final database statistics:");
-    console.log(`   Total clans: ${finalStats[0]}`);
-    console.log(`   Total players: ${finalStats[1]}`);
-    console.log(`   Total Steam IDs: ${finalStats[2]}`);
+    logInfo("Final database statistics:");
+    log(`  Games: ${finalStats[0]}`);
+    log(`  Countries: ${finalStats[1]}`);
+    log(`  Servers: ${finalStats[2]}`);
+    log(`  Teams: ${finalStats[3]}`);
+    log(`  Weapons: ${finalStats[4]}`);
+    log(`  Clans: ${finalStats[5]}`);
+    log(`  Players: ${finalStats[6]}`);
+    log(`  Steam IDs: ${finalStats[7]}`);
   } catch (error) {
-    console.error("❌ Seeding failed:", error);
+    logError("Seeding failed:");
+    console.error(error);
     throw error;
   }
 }
 
 main()
   .catch((e) => {
-    console.error("❌ Seeding failed:", e);
+    logError("Seeding failed with unhandled error.");
+    console.error(e);
     process.exit(1);
   })
   .finally(async () => {

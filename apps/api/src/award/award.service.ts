@@ -6,6 +6,7 @@ import {
   AppError,
   PaginatedResult,
 } from "../types/common";
+import { isRecordNotFoundError } from "../utils/prisma-error-handler";
 
 export class AwardService {
   constructor(private readonly db: PrismaClient) {}
@@ -133,7 +134,7 @@ export class AwardService {
    * Create a new award
    */
   async createAward(
-    input: Prisma.AwardCreateInput,
+    input: Prisma.AwardCreateInput
   ): Promise<Result<Award, AppError>> {
     try {
       const award = await this.db.award.create({
@@ -160,7 +161,7 @@ export class AwardService {
    */
   async updateAward(
     awardId: number,
-    input: Prisma.AwardUpdateInput,
+    input: Prisma.AwardUpdateInput
   ): Promise<Result<Award, AppError>> {
     try {
       const award = await this.db.award.update({
@@ -175,7 +176,7 @@ export class AwardService {
       return success(award);
     } catch (error: unknown) {
       console.error(error);
-      if (error?.code === "P2025") {
+      if (isRecordNotFoundError(error)) {
         return failure({
           type: "NOT_FOUND",
           message: "Award not found",
@@ -184,7 +185,6 @@ export class AwardService {
         });
       }
 
-      console.error(error);
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to update award",
@@ -205,7 +205,7 @@ export class AwardService {
       return success(true);
     } catch (error) {
       console.error(error);
-      if (error?.code === "P2025") {
+      if (isRecordNotFoundError(error)) {
         return failure({
           type: "NOT_FOUND",
           message: "Award not found",

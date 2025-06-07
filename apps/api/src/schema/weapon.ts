@@ -171,7 +171,7 @@ builder.mutationFields((t) => ({
       const input: Prisma.WeaponUpdateInput = {
         ...(args.input.name && { name: { set: args.input.name } }),
         ...(args.input.modifier !== undefined && {
-          modifier: { set: args.input.modifier },
+          modifier: { set: args.input.modifier ?? undefined },
         }),
       };
 

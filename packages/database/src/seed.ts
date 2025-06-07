@@ -5,6 +5,7 @@ import {
   seedPlayerUniqueIds,
   getSeedConfig,
   seedServers,
+  logDatabaseStats,
 } from "./seeds";
 import { log, logError, logStep, logSuccess, logInfo } from "./seeds/logger";
 
@@ -46,29 +47,10 @@ async function main() {
     await seedPlayerUniqueIds();
 
     const duration = Math.round((Date.now() - startTime) / 1000);
-    logSuccess(`🎉 Database seeding completed successfully in ${duration}s!`);
+    logSuccess(`Database seeding completed successfully in ${duration}s!`);
 
     // Show final stats
-    const finalStats = await Promise.all([
-      db.game.count(),
-      db.country.count(),
-      db.server.count(),
-      db.team.count(),
-      db.weapon.count(),
-      db.clan.count(),
-      db.player.count(),
-      db.playerUniqueId.count(),
-    ]);
-
-    logInfo("Final database statistics:");
-    log(`  Games: ${finalStats[0]}`);
-    log(`  Countries: ${finalStats[1]}`);
-    log(`  Servers: ${finalStats[2]}`);
-    log(`  Teams: ${finalStats[3]}`);
-    log(`  Weapons: ${finalStats[4]}`);
-    log(`  Clans: ${finalStats[5]}`);
-    log(`  Players: ${finalStats[6]}`);
-    log(`  Steam IDs: ${finalStats[7]}`);
+    await logDatabaseStats("Final database statistics:");
   } catch (error) {
     logError("Seeding failed:");
     console.error(error);

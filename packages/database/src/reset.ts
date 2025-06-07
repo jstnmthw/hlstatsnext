@@ -1,86 +1,52 @@
 import { db } from "./index";
+import { logError, logInfo, logStep, logSuccess } from "./seeds/logger";
+import { logDatabaseStats } from "./seeds";
 
 /**
  * Reset development data from the database.
  * This script clears out data that was added during development/testing
- * while preserving the initial seeded data from the SQL installation script.
- *
- * Tables that will be cleared:
- * - Players
- * - PlayerUniqueIds
- * - Clans
- *
- * Tables that will be preserved:
- * - Games (initial seeded data)
- * - Countries (initial seeded data)
- * - Any other initial schema data
+ * while preserving the initial seeded data (Games, Countries).
  */
 async function resetDatabase() {
-  console.log("🗑️  Starting database reset...");
-  console.log(
-    "⚠️  This will clear development data while preserving initial seeded data"
+  logStep("Starting database reset...");
+  logInfo(
+    "This will clear development data while preserving initial seeded data."
   );
 
   try {
-    // Show current data before reset
-    const beforeStats = await Promise.all([
-      db.clan.count(),
-      db.player.count(),
-      db.playerUniqueId.count(),
-    ]);
+    const beforeStats = await logDatabaseStats("Current database statistics:");
 
-    console.log("\n📊 Current database statistics:");
-    console.log(`   Clans: ${beforeStats[0]}`);
-    console.log(`   Players: ${beforeStats[1]}`);
-    console.log(`   Player Unique IDs: ${beforeStats[2]}`);
-
-    if (beforeStats.every((count) => count === 0)) {
-      console.log(
-        "✅ Database is already clean - no development data to reset"
-      );
+    // Check only resettable stats (ignore first 2: Games, Countries)
+    if (beforeStats.slice(2).every((count: number) => count === 0)) {
+      logSuccess("Database is already clean - no development data to reset.");
       return;
     }
 
     const startTime = Date.now();
 
-    // Clear tables in dependency order (reverse of seeding order)
-    // PlayerUniqueIds → Players → Clans
-    console.log("\n🧹 Step 1: Clearing player unique IDs...");
-    const deletedPlayerUniqueIds = await db.playerUniqueId.deleteMany();
-    console.log(`   Deleted ${deletedPlayerUniqueIds.count} player unique IDs`);
+    logStep("Step 1: Clearing player-related data...");
+    await db.playerUniqueId.deleteMany();
+    await db.player.deleteMany();
 
-    console.log("\n🧹 Step 2: Clearing players...");
-    const deletedPlayers = await db.player.deleteMany();
-    console.log(`   Deleted ${deletedPlayers.count} players`);
+    logStep("Step 2: Clearing community and server data...");
+    await db.clan.deleteMany();
+    await db.serverConfig.deleteMany();
+    await db.server.deleteMany();
 
-    console.log("\n🧹 Step 3: Clearing clans...");
-    const deletedClans = await db.clan.deleteMany();
-    console.log(`   Deleted ${deletedClans.count} clans`);
+    // logStep("Step 3: Clearing game-specific definitions...");
+    // await db.team.deleteMany();
+    // await db.weapon.deleteMany();
+    // await db.action.deleteMany();
+    // await db.rank.deleteMany();
+    // await db.award.deleteMany();
 
     const duration = Math.round((Date.now() - startTime) / 1000);
-    console.log(`\n🎉 Database reset completed successfully in ${duration}s!`);
+    logSuccess(`Database reset completed successfully in ${duration}s!`);
 
-    // Verify preserved data still exists
-    const gameCount = await db.game.count();
-    const countryCount = await db.country.count();
-
-    console.log("\n✅ Verified preserved initial seeded data:");
-    console.log(`   Games: ${gameCount}`);
-    console.log(`   Countries: ${countryCount}`);
-
-    // Show final stats
-    const afterStats = await Promise.all([
-      db.clan.count(),
-      db.player.count(),
-      db.playerUniqueId.count(),
-    ]);
-
-    console.log("\n📊 Final database statistics:");
-    console.log(`   Clans: ${afterStats[0]}`);
-    console.log(`   Players: ${afterStats[1]}`);
-    console.log(`   Player Unique IDs: ${afterStats[2]}`);
+    await logDatabaseStats("Final database statistics:");
   } catch (error) {
-    console.error("❌ Database reset failed:", error);
+    logError("Database reset failed:");
+    console.error(error);
     throw error;
   }
 }
@@ -89,16 +55,12 @@ async function main() {
   try {
     await resetDatabase();
   } catch (error) {
-    console.error("❌ Reset failed:", error);
+    logError("Reset failed with unhandled error:");
+    console.error(error);
     process.exit(1);
   } finally {
     await db.$disconnect();
   }
 }
 
-// Only run if this file is executed directly
-if (require.main === module) {
-  main();
-}
-
-export { resetDatabase };
+main();

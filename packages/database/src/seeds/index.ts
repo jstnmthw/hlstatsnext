@@ -10,3 +10,4 @@ export { seedWeapons } from "./weapons";
 export { seedActions } from "./actions";
 export { seedRanks } from "./ranks";
 export { seedAwards } from "./awards";
+export { logDatabaseStats } from "./log-stats";

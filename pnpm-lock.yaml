@@ -15,7 +15,7 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0(prettier@3.5.3)(typescript@5.8.2)
       prettier-plugin-tailwindcss:
-        specifier: ^0.6.11
+        specifier: ^0.6.12
         version: 0.6.12(prettier-plugin-organize-imports@4.1.0(prettier@3.5.3)(typescript@5.8.2))(prettier@3.5.3)
       turbo:
         specifier: ^2.5.4
@@ -161,6 +161,9 @@ importers:
       eslint:
         specifier: ^9.27.0
         version: 9.27.0(jiti@2.4.2)
+      prisma-generator-pothos-codegen:
+        specifier: ^0.7.1
+        version: 0.7.1(@pothos/core@4.6.2(graphql@16.11.0))(@pothos/plugin-prisma@4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.9.0(prisma@6.9.0(typescript@5.8.2))(typescript@5.8.2))(graphql@16.11.0)(typescript@5.8.2))(@prisma/client@6.9.0(prisma@6.9.0(typescript@5.8.2))(typescript@5.8.2))(prisma@6.9.0(typescript@5.8.2))
       ts-deepmerge:
         specifier: ^7.0.3
         version: 7.0.3
@@ -858,6 +861,9 @@ packages:
   '@prisma/config@6.9.0':
     resolution: {integrity: sha512-Wcfk8/lN3WRJd5w4jmNQkUwhUw0eksaU/+BlAJwPQKW10k0h0LC9PD/6TQFmqKVbHQL0vG2z266r0S1MPzzhbA==}
 
+  '@prisma/debug@5.17.0':
+    resolution: {integrity: sha512-l7+AteR3P8FXiYyo496zkuoiJ5r9jLQEdUuxIxNCN1ud8rdbH3GTxm+f+dCyaSv9l9WY+29L9czaVRXz9mULfg==}
+
   '@prisma/debug@6.8.2':
     resolution: {integrity: sha512-4muBSSUwJJ9BYth5N8tqts8JtiLT8QI/RSAzEogwEfpbYGFo9mYsInsVo8dqXdPO2+Rm5OG5q0qWDDE3nyUbVg==}
 
@@ -875,6 +881,9 @@ packages:
 
   '@prisma/fetch-engine@6.9.0':
     resolution: {integrity: sha512-PMKhJdl4fOdeE3J3NkcWZ+tf3W6rx3ht/rLU8w4SXFRcLhd5+3VcqY4Kslpdm8osca4ej3gTfB3+cSk5pGxgFg==}
+
+  '@prisma/generator-helper@5.17.0':
+    resolution: {integrity: sha512-UcYpNjjQNVHAjIxgjfXnF4fcKU7B2vuzG1L27xIV81xQoGSbxg7v670URBhd0/ZoE8v2Itj2bbuyezY1ViHVaA==}
 
   '@prisma/generator-helper@6.8.2':
     resolution: {integrity: sha512-KBLW47sbwFBKKYMiICIAEWsG6TdpPapPT7e7hpmpF3xMgYAm6YIXu4JGwfQVDY9Vbcb+0vPdPdSEQtInYOOe5g==}
@@ -2005,6 +2014,15 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
+  prisma-generator-pothos-codegen@0.7.1:
+    resolution: {integrity: sha512-NBo8s9Rp91PXzxTbOTry7847a7Ce+UQe3Vied3K97/Y5bBTSpny6Tx+qgNjZdYv6pyW1+KkqXj2VarcI81z6Ug==}
+    hasBin: true
+    peerDependencies:
+      '@pothos/core': ^4.0.2
+      '@pothos/plugin-prisma': ^4.0.3
+      '@prisma/client': ^5.0.0
+      prisma: ^5.0.0
+
   prisma@6.9.0:
     resolution: {integrity: sha512-resJAwMyZREC/I40LF6FZ6rZTnlrlrYrb63oW37Gq+U+9xHwbyMSPJjKtM7VZf3gTO86t/Oyz+YeSXr3CmAY1Q==}
     engines: {node: '>=18.18'}
@@ -2807,6 +2825,8 @@ snapshots:
     dependencies:
       jiti: 2.4.2
 
+  '@prisma/debug@5.17.0': {}
+
   '@prisma/debug@6.8.2': {}
 
   '@prisma/debug@6.9.0': {}
@@ -2827,6 +2847,10 @@ snapshots:
       '@prisma/debug': 6.9.0
       '@prisma/engines-version': 6.9.0-10.81e4af48011447c3cc503a190e86995b66d2a28e
       '@prisma/get-platform': 6.9.0
+
+  '@prisma/generator-helper@5.17.0':
+    dependencies:
+      '@prisma/debug': 5.17.0
 
   '@prisma/generator-helper@6.8.2':
     dependencies:
@@ -4115,6 +4139,14 @@ snapshots:
       prettier-plugin-organize-imports: 4.1.0(prettier@3.5.3)(typescript@5.8.2)
 
   prettier@3.5.3: {}
+
+  prisma-generator-pothos-codegen@0.7.1(@pothos/core@4.6.2(graphql@16.11.0))(@pothos/plugin-prisma@4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.9.0(prisma@6.9.0(typescript@5.8.2))(typescript@5.8.2))(graphql@16.11.0)(typescript@5.8.2))(@prisma/client@6.9.0(prisma@6.9.0(typescript@5.8.2))(typescript@5.8.2))(prisma@6.9.0(typescript@5.8.2)):
+    dependencies:
+      '@pothos/core': 4.6.2(graphql@16.11.0)
+      '@pothos/plugin-prisma': 4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.9.0(prisma@6.9.0(typescript@5.8.2))(typescript@5.8.2))(graphql@16.11.0)(typescript@5.8.2)
+      '@prisma/client': 6.9.0(prisma@6.9.0(typescript@5.8.2))(typescript@5.8.2)
+      '@prisma/generator-helper': 5.17.0
+      prisma: 6.9.0(typescript@5.8.2)
 
   prisma@6.9.0(typescript@5.8.2):
     dependencies:

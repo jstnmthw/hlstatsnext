@@ -17,6 +17,11 @@ generator pothos {
   output    = "../generated/graphql/pothos-types.ts"
 }
 
+generator pothosCodegen {
+  provider            = "prisma-generator-pothos-codegen"
+  generatorConfigPath = "../src/pothos.config.js"
+}
+
 // Legacy HLStatsX database schema - exact mirror for compatibility
 
 model Game {

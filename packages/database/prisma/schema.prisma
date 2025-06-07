@@ -18,7 +18,6 @@ generator pothos {
 }
 
 // Legacy HLStatsX database schema - exact mirror for compatibility
-// DO NOT MODIFY - Must match existing database structure exactly
 
 model Game {
   code     String @id // Primary key, e.g., "tf", "css", "csgo"
@@ -122,7 +121,35 @@ model Player {
   createdate Int  @default(0) @db.Int
 
   // Relationships
-  uniqueIds PlayerUniqueId[]
+  uniqueIds                   PlayerUniqueId[]
+  awardsWonAsDWinner          Award[]                   @relation("AwardDWinner")
+  awardsWonAsGWinner          Award[]                   @relation("AwardGWinner")
+  nameChanges                 EventChangeName[]
+  roleChanges                 EventChangeRole[]
+  teamChanges                 EventChangeTeam[]
+  chats                       EventChat[]
+  connects                    EventConnect[]
+  disconnects                 EventDisconnect[]
+  entries                     EventEntry[]
+  fragsAsKiller               EventFrag[]               @relation("FragsAsKiller")
+  fragsAsVictim               EventFrag[]               @relation("FragsAsVictim")
+  latencyEvents               EventLatency[]
+  playerActions               EventPlayerAction[]
+  playerPlayerActionsAsActor  EventPlayerPlayerAction[] @relation("PPA_Actor")
+  playerPlayerActionsAsVictim EventPlayerPlayerAction[] @relation("PPA_Victim")
+  statsmeEvents               EventStatsme[]
+  statsme2Events              EventStatsme2[]
+  statsmeLatencyEvents        EventStatsmeLatency[]
+  statsmeTimeEvents           EventStatsmeTime[]
+  suicideEvents               EventSuicide[]
+  teamBonuses                 EventTeamBonus[]
+  teamkillsAsKiller           EventTeamkill[]           @relation("TK_Killer")
+  teamkillsAsVictim           EventTeamkill[]           @relation("TK_Victim")
+  awards                      PlayerAward[]
+  history                     PlayerHistory[]
+  ribbons                     PlayerRibbon[]
+  names                       PlayerName[]
+  users                       User[]
 
   // Indexes for performance
   @@index([clan, playerId], name: "playerclan")
@@ -144,4 +171,876 @@ model PlayerUniqueId {
   @@id([uniqueId, game])
   @@index([playerId], name: "playerId")
   @@map("hlstats_PlayerUniqueIds")
+}
+
+// HLStatsX:CE Schema Additions
+
+// GeoIP Tables
+model GeoLiteCityBlock {
+  startIpNum BigInt @db.UnsignedBigInt
+  endIpNum   BigInt @db.UnsignedBigInt
+  locId      BigInt @db.UnsignedBigInt
+
+  location GeoLiteCityLocation @relation(fields: [locId], references: [locId])
+
+  @@id([startIpNum, endIpNum])
+  @@map("geoLiteCity_Blocks")
+}
+
+model GeoLiteCityLocation {
+  locId      BigInt   @id @db.UnsignedBigInt
+  country    String   @db.VarChar(2)
+  region     String?  @db.VarChar(50)
+  city       String?  @db.VarChar(50)
+  postalCode String?  @db.VarChar(10)
+  latitude   Decimal? @db.Decimal(14, 4)
+  longitude  Decimal? @db.Decimal(14, 4)
+
+  blocks GeoLiteCityBlock[]
+
+  @@map("geoLiteCity_Location")
+}
+
+// Core Tables
+model Action {
+  id                      Int     @id @default(autoincrement()) @db.UnsignedInt
+  game                    String  @default("valve") @db.VarChar(32)
+  code                    String  @default("") @db.VarChar(64)
+  reward_player           Int     @default(10)
+  reward_team             Int     @default(0)
+  team                    String  @default("") @db.VarChar(64)
+  description             String? @db.VarChar(128)
+  for_PlayerActions       String  @default("0") @db.VarChar(1) // ENUM('0','1')
+  for_PlayerPlayerActions String  @default("0") @db.VarChar(1) // ENUM('0','1')
+  for_TeamActions         String  @default("0") @db.VarChar(1) // ENUM('0','1')
+  for_WorldActions        String  @default("0") @db.VarChar(1) // ENUM('0','1')
+  count                   Int     @default(0) @db.UnsignedInt
+
+  eventPlayerActions       EventPlayerAction[]
+  eventPlayerPlayerActions EventPlayerPlayerAction[]
+  eventTeamBonuses         EventTeamBonus[]
+
+  @@unique([code, game, team], name: "gamecode")
+  @@index([code])
+  @@map("hlstats_Actions")
+}
+
+model Award {
+  awardId        Int    @id @default(autoincrement()) @db.UnsignedInt
+  awardType      String @default("W") @db.Char(1)
+  game           String @default("valve") @db.VarChar(32)
+  code           String @default("") @db.VarChar(128)
+  name           String @default("") @db.VarChar(128)
+  verb           String @default("") @db.VarChar(128)
+  d_winner_id    Int?   @db.UnsignedInt
+  d_winner_count Int?   @db.UnsignedInt
+  g_winner_id    Int?   @db.UnsignedInt
+  g_winner_count Int?   @db.UnsignedInt
+
+  d_winner     Player?       @relation("AwardDWinner", fields: [d_winner_id], references: [playerId])
+  g_winner     Player?       @relation("AwardGWinner", fields: [g_winner_id], references: [playerId])
+  playerAwards PlayerAward[]
+
+  @@unique([game, awardType, code], name: "game_awardType_code")
+  @@map("hlstats_Awards")
+}
+
+enum ClanTagPosition {
+  EITHER
+  START
+  END
+}
+
+model ClanTag {
+  id       Int             @id @default(autoincrement()) @db.UnsignedInt
+  pattern  String          @unique @db.VarChar(64)
+  position ClanTagPosition @default(EITHER)
+
+  @@map("hlstats_ClanTags")
+}
+
+// Event Tables
+model EventAdmin {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime  DateTime? @db.DateTime(0)
+  serverId   Int       @default(0) @db.UnsignedInt
+  map        String    @default("") @db.VarChar(64)
+  type       String    @default("Unknown") @db.VarChar(64)
+  message    String    @default("") @db.VarChar(255)
+  playerName String    @default("") @db.VarChar(64)
+
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@map("hlstats_Events_Admin")
+}
+
+model EventChangeName {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  oldName   String    @default("") @db.VarChar(64)
+  newName   String    @default("") @db.VarChar(64)
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@map("hlstats_Events_ChangeName")
+}
+
+model EventChangeRole {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  role      String    @default("") @db.VarChar(64)
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@map("hlstats_Events_ChangeRole")
+}
+
+model EventChangeTeam {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  team      String    @default("") @db.VarChar(64)
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@map("hlstats_Events_ChangeTeam")
+}
+
+model EventChat {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime    DateTime? @db.DateTime(0)
+  serverId     Int       @default(0) @db.UnsignedInt
+  map          String    @default("") @db.VarChar(64)
+  playerId     Int       @default(0) @db.UnsignedInt
+  message_mode Int       @default(0) @db.TinyInt
+  message      String    @default("") @db.VarChar(128)
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@index([serverId])
+  @@fulltext([message])
+  @@map("hlstats_Events_Chat")
+}
+
+model EventConnect {
+  id                   Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime            DateTime? @db.DateTime(0)
+  serverId             Int       @default(0) @db.UnsignedInt
+  map                  String    @default("") @db.VarChar(64)
+  playerId             Int       @default(0) @db.UnsignedInt
+  ipAddress            String    @default("") @db.VarChar(32)
+  hostname             String    @default("") @db.VarChar(255)
+  hostgroup            String    @default("") @db.VarChar(255)
+  eventTime_Disconnect DateTime? @db.DateTime(0)
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@map("hlstats_Events_Connects")
+}
+
+model EventDisconnect {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@map("hlstats_Events_Disconnects")
+}
+
+model EventEntry {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@map("hlstats_Events_Entries")
+}
+
+model EventFrag {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime    DateTime? @db.DateTime(0)
+  serverId     Int       @default(0) @db.UnsignedInt
+  map          String    @default("") @db.VarChar(64)
+  killerId     Int       @default(0) @db.UnsignedInt
+  victimId     Int       @default(0) @db.UnsignedInt
+  weapon       String    @default("") @db.VarChar(64)
+  headshot     Int       @default(0) @db.TinyInt
+  killerRole   String    @default("") @db.VarChar(64)
+  victimRole   String    @default("") @db.VarChar(64)
+  pos_x        Int?      @db.MediumInt
+  pos_y        Int?      @db.MediumInt
+  pos_z        Int?      @db.MediumInt
+  pos_victim_x Int?      @db.MediumInt
+  pos_victim_y Int?      @db.MediumInt
+  pos_victim_z Int?      @db.MediumInt
+
+  killer Player @relation("FragsAsKiller", fields: [killerId], references: [playerId])
+  victim Player @relation("FragsAsVictim", fields: [victimId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([killerId])
+  @@index([victimId])
+  @@index([serverId])
+  @@index([headshot])
+  @@index([map])
+  @@index([weapon])
+  @@index([killerRole])
+  @@map("hlstats_Events_Frags")
+}
+
+model EventLatency {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  ping      Int       @default(0) @db.UnsignedInt
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@map("hlstats_Events_Latency")
+}
+
+model EventPlayerAction {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  actionId  Int       @default(0) @db.UnsignedInt
+  bonus     Int       @default(0)
+  pos_x     Int?      @db.MediumInt
+  pos_y     Int?      @db.MediumInt
+  pos_z     Int?      @db.MediumInt
+
+  action Action @relation(fields: [actionId], references: [id])
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@index([actionId])
+  @@map("hlstats_Events_PlayerActions")
+}
+
+model EventPlayerPlayerAction {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime    DateTime? @db.DateTime(0)
+  serverId     Int       @default(0) @db.UnsignedInt
+  map          String    @default("") @db.VarChar(64)
+  playerId     Int       @default(0) @db.UnsignedInt
+  victimId     Int       @default(0) @db.UnsignedInt
+  actionId     Int       @default(0) @db.UnsignedInt
+  bonus        Int       @default(0)
+  pos_x        Int?      @db.MediumInt
+  pos_y        Int?      @db.MediumInt
+  pos_z        Int?      @db.MediumInt
+  pos_victim_x Int?      @db.MediumInt
+  pos_victim_y Int?      @db.MediumInt
+  pos_victim_z Int?      @db.MediumInt
+
+  action Action @relation(fields: [actionId], references: [id])
+  player Player @relation("PPA_Actor", fields: [playerId], references: [playerId])
+  victim Player @relation("PPA_Victim", fields: [victimId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@index([actionId])
+  @@index([victimId])
+  @@map("hlstats_Events_PlayerPlayerActions")
+}
+
+model EventRcon {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  type      String    @default("UNK") @db.VarChar(6)
+  remoteIp  String    @default("") @db.VarChar(32)
+  password  String    @default("") @db.VarChar(128)
+  command   String    @default("") @db.VarChar(255)
+
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@map("hlstats_Events_Rcon")
+}
+
+model EventStatsme {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  weapon    String    @default("") @db.VarChar(64)
+  shots     Int       @default(0) @db.UnsignedInt
+  hits      Int       @default(0) @db.UnsignedInt
+  headshots Int       @default(0) @db.UnsignedInt
+  damage    Int       @default(0) @db.UnsignedInt
+  kills     Int       @default(0) @db.UnsignedInt
+  deaths    Int       @default(0) @db.UnsignedInt
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@index([weapon])
+  @@map("hlstats_Events_Statsme")
+}
+
+model EventStatsme2 {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  weapon    String    @default("") @db.VarChar(64)
+  head      Int       @default(0) @db.UnsignedInt
+  chest     Int       @default(0) @db.UnsignedInt
+  stomach   Int       @default(0) @db.UnsignedInt
+  leftarm   Int       @default(0) @db.UnsignedInt
+  rightarm  Int       @default(0) @db.UnsignedInt
+  leftleg   Int       @default(0) @db.UnsignedInt
+  rightleg  Int       @default(0) @db.UnsignedInt
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@index([weapon])
+  @@map("hlstats_Events_Statsme2")
+}
+
+model EventStatsmeLatency {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  ping      Int       @default(0) @db.UnsignedInt
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@map("hlstats_Events_StatsmeLatency")
+}
+
+model EventStatsmeTime {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  time      DateTime  @db.Time(0)
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@map("hlstats_Events_StatsmeTime")
+}
+
+model EventSuicide {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  weapon    String    @default("") @db.VarChar(64)
+  pos_x     Int?      @db.MediumInt
+  pos_y     Int?      @db.MediumInt
+  pos_z     Int?      @db.MediumInt
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@map("hlstats_Events_Suicides")
+}
+
+model EventTeamBonus {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  actionId  Int       @default(0) @db.UnsignedInt
+  bonus     Int       @default(0)
+
+  action Action @relation(fields: [actionId], references: [id])
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@index([actionId])
+  @@map("hlstats_Events_TeamBonuses")
+}
+
+model EventTeamkill {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime    DateTime? @db.DateTime(0)
+  serverId     Int       @default(0) @db.UnsignedInt
+  map          String    @default("") @db.VarChar(64)
+  killerId     Int       @default(0) @db.UnsignedInt
+  victimId     Int       @default(0) @db.UnsignedInt
+  weapon       String    @default("") @db.VarChar(64)
+  pos_x        Int?      @db.MediumInt
+  pos_y        Int?      @db.MediumInt
+  pos_z        Int?      @db.MediumInt
+  pos_victim_x Int?      @db.MediumInt
+  pos_victim_y Int?      @db.MediumInt
+  pos_victim_z Int?      @db.MediumInt
+
+  killer Player @relation("TK_Killer", fields: [killerId], references: [playerId])
+  victim Player @relation("TK_Victim", fields: [victimId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([killerId])
+  @@map("hlstats_Events_Teamkills")
+}
+
+// Game and Server Config Tables
+model GameDefault {
+  code      String @db.VarChar(32)
+  parameter String @db.VarChar(50)
+  value     String @db.VarChar(128)
+
+  @@id([code, parameter])
+  @@map("hlstats_Games_Defaults")
+}
+
+model GameSupported {
+  code String @id @db.VarChar(32)
+  name String @db.VarChar(128)
+
+  @@map("hlstats_Games_Supported")
+}
+
+model HeatmapConfig {
+  id      Int    @id @default(autoincrement())
+  map     String @db.VarChar(64)
+  game    String @db.VarChar(32)
+  xoffset Float
+  yoffset Float
+  flipx   Int    @default(0) @db.TinyInt
+  flipy   Int    @default(1) @db.TinyInt
+  rotate  Int    @default(0) @db.TinyInt
+  days    Int    @default(30) @db.TinyInt
+  brush   String @default("small") @db.VarChar(5)
+  scale   Float
+  font    Int    @default(10) @db.TinyInt
+  thumbw  Float  @default(0.170312)
+  thumbh  Float  @default(0.170312)
+  cropx1  Int    @default(0)
+  cropy1  Int    @default(0)
+  cropx2  Int    @default(0)
+  cropy2  Int    @default(0)
+
+  @@unique([map, game], name: "gamemap")
+  @@map("hlstats_Heatmap_Config")
+}
+
+model HostGroup {
+  id      Int    @id @default(autoincrement())
+  pattern String @default("") @db.VarChar(255)
+  name    String @default("") @db.VarChar(255)
+
+  @@map("hlstats_HostGroups")
+}
+
+// Live Stats (Memory Table)
+model Livestat {
+  player_id    Int    @id
+  server_id    Int    @default(0)
+  cli_address  String @default("") @db.VarChar(32)
+  cli_city     String @default("") @db.VarChar(64)
+  cli_country  String @default("") @db.VarChar(64)
+  cli_flag     String @default("") @db.VarChar(16)
+  cli_state    String @default("") @db.VarChar(64)
+  cli_lat      Float?
+  cli_lng      Float?
+  steam_id     String @default("") @db.VarChar(64)
+  name         String @db.VarChar(64)
+  team         String @default("") @db.VarChar(64)
+  kills        Int    @default(0)
+  deaths       Int    @default(0)
+  suicides     Int    @default(0)
+  headshots    Int    @default(0)
+  shots        Int    @default(0)
+  hits         Int    @default(0)
+  is_dead      Int    @default(0) @db.TinyInt
+  has_bomb     Int    @default(0)
+  ping         Int    @default(0)
+  connected    Int    @default(0)
+  skill_change Int    @default(0)
+  skill        Int    @default(0)
+
+  @@map("hlstats_Livestats")
+}
+
+model MapCount {
+  rowId     Int    @unique @default(autoincrement())
+  game      String @db.VarChar(32)
+  map       String @db.VarChar(64)
+  kills     Int
+  headshots Int
+
+  @@id([game, map])
+  @@map("hlstats_Maps_Counts")
+}
+
+model ModDefault {
+  code      String @db.VarChar(32)
+  parameter String @db.VarChar(50)
+  value     String @db.VarChar(128)
+
+  @@id([code, parameter])
+  @@map("hlstats_Mods_Defaults")
+}
+
+model ModSupported {
+  code String @id @db.VarChar(32)
+  name String @db.VarChar(128)
+
+  @@map("hlstats_Mods_Supported")
+}
+
+model Option {
+  keyname String @id @db.VarChar(32)
+  value   String @default("") @db.VarChar(128)
+  opttype Int    @default(1) @db.TinyInt
+
+  choices OptionChoice[]
+
+  @@index([opttype])
+  @@map("hlstats_Options")
+}
+
+model OptionChoice {
+  keyname   String @db.VarChar(32)
+  value     String @db.VarChar(128)
+  text      String @default("") @db.VarChar(128)
+  isDefault Int    @default(0) @db.TinyInt
+
+  option Option @relation(fields: [keyname], references: [keyname])
+
+  @@id([keyname, value])
+  @@index([keyname])
+  @@map("hlstats_Options_Choices")
+}
+
+model PlayerName {
+  playerId        Int       @db.UnsignedInt
+  name            String    @db.VarChar(64)
+  lastuse         DateTime? @db.DateTime(0)
+  connection_time Int       @default(0) @db.UnsignedInt
+  numuses         Int       @default(0) @db.UnsignedInt
+  kills           Int       @default(0) @db.UnsignedInt
+  deaths          Int       @default(0) @db.UnsignedInt
+  suicides        Int       @default(0) @db.UnsignedInt
+  headshots       Int       @default(0) @db.UnsignedInt
+  shots           Int       @default(0) @db.UnsignedInt
+  hits            Int       @default(0) @db.UnsignedInt
+
+  player Player @relation(fields: [playerId], references: [playerId])
+
+  @@id([playerId, name])
+  @@index([name(length: 16)], name: "name16")
+  @@map("hlstats_PlayerNames")
+}
+
+model PlayerAward {
+  awardTime DateTime @db.Date
+  awardId   Int      @db.UnsignedInt
+  playerId  Int      @db.UnsignedInt
+  count     Int      @default(0) @db.UnsignedInt
+  game      String   @db.VarChar(32)
+
+  award  Award  @relation(fields: [awardId], references: [awardId])
+  player Player @relation(fields: [playerId], references: [playerId])
+
+  @@id([awardTime, awardId, playerId, game])
+  @@map("hlstats_Players_Awards")
+}
+
+model PlayerHistory {
+  playerId        Int      @db.UnsignedInt
+  eventTime       DateTime @db.Date
+  connection_time Int      @default(0) @db.UnsignedInt
+  kills           Int      @default(0) @db.UnsignedInt
+  deaths          Int      @default(0) @db.UnsignedInt
+  suicides        Int      @default(0) @db.UnsignedInt
+  skill           Int      @default(1000) @db.UnsignedInt
+  shots           Int      @default(0) @db.UnsignedInt
+  hits            Int      @default(0) @db.UnsignedInt
+  game            String   @default("") @db.VarChar(32)
+  headshots       Int      @default(0) @db.UnsignedInt
+  teamkills       Int      @default(0) @db.UnsignedInt
+  kill_streak     Int      @default(0)
+  death_streak    Int      @default(0)
+  skill_change    Int      @default(0)
+
+  player Player @relation(fields: [playerId], references: [playerId])
+
+  @@unique([eventTime, playerId, game], name: "eventTime_playerId_game")
+  @@index([playerId])
+  @@map("hlstats_Players_History")
+}
+
+model PlayerRibbon {
+  playerId Int    @db.UnsignedInt
+  ribbonId Int    @db.UnsignedInt
+  game     String @db.VarChar(32)
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  ribbon Ribbon @relation(fields: [ribbonId], references: [ribbonId])
+
+  @@id([playerId, ribbonId, game])
+  @@map("hlstats_Players_Ribbons")
+}
+
+model Rank {
+  rankId   Int    @id @default(autoincrement()) @db.UnsignedInt
+  image    String @db.VarChar(30)
+  minKills Int    @default(0) @db.UnsignedInt
+  maxKills Int    @default(0)
+  rankName String @db.VarChar(50)
+  game     String @db.VarChar(32)
+
+  @@unique([image, game], name: "rankgame")
+  @@index([game(length: 8)], name: "game")
+  @@map("hlstats_Ranks")
+}
+
+model Ribbon {
+  ribbonId   Int    @id @default(autoincrement()) @db.UnsignedInt
+  awardCode  String @db.VarChar(50)
+  awardCount Int    @default(0)
+  special    Int    @default(0) @db.TinyInt
+  game       String @db.VarChar(32)
+  image      String @db.VarChar(50)
+  ribbonName String @db.VarChar(50)
+
+  playerRibbons PlayerRibbon[]
+
+  @@unique([awardCode, awardCount, game, special], name: "award")
+  @@map("hlstats_Ribbons")
+}
+
+model Role {
+  roleId Int    @id @default(autoincrement()) @db.UnsignedInt
+  game   String @default("valve") @db.VarChar(32)
+  code   String @default("") @db.VarChar(64)
+  name   String @default("") @db.VarChar(64)
+  hidden String @default("0") @db.VarChar(1) // ENUM('0','1')
+  picked Int    @default(0) @db.UnsignedInt
+  kills  Int    @default(0) @db.UnsignedInt
+  deaths Int    @default(0) @db.UnsignedInt
+
+  @@unique([game, code], name: "gamecode")
+  @@map("hlstats_Roles")
+}
+
+model Server {
+  serverId      Int     @id @default(autoincrement()) @db.UnsignedInt
+  address       String  @default("") @db.VarChar(32)
+  port          Int     @default(0) @db.UnsignedInt
+  name          String  @default("") @db.VarChar(255)
+  sortorder     Int     @default(0) @db.TinyInt
+  game          String  @default("valve") @db.VarChar(32)
+  publicaddress String  @default("") @db.VarChar(128)
+  statusurl     String? @db.VarChar(255)
+  rcon_password String  @default("") @db.VarChar(128)
+  kills         Int     @default(0)
+  players       Int     @default(0)
+  rounds        Int     @default(0)
+  suicides      Int     @default(0)
+  headshots     Int     @default(0)
+  bombs_planted Int     @default(0)
+  bombs_defused Int     @default(0)
+  ct_wins       Int     @default(0)
+  ts_wins       Int     @default(0)
+  act_players   Int     @default(0) @db.SmallInt
+  max_players   Int     @default(0) @db.SmallInt
+  act_map       String  @default("") @db.VarChar(64)
+  map_rounds    Int     @default(0)
+  map_ct_wins   Int     @default(0)
+  map_ts_wins   Int     @default(0)
+  map_started   Int     @default(0)
+  map_changes   Int     @default(0)
+  ct_shots      Int     @default(0)
+  ct_hits       Int     @default(0)
+  ts_shots      Int     @default(0)
+  ts_hits       Int     @default(0)
+  map_ct_shots  Int     @default(0)
+  map_ct_hits   Int     @default(0)
+  map_ts_shots  Int     @default(0)
+  map_ts_hits   Int     @default(0)
+  lat           Float?
+  lng           Float?
+  city          String  @default("") @db.VarChar(64)
+  country       String  @default("") @db.VarChar(64)
+  last_event    Int     @default(0) @db.UnsignedInt
+
+  eventsAdmin              EventAdmin[]
+  eventsChangeName         EventChangeName[]
+  eventsChangeRole         EventChangeRole[]
+  eventsChangeTeam         EventChangeTeam[]
+  eventsChat               EventChat[]
+  eventsConnect            EventConnect[]
+  eventsDisconnect         EventDisconnect[]
+  eventsEntry              EventEntry[]
+  eventsFrag               EventFrag[]
+  eventsLatency            EventLatency[]
+  eventsPlayerAction       EventPlayerAction[]
+  eventsPlayerPlayerAction EventPlayerPlayerAction[]
+  eventsRcon               EventRcon[]
+  eventsStatsme            EventStatsme[]
+  eventsStatsme2           EventStatsme2[]
+  eventsStatsmeLatency     EventStatsmeLatency[]
+  eventsStatsmeTime        EventStatsmeTime[]
+  eventsSuicide            EventSuicide[]
+  eventsTeamBonus          EventTeamBonus[]
+  eventsTeamkill           EventTeamkill[]
+  configs                  ServerConfig[]
+  loads                    ServerLoad[]
+
+  @@unique([address, port], name: "addressport")
+  @@map("hlstats_Servers")
+}
+
+model ServerConfig {
+  serverConfigId Int    @unique @default(autoincrement()) @db.UnsignedInt
+  serverId       Int    @db.UnsignedInt
+  parameter      String @db.VarChar(50)
+  value          String @db.VarChar(128)
+
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@id([serverId, parameter])
+  @@map("hlstats_Servers_Config")
+}
+
+model ServerConfigDefault {
+  parameter   String  @id @db.VarChar(50)
+  value       String  @db.VarChar(128)
+  description String? @db.MediumText
+
+  @@map("hlstats_Servers_Config_Default")
+}
+
+model ServerVoiceComm {
+  serverId   Int     @id @default(autoincrement()) @db.UnsignedInt
+  name       String  @db.VarChar(128)
+  addr       String  @db.VarChar(128)
+  password   String? @db.VarChar(128)
+  descr      String? @db.VarChar(255)
+  queryPort  Int     @default(51234) @db.UnsignedInt
+  UDPPort    Int     @default(8767) @db.UnsignedInt
+  serverType Int     @default(0) @db.TinyInt
+
+  @@unique([addr, UDPPort, queryPort], name: "address")
+  @@map("hlstats_Servers_VoiceComm")
+}
+
+model ServerLoad {
+  server_id   Int     @default(0)
+  timestamp   Int     @default(0)
+  act_players Int     @default(0) @db.TinyInt
+  min_players Int     @default(0) @db.TinyInt
+  max_players Int     @default(0) @db.TinyInt
+  map         String? @db.VarChar(64)
+  uptime      String  @default("0") @db.VarChar(10)
+  fps         String  @default("0") @db.VarChar(10)
+
+  server Server @relation(fields: [server_id], references: [serverId])
+
+  @@id([server_id, timestamp])
+  @@index([server_id])
+  @@index([timestamp])
+  @@map("hlstats_server_load")
+}
+
+model Team {
+  teamId             Int     @id @default(autoincrement()) @db.UnsignedInt
+  game               String  @default("valve") @db.VarChar(32)
+  code               String  @default("") @db.VarChar(64)
+  name               String  @default("") @db.VarChar(64)
+  hidden             String  @default("0") @db.VarChar(1) // ENUM('0','1')
+  playerlist_bgcolor String? @db.VarChar(7)
+  playerlist_color   String? @db.VarChar(7)
+  playerlist_index   Int     @default(0) @db.UnsignedTinyInt
+
+  @@unique([game, code], name: "gamecode")
+  @@map("hlstats_Teams")
+}
+
+model Trend {
+  timestamp Int    @default(0)
+  game      String @default("") @db.VarChar(32)
+  players   Int    @default(0)
+  kills     Int    @default(0)
+  headshots Int    @default(0)
+  servers   Int    @default(0)
+  act_slots Int    @default(0)
+  max_slots Int    @default(0)
+
+  @@id([timestamp, game])
+  @@index([game])
+  @@index([timestamp])
+  @@map("hlstats_Trend")
+}
+
+model User {
+  username String @id @db.VarChar(16)
+  password String @db.VarChar(32)
+  acclevel Int    @default(0)
+  playerId Int    @default(0)
+
+  player Player? @relation(fields: [playerId], references: [playerId])
+
+  @@map("hlstats_Users")
+}
+
+model Weapon {
+  weaponId  Int    @id @default(autoincrement()) @db.UnsignedInt
+  game      String @default("valve") @db.VarChar(32)
+  code      String @default("") @db.VarChar(64)
+  name      String @default("") @db.VarChar(128)
+  modifier  Float  @default(1.00) @db.Float
+  kills     Int    @default(0) @db.UnsignedInt
+  headshots Int    @default(0) @db.UnsignedInt
+
+  @@unique([game, code], name: "gamecode")
+  @@index([code])
+  @@index([modifier])
+  @@map("hlstats_Weapons")
 }

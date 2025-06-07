@@ -236,7 +236,7 @@ builder.queryField("players", (t) =>
         skip: args.offset ?? 0,
       });
     },
-  })
+  }),
 );
 
 // Query to get a single player by ID
@@ -258,7 +258,7 @@ builder.queryField("player", (t) =>
         where: { playerId },
       });
     },
-  })
+  }),
 );
 
 // Query to get a player by Steam ID
@@ -285,7 +285,7 @@ builder.queryField("playerBySteamId", (t) =>
         where: whereClause,
       });
     },
-  })
+  }),
 );
 
 // Query to get top players for a game
@@ -309,7 +309,7 @@ builder.queryField("topPlayers", (t) =>
         take: Math.min(args.limit ?? 10, 100),
       });
     },
-  })
+  }),
 );
 
 // Query to get player statistics with rank calculation
@@ -337,7 +337,7 @@ builder.queryField("playerStats", (t) =>
         rank: data.rank,
       };
     },
-  })
+  }),
 );
 
 // Mutation to create a new player
@@ -364,7 +364,7 @@ builder.mutationField("createPlayer", (t) =>
       const result = await context.services.player.createPlayer(cleanedInput);
       return handleGraphQLResult(result);
     },
-  })
+  }),
 );
 
 // Mutation to update player statistics (for daemon use)
@@ -391,12 +391,12 @@ builder.mutationField("updatePlayerStats", (t) =>
           skill: args.input.skill ?? undefined,
           connectionTime: args.input.connectionTime ?? undefined,
           lastEvent: args.input.lastEvent ?? undefined,
-        }
+        },
       );
 
       return handleGraphQLResult(result);
     },
-  })
+  }),
 );
 
 export { Player };

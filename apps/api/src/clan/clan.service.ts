@@ -21,7 +21,7 @@ export class ClanService {
    * Get clan statistics - Complex business logic for statistical calculations
    */
   async getClanStats(
-    clanId: string
+    clanId: string,
   ): Promise<Result<ClanStatistics, AppError>> {
     try {
       const clan = await this.db.clan.findUnique({
@@ -100,7 +100,7 @@ export class ClanService {
    */
   async getTopClans(
     gameId: string,
-    limit: number = 10
+    limit: number = 10,
   ): Promise<Result<readonly ClanWithAverageSkill[], AppError>> {
     try {
       const clans = await this.db.clan.findMany({
@@ -122,7 +122,7 @@ export class ClanService {
       const clansWithAvgSkill = clans.map((clan): ClanWithAverageSkill => {
         const totalSkill = clan.players.reduce(
           (sum, player) => sum + player.skill,
-          0
+          0,
         );
         const averageSkill =
           clan.players.length > 0 ? totalSkill / clan.players.length : 1000;
@@ -195,7 +195,7 @@ export class ClanService {
    */
   async updateClan(
     id: number,
-    input: UpdateClanInput
+    input: UpdateClanInput,
   ): Promise<Result<Clan, AppError>> {
     try {
       const clan = await this.db.clan.update({

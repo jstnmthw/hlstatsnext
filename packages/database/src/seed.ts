@@ -20,8 +20,8 @@ async function main() {
   log(`  Players: ${config.players.count}`);
   log(
     `  Multi-game players: ${Math.round(
-      config.playerUniqueIds.multiGamePlayersPercentage * 100
-    )}%`
+      config.playerUniqueIds.multiGamePlayersPercentage * 100,
+    )}%`,
   );
   log(`  Servers: ${config.servers.count}`);
 

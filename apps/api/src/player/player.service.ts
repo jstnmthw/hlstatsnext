@@ -22,7 +22,7 @@ export class PlayerService {
    * This involves complex business logic that's better handled in the service layer
    */
   async getPlayerStats(
-    playerId: string
+    playerId: string,
   ): Promise<Result<PlayerStatistics, AppError>> {
     try {
       const player = await this.db.player.findUnique({
@@ -84,7 +84,7 @@ export class PlayerService {
   async updatePlayerStats(
     steamId: string,
     gameId: string,
-    stats: UpdatePlayerStatsInput
+    stats: UpdatePlayerStatsInput,
   ): Promise<Result<Player, AppError>> {
     try {
       // Find player by Steam ID - complex relation query
@@ -143,7 +143,7 @@ export class PlayerService {
    * Requires transaction to ensure data consistency across tables
    */
   async createPlayer(
-    data: CreatePlayerInput
+    data: CreatePlayerInput,
   ): Promise<Result<Player, AppError>> {
     try {
       const player = await this.db.player.create({

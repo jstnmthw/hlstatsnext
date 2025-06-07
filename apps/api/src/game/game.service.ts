@@ -18,7 +18,7 @@ export class GameService {
    * Get game statistics summary - Complex business logic not suitable for schema resolvers
    */
   async getGameStats(
-    gameId: string
+    gameId: string,
   ): Promise<Result<GameStatistics, AppError>> {
     try {
       const game = await this.db.game.findUnique({
@@ -141,7 +141,7 @@ export class GameService {
    */
   async updateGame(
     code: string,
-    input: UpdateGameInput
+    input: UpdateGameInput,
   ): Promise<Result<Game, AppError>> {
     try {
       const game = await this.db.game.update({

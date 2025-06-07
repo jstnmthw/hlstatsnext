@@ -27,7 +27,7 @@ builder.queryField("countries", (t) =>
         orderBy: { name: "asc" },
       });
     },
-  })
+  }),
 );
 
 // Query to get a single country by id
@@ -44,7 +44,7 @@ builder.queryField("country", (t) =>
         where: { flag: args.id },
       });
     },
-  })
+  }),
 );
 
 export { Country };

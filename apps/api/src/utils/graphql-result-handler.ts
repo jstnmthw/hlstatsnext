@@ -18,7 +18,7 @@ export function handleGraphQLResult<T>(result: Result<T, AppError>): T {
  * Returns null for failures instead of throwing errors
  */
 export function handleGraphQLResultNullable<T>(
-  result: Result<T, AppError>
+  result: Result<T, AppError>,
 ): T | null {
   if (!result.success) {
     // Log the error but return null instead of throwing
@@ -36,7 +36,7 @@ export function handleGraphQLResultNullable<T>(
  * Async version of handleGraphQLResult for promise-based operations
  */
 export async function handleGraphQLResultAsync<T>(
-  resultPromise: Promise<Result<T, AppError>>
+  resultPromise: Promise<Result<T, AppError>>,
 ): Promise<T> {
   const result = await resultPromise;
   return handleGraphQLResult(result);
@@ -46,7 +46,7 @@ export async function handleGraphQLResultAsync<T>(
  * Async version of handleGraphQLResultNullable for promise-based operations
  */
 export async function handleGraphQLResultNullableAsync<T>(
-  resultPromise: Promise<Result<T, AppError>>
+  resultPromise: Promise<Result<T, AppError>>,
 ): Promise<T | null> {
   const result = await resultPromise;
   return handleGraphQLResultNullable(result);

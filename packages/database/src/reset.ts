@@ -10,7 +10,7 @@ import { logDatabaseStats } from "./seeds";
 async function resetDatabase() {
   logStep("Starting database reset...");
   logInfo(
-    "This will clear development data while preserving initial seeded data."
+    "This will clear development data while preserving initial seeded data.",
   );
 
   try {

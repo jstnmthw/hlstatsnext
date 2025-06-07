@@ -91,7 +91,7 @@ builder.queryField("servers", (t) =>
       const result = await context.services.server.getServers();
       return handleGraphQLResult(result);
     },
-  })
+  }),
 );
 
 // Query to get a single server's details
@@ -106,7 +106,7 @@ builder.queryField("server", (t) =>
       const result = await context.services.server.getServerDetails(args.id);
       return handleGraphQLResultNullable(result);
     },
-  })
+  }),
 );
 
 // Mutation to create a server
@@ -118,11 +118,11 @@ builder.mutationField("createServer", (t) =>
     },
     resolve: async (_parent, args, context) => {
       const result = await context.services.server.createServer(
-        args.input as CreateServerInputType
+        args.input as CreateServerInputType,
       );
       return handleGraphQLResult(result);
     },
-  })
+  }),
 );
 
 // Mutation to update a server
@@ -136,9 +136,9 @@ builder.mutationField("updateServer", (t) =>
     resolve: async (_parent, args, context) => {
       const result = await context.services.server.updateServer(
         args.id,
-        args.input as UpdateServerInputType
+        args.input as UpdateServerInputType,
       );
       return handleGraphQLResult(result);
     },
-  })
+  }),
 );

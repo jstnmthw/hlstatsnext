@@ -237,7 +237,6 @@ model GameEvent {
 
 - [x] GraphQL Playground accessible and functional
 - [x] Basic queries return correct data
-- [ ] Subscriptions working for real-time updates
 - [ ] Error handling comprehensive
 - [ ] Performance acceptable (<100ms for basic queries)
 
@@ -245,36 +244,7 @@ model GameEvent {
 
 ## Phase 2: Essential Data and Core Features (Week 3-5)
 
-### Step 2.1: Game Server Monitoring Daemon
-
-**Deliverable**: Node.js daemon that monitors game servers and updates database
-**Review Point**: Daemon reliably collects and stores game data
-
-**Actions**:
-
-- Create `apps/daemon` for game server monitoring
-- Implement server query protocols (Steam A2S, SourceRCON)
-- Set up real-time player tracking and statistics collection
-- Configure database updates and conflict resolution
-- Add health monitoring and error recovery
-
-**Daemon Features**:
-
-- **Multi-server support**: Monitor multiple game servers simultaneously
-- **Real-time updates**: Live player counts and server status
-- **Statistics collection**: Player kills, deaths, scores, and custom events
-- **Fault tolerance**: Automatic recovery from connection failures
-- **Performance monitoring**: Track daemon health and performance
-
-**Review Criteria**:
-
-- [ ] Daemon connects to game servers successfully
-- [ ] Player statistics collected accurately
-- [ ] Database updates happen reliably
-- [ ] Error recovery working properly
-- [ ] Performance monitoring functional
-
-### Step 2.2: Core Web Interface (Next.js App)
+### Step 2.1: Core Web Interface (Next.js App)
 
 **Deliverable**: Essential web pages with Server-Side Rendering
 **Review Point**: Basic functionality accessible and performant
@@ -312,7 +282,7 @@ export default async function PlayersPage() {
 - [ ] GraphQL integration functional
 - [ ] Performance acceptable (<2s initial load)
 
-### Step 2.3: Data Import and Legacy Migration Tools
+### Step 2.2: Data Import and Legacy Migration Tools
 
 **Deliverable**: Tools to import data from existing HLStatsX installation
 **Review Point**: Legacy data successfully imported and verified

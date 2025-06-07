@@ -51,14 +51,7 @@ pnpm dev
 - [x] Basic schema with health check
 - [x] Database context integration
 - [ ] Implement core entity queries
-- [ ] Add subscription support
 - [ ] Error handling and validation
-
-### Phase 2.1: Game Server Monitoring Daemon
-
-- [ ] Real-time server status subscriptions
-- [ ] Player statistics updates
-- [ ] Game event streaming
 
 ### Phase 3.1: Authentication and Authorization System
 

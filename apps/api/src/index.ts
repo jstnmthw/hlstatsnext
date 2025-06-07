@@ -5,6 +5,7 @@ import { createContext } from "./context";
 
 // Create GraphQL Yoga server
 const yoga = createYoga({
+  landingPage: false,
   schema,
   context: createContext,
   cors: {

@@ -171,7 +171,7 @@ export function generatePlayerData(): PlayerData {
         from: new Date(createdate * 1000),
         to: new Date(),
       })
-      .getTime() / 1000
+      .getTime() / 1000,
   );
 
   return {

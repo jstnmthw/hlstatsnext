@@ -119,7 +119,7 @@ export function mapAppErrorToGraphQLError(error: AppError): GraphQLError {
               id: error.id,
             },
           },
-        }
+        },
       );
     // ... other error types
   }
@@ -157,7 +157,7 @@ builder.queryField("gameStats", (t) =>
       const result = await context.services.game.getGameStats(args.gameId);
       return handleGraphQLResult(result); // Throws GraphQLError if failed
     },
-  })
+  }),
 );
 
 // For nullable fields (will return null on error)
@@ -172,7 +172,7 @@ builder.queryField("playerStats", (t) =>
       const result = await context.services.player.getPlayerStats(args.id);
       return handleGraphQLResultNullable(result); // Returns null if failed
     },
-  })
+  }),
 );
 ```
 
@@ -268,10 +268,10 @@ function handleGraphQLResultNullable<T>(result: Result<T, AppError>): T | null;
 
 // Async versions
 async function handleGraphQLResultAsync<T>(
-  resultPromise: Promise<Result<T, AppError>>
+  resultPromise: Promise<Result<T, AppError>>,
 ): Promise<T>;
 async function handleGraphQLResultNullableAsync<T>(
-  resultPromise: Promise<Result<T, AppError>>
+  resultPromise: Promise<Result<T, AppError>>,
 ): Promise<T | null>;
 ```
 

@@ -98,7 +98,7 @@ export class ServerService {
    * Create a new server
    */
   async createServer(
-    input: CreateServerInput
+    input: CreateServerInput,
   ): Promise<Result<Server, AppError>> {
     try {
       const server = await this.db.server.create({
@@ -127,7 +127,7 @@ export class ServerService {
    */
   async updateServer(
     id: string,
-    input: UpdateServerInput
+    input: UpdateServerInput,
   ): Promise<Result<Server, AppError>> {
     try {
       const serverId = parseInt(id);

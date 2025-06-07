@@ -21,7 +21,7 @@ enum GraphQLErrorCode {
 function createGraphQLError(
   message: string,
   code: GraphQLErrorCode,
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
 ): GraphQLError {
   return new GraphQLError(message, {
     extensions: {
@@ -44,7 +44,7 @@ export function mapAppErrorToGraphQLError(error: AppError): GraphQLError {
         {
           resource: error.resource,
           id: error.id,
-        }
+        },
       );
 
     case "VALIDATION_ERROR":
@@ -54,13 +54,13 @@ export function mapAppErrorToGraphQLError(error: AppError): GraphQLError {
         {
           field: error.field,
           value: error.value,
-        }
+        },
       );
 
     case "UNAUTHORIZED":
       return createGraphQLError(
         "Authentication required to access this resource.",
-        GraphQLErrorCode.UNAUTHORIZED
+        GraphQLErrorCode.UNAUTHORIZED,
       );
 
     case "DATABASE_ERROR":
@@ -69,13 +69,13 @@ export function mapAppErrorToGraphQLError(error: AppError): GraphQLError {
         GraphQLErrorCode.INTERNAL_SERVER_ERROR,
         {
           operation: error.operation,
-        }
+        },
       );
 
     default:
       return createGraphQLError(
         "An internal error occurred. Please try again later.",
-        GraphQLErrorCode.INTERNAL_SERVER_ERROR
+        GraphQLErrorCode.INTERNAL_SERVER_ERROR,
       );
   }
 }

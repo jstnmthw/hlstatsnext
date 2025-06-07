@@ -91,7 +91,7 @@ builder.queryField("clans", (t) =>
         skip: args.offset ?? 0,
       });
     },
-  })
+  }),
 );
 
 // Query to get a single clan by ID
@@ -113,7 +113,7 @@ builder.queryField("clan", (t) =>
         where: { clanId },
       });
     },
-  })
+  }),
 );
 
 // Input for creating a clan
@@ -145,11 +145,11 @@ builder.mutationField("createClan", (t) =>
     },
     resolve: async (_parent, args, context) => {
       const result = await context.services.clan.createClan(
-        args.input as CreateClanInputType
+        args.input as CreateClanInputType,
       );
       return handleGraphQLResult(result);
     },
-  })
+  }),
 );
 
 // Mutation to update a clan
@@ -163,11 +163,11 @@ builder.mutationField("updateClan", (t) =>
     resolve: async (_parent, args, context) => {
       const result = await context.services.clan.updateClan(
         args.id,
-        args.input as UpdateClanInputType
+        args.input as UpdateClanInputType,
       );
       return handleGraphQLResult(result);
     },
-  })
+  }),
 );
 
 export { Clan };

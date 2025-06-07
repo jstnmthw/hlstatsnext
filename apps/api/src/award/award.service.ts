@@ -133,7 +133,7 @@ export class AwardService {
    * Create a new award
    */
   async createAward(
-    input: Prisma.AwardCreateInput
+    input: Prisma.AwardCreateInput,
   ): Promise<Result<Award, AppError>> {
     try {
       const award = await this.db.award.create({
@@ -160,7 +160,7 @@ export class AwardService {
    */
   async updateAward(
     awardId: number,
-    input: Prisma.AwardUpdateInput
+    input: Prisma.AwardUpdateInput,
   ): Promise<Result<Award, AppError>> {
     try {
       const award = await this.db.award.update({

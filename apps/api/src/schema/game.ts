@@ -70,7 +70,7 @@ builder.queryField("games", (t) =>
         where: args.includeHidden ? {} : { hidden: "0" },
       });
     },
-  })
+  }),
 );
 
 // Query to get a single game with automatic Prisma integration
@@ -88,7 +88,7 @@ builder.queryField("game", (t) =>
         where: { code: args.id },
       });
     },
-  })
+  }),
 );
 
 // Query to get game statistics using the service for complex business logic
@@ -102,7 +102,7 @@ builder.queryField("gameStats", (t) =>
       const result = await context.services.game.getGameStats(args.gameId);
       return handleGraphQLResult(result);
     },
-  })
+  }),
 );
 
 // Input for creating a game
@@ -133,11 +133,11 @@ builder.mutationField("createGame", (t) =>
     },
     resolve: async (_parent, args, context) => {
       const result = await context.services.game.createGame(
-        args.input as CreateGameInputType
+        args.input as CreateGameInputType,
       );
       return handleGraphQLResult(result);
     },
-  })
+  }),
 );
 
 // Mutation to update a game
@@ -151,11 +151,11 @@ builder.mutationField("updateGame", (t) =>
     resolve: async (_parent, args, context) => {
       const result = await context.services.game.updateGame(
         args.code,
-        args.input as UpdateGameInputType
+        args.input as UpdateGameInputType,
       );
       return handleGraphQLResult(result);
     },
-  })
+  }),
 );
 
 export { Game };

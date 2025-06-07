@@ -28,11 +28,11 @@ const port = process.env.PORT || 4000;
 
 server.listen(port, () => {
   console.log(
-    `🚀 GraphQL API server ready at http://localhost:${port}/graphql`
+    `🚀 GraphQL API server ready at http://localhost:${port}/graphql`,
   );
   if (process.env.NODE_ENV !== "production") {
     console.log(
-      `📊 GraphiQL interface available at http://localhost:${port}/graphql`
+      `📊 GraphiQL interface available at http://localhost:${port}/graphql`,
     );
   }
 });

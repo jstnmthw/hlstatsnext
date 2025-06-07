@@ -43,8 +43,8 @@ enhance the proven concepts of HLstatsX:CE.
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/jstnmthw/hlstatsnext.com.git
-cd hlstatsnext.com
+git clone https://github.com/jstnmthw/hlstatsnext.git
+cd hlstatsnext
 ```
 
 2. Install dependencies:

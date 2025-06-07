@@ -113,7 +113,7 @@ export class ActionService {
    * Create a new action
    */
   async createAction(
-    input: Prisma.ActionCreateInput
+    input: Prisma.ActionCreateInput,
   ): Promise<Result<Action, AppError>> {
     try {
       const action = await this.db.action.create({
@@ -136,7 +136,7 @@ export class ActionService {
    */
   async updateAction(
     id: number,
-    input: Prisma.ActionUpdateInput
+    input: Prisma.ActionUpdateInput,
   ): Promise<Result<Action, AppError>> {
     try {
       const action = await this.db.action.update({

@@ -60,7 +60,7 @@ export class RankService {
    */
   async getPlayerRank(
     game: string,
-    kills: number
+    kills: number,
   ): Promise<Result<Rank | null, AppError>> {
     try {
       const rank = await this.db.rank.findFirst({
@@ -87,7 +87,7 @@ export class RankService {
    * Create a new rank
    */
   async createRank(
-    input: Prisma.RankCreateInput
+    input: Prisma.RankCreateInput,
   ): Promise<Result<Rank, AppError>> {
     try {
       const rank = await this.db.rank.create({
@@ -110,7 +110,7 @@ export class RankService {
    */
   async updateRank(
     rankId: number,
-    input: Prisma.RankUpdateInput
+    input: Prisma.RankUpdateInput,
   ): Promise<Result<Rank, AppError>> {
     try {
       const rank = await this.db.rank.update({

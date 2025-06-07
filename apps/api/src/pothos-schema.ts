@@ -35,14 +35,14 @@ builder.queryField("health", (t) =>
       timestamp: new Date().toISOString(),
       version: "1.0.0",
     }),
-  })
+  }),
 );
 
 // Hello world query
 builder.queryField("hello", (t) =>
   t.string({
     resolve: () => "Hello from HLStatsNext API!",
-  })
+  }),
 );
 
 // Build and export the schema

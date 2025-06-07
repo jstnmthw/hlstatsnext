@@ -11,23 +11,24 @@
     "clean": "rm -rf node_modules"
   },
   "dependencies": {
-    "@repo/database": "workspace:*",
     "@graphql-tools/schema": "^10.0.23",
-    "graphql": "^16.11.0",
-    "graphql-yoga": "^5.13.5",
-    "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
     "@pothos/core": "^4.6.2",
     "@pothos/plugin-prisma": "^4.8.2",
-    "@pothos/plugin-relay": "^4.4.2"
+    "@pothos/plugin-relay": "^4.4.2",
+    "@pothos/plugin-with-input": "^4.1.1",
+    "@repo/database": "workspace:*",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "graphql": "^16.11.0",
+    "graphql-yoga": "^5.13.5"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/cors": "^2.8.18",
     "@types/node": "^22.15.29",
-    "tsx": "^4.7.0",
     "eslint": "^9.28.0",
+    "tsx": "^4.7.0",
     "typescript": "5.8.3"
   }
 }

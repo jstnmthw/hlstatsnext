@@ -145,7 +145,7 @@ export class RoleService {
    * Create a new role
    */
   async createRole(
-    input: Prisma.RoleCreateInput
+    input: Prisma.RoleCreateInput,
   ): Promise<Result<Role, AppError>> {
     try {
       const role = await this.db.role.create({
@@ -168,7 +168,7 @@ export class RoleService {
    */
   async updateRole(
     roleId: number,
-    input: Prisma.RoleUpdateInput
+    input: Prisma.RoleUpdateInput,
   ): Promise<Result<Role, AppError>> {
     try {
       const role = await this.db.role.update({

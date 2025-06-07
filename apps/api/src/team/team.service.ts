@@ -113,7 +113,7 @@ export class TeamService {
    * Create a new team
    */
   async createTeam(
-    input: Prisma.TeamCreateInput
+    input: Prisma.TeamCreateInput,
   ): Promise<Result<Team, AppError>> {
     try {
       const team = await this.db.team.create({
@@ -136,7 +136,7 @@ export class TeamService {
    */
   async updateTeam(
     teamId: number,
-    input: Prisma.TeamUpdateInput
+    input: Prisma.TeamUpdateInput,
   ): Promise<Result<Team, AppError>> {
     try {
       const team = await this.db.team.update({

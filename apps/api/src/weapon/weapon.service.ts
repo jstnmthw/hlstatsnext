@@ -142,7 +142,7 @@ export class WeaponService {
    * Create a new weapon
    */
   async createWeapon(
-    input: Prisma.WeaponCreateInput
+    input: Prisma.WeaponCreateInput,
   ): Promise<Result<Weapon, AppError>> {
     try {
       const weapon = await this.db.weapon.create({
@@ -165,7 +165,7 @@ export class WeaponService {
    */
   async updateWeapon(
     weaponId: number,
-    input: Prisma.WeaponUpdateInput
+    input: Prisma.WeaponUpdateInput,
   ): Promise<Result<Weapon, AppError>> {
     try {
       const weapon = await this.db.weapon.update({

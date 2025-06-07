@@ -6,6 +6,8 @@ import "./schema/country";
 import "./schema/player";
 import "./schema/clan";
 import "./schema/server";
+import "./schema/award";
+import "./schema/action";
 
 // Define HealthStatus type
 const HealthStatus = builder.objectRef<{

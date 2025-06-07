@@ -1,10 +1,14 @@
-import type { PrismaClient } from "@repo/database/client";
+import type { PrismaClient, Clan } from "@repo/database/client";
 import type {
   ClanWithAverageSkill,
   ClanStatistics,
 } from "../types/database/clan.types";
 import type { Result, AppError } from "../types/common";
 import { success, failure } from "../types";
+import type {
+  CreateClanInput,
+  UpdateClanInput,
+} from "../types/database/clan.types";
 
 /**
  * Service class for handling clan-related business logic
@@ -149,6 +153,67 @@ export class ClanService {
         type: "DATABASE_ERROR",
         message: "Failed to fetch top clans",
         operation: "getTopClans",
+      });
+    }
+  }
+
+  /**
+   * Create a new clan
+   */
+  async createClan(input: CreateClanInput): Promise<Result<Clan, AppError>> {
+    try {
+      const clan = await this.db.clan.create({
+        data: {
+          tag: input.tag,
+          name: input.name,
+          game: input.gameId,
+          homepage: input.homepage ?? "",
+          hidden: 0,
+        },
+      });
+      return success(clan);
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error && "code" in error && error.code === "P2002") {
+        return failure({
+          type: "VALIDATION_ERROR",
+          message: `A clan with tag '${input.tag}' for this game already exists.`,
+          field: "tag",
+          value: input.tag,
+        });
+      }
+      return failure({
+        type: "DATABASE_ERROR",
+        message: "Failed to create clan",
+        operation: "createClan",
+      });
+    }
+  }
+
+  /**
+   * Update an existing clan
+   */
+  async updateClan(
+    id: number,
+    input: UpdateClanInput
+  ): Promise<Result<Clan, AppError>> {
+    try {
+      const clan = await this.db.clan.update({
+        where: { clanId: id },
+        data: {
+          ...(input.tag && { tag: input.tag }),
+          ...(input.name && { name: input.name }),
+          ...(input.homepage && { homepage: input.homepage }),
+          ...(input.hidden !== undefined && { hidden: input.hidden ? 1 : 0 }),
+        },
+      });
+      return success(clan);
+    } catch (error) {
+      console.error(error);
+      return failure({
+        type: "DATABASE_ERROR",
+        message: "Failed to update clan",
+        operation: "updateClan",
       });
     }
   }

@@ -1,5 +1,9 @@
-import type { PrismaClient } from "@repo/database/client";
-import type { GameStatistics } from "../types/database/game.types";
+import type { PrismaClient, Game } from "@repo/database/client";
+import type {
+  GameStatistics,
+  CreateGameInput,
+  UpdateGameInput,
+} from "../types/database/game.types";
 import { ACTIVITY_TIMEFRAMES } from "../types/database/game.types";
 import type { Result, AppError } from "../types/common";
 import { success, failure } from "../types";
@@ -95,6 +99,68 @@ export class GameService {
         type: "DATABASE_ERROR",
         message: "Failed to calculate game statistics",
         operation: "getGameStats",
+      });
+    }
+  }
+
+  /**
+   * Create a new game
+   */
+  async createGame(input: CreateGameInput): Promise<Result<Game, AppError>> {
+    try {
+      const game = await this.db.game.create({
+        data: {
+          code: input.code,
+          name: input.name,
+          realgame: input.realgame,
+          hidden: input.hidden ? "1" : "0",
+        },
+      });
+      return success(game);
+    } catch (error) {
+      console.error(error);
+      // Prisma unique constraint violation
+      if (error instanceof Error && "code" in error && error.code === "P2002") {
+        return failure({
+          type: "VALIDATION_ERROR",
+          message: `Game with code '${input.code}' already exists.`,
+          field: "code",
+          value: input.code,
+        });
+      }
+      return failure({
+        type: "DATABASE_ERROR",
+        message: "Failed to create game",
+        operation: "createGame",
+      });
+    }
+  }
+
+  /**
+   * Update an existing game
+   */
+  async updateGame(
+    code: string,
+    input: UpdateGameInput
+  ): Promise<Result<Game, AppError>> {
+    try {
+      const game = await this.db.game.update({
+        where: { code },
+        data: {
+          ...(input.name && { name: input.name }),
+          ...(input.realgame && { realgame: input.realgame }),
+          ...(input.hidden !== undefined && {
+            hidden: input.hidden ? "1" : "0",
+          }),
+        },
+      });
+      return success(game);
+    } catch (error) {
+      console.error(error);
+      return failure({
+        type: "DATABASE_ERROR",
+        message: "Failed to update game",
+        operation: "updateGame",
       });
     }
   }

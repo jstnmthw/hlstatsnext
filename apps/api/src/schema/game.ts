@@ -1,6 +1,10 @@
 import { builder } from "../builder";
 import { Player } from "./player";
 import { handleGraphQLResult } from "../utils/graphql-result-handler";
+import type {
+  CreateGameInput as CreateGameInputType,
+  UpdateGameInput as UpdateGameInputType,
+} from "../types/database/game.types";
 
 // Define Game object using Prisma plugin - automatically maps all Prisma fields
 const Game = builder.prismaObject("Game", {
@@ -96,6 +100,59 @@ builder.queryField("gameStats", (t) =>
     },
     resolve: async (_parent, args, context) => {
       const result = await context.services.game.getGameStats(args.gameId);
+      return handleGraphQLResult(result);
+    },
+  })
+);
+
+// Input for creating a game
+const CreateGameInput = builder.inputType("CreateGameInput", {
+  fields: (t) => ({
+    code: t.string({ required: true }),
+    name: t.string({ required: true }),
+    realgame: t.string({ required: true }),
+    hidden: t.boolean({ required: false, defaultValue: false }),
+  }),
+});
+
+// Input for updating a game
+const UpdateGameInput = builder.inputType("UpdateGameInput", {
+  fields: (t) => ({
+    name: t.string({ required: false }),
+    realgame: t.string({ required: false }),
+    hidden: t.boolean({ required: false }),
+  }),
+});
+
+// Mutation to create a game
+builder.mutationField("createGame", (t) =>
+  t.field({
+    type: Game,
+    args: {
+      input: t.arg({ type: CreateGameInput, required: true }),
+    },
+    resolve: async (_parent, args, context) => {
+      const result = await context.services.game.createGame(
+        args.input as CreateGameInputType
+      );
+      return handleGraphQLResult(result);
+    },
+  })
+);
+
+// Mutation to update a game
+builder.mutationField("updateGame", (t) =>
+  t.field({
+    type: Game,
+    args: {
+      code: t.arg.string({ required: true }),
+      input: t.arg({ type: UpdateGameInput, required: true }),
+    },
+    resolve: async (_parent, args, context) => {
+      const result = await context.services.game.updateGame(
+        args.code,
+        args.input as UpdateGameInputType
+      );
       return handleGraphQLResult(result);
     },
   })

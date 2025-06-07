@@ -1,5 +1,10 @@
 import { builder } from "../builder";
 import type { Prisma } from "@repo/database/client";
+import { handleGraphQLResult } from "../utils/graphql-result-handler";
+import type {
+  CreateClanInput as CreateClanInputType,
+  UpdateClanInput as UpdateClanInputType,
+} from "../types/database/clan.types";
 
 // Define Clan object using Prisma plugin
 const Clan = builder.prismaObject("Clan", {
@@ -107,6 +112,60 @@ builder.queryField("clan", (t) =>
         ...query,
         where: { clanId },
       });
+    },
+  })
+);
+
+// Input for creating a clan
+const CreateClanInput = builder.inputType("CreateClanInput", {
+  fields: (t) => ({
+    tag: t.string({ required: true }),
+    name: t.string({ required: true }),
+    gameId: t.string({ required: true }),
+    homepage: t.string({ required: false }),
+  }),
+});
+
+// Input for updating a clan
+const UpdateClanInput = builder.inputType("UpdateClanInput", {
+  fields: (t) => ({
+    tag: t.string({ required: false }),
+    name: t.string({ required: false }),
+    homepage: t.string({ required: false }),
+    hidden: t.boolean({ required: false }),
+  }),
+});
+
+// Mutation to create a clan
+builder.mutationField("createClan", (t) =>
+  t.field({
+    type: Clan,
+    args: {
+      input: t.arg({ type: CreateClanInput, required: true }),
+    },
+    resolve: async (_parent, args, context) => {
+      const result = await context.services.clan.createClan(
+        args.input as CreateClanInputType
+      );
+      return handleGraphQLResult(result);
+    },
+  })
+);
+
+// Mutation to update a clan
+builder.mutationField("updateClan", (t) =>
+  t.field({
+    type: Clan,
+    args: {
+      id: t.arg.int({ required: true }),
+      input: t.arg({ type: UpdateClanInput, required: true }),
+    },
+    resolve: async (_parent, args, context) => {
+      const result = await context.services.clan.updateClan(
+        args.id,
+        args.input as UpdateClanInputType
+      );
+      return handleGraphQLResult(result);
     },
   })
 );

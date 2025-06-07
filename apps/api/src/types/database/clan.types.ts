@@ -41,28 +41,23 @@ export interface ClanFilters {
 }
 
 /**
- * Business logic input for clan creation
- * This maintains the existing API for business logic
+ * Input for creating a clan
  */
 export interface CreateClanInput {
-  readonly tag: string;
-  readonly name: string;
-  readonly gameId: string;
-  readonly homepage?: string;
-  readonly mapRegion?: string;
-  readonly hidden?: boolean;
+  tag: string;
+  name: string;
+  gameId: string;
+  homepage?: string;
 }
 
 /**
- * Business logic input for clan updates
- * This maintains the existing API for business logic
+ * Input for updating a clan
  */
 export interface UpdateClanInput {
-  readonly tag?: string;
-  readonly name?: string;
-  readonly homepage?: string;
-  readonly mapRegion?: string;
-  readonly hidden?: boolean;
+  tag?: string;
+  name?: string;
+  homepage?: string;
+  hidden?: boolean;
 }
 
 // Re-export Prisma-generated types for direct database operations

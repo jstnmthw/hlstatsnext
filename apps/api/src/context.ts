@@ -1,5 +1,8 @@
 import { db } from "@repo/database/client";
-import { PlayerService, GameService, ClanService } from "./services";
+import { PlayerService } from "./player/player.service";
+import { GameService } from "./game/game.service";
+import { ClanService } from "./clan/clan.service";
+import { ServerService } from "./server/server.service";
 
 /**
  * GraphQL context interface with strict typing
@@ -10,6 +13,7 @@ export interface Context {
     readonly player: PlayerService;
     readonly game: GameService;
     readonly clan: ClanService;
+    readonly server: ServerService;
   };
   // Authentication context will be added during Phase 3.1
   // readonly user?: User;
@@ -26,6 +30,7 @@ export function createContext(): Context {
       player: new PlayerService(db),
       game: new GameService(db),
       clan: new ClanService(db),
+      server: new ServerService(db),
     },
     // Authentication context will be added during Phase 3.1
     // This will include:

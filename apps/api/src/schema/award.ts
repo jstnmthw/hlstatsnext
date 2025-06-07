@@ -54,7 +54,18 @@ const Award = builder.prismaObject("Award", {
 
 // Define PaginatedAwards type
 const PaginatedAwards = builder.objectRef<{
-  items: any[];
+  items: {
+    awardId: number;
+    awardType: string;
+    game: string;
+    code: string;
+    name: string;
+    verb: string;
+    d_winner_id: number | null;
+    d_winner_count: number | null;
+    g_winner_id: number | null;
+    g_winner_count: number | null;
+  }[];
   total: number;
   page: number;
   totalPages: number;

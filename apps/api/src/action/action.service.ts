@@ -6,6 +6,7 @@ import {
   AppError,
   PaginatedResult,
 } from "../types/common";
+import { isRecordNotFoundError } from "../utils/prisma-error-handler";
 
 export class ActionService {
   constructor(private readonly db: PrismaClient) {}
@@ -112,7 +113,7 @@ export class ActionService {
    * Create a new action
    */
   async createAction(
-    input: Prisma.ActionCreateInput,
+    input: Prisma.ActionCreateInput
   ): Promise<Result<Action, AppError>> {
     try {
       const action = await this.db.action.create({
@@ -135,7 +136,7 @@ export class ActionService {
    */
   async updateAction(
     id: number,
-    input: Prisma.ActionUpdateInput,
+    input: Prisma.ActionUpdateInput
   ): Promise<Result<Action, AppError>> {
     try {
       const action = await this.db.action.update({
@@ -144,9 +145,9 @@ export class ActionService {
       });
 
       return success(action);
-    } catch (error: any) {
-      if (error?.code === "P2025") {
-        console.error(error);
+    } catch (error: unknown) {
+      console.error(error);
+      if (isRecordNotFoundError(error)) {
         return failure({
           type: "NOT_FOUND",
           message: "Action not found",
@@ -173,8 +174,9 @@ export class ActionService {
       });
 
       return success(true);
-    } catch (error: any) {
-      if (error?.code === "P2025") {
+    } catch (error: unknown) {
+      console.error(error);
+      if (isRecordNotFoundError(error)) {
         return failure({
           type: "NOT_FOUND",
           message: "Action not found",
@@ -183,7 +185,6 @@ export class ActionService {
         });
       }
 
-      console.error(error);
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to delete action",

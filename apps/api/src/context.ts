@@ -5,6 +5,10 @@ import { ClanService } from "./clan/clan.service";
 import { ServerService } from "./server/server.service";
 import { AwardService } from "./award/award.service";
 import { ActionService } from "./action/action.service";
+import { WeaponService } from "./weapon/weapon.service";
+import { RoleService } from "./role/role.service";
+import { TeamService } from "./team/team.service";
+import { RankService } from "./rank/rank.service";
 
 /**
  * GraphQL context interface with strict typing
@@ -18,6 +22,10 @@ export interface Context {
     readonly server: ServerService;
     readonly award: AwardService;
     readonly action: ActionService;
+    readonly weapon: WeaponService;
+    readonly role: RoleService;
+    readonly team: TeamService;
+    readonly rank: RankService;
   };
   // Authentication context will be added during Phase 3.1
   // readonly user?: User;
@@ -37,6 +45,10 @@ export function createContext(): Context {
       server: new ServerService(db),
       award: new AwardService(db),
       action: new ActionService(db),
+      weapon: new WeaponService(db),
+      role: new RoleService(db),
+      team: new TeamService(db),
+      rank: new RankService(db),
     },
     // Authentication context will be added during Phase 3.1
     // This will include:

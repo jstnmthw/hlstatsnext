@@ -44,5 +44,5 @@ export async function seedPlayers() {
     skipDuplicates: true,
   });
 
-  log(`✚ Created ${players.length} players.`);
+  log(`✔ Created ${players.length} players.`);
 }

@@ -32,5 +32,5 @@ export async function seedRanks() {
     skipDuplicates: true,
   });
 
-  log(`✚ Created ${result.count} ranks.`);
+  log(`✔ Created ${result.count} ranks.`);
 }

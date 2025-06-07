@@ -41,5 +41,5 @@ export async function seedGames() {
     skipDuplicates: true,
   });
 
-  log(`✚ Created ${result.count} games.`);
+  log(`✔ Created ${result.count} games.`);
 }

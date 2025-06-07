@@ -27,5 +27,5 @@ export async function seedCountries() {
     skipDuplicates: true,
   });
 
-  log(`✚ Created ${result.count} countries.`);
+  log(`✔ Created ${result.count} countries.`);
 }

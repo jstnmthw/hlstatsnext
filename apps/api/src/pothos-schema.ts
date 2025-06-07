@@ -5,6 +5,7 @@ import "./schema/game";
 import "./schema/country";
 import "./schema/player";
 import "./schema/clan";
+import "./schema/server";
 
 // Define HealthStatus type
 const HealthStatus = builder.objectRef<{

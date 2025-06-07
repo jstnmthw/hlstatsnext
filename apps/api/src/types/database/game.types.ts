@@ -94,3 +94,22 @@ export const ACTIVITY_TIMEFRAMES = {
   SEVEN_DAYS: 7 * 24 * 60 * 60, // 7 days in seconds
   ONE_DAY: 24 * 60 * 60, // 1 day in seconds
 } as const;
+
+/**
+ * Input for creating a game
+ */
+export interface CreateGameInput {
+  code: string;
+  name: string;
+  realgame: string;
+  hidden?: boolean;
+}
+
+/**
+ * Input for updating a game
+ */
+export interface UpdateGameInput {
+  name?: string;
+  realgame?: string;
+  hidden?: boolean;
+}

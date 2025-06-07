@@ -28,6 +28,7 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.8.4",
     "eslint": "^9.27.0",
+    "ts-deepmerge": "^7.0.3",
     "tsx": "^4.7.0",
     "typescript": "5.8.2"
   },

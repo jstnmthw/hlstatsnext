@@ -79,6 +79,9 @@ pnpm build
 # Run linting across all apps and packages
 pnpm lint
 
+# Generate GraphQL client for the web app (requires api to be running)
+pnpm --filter=web graphql:codegen
+
 # Run tests across all apps and packages
 pnpm test
 

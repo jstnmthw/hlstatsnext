@@ -240,6 +240,68 @@ model GameEvent {
 - [x] Error handling comprehensive
 - [ ] Performance acceptable (<100ms for basic queries)
 
+### Step 1.5: GraphQL Client Setup in Web App
+
+**Deliverable**: A fully configured GraphQL client in `apps/web` capable of querying the `apps/api` endpoint with end-to-end type safety.
+**Review Point**: The Next.js app can successfully query the GraphQL API using auto-generated, type-safe code for both Server-Side Rendering (SSR) and client-side operations.
+
+**Actions**:
+
+- **Install Dependencies**: Add `@apollo/client` for robust state management and caching, along with `graphql`.
+- **Set Up Code Generation**:
+  - Install dev dependencies: `@graphql-codegen/cli`, `@graphql-codegen/client-preset`.
+  - Create a `codegen.ts` file in `apps/web` to configure the generation process.
+- **Configure Codegen**:
+  - Point the codegen configuration to the `apps/api` GraphQL endpoint (`http://localhost:4000/graphql`).
+  - Configure it to scan `apps/web/**/*.{ts,tsx}` for GraphQL queries.
+  - Use the `client-preset` to generate a fully typed client SDK.
+- **Add Codegen Script**: Add a `graphql:codegen` script to `apps/web/package.json` to automate type generation.
+- **Implement Apollo Client**:
+  - Create a new lib file (`apps/web/src/lib/apollo-client.ts`) to initialize and export a single Apollo Client instance.
+  - Implement a provider in `apps/web/src/components/apollo-provider.tsx` to wrap the application and make the client available to all components.
+  - Update the root layout (`apps/web/app/layout.tsx`) to use the `ApolloProvider`.
+- **Example Usage**:
+  - Demonstrate a query in a Server Component using the generated SDK for SSR.
+  - Demonstrate a mutation in a Client Component to showcase client-side data fetching.
+- **Documentation**: Update `apps/web/README.md` with instructions on the GraphQL setup, code generation, and usage patterns.
+
+**Technical Requirements**:
+
+_apps/web/codegen.ts_
+
+```typescript
+import { CodegenConfig } from "@graphql-codegen/cli";
+
+const config: CodegenConfig = {
+  schema: "http://localhost:4000/graphql",
+  documents: ["src/**/*.{ts,tsx}"],
+  generates: {
+    "./src/lib/gql/": {
+      preset: "client",
+      plugins: [],
+    },
+  },
+};
+
+export default config;
+```
+
+_apps/web/package.json script_
+
+```json
+"scripts": {
+  "graphql:codegen": "graphql-codegen --config codegen.ts"
+}
+```
+
+**Review Criteria**:
+
+- [ ] `pnpm graphql:codegen` runs successfully and generates typed SDK.
+- [ ] Apollo Client is correctly integrated with Next.js App Router.
+- [ ] Server Components can fetch data using the generated SDK during SSR.
+- [ ] Client Components can perform mutations and receive updates.
+- [ ] The entire data fetching pipeline is type-safe from the database to the UI.
+
 ---
 
 ## Phase 2: Core Web Interface and User Experience (Week 3-5)

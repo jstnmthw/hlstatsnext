@@ -2,6 +2,50 @@
 
 This document outlines the complete development strategy for building a modern HLStatsX replacement using Next.js 15 called HLStatsNext, GraphQL, and Prisma ORM in a fresh Turbo Repo. The approach prioritizes essential data first, followed by admin features, extended functionality, and finally polishing for optimal user experience.
 
+## Table of Contents
+
+- [Core Principles](#core-principles)
+  - [1. Clean Architecture from Day One](#1-clean-architecture-from-day-one)
+  - [2. Database-First Development](#2-database-first-development)
+  - [3. Essential-First Approach](#3-essential-first-approach)
+- [Architecture Overview](#architecture-overview)
+  - [Technology Stack](#technology-stack)
+  - [Turbo Repo Structure](#turbo-repo-structure)
+- [Phase 1: Foundation & Core Infrastructure (Week 1-2)](#phase-1-foundation--core-infrastructure-week-1-2)
+  - [Step 1.1: Turbo Repo Setup and Configuration](#step-11-turbo-repo-setup-and-configuration)
+  - [Step 1.2: Legacy Database Analysis and Schema Discovery](#step-12-legacy-database-analysis-and-schema-discovery)
+  - [Step 1.3: Database Design and Prisma Setup](#step-13-database-design-and-prisma-setup)
+  - [Step 1.4: GraphQL API Foundation](#step-14-graphql-api-foundation)
+  - [Step 1.5: GraphQL Client Setup in Web App](#step-15-graphql-client-setup-in-web-app)
+- [Phase 2: Core Web Interface and User Experience (Week 3-5)](#phase-2-core-web-interface-and-user-experience-week-3-5)
+  - [Step 2.1: Homepage and Game List Implementation](#step-21-homepage-and-game-list-implementation)
+  - [Step 2.2: Game Dashboard and Server List](#step-22-game-dashboard-and-server-list)
+  - [Step 2.3: Server Details and Live Stats](#step-23-server-details-and-live-stats)
+  - [Step 2.4: Player Profiles and Statistics](#step-24-player-profiles-and-statistics)
+  - [Step 2.5: Rankings and Leaderboards](#step-25-rankings-and-leaderboards)
+  - [Step 2.6: Cross-Cutting Concerns](#step-26-cross-cutting-concerns)
+- [Phase 3: Administration Interface (Week 6-7)](#phase-3-administration-interface-week-6-7)
+  - [Step 3.1: Authentication and Authorization System](#step-31-authentication-and-authorization-system)
+  - [Step 3.2: Game and Server Management](#step-32-game-and-server-management)
+  - [Step 3.3: Analytics and Reporting Dashboard](#step-33-analytics-and-reporting-dashboard)
+- [Phase 4: Extended Features and Functionality (Week 8-10)](#phase-4-extended-features-and-functionality-week-8-10)
+  - [Step 4.1: Advanced Player Statistics and Rankings](#step-41-advanced-player-statistics-and-rankings)
+  - [Step 4.2: Clan and Team Management](#step-42-clan-and-team-management)
+  - [Step 4.3: Interactive Charts and Visualizations](#step-43-interactive-charts-and-visualizations)
+- [Phase 5: Polish and Optimization (Week 11-12)](#phase-5-polish-and-optimization-week-11-12)
+  - [Step 5.1: Performance Optimization](#step-51-performance-optimization)
+  - [Step 5.2: User Experience Enhancements](#step-52-user-experience-enhancements)
+  - [Step 5.3: Security Hardening and Production Readiness](#step-53-security-hardening-and-production-readiness)
+- [Quality Assurance:](#quality-assurance)
+- [Success Metrics](#success-metrics)
+  - [Technical Metrics:](#technical-metrics)
+  - [User Experience Metrics:](#user-experience-metrics)
+  - [Business Metrics:](#business-metrics)
+- [Risk Mitigation](#risk-mitigation)
+  - [Technical Risks:](#technical-risks)
+  - [Mitigation Strategies:](#mitigation-strategies)
+- [Next Steps](#next-steps)
+
 ## Core Principles
 
 ### 1. Clean Architecture from Day One
@@ -970,7 +1014,7 @@ export default function RootLayout({
 
 ---
 
-### Quality Assurance:
+## Quality Assurance:
 
 - **TypeScript Strict Mode**: Zero type errors allowed
 - **Test Coverage**: 90%+ coverage for critical paths

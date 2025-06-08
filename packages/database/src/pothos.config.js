@@ -1,12 +1,9 @@
 /* eslint-disable */
-
 /** @type {import('prisma-generator-pothos-codegen').Config} */
-
 module.exports = {
   inputs: {
     outputFilePath: "./generated/graphql/pothos-inputs.ts",
-    prismaImporter: `import { db } from "../../src";`,
-    prismaCaller: "db",
+    prismaImporter: `import { Prisma } from "../../src";`,
   },
   crud: {
     outputDir: "./generated/graphql/pothos-inputs",

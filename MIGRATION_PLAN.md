@@ -242,74 +242,396 @@ model GameEvent {
 
 ---
 
-## Phase 2: Essential Data and Core Features (Week 3-5)
+## Phase 2: Core Web Interface and User Experience (Week 3-5)
 
-### Step 2.1: Core Web Interface (Next.js App)
+### Step 2.1: Homepage and Game List Implementation
 
-**Deliverable**: Essential web pages with Server-Side Rendering
-**Review Point**: Basic functionality accessible and performant
+**Deliverable**: Dynamic homepage showcasing available games and global statistics
+**Review Point**: Homepage provides clear entry points to different game sections
 
 **Actions**:
 
-- Set up Next.js 15 app in `apps/web` with App Router
-- Create shared UI components in `packages/ui`
-- Implement core pages: Home, Player Rankings, Server Status
-- Add responsive design with Tailwind CSS
-- Configure Apollo Client for GraphQL integration
+- Create responsive homepage layout with game cards
+- Implement game list with real-time player counts
+- Add global statistics section for each game
+- Create game-specific leaderboard previews
+- Implement game filtering by status and player count
 
-**Essential Pages**:
-
-- **Home Dashboard**: Overview of active servers and top players
-- **Player Rankings**: Sortable, filterable player leaderboards
-- **Server Status**: Real-time server information and player lists
-- **Player Profiles**: Individual player statistics and history
-
-**SSR Implementation**:
+**Application Structure**:
 
 ```typescript
-// Server Component for player rankings
-export default async function PlayersPage() {
-  const players = await getTopPlayers(); // Server-side GraphQL call
-  return <PlayerRankings players={players} />;
+// apps/web/app structure
+├── app/
+│   ├── page.tsx                 # Homepage (Server Component)
+│   ├── loading.tsx              # Loading UI
+│   ├── error.tsx               # Error handling
+│   └── layout.tsx              # Root layout
+├── components/
+│   └── home/
+│       ├── game-list.tsx       # Server Component
+│       ├── global-stats.tsx    # Server Component
+│       └── featured-content.tsx # Server Component
+
+// @repo/ui shared components
+├── packages/ui/
+│   └── src/
+│       └── components/
+│           ├── game-card/
+│           │   ├── index.tsx   # Reusable game card
+│           │   └── types.ts    # Game card types
+│           ├── stats/
+│           │   ├── stats-card.tsx
+│           │   └── activity-graph.tsx
+│           └── filters/
+│               └── filter-group.tsx
+```
+
+**Component Implementation**:
+
+```typescript
+// apps/web/app/page.tsx
+import { Suspense } from 'react'
+import { GameList, GlobalStats, FeaturedContent } from '@/components/home'
+import { StatsCard, ActivityGraph } from '@repo/ui'
+
+export default async function HomePage() {
+  return (
+    <main className="container mx-auto">
+      <Suspense fallback={<StatsCard.Skeleton />}>
+        <GlobalStats />
+      </Suspense>
+
+      <Suspense fallback={<GameList.Skeleton />}>
+        <GameList />
+      </Suspense>
+
+      <Suspense>
+        <FeaturedContent />
+      </Suspense>
+    </main>
+  )
+}
+
+// apps/web/components/home/game-list.tsx
+import { GameCard, FilterGroup } from '@repo/ui'
+
+export async function GameList() {
+  const games = await fetchGames() // Server-side data fetching
+
+  return (
+    <section>
+      <FilterGroup /> {/* Client Component for filters */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {games.map(game => (
+          <GameCard key={game.id} {...game} />
+        ))}
+      </div>
+    </section>
+  )
 }
 ```
 
 **Review Criteria**:
 
-- [ ] All core pages render correctly
-- [ ] SSR working properly
-- [ ] Mobile responsive design
-- [ ] GraphQL integration functional
-- [ ] Performance acceptable (<2s initial load)
+- [ ] Server Components used appropriately for data fetching
+- [ ] Shared UI components properly imported and utilized
+- [ ] Proper loading and error states implemented
+- [ ] Responsive design for all screen sizes
+- [ ] Performance optimized with proper component boundaries
 
-### Step 2.2: Data Import and Legacy Migration Tools
+### Step 2.2: Game Dashboard and Server List
 
-**Deliverable**: Tools to import data from existing HLStatsX installation
-**Review Point**: Legacy data successfully imported and verified
+**Deliverable**: Comprehensive game-specific dashboard with server listings
+**Review Point**: Users can easily find and access game servers
 
 **Actions**:
 
-- Create data import scripts for legacy MySQL database
-- Map legacy schema to new modern schema
-- Implement data validation and transformation logic
-- Add progress tracking and error reporting
-- Create verification tools to ensure data integrity
+- Create game-specific dashboard layout
+- Implement detailed server list with status and player counts
+- Add server filtering and sorting capabilities
+- Create game-specific statistics overview
+- Implement real-time server status updates
 
-**Import Strategy**:
+**Application Structure**:
 
-- **Incremental import**: Support for importing subsets of data
-- **Data transformation**: Convert legacy format to modern schema
-- **Conflict resolution**: Handle duplicate or inconsistent data
-- **Validation**: Verify imported data integrity
-- **Rollback capability**: Ability to undo imports if needed
+```typescript
+// apps/web/app structure
+├── app/
+│   └── games/
+│       ├── [gameId]/
+│       │   ├── page.tsx           # Game dashboard
+│       │   ├── loading.tsx        # Game loading state
+│       │   ├── error.tsx          # Game error handling
+│       │   └── layout.tsx         # Game layout
+│       └── layout.tsx             # Games layout
+├── components/
+│   └── games/
+│       ├── game-header.tsx       # Server Component
+│       ├── server-list.tsx       # Server Component
+│       └── game-stats.tsx        # Server Component
+
+// @repo/ui shared components
+├── packages/ui/
+│   └── src/
+│       └── components/
+│           ├── server-card/
+│           │   ├── index.tsx     # Reusable server card
+│           │   └── types.ts      # Server card types
+│           └── stats/
+│               └── game-metrics.tsx
+```
+
+**Component Implementation**:
+
+```typescript
+// apps/web/app/games/[gameId]/page.tsx
+import { Suspense } from 'react'
+import { GameHeader, ServerList, GameStats } from '@/components/games'
+import { GameMetrics } from '@repo/ui'
+
+export default async function GamePage({ params }: { params: { gameId: string } }) {
+  return (
+    <div className="container mx-auto">
+      <Suspense fallback={<GameHeader.Skeleton />}>
+        <GameHeader gameId={params.gameId} />
+      </Suspense>
+
+      <Suspense fallback={<GameMetrics.Skeleton />}>
+        <GameStats gameId={params.gameId} />
+      </Suspense>
+
+      <Suspense fallback={<ServerList.Skeleton />}>
+        <ServerList gameId={params.gameId} />
+      </Suspense>
+    </div>
+  )
+}
+
+// apps/web/components/games/server-list.tsx
+import { ServerCard } from '@repo/ui'
+
+export async function ServerList({ gameId }: { gameId: string }) {
+  const servers = await fetchGameServers(gameId) // Server-side data fetching
+
+  return (
+    <section>
+      <div className="grid gap-4 md:grid-cols-2">
+        {servers.map(server => (
+          <ServerCard key={server.id} {...server} />
+        ))}
+      </div>
+    </section>
+  )
+}
+```
 
 **Review Criteria**:
 
-- [ ] Legacy data imports successfully
-- [ ] Data transformation accurate
-- [ ] No data loss during import
-- [ ] Performance acceptable for large datasets
-- [ ] Verification tools confirm data integrity
+- [ ] Server list updates in real-time
+- [ ] Filtering and sorting work efficiently
+- [ ] Game statistics accurately displayed
+- [ ] Server cards show relevant information
+- [ ] Quick join functionality working
+
+### Step 2.3: Server Details and Live Stats
+
+**Deliverable**: Detailed server page with real-time statistics and player information
+**Review Point**: Users can monitor server activity and player performance
+
+**Actions**:
+
+- Create server details page with live updates
+- Implement current map and rotation information
+- Add real-time player list with stats
+- Create server performance graphs
+- Implement server chat/events feed
+
+**Page Components**:
+
+```typescript
+// Server details structure
+├── ServerHeader
+│   ├── ServerInfo (name, IP, current map)
+│   └── QuickStats (player count, uptime)
+├── LiveStats
+│   ├── PlayerList
+│   │   ├── PlayerCard (name, score, time)
+│   │   └── PlayerActions (profile, message)
+│   └── TeamOverview (if applicable)
+├── MapInfo
+│   ├── CurrentMap
+│   ├── MapRotation
+│   └── MapStats
+└── ServerMetrics
+    ├── PopulationGraph (24h)
+    ├── PerformanceStats
+    └── EventLog
+```
+
+**Review Criteria**:
+
+- [ ] Real-time updates working smoothly
+- [ ] Player list accurate and responsive
+- [ ] Map information properly displayed
+- [ ] Performance metrics accurate
+- [ ] Event log updating correctly
+
+### Step 2.4: Player Profiles and Statistics
+
+**Deliverable**: Comprehensive player profiles with detailed statistics and achievements
+**Review Point**: Players can view their performance and progress
+
+**Actions**:
+
+- Create detailed player profile pages
+- Implement comprehensive statistics display
+- Add achievement and progression system
+- Create performance graphs and trends
+- Implement player comparison features
+
+**Profile Structure**:
+
+```typescript
+// Player profile layout
+├── PlayerHeader
+│   ├── PlayerInfo (name, rank, playtime)
+│   ├── PlayerStats (KD ratio, accuracy)
+│   └── PlayerActions (add friend, message)
+├── StatisticsPanel
+│   ├── GeneralStats
+│   │   ├── Performance (kills, deaths, assists)
+│   │   ├── Accuracy (hits, misses, headshots)
+│   │   └── ObjectiveStats (wins, score)
+│   ├── WeaponStats
+│   │   ├── WeaponUsage
+│   │   └── WeaponAccuracy
+│   └── MapPerformance
+├── Achievements
+│   ├── RecentAchievements
+│   ├── ProgressTrackers
+│   └── Badges
+└── HistoricalData
+    ├── PerformanceGraphs
+    ├── SessionHistory
+    └── Milestones
+```
+
+**Review Criteria**:
+
+- [ ] Statistics accurately calculated
+- [ ] Achievements properly tracked
+- [ ] Graphs render efficiently
+- [ ] Historical data properly displayed
+- [ ] Profile actions working correctly
+
+### Step 2.5: Rankings and Leaderboards
+
+**Deliverable**: Multi-faceted ranking system with various leaderboards
+**Review Point**: Players can view and compare rankings across different metrics
+
+**Actions**:
+
+- Implement global and game-specific leaderboards
+- Create various ranking categories (daily, weekly, all-time)
+- Add weapon and map-specific leaderboards
+- Create ranking progression tracking
+
+**Leaderboard Structure**:
+
+```typescript
+// Rankings system layout
+├── GlobalRankings
+│   ├── RankingFilters (timeframe, category)
+│   ├── RankingList
+│   │   ├── RankCard (player, stats, trend)
+│   │   └── RankActions (view profile, compare)
+│   └── RankingStats
+├── CategoryLeaderboards
+│   ├── WeaponMasters
+│   ├── MapSpecialists
+│   └── ObjectiveLegends
+└── ProgressionTracking
+    ├── RankHistory
+    ├── ProgressGraphs
+    └── Milestones
+```
+
+**Review Criteria**:
+
+- [ ] Rankings update correctly
+- [ ] Filters work efficiently
+- [ ] Progression tracking accurate
+- [ ] Leaderboard categories properly segregated
+
+### Step 2.6: Cross-Cutting Concerns
+
+**Deliverable**: Essential features that span across all pages
+**Review Point**: Consistent user experience across the application
+
+**Actions**:
+
+- Create consistent navigation system
+- Add real-time notifications
+- Implement user preferences
+- Create shared components library
+
+**Application Structure**:
+
+```typescript
+// apps/web/app structure
+├── app/
+│   └── layout.tsx               # Root layout with providers
+├── components/
+│   └── layout/
+│       ├── main-nav.tsx        # Client Component
+│       ├── breadcrumbs.tsx     # Server Component
+│       └── notifications.tsx    # Client Component
+
+// @repo/ui shared components
+├── packages/ui/
+│   └── src/
+│       └── components/
+│           ├── navigation/
+│           │   ├── nav-menu.tsx
+│           │   └── breadcrumb.tsx
+│           └── notifications/
+│               └── toast.tsx
+```
+
+**Component Implementation**:
+
+```typescript
+// apps/web/app/layout.tsx
+import { MainNav, Breadcrumbs, Notifications } from '@/components/layout'
+import { Providers } from '@/components/providers'
+
+export default function RootLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <Providers>
+          <MainNav />
+          <Breadcrumbs />
+          <main>{children}</main>
+          <Notifications />
+        </Providers>
+      </body>
+    </html>
+  )
+}
+```
+
+**Review Criteria**:
+
+- [ ] Clear separation between app-specific and shared components
+- [ ] Proper use of Server and Client Components
+- [ ] Efficient data fetching with proper suspense boundaries
+- [ ] Consistent error handling across the application
+- [ ] Shared components properly typed and documented
 
 ---
 

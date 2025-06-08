@@ -9,6 +9,7 @@ module.exports = {
     outputDir: "./generated/graphql/pothos-inputs",
     inputsImporter: `import * as Inputs from '../../../../generated/graphql/pothos-inputs';`,
     resolverImports: `\nimport { db } from "../../../../../src";`,
+    prismaImporter: `import { Prisma } from "../../../src";`,
     prismaCaller: "db",
   },
   global: {

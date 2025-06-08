@@ -56,7 +56,7 @@ const player = await db.player.findUnique({
 - [x] Design modern database schema based on legacy analysis
 - [x] Create Prisma models for core entities
 - [x] Set up relationships and indexes
-- [ ] Add seed data for development
+- [x] Add seed data for development
 
 ### Phase 2.3: Data Import and Legacy Migration
 

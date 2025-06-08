@@ -14,5 +14,8 @@ module.exports = {
   },
   global: {
     builderLocation: "../../apps/api/src/builder",
+    replacer: (generated) => {
+      return `// @ts-nocheck\n${generated}`;
+    },
   },
 };

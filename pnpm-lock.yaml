@@ -242,6 +242,9 @@ importers:
 
   packages/tailwind-config:
     devDependencies:
+      '@tailwindcss/postcss':
+        specifier: ^4.1.8
+        version: 4.1.8
       postcss:
         specifier: ^8.5.3
         version: 8.5.4

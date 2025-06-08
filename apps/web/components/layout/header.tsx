@@ -19,9 +19,11 @@ export async function Header() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center space-x-2">
-              <BarChart3 className="h-6 w-6 text-blue-500" />
               <span className="text-zinc-100 font-semibold text-base">
-                HLStats<span className="text-lime-400">Next</span>
+                HLStats
+                <span className="font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+                  NEXT
+                </span>
               </span>
             </Link>
 
@@ -33,7 +35,7 @@ export async function Header() {
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      "flex items-center space-x-1 px-3 py-2 rounded-md text-sm transition-colors",
+                      "flex items-center space-x-1 px-3 py-2 rounded-md text-sm transition-colors font-medium",
                       pathname === item.href
                         ? "text-zinc-100 bg-zinc-800"
                         : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900"

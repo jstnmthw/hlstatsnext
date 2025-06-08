@@ -20,7 +20,7 @@ export async function GameList() {
       <ul>
         {data.findManyGame.map((game) => (
           <li key={game.code}>
-            {game.name} {game.hidden ? "hidden" : "visible"}
+            {game.name} {game.hidden === "0" ? "visible" : "hidden"}
           </li>
         ))}
       </ul>

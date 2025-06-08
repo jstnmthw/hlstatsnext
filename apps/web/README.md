@@ -33,6 +33,8 @@ const GET_GAMES_QUERY = graphql(`...`);
 export async function GameList() {
   // const { data } = await query({ query: GET_GAMES_QUERY });
   const { data } = await getClient().query({ query: GET_GAMES_QUERY });
+  // `query` is a shortcut for `getClient().query`
+  const { data } = await query({ query: GET_GAMES_QUERY });
 
   return (
     //... render component

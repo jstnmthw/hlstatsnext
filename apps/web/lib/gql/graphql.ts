@@ -1,80 +1,70 @@
 /* eslint-disable */
-import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
+import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = {
-  [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]?: Maybe<T[SubKey]>;
-};
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]: Maybe<T[SubKey]>;
-};
-export type MakeEmpty<
-  T extends { [key: string]: unknown },
-  K extends keyof T,
-> = { [_ in K]?: never };
-export type Incremental<T> =
-  | T
-  | {
-      [P in keyof T]?: P extends " $fragmentName" | "__typename" ? T[P] : never;
-    };
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string };
-  String: { input: string; output: string };
-  Boolean: { input: boolean; output: boolean };
-  Int: { input: number; output: number };
-  Float: { input: number; output: number };
-  BigInt: { input: any; output: any };
-  DateTime: { input: any; output: any };
-  Decimal: { input: any; output: any };
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
+  BigInt: { input: any; output: any; }
+  DateTime: { input: any; output: any; }
+  Decimal: { input: any; output: any; }
 };
 
 export type Action = {
-  __typename?: "Action";
-  code: Scalars["String"]["output"];
-  count: Scalars["Int"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
+  __typename?: 'Action';
+  code: Scalars['String']['output'];
+  count: Scalars['Int']['output'];
+  description?: Maybe<Scalars['String']['output']>;
   eventPlayerActions: Array<EventPlayerAction>;
   eventPlayerPlayerActions: Array<EventPlayerPlayerAction>;
   eventTeamBonuses: Array<EventTeamBonus>;
-  for_PlayerActions: Scalars["String"]["output"];
-  for_PlayerPlayerActions: Scalars["String"]["output"];
-  for_TeamActions: Scalars["String"]["output"];
-  for_WorldActions: Scalars["String"]["output"];
-  game: Scalars["String"]["output"];
-  id: Scalars["ID"]["output"];
-  reward_player: Scalars["Int"]["output"];
-  reward_team: Scalars["Int"]["output"];
-  team: Scalars["String"]["output"];
+  for_PlayerActions: Scalars['String']['output'];
+  for_PlayerPlayerActions: Scalars['String']['output'];
+  for_TeamActions: Scalars['String']['output'];
+  for_WorldActions: Scalars['String']['output'];
+  game: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  reward_player: Scalars['Int']['output'];
+  reward_team: Scalars['Int']['output'];
+  team: Scalars['String']['output'];
 };
+
 
 export type ActionEventPlayerActionsArgs = {
   cursor?: InputMaybe<EventPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerActionWhereInput>;
 };
+
 
 export type ActionEventPlayerPlayerActionsArgs = {
   cursor?: InputMaybe<EventPlayerPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerPlayerActionWhereInput>;
 };
+
 
 export type ActionEventTeamBonusesArgs = {
   cursor?: InputMaybe<EventTeamBonusWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventTeamBonusScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventTeamBonusOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventTeamBonusWhereInput>;
 };
 
@@ -101,35 +91,35 @@ export type ActionCountOrderByAggregateInput = {
 };
 
 export type ActionCreateInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  count?: InputMaybe<Scalars["Int"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   eventPlayerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutActionInput>;
   eventPlayerPlayerActions?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutActionInput>;
   eventTeamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutActionInput>;
-  for_PlayerActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_PlayerPlayerActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_TeamActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_WorldActions?: InputMaybe<Scalars["String"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  reward_player?: InputMaybe<Scalars["Int"]["input"]>;
-  reward_team?: InputMaybe<Scalars["Int"]["input"]>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  for_PlayerActions?: InputMaybe<Scalars['String']['input']>;
+  for_PlayerPlayerActions?: InputMaybe<Scalars['String']['input']>;
+  for_TeamActions?: InputMaybe<Scalars['String']['input']>;
+  for_WorldActions?: InputMaybe<Scalars['String']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  reward_player?: InputMaybe<Scalars['Int']['input']>;
+  reward_team?: InputMaybe<Scalars['Int']['input']>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ActionCreateManyInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  count?: InputMaybe<Scalars["Int"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  for_PlayerActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_PlayerPlayerActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_TeamActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_WorldActions?: InputMaybe<Scalars["String"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  reward_player?: InputMaybe<Scalars["Int"]["input"]>;
-  reward_team?: InputMaybe<Scalars["Int"]["input"]>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  for_PlayerActions?: InputMaybe<Scalars['String']['input']>;
+  for_PlayerPlayerActions?: InputMaybe<Scalars['String']['input']>;
+  for_TeamActions?: InputMaybe<Scalars['String']['input']>;
+  for_WorldActions?: InputMaybe<Scalars['String']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  reward_player?: InputMaybe<Scalars['Int']['input']>;
+  reward_team?: InputMaybe<Scalars['Int']['input']>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ActionCreateNestedOneWithoutEventPlayerActionsInput = {
@@ -166,57 +156,57 @@ export type ActionCreateOrConnectWithoutEventTeamBonusesInput = {
 };
 
 export type ActionCreateWithoutEventPlayerActionsInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  count?: InputMaybe<Scalars["Int"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   eventPlayerPlayerActions?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutActionInput>;
   eventTeamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutActionInput>;
-  for_PlayerActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_PlayerPlayerActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_TeamActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_WorldActions?: InputMaybe<Scalars["String"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  reward_player?: InputMaybe<Scalars["Int"]["input"]>;
-  reward_team?: InputMaybe<Scalars["Int"]["input"]>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  for_PlayerActions?: InputMaybe<Scalars['String']['input']>;
+  for_PlayerPlayerActions?: InputMaybe<Scalars['String']['input']>;
+  for_TeamActions?: InputMaybe<Scalars['String']['input']>;
+  for_WorldActions?: InputMaybe<Scalars['String']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  reward_player?: InputMaybe<Scalars['Int']['input']>;
+  reward_team?: InputMaybe<Scalars['Int']['input']>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ActionCreateWithoutEventPlayerPlayerActionsInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  count?: InputMaybe<Scalars["Int"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   eventPlayerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutActionInput>;
   eventTeamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutActionInput>;
-  for_PlayerActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_PlayerPlayerActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_TeamActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_WorldActions?: InputMaybe<Scalars["String"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  reward_player?: InputMaybe<Scalars["Int"]["input"]>;
-  reward_team?: InputMaybe<Scalars["Int"]["input"]>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  for_PlayerActions?: InputMaybe<Scalars['String']['input']>;
+  for_PlayerPlayerActions?: InputMaybe<Scalars['String']['input']>;
+  for_TeamActions?: InputMaybe<Scalars['String']['input']>;
+  for_WorldActions?: InputMaybe<Scalars['String']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  reward_player?: InputMaybe<Scalars['Int']['input']>;
+  reward_team?: InputMaybe<Scalars['Int']['input']>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ActionCreateWithoutEventTeamBonusesInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  count?: InputMaybe<Scalars["Int"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   eventPlayerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutActionInput>;
   eventPlayerPlayerActions?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutActionInput>;
-  for_PlayerActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_PlayerPlayerActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_TeamActions?: InputMaybe<Scalars["String"]["input"]>;
-  for_WorldActions?: InputMaybe<Scalars["String"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  reward_player?: InputMaybe<Scalars["Int"]["input"]>;
-  reward_team?: InputMaybe<Scalars["Int"]["input"]>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  for_PlayerActions?: InputMaybe<Scalars['String']['input']>;
+  for_PlayerPlayerActions?: InputMaybe<Scalars['String']['input']>;
+  for_TeamActions?: InputMaybe<Scalars['String']['input']>;
+  for_WorldActions?: InputMaybe<Scalars['String']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  reward_player?: InputMaybe<Scalars['Int']['input']>;
+  reward_team?: InputMaybe<Scalars['Int']['input']>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ActionGamecodeCompoundUniqueInput = {
-  code: Scalars["String"]["input"];
-  game: Scalars["String"]["input"];
-  team: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  game: Scalars['String']['input'];
+  team: Scalars['String']['input'];
 };
 
 export type ActionMaxOrderByAggregateInput = {
@@ -250,19 +240,19 @@ export type ActionMinOrderByAggregateInput = {
 };
 
 export enum ActionOrderByRelevanceFieldEnum {
-  Code = "code",
-  Description = "description",
-  ForPlayerActions = "for_PlayerActions",
-  ForPlayerPlayerActions = "for_PlayerPlayerActions",
-  ForTeamActions = "for_TeamActions",
-  ForWorldActions = "for_WorldActions",
-  Game = "game",
-  Team = "team",
+  Code = 'code',
+  Description = 'description',
+  ForPlayerActions = 'for_PlayerActions',
+  ForPlayerPlayerActions = 'for_PlayerPlayerActions',
+  ForTeamActions = 'for_TeamActions',
+  ForWorldActions = 'for_WorldActions',
+  Game = 'game',
+  Team = 'team'
 }
 
 export type ActionOrderByRelevanceInput = {
   fields: Array<ActionOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -306,18 +296,18 @@ export type ActionOrderByWithRelationInput = {
 };
 
 export enum ActionScalarFieldEnum {
-  Code = "code",
-  Count = "count",
-  Description = "description",
-  ForPlayerActions = "for_PlayerActions",
-  ForPlayerPlayerActions = "for_PlayerPlayerActions",
-  ForTeamActions = "for_TeamActions",
-  ForWorldActions = "for_WorldActions",
-  Game = "game",
-  Id = "id",
-  RewardPlayer = "reward_player",
-  RewardTeam = "reward_team",
-  Team = "team",
+  Code = 'code',
+  Count = 'count',
+  Description = 'description',
+  ForPlayerActions = 'for_PlayerActions',
+  ForPlayerPlayerActions = 'for_PlayerPlayerActions',
+  ForTeamActions = 'for_TeamActions',
+  ForWorldActions = 'for_WorldActions',
+  Game = 'game',
+  Id = 'id',
+  RewardPlayer = 'reward_player',
+  RewardTeam = 'reward_team',
+  Team = 'team'
 }
 
 export type ActionScalarRelationFilter = {
@@ -389,14 +379,13 @@ export type ActionUpdateOneRequiredWithoutEventPlayerActionsNestedInput = {
   upsert?: InputMaybe<ActionUpsertWithoutEventPlayerActionsInput>;
 };
 
-export type ActionUpdateOneRequiredWithoutEventPlayerPlayerActionsNestedInput =
-  {
-    connect?: InputMaybe<ActionWhereUniqueInput>;
-    connectOrCreate?: InputMaybe<ActionCreateOrConnectWithoutEventPlayerPlayerActionsInput>;
-    create?: InputMaybe<ActionCreateWithoutEventPlayerPlayerActionsInput>;
-    update?: InputMaybe<ActionUpdateToOneWithWhereWithoutEventPlayerPlayerActionsInput>;
-    upsert?: InputMaybe<ActionUpsertWithoutEventPlayerPlayerActionsInput>;
-  };
+export type ActionUpdateOneRequiredWithoutEventPlayerPlayerActionsNestedInput = {
+  connect?: InputMaybe<ActionWhereUniqueInput>;
+  connectOrCreate?: InputMaybe<ActionCreateOrConnectWithoutEventPlayerPlayerActionsInput>;
+  create?: InputMaybe<ActionCreateWithoutEventPlayerPlayerActionsInput>;
+  update?: InputMaybe<ActionUpdateToOneWithWhereWithoutEventPlayerPlayerActionsInput>;
+  upsert?: InputMaybe<ActionUpsertWithoutEventPlayerPlayerActionsInput>;
+};
 
 export type ActionUpdateOneRequiredWithoutEventTeamBonusesNestedInput = {
   connect?: InputMaybe<ActionWhereUniqueInput>;
@@ -524,35 +513,36 @@ export type ActionWhereUniqueInput = {
   for_WorldActions?: InputMaybe<StringFilter>;
   game?: InputMaybe<StringFilter>;
   gamecode?: InputMaybe<ActionGamecodeCompoundUniqueInput>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   reward_player?: InputMaybe<IntFilter>;
   reward_team?: InputMaybe<IntFilter>;
   team?: InputMaybe<StringFilter>;
 };
 
 export type Award = {
-  __typename?: "Award";
-  awardId: Scalars["ID"]["output"];
-  awardType: Scalars["String"]["output"];
-  code: Scalars["String"]["output"];
+  __typename?: 'Award';
+  awardId: Scalars['ID']['output'];
+  awardType: Scalars['String']['output'];
+  code: Scalars['String']['output'];
   d_winner?: Maybe<Player>;
-  d_winner_count?: Maybe<Scalars["Int"]["output"]>;
-  d_winner_id?: Maybe<Scalars["Int"]["output"]>;
+  d_winner_count?: Maybe<Scalars['Int']['output']>;
+  d_winner_id?: Maybe<Scalars['Int']['output']>;
   g_winner?: Maybe<Player>;
-  g_winner_count?: Maybe<Scalars["Int"]["output"]>;
-  g_winner_id?: Maybe<Scalars["Int"]["output"]>;
-  game: Scalars["String"]["output"];
-  name: Scalars["String"]["output"];
+  g_winner_count?: Maybe<Scalars['Int']['output']>;
+  g_winner_id?: Maybe<Scalars['Int']['output']>;
+  game: Scalars['String']['output'];
+  name: Scalars['String']['output'];
   playerAwards: Array<PlayerAward>;
-  verb: Scalars["String"]["output"];
+  verb: Scalars['String']['output'];
 };
+
 
 export type AwardPlayerAwardsArgs = {
   cursor?: InputMaybe<PlayerAwardWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerAwardScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerAwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerAwardWhereInput>;
 };
 
@@ -578,63 +568,63 @@ export type AwardCountOrderByAggregateInput = {
 };
 
 export type AwardCreateInput = {
-  awardType?: InputMaybe<Scalars["String"]["input"]>;
-  code?: InputMaybe<Scalars["String"]["input"]>;
+  awardType?: InputMaybe<Scalars['String']['input']>;
+  code?: InputMaybe<Scalars['String']['input']>;
   d_winner?: InputMaybe<PlayerCreateNestedOneWithoutAwardsWonAsDWinnerInput>;
-  d_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
+  d_winner_count?: InputMaybe<Scalars['Int']['input']>;
   g_winner?: InputMaybe<PlayerCreateNestedOneWithoutAwardsWonAsGWinnerInput>;
-  g_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  g_winner_count?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
   playerAwards?: InputMaybe<PlayerAwardCreateNestedManyWithoutAwardInput>;
-  verb?: InputMaybe<Scalars["String"]["input"]>;
+  verb?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AwardCreateManyD_WinnerInput = {
-  awardId?: InputMaybe<Scalars["Int"]["input"]>;
-  awardType?: InputMaybe<Scalars["String"]["input"]>;
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  d_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
-  g_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
-  g_winner_id?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  verb?: InputMaybe<Scalars["String"]["input"]>;
+  awardId?: InputMaybe<Scalars['Int']['input']>;
+  awardType?: InputMaybe<Scalars['String']['input']>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  d_winner_count?: InputMaybe<Scalars['Int']['input']>;
+  g_winner_count?: InputMaybe<Scalars['Int']['input']>;
+  g_winner_id?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  verb?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AwardCreateManyD_WinnerInputEnvelope = {
   data: Array<AwardCreateManyD_WinnerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type AwardCreateManyG_WinnerInput = {
-  awardId?: InputMaybe<Scalars["Int"]["input"]>;
-  awardType?: InputMaybe<Scalars["String"]["input"]>;
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  d_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
-  d_winner_id?: InputMaybe<Scalars["Int"]["input"]>;
-  g_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  verb?: InputMaybe<Scalars["String"]["input"]>;
+  awardId?: InputMaybe<Scalars['Int']['input']>;
+  awardType?: InputMaybe<Scalars['String']['input']>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  d_winner_count?: InputMaybe<Scalars['Int']['input']>;
+  d_winner_id?: InputMaybe<Scalars['Int']['input']>;
+  g_winner_count?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  verb?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AwardCreateManyG_WinnerInputEnvelope = {
   data: Array<AwardCreateManyG_WinnerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type AwardCreateManyInput = {
-  awardId?: InputMaybe<Scalars["Int"]["input"]>;
-  awardType?: InputMaybe<Scalars["String"]["input"]>;
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  d_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
-  d_winner_id?: InputMaybe<Scalars["Int"]["input"]>;
-  g_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
-  g_winner_id?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  verb?: InputMaybe<Scalars["String"]["input"]>;
+  awardId?: InputMaybe<Scalars['Int']['input']>;
+  awardType?: InputMaybe<Scalars['String']['input']>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  d_winner_count?: InputMaybe<Scalars['Int']['input']>;
+  d_winner_id?: InputMaybe<Scalars['Int']['input']>;
+  g_winner_count?: InputMaybe<Scalars['Int']['input']>;
+  g_winner_id?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  verb?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AwardCreateNestedManyWithoutD_WinnerInput = {
@@ -673,45 +663,45 @@ export type AwardCreateOrConnectWithoutPlayerAwardsInput = {
 };
 
 export type AwardCreateWithoutD_WinnerInput = {
-  awardType?: InputMaybe<Scalars["String"]["input"]>;
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  d_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
+  awardType?: InputMaybe<Scalars['String']['input']>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  d_winner_count?: InputMaybe<Scalars['Int']['input']>;
   g_winner?: InputMaybe<PlayerCreateNestedOneWithoutAwardsWonAsGWinnerInput>;
-  g_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  g_winner_count?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
   playerAwards?: InputMaybe<PlayerAwardCreateNestedManyWithoutAwardInput>;
-  verb?: InputMaybe<Scalars["String"]["input"]>;
+  verb?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AwardCreateWithoutG_WinnerInput = {
-  awardType?: InputMaybe<Scalars["String"]["input"]>;
-  code?: InputMaybe<Scalars["String"]["input"]>;
+  awardType?: InputMaybe<Scalars['String']['input']>;
+  code?: InputMaybe<Scalars['String']['input']>;
   d_winner?: InputMaybe<PlayerCreateNestedOneWithoutAwardsWonAsDWinnerInput>;
-  d_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
-  g_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  d_winner_count?: InputMaybe<Scalars['Int']['input']>;
+  g_winner_count?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
   playerAwards?: InputMaybe<PlayerAwardCreateNestedManyWithoutAwardInput>;
-  verb?: InputMaybe<Scalars["String"]["input"]>;
+  verb?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AwardCreateWithoutPlayerAwardsInput = {
-  awardType?: InputMaybe<Scalars["String"]["input"]>;
-  code?: InputMaybe<Scalars["String"]["input"]>;
+  awardType?: InputMaybe<Scalars['String']['input']>;
+  code?: InputMaybe<Scalars['String']['input']>;
   d_winner?: InputMaybe<PlayerCreateNestedOneWithoutAwardsWonAsDWinnerInput>;
-  d_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
+  d_winner_count?: InputMaybe<Scalars['Int']['input']>;
   g_winner?: InputMaybe<PlayerCreateNestedOneWithoutAwardsWonAsGWinnerInput>;
-  g_winner_count?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  verb?: InputMaybe<Scalars["String"]["input"]>;
+  g_winner_count?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  verb?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AwardGame_AwardType_CodeCompoundUniqueInput = {
-  awardType: Scalars["String"]["input"];
-  code: Scalars["String"]["input"];
-  game: Scalars["String"]["input"];
+  awardType: Scalars['String']['input'];
+  code: Scalars['String']['input'];
+  game: Scalars['String']['input'];
 };
 
 export type AwardListRelationFilter = {
@@ -751,16 +741,16 @@ export type AwardOrderByRelationAggregateInput = {
 };
 
 export enum AwardOrderByRelevanceFieldEnum {
-  AwardType = "awardType",
-  Code = "code",
-  Game = "game",
-  Name = "name",
-  Verb = "verb",
+  AwardType = 'awardType',
+  Code = 'code',
+  Game = 'game',
+  Name = 'name',
+  Verb = 'verb'
 }
 
 export type AwardOrderByRelevanceInput = {
   fields: Array<AwardOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -800,16 +790,16 @@ export type AwardOrderByWithRelationInput = {
 };
 
 export enum AwardScalarFieldEnum {
-  AwardId = "awardId",
-  AwardType = "awardType",
-  Code = "code",
-  DWinnerCount = "d_winner_count",
-  DWinnerId = "d_winner_id",
-  GWinnerCount = "g_winner_count",
-  GWinnerId = "g_winner_id",
-  Game = "game",
-  Name = "name",
-  Verb = "verb",
+  AwardId = 'awardId',
+  AwardType = 'awardType',
+  Code = 'code',
+  DWinnerCount = 'd_winner_count',
+  DWinnerId = 'd_winner_id',
+  GWinnerCount = 'g_winner_count',
+  GWinnerId = 'g_winner_id',
+  Game = 'game',
+  Name = 'name',
+  Verb = 'verb'
 }
 
 export type AwardScalarRelationFilter = {
@@ -1018,7 +1008,7 @@ export type AwardWhereUniqueInput = {
   AND?: InputMaybe<Array<AwardWhereInput>>;
   NOT?: InputMaybe<Array<AwardWhereInput>>;
   OR?: InputMaybe<Array<AwardWhereInput>>;
-  awardId?: InputMaybe<Scalars["Int"]["input"]>;
+  awardId?: InputMaybe<Scalars['Int']['input']>;
   awardType?: InputMaybe<StringFilter>;
   code?: InputMaybe<StringFilter>;
   d_winner?: InputMaybe<PlayerWhereInput>;
@@ -1036,28 +1026,28 @@ export type AwardWhereUniqueInput = {
 
 /** Batch payloads from prisma. */
 export type BatchPayload = {
-  __typename?: "BatchPayload";
+  __typename?: 'BatchPayload';
   /** Prisma Batch Payload */
-  count: Scalars["Int"]["output"];
+  count: Scalars['Int']['output'];
 };
 
 export type BigIntFieldUpdateOperationsInput = {
-  decrement?: InputMaybe<Scalars["BigInt"]["input"]>;
-  divide?: InputMaybe<Scalars["BigInt"]["input"]>;
-  increment?: InputMaybe<Scalars["BigInt"]["input"]>;
-  multiply?: InputMaybe<Scalars["BigInt"]["input"]>;
-  set?: InputMaybe<Scalars["BigInt"]["input"]>;
+  decrement?: InputMaybe<Scalars['BigInt']['input']>;
+  divide?: InputMaybe<Scalars['BigInt']['input']>;
+  increment?: InputMaybe<Scalars['BigInt']['input']>;
+  multiply?: InputMaybe<Scalars['BigInt']['input']>;
+  set?: InputMaybe<Scalars['BigInt']['input']>;
 };
 
 export type BigIntFilter = {
-  equals?: InputMaybe<Scalars["BigInt"]["input"]>;
-  gt?: InputMaybe<Scalars["BigInt"]["input"]>;
-  gte?: InputMaybe<Scalars["BigInt"]["input"]>;
-  in?: InputMaybe<Array<Scalars["BigInt"]["input"]>>;
-  lt?: InputMaybe<Scalars["BigInt"]["input"]>;
-  lte?: InputMaybe<Scalars["BigInt"]["input"]>;
+  equals?: InputMaybe<Scalars['BigInt']['input']>;
+  gt?: InputMaybe<Scalars['BigInt']['input']>;
+  gte?: InputMaybe<Scalars['BigInt']['input']>;
+  in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  lt?: InputMaybe<Scalars['BigInt']['input']>;
+  lte?: InputMaybe<Scalars['BigInt']['input']>;
   not?: InputMaybe<NestedBigIntFilter>;
-  notIn?: InputMaybe<Array<Scalars["BigInt"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['BigInt']['input']>>;
 };
 
 export type BigIntWithAggregatesFilter = {
@@ -1066,35 +1056,36 @@ export type BigIntWithAggregatesFilter = {
   _max?: InputMaybe<NestedBigIntFilter>;
   _min?: InputMaybe<NestedBigIntFilter>;
   _sum?: InputMaybe<NestedBigIntFilter>;
-  equals?: InputMaybe<Scalars["BigInt"]["input"]>;
-  gt?: InputMaybe<Scalars["BigInt"]["input"]>;
-  gte?: InputMaybe<Scalars["BigInt"]["input"]>;
-  in?: InputMaybe<Array<Scalars["BigInt"]["input"]>>;
-  lt?: InputMaybe<Scalars["BigInt"]["input"]>;
-  lte?: InputMaybe<Scalars["BigInt"]["input"]>;
+  equals?: InputMaybe<Scalars['BigInt']['input']>;
+  gt?: InputMaybe<Scalars['BigInt']['input']>;
+  gte?: InputMaybe<Scalars['BigInt']['input']>;
+  in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  lt?: InputMaybe<Scalars['BigInt']['input']>;
+  lte?: InputMaybe<Scalars['BigInt']['input']>;
   not?: InputMaybe<NestedBigIntWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["BigInt"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['BigInt']['input']>>;
 };
 
 export type Clan = {
-  __typename?: "Clan";
-  clanId: Scalars["ID"]["output"];
-  game: Scalars["String"]["output"];
+  __typename?: 'Clan';
+  clanId: Scalars['ID']['output'];
+  game: Scalars['String']['output'];
   gameData: Game;
-  hidden: Scalars["Int"]["output"];
-  homepage: Scalars["String"]["output"];
-  mapregion: Scalars["String"]["output"];
-  name: Scalars["String"]["output"];
+  hidden: Scalars['Int']['output'];
+  homepage: Scalars['String']['output'];
+  mapregion: Scalars['String']['output'];
+  name: Scalars['String']['output'];
   players: Array<Player>;
-  tag: Scalars["String"]["output"];
+  tag: Scalars['String']['output'];
 };
+
 
 export type ClanPlayersArgs = {
   cursor?: InputMaybe<PlayerWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerWhereInput>;
 };
 
@@ -1115,36 +1106,36 @@ export type ClanCountOrderByAggregateInput = {
 
 export type ClanCreateInput = {
   gameData?: InputMaybe<GameCreateNestedOneWithoutClansInput>;
-  hidden?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  mapregion?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  hidden?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  mapregion?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
   players?: InputMaybe<PlayerCreateNestedManyWithoutClanDataInput>;
-  tag?: InputMaybe<Scalars["String"]["input"]>;
+  tag?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ClanCreateManyGameDataInput = {
-  clanId?: InputMaybe<Scalars["Int"]["input"]>;
-  hidden?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  mapregion?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  tag?: InputMaybe<Scalars["String"]["input"]>;
+  clanId?: InputMaybe<Scalars['Int']['input']>;
+  hidden?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  mapregion?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  tag?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ClanCreateManyGameDataInputEnvelope = {
   data: Array<ClanCreateManyGameDataInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ClanCreateManyInput = {
-  clanId?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  hidden?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  mapregion?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  tag?: InputMaybe<Scalars["String"]["input"]>;
+  clanId?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  hidden?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  mapregion?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  tag?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ClanCreateNestedManyWithoutGameDataInput = {
@@ -1171,26 +1162,26 @@ export type ClanCreateOrConnectWithoutPlayersInput = {
 };
 
 export type ClanCreateWithoutGameDataInput = {
-  hidden?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  mapregion?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  hidden?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  mapregion?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
   players?: InputMaybe<PlayerCreateNestedManyWithoutClanDataInput>;
-  tag?: InputMaybe<Scalars["String"]["input"]>;
+  tag?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ClanCreateWithoutPlayersInput = {
   gameData?: InputMaybe<GameCreateNestedOneWithoutClansInput>;
-  hidden?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  mapregion?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  tag?: InputMaybe<Scalars["String"]["input"]>;
+  hidden?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  mapregion?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  tag?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ClanGame_TagCompoundUniqueInput = {
-  game: Scalars["String"]["input"];
-  tag: Scalars["String"]["input"];
+  game: Scalars['String']['input'];
+  tag: Scalars['String']['input'];
 };
 
 export type ClanListRelationFilter = {
@@ -1229,16 +1220,16 @@ export type ClanOrderByRelationAggregateInput = {
 };
 
 export enum ClanOrderByRelevanceFieldEnum {
-  Game = "game",
-  Homepage = "homepage",
-  Mapregion = "mapregion",
-  Name = "name",
-  Tag = "tag",
+  Game = 'game',
+  Homepage = 'homepage',
+  Mapregion = 'mapregion',
+  Name = 'name',
+  Tag = 'tag'
 }
 
 export type ClanOrderByRelevanceInput = {
   fields: Array<ClanOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -1271,13 +1262,13 @@ export type ClanOrderByWithRelationInput = {
 };
 
 export enum ClanScalarFieldEnum {
-  ClanId = "clanId",
-  Game = "game",
-  Hidden = "hidden",
-  Homepage = "homepage",
-  Mapregion = "mapregion",
-  Name = "name",
-  Tag = "tag",
+  ClanId = 'clanId',
+  Game = 'game',
+  Hidden = 'hidden',
+  Homepage = 'homepage',
+  Mapregion = 'mapregion',
+  Name = 'name',
+  Tag = 'tag'
 }
 
 export type ClanScalarWhereInput = {
@@ -1312,9 +1303,9 @@ export type ClanSumOrderByAggregateInput = {
 };
 
 export type ClanTag = {
-  __typename?: "ClanTag";
-  id: Scalars["ID"]["output"];
-  pattern: Scalars["String"]["output"];
+  __typename?: 'ClanTag';
+  id: Scalars['ID']['output'];
+  pattern: Scalars['String']['output'];
   position: ClanTagPosition;
 };
 
@@ -1329,13 +1320,13 @@ export type ClanTagCountOrderByAggregateInput = {
 };
 
 export type ClanTagCreateInput = {
-  pattern: Scalars["String"]["input"];
+  pattern: Scalars['String']['input'];
   position?: InputMaybe<ClanTagPosition>;
 };
 
 export type ClanTagCreateManyInput = {
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  pattern: Scalars["String"]["input"];
+  id?: InputMaybe<Scalars['Int']['input']>;
+  pattern: Scalars['String']['input'];
   position?: InputMaybe<ClanTagPosition>;
 };
 
@@ -1352,12 +1343,12 @@ export type ClanTagMinOrderByAggregateInput = {
 };
 
 export enum ClanTagOrderByRelevanceFieldEnum {
-  Pattern = "pattern",
+  Pattern = 'pattern'
 }
 
 export type ClanTagOrderByRelevanceInput = {
   fields: Array<ClanTagOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -1380,15 +1371,15 @@ export type ClanTagOrderByWithRelationInput = {
 };
 
 export enum ClanTagPosition {
-  Either = "EITHER",
-  End = "END",
-  Start = "START",
+  Either = 'EITHER',
+  End = 'END',
+  Start = 'START'
 }
 
 export enum ClanTagScalarFieldEnum {
-  Id = "id",
-  Pattern = "pattern",
-  Position = "position",
+  Id = 'id',
+  Pattern = 'pattern',
+  Position = 'position'
 }
 
 export type ClanTagScalarWhereWithAggregatesInput = {
@@ -1427,8 +1418,8 @@ export type ClanTagWhereUniqueInput = {
   AND?: InputMaybe<Array<ClanTagWhereInput>>;
   NOT?: InputMaybe<Array<ClanTagWhereInput>>;
   OR?: InputMaybe<Array<ClanTagWhereInput>>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  pattern?: InputMaybe<Scalars["String"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  pattern?: InputMaybe<Scalars['String']['input']>;
   position?: InputMaybe<EnumClanTagPositionFilter>;
 };
 
@@ -1538,7 +1529,7 @@ export type ClanWhereUniqueInput = {
   AND?: InputMaybe<Array<ClanWhereInput>>;
   NOT?: InputMaybe<Array<ClanWhereInput>>;
   OR?: InputMaybe<Array<ClanWhereInput>>;
-  clanId?: InputMaybe<Scalars["Int"]["input"]>;
+  clanId?: InputMaybe<Scalars['Int']['input']>;
   game?: InputMaybe<StringFilter>;
   gameData?: InputMaybe<GameWhereInput>;
   game_tag?: InputMaybe<ClanGame_TagCompoundUniqueInput>;
@@ -1551,18 +1542,19 @@ export type ClanWhereUniqueInput = {
 };
 
 export type Country = {
-  __typename?: "Country";
-  flag: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
+  __typename?: 'Country';
+  flag: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
   players: Array<Player>;
 };
+
 
 export type CountryPlayersArgs = {
   cursor?: InputMaybe<PlayerWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerWhereInput>;
 };
 
@@ -1572,14 +1564,14 @@ export type CountryCountOrderByAggregateInput = {
 };
 
 export type CountryCreateInput = {
-  flag: Scalars["String"]["input"];
-  name: Scalars["String"]["input"];
+  flag: Scalars['String']['input'];
+  name: Scalars['String']['input'];
   players?: InputMaybe<PlayerCreateNestedManyWithoutCountryDataInput>;
 };
 
 export type CountryCreateManyInput = {
-  flag: Scalars["String"]["input"];
-  name: Scalars["String"]["input"];
+  flag: Scalars['String']['input'];
+  name: Scalars['String']['input'];
 };
 
 export type CountryCreateNestedOneWithoutPlayersInput = {
@@ -1594,8 +1586,8 @@ export type CountryCreateOrConnectWithoutPlayersInput = {
 };
 
 export type CountryCreateWithoutPlayersInput = {
-  flag: Scalars["String"]["input"];
-  name: Scalars["String"]["input"];
+  flag: Scalars['String']['input'];
+  name: Scalars['String']['input'];
 };
 
 export type CountryMaxOrderByAggregateInput = {
@@ -1614,13 +1606,13 @@ export type CountryNullableScalarRelationFilter = {
 };
 
 export enum CountryOrderByRelevanceFieldEnum {
-  Flag = "flag",
-  Name = "name",
+  Flag = 'flag',
+  Name = 'name'
 }
 
 export type CountryOrderByRelevanceInput = {
   fields: Array<CountryOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -1640,8 +1632,8 @@ export type CountryOrderByWithRelationInput = {
 };
 
 export enum CountryScalarFieldEnum {
-  Flag = "flag",
-  Name = "name",
+  Flag = 'flag',
+  Name = 'name'
 }
 
 export type CountryScalarWhereWithAggregatesInput = {
@@ -1702,74 +1694,74 @@ export type CountryWhereUniqueInput = {
   AND?: InputMaybe<Array<CountryWhereInput>>;
   NOT?: InputMaybe<Array<CountryWhereInput>>;
   OR?: InputMaybe<Array<CountryWhereInput>>;
-  flag?: InputMaybe<Scalars["String"]["input"]>;
+  flag?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<StringFilter>;
   players?: InputMaybe<PlayerListRelationFilter>;
 };
 
 export type DateTimeFieldUpdateOperationsInput = {
-  set?: InputMaybe<Scalars["DateTime"]["input"]>;
+  set?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type DateTimeFilter = {
-  equals?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gte?: InputMaybe<Scalars["DateTime"]["input"]>;
-  in?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
-  lt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  equals?: InputMaybe<Scalars['DateTime']['input']>;
+  gt?: InputMaybe<Scalars['DateTime']['input']>;
+  gte?: InputMaybe<Scalars['DateTime']['input']>;
+  in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  lt?: InputMaybe<Scalars['DateTime']['input']>;
+  lte?: InputMaybe<Scalars['DateTime']['input']>;
   not?: InputMaybe<NestedDateTimeFilter>;
-  notIn?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['DateTime']['input']>>;
 };
 
 export type DateTimeNullableFilter = {
-  equals?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gte?: InputMaybe<Scalars["DateTime"]["input"]>;
-  in?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
-  lt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  equals?: InputMaybe<Scalars['DateTime']['input']>;
+  gt?: InputMaybe<Scalars['DateTime']['input']>;
+  gte?: InputMaybe<Scalars['DateTime']['input']>;
+  in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  lt?: InputMaybe<Scalars['DateTime']['input']>;
+  lte?: InputMaybe<Scalars['DateTime']['input']>;
   not?: InputMaybe<NestedDateTimeNullableFilter>;
-  notIn?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['DateTime']['input']>>;
 };
 
 export type DateTimeNullableWithAggregatesFilter = {
   _count?: InputMaybe<NestedIntNullableFilter>;
   _max?: InputMaybe<NestedDateTimeNullableFilter>;
   _min?: InputMaybe<NestedDateTimeNullableFilter>;
-  equals?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gte?: InputMaybe<Scalars["DateTime"]["input"]>;
-  in?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
-  lt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  equals?: InputMaybe<Scalars['DateTime']['input']>;
+  gt?: InputMaybe<Scalars['DateTime']['input']>;
+  gte?: InputMaybe<Scalars['DateTime']['input']>;
+  in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  lt?: InputMaybe<Scalars['DateTime']['input']>;
+  lte?: InputMaybe<Scalars['DateTime']['input']>;
   not?: InputMaybe<NestedDateTimeNullableWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['DateTime']['input']>>;
 };
 
 export type DateTimeWithAggregatesFilter = {
   _count?: InputMaybe<NestedIntFilter>;
   _max?: InputMaybe<NestedDateTimeFilter>;
   _min?: InputMaybe<NestedDateTimeFilter>;
-  equals?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gte?: InputMaybe<Scalars["DateTime"]["input"]>;
-  in?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
-  lt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  equals?: InputMaybe<Scalars['DateTime']['input']>;
+  gt?: InputMaybe<Scalars['DateTime']['input']>;
+  gte?: InputMaybe<Scalars['DateTime']['input']>;
+  in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  lt?: InputMaybe<Scalars['DateTime']['input']>;
+  lte?: InputMaybe<Scalars['DateTime']['input']>;
   not?: InputMaybe<NestedDateTimeWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['DateTime']['input']>>;
 };
 
 export type DecimalNullableFilter = {
-  equals?: InputMaybe<Scalars["Decimal"]["input"]>;
-  gt?: InputMaybe<Scalars["Decimal"]["input"]>;
-  gte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Decimal"]["input"]>>;
-  lt?: InputMaybe<Scalars["Decimal"]["input"]>;
-  lte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  equals?: InputMaybe<Scalars['Decimal']['input']>;
+  gt?: InputMaybe<Scalars['Decimal']['input']>;
+  gte?: InputMaybe<Scalars['Decimal']['input']>;
+  in?: InputMaybe<Array<Scalars['Decimal']['input']>>;
+  lt?: InputMaybe<Scalars['Decimal']['input']>;
+  lte?: InputMaybe<Scalars['Decimal']['input']>;
   not?: InputMaybe<NestedDecimalNullableFilter>;
-  notIn?: InputMaybe<Array<Scalars["Decimal"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Decimal']['input']>>;
 };
 
 export type DecimalNullableWithAggregatesFilter = {
@@ -1778,14 +1770,14 @@ export type DecimalNullableWithAggregatesFilter = {
   _max?: InputMaybe<NestedDecimalNullableFilter>;
   _min?: InputMaybe<NestedDecimalNullableFilter>;
   _sum?: InputMaybe<NestedDecimalNullableFilter>;
-  equals?: InputMaybe<Scalars["Decimal"]["input"]>;
-  gt?: InputMaybe<Scalars["Decimal"]["input"]>;
-  gte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Decimal"]["input"]>>;
-  lt?: InputMaybe<Scalars["Decimal"]["input"]>;
-  lte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  equals?: InputMaybe<Scalars['Decimal']['input']>;
+  gt?: InputMaybe<Scalars['Decimal']['input']>;
+  gte?: InputMaybe<Scalars['Decimal']['input']>;
+  in?: InputMaybe<Array<Scalars['Decimal']['input']>>;
+  lt?: InputMaybe<Scalars['Decimal']['input']>;
+  lte?: InputMaybe<Scalars['Decimal']['input']>;
   not?: InputMaybe<NestedDecimalNullableWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["Decimal"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Decimal']['input']>>;
 };
 
 export type EnumClanTagPositionFieldUpdateOperationsInput = {
@@ -1810,15 +1802,15 @@ export type EnumClanTagPositionWithAggregatesFilter = {
 };
 
 export type EventAdmin = {
-  __typename?: "EventAdmin";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
-  message: Scalars["String"]["output"];
-  playerName: Scalars["String"]["output"];
+  __typename?: 'EventAdmin';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
+  message: Scalars['String']['output'];
+  playerName: Scalars['String']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
-  type: Scalars["String"]["output"];
+  serverId: Scalars['Int']['output'];
+  type: Scalars['String']['output'];
 };
 
 export type EventAdminAvgOrderByAggregateInput = {
@@ -1837,43 +1829,41 @@ export type EventAdminCountOrderByAggregateInput = {
 };
 
 export type EventAdminCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  playerName?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  playerName?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsAdminInput>;
-  type?: InputMaybe<Scalars["String"]["input"]>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventAdminCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  playerName?: InputMaybe<Scalars["String"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  type?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  playerName?: InputMaybe<Scalars['String']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventAdminCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  playerName?: InputMaybe<Scalars["String"]["input"]>;
-  type?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  playerName?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventAdminCreateManyServerInputEnvelope = {
   data: Array<EventAdminCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventAdminCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventAdminWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventAdminCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventAdminCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventAdminCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventAdminCreateManyServerInputEnvelope>;
 };
@@ -1884,11 +1874,11 @@ export type EventAdminCreateOrConnectWithoutServerInput = {
 };
 
 export type EventAdminCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  playerName?: InputMaybe<Scalars["String"]["input"]>;
-  type?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  playerName?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventAdminListRelationFilter = {
@@ -1922,15 +1912,15 @@ export type EventAdminOrderByRelationAggregateInput = {
 };
 
 export enum EventAdminOrderByRelevanceFieldEnum {
-  Map = "map",
-  Message = "message",
-  PlayerName = "playerName",
-  Type = "type",
+  Map = 'map',
+  Message = 'message',
+  PlayerName = 'playerName',
+  Type = 'type'
 }
 
 export type EventAdminOrderByRelevanceInput = {
   fields: Array<EventAdminOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -1962,13 +1952,13 @@ export type EventAdminOrderByWithRelationInput = {
 };
 
 export enum EventAdminScalarFieldEnum {
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  Message = "message",
-  PlayerName = "playerName",
-  ServerId = "serverId",
-  Type = "type",
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  Message = 'message',
+  PlayerName = 'playerName',
+  ServerId = 'serverId',
+  Type = 'type'
 }
 
 export type EventAdminScalarWhereInput = {
@@ -2026,9 +2016,7 @@ export type EventAdminUpdateManyWithWhereWithoutServerInput = {
 
 export type EventAdminUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventAdminWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventAdminCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventAdminCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventAdminCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventAdminCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventAdminWhereUniqueInput>>;
@@ -2036,9 +2024,7 @@ export type EventAdminUpdateManyWithoutServerNestedInput = {
   disconnect?: InputMaybe<Array<EventAdminWhereUniqueInput>>;
   set?: InputMaybe<Array<EventAdminWhereUniqueInput>>;
   update?: InputMaybe<Array<EventAdminUpdateWithWhereUniqueWithoutServerInput>>;
-  updateMany?: InputMaybe<
-    Array<EventAdminUpdateManyWithWhereWithoutServerInput>
-  >;
+  updateMany?: InputMaybe<Array<EventAdminUpdateManyWithWhereWithoutServerInput>>;
   upsert?: InputMaybe<Array<EventAdminUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
@@ -2080,7 +2066,7 @@ export type EventAdminWhereUniqueInput = {
   NOT?: InputMaybe<Array<EventAdminWhereInput>>;
   OR?: InputMaybe<Array<EventAdminWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   message?: InputMaybe<StringFilter>;
   playerName?: InputMaybe<StringFilter>;
@@ -2090,16 +2076,16 @@ export type EventAdminWhereUniqueInput = {
 };
 
 export type EventChangeName = {
-  __typename?: "EventChangeName";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
-  newName: Scalars["String"]["output"];
-  oldName: Scalars["String"]["output"];
+  __typename?: 'EventChangeName';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
+  newName: Scalars['String']['output'];
+  oldName: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
 };
 
 export type EventChangeNameAvgOrderByAggregateInput = {
@@ -2119,66 +2105,62 @@ export type EventChangeNameCountOrderByAggregateInput = {
 };
 
 export type EventChangeNameCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  newName?: InputMaybe<Scalars["String"]["input"]>;
-  oldName?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  newName?: InputMaybe<Scalars['String']['input']>;
+  oldName?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutNameChangesInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsChangeNameInput>;
 };
 
 export type EventChangeNameCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  newName?: InputMaybe<Scalars["String"]["input"]>;
-  oldName?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  newName?: InputMaybe<Scalars['String']['input']>;
+  oldName?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventChangeNameCreateManyPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  newName?: InputMaybe<Scalars["String"]["input"]>;
-  oldName?: InputMaybe<Scalars["String"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  newName?: InputMaybe<Scalars['String']['input']>;
+  oldName?: InputMaybe<Scalars['String']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventChangeNameCreateManyPlayerInputEnvelope = {
   data: Array<EventChangeNameCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventChangeNameCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  newName?: InputMaybe<Scalars["String"]["input"]>;
-  oldName?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  newName?: InputMaybe<Scalars['String']['input']>;
+  oldName?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventChangeNameCreateManyServerInputEnvelope = {
   data: Array<EventChangeNameCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventChangeNameCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventChangeNameWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChangeNameCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChangeNameCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventChangeNameCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventChangeNameCreateManyPlayerInputEnvelope>;
 };
 
 export type EventChangeNameCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventChangeNameWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChangeNameCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChangeNameCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventChangeNameCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventChangeNameCreateManyServerInputEnvelope>;
 };
@@ -2194,18 +2176,18 @@ export type EventChangeNameCreateOrConnectWithoutServerInput = {
 };
 
 export type EventChangeNameCreateWithoutPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  newName?: InputMaybe<Scalars["String"]["input"]>;
-  oldName?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  newName?: InputMaybe<Scalars['String']['input']>;
+  oldName?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsChangeNameInput>;
 };
 
 export type EventChangeNameCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  newName?: InputMaybe<Scalars["String"]["input"]>;
-  oldName?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  newName?: InputMaybe<Scalars['String']['input']>;
+  oldName?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutNameChangesInput>;
 };
 
@@ -2240,14 +2222,14 @@ export type EventChangeNameOrderByRelationAggregateInput = {
 };
 
 export enum EventChangeNameOrderByRelevanceFieldEnum {
-  Map = "map",
-  NewName = "newName",
-  OldName = "oldName",
+  Map = 'map',
+  NewName = 'newName',
+  OldName = 'oldName'
 }
 
 export type EventChangeNameOrderByRelevanceInput = {
   fields: Array<EventChangeNameOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -2280,13 +2262,13 @@ export type EventChangeNameOrderByWithRelationInput = {
 };
 
 export enum EventChangeNameScalarFieldEnum {
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  NewName = "newName",
-  OldName = "oldName",
-  PlayerId = "playerId",
-  ServerId = "serverId",
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  NewName = 'newName',
+  OldName = 'oldName',
+  PlayerId = 'playerId',
+  ServerId = 'serverId'
 }
 
 export type EventChangeNameScalarWhereInput = {
@@ -2349,46 +2331,30 @@ export type EventChangeNameUpdateManyWithWhereWithoutServerInput = {
 
 export type EventChangeNameUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventChangeNameWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChangeNameCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChangeNameCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventChangeNameCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventChangeNameCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventChangeNameWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventChangeNameScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventChangeNameWhereUniqueInput>>;
   set?: InputMaybe<Array<EventChangeNameWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventChangeNameUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventChangeNameUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventChangeNameUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventChangeNameUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventChangeNameUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventChangeNameUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventChangeNameUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventChangeNameWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChangeNameCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChangeNameCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventChangeNameCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventChangeNameCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventChangeNameWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventChangeNameScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventChangeNameWhereUniqueInput>>;
   set?: InputMaybe<Array<EventChangeNameWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventChangeNameUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventChangeNameUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventChangeNameUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventChangeNameUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventChangeNameUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventChangeNameUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventChangeNameUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -2449,7 +2415,7 @@ export type EventChangeNameWhereUniqueInput = {
   NOT?: InputMaybe<Array<EventChangeNameWhereInput>>;
   OR?: InputMaybe<Array<EventChangeNameWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   newName?: InputMaybe<StringFilter>;
   oldName?: InputMaybe<StringFilter>;
@@ -2460,15 +2426,15 @@ export type EventChangeNameWhereUniqueInput = {
 };
 
 export type EventChangeRole = {
-  __typename?: "EventChangeRole";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
+  __typename?: 'EventChangeRole';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
-  role: Scalars["String"]["output"];
+  playerId: Scalars['Int']['output'];
+  role: Scalars['String']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
 };
 
 export type EventChangeRoleAvgOrderByAggregateInput = {
@@ -2487,62 +2453,58 @@ export type EventChangeRoleCountOrderByAggregateInput = {
 };
 
 export type EventChangeRoleCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutRoleChangesInput>;
-  role?: InputMaybe<Scalars["String"]["input"]>;
+  role?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsChangeRoleInput>;
 };
 
 export type EventChangeRoleCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  role?: InputMaybe<Scalars["String"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  role?: InputMaybe<Scalars['String']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventChangeRoleCreateManyPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  role?: InputMaybe<Scalars["String"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<Scalars['String']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventChangeRoleCreateManyPlayerInputEnvelope = {
   data: Array<EventChangeRoleCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventChangeRoleCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  role?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  role?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventChangeRoleCreateManyServerInputEnvelope = {
   data: Array<EventChangeRoleCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventChangeRoleCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventChangeRoleWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChangeRoleCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChangeRoleCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventChangeRoleCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventChangeRoleCreateManyPlayerInputEnvelope>;
 };
 
 export type EventChangeRoleCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventChangeRoleWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChangeRoleCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChangeRoleCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventChangeRoleCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventChangeRoleCreateManyServerInputEnvelope>;
 };
@@ -2558,17 +2520,17 @@ export type EventChangeRoleCreateOrConnectWithoutServerInput = {
 };
 
 export type EventChangeRoleCreateWithoutPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  role?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsChangeRoleInput>;
 };
 
 export type EventChangeRoleCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutRoleChangesInput>;
-  role?: InputMaybe<Scalars["String"]["input"]>;
+  role?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventChangeRoleListRelationFilter = {
@@ -2600,13 +2562,13 @@ export type EventChangeRoleOrderByRelationAggregateInput = {
 };
 
 export enum EventChangeRoleOrderByRelevanceFieldEnum {
-  Map = "map",
-  Role = "role",
+  Map = 'map',
+  Role = 'role'
 }
 
 export type EventChangeRoleOrderByRelevanceInput = {
   fields: Array<EventChangeRoleOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -2637,12 +2599,12 @@ export type EventChangeRoleOrderByWithRelationInput = {
 };
 
 export enum EventChangeRoleScalarFieldEnum {
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  PlayerId = "playerId",
-  Role = "role",
-  ServerId = "serverId",
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  PlayerId = 'playerId',
+  Role = 'role',
+  ServerId = 'serverId'
 }
 
 export type EventChangeRoleScalarWhereInput = {
@@ -2701,46 +2663,30 @@ export type EventChangeRoleUpdateManyWithWhereWithoutServerInput = {
 
 export type EventChangeRoleUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventChangeRoleWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChangeRoleCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChangeRoleCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventChangeRoleCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventChangeRoleCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventChangeRoleWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventChangeRoleScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventChangeRoleWhereUniqueInput>>;
   set?: InputMaybe<Array<EventChangeRoleWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventChangeRoleUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventChangeRoleUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventChangeRoleUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventChangeRoleUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventChangeRoleUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventChangeRoleUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventChangeRoleUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventChangeRoleWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChangeRoleCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChangeRoleCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventChangeRoleCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventChangeRoleCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventChangeRoleWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventChangeRoleScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventChangeRoleWhereUniqueInput>>;
   set?: InputMaybe<Array<EventChangeRoleWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventChangeRoleUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventChangeRoleUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventChangeRoleUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventChangeRoleUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventChangeRoleUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventChangeRoleUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventChangeRoleUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -2798,7 +2744,7 @@ export type EventChangeRoleWhereUniqueInput = {
   NOT?: InputMaybe<Array<EventChangeRoleWhereInput>>;
   OR?: InputMaybe<Array<EventChangeRoleWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
   playerId?: InputMaybe<IntFilter>;
@@ -2808,15 +2754,15 @@ export type EventChangeRoleWhereUniqueInput = {
 };
 
 export type EventChangeTeam = {
-  __typename?: "EventChangeTeam";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
+  __typename?: 'EventChangeTeam';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
-  team: Scalars["String"]["output"];
+  serverId: Scalars['Int']['output'];
+  team: Scalars['String']['output'];
 };
 
 export type EventChangeTeamAvgOrderByAggregateInput = {
@@ -2835,62 +2781,58 @@ export type EventChangeTeamCountOrderByAggregateInput = {
 };
 
 export type EventChangeTeamCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutTeamChangesInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsChangeTeamInput>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventChangeTeamCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventChangeTeamCreateManyPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventChangeTeamCreateManyPlayerInputEnvelope = {
   data: Array<EventChangeTeamCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventChangeTeamCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventChangeTeamCreateManyServerInputEnvelope = {
   data: Array<EventChangeTeamCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventChangeTeamCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventChangeTeamWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChangeTeamCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChangeTeamCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventChangeTeamCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventChangeTeamCreateManyPlayerInputEnvelope>;
 };
 
 export type EventChangeTeamCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventChangeTeamWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChangeTeamCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChangeTeamCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventChangeTeamCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventChangeTeamCreateManyServerInputEnvelope>;
 };
@@ -2906,17 +2848,17 @@ export type EventChangeTeamCreateOrConnectWithoutServerInput = {
 };
 
 export type EventChangeTeamCreateWithoutPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsChangeTeamInput>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventChangeTeamCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutTeamChangesInput>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventChangeTeamListRelationFilter = {
@@ -2948,13 +2890,13 @@ export type EventChangeTeamOrderByRelationAggregateInput = {
 };
 
 export enum EventChangeTeamOrderByRelevanceFieldEnum {
-  Map = "map",
-  Team = "team",
+  Map = 'map',
+  Team = 'team'
 }
 
 export type EventChangeTeamOrderByRelevanceInput = {
   fields: Array<EventChangeTeamOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -2985,12 +2927,12 @@ export type EventChangeTeamOrderByWithRelationInput = {
 };
 
 export enum EventChangeTeamScalarFieldEnum {
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  PlayerId = "playerId",
-  ServerId = "serverId",
-  Team = "team",
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  PlayerId = 'playerId',
+  ServerId = 'serverId',
+  Team = 'team'
 }
 
 export type EventChangeTeamScalarWhereInput = {
@@ -3049,46 +2991,30 @@ export type EventChangeTeamUpdateManyWithWhereWithoutServerInput = {
 
 export type EventChangeTeamUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventChangeTeamWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChangeTeamCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChangeTeamCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventChangeTeamCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventChangeTeamCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventChangeTeamWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventChangeTeamScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventChangeTeamWhereUniqueInput>>;
   set?: InputMaybe<Array<EventChangeTeamWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventChangeTeamUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventChangeTeamUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventChangeTeamUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventChangeTeamUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventChangeTeamUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventChangeTeamUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventChangeTeamUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventChangeTeamWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChangeTeamCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChangeTeamCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventChangeTeamCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventChangeTeamCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventChangeTeamWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventChangeTeamScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventChangeTeamWhereUniqueInput>>;
   set?: InputMaybe<Array<EventChangeTeamWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventChangeTeamUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventChangeTeamUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventChangeTeamUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventChangeTeamUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventChangeTeamUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventChangeTeamUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventChangeTeamUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -3146,7 +3072,7 @@ export type EventChangeTeamWhereUniqueInput = {
   NOT?: InputMaybe<Array<EventChangeTeamWhereInput>>;
   OR?: InputMaybe<Array<EventChangeTeamWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
   playerId?: InputMaybe<IntFilter>;
@@ -3156,16 +3082,16 @@ export type EventChangeTeamWhereUniqueInput = {
 };
 
 export type EventChat = {
-  __typename?: "EventChat";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
-  message: Scalars["String"]["output"];
-  message_mode: Scalars["Int"]["output"];
+  __typename?: 'EventChat';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
+  message: Scalars['String']['output'];
+  message_mode: Scalars['Int']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
 };
 
 export type EventChatAvgOrderByAggregateInput = {
@@ -3186,66 +3112,62 @@ export type EventChatCountOrderByAggregateInput = {
 };
 
 export type EventChatCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  message_mode?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_mode?: InputMaybe<Scalars['Int']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutChatsInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsChatInput>;
 };
 
 export type EventChatCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  message_mode?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_mode?: InputMaybe<Scalars['Int']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventChatCreateManyPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  message_mode?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_mode?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventChatCreateManyPlayerInputEnvelope = {
   data: Array<EventChatCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventChatCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  message_mode?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_mode?: InputMaybe<Scalars['Int']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventChatCreateManyServerInputEnvelope = {
   data: Array<EventChatCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventChatCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventChatWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChatCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChatCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventChatCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventChatCreateManyPlayerInputEnvelope>;
 };
 
 export type EventChatCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventChatWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChatCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChatCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventChatCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventChatCreateManyServerInputEnvelope>;
 };
@@ -3261,18 +3183,18 @@ export type EventChatCreateOrConnectWithoutServerInput = {
 };
 
 export type EventChatCreateWithoutPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  message_mode?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_mode?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsChatInput>;
 };
 
 export type EventChatCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  message_mode?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_mode?: InputMaybe<Scalars['Int']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutChatsInput>;
 };
 
@@ -3307,13 +3229,13 @@ export type EventChatOrderByRelationAggregateInput = {
 };
 
 export enum EventChatOrderByRelevanceFieldEnum {
-  Map = "map",
-  Message = "message",
+  Map = 'map',
+  Message = 'message'
 }
 
 export type EventChatOrderByRelevanceInput = {
   fields: Array<EventChatOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -3346,13 +3268,13 @@ export type EventChatOrderByWithRelationInput = {
 };
 
 export enum EventChatScalarFieldEnum {
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  Message = "message",
-  MessageMode = "message_mode",
-  PlayerId = "playerId",
-  ServerId = "serverId",
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  Message = 'message',
+  MessageMode = 'message_mode',
+  PlayerId = 'playerId',
+  ServerId = 'serverId'
 }
 
 export type EventChatScalarWhereInput = {
@@ -3416,9 +3338,7 @@ export type EventChatUpdateManyWithWhereWithoutServerInput = {
 
 export type EventChatUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventChatWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChatCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChatCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventChatCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventChatCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventChatWhereUniqueInput>>;
@@ -3426,17 +3346,13 @@ export type EventChatUpdateManyWithoutPlayerNestedInput = {
   disconnect?: InputMaybe<Array<EventChatWhereUniqueInput>>;
   set?: InputMaybe<Array<EventChatWhereUniqueInput>>;
   update?: InputMaybe<Array<EventChatUpdateWithWhereUniqueWithoutPlayerInput>>;
-  updateMany?: InputMaybe<
-    Array<EventChatUpdateManyWithWhereWithoutPlayerInput>
-  >;
+  updateMany?: InputMaybe<Array<EventChatUpdateManyWithWhereWithoutPlayerInput>>;
   upsert?: InputMaybe<Array<EventChatUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventChatUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventChatWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventChatCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventChatCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventChatCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventChatCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventChatWhereUniqueInput>>;
@@ -3444,9 +3360,7 @@ export type EventChatUpdateManyWithoutServerNestedInput = {
   disconnect?: InputMaybe<Array<EventChatWhereUniqueInput>>;
   set?: InputMaybe<Array<EventChatWhereUniqueInput>>;
   update?: InputMaybe<Array<EventChatUpdateWithWhereUniqueWithoutServerInput>>;
-  updateMany?: InputMaybe<
-    Array<EventChatUpdateManyWithWhereWithoutServerInput>
-  >;
+  updateMany?: InputMaybe<Array<EventChatUpdateManyWithWhereWithoutServerInput>>;
   upsert?: InputMaybe<Array<EventChatUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
@@ -3508,7 +3422,7 @@ export type EventChatWhereUniqueInput = {
   NOT?: InputMaybe<Array<EventChatWhereInput>>;
   OR?: InputMaybe<Array<EventChatWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   message?: InputMaybe<StringFilter>;
   message_mode?: InputMaybe<IntFilter>;
@@ -3519,18 +3433,18 @@ export type EventChatWhereUniqueInput = {
 };
 
 export type EventConnect = {
-  __typename?: "EventConnect";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  eventTime_Disconnect?: Maybe<Scalars["DateTime"]["output"]>;
-  hostgroup: Scalars["String"]["output"];
-  hostname: Scalars["String"]["output"];
-  id: Scalars["ID"]["output"];
-  ipAddress: Scalars["String"]["output"];
-  map: Scalars["String"]["output"];
+  __typename?: 'EventConnect';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  eventTime_Disconnect?: Maybe<Scalars['DateTime']['output']>;
+  hostgroup: Scalars['String']['output'];
+  hostname: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  ipAddress: Scalars['String']['output'];
+  map: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
 };
 
 export type EventConnectAvgOrderByAggregateInput = {
@@ -3552,74 +3466,70 @@ export type EventConnectCountOrderByAggregateInput = {
 };
 
 export type EventConnectCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  eventTime_Disconnect?: InputMaybe<Scalars["DateTime"]["input"]>;
-  hostgroup?: InputMaybe<Scalars["String"]["input"]>;
-  hostname?: InputMaybe<Scalars["String"]["input"]>;
-  ipAddress?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  eventTime_Disconnect?: InputMaybe<Scalars['DateTime']['input']>;
+  hostgroup?: InputMaybe<Scalars['String']['input']>;
+  hostname?: InputMaybe<Scalars['String']['input']>;
+  ipAddress?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutConnectsInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsConnectInput>;
 };
 
 export type EventConnectCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  eventTime_Disconnect?: InputMaybe<Scalars["DateTime"]["input"]>;
-  hostgroup?: InputMaybe<Scalars["String"]["input"]>;
-  hostname?: InputMaybe<Scalars["String"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  ipAddress?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  eventTime_Disconnect?: InputMaybe<Scalars['DateTime']['input']>;
+  hostgroup?: InputMaybe<Scalars['String']['input']>;
+  hostname?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  ipAddress?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventConnectCreateManyPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  eventTime_Disconnect?: InputMaybe<Scalars["DateTime"]["input"]>;
-  hostgroup?: InputMaybe<Scalars["String"]["input"]>;
-  hostname?: InputMaybe<Scalars["String"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  ipAddress?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  eventTime_Disconnect?: InputMaybe<Scalars['DateTime']['input']>;
+  hostgroup?: InputMaybe<Scalars['String']['input']>;
+  hostname?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  ipAddress?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventConnectCreateManyPlayerInputEnvelope = {
   data: Array<EventConnectCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventConnectCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  eventTime_Disconnect?: InputMaybe<Scalars["DateTime"]["input"]>;
-  hostgroup?: InputMaybe<Scalars["String"]["input"]>;
-  hostname?: InputMaybe<Scalars["String"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  ipAddress?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  eventTime_Disconnect?: InputMaybe<Scalars['DateTime']['input']>;
+  hostgroup?: InputMaybe<Scalars['String']['input']>;
+  hostname?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  ipAddress?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventConnectCreateManyServerInputEnvelope = {
   data: Array<EventConnectCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventConnectCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventConnectWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventConnectCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventConnectCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventConnectCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventConnectCreateManyPlayerInputEnvelope>;
 };
 
 export type EventConnectCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventConnectWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventConnectCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventConnectCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventConnectCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventConnectCreateManyServerInputEnvelope>;
 };
@@ -3635,22 +3545,22 @@ export type EventConnectCreateOrConnectWithoutServerInput = {
 };
 
 export type EventConnectCreateWithoutPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  eventTime_Disconnect?: InputMaybe<Scalars["DateTime"]["input"]>;
-  hostgroup?: InputMaybe<Scalars["String"]["input"]>;
-  hostname?: InputMaybe<Scalars["String"]["input"]>;
-  ipAddress?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  eventTime_Disconnect?: InputMaybe<Scalars['DateTime']['input']>;
+  hostgroup?: InputMaybe<Scalars['String']['input']>;
+  hostname?: InputMaybe<Scalars['String']['input']>;
+  ipAddress?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsConnectInput>;
 };
 
 export type EventConnectCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  eventTime_Disconnect?: InputMaybe<Scalars["DateTime"]["input"]>;
-  hostgroup?: InputMaybe<Scalars["String"]["input"]>;
-  hostname?: InputMaybe<Scalars["String"]["input"]>;
-  ipAddress?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  eventTime_Disconnect?: InputMaybe<Scalars['DateTime']['input']>;
+  hostgroup?: InputMaybe<Scalars['String']['input']>;
+  hostname?: InputMaybe<Scalars['String']['input']>;
+  ipAddress?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutConnectsInput>;
 };
 
@@ -3689,15 +3599,15 @@ export type EventConnectOrderByRelationAggregateInput = {
 };
 
 export enum EventConnectOrderByRelevanceFieldEnum {
-  Hostgroup = "hostgroup",
-  Hostname = "hostname",
-  IpAddress = "ipAddress",
-  Map = "map",
+  Hostgroup = 'hostgroup',
+  Hostname = 'hostname',
+  IpAddress = 'ipAddress',
+  Map = 'map'
 }
 
 export type EventConnectOrderByRelevanceInput = {
   fields: Array<EventConnectOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -3734,15 +3644,15 @@ export type EventConnectOrderByWithRelationInput = {
 };
 
 export enum EventConnectScalarFieldEnum {
-  EventTime = "eventTime",
-  EventTimeDisconnect = "eventTime_Disconnect",
-  Hostgroup = "hostgroup",
-  Hostname = "hostname",
-  Id = "id",
-  IpAddress = "ipAddress",
-  Map = "map",
-  PlayerId = "playerId",
-  ServerId = "serverId",
+  EventTime = 'eventTime',
+  EventTimeDisconnect = 'eventTime_Disconnect',
+  Hostgroup = 'hostgroup',
+  Hostname = 'hostname',
+  Id = 'id',
+  IpAddress = 'ipAddress',
+  Map = 'map',
+  PlayerId = 'playerId',
+  ServerId = 'serverId'
 }
 
 export type EventConnectScalarWhereInput = {
@@ -3813,46 +3723,30 @@ export type EventConnectUpdateManyWithWhereWithoutServerInput = {
 
 export type EventConnectUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventConnectWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventConnectCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventConnectCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventConnectCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventConnectCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventConnectWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventConnectScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventConnectWhereUniqueInput>>;
   set?: InputMaybe<Array<EventConnectWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventConnectUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventConnectUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventConnectUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventConnectUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventConnectUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventConnectUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventConnectUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventConnectWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventConnectCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventConnectCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventConnectCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventConnectCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventConnectWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventConnectScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventConnectWhereUniqueInput>>;
   set?: InputMaybe<Array<EventConnectWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventConnectUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventConnectUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventConnectUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventConnectUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventConnectUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventConnectUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventConnectUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -3922,7 +3816,7 @@ export type EventConnectWhereUniqueInput = {
   eventTime_Disconnect?: InputMaybe<DateTimeNullableFilter>;
   hostgroup?: InputMaybe<StringFilter>;
   hostname?: InputMaybe<StringFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   ipAddress?: InputMaybe<StringFilter>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
@@ -3932,14 +3826,14 @@ export type EventConnectWhereUniqueInput = {
 };
 
 export type EventDisconnect = {
-  __typename?: "EventDisconnect";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
+  __typename?: 'EventDisconnect';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
 };
 
 export type EventDisconnectAvgOrderByAggregateInput = {
@@ -3957,58 +3851,54 @@ export type EventDisconnectCountOrderByAggregateInput = {
 };
 
 export type EventDisconnectCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutDisconnectsInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsDisconnectInput>;
 };
 
 export type EventDisconnectCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventDisconnectCreateManyPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventDisconnectCreateManyPlayerInputEnvelope = {
   data: Array<EventDisconnectCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventDisconnectCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventDisconnectCreateManyServerInputEnvelope = {
   data: Array<EventDisconnectCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventDisconnectCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventDisconnectWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventDisconnectCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventDisconnectCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventDisconnectCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventDisconnectCreateManyPlayerInputEnvelope>;
 };
 
 export type EventDisconnectCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventDisconnectWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventDisconnectCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventDisconnectCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventDisconnectCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventDisconnectCreateManyServerInputEnvelope>;
 };
@@ -4024,14 +3914,14 @@ export type EventDisconnectCreateOrConnectWithoutServerInput = {
 };
 
 export type EventDisconnectCreateWithoutPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsDisconnectInput>;
 };
 
 export type EventDisconnectCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutDisconnectsInput>;
 };
 
@@ -4062,12 +3952,12 @@ export type EventDisconnectOrderByRelationAggregateInput = {
 };
 
 export enum EventDisconnectOrderByRelevanceFieldEnum {
-  Map = "map",
+  Map = 'map'
 }
 
 export type EventDisconnectOrderByRelevanceInput = {
   fields: Array<EventDisconnectOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -4096,11 +3986,11 @@ export type EventDisconnectOrderByWithRelationInput = {
 };
 
 export enum EventDisconnectScalarFieldEnum {
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  PlayerId = "playerId",
-  ServerId = "serverId",
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  PlayerId = 'playerId',
+  ServerId = 'serverId'
 }
 
 export type EventDisconnectScalarWhereInput = {
@@ -4155,46 +4045,30 @@ export type EventDisconnectUpdateManyWithWhereWithoutServerInput = {
 
 export type EventDisconnectUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventDisconnectWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventDisconnectCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventDisconnectCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventDisconnectCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventDisconnectCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventDisconnectWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventDisconnectScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventDisconnectWhereUniqueInput>>;
   set?: InputMaybe<Array<EventDisconnectWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventDisconnectUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventDisconnectUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventDisconnectUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventDisconnectUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventDisconnectUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventDisconnectUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventDisconnectUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventDisconnectWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventDisconnectCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventDisconnectCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventDisconnectCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventDisconnectCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventDisconnectWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventDisconnectScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventDisconnectWhereUniqueInput>>;
   set?: InputMaybe<Array<EventDisconnectWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventDisconnectUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventDisconnectUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventDisconnectUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventDisconnectUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventDisconnectUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventDisconnectUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventDisconnectUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -4249,7 +4123,7 @@ export type EventDisconnectWhereUniqueInput = {
   NOT?: InputMaybe<Array<EventDisconnectWhereInput>>;
   OR?: InputMaybe<Array<EventDisconnectWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
   playerId?: InputMaybe<IntFilter>;
@@ -4258,14 +4132,14 @@ export type EventDisconnectWhereUniqueInput = {
 };
 
 export type EventEntry = {
-  __typename?: "EventEntry";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
+  __typename?: 'EventEntry';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
 };
 
 export type EventEntryAvgOrderByAggregateInput = {
@@ -4283,58 +4157,54 @@ export type EventEntryCountOrderByAggregateInput = {
 };
 
 export type EventEntryCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutEntriesInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsEntryInput>;
 };
 
 export type EventEntryCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventEntryCreateManyPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventEntryCreateManyPlayerInputEnvelope = {
   data: Array<EventEntryCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventEntryCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventEntryCreateManyServerInputEnvelope = {
   data: Array<EventEntryCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventEntryCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventEntryWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventEntryCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventEntryCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventEntryCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventEntryCreateManyPlayerInputEnvelope>;
 };
 
 export type EventEntryCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventEntryWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventEntryCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventEntryCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventEntryCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventEntryCreateManyServerInputEnvelope>;
 };
@@ -4350,14 +4220,14 @@ export type EventEntryCreateOrConnectWithoutServerInput = {
 };
 
 export type EventEntryCreateWithoutPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsEntryInput>;
 };
 
 export type EventEntryCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutEntriesInput>;
 };
 
@@ -4388,12 +4258,12 @@ export type EventEntryOrderByRelationAggregateInput = {
 };
 
 export enum EventEntryOrderByRelevanceFieldEnum {
-  Map = "map",
+  Map = 'map'
 }
 
 export type EventEntryOrderByRelevanceInput = {
   fields: Array<EventEntryOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -4422,11 +4292,11 @@ export type EventEntryOrderByWithRelationInput = {
 };
 
 export enum EventEntryScalarFieldEnum {
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  PlayerId = "playerId",
-  ServerId = "serverId",
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  PlayerId = 'playerId',
+  ServerId = 'serverId'
 }
 
 export type EventEntryScalarWhereInput = {
@@ -4481,9 +4351,7 @@ export type EventEntryUpdateManyWithWhereWithoutServerInput = {
 
 export type EventEntryUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventEntryWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventEntryCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventEntryCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventEntryCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventEntryCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventEntryWhereUniqueInput>>;
@@ -4491,17 +4359,13 @@ export type EventEntryUpdateManyWithoutPlayerNestedInput = {
   disconnect?: InputMaybe<Array<EventEntryWhereUniqueInput>>;
   set?: InputMaybe<Array<EventEntryWhereUniqueInput>>;
   update?: InputMaybe<Array<EventEntryUpdateWithWhereUniqueWithoutPlayerInput>>;
-  updateMany?: InputMaybe<
-    Array<EventEntryUpdateManyWithWhereWithoutPlayerInput>
-  >;
+  updateMany?: InputMaybe<Array<EventEntryUpdateManyWithWhereWithoutPlayerInput>>;
   upsert?: InputMaybe<Array<EventEntryUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventEntryUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventEntryWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventEntryCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventEntryCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventEntryCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventEntryCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventEntryWhereUniqueInput>>;
@@ -4509,9 +4373,7 @@ export type EventEntryUpdateManyWithoutServerNestedInput = {
   disconnect?: InputMaybe<Array<EventEntryWhereUniqueInput>>;
   set?: InputMaybe<Array<EventEntryWhereUniqueInput>>;
   update?: InputMaybe<Array<EventEntryUpdateWithWhereUniqueWithoutServerInput>>;
-  updateMany?: InputMaybe<
-    Array<EventEntryUpdateManyWithWhereWithoutServerInput>
-  >;
+  updateMany?: InputMaybe<Array<EventEntryUpdateManyWithWhereWithoutServerInput>>;
   upsert?: InputMaybe<Array<EventEntryUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
@@ -4567,7 +4429,7 @@ export type EventEntryWhereUniqueInput = {
   NOT?: InputMaybe<Array<EventEntryWhereInput>>;
   OR?: InputMaybe<Array<EventEntryWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
   playerId?: InputMaybe<IntFilter>;
@@ -4576,26 +4438,26 @@ export type EventEntryWhereUniqueInput = {
 };
 
 export type EventFrag = {
-  __typename?: "EventFrag";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  headshot: Scalars["Int"]["output"];
-  id: Scalars["ID"]["output"];
+  __typename?: 'EventFrag';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  headshot: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
   killer: Player;
-  killerId: Scalars["Int"]["output"];
-  killerRole: Scalars["String"]["output"];
-  map: Scalars["String"]["output"];
-  pos_victim_x?: Maybe<Scalars["Int"]["output"]>;
-  pos_victim_y?: Maybe<Scalars["Int"]["output"]>;
-  pos_victim_z?: Maybe<Scalars["Int"]["output"]>;
-  pos_x?: Maybe<Scalars["Int"]["output"]>;
-  pos_y?: Maybe<Scalars["Int"]["output"]>;
-  pos_z?: Maybe<Scalars["Int"]["output"]>;
+  killerId: Scalars['Int']['output'];
+  killerRole: Scalars['String']['output'];
+  map: Scalars['String']['output'];
+  pos_victim_x?: Maybe<Scalars['Int']['output']>;
+  pos_victim_y?: Maybe<Scalars['Int']['output']>;
+  pos_victim_z?: Maybe<Scalars['Int']['output']>;
+  pos_x?: Maybe<Scalars['Int']['output']>;
+  pos_y?: Maybe<Scalars['Int']['output']>;
+  pos_z?: Maybe<Scalars['Int']['output']>;
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
   victim: Player;
-  victimId: Scalars["Int"]["output"];
-  victimRole: Scalars["String"]["output"];
-  weapon: Scalars["String"]["output"];
+  victimId: Scalars['Int']['output'];
+  victimRole: Scalars['String']['output'];
+  weapon: Scalars['String']['output'];
 };
 
 export type EventFragAvgOrderByAggregateInput = {
@@ -4632,134 +4494,128 @@ export type EventFragCountOrderByAggregateInput = {
 };
 
 export type EventFragCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshot?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshot?: InputMaybe<Scalars['Int']['input']>;
   killer?: InputMaybe<PlayerCreateNestedOneWithoutFragsAsKillerInput>;
-  killerRole?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  killerRole?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsFragInput>;
   victim?: InputMaybe<PlayerCreateNestedOneWithoutFragsAsVictimInput>;
-  victimRole?: InputMaybe<Scalars["String"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  victimRole?: InputMaybe<Scalars['String']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventFragCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshot?: InputMaybe<Scalars["Int"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  killerId?: InputMaybe<Scalars["Int"]["input"]>;
-  killerRole?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  victimId?: InputMaybe<Scalars["Int"]["input"]>;
-  victimRole?: InputMaybe<Scalars["String"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshot?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  killerId?: InputMaybe<Scalars['Int']['input']>;
+  killerRole?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  victimId?: InputMaybe<Scalars['Int']['input']>;
+  victimRole?: InputMaybe<Scalars['String']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventFragCreateManyKillerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshot?: InputMaybe<Scalars["Int"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  killerRole?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  victimId?: InputMaybe<Scalars["Int"]["input"]>;
-  victimRole?: InputMaybe<Scalars["String"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshot?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  killerRole?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  victimId?: InputMaybe<Scalars['Int']['input']>;
+  victimRole?: InputMaybe<Scalars['String']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventFragCreateManyKillerInputEnvelope = {
   data: Array<EventFragCreateManyKillerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventFragCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshot?: InputMaybe<Scalars["Int"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  killerId?: InputMaybe<Scalars["Int"]["input"]>;
-  killerRole?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  victimId?: InputMaybe<Scalars["Int"]["input"]>;
-  victimRole?: InputMaybe<Scalars["String"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshot?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  killerId?: InputMaybe<Scalars['Int']['input']>;
+  killerRole?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  victimId?: InputMaybe<Scalars['Int']['input']>;
+  victimRole?: InputMaybe<Scalars['String']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventFragCreateManyServerInputEnvelope = {
   data: Array<EventFragCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventFragCreateManyVictimInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshot?: InputMaybe<Scalars["Int"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  killerId?: InputMaybe<Scalars["Int"]["input"]>;
-  killerRole?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  victimRole?: InputMaybe<Scalars["String"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshot?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  killerId?: InputMaybe<Scalars['Int']['input']>;
+  killerRole?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  victimRole?: InputMaybe<Scalars['String']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventFragCreateManyVictimInputEnvelope = {
   data: Array<EventFragCreateManyVictimInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventFragCreateNestedManyWithoutKillerInput = {
   connect?: InputMaybe<Array<EventFragWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventFragCreateOrConnectWithoutKillerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventFragCreateOrConnectWithoutKillerInput>>;
   create?: InputMaybe<Array<EventFragCreateWithoutKillerInput>>;
   createMany?: InputMaybe<EventFragCreateManyKillerInputEnvelope>;
 };
 
 export type EventFragCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventFragWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventFragCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventFragCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventFragCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventFragCreateManyServerInputEnvelope>;
 };
 
 export type EventFragCreateNestedManyWithoutVictimInput = {
   connect?: InputMaybe<Array<EventFragWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventFragCreateOrConnectWithoutVictimInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventFragCreateOrConnectWithoutVictimInput>>;
   create?: InputMaybe<Array<EventFragCreateWithoutVictimInput>>;
   createMany?: InputMaybe<EventFragCreateManyVictimInputEnvelope>;
 };
@@ -4780,54 +4636,54 @@ export type EventFragCreateOrConnectWithoutVictimInput = {
 };
 
 export type EventFragCreateWithoutKillerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshot?: InputMaybe<Scalars["Int"]["input"]>;
-  killerRole?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshot?: InputMaybe<Scalars['Int']['input']>;
+  killerRole?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsFragInput>;
   victim?: InputMaybe<PlayerCreateNestedOneWithoutFragsAsVictimInput>;
-  victimRole?: InputMaybe<Scalars["String"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  victimRole?: InputMaybe<Scalars['String']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventFragCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshot?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshot?: InputMaybe<Scalars['Int']['input']>;
   killer?: InputMaybe<PlayerCreateNestedOneWithoutFragsAsKillerInput>;
-  killerRole?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  killerRole?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   victim?: InputMaybe<PlayerCreateNestedOneWithoutFragsAsVictimInput>;
-  victimRole?: InputMaybe<Scalars["String"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  victimRole?: InputMaybe<Scalars['String']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventFragCreateWithoutVictimInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshot?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshot?: InputMaybe<Scalars['Int']['input']>;
   killer?: InputMaybe<PlayerCreateNestedOneWithoutFragsAsKillerInput>;
-  killerRole?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  killerRole?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsFragInput>;
-  victimRole?: InputMaybe<Scalars["String"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  victimRole?: InputMaybe<Scalars['String']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventFragListRelationFilter = {
@@ -4879,15 +4735,15 @@ export type EventFragOrderByRelationAggregateInput = {
 };
 
 export enum EventFragOrderByRelevanceFieldEnum {
-  KillerRole = "killerRole",
-  Map = "map",
-  VictimRole = "victimRole",
-  Weapon = "weapon",
+  KillerRole = 'killerRole',
+  Map = 'map',
+  VictimRole = 'victimRole',
+  Weapon = 'weapon'
 }
 
 export type EventFragOrderByRelevanceInput = {
   fields: Array<EventFragOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -4939,22 +4795,22 @@ export type EventFragOrderByWithRelationInput = {
 };
 
 export enum EventFragScalarFieldEnum {
-  EventTime = "eventTime",
-  Headshot = "headshot",
-  Id = "id",
-  KillerId = "killerId",
-  KillerRole = "killerRole",
-  Map = "map",
-  PosVictimX = "pos_victim_x",
-  PosVictimY = "pos_victim_y",
-  PosVictimZ = "pos_victim_z",
-  PosX = "pos_x",
-  PosY = "pos_y",
-  PosZ = "pos_z",
-  ServerId = "serverId",
-  VictimId = "victimId",
-  VictimRole = "victimRole",
-  Weapon = "weapon",
+  EventTime = 'eventTime',
+  Headshot = 'headshot',
+  Id = 'id',
+  KillerId = 'killerId',
+  KillerRole = 'killerRole',
+  Map = 'map',
+  PosVictimX = 'pos_victim_x',
+  PosVictimY = 'pos_victim_y',
+  PosVictimZ = 'pos_victim_z',
+  PosX = 'pos_x',
+  PosY = 'pos_y',
+  PosZ = 'pos_z',
+  ServerId = 'serverId',
+  VictimId = 'victimId',
+  VictimRole = 'victimRole',
+  Weapon = 'weapon'
 }
 
 export type EventFragScalarWhereInput = {
@@ -5065,9 +4921,7 @@ export type EventFragUpdateManyWithWhereWithoutVictimInput = {
 
 export type EventFragUpdateManyWithoutKillerNestedInput = {
   connect?: InputMaybe<Array<EventFragWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventFragCreateOrConnectWithoutKillerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventFragCreateOrConnectWithoutKillerInput>>;
   create?: InputMaybe<Array<EventFragCreateWithoutKillerInput>>;
   createMany?: InputMaybe<EventFragCreateManyKillerInputEnvelope>;
   delete?: InputMaybe<Array<EventFragWhereUniqueInput>>;
@@ -5075,17 +4929,13 @@ export type EventFragUpdateManyWithoutKillerNestedInput = {
   disconnect?: InputMaybe<Array<EventFragWhereUniqueInput>>;
   set?: InputMaybe<Array<EventFragWhereUniqueInput>>;
   update?: InputMaybe<Array<EventFragUpdateWithWhereUniqueWithoutKillerInput>>;
-  updateMany?: InputMaybe<
-    Array<EventFragUpdateManyWithWhereWithoutKillerInput>
-  >;
+  updateMany?: InputMaybe<Array<EventFragUpdateManyWithWhereWithoutKillerInput>>;
   upsert?: InputMaybe<Array<EventFragUpsertWithWhereUniqueWithoutKillerInput>>;
 };
 
 export type EventFragUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventFragWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventFragCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventFragCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventFragCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventFragCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventFragWhereUniqueInput>>;
@@ -5093,17 +4943,13 @@ export type EventFragUpdateManyWithoutServerNestedInput = {
   disconnect?: InputMaybe<Array<EventFragWhereUniqueInput>>;
   set?: InputMaybe<Array<EventFragWhereUniqueInput>>;
   update?: InputMaybe<Array<EventFragUpdateWithWhereUniqueWithoutServerInput>>;
-  updateMany?: InputMaybe<
-    Array<EventFragUpdateManyWithWhereWithoutServerInput>
-  >;
+  updateMany?: InputMaybe<Array<EventFragUpdateManyWithWhereWithoutServerInput>>;
   upsert?: InputMaybe<Array<EventFragUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventFragUpdateManyWithoutVictimNestedInput = {
   connect?: InputMaybe<Array<EventFragWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventFragCreateOrConnectWithoutVictimInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventFragCreateOrConnectWithoutVictimInput>>;
   create?: InputMaybe<Array<EventFragCreateWithoutVictimInput>>;
   createMany?: InputMaybe<EventFragCreateManyVictimInputEnvelope>;
   delete?: InputMaybe<Array<EventFragWhereUniqueInput>>;
@@ -5111,9 +4957,7 @@ export type EventFragUpdateManyWithoutVictimNestedInput = {
   disconnect?: InputMaybe<Array<EventFragWhereUniqueInput>>;
   set?: InputMaybe<Array<EventFragWhereUniqueInput>>;
   update?: InputMaybe<Array<EventFragUpdateWithWhereUniqueWithoutVictimInput>>;
-  updateMany?: InputMaybe<
-    Array<EventFragUpdateManyWithWhereWithoutVictimInput>
-  >;
+  updateMany?: InputMaybe<Array<EventFragUpdateManyWithWhereWithoutVictimInput>>;
   upsert?: InputMaybe<Array<EventFragUpsertWithWhereUniqueWithoutVictimInput>>;
 };
 
@@ -5232,7 +5076,7 @@ export type EventFragWhereUniqueInput = {
   OR?: InputMaybe<Array<EventFragWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
   headshot?: InputMaybe<IntFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   killer?: InputMaybe<PlayerWhereInput>;
   killerId?: InputMaybe<IntFilter>;
   killerRole?: InputMaybe<StringFilter>;
@@ -5252,15 +5096,15 @@ export type EventFragWhereUniqueInput = {
 };
 
 export type EventLatency = {
-  __typename?: "EventLatency";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
-  ping: Scalars["Int"]["output"];
+  __typename?: 'EventLatency';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
+  ping: Scalars['Int']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
 };
 
 export type EventLatencyAvgOrderByAggregateInput = {
@@ -5280,62 +5124,58 @@ export type EventLatencyCountOrderByAggregateInput = {
 };
 
 export type EventLatencyCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  ping?: InputMaybe<Scalars['Int']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutLatencyEventsInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsLatencyInput>;
 };
 
 export type EventLatencyCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  ping?: InputMaybe<Scalars['Int']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventLatencyCreateManyPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  ping?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventLatencyCreateManyPlayerInputEnvelope = {
   data: Array<EventLatencyCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventLatencyCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  ping?: InputMaybe<Scalars['Int']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventLatencyCreateManyServerInputEnvelope = {
   data: Array<EventLatencyCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventLatencyCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventLatencyWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventLatencyCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventLatencyCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventLatencyCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventLatencyCreateManyPlayerInputEnvelope>;
 };
 
 export type EventLatencyCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventLatencyWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventLatencyCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventLatencyCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventLatencyCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventLatencyCreateManyServerInputEnvelope>;
 };
@@ -5351,16 +5191,16 @@ export type EventLatencyCreateOrConnectWithoutServerInput = {
 };
 
 export type EventLatencyCreateWithoutPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  ping?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsLatencyInput>;
 };
 
 export type EventLatencyCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  ping?: InputMaybe<Scalars['Int']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutLatencyEventsInput>;
 };
 
@@ -5393,12 +5233,12 @@ export type EventLatencyOrderByRelationAggregateInput = {
 };
 
 export enum EventLatencyOrderByRelevanceFieldEnum {
-  Map = "map",
+  Map = 'map'
 }
 
 export type EventLatencyOrderByRelevanceInput = {
   fields: Array<EventLatencyOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -5429,12 +5269,12 @@ export type EventLatencyOrderByWithRelationInput = {
 };
 
 export enum EventLatencyScalarFieldEnum {
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  Ping = "ping",
-  PlayerId = "playerId",
-  ServerId = "serverId",
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  Ping = 'ping',
+  PlayerId = 'playerId',
+  ServerId = 'serverId'
 }
 
 export type EventLatencyScalarWhereInput = {
@@ -5494,46 +5334,30 @@ export type EventLatencyUpdateManyWithWhereWithoutServerInput = {
 
 export type EventLatencyUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventLatencyWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventLatencyCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventLatencyCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventLatencyCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventLatencyCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventLatencyWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventLatencyScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventLatencyWhereUniqueInput>>;
   set?: InputMaybe<Array<EventLatencyWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventLatencyUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventLatencyUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventLatencyUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventLatencyUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventLatencyUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventLatencyUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventLatencyUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventLatencyWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventLatencyCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventLatencyCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventLatencyCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventLatencyCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventLatencyWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventLatencyScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventLatencyWhereUniqueInput>>;
   set?: InputMaybe<Array<EventLatencyWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventLatencyUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventLatencyUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventLatencyUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventLatencyUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventLatencyUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventLatencyUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventLatencyUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -5591,7 +5415,7 @@ export type EventLatencyWhereUniqueInput = {
   NOT?: InputMaybe<Array<EventLatencyWhereInput>>;
   OR?: InputMaybe<Array<EventLatencyWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   ping?: InputMaybe<IntFilter>;
   player?: InputMaybe<PlayerWhereInput>;
@@ -5601,20 +5425,20 @@ export type EventLatencyWhereUniqueInput = {
 };
 
 export type EventPlayerAction = {
-  __typename?: "EventPlayerAction";
+  __typename?: 'EventPlayerAction';
   action: Action;
-  actionId: Scalars["Int"]["output"];
-  bonus: Scalars["Int"]["output"];
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
+  actionId: Scalars['Int']['output'];
+  bonus: Scalars['Int']['output'];
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
-  pos_x?: Maybe<Scalars["Int"]["output"]>;
-  pos_y?: Maybe<Scalars["Int"]["output"]>;
-  pos_z?: Maybe<Scalars["Int"]["output"]>;
+  playerId: Scalars['Int']['output'];
+  pos_x?: Maybe<Scalars['Int']['output']>;
+  pos_y?: Maybe<Scalars['Int']['output']>;
+  pos_z?: Maybe<Scalars['Int']['output']>;
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
 };
 
 export type EventPlayerActionAvgOrderByAggregateInput = {
@@ -5643,103 +5467,97 @@ export type EventPlayerActionCountOrderByAggregateInput = {
 
 export type EventPlayerActionCreateInput = {
   action?: InputMaybe<ActionCreateNestedOneWithoutEventPlayerActionsInput>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutPlayerActionsInput>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsPlayerActionInput>;
 };
 
 export type EventPlayerActionCreateManyActionInput = {
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventPlayerActionCreateManyActionInputEnvelope = {
   data: Array<EventPlayerActionCreateManyActionInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventPlayerActionCreateManyInput = {
-  actionId?: InputMaybe<Scalars["Int"]["input"]>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  actionId?: InputMaybe<Scalars['Int']['input']>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventPlayerActionCreateManyPlayerInput = {
-  actionId?: InputMaybe<Scalars["Int"]["input"]>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  actionId?: InputMaybe<Scalars['Int']['input']>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventPlayerActionCreateManyPlayerInputEnvelope = {
   data: Array<EventPlayerActionCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventPlayerActionCreateManyServerInput = {
-  actionId?: InputMaybe<Scalars["Int"]["input"]>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  actionId?: InputMaybe<Scalars['Int']['input']>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventPlayerActionCreateManyServerInputEnvelope = {
   data: Array<EventPlayerActionCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventPlayerActionCreateNestedManyWithoutActionInput = {
   connect?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerActionCreateOrConnectWithoutActionInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerActionCreateOrConnectWithoutActionInput>>;
   create?: InputMaybe<Array<EventPlayerActionCreateWithoutActionInput>>;
   createMany?: InputMaybe<EventPlayerActionCreateManyActionInputEnvelope>;
 };
 
 export type EventPlayerActionCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerActionCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerActionCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventPlayerActionCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventPlayerActionCreateManyPlayerInputEnvelope>;
 };
 
 export type EventPlayerActionCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerActionCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerActionCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventPlayerActionCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventPlayerActionCreateManyServerInputEnvelope>;
 };
@@ -5760,36 +5578,36 @@ export type EventPlayerActionCreateOrConnectWithoutServerInput = {
 };
 
 export type EventPlayerActionCreateWithoutActionInput = {
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutPlayerActionsInput>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsPlayerActionInput>;
 };
 
 export type EventPlayerActionCreateWithoutPlayerInput = {
   action?: InputMaybe<ActionCreateNestedOneWithoutEventPlayerActionsInput>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsPlayerActionInput>;
 };
 
 export type EventPlayerActionCreateWithoutServerInput = {
   action?: InputMaybe<ActionCreateNestedOneWithoutEventPlayerActionsInput>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutPlayerActionsInput>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventPlayerActionListRelationFilter = {
@@ -5829,12 +5647,12 @@ export type EventPlayerActionOrderByRelationAggregateInput = {
 };
 
 export enum EventPlayerActionOrderByRelevanceFieldEnum {
-  Map = "map",
+  Map = 'map'
 }
 
 export type EventPlayerActionOrderByRelevanceInput = {
   fields: Array<EventPlayerActionOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -5874,16 +5692,16 @@ export type EventPlayerActionOrderByWithRelationInput = {
 };
 
 export enum EventPlayerActionScalarFieldEnum {
-  ActionId = "actionId",
-  Bonus = "bonus",
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  PlayerId = "playerId",
-  PosX = "pos_x",
-  PosY = "pos_y",
-  PosZ = "pos_z",
-  ServerId = "serverId",
+  ActionId = 'actionId',
+  Bonus = 'bonus',
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  PlayerId = 'playerId',
+  PosX = 'pos_x',
+  PosY = 'pos_y',
+  PosZ = 'pos_z',
+  ServerId = 'serverId'
 }
 
 export type EventPlayerActionScalarWhereInput = {
@@ -5967,68 +5785,44 @@ export type EventPlayerActionUpdateManyWithWhereWithoutServerInput = {
 
 export type EventPlayerActionUpdateManyWithoutActionNestedInput = {
   connect?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerActionCreateOrConnectWithoutActionInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerActionCreateOrConnectWithoutActionInput>>;
   create?: InputMaybe<Array<EventPlayerActionCreateWithoutActionInput>>;
   createMany?: InputMaybe<EventPlayerActionCreateManyActionInputEnvelope>;
   delete?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventPlayerActionScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
   set?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventPlayerActionUpdateWithWhereUniqueWithoutActionInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventPlayerActionUpdateManyWithWhereWithoutActionInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventPlayerActionUpsertWithWhereUniqueWithoutActionInput>
-  >;
+  update?: InputMaybe<Array<EventPlayerActionUpdateWithWhereUniqueWithoutActionInput>>;
+  updateMany?: InputMaybe<Array<EventPlayerActionUpdateManyWithWhereWithoutActionInput>>;
+  upsert?: InputMaybe<Array<EventPlayerActionUpsertWithWhereUniqueWithoutActionInput>>;
 };
 
 export type EventPlayerActionUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerActionCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerActionCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventPlayerActionCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventPlayerActionCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventPlayerActionScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
   set?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventPlayerActionUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventPlayerActionUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventPlayerActionUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventPlayerActionUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventPlayerActionUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventPlayerActionUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventPlayerActionUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerActionCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerActionCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventPlayerActionCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventPlayerActionCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventPlayerActionScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
   set?: InputMaybe<Array<EventPlayerActionWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventPlayerActionUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventPlayerActionUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventPlayerActionUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventPlayerActionUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventPlayerActionUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventPlayerActionUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventPlayerActionUpdateWithWhereUniqueWithoutActionInput = {
@@ -6124,7 +5918,7 @@ export type EventPlayerActionWhereUniqueInput = {
   actionId?: InputMaybe<IntFilter>;
   bonus?: InputMaybe<IntFilter>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
   playerId?: InputMaybe<IntFilter>;
@@ -6136,25 +5930,25 @@ export type EventPlayerActionWhereUniqueInput = {
 };
 
 export type EventPlayerPlayerAction = {
-  __typename?: "EventPlayerPlayerAction";
+  __typename?: 'EventPlayerPlayerAction';
   action: Action;
-  actionId: Scalars["Int"]["output"];
-  bonus: Scalars["Int"]["output"];
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
+  actionId: Scalars['Int']['output'];
+  bonus: Scalars['Int']['output'];
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
-  pos_victim_x?: Maybe<Scalars["Int"]["output"]>;
-  pos_victim_y?: Maybe<Scalars["Int"]["output"]>;
-  pos_victim_z?: Maybe<Scalars["Int"]["output"]>;
-  pos_x?: Maybe<Scalars["Int"]["output"]>;
-  pos_y?: Maybe<Scalars["Int"]["output"]>;
-  pos_z?: Maybe<Scalars["Int"]["output"]>;
+  playerId: Scalars['Int']['output'];
+  pos_victim_x?: Maybe<Scalars['Int']['output']>;
+  pos_victim_y?: Maybe<Scalars['Int']['output']>;
+  pos_victim_z?: Maybe<Scalars['Int']['output']>;
+  pos_x?: Maybe<Scalars['Int']['output']>;
+  pos_y?: Maybe<Scalars['Int']['output']>;
+  pos_z?: Maybe<Scalars['Int']['output']>;
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
   victim: Player;
-  victimId: Scalars["Int"]["output"];
+  victimId: Scalars['Int']['output'];
 };
 
 export type EventPlayerPlayerActionAvgOrderByAggregateInput = {
@@ -6191,153 +5985,145 @@ export type EventPlayerPlayerActionCountOrderByAggregateInput = {
 
 export type EventPlayerPlayerActionCreateInput = {
   action?: InputMaybe<ActionCreateNestedOneWithoutEventPlayerPlayerActionsInput>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutPlayerPlayerActionsAsActorInput>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsPlayerPlayerActionInput>;
   victim?: InputMaybe<PlayerCreateNestedOneWithoutPlayerPlayerActionsAsVictimInput>;
 };
 
 export type EventPlayerPlayerActionCreateManyActionInput = {
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  victimId?: InputMaybe<Scalars["Int"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  victimId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventPlayerPlayerActionCreateManyActionInputEnvelope = {
   data: Array<EventPlayerPlayerActionCreateManyActionInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventPlayerPlayerActionCreateManyInput = {
-  actionId?: InputMaybe<Scalars["Int"]["input"]>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  victimId?: InputMaybe<Scalars["Int"]["input"]>;
+  actionId?: InputMaybe<Scalars['Int']['input']>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  victimId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventPlayerPlayerActionCreateManyPlayerInput = {
-  actionId?: InputMaybe<Scalars["Int"]["input"]>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  victimId?: InputMaybe<Scalars["Int"]["input"]>;
+  actionId?: InputMaybe<Scalars['Int']['input']>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  victimId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventPlayerPlayerActionCreateManyPlayerInputEnvelope = {
   data: Array<EventPlayerPlayerActionCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventPlayerPlayerActionCreateManyServerInput = {
-  actionId?: InputMaybe<Scalars["Int"]["input"]>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  victimId?: InputMaybe<Scalars["Int"]["input"]>;
+  actionId?: InputMaybe<Scalars['Int']['input']>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  victimId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventPlayerPlayerActionCreateManyServerInputEnvelope = {
   data: Array<EventPlayerPlayerActionCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventPlayerPlayerActionCreateManyVictimInput = {
-  actionId?: InputMaybe<Scalars["Int"]["input"]>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  actionId?: InputMaybe<Scalars['Int']['input']>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventPlayerPlayerActionCreateManyVictimInputEnvelope = {
   data: Array<EventPlayerPlayerActionCreateManyVictimInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventPlayerPlayerActionCreateNestedManyWithoutActionInput = {
   connect?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerPlayerActionCreateOrConnectWithoutActionInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerPlayerActionCreateOrConnectWithoutActionInput>>;
   create?: InputMaybe<Array<EventPlayerPlayerActionCreateWithoutActionInput>>;
   createMany?: InputMaybe<EventPlayerPlayerActionCreateManyActionInputEnvelope>;
 };
 
 export type EventPlayerPlayerActionCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerPlayerActionCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerPlayerActionCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventPlayerPlayerActionCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventPlayerPlayerActionCreateManyPlayerInputEnvelope>;
 };
 
 export type EventPlayerPlayerActionCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerPlayerActionCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerPlayerActionCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventPlayerPlayerActionCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventPlayerPlayerActionCreateManyServerInputEnvelope>;
 };
 
 export type EventPlayerPlayerActionCreateNestedManyWithoutVictimInput = {
   connect?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerPlayerActionCreateOrConnectWithoutVictimInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerPlayerActionCreateOrConnectWithoutVictimInput>>;
   create?: InputMaybe<Array<EventPlayerPlayerActionCreateWithoutVictimInput>>;
   createMany?: InputMaybe<EventPlayerPlayerActionCreateManyVictimInputEnvelope>;
 };
@@ -6363,62 +6149,62 @@ export type EventPlayerPlayerActionCreateOrConnectWithoutVictimInput = {
 };
 
 export type EventPlayerPlayerActionCreateWithoutActionInput = {
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutPlayerPlayerActionsAsActorInput>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsPlayerPlayerActionInput>;
   victim?: InputMaybe<PlayerCreateNestedOneWithoutPlayerPlayerActionsAsVictimInput>;
 };
 
 export type EventPlayerPlayerActionCreateWithoutPlayerInput = {
   action?: InputMaybe<ActionCreateNestedOneWithoutEventPlayerPlayerActionsInput>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsPlayerPlayerActionInput>;
   victim?: InputMaybe<PlayerCreateNestedOneWithoutPlayerPlayerActionsAsVictimInput>;
 };
 
 export type EventPlayerPlayerActionCreateWithoutServerInput = {
   action?: InputMaybe<ActionCreateNestedOneWithoutEventPlayerPlayerActionsInput>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutPlayerPlayerActionsAsActorInput>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   victim?: InputMaybe<PlayerCreateNestedOneWithoutPlayerPlayerActionsAsVictimInput>;
 };
 
 export type EventPlayerPlayerActionCreateWithoutVictimInput = {
   action?: InputMaybe<ActionCreateNestedOneWithoutEventPlayerPlayerActionsInput>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutPlayerPlayerActionsAsActorInput>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsPlayerPlayerActionInput>;
 };
 
@@ -6467,12 +6253,12 @@ export type EventPlayerPlayerActionOrderByRelationAggregateInput = {
 };
 
 export enum EventPlayerPlayerActionOrderByRelevanceFieldEnum {
-  Map = "map",
+  Map = 'map'
 }
 
 export type EventPlayerPlayerActionOrderByRelevanceInput = {
   fields: Array<EventPlayerPlayerActionOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -6521,20 +6307,20 @@ export type EventPlayerPlayerActionOrderByWithRelationInput = {
 };
 
 export enum EventPlayerPlayerActionScalarFieldEnum {
-  ActionId = "actionId",
-  Bonus = "bonus",
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  PlayerId = "playerId",
-  PosVictimX = "pos_victim_x",
-  PosVictimY = "pos_victim_y",
-  PosVictimZ = "pos_victim_z",
-  PosX = "pos_x",
-  PosY = "pos_y",
-  PosZ = "pos_z",
-  ServerId = "serverId",
-  VictimId = "victimId",
+  ActionId = 'actionId',
+  Bonus = 'bonus',
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  PlayerId = 'playerId',
+  PosVictimX = 'pos_victim_x',
+  PosVictimY = 'pos_victim_y',
+  PosVictimZ = 'pos_victim_z',
+  PosX = 'pos_x',
+  PosY = 'pos_y',
+  PosZ = 'pos_z',
+  ServerId = 'serverId',
+  VictimId = 'victimId'
 }
 
 export type EventPlayerPlayerActionScalarWhereInput = {
@@ -6558,12 +6344,8 @@ export type EventPlayerPlayerActionScalarWhereInput = {
 };
 
 export type EventPlayerPlayerActionScalarWhereWithAggregatesInput = {
-  AND?: InputMaybe<
-    Array<EventPlayerPlayerActionScalarWhereWithAggregatesInput>
-  >;
-  NOT?: InputMaybe<
-    Array<EventPlayerPlayerActionScalarWhereWithAggregatesInput>
-  >;
+  AND?: InputMaybe<Array<EventPlayerPlayerActionScalarWhereWithAggregatesInput>>;
+  NOT?: InputMaybe<Array<EventPlayerPlayerActionScalarWhereWithAggregatesInput>>;
   OR?: InputMaybe<Array<EventPlayerPlayerActionScalarWhereWithAggregatesInput>>;
   actionId?: InputMaybe<IntWithAggregatesFilter>;
   bonus?: InputMaybe<IntWithAggregatesFilter>;
@@ -6646,90 +6428,58 @@ export type EventPlayerPlayerActionUpdateManyWithWhereWithoutVictimInput = {
 
 export type EventPlayerPlayerActionUpdateManyWithoutActionNestedInput = {
   connect?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerPlayerActionCreateOrConnectWithoutActionInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerPlayerActionCreateOrConnectWithoutActionInput>>;
   create?: InputMaybe<Array<EventPlayerPlayerActionCreateWithoutActionInput>>;
   createMany?: InputMaybe<EventPlayerPlayerActionCreateManyActionInputEnvelope>;
   delete?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventPlayerPlayerActionScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
   set?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventPlayerPlayerActionUpdateWithWhereUniqueWithoutActionInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventPlayerPlayerActionUpdateManyWithWhereWithoutActionInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventPlayerPlayerActionUpsertWithWhereUniqueWithoutActionInput>
-  >;
+  update?: InputMaybe<Array<EventPlayerPlayerActionUpdateWithWhereUniqueWithoutActionInput>>;
+  updateMany?: InputMaybe<Array<EventPlayerPlayerActionUpdateManyWithWhereWithoutActionInput>>;
+  upsert?: InputMaybe<Array<EventPlayerPlayerActionUpsertWithWhereUniqueWithoutActionInput>>;
 };
 
 export type EventPlayerPlayerActionUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerPlayerActionCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerPlayerActionCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventPlayerPlayerActionCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventPlayerPlayerActionCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventPlayerPlayerActionScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
   set?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventPlayerPlayerActionUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventPlayerPlayerActionUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventPlayerPlayerActionUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventPlayerPlayerActionUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventPlayerPlayerActionUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventPlayerPlayerActionUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventPlayerPlayerActionUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerPlayerActionCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerPlayerActionCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventPlayerPlayerActionCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventPlayerPlayerActionCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventPlayerPlayerActionScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
   set?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventPlayerPlayerActionUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventPlayerPlayerActionUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventPlayerPlayerActionUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventPlayerPlayerActionUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventPlayerPlayerActionUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventPlayerPlayerActionUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventPlayerPlayerActionUpdateManyWithoutVictimNestedInput = {
   connect?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventPlayerPlayerActionCreateOrConnectWithoutVictimInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventPlayerPlayerActionCreateOrConnectWithoutVictimInput>>;
   create?: InputMaybe<Array<EventPlayerPlayerActionCreateWithoutVictimInput>>;
   createMany?: InputMaybe<EventPlayerPlayerActionCreateManyVictimInputEnvelope>;
   delete?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventPlayerPlayerActionScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
   set?: InputMaybe<Array<EventPlayerPlayerActionWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventPlayerPlayerActionUpdateWithWhereUniqueWithoutVictimInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventPlayerPlayerActionUpdateManyWithWhereWithoutVictimInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventPlayerPlayerActionUpsertWithWhereUniqueWithoutVictimInput>
-  >;
+  update?: InputMaybe<Array<EventPlayerPlayerActionUpdateWithWhereUniqueWithoutVictimInput>>;
+  updateMany?: InputMaybe<Array<EventPlayerPlayerActionUpdateManyWithWhereWithoutVictimInput>>;
+  upsert?: InputMaybe<Array<EventPlayerPlayerActionUpsertWithWhereUniqueWithoutVictimInput>>;
 };
 
 export type EventPlayerPlayerActionUpdateWithWhereUniqueWithoutActionInput = {
@@ -6868,7 +6618,7 @@ export type EventPlayerPlayerActionWhereUniqueInput = {
   actionId?: InputMaybe<IntFilter>;
   bonus?: InputMaybe<IntFilter>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
   playerId?: InputMaybe<IntFilter>;
@@ -6885,16 +6635,16 @@ export type EventPlayerPlayerActionWhereUniqueInput = {
 };
 
 export type EventRcon = {
-  __typename?: "EventRcon";
-  command: Scalars["String"]["output"];
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
-  password: Scalars["String"]["output"];
-  remoteIp: Scalars["String"]["output"];
+  __typename?: 'EventRcon';
+  command: Scalars['String']['output'];
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
+  password: Scalars['String']['output'];
+  remoteIp: Scalars['String']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
-  type: Scalars["String"]["output"];
+  serverId: Scalars['Int']['output'];
+  type: Scalars['String']['output'];
 };
 
 export type EventRconAvgOrderByAggregateInput = {
@@ -6914,46 +6664,44 @@ export type EventRconCountOrderByAggregateInput = {
 };
 
 export type EventRconCreateInput = {
-  command?: InputMaybe<Scalars["String"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  password?: InputMaybe<Scalars["String"]["input"]>;
-  remoteIp?: InputMaybe<Scalars["String"]["input"]>;
+  command?: InputMaybe<Scalars['String']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+  remoteIp?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsRconInput>;
-  type?: InputMaybe<Scalars["String"]["input"]>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventRconCreateManyInput = {
-  command?: InputMaybe<Scalars["String"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  password?: InputMaybe<Scalars["String"]["input"]>;
-  remoteIp?: InputMaybe<Scalars["String"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  type?: InputMaybe<Scalars["String"]["input"]>;
+  command?: InputMaybe<Scalars['String']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+  remoteIp?: InputMaybe<Scalars['String']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventRconCreateManyServerInput = {
-  command?: InputMaybe<Scalars["String"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  password?: InputMaybe<Scalars["String"]["input"]>;
-  remoteIp?: InputMaybe<Scalars["String"]["input"]>;
-  type?: InputMaybe<Scalars["String"]["input"]>;
+  command?: InputMaybe<Scalars['String']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+  remoteIp?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventRconCreateManyServerInputEnvelope = {
   data: Array<EventRconCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventRconCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventRconWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventRconCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventRconCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventRconCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventRconCreateManyServerInputEnvelope>;
 };
@@ -6964,12 +6712,12 @@ export type EventRconCreateOrConnectWithoutServerInput = {
 };
 
 export type EventRconCreateWithoutServerInput = {
-  command?: InputMaybe<Scalars["String"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  password?: InputMaybe<Scalars["String"]["input"]>;
-  remoteIp?: InputMaybe<Scalars["String"]["input"]>;
-  type?: InputMaybe<Scalars["String"]["input"]>;
+  command?: InputMaybe<Scalars['String']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+  remoteIp?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventRconListRelationFilter = {
@@ -7005,16 +6753,16 @@ export type EventRconOrderByRelationAggregateInput = {
 };
 
 export enum EventRconOrderByRelevanceFieldEnum {
-  Command = "command",
-  Map = "map",
-  Password = "password",
-  RemoteIp = "remoteIp",
-  Type = "type",
+  Command = 'command',
+  Map = 'map',
+  Password = 'password',
+  RemoteIp = 'remoteIp',
+  Type = 'type'
 }
 
 export type EventRconOrderByRelevanceInput = {
   fields: Array<EventRconOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -7048,14 +6796,14 @@ export type EventRconOrderByWithRelationInput = {
 };
 
 export enum EventRconScalarFieldEnum {
-  Command = "command",
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  Password = "password",
-  RemoteIp = "remoteIp",
-  ServerId = "serverId",
-  Type = "type",
+  Command = 'command',
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  Password = 'password',
+  RemoteIp = 'remoteIp',
+  ServerId = 'serverId',
+  Type = 'type'
 }
 
 export type EventRconScalarWhereInput = {
@@ -7117,9 +6865,7 @@ export type EventRconUpdateManyWithWhereWithoutServerInput = {
 
 export type EventRconUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventRconWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventRconCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventRconCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventRconCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventRconCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventRconWhereUniqueInput>>;
@@ -7127,9 +6873,7 @@ export type EventRconUpdateManyWithoutServerNestedInput = {
   disconnect?: InputMaybe<Array<EventRconWhereUniqueInput>>;
   set?: InputMaybe<Array<EventRconWhereUniqueInput>>;
   update?: InputMaybe<Array<EventRconUpdateWithWhereUniqueWithoutServerInput>>;
-  updateMany?: InputMaybe<
-    Array<EventRconUpdateManyWithWhereWithoutServerInput>
-  >;
+  updateMany?: InputMaybe<Array<EventRconUpdateManyWithWhereWithoutServerInput>>;
   upsert?: InputMaybe<Array<EventRconUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
@@ -7174,7 +6918,7 @@ export type EventRconWhereUniqueInput = {
   OR?: InputMaybe<Array<EventRconWhereInput>>;
   command?: InputMaybe<StringFilter>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   password?: InputMaybe<StringFilter>;
   remoteIp?: InputMaybe<StringFilter>;
@@ -7184,40 +6928,40 @@ export type EventRconWhereUniqueInput = {
 };
 
 export type EventStatsme = {
-  __typename?: "EventStatsme";
-  damage: Scalars["Int"]["output"];
-  deaths: Scalars["Int"]["output"];
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  headshots: Scalars["Int"]["output"];
-  hits: Scalars["Int"]["output"];
-  id: Scalars["ID"]["output"];
-  kills: Scalars["Int"]["output"];
-  map: Scalars["String"]["output"];
+  __typename?: 'EventStatsme';
+  damage: Scalars['Int']['output'];
+  deaths: Scalars['Int']['output'];
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  headshots: Scalars['Int']['output'];
+  hits: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  kills: Scalars['Int']['output'];
+  map: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
-  shots: Scalars["Int"]["output"];
-  weapon: Scalars["String"]["output"];
+  serverId: Scalars['Int']['output'];
+  shots: Scalars['Int']['output'];
+  weapon: Scalars['String']['output'];
 };
 
 export type EventStatsme2 = {
-  __typename?: "EventStatsme2";
-  chest: Scalars["Int"]["output"];
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  head: Scalars["Int"]["output"];
-  id: Scalars["ID"]["output"];
-  leftarm: Scalars["Int"]["output"];
-  leftleg: Scalars["Int"]["output"];
-  map: Scalars["String"]["output"];
+  __typename?: 'EventStatsme2';
+  chest: Scalars['Int']['output'];
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  head: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  leftarm: Scalars['Int']['output'];
+  leftleg: Scalars['Int']['output'];
+  map: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
-  rightarm: Scalars["Int"]["output"];
-  rightleg: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
+  rightarm: Scalars['Int']['output'];
+  rightleg: Scalars['Int']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
-  stomach: Scalars["Int"]["output"];
-  weapon: Scalars["String"]["output"];
+  serverId: Scalars['Int']['output'];
+  stomach: Scalars['Int']['output'];
+  weapon: Scalars['String']['output'];
 };
 
 export type EventStatsme2AvgOrderByAggregateInput = {
@@ -7250,90 +6994,86 @@ export type EventStatsme2CountOrderByAggregateInput = {
 };
 
 export type EventStatsme2CreateInput = {
-  chest?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  head?: InputMaybe<Scalars["Int"]["input"]>;
-  leftarm?: InputMaybe<Scalars["Int"]["input"]>;
-  leftleg?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  chest?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  head?: InputMaybe<Scalars['Int']['input']>;
+  leftarm?: InputMaybe<Scalars['Int']['input']>;
+  leftleg?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutStatsme2EventsInput>;
-  rightarm?: InputMaybe<Scalars["Int"]["input"]>;
-  rightleg?: InputMaybe<Scalars["Int"]["input"]>;
+  rightarm?: InputMaybe<Scalars['Int']['input']>;
+  rightleg?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsStatsme2Input>;
-  stomach?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  stomach?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventStatsme2CreateManyInput = {
-  chest?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  head?: InputMaybe<Scalars["Int"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  leftarm?: InputMaybe<Scalars["Int"]["input"]>;
-  leftleg?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  rightarm?: InputMaybe<Scalars["Int"]["input"]>;
-  rightleg?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  stomach?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  chest?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  head?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  leftarm?: InputMaybe<Scalars['Int']['input']>;
+  leftleg?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  rightarm?: InputMaybe<Scalars['Int']['input']>;
+  rightleg?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  stomach?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventStatsme2CreateManyPlayerInput = {
-  chest?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  head?: InputMaybe<Scalars["Int"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  leftarm?: InputMaybe<Scalars["Int"]["input"]>;
-  leftleg?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  rightarm?: InputMaybe<Scalars["Int"]["input"]>;
-  rightleg?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  stomach?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  chest?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  head?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  leftarm?: InputMaybe<Scalars['Int']['input']>;
+  leftleg?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  rightarm?: InputMaybe<Scalars['Int']['input']>;
+  rightleg?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  stomach?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventStatsme2CreateManyPlayerInputEnvelope = {
   data: Array<EventStatsme2CreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventStatsme2CreateManyServerInput = {
-  chest?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  head?: InputMaybe<Scalars["Int"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  leftarm?: InputMaybe<Scalars["Int"]["input"]>;
-  leftleg?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  rightarm?: InputMaybe<Scalars["Int"]["input"]>;
-  rightleg?: InputMaybe<Scalars["Int"]["input"]>;
-  stomach?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  chest?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  head?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  leftarm?: InputMaybe<Scalars['Int']['input']>;
+  leftleg?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  rightarm?: InputMaybe<Scalars['Int']['input']>;
+  rightleg?: InputMaybe<Scalars['Int']['input']>;
+  stomach?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventStatsme2CreateManyServerInputEnvelope = {
   data: Array<EventStatsme2CreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventStatsme2CreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventStatsme2WhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsme2CreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsme2CreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventStatsme2CreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventStatsme2CreateManyPlayerInputEnvelope>;
 };
 
 export type EventStatsme2CreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventStatsme2WhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsme2CreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsme2CreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventStatsme2CreateWithoutServerInput>>;
   createMany?: InputMaybe<EventStatsme2CreateManyServerInputEnvelope>;
 };
@@ -7349,31 +7089,31 @@ export type EventStatsme2CreateOrConnectWithoutServerInput = {
 };
 
 export type EventStatsme2CreateWithoutPlayerInput = {
-  chest?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  head?: InputMaybe<Scalars["Int"]["input"]>;
-  leftarm?: InputMaybe<Scalars["Int"]["input"]>;
-  leftleg?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  rightarm?: InputMaybe<Scalars["Int"]["input"]>;
-  rightleg?: InputMaybe<Scalars["Int"]["input"]>;
+  chest?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  head?: InputMaybe<Scalars['Int']['input']>;
+  leftarm?: InputMaybe<Scalars['Int']['input']>;
+  leftleg?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  rightarm?: InputMaybe<Scalars['Int']['input']>;
+  rightleg?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsStatsme2Input>;
-  stomach?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  stomach?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventStatsme2CreateWithoutServerInput = {
-  chest?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  head?: InputMaybe<Scalars["Int"]["input"]>;
-  leftarm?: InputMaybe<Scalars["Int"]["input"]>;
-  leftleg?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  chest?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  head?: InputMaybe<Scalars['Int']['input']>;
+  leftarm?: InputMaybe<Scalars['Int']['input']>;
+  leftleg?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutStatsme2EventsInput>;
-  rightarm?: InputMaybe<Scalars["Int"]["input"]>;
-  rightleg?: InputMaybe<Scalars["Int"]["input"]>;
-  stomach?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  rightarm?: InputMaybe<Scalars['Int']['input']>;
+  rightleg?: InputMaybe<Scalars['Int']['input']>;
+  stomach?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventStatsme2ListRelationFilter = {
@@ -7419,13 +7159,13 @@ export type EventStatsme2OrderByRelationAggregateInput = {
 };
 
 export enum EventStatsme2OrderByRelevanceFieldEnum {
-  Map = "map",
-  Weapon = "weapon",
+  Map = 'map',
+  Weapon = 'weapon'
 }
 
 export type EventStatsme2OrderByRelevanceInput = {
   fields: Array<EventStatsme2OrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -7470,19 +7210,19 @@ export type EventStatsme2OrderByWithRelationInput = {
 };
 
 export enum EventStatsme2ScalarFieldEnum {
-  Chest = "chest",
-  EventTime = "eventTime",
-  Head = "head",
-  Id = "id",
-  Leftarm = "leftarm",
-  Leftleg = "leftleg",
-  Map = "map",
-  PlayerId = "playerId",
-  Rightarm = "rightarm",
-  Rightleg = "rightleg",
-  ServerId = "serverId",
-  Stomach = "stomach",
-  Weapon = "weapon",
+  Chest = 'chest',
+  EventTime = 'eventTime',
+  Head = 'head',
+  Id = 'id',
+  Leftarm = 'leftarm',
+  Leftleg = 'leftleg',
+  Map = 'map',
+  PlayerId = 'playerId',
+  Rightarm = 'rightarm',
+  Rightleg = 'rightleg',
+  ServerId = 'serverId',
+  Stomach = 'stomach',
+  Weapon = 'weapon'
 }
 
 export type EventStatsme2ScalarWhereInput = {
@@ -7576,46 +7316,30 @@ export type EventStatsme2UpdateManyWithWhereWithoutServerInput = {
 
 export type EventStatsme2UpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventStatsme2WhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsme2CreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsme2CreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventStatsme2CreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventStatsme2CreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventStatsme2WhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventStatsme2ScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventStatsme2WhereUniqueInput>>;
   set?: InputMaybe<Array<EventStatsme2WhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventStatsme2UpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventStatsme2UpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventStatsme2UpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventStatsme2UpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventStatsme2UpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventStatsme2UpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventStatsme2UpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventStatsme2WhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsme2CreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsme2CreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventStatsme2CreateWithoutServerInput>>;
   createMany?: InputMaybe<EventStatsme2CreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventStatsme2WhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventStatsme2ScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventStatsme2WhereUniqueInput>>;
   set?: InputMaybe<Array<EventStatsme2WhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventStatsme2UpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventStatsme2UpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventStatsme2UpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventStatsme2UpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventStatsme2UpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventStatsme2UpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventStatsme2UpdateWithWhereUniqueWithoutPlayerInput = {
@@ -7696,7 +7420,7 @@ export type EventStatsme2WhereUniqueInput = {
   chest?: InputMaybe<IntFilter>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
   head?: InputMaybe<IntFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   leftarm?: InputMaybe<IntFilter>;
   leftleg?: InputMaybe<IntFilter>;
   map?: InputMaybe<StringFilter>;
@@ -7738,86 +7462,82 @@ export type EventStatsmeCountOrderByAggregateInput = {
 };
 
 export type EventStatsmeCreateInput = {
-  damage?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  damage?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutStatsmeEventsInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsStatsmeInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventStatsmeCreateManyInput = {
-  damage?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  damage?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventStatsmeCreateManyPlayerInput = {
-  damage?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  damage?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventStatsmeCreateManyPlayerInputEnvelope = {
   data: Array<EventStatsmeCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventStatsmeCreateManyServerInput = {
-  damage?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  damage?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventStatsmeCreateManyServerInputEnvelope = {
   data: Array<EventStatsmeCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventStatsmeCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventStatsmeWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsmeCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsmeCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventStatsmeCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventStatsmeCreateManyPlayerInputEnvelope>;
 };
 
 export type EventStatsmeCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventStatsmeWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsmeCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsmeCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventStatsmeCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventStatsmeCreateManyServerInputEnvelope>;
 };
@@ -7833,41 +7553,41 @@ export type EventStatsmeCreateOrConnectWithoutServerInput = {
 };
 
 export type EventStatsmeCreateWithoutPlayerInput = {
-  damage?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  damage?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsStatsmeInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventStatsmeCreateWithoutServerInput = {
-  damage?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  damage?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutStatsmeEventsInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventStatsmeLatency = {
-  __typename?: "EventStatsmeLatency";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
-  ping: Scalars["Int"]["output"];
+  __typename?: 'EventStatsmeLatency';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
+  ping: Scalars['Int']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
 };
 
 export type EventStatsmeLatencyAvgOrderByAggregateInput = {
@@ -7887,62 +7607,58 @@ export type EventStatsmeLatencyCountOrderByAggregateInput = {
 };
 
 export type EventStatsmeLatencyCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  ping?: InputMaybe<Scalars['Int']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutStatsmeLatencyEventsInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsStatsmeLatencyInput>;
 };
 
 export type EventStatsmeLatencyCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  ping?: InputMaybe<Scalars['Int']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventStatsmeLatencyCreateManyPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  ping?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventStatsmeLatencyCreateManyPlayerInputEnvelope = {
   data: Array<EventStatsmeLatencyCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventStatsmeLatencyCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  ping?: InputMaybe<Scalars['Int']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventStatsmeLatencyCreateManyServerInputEnvelope = {
   data: Array<EventStatsmeLatencyCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventStatsmeLatencyCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventStatsmeLatencyWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsmeLatencyCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsmeLatencyCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventStatsmeLatencyCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventStatsmeLatencyCreateManyPlayerInputEnvelope>;
 };
 
 export type EventStatsmeLatencyCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventStatsmeLatencyWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsmeLatencyCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsmeLatencyCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventStatsmeLatencyCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventStatsmeLatencyCreateManyServerInputEnvelope>;
 };
@@ -7958,16 +7674,16 @@ export type EventStatsmeLatencyCreateOrConnectWithoutServerInput = {
 };
 
 export type EventStatsmeLatencyCreateWithoutPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  ping?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsStatsmeLatencyInput>;
 };
 
 export type EventStatsmeLatencyCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  ping?: InputMaybe<Scalars['Int']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutStatsmeLatencyEventsInput>;
 };
 
@@ -8000,12 +7716,12 @@ export type EventStatsmeLatencyOrderByRelationAggregateInput = {
 };
 
 export enum EventStatsmeLatencyOrderByRelevanceFieldEnum {
-  Map = "map",
+  Map = 'map'
 }
 
 export type EventStatsmeLatencyOrderByRelevanceInput = {
   fields: Array<EventStatsmeLatencyOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -8036,12 +7752,12 @@ export type EventStatsmeLatencyOrderByWithRelationInput = {
 };
 
 export enum EventStatsmeLatencyScalarFieldEnum {
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  Ping = "ping",
-  PlayerId = "playerId",
-  ServerId = "serverId",
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  Ping = 'ping',
+  PlayerId = 'playerId',
+  ServerId = 'serverId'
 }
 
 export type EventStatsmeLatencyScalarWhereInput = {
@@ -8101,46 +7817,30 @@ export type EventStatsmeLatencyUpdateManyWithWhereWithoutServerInput = {
 
 export type EventStatsmeLatencyUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventStatsmeLatencyWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsmeLatencyCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsmeLatencyCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventStatsmeLatencyCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventStatsmeLatencyCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventStatsmeLatencyWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventStatsmeLatencyScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventStatsmeLatencyWhereUniqueInput>>;
   set?: InputMaybe<Array<EventStatsmeLatencyWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventStatsmeLatencyUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventStatsmeLatencyUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventStatsmeLatencyUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventStatsmeLatencyUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventStatsmeLatencyUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventStatsmeLatencyUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventStatsmeLatencyUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventStatsmeLatencyWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsmeLatencyCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsmeLatencyCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventStatsmeLatencyCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventStatsmeLatencyCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventStatsmeLatencyWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventStatsmeLatencyScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventStatsmeLatencyWhereUniqueInput>>;
   set?: InputMaybe<Array<EventStatsmeLatencyWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventStatsmeLatencyUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventStatsmeLatencyUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventStatsmeLatencyUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventStatsmeLatencyUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventStatsmeLatencyUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventStatsmeLatencyUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventStatsmeLatencyUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -8198,7 +7898,7 @@ export type EventStatsmeLatencyWhereUniqueInput = {
   NOT?: InputMaybe<Array<EventStatsmeLatencyWhereInput>>;
   OR?: InputMaybe<Array<EventStatsmeLatencyWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   ping?: InputMaybe<IntFilter>;
   player?: InputMaybe<PlayerWhereInput>;
@@ -8248,13 +7948,13 @@ export type EventStatsmeOrderByRelationAggregateInput = {
 };
 
 export enum EventStatsmeOrderByRelevanceFieldEnum {
-  Map = "map",
-  Weapon = "weapon",
+  Map = 'map',
+  Weapon = 'weapon'
 }
 
 export type EventStatsmeOrderByRelevanceInput = {
   fields: Array<EventStatsmeOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -8297,18 +7997,18 @@ export type EventStatsmeOrderByWithRelationInput = {
 };
 
 export enum EventStatsmeScalarFieldEnum {
-  Damage = "damage",
-  Deaths = "deaths",
-  EventTime = "eventTime",
-  Headshots = "headshots",
-  Hits = "hits",
-  Id = "id",
-  Kills = "kills",
-  Map = "map",
-  PlayerId = "playerId",
-  ServerId = "serverId",
-  Shots = "shots",
-  Weapon = "weapon",
+  Damage = 'damage',
+  Deaths = 'deaths',
+  EventTime = 'eventTime',
+  Headshots = 'headshots',
+  Hits = 'hits',
+  Id = 'id',
+  Kills = 'kills',
+  Map = 'map',
+  PlayerId = 'playerId',
+  ServerId = 'serverId',
+  Shots = 'shots',
+  Weapon = 'weapon'
 }
 
 export type EventStatsmeScalarWhereInput = {
@@ -8360,15 +8060,15 @@ export type EventStatsmeSumOrderByAggregateInput = {
 };
 
 export type EventStatsmeTime = {
-  __typename?: "EventStatsmeTime";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
+  __typename?: 'EventStatsmeTime';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
-  time: Scalars["DateTime"]["output"];
+  serverId: Scalars['Int']['output'];
+  time: Scalars['DateTime']['output'];
 };
 
 export type EventStatsmeTimeAvgOrderByAggregateInput = {
@@ -8387,62 +8087,58 @@ export type EventStatsmeTimeCountOrderByAggregateInput = {
 };
 
 export type EventStatsmeTimeCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutStatsmeTimeEventsInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsStatsmeTimeInput>;
-  time: Scalars["DateTime"]["input"];
+  time: Scalars['DateTime']['input'];
 };
 
 export type EventStatsmeTimeCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  time: Scalars["DateTime"]["input"];
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  time: Scalars['DateTime']['input'];
 };
 
 export type EventStatsmeTimeCreateManyPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  time: Scalars["DateTime"]["input"];
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  time: Scalars['DateTime']['input'];
 };
 
 export type EventStatsmeTimeCreateManyPlayerInputEnvelope = {
   data: Array<EventStatsmeTimeCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventStatsmeTimeCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  time: Scalars["DateTime"]["input"];
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  time: Scalars['DateTime']['input'];
 };
 
 export type EventStatsmeTimeCreateManyServerInputEnvelope = {
   data: Array<EventStatsmeTimeCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventStatsmeTimeCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventStatsmeTimeWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsmeTimeCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsmeTimeCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventStatsmeTimeCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventStatsmeTimeCreateManyPlayerInputEnvelope>;
 };
 
 export type EventStatsmeTimeCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventStatsmeTimeWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsmeTimeCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsmeTimeCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventStatsmeTimeCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventStatsmeTimeCreateManyServerInputEnvelope>;
 };
@@ -8458,17 +8154,17 @@ export type EventStatsmeTimeCreateOrConnectWithoutServerInput = {
 };
 
 export type EventStatsmeTimeCreateWithoutPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsStatsmeTimeInput>;
-  time: Scalars["DateTime"]["input"];
+  time: Scalars['DateTime']['input'];
 };
 
 export type EventStatsmeTimeCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutStatsmeTimeEventsInput>;
-  time: Scalars["DateTime"]["input"];
+  time: Scalars['DateTime']['input'];
 };
 
 export type EventStatsmeTimeListRelationFilter = {
@@ -8500,12 +8196,12 @@ export type EventStatsmeTimeOrderByRelationAggregateInput = {
 };
 
 export enum EventStatsmeTimeOrderByRelevanceFieldEnum {
-  Map = "map",
+  Map = 'map'
 }
 
 export type EventStatsmeTimeOrderByRelevanceInput = {
   fields: Array<EventStatsmeTimeOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -8536,12 +8232,12 @@ export type EventStatsmeTimeOrderByWithRelationInput = {
 };
 
 export enum EventStatsmeTimeScalarFieldEnum {
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  PlayerId = "playerId",
-  ServerId = "serverId",
-  Time = "time",
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  PlayerId = 'playerId',
+  ServerId = 'serverId',
+  Time = 'time'
 }
 
 export type EventStatsmeTimeScalarWhereInput = {
@@ -8600,46 +8296,30 @@ export type EventStatsmeTimeUpdateManyWithWhereWithoutServerInput = {
 
 export type EventStatsmeTimeUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventStatsmeTimeWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsmeTimeCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsmeTimeCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventStatsmeTimeCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventStatsmeTimeCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventStatsmeTimeWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventStatsmeTimeScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventStatsmeTimeWhereUniqueInput>>;
   set?: InputMaybe<Array<EventStatsmeTimeWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventStatsmeTimeUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventStatsmeTimeUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventStatsmeTimeUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventStatsmeTimeUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventStatsmeTimeUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventStatsmeTimeUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventStatsmeTimeUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventStatsmeTimeWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsmeTimeCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsmeTimeCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventStatsmeTimeCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventStatsmeTimeCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventStatsmeTimeWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventStatsmeTimeScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventStatsmeTimeWhereUniqueInput>>;
   set?: InputMaybe<Array<EventStatsmeTimeWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventStatsmeTimeUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventStatsmeTimeUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventStatsmeTimeUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventStatsmeTimeUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventStatsmeTimeUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventStatsmeTimeUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventStatsmeTimeUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -8697,7 +8377,7 @@ export type EventStatsmeTimeWhereUniqueInput = {
   NOT?: InputMaybe<Array<EventStatsmeTimeWhereInput>>;
   OR?: InputMaybe<Array<EventStatsmeTimeWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
   playerId?: InputMaybe<IntFilter>;
@@ -8744,46 +8424,30 @@ export type EventStatsmeUpdateManyWithWhereWithoutServerInput = {
 
 export type EventStatsmeUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventStatsmeWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsmeCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsmeCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventStatsmeCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventStatsmeCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventStatsmeWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventStatsmeScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventStatsmeWhereUniqueInput>>;
   set?: InputMaybe<Array<EventStatsmeWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventStatsmeUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventStatsmeUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventStatsmeUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventStatsmeUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventStatsmeUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventStatsmeUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventStatsmeUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventStatsmeWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventStatsmeCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventStatsmeCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventStatsmeCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventStatsmeCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventStatsmeWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventStatsmeScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventStatsmeWhereUniqueInput>>;
   set?: InputMaybe<Array<EventStatsmeWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventStatsmeUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventStatsmeUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventStatsmeUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventStatsmeUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventStatsmeUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventStatsmeUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventStatsmeUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -8863,7 +8527,7 @@ export type EventStatsmeWhereUniqueInput = {
   eventTime?: InputMaybe<DateTimeNullableFilter>;
   headshots?: InputMaybe<IntFilter>;
   hits?: InputMaybe<IntFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<IntFilter>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
@@ -8875,18 +8539,18 @@ export type EventStatsmeWhereUniqueInput = {
 };
 
 export type EventSuicide = {
-  __typename?: "EventSuicide";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
+  __typename?: 'EventSuicide';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
-  pos_x?: Maybe<Scalars["Int"]["output"]>;
-  pos_y?: Maybe<Scalars["Int"]["output"]>;
-  pos_z?: Maybe<Scalars["Int"]["output"]>;
+  playerId: Scalars['Int']['output'];
+  pos_x?: Maybe<Scalars['Int']['output']>;
+  pos_y?: Maybe<Scalars['Int']['output']>;
+  pos_z?: Maybe<Scalars['Int']['output']>;
   server: Server;
-  serverId: Scalars["Int"]["output"];
-  weapon: Scalars["String"]["output"];
+  serverId: Scalars['Int']['output'];
+  weapon: Scalars['String']['output'];
 };
 
 export type EventSuicideAvgOrderByAggregateInput = {
@@ -8911,74 +8575,70 @@ export type EventSuicideCountOrderByAggregateInput = {
 };
 
 export type EventSuicideCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutSuicideEventsInput>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsSuicideInput>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventSuicideCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventSuicideCreateManyPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventSuicideCreateManyPlayerInputEnvelope = {
   data: Array<EventSuicideCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventSuicideCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventSuicideCreateManyServerInputEnvelope = {
   data: Array<EventSuicideCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventSuicideCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventSuicideWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventSuicideCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventSuicideCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventSuicideCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventSuicideCreateManyPlayerInputEnvelope>;
 };
 
 export type EventSuicideCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventSuicideWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventSuicideCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventSuicideCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventSuicideCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventSuicideCreateManyServerInputEnvelope>;
 };
@@ -8994,23 +8654,23 @@ export type EventSuicideCreateOrConnectWithoutServerInput = {
 };
 
 export type EventSuicideCreateWithoutPlayerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsSuicideInput>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventSuicideCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutSuicideEventsInput>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventSuicideListRelationFilter = {
@@ -9048,13 +8708,13 @@ export type EventSuicideOrderByRelationAggregateInput = {
 };
 
 export enum EventSuicideOrderByRelevanceFieldEnum {
-  Map = "map",
-  Weapon = "weapon",
+  Map = 'map',
+  Weapon = 'weapon'
 }
 
 export type EventSuicideOrderByRelevanceInput = {
   fields: Array<EventSuicideOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -9091,15 +8751,15 @@ export type EventSuicideOrderByWithRelationInput = {
 };
 
 export enum EventSuicideScalarFieldEnum {
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  PlayerId = "playerId",
-  PosX = "pos_x",
-  PosY = "pos_y",
-  PosZ = "pos_z",
-  ServerId = "serverId",
-  Weapon = "weapon",
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  PlayerId = 'playerId',
+  PosX = 'pos_x',
+  PosY = 'pos_y',
+  PosZ = 'pos_z',
+  ServerId = 'serverId',
+  Weapon = 'weapon'
 }
 
 export type EventSuicideScalarWhereInput = {
@@ -9173,46 +8833,30 @@ export type EventSuicideUpdateManyWithWhereWithoutServerInput = {
 
 export type EventSuicideUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventSuicideWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventSuicideCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventSuicideCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventSuicideCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventSuicideCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventSuicideWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventSuicideScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventSuicideWhereUniqueInput>>;
   set?: InputMaybe<Array<EventSuicideWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventSuicideUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventSuicideUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventSuicideUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventSuicideUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventSuicideUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventSuicideUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventSuicideUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventSuicideWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventSuicideCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventSuicideCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventSuicideCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventSuicideCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventSuicideWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventSuicideScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventSuicideWhereUniqueInput>>;
   set?: InputMaybe<Array<EventSuicideWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventSuicideUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventSuicideUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventSuicideUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventSuicideUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventSuicideUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventSuicideUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventSuicideUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -9279,7 +8923,7 @@ export type EventSuicideWhereUniqueInput = {
   NOT?: InputMaybe<Array<EventSuicideWhereInput>>;
   OR?: InputMaybe<Array<EventSuicideWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
   playerId?: InputMaybe<IntFilter>;
@@ -9292,17 +8936,17 @@ export type EventSuicideWhereUniqueInput = {
 };
 
 export type EventTeamBonus = {
-  __typename?: "EventTeamBonus";
+  __typename?: 'EventTeamBonus';
   action: Action;
-  actionId: Scalars["Int"]["output"];
-  bonus: Scalars["Int"]["output"];
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
+  actionId: Scalars['Int']['output'];
+  bonus: Scalars['Int']['output'];
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
 };
 
 export type EventTeamBonusAvgOrderByAggregateInput = {
@@ -9325,88 +8969,82 @@ export type EventTeamBonusCountOrderByAggregateInput = {
 
 export type EventTeamBonusCreateInput = {
   action?: InputMaybe<ActionCreateNestedOneWithoutEventTeamBonusesInput>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutTeamBonusesInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsTeamBonusInput>;
 };
 
 export type EventTeamBonusCreateManyActionInput = {
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventTeamBonusCreateManyActionInputEnvelope = {
   data: Array<EventTeamBonusCreateManyActionInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventTeamBonusCreateManyInput = {
-  actionId?: InputMaybe<Scalars["Int"]["input"]>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  actionId?: InputMaybe<Scalars['Int']['input']>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventTeamBonusCreateManyPlayerInput = {
-  actionId?: InputMaybe<Scalars["Int"]["input"]>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  actionId?: InputMaybe<Scalars['Int']['input']>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventTeamBonusCreateManyPlayerInputEnvelope = {
   data: Array<EventTeamBonusCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventTeamBonusCreateManyServerInput = {
-  actionId?: InputMaybe<Scalars["Int"]["input"]>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
+  actionId?: InputMaybe<Scalars['Int']['input']>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type EventTeamBonusCreateManyServerInputEnvelope = {
   data: Array<EventTeamBonusCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventTeamBonusCreateNestedManyWithoutActionInput = {
   connect?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventTeamBonusCreateOrConnectWithoutActionInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventTeamBonusCreateOrConnectWithoutActionInput>>;
   create?: InputMaybe<Array<EventTeamBonusCreateWithoutActionInput>>;
   createMany?: InputMaybe<EventTeamBonusCreateManyActionInputEnvelope>;
 };
 
 export type EventTeamBonusCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventTeamBonusCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventTeamBonusCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventTeamBonusCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventTeamBonusCreateManyPlayerInputEnvelope>;
 };
 
 export type EventTeamBonusCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventTeamBonusCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventTeamBonusCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventTeamBonusCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventTeamBonusCreateManyServerInputEnvelope>;
 };
@@ -9427,26 +9065,26 @@ export type EventTeamBonusCreateOrConnectWithoutServerInput = {
 };
 
 export type EventTeamBonusCreateWithoutActionInput = {
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutTeamBonusesInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsTeamBonusInput>;
 };
 
 export type EventTeamBonusCreateWithoutPlayerInput = {
   action?: InputMaybe<ActionCreateNestedOneWithoutEventTeamBonusesInput>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsTeamBonusInput>;
 };
 
 export type EventTeamBonusCreateWithoutServerInput = {
   action?: InputMaybe<ActionCreateNestedOneWithoutEventTeamBonusesInput>;
-  bonus?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutTeamBonusesInput>;
 };
 
@@ -9481,12 +9119,12 @@ export type EventTeamBonusOrderByRelationAggregateInput = {
 };
 
 export enum EventTeamBonusOrderByRelevanceFieldEnum {
-  Map = "map",
+  Map = 'map'
 }
 
 export type EventTeamBonusOrderByRelevanceInput = {
   fields: Array<EventTeamBonusOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -9520,13 +9158,13 @@ export type EventTeamBonusOrderByWithRelationInput = {
 };
 
 export enum EventTeamBonusScalarFieldEnum {
-  ActionId = "actionId",
-  Bonus = "bonus",
-  EventTime = "eventTime",
-  Id = "id",
-  Map = "map",
-  PlayerId = "playerId",
-  ServerId = "serverId",
+  ActionId = 'actionId',
+  Bonus = 'bonus',
+  EventTime = 'eventTime',
+  Id = 'id',
+  Map = 'map',
+  PlayerId = 'playerId',
+  ServerId = 'serverId'
 }
 
 export type EventTeamBonusScalarWhereInput = {
@@ -9595,68 +9233,44 @@ export type EventTeamBonusUpdateManyWithWhereWithoutServerInput = {
 
 export type EventTeamBonusUpdateManyWithoutActionNestedInput = {
   connect?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventTeamBonusCreateOrConnectWithoutActionInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventTeamBonusCreateOrConnectWithoutActionInput>>;
   create?: InputMaybe<Array<EventTeamBonusCreateWithoutActionInput>>;
   createMany?: InputMaybe<EventTeamBonusCreateManyActionInputEnvelope>;
   delete?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventTeamBonusScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
   set?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventTeamBonusUpdateWithWhereUniqueWithoutActionInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventTeamBonusUpdateManyWithWhereWithoutActionInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventTeamBonusUpsertWithWhereUniqueWithoutActionInput>
-  >;
+  update?: InputMaybe<Array<EventTeamBonusUpdateWithWhereUniqueWithoutActionInput>>;
+  updateMany?: InputMaybe<Array<EventTeamBonusUpdateManyWithWhereWithoutActionInput>>;
+  upsert?: InputMaybe<Array<EventTeamBonusUpsertWithWhereUniqueWithoutActionInput>>;
 };
 
 export type EventTeamBonusUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventTeamBonusCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventTeamBonusCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<EventTeamBonusCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<EventTeamBonusCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventTeamBonusScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
   set?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventTeamBonusUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventTeamBonusUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventTeamBonusUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<EventTeamBonusUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<EventTeamBonusUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<EventTeamBonusUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type EventTeamBonusUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventTeamBonusCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventTeamBonusCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventTeamBonusCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventTeamBonusCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventTeamBonusScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
   set?: InputMaybe<Array<EventTeamBonusWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventTeamBonusUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventTeamBonusUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventTeamBonusUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventTeamBonusUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventTeamBonusUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventTeamBonusUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventTeamBonusUpdateWithWhereUniqueWithoutActionInput = {
@@ -9740,7 +9354,7 @@ export type EventTeamBonusWhereUniqueInput = {
   actionId?: InputMaybe<IntFilter>;
   bonus?: InputMaybe<IntFilter>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
   playerId?: InputMaybe<IntFilter>;
@@ -9749,23 +9363,23 @@ export type EventTeamBonusWhereUniqueInput = {
 };
 
 export type EventTeamkill = {
-  __typename?: "EventTeamkill";
-  eventTime?: Maybe<Scalars["DateTime"]["output"]>;
-  id: Scalars["ID"]["output"];
+  __typename?: 'EventTeamkill';
+  eventTime?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
   killer: Player;
-  killerId: Scalars["Int"]["output"];
-  map: Scalars["String"]["output"];
-  pos_victim_x?: Maybe<Scalars["Int"]["output"]>;
-  pos_victim_y?: Maybe<Scalars["Int"]["output"]>;
-  pos_victim_z?: Maybe<Scalars["Int"]["output"]>;
-  pos_x?: Maybe<Scalars["Int"]["output"]>;
-  pos_y?: Maybe<Scalars["Int"]["output"]>;
-  pos_z?: Maybe<Scalars["Int"]["output"]>;
+  killerId: Scalars['Int']['output'];
+  map: Scalars['String']['output'];
+  pos_victim_x?: Maybe<Scalars['Int']['output']>;
+  pos_victim_y?: Maybe<Scalars['Int']['output']>;
+  pos_victim_z?: Maybe<Scalars['Int']['output']>;
+  pos_x?: Maybe<Scalars['Int']['output']>;
+  pos_y?: Maybe<Scalars['Int']['output']>;
+  pos_z?: Maybe<Scalars['Int']['output']>;
   server: Server;
-  serverId: Scalars["Int"]["output"];
+  serverId: Scalars['Int']['output'];
   victim: Player;
-  victimId: Scalars["Int"]["output"];
-  weapon: Scalars["String"]["output"];
+  victimId: Scalars['Int']['output'];
+  weapon: Scalars['String']['output'];
 };
 
 export type EventTeamkillAvgOrderByAggregateInput = {
@@ -9798,119 +9412,113 @@ export type EventTeamkillCountOrderByAggregateInput = {
 };
 
 export type EventTeamkillCreateInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   killer?: InputMaybe<PlayerCreateNestedOneWithoutTeamkillsAsKillerInput>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsTeamkillInput>;
   victim?: InputMaybe<PlayerCreateNestedOneWithoutTeamkillsAsVictimInput>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventTeamkillCreateManyInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  killerId?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  victimId?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  killerId?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  victimId?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventTeamkillCreateManyKillerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  victimId?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  victimId?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventTeamkillCreateManyKillerInputEnvelope = {
   data: Array<EventTeamkillCreateManyKillerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventTeamkillCreateManyServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  killerId?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  victimId?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  killerId?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  victimId?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventTeamkillCreateManyServerInputEnvelope = {
   data: Array<EventTeamkillCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventTeamkillCreateManyVictimInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  killerId?: InputMaybe<Scalars["Int"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  killerId?: InputMaybe<Scalars['Int']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventTeamkillCreateManyVictimInputEnvelope = {
   data: Array<EventTeamkillCreateManyVictimInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventTeamkillCreateNestedManyWithoutKillerInput = {
   connect?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventTeamkillCreateOrConnectWithoutKillerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventTeamkillCreateOrConnectWithoutKillerInput>>;
   create?: InputMaybe<Array<EventTeamkillCreateWithoutKillerInput>>;
   createMany?: InputMaybe<EventTeamkillCreateManyKillerInputEnvelope>;
 };
 
 export type EventTeamkillCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventTeamkillCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventTeamkillCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventTeamkillCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventTeamkillCreateManyServerInputEnvelope>;
 };
 
 export type EventTeamkillCreateNestedManyWithoutVictimInput = {
   connect?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventTeamkillCreateOrConnectWithoutVictimInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventTeamkillCreateOrConnectWithoutVictimInput>>;
   create?: InputMaybe<Array<EventTeamkillCreateWithoutVictimInput>>;
   createMany?: InputMaybe<EventTeamkillCreateManyVictimInputEnvelope>;
 };
@@ -9931,45 +9539,45 @@ export type EventTeamkillCreateOrConnectWithoutVictimInput = {
 };
 
 export type EventTeamkillCreateWithoutKillerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsTeamkillInput>;
   victim?: InputMaybe<PlayerCreateNestedOneWithoutTeamkillsAsVictimInput>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventTeamkillCreateWithoutServerInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   killer?: InputMaybe<PlayerCreateNestedOneWithoutTeamkillsAsKillerInput>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   victim?: InputMaybe<PlayerCreateNestedOneWithoutTeamkillsAsVictimInput>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventTeamkillCreateWithoutVictimInput = {
-  eventTime?: InputMaybe<Scalars["DateTime"]["input"]>;
+  eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   killer?: InputMaybe<PlayerCreateNestedOneWithoutTeamkillsAsKillerInput>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  pos_victim_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_victim_z?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_x?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_y?: InputMaybe<Scalars["Int"]["input"]>;
-  pos_z?: InputMaybe<Scalars["Int"]["input"]>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  pos_victim_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_victim_z?: InputMaybe<Scalars['Int']['input']>;
+  pos_x?: InputMaybe<Scalars['Int']['input']>;
+  pos_y?: InputMaybe<Scalars['Int']['input']>;
+  pos_z?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsTeamkillInput>;
-  weapon?: InputMaybe<Scalars["String"]["input"]>;
+  weapon?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventTeamkillListRelationFilter = {
@@ -10015,13 +9623,13 @@ export type EventTeamkillOrderByRelationAggregateInput = {
 };
 
 export enum EventTeamkillOrderByRelevanceFieldEnum {
-  Map = "map",
-  Weapon = "weapon",
+  Map = 'map',
+  Weapon = 'weapon'
 }
 
 export type EventTeamkillOrderByRelevanceInput = {
   fields: Array<EventTeamkillOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -10067,19 +9675,19 @@ export type EventTeamkillOrderByWithRelationInput = {
 };
 
 export enum EventTeamkillScalarFieldEnum {
-  EventTime = "eventTime",
-  Id = "id",
-  KillerId = "killerId",
-  Map = "map",
-  PosVictimX = "pos_victim_x",
-  PosVictimY = "pos_victim_y",
-  PosVictimZ = "pos_victim_z",
-  PosX = "pos_x",
-  PosY = "pos_y",
-  PosZ = "pos_z",
-  ServerId = "serverId",
-  VictimId = "victimId",
-  Weapon = "weapon",
+  EventTime = 'eventTime',
+  Id = 'id',
+  KillerId = 'killerId',
+  Map = 'map',
+  PosVictimX = 'pos_victim_x',
+  PosVictimY = 'pos_victim_y',
+  PosVictimZ = 'pos_victim_z',
+  PosX = 'pos_x',
+  PosY = 'pos_y',
+  PosZ = 'pos_z',
+  ServerId = 'serverId',
+  VictimId = 'victimId',
+  Weapon = 'weapon'
 }
 
 export type EventTeamkillScalarWhereInput = {
@@ -10177,68 +9785,44 @@ export type EventTeamkillUpdateManyWithWhereWithoutVictimInput = {
 
 export type EventTeamkillUpdateManyWithoutKillerNestedInput = {
   connect?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventTeamkillCreateOrConnectWithoutKillerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventTeamkillCreateOrConnectWithoutKillerInput>>;
   create?: InputMaybe<Array<EventTeamkillCreateWithoutKillerInput>>;
   createMany?: InputMaybe<EventTeamkillCreateManyKillerInputEnvelope>;
   delete?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventTeamkillScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
   set?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventTeamkillUpdateWithWhereUniqueWithoutKillerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventTeamkillUpdateManyWithWhereWithoutKillerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventTeamkillUpsertWithWhereUniqueWithoutKillerInput>
-  >;
+  update?: InputMaybe<Array<EventTeamkillUpdateWithWhereUniqueWithoutKillerInput>>;
+  updateMany?: InputMaybe<Array<EventTeamkillUpdateManyWithWhereWithoutKillerInput>>;
+  upsert?: InputMaybe<Array<EventTeamkillUpsertWithWhereUniqueWithoutKillerInput>>;
 };
 
 export type EventTeamkillUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventTeamkillCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventTeamkillCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<EventTeamkillCreateWithoutServerInput>>;
   createMany?: InputMaybe<EventTeamkillCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventTeamkillScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
   set?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventTeamkillUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventTeamkillUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventTeamkillUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<EventTeamkillUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<EventTeamkillUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<EventTeamkillUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type EventTeamkillUpdateManyWithoutVictimNestedInput = {
   connect?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<EventTeamkillCreateOrConnectWithoutVictimInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<EventTeamkillCreateOrConnectWithoutVictimInput>>;
   create?: InputMaybe<Array<EventTeamkillCreateWithoutVictimInput>>;
   createMany?: InputMaybe<EventTeamkillCreateManyVictimInputEnvelope>;
   delete?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<EventTeamkillScalarWhereInput>>;
   disconnect?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
   set?: InputMaybe<Array<EventTeamkillWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<EventTeamkillUpdateWithWhereUniqueWithoutVictimInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<EventTeamkillUpdateManyWithWhereWithoutVictimInput>
-  >;
-  upsert?: InputMaybe<
-    Array<EventTeamkillUpsertWithWhereUniqueWithoutVictimInput>
-  >;
+  update?: InputMaybe<Array<EventTeamkillUpdateWithWhereUniqueWithoutVictimInput>>;
+  updateMany?: InputMaybe<Array<EventTeamkillUpdateManyWithWhereWithoutVictimInput>>;
+  upsert?: InputMaybe<Array<EventTeamkillUpsertWithWhereUniqueWithoutVictimInput>>;
 };
 
 export type EventTeamkillUpdateWithWhereUniqueWithoutKillerInput = {
@@ -10343,7 +9927,7 @@ export type EventTeamkillWhereUniqueInput = {
   NOT?: InputMaybe<Array<EventTeamkillWhereInput>>;
   OR?: InputMaybe<Array<EventTeamkillWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   killer?: InputMaybe<PlayerWhereInput>;
   killerId?: InputMaybe<IntFilter>;
   map?: InputMaybe<StringFilter>;
@@ -10361,33 +9945,33 @@ export type EventTeamkillWhereUniqueInput = {
 };
 
 export type FloatFieldUpdateOperationsInput = {
-  decrement?: InputMaybe<Scalars["Float"]["input"]>;
-  divide?: InputMaybe<Scalars["Float"]["input"]>;
-  increment?: InputMaybe<Scalars["Float"]["input"]>;
-  multiply?: InputMaybe<Scalars["Float"]["input"]>;
-  set?: InputMaybe<Scalars["Float"]["input"]>;
+  decrement?: InputMaybe<Scalars['Float']['input']>;
+  divide?: InputMaybe<Scalars['Float']['input']>;
+  increment?: InputMaybe<Scalars['Float']['input']>;
+  multiply?: InputMaybe<Scalars['Float']['input']>;
+  set?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type FloatFilter = {
-  equals?: InputMaybe<Scalars["Float"]["input"]>;
-  gt?: InputMaybe<Scalars["Float"]["input"]>;
-  gte?: InputMaybe<Scalars["Float"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Float"]["input"]>>;
-  lt?: InputMaybe<Scalars["Float"]["input"]>;
-  lte?: InputMaybe<Scalars["Float"]["input"]>;
+  equals?: InputMaybe<Scalars['Float']['input']>;
+  gt?: InputMaybe<Scalars['Float']['input']>;
+  gte?: InputMaybe<Scalars['Float']['input']>;
+  in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  lt?: InputMaybe<Scalars['Float']['input']>;
+  lte?: InputMaybe<Scalars['Float']['input']>;
   not?: InputMaybe<NestedFloatFilter>;
-  notIn?: InputMaybe<Array<Scalars["Float"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Float']['input']>>;
 };
 
 export type FloatNullableFilter = {
-  equals?: InputMaybe<Scalars["Float"]["input"]>;
-  gt?: InputMaybe<Scalars["Float"]["input"]>;
-  gte?: InputMaybe<Scalars["Float"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Float"]["input"]>>;
-  lt?: InputMaybe<Scalars["Float"]["input"]>;
-  lte?: InputMaybe<Scalars["Float"]["input"]>;
+  equals?: InputMaybe<Scalars['Float']['input']>;
+  gt?: InputMaybe<Scalars['Float']['input']>;
+  gte?: InputMaybe<Scalars['Float']['input']>;
+  in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  lt?: InputMaybe<Scalars['Float']['input']>;
+  lte?: InputMaybe<Scalars['Float']['input']>;
   not?: InputMaybe<NestedFloatNullableFilter>;
-  notIn?: InputMaybe<Array<Scalars["Float"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Float']['input']>>;
 };
 
 export type FloatNullableWithAggregatesFilter = {
@@ -10396,14 +9980,14 @@ export type FloatNullableWithAggregatesFilter = {
   _max?: InputMaybe<NestedFloatNullableFilter>;
   _min?: InputMaybe<NestedFloatNullableFilter>;
   _sum?: InputMaybe<NestedFloatNullableFilter>;
-  equals?: InputMaybe<Scalars["Float"]["input"]>;
-  gt?: InputMaybe<Scalars["Float"]["input"]>;
-  gte?: InputMaybe<Scalars["Float"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Float"]["input"]>>;
-  lt?: InputMaybe<Scalars["Float"]["input"]>;
-  lte?: InputMaybe<Scalars["Float"]["input"]>;
+  equals?: InputMaybe<Scalars['Float']['input']>;
+  gt?: InputMaybe<Scalars['Float']['input']>;
+  gte?: InputMaybe<Scalars['Float']['input']>;
+  in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  lt?: InputMaybe<Scalars['Float']['input']>;
+  lte?: InputMaybe<Scalars['Float']['input']>;
   not?: InputMaybe<NestedFloatNullableWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["Float"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Float']['input']>>;
 };
 
 export type FloatWithAggregatesFilter = {
@@ -10412,41 +9996,43 @@ export type FloatWithAggregatesFilter = {
   _max?: InputMaybe<NestedFloatFilter>;
   _min?: InputMaybe<NestedFloatFilter>;
   _sum?: InputMaybe<NestedFloatFilter>;
-  equals?: InputMaybe<Scalars["Float"]["input"]>;
-  gt?: InputMaybe<Scalars["Float"]["input"]>;
-  gte?: InputMaybe<Scalars["Float"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Float"]["input"]>>;
-  lt?: InputMaybe<Scalars["Float"]["input"]>;
-  lte?: InputMaybe<Scalars["Float"]["input"]>;
+  equals?: InputMaybe<Scalars['Float']['input']>;
+  gt?: InputMaybe<Scalars['Float']['input']>;
+  gte?: InputMaybe<Scalars['Float']['input']>;
+  in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  lt?: InputMaybe<Scalars['Float']['input']>;
+  lte?: InputMaybe<Scalars['Float']['input']>;
   not?: InputMaybe<NestedFloatWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["Float"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Float']['input']>>;
 };
 
 export type Game = {
-  __typename?: "Game";
+  __typename?: 'Game';
   clans: Array<Clan>;
-  code: Scalars["ID"]["output"];
-  hidden: Scalars["String"]["output"];
-  name: Scalars["String"]["output"];
+  code: Scalars['ID']['output'];
+  hidden: Scalars['String']['output'];
+  name: Scalars['String']['output'];
   players: Array<Player>;
-  realgame: Scalars["String"]["output"];
+  realgame: Scalars['String']['output'];
 };
+
 
 export type GameClansArgs = {
   cursor?: InputMaybe<ClanWhereUniqueInput>;
   distinct?: InputMaybe<Array<ClanScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ClanOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ClanWhereInput>;
 };
+
 
 export type GamePlayersArgs = {
   cursor?: InputMaybe<PlayerWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerWhereInput>;
 };
 
@@ -10459,18 +10045,18 @@ export type GameCountOrderByAggregateInput = {
 
 export type GameCreateInput = {
   clans?: InputMaybe<ClanCreateNestedManyWithoutGameDataInput>;
-  code: Scalars["String"]["input"];
-  hidden?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  hidden?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
   players?: InputMaybe<PlayerCreateNestedManyWithoutGameDataInput>;
-  realgame?: InputMaybe<Scalars["String"]["input"]>;
+  realgame?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type GameCreateManyInput = {
-  code: Scalars["String"]["input"];
-  hidden?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
-  realgame?: InputMaybe<Scalars["String"]["input"]>;
+  code: Scalars['String']['input'];
+  hidden?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  realgame?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type GameCreateNestedOneWithoutClansInput = {
@@ -10496,31 +10082,31 @@ export type GameCreateOrConnectWithoutPlayersInput = {
 };
 
 export type GameCreateWithoutClansInput = {
-  code: Scalars["String"]["input"];
-  hidden?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  hidden?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
   players?: InputMaybe<PlayerCreateNestedManyWithoutGameDataInput>;
-  realgame?: InputMaybe<Scalars["String"]["input"]>;
+  realgame?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type GameCreateWithoutPlayersInput = {
   clans?: InputMaybe<ClanCreateNestedManyWithoutGameDataInput>;
-  code: Scalars["String"]["input"];
-  hidden?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
-  realgame?: InputMaybe<Scalars["String"]["input"]>;
+  code: Scalars['String']['input'];
+  hidden?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  realgame?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type GameDefault = {
-  __typename?: "GameDefault";
-  code: Scalars["String"]["output"];
-  parameter: Scalars["String"]["output"];
-  value: Scalars["String"]["output"];
+  __typename?: 'GameDefault';
+  code: Scalars['String']['output'];
+  parameter: Scalars['String']['output'];
+  value: Scalars['String']['output'];
 };
 
 export type GameDefaultCodeParameterCompoundUniqueInput = {
-  code: Scalars["String"]["input"];
-  parameter: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  parameter: Scalars['String']['input'];
 };
 
 export type GameDefaultCountOrderByAggregateInput = {
@@ -10530,15 +10116,15 @@ export type GameDefaultCountOrderByAggregateInput = {
 };
 
 export type GameDefaultCreateInput = {
-  code: Scalars["String"]["input"];
-  parameter: Scalars["String"]["input"];
-  value: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  parameter: Scalars['String']['input'];
+  value: Scalars['String']['input'];
 };
 
 export type GameDefaultCreateManyInput = {
-  code: Scalars["String"]["input"];
-  parameter: Scalars["String"]["input"];
-  value: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  parameter: Scalars['String']['input'];
+  value: Scalars['String']['input'];
 };
 
 export type GameDefaultMaxOrderByAggregateInput = {
@@ -10554,14 +10140,14 @@ export type GameDefaultMinOrderByAggregateInput = {
 };
 
 export enum GameDefaultOrderByRelevanceFieldEnum {
-  Code = "code",
-  Parameter = "parameter",
-  Value = "value",
+  Code = 'code',
+  Parameter = 'parameter',
+  Value = 'value'
 }
 
 export type GameDefaultOrderByRelevanceInput = {
   fields: Array<GameDefaultOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -10582,9 +10168,9 @@ export type GameDefaultOrderByWithRelationInput = {
 };
 
 export enum GameDefaultScalarFieldEnum {
-  Code = "code",
-  Parameter = "parameter",
-  Value = "value",
+  Code = 'code',
+  Parameter = 'parameter',
+  Value = 'value'
 }
 
 export type GameDefaultScalarWhereWithAggregatesInput = {
@@ -10642,15 +10228,15 @@ export type GameMinOrderByAggregateInput = {
 };
 
 export enum GameOrderByRelevanceFieldEnum {
-  Code = "code",
-  Hidden = "hidden",
-  Name = "name",
-  Realgame = "realgame",
+  Code = 'code',
+  Hidden = 'hidden',
+  Name = 'name',
+  Realgame = 'realgame'
 }
 
 export type GameOrderByRelevanceInput = {
   fields: Array<GameOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -10675,10 +10261,10 @@ export type GameOrderByWithRelationInput = {
 };
 
 export enum GameScalarFieldEnum {
-  Code = "code",
-  Hidden = "hidden",
-  Name = "name",
-  Realgame = "realgame",
+  Code = 'code',
+  Hidden = 'hidden',
+  Name = 'name',
+  Realgame = 'realgame'
 }
 
 export type GameScalarRelationFilter = {
@@ -10697,9 +10283,9 @@ export type GameScalarWhereWithAggregatesInput = {
 };
 
 export type GameSupported = {
-  __typename?: "GameSupported";
-  code: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
+  __typename?: 'GameSupported';
+  code: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
 };
 
 export type GameSupportedCountOrderByAggregateInput = {
@@ -10708,13 +10294,13 @@ export type GameSupportedCountOrderByAggregateInput = {
 };
 
 export type GameSupportedCreateInput = {
-  code: Scalars["String"]["input"];
-  name: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  name: Scalars['String']['input'];
 };
 
 export type GameSupportedCreateManyInput = {
-  code: Scalars["String"]["input"];
-  name: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  name: Scalars['String']['input'];
 };
 
 export type GameSupportedMaxOrderByAggregateInput = {
@@ -10728,13 +10314,13 @@ export type GameSupportedMinOrderByAggregateInput = {
 };
 
 export enum GameSupportedOrderByRelevanceFieldEnum {
-  Code = "code",
-  Name = "name",
+  Code = 'code',
+  Name = 'name'
 }
 
 export type GameSupportedOrderByRelevanceInput = {
   fields: Array<GameSupportedOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -10753,8 +10339,8 @@ export type GameSupportedOrderByWithRelationInput = {
 };
 
 export enum GameSupportedScalarFieldEnum {
-  Code = "code",
-  Name = "name",
+  Code = 'code',
+  Name = 'name'
 }
 
 export type GameSupportedScalarWhereWithAggregatesInput = {
@@ -10787,7 +10373,7 @@ export type GameSupportedWhereUniqueInput = {
   AND?: InputMaybe<Array<GameSupportedWhereInput>>;
   NOT?: InputMaybe<Array<GameSupportedWhereInput>>;
   OR?: InputMaybe<Array<GameSupportedWhereInput>>;
-  code?: InputMaybe<Scalars["String"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<StringFilter>;
 };
 
@@ -10878,7 +10464,7 @@ export type GameWhereUniqueInput = {
   NOT?: InputMaybe<Array<GameWhereInput>>;
   OR?: InputMaybe<Array<GameWhereInput>>;
   clans?: InputMaybe<ClanListRelationFilter>;
-  code?: InputMaybe<Scalars["String"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
   hidden?: InputMaybe<StringFilter>;
   name?: InputMaybe<StringFilter>;
   players?: InputMaybe<PlayerListRelationFilter>;
@@ -10886,11 +10472,11 @@ export type GameWhereUniqueInput = {
 };
 
 export type GeoLiteCityBlock = {
-  __typename?: "GeoLiteCityBlock";
-  endIpNum: Scalars["BigInt"]["output"];
-  locId: Scalars["BigInt"]["output"];
+  __typename?: 'GeoLiteCityBlock';
+  endIpNum: Scalars['BigInt']['output'];
+  locId: Scalars['BigInt']['output'];
   location: GeoLiteCityLocation;
-  startIpNum: Scalars["BigInt"]["output"];
+  startIpNum: Scalars['BigInt']['output'];
 };
 
 export type GeoLiteCityBlockAvgOrderByAggregateInput = {
@@ -10906,32 +10492,30 @@ export type GeoLiteCityBlockCountOrderByAggregateInput = {
 };
 
 export type GeoLiteCityBlockCreateInput = {
-  endIpNum: Scalars["BigInt"]["input"];
+  endIpNum: Scalars['BigInt']['input'];
   location: GeoLiteCityLocationCreateNestedOneWithoutBlocksInput;
-  startIpNum: Scalars["BigInt"]["input"];
+  startIpNum: Scalars['BigInt']['input'];
 };
 
 export type GeoLiteCityBlockCreateManyInput = {
-  endIpNum: Scalars["BigInt"]["input"];
-  locId: Scalars["BigInt"]["input"];
-  startIpNum: Scalars["BigInt"]["input"];
+  endIpNum: Scalars['BigInt']['input'];
+  locId: Scalars['BigInt']['input'];
+  startIpNum: Scalars['BigInt']['input'];
 };
 
 export type GeoLiteCityBlockCreateManyLocationInput = {
-  endIpNum: Scalars["BigInt"]["input"];
-  startIpNum: Scalars["BigInt"]["input"];
+  endIpNum: Scalars['BigInt']['input'];
+  startIpNum: Scalars['BigInt']['input'];
 };
 
 export type GeoLiteCityBlockCreateManyLocationInputEnvelope = {
   data: Array<GeoLiteCityBlockCreateManyLocationInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type GeoLiteCityBlockCreateNestedManyWithoutLocationInput = {
   connect?: InputMaybe<Array<GeoLiteCityBlockWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<GeoLiteCityBlockCreateOrConnectWithoutLocationInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<GeoLiteCityBlockCreateOrConnectWithoutLocationInput>>;
   create?: InputMaybe<Array<GeoLiteCityBlockCreateWithoutLocationInput>>;
   createMany?: InputMaybe<GeoLiteCityBlockCreateManyLocationInputEnvelope>;
 };
@@ -10942,8 +10526,8 @@ export type GeoLiteCityBlockCreateOrConnectWithoutLocationInput = {
 };
 
 export type GeoLiteCityBlockCreateWithoutLocationInput = {
-  endIpNum: Scalars["BigInt"]["input"];
-  startIpNum: Scalars["BigInt"]["input"];
+  endIpNum: Scalars['BigInt']['input'];
+  startIpNum: Scalars['BigInt']['input'];
 };
 
 export type GeoLiteCityBlockListRelationFilter = {
@@ -10987,9 +10571,9 @@ export type GeoLiteCityBlockOrderByWithRelationInput = {
 };
 
 export enum GeoLiteCityBlockScalarFieldEnum {
-  EndIpNum = "endIpNum",
-  LocId = "locId",
-  StartIpNum = "startIpNum",
+  EndIpNum = 'endIpNum',
+  LocId = 'locId',
+  StartIpNum = 'startIpNum'
 }
 
 export type GeoLiteCityBlockScalarWhereInput = {
@@ -11011,8 +10595,8 @@ export type GeoLiteCityBlockScalarWhereWithAggregatesInput = {
 };
 
 export type GeoLiteCityBlockStartIpNumEndIpNumCompoundUniqueInput = {
-  endIpNum: Scalars["BigInt"]["input"];
-  startIpNum: Scalars["BigInt"]["input"];
+  endIpNum: Scalars['BigInt']['input'];
+  startIpNum: Scalars['BigInt']['input'];
 };
 
 export type GeoLiteCityBlockSumOrderByAggregateInput = {
@@ -11039,24 +10623,16 @@ export type GeoLiteCityBlockUpdateManyWithWhereWithoutLocationInput = {
 
 export type GeoLiteCityBlockUpdateManyWithoutLocationNestedInput = {
   connect?: InputMaybe<Array<GeoLiteCityBlockWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<GeoLiteCityBlockCreateOrConnectWithoutLocationInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<GeoLiteCityBlockCreateOrConnectWithoutLocationInput>>;
   create?: InputMaybe<Array<GeoLiteCityBlockCreateWithoutLocationInput>>;
   createMany?: InputMaybe<GeoLiteCityBlockCreateManyLocationInputEnvelope>;
   delete?: InputMaybe<Array<GeoLiteCityBlockWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<GeoLiteCityBlockScalarWhereInput>>;
   disconnect?: InputMaybe<Array<GeoLiteCityBlockWhereUniqueInput>>;
   set?: InputMaybe<Array<GeoLiteCityBlockWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<GeoLiteCityBlockUpdateWithWhereUniqueWithoutLocationInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<GeoLiteCityBlockUpdateManyWithWhereWithoutLocationInput>
-  >;
-  upsert?: InputMaybe<
-    Array<GeoLiteCityBlockUpsertWithWhereUniqueWithoutLocationInput>
-  >;
+  update?: InputMaybe<Array<GeoLiteCityBlockUpdateWithWhereUniqueWithoutLocationInput>>;
+  updateMany?: InputMaybe<Array<GeoLiteCityBlockUpdateManyWithWhereWithoutLocationInput>>;
+  upsert?: InputMaybe<Array<GeoLiteCityBlockUpsertWithWhereUniqueWithoutLocationInput>>;
 };
 
 export type GeoLiteCityBlockUpdateWithWhereUniqueWithoutLocationInput = {
@@ -11097,23 +10673,24 @@ export type GeoLiteCityBlockWhereUniqueInput = {
 };
 
 export type GeoLiteCityLocation = {
-  __typename?: "GeoLiteCityLocation";
+  __typename?: 'GeoLiteCityLocation';
   blocks: Array<GeoLiteCityBlock>;
-  city?: Maybe<Scalars["String"]["output"]>;
-  country: Scalars["String"]["output"];
-  latitude?: Maybe<Scalars["Decimal"]["output"]>;
-  locId: Scalars["ID"]["output"];
-  longitude?: Maybe<Scalars["Decimal"]["output"]>;
-  postalCode?: Maybe<Scalars["String"]["output"]>;
-  region?: Maybe<Scalars["String"]["output"]>;
+  city?: Maybe<Scalars['String']['output']>;
+  country: Scalars['String']['output'];
+  latitude?: Maybe<Scalars['Decimal']['output']>;
+  locId: Scalars['ID']['output'];
+  longitude?: Maybe<Scalars['Decimal']['output']>;
+  postalCode?: Maybe<Scalars['String']['output']>;
+  region?: Maybe<Scalars['String']['output']>;
 };
+
 
 export type GeoLiteCityLocationBlocksArgs = {
   cursor?: InputMaybe<GeoLiteCityBlockWhereUniqueInput>;
   distinct?: InputMaybe<Array<GeoLiteCityBlockScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GeoLiteCityBlockOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GeoLiteCityBlockWhereInput>;
 };
 
@@ -11135,23 +10712,23 @@ export type GeoLiteCityLocationCountOrderByAggregateInput = {
 
 export type GeoLiteCityLocationCreateInput = {
   blocks?: InputMaybe<GeoLiteCityBlockCreateNestedManyWithoutLocationInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
-  country: Scalars["String"]["input"];
-  latitude?: InputMaybe<Scalars["Decimal"]["input"]>;
-  locId: Scalars["BigInt"]["input"];
-  longitude?: InputMaybe<Scalars["Decimal"]["input"]>;
-  postalCode?: InputMaybe<Scalars["String"]["input"]>;
-  region?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  country: Scalars['String']['input'];
+  latitude?: InputMaybe<Scalars['Decimal']['input']>;
+  locId: Scalars['BigInt']['input'];
+  longitude?: InputMaybe<Scalars['Decimal']['input']>;
+  postalCode?: InputMaybe<Scalars['String']['input']>;
+  region?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type GeoLiteCityLocationCreateManyInput = {
-  city?: InputMaybe<Scalars["String"]["input"]>;
-  country: Scalars["String"]["input"];
-  latitude?: InputMaybe<Scalars["Decimal"]["input"]>;
-  locId: Scalars["BigInt"]["input"];
-  longitude?: InputMaybe<Scalars["Decimal"]["input"]>;
-  postalCode?: InputMaybe<Scalars["String"]["input"]>;
-  region?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  country: Scalars['String']['input'];
+  latitude?: InputMaybe<Scalars['Decimal']['input']>;
+  locId: Scalars['BigInt']['input'];
+  longitude?: InputMaybe<Scalars['Decimal']['input']>;
+  postalCode?: InputMaybe<Scalars['String']['input']>;
+  region?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type GeoLiteCityLocationCreateNestedOneWithoutBlocksInput = {
@@ -11166,13 +10743,13 @@ export type GeoLiteCityLocationCreateOrConnectWithoutBlocksInput = {
 };
 
 export type GeoLiteCityLocationCreateWithoutBlocksInput = {
-  city?: InputMaybe<Scalars["String"]["input"]>;
-  country: Scalars["String"]["input"];
-  latitude?: InputMaybe<Scalars["Decimal"]["input"]>;
-  locId: Scalars["BigInt"]["input"];
-  longitude?: InputMaybe<Scalars["Decimal"]["input"]>;
-  postalCode?: InputMaybe<Scalars["String"]["input"]>;
-  region?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  country: Scalars['String']['input'];
+  latitude?: InputMaybe<Scalars['Decimal']['input']>;
+  locId: Scalars['BigInt']['input'];
+  longitude?: InputMaybe<Scalars['Decimal']['input']>;
+  postalCode?: InputMaybe<Scalars['String']['input']>;
+  region?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type GeoLiteCityLocationMaxOrderByAggregateInput = {
@@ -11196,15 +10773,15 @@ export type GeoLiteCityLocationMinOrderByAggregateInput = {
 };
 
 export enum GeoLiteCityLocationOrderByRelevanceFieldEnum {
-  City = "city",
-  Country = "country",
-  PostalCode = "postalCode",
-  Region = "region",
+  City = 'city',
+  Country = 'country',
+  PostalCode = 'postalCode',
+  Region = 'region'
 }
 
 export type GeoLiteCityLocationOrderByRelevanceInput = {
   fields: Array<GeoLiteCityLocationOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -11236,13 +10813,13 @@ export type GeoLiteCityLocationOrderByWithRelationInput = {
 };
 
 export enum GeoLiteCityLocationScalarFieldEnum {
-  City = "city",
-  Country = "country",
-  Latitude = "latitude",
-  LocId = "locId",
-  Longitude = "longitude",
-  PostalCode = "postalCode",
-  Region = "region",
+  City = 'city',
+  Country = 'country',
+  Latitude = 'latitude',
+  LocId = 'locId',
+  Longitude = 'longitude',
+  PostalCode = 'postalCode',
+  Region = 'region'
 }
 
 export type GeoLiteCityLocationScalarRelationFilter = {
@@ -11341,39 +10918,39 @@ export type GeoLiteCityLocationWhereUniqueInput = {
   city?: InputMaybe<StringNullableFilter>;
   country?: InputMaybe<StringFilter>;
   latitude?: InputMaybe<DecimalNullableFilter>;
-  locId?: InputMaybe<Scalars["BigInt"]["input"]>;
+  locId?: InputMaybe<Scalars['BigInt']['input']>;
   longitude?: InputMaybe<DecimalNullableFilter>;
   postalCode?: InputMaybe<StringNullableFilter>;
   region?: InputMaybe<StringNullableFilter>;
 };
 
 export type HealthStatus = {
-  __typename?: "HealthStatus";
-  status?: Maybe<Scalars["String"]["output"]>;
-  timestamp?: Maybe<Scalars["String"]["output"]>;
-  version?: Maybe<Scalars["String"]["output"]>;
+  __typename?: 'HealthStatus';
+  status?: Maybe<Scalars['String']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+  version?: Maybe<Scalars['String']['output']>;
 };
 
 export type HeatmapConfig = {
-  __typename?: "HeatmapConfig";
-  brush: Scalars["String"]["output"];
-  cropx1: Scalars["Int"]["output"];
-  cropx2: Scalars["Int"]["output"];
-  cropy1: Scalars["Int"]["output"];
-  cropy2: Scalars["Int"]["output"];
-  days: Scalars["Int"]["output"];
-  flipx: Scalars["Int"]["output"];
-  flipy: Scalars["Int"]["output"];
-  font: Scalars["Int"]["output"];
-  game: Scalars["String"]["output"];
-  id: Scalars["ID"]["output"];
-  map: Scalars["String"]["output"];
-  rotate: Scalars["Int"]["output"];
-  scale: Scalars["Float"]["output"];
-  thumbh: Scalars["Float"]["output"];
-  thumbw: Scalars["Float"]["output"];
-  xoffset: Scalars["Float"]["output"];
-  yoffset: Scalars["Float"]["output"];
+  __typename?: 'HeatmapConfig';
+  brush: Scalars['String']['output'];
+  cropx1: Scalars['Int']['output'];
+  cropx2: Scalars['Int']['output'];
+  cropy1: Scalars['Int']['output'];
+  cropy2: Scalars['Int']['output'];
+  days: Scalars['Int']['output'];
+  flipx: Scalars['Int']['output'];
+  flipy: Scalars['Int']['output'];
+  font: Scalars['Int']['output'];
+  game: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  map: Scalars['String']['output'];
+  rotate: Scalars['Int']['output'];
+  scale: Scalars['Float']['output'];
+  thumbh: Scalars['Float']['output'];
+  thumbw: Scalars['Float']['output'];
+  xoffset: Scalars['Float']['output'];
+  yoffset: Scalars['Float']['output'];
 };
 
 export type HeatmapConfigAvgOrderByAggregateInput = {
@@ -11416,49 +10993,49 @@ export type HeatmapConfigCountOrderByAggregateInput = {
 };
 
 export type HeatmapConfigCreateInput = {
-  brush?: InputMaybe<Scalars["String"]["input"]>;
-  cropx1?: InputMaybe<Scalars["Int"]["input"]>;
-  cropx2?: InputMaybe<Scalars["Int"]["input"]>;
-  cropy1?: InputMaybe<Scalars["Int"]["input"]>;
-  cropy2?: InputMaybe<Scalars["Int"]["input"]>;
-  days?: InputMaybe<Scalars["Int"]["input"]>;
-  flipx?: InputMaybe<Scalars["Int"]["input"]>;
-  flipy?: InputMaybe<Scalars["Int"]["input"]>;
-  font?: InputMaybe<Scalars["Int"]["input"]>;
-  game: Scalars["String"]["input"];
-  map: Scalars["String"]["input"];
-  rotate?: InputMaybe<Scalars["Int"]["input"]>;
-  scale: Scalars["Float"]["input"];
-  thumbh?: InputMaybe<Scalars["Float"]["input"]>;
-  thumbw?: InputMaybe<Scalars["Float"]["input"]>;
-  xoffset: Scalars["Float"]["input"];
-  yoffset: Scalars["Float"]["input"];
+  brush?: InputMaybe<Scalars['String']['input']>;
+  cropx1?: InputMaybe<Scalars['Int']['input']>;
+  cropx2?: InputMaybe<Scalars['Int']['input']>;
+  cropy1?: InputMaybe<Scalars['Int']['input']>;
+  cropy2?: InputMaybe<Scalars['Int']['input']>;
+  days?: InputMaybe<Scalars['Int']['input']>;
+  flipx?: InputMaybe<Scalars['Int']['input']>;
+  flipy?: InputMaybe<Scalars['Int']['input']>;
+  font?: InputMaybe<Scalars['Int']['input']>;
+  game: Scalars['String']['input'];
+  map: Scalars['String']['input'];
+  rotate?: InputMaybe<Scalars['Int']['input']>;
+  scale: Scalars['Float']['input'];
+  thumbh?: InputMaybe<Scalars['Float']['input']>;
+  thumbw?: InputMaybe<Scalars['Float']['input']>;
+  xoffset: Scalars['Float']['input'];
+  yoffset: Scalars['Float']['input'];
 };
 
 export type HeatmapConfigCreateManyInput = {
-  brush?: InputMaybe<Scalars["String"]["input"]>;
-  cropx1?: InputMaybe<Scalars["Int"]["input"]>;
-  cropx2?: InputMaybe<Scalars["Int"]["input"]>;
-  cropy1?: InputMaybe<Scalars["Int"]["input"]>;
-  cropy2?: InputMaybe<Scalars["Int"]["input"]>;
-  days?: InputMaybe<Scalars["Int"]["input"]>;
-  flipx?: InputMaybe<Scalars["Int"]["input"]>;
-  flipy?: InputMaybe<Scalars["Int"]["input"]>;
-  font?: InputMaybe<Scalars["Int"]["input"]>;
-  game: Scalars["String"]["input"];
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  map: Scalars["String"]["input"];
-  rotate?: InputMaybe<Scalars["Int"]["input"]>;
-  scale: Scalars["Float"]["input"];
-  thumbh?: InputMaybe<Scalars["Float"]["input"]>;
-  thumbw?: InputMaybe<Scalars["Float"]["input"]>;
-  xoffset: Scalars["Float"]["input"];
-  yoffset: Scalars["Float"]["input"];
+  brush?: InputMaybe<Scalars['String']['input']>;
+  cropx1?: InputMaybe<Scalars['Int']['input']>;
+  cropx2?: InputMaybe<Scalars['Int']['input']>;
+  cropy1?: InputMaybe<Scalars['Int']['input']>;
+  cropy2?: InputMaybe<Scalars['Int']['input']>;
+  days?: InputMaybe<Scalars['Int']['input']>;
+  flipx?: InputMaybe<Scalars['Int']['input']>;
+  flipy?: InputMaybe<Scalars['Int']['input']>;
+  font?: InputMaybe<Scalars['Int']['input']>;
+  game: Scalars['String']['input'];
+  id?: InputMaybe<Scalars['Int']['input']>;
+  map: Scalars['String']['input'];
+  rotate?: InputMaybe<Scalars['Int']['input']>;
+  scale: Scalars['Float']['input'];
+  thumbh?: InputMaybe<Scalars['Float']['input']>;
+  thumbw?: InputMaybe<Scalars['Float']['input']>;
+  xoffset: Scalars['Float']['input'];
+  yoffset: Scalars['Float']['input'];
 };
 
 export type HeatmapConfigGamemapCompoundUniqueInput = {
-  game: Scalars["String"]["input"];
-  map: Scalars["String"]["input"];
+  game: Scalars['String']['input'];
+  map: Scalars['String']['input'];
 };
 
 export type HeatmapConfigMaxOrderByAggregateInput = {
@@ -11504,14 +11081,14 @@ export type HeatmapConfigMinOrderByAggregateInput = {
 };
 
 export enum HeatmapConfigOrderByRelevanceFieldEnum {
-  Brush = "brush",
-  Game = "game",
-  Map = "map",
+  Brush = 'brush',
+  Game = 'game',
+  Map = 'map'
 }
 
 export type HeatmapConfigOrderByRelevanceInput = {
   fields: Array<HeatmapConfigOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -11564,24 +11141,24 @@ export type HeatmapConfigOrderByWithRelationInput = {
 };
 
 export enum HeatmapConfigScalarFieldEnum {
-  Brush = "brush",
-  Cropx1 = "cropx1",
-  Cropx2 = "cropx2",
-  Cropy1 = "cropy1",
-  Cropy2 = "cropy2",
-  Days = "days",
-  Flipx = "flipx",
-  Flipy = "flipy",
-  Font = "font",
-  Game = "game",
-  Id = "id",
-  Map = "map",
-  Rotate = "rotate",
-  Scale = "scale",
-  Thumbh = "thumbh",
-  Thumbw = "thumbw",
-  Xoffset = "xoffset",
-  Yoffset = "yoffset",
+  Brush = 'brush',
+  Cropx1 = 'cropx1',
+  Cropx2 = 'cropx2',
+  Cropy1 = 'cropy1',
+  Cropy2 = 'cropy2',
+  Days = 'days',
+  Flipx = 'flipx',
+  Flipy = 'flipy',
+  Font = 'font',
+  Game = 'game',
+  Id = 'id',
+  Map = 'map',
+  Rotate = 'rotate',
+  Scale = 'scale',
+  Thumbh = 'thumbh',
+  Thumbw = 'thumbw',
+  Xoffset = 'xoffset',
+  Yoffset = 'yoffset'
 }
 
 export type HeatmapConfigScalarWhereWithAggregatesInput = {
@@ -11705,7 +11282,7 @@ export type HeatmapConfigWhereUniqueInput = {
   font?: InputMaybe<IntFilter>;
   game?: InputMaybe<StringFilter>;
   gamemap?: InputMaybe<HeatmapConfigGamemapCompoundUniqueInput>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
   rotate?: InputMaybe<IntFilter>;
   scale?: InputMaybe<FloatFilter>;
@@ -11716,10 +11293,10 @@ export type HeatmapConfigWhereUniqueInput = {
 };
 
 export type HostGroup = {
-  __typename?: "HostGroup";
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  pattern: Scalars["String"]["output"];
+  __typename?: 'HostGroup';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  pattern: Scalars['String']['output'];
 };
 
 export type HostGroupAvgOrderByAggregateInput = {
@@ -11733,14 +11310,14 @@ export type HostGroupCountOrderByAggregateInput = {
 };
 
 export type HostGroupCreateInput = {
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  pattern?: InputMaybe<Scalars["String"]["input"]>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  pattern?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type HostGroupCreateManyInput = {
-  id?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  pattern?: InputMaybe<Scalars["String"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  pattern?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type HostGroupMaxOrderByAggregateInput = {
@@ -11756,13 +11333,13 @@ export type HostGroupMinOrderByAggregateInput = {
 };
 
 export enum HostGroupOrderByRelevanceFieldEnum {
-  Name = "name",
-  Pattern = "pattern",
+  Name = 'name',
+  Pattern = 'pattern'
 }
 
 export type HostGroupOrderByRelevanceInput = {
   fields: Array<HostGroupOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -11785,9 +11362,9 @@ export type HostGroupOrderByWithRelationInput = {
 };
 
 export enum HostGroupScalarFieldEnum {
-  Id = "id",
-  Name = "name",
-  Pattern = "pattern",
+  Id = 'id',
+  Name = 'name',
+  Pattern = 'pattern'
 }
 
 export type HostGroupScalarWhereWithAggregatesInput = {
@@ -11826,39 +11403,39 @@ export type HostGroupWhereUniqueInput = {
   AND?: InputMaybe<Array<HostGroupWhereInput>>;
   NOT?: InputMaybe<Array<HostGroupWhereInput>>;
   OR?: InputMaybe<Array<HostGroupWhereInput>>;
-  id?: InputMaybe<Scalars["Int"]["input"]>;
+  id?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<StringFilter>;
   pattern?: InputMaybe<StringFilter>;
 };
 
 export type IntFieldUpdateOperationsInput = {
-  decrement?: InputMaybe<Scalars["Int"]["input"]>;
-  divide?: InputMaybe<Scalars["Int"]["input"]>;
-  increment?: InputMaybe<Scalars["Int"]["input"]>;
-  multiply?: InputMaybe<Scalars["Int"]["input"]>;
-  set?: InputMaybe<Scalars["Int"]["input"]>;
+  decrement?: InputMaybe<Scalars['Int']['input']>;
+  divide?: InputMaybe<Scalars['Int']['input']>;
+  increment?: InputMaybe<Scalars['Int']['input']>;
+  multiply?: InputMaybe<Scalars['Int']['input']>;
+  set?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type IntFilter = {
-  equals?: InputMaybe<Scalars["Int"]["input"]>;
-  gt?: InputMaybe<Scalars["Int"]["input"]>;
-  gte?: InputMaybe<Scalars["Int"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  lt?: InputMaybe<Scalars["Int"]["input"]>;
-  lte?: InputMaybe<Scalars["Int"]["input"]>;
+  equals?: InputMaybe<Scalars['Int']['input']>;
+  gt?: InputMaybe<Scalars['Int']['input']>;
+  gte?: InputMaybe<Scalars['Int']['input']>;
+  in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lt?: InputMaybe<Scalars['Int']['input']>;
+  lte?: InputMaybe<Scalars['Int']['input']>;
   not?: InputMaybe<NestedIntFilter>;
-  notIn?: InputMaybe<Array<Scalars["Int"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
 
 export type IntNullableFilter = {
-  equals?: InputMaybe<Scalars["Int"]["input"]>;
-  gt?: InputMaybe<Scalars["Int"]["input"]>;
-  gte?: InputMaybe<Scalars["Int"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  lt?: InputMaybe<Scalars["Int"]["input"]>;
-  lte?: InputMaybe<Scalars["Int"]["input"]>;
+  equals?: InputMaybe<Scalars['Int']['input']>;
+  gt?: InputMaybe<Scalars['Int']['input']>;
+  gte?: InputMaybe<Scalars['Int']['input']>;
+  in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lt?: InputMaybe<Scalars['Int']['input']>;
+  lte?: InputMaybe<Scalars['Int']['input']>;
   not?: InputMaybe<NestedIntNullableFilter>;
-  notIn?: InputMaybe<Array<Scalars["Int"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
 
 export type IntNullableWithAggregatesFilter = {
@@ -11867,14 +11444,14 @@ export type IntNullableWithAggregatesFilter = {
   _max?: InputMaybe<NestedIntNullableFilter>;
   _min?: InputMaybe<NestedIntNullableFilter>;
   _sum?: InputMaybe<NestedIntNullableFilter>;
-  equals?: InputMaybe<Scalars["Int"]["input"]>;
-  gt?: InputMaybe<Scalars["Int"]["input"]>;
-  gte?: InputMaybe<Scalars["Int"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  lt?: InputMaybe<Scalars["Int"]["input"]>;
-  lte?: InputMaybe<Scalars["Int"]["input"]>;
+  equals?: InputMaybe<Scalars['Int']['input']>;
+  gt?: InputMaybe<Scalars['Int']['input']>;
+  gte?: InputMaybe<Scalars['Int']['input']>;
+  in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lt?: InputMaybe<Scalars['Int']['input']>;
+  lte?: InputMaybe<Scalars['Int']['input']>;
   not?: InputMaybe<NestedIntNullableWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["Int"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
 
 export type IntWithAggregatesFilter = {
@@ -11883,42 +11460,42 @@ export type IntWithAggregatesFilter = {
   _max?: InputMaybe<NestedIntFilter>;
   _min?: InputMaybe<NestedIntFilter>;
   _sum?: InputMaybe<NestedIntFilter>;
-  equals?: InputMaybe<Scalars["Int"]["input"]>;
-  gt?: InputMaybe<Scalars["Int"]["input"]>;
-  gte?: InputMaybe<Scalars["Int"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  lt?: InputMaybe<Scalars["Int"]["input"]>;
-  lte?: InputMaybe<Scalars["Int"]["input"]>;
+  equals?: InputMaybe<Scalars['Int']['input']>;
+  gt?: InputMaybe<Scalars['Int']['input']>;
+  gte?: InputMaybe<Scalars['Int']['input']>;
+  in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lt?: InputMaybe<Scalars['Int']['input']>;
+  lte?: InputMaybe<Scalars['Int']['input']>;
   not?: InputMaybe<NestedIntWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["Int"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
 
 export type Livestat = {
-  __typename?: "Livestat";
-  cli_address: Scalars["String"]["output"];
-  cli_city: Scalars["String"]["output"];
-  cli_country: Scalars["String"]["output"];
-  cli_flag: Scalars["String"]["output"];
-  cli_lat?: Maybe<Scalars["Float"]["output"]>;
-  cli_lng?: Maybe<Scalars["Float"]["output"]>;
-  cli_state: Scalars["String"]["output"];
-  connected: Scalars["Int"]["output"];
-  deaths: Scalars["Int"]["output"];
-  has_bomb: Scalars["Int"]["output"];
-  headshots: Scalars["Int"]["output"];
-  hits: Scalars["Int"]["output"];
-  is_dead: Scalars["Int"]["output"];
-  kills: Scalars["Int"]["output"];
-  name: Scalars["String"]["output"];
-  ping: Scalars["Int"]["output"];
-  player_id: Scalars["ID"]["output"];
-  server_id: Scalars["Int"]["output"];
-  shots: Scalars["Int"]["output"];
-  skill: Scalars["Int"]["output"];
-  skill_change: Scalars["Int"]["output"];
-  steam_id: Scalars["String"]["output"];
-  suicides: Scalars["Int"]["output"];
-  team: Scalars["String"]["output"];
+  __typename?: 'Livestat';
+  cli_address: Scalars['String']['output'];
+  cli_city: Scalars['String']['output'];
+  cli_country: Scalars['String']['output'];
+  cli_flag: Scalars['String']['output'];
+  cli_lat?: Maybe<Scalars['Float']['output']>;
+  cli_lng?: Maybe<Scalars['Float']['output']>;
+  cli_state: Scalars['String']['output'];
+  connected: Scalars['Int']['output'];
+  deaths: Scalars['Int']['output'];
+  has_bomb: Scalars['Int']['output'];
+  headshots: Scalars['Int']['output'];
+  hits: Scalars['Int']['output'];
+  is_dead: Scalars['Int']['output'];
+  kills: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  ping: Scalars['Int']['output'];
+  player_id: Scalars['ID']['output'];
+  server_id: Scalars['Int']['output'];
+  shots: Scalars['Int']['output'];
+  skill: Scalars['Int']['output'];
+  skill_change: Scalars['Int']['output'];
+  steam_id: Scalars['String']['output'];
+  suicides: Scalars['Int']['output'];
+  team: Scalars['String']['output'];
 };
 
 export type LivestatAvgOrderByAggregateInput = {
@@ -11968,57 +11545,57 @@ export type LivestatCountOrderByAggregateInput = {
 };
 
 export type LivestatCreateInput = {
-  cli_address?: InputMaybe<Scalars["String"]["input"]>;
-  cli_city?: InputMaybe<Scalars["String"]["input"]>;
-  cli_country?: InputMaybe<Scalars["String"]["input"]>;
-  cli_flag?: InputMaybe<Scalars["String"]["input"]>;
-  cli_lat?: InputMaybe<Scalars["Float"]["input"]>;
-  cli_lng?: InputMaybe<Scalars["Float"]["input"]>;
-  cli_state?: InputMaybe<Scalars["String"]["input"]>;
-  connected?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  has_bomb?: InputMaybe<Scalars["Int"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  is_dead?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  name: Scalars["String"]["input"];
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
-  player_id: Scalars["Int"]["input"];
-  server_id?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  steam_id?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  cli_address?: InputMaybe<Scalars['String']['input']>;
+  cli_city?: InputMaybe<Scalars['String']['input']>;
+  cli_country?: InputMaybe<Scalars['String']['input']>;
+  cli_flag?: InputMaybe<Scalars['String']['input']>;
+  cli_lat?: InputMaybe<Scalars['Float']['input']>;
+  cli_lng?: InputMaybe<Scalars['Float']['input']>;
+  cli_state?: InputMaybe<Scalars['String']['input']>;
+  connected?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  has_bomb?: InputMaybe<Scalars['Int']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  is_dead?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  name: Scalars['String']['input'];
+  ping?: InputMaybe<Scalars['Int']['input']>;
+  player_id: Scalars['Int']['input'];
+  server_id?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  skill_change?: InputMaybe<Scalars['Int']['input']>;
+  steam_id?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type LivestatCreateManyInput = {
-  cli_address?: InputMaybe<Scalars["String"]["input"]>;
-  cli_city?: InputMaybe<Scalars["String"]["input"]>;
-  cli_country?: InputMaybe<Scalars["String"]["input"]>;
-  cli_flag?: InputMaybe<Scalars["String"]["input"]>;
-  cli_lat?: InputMaybe<Scalars["Float"]["input"]>;
-  cli_lng?: InputMaybe<Scalars["Float"]["input"]>;
-  cli_state?: InputMaybe<Scalars["String"]["input"]>;
-  connected?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  has_bomb?: InputMaybe<Scalars["Int"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  is_dead?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  name: Scalars["String"]["input"];
-  ping?: InputMaybe<Scalars["Int"]["input"]>;
-  player_id: Scalars["Int"]["input"];
-  server_id?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  steam_id?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  team?: InputMaybe<Scalars["String"]["input"]>;
+  cli_address?: InputMaybe<Scalars['String']['input']>;
+  cli_city?: InputMaybe<Scalars['String']['input']>;
+  cli_country?: InputMaybe<Scalars['String']['input']>;
+  cli_flag?: InputMaybe<Scalars['String']['input']>;
+  cli_lat?: InputMaybe<Scalars['Float']['input']>;
+  cli_lng?: InputMaybe<Scalars['Float']['input']>;
+  cli_state?: InputMaybe<Scalars['String']['input']>;
+  connected?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  has_bomb?: InputMaybe<Scalars['Int']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  is_dead?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  name: Scalars['String']['input'];
+  ping?: InputMaybe<Scalars['Int']['input']>;
+  player_id: Scalars['Int']['input'];
+  server_id?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  skill_change?: InputMaybe<Scalars['Int']['input']>;
+  steam_id?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  team?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type LivestatMaxOrderByAggregateInput = {
@@ -12076,19 +11653,19 @@ export type LivestatMinOrderByAggregateInput = {
 };
 
 export enum LivestatOrderByRelevanceFieldEnum {
-  CliAddress = "cli_address",
-  CliCity = "cli_city",
-  CliCountry = "cli_country",
-  CliFlag = "cli_flag",
-  CliState = "cli_state",
-  Name = "name",
-  SteamId = "steam_id",
-  Team = "team",
+  CliAddress = 'cli_address',
+  CliCity = 'cli_city',
+  CliCountry = 'cli_country',
+  CliFlag = 'cli_flag',
+  CliState = 'cli_state',
+  Name = 'name',
+  SteamId = 'steam_id',
+  Team = 'team'
 }
 
 export type LivestatOrderByRelevanceInput = {
   fields: Array<LivestatOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -12153,30 +11730,30 @@ export type LivestatOrderByWithRelationInput = {
 };
 
 export enum LivestatScalarFieldEnum {
-  CliAddress = "cli_address",
-  CliCity = "cli_city",
-  CliCountry = "cli_country",
-  CliFlag = "cli_flag",
-  CliLat = "cli_lat",
-  CliLng = "cli_lng",
-  CliState = "cli_state",
-  Connected = "connected",
-  Deaths = "deaths",
-  HasBomb = "has_bomb",
-  Headshots = "headshots",
-  Hits = "hits",
-  IsDead = "is_dead",
-  Kills = "kills",
-  Name = "name",
-  Ping = "ping",
-  PlayerId = "player_id",
-  ServerId = "server_id",
-  Shots = "shots",
-  Skill = "skill",
-  SkillChange = "skill_change",
-  SteamId = "steam_id",
-  Suicides = "suicides",
-  Team = "team",
+  CliAddress = 'cli_address',
+  CliCity = 'cli_city',
+  CliCountry = 'cli_country',
+  CliFlag = 'cli_flag',
+  CliLat = 'cli_lat',
+  CliLng = 'cli_lng',
+  CliState = 'cli_state',
+  Connected = 'connected',
+  Deaths = 'deaths',
+  HasBomb = 'has_bomb',
+  Headshots = 'headshots',
+  Hits = 'hits',
+  IsDead = 'is_dead',
+  Kills = 'kills',
+  Name = 'name',
+  Ping = 'ping',
+  PlayerId = 'player_id',
+  ServerId = 'server_id',
+  Shots = 'shots',
+  Skill = 'skill',
+  SkillChange = 'skill_change',
+  SteamId = 'steam_id',
+  Suicides = 'suicides',
+  Team = 'team'
 }
 
 export type LivestatScalarWhereWithAggregatesInput = {
@@ -12332,7 +11909,7 @@ export type LivestatWhereUniqueInput = {
   kills?: InputMaybe<IntFilter>;
   name?: InputMaybe<StringFilter>;
   ping?: InputMaybe<IntFilter>;
-  player_id?: InputMaybe<Scalars["Int"]["input"]>;
+  player_id?: InputMaybe<Scalars['Int']['input']>;
   server_id?: InputMaybe<IntFilter>;
   shots?: InputMaybe<IntFilter>;
   skill?: InputMaybe<IntFilter>;
@@ -12343,12 +11920,12 @@ export type LivestatWhereUniqueInput = {
 };
 
 export type MapCount = {
-  __typename?: "MapCount";
-  game: Scalars["String"]["output"];
-  headshots: Scalars["Int"]["output"];
-  kills: Scalars["Int"]["output"];
-  map: Scalars["String"]["output"];
-  rowId: Scalars["Int"]["output"];
+  __typename?: 'MapCount';
+  game: Scalars['String']['output'];
+  headshots: Scalars['Int']['output'];
+  kills: Scalars['Int']['output'];
+  map: Scalars['String']['output'];
+  rowId: Scalars['Int']['output'];
 };
 
 export type MapCountAvgOrderByAggregateInput = {
@@ -12366,24 +11943,24 @@ export type MapCountCountOrderByAggregateInput = {
 };
 
 export type MapCountCreateInput = {
-  game: Scalars["String"]["input"];
-  headshots: Scalars["Int"]["input"];
-  kills: Scalars["Int"]["input"];
-  map: Scalars["String"]["input"];
-  rowId?: InputMaybe<Scalars["Int"]["input"]>;
+  game: Scalars['String']['input'];
+  headshots: Scalars['Int']['input'];
+  kills: Scalars['Int']['input'];
+  map: Scalars['String']['input'];
+  rowId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type MapCountCreateManyInput = {
-  game: Scalars["String"]["input"];
-  headshots: Scalars["Int"]["input"];
-  kills: Scalars["Int"]["input"];
-  map: Scalars["String"]["input"];
-  rowId?: InputMaybe<Scalars["Int"]["input"]>;
+  game: Scalars['String']['input'];
+  headshots: Scalars['Int']['input'];
+  kills: Scalars['Int']['input'];
+  map: Scalars['String']['input'];
+  rowId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type MapCountGameMapCompoundUniqueInput = {
-  game: Scalars["String"]["input"];
-  map: Scalars["String"]["input"];
+  game: Scalars['String']['input'];
+  map: Scalars['String']['input'];
 };
 
 export type MapCountMaxOrderByAggregateInput = {
@@ -12403,13 +11980,13 @@ export type MapCountMinOrderByAggregateInput = {
 };
 
 export enum MapCountOrderByRelevanceFieldEnum {
-  Game = "game",
-  Map = "map",
+  Game = 'game',
+  Map = 'map'
 }
 
 export type MapCountOrderByRelevanceInput = {
   fields: Array<MapCountOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -12436,11 +12013,11 @@ export type MapCountOrderByWithRelationInput = {
 };
 
 export enum MapCountScalarFieldEnum {
-  Game = "game",
-  Headshots = "headshots",
-  Kills = "kills",
-  Map = "map",
-  RowId = "rowId",
+  Game = 'game',
+  Headshots = 'headshots',
+  Kills = 'kills',
+  Map = 'map',
+  RowId = 'rowId'
 }
 
 export type MapCountScalarWhereWithAggregatesInput = {
@@ -12494,19 +12071,19 @@ export type MapCountWhereUniqueInput = {
   headshots?: InputMaybe<IntFilter>;
   kills?: InputMaybe<IntFilter>;
   map?: InputMaybe<StringFilter>;
-  rowId?: InputMaybe<Scalars["Int"]["input"]>;
+  rowId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ModDefault = {
-  __typename?: "ModDefault";
-  code: Scalars["String"]["output"];
-  parameter: Scalars["String"]["output"];
-  value: Scalars["String"]["output"];
+  __typename?: 'ModDefault';
+  code: Scalars['String']['output'];
+  parameter: Scalars['String']['output'];
+  value: Scalars['String']['output'];
 };
 
 export type ModDefaultCodeParameterCompoundUniqueInput = {
-  code: Scalars["String"]["input"];
-  parameter: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  parameter: Scalars['String']['input'];
 };
 
 export type ModDefaultCountOrderByAggregateInput = {
@@ -12516,15 +12093,15 @@ export type ModDefaultCountOrderByAggregateInput = {
 };
 
 export type ModDefaultCreateInput = {
-  code: Scalars["String"]["input"];
-  parameter: Scalars["String"]["input"];
-  value: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  parameter: Scalars['String']['input'];
+  value: Scalars['String']['input'];
 };
 
 export type ModDefaultCreateManyInput = {
-  code: Scalars["String"]["input"];
-  parameter: Scalars["String"]["input"];
-  value: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  parameter: Scalars['String']['input'];
+  value: Scalars['String']['input'];
 };
 
 export type ModDefaultMaxOrderByAggregateInput = {
@@ -12540,14 +12117,14 @@ export type ModDefaultMinOrderByAggregateInput = {
 };
 
 export enum ModDefaultOrderByRelevanceFieldEnum {
-  Code = "code",
-  Parameter = "parameter",
-  Value = "value",
+  Code = 'code',
+  Parameter = 'parameter',
+  Value = 'value'
 }
 
 export type ModDefaultOrderByRelevanceInput = {
   fields: Array<ModDefaultOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -12568,9 +12145,9 @@ export type ModDefaultOrderByWithRelationInput = {
 };
 
 export enum ModDefaultScalarFieldEnum {
-  Code = "code",
-  Parameter = "parameter",
-  Value = "value",
+  Code = 'code',
+  Parameter = 'parameter',
+  Value = 'value'
 }
 
 export type ModDefaultScalarWhereWithAggregatesInput = {
@@ -12614,9 +12191,9 @@ export type ModDefaultWhereUniqueInput = {
 };
 
 export type ModSupported = {
-  __typename?: "ModSupported";
-  code: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
+  __typename?: 'ModSupported';
+  code: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
 };
 
 export type ModSupportedCountOrderByAggregateInput = {
@@ -12625,13 +12202,13 @@ export type ModSupportedCountOrderByAggregateInput = {
 };
 
 export type ModSupportedCreateInput = {
-  code: Scalars["String"]["input"];
-  name: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  name: Scalars['String']['input'];
 };
 
 export type ModSupportedCreateManyInput = {
-  code: Scalars["String"]["input"];
-  name: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  name: Scalars['String']['input'];
 };
 
 export type ModSupportedMaxOrderByAggregateInput = {
@@ -12645,13 +12222,13 @@ export type ModSupportedMinOrderByAggregateInput = {
 };
 
 export enum ModSupportedOrderByRelevanceFieldEnum {
-  Code = "code",
-  Name = "name",
+  Code = 'code',
+  Name = 'name'
 }
 
 export type ModSupportedOrderByRelevanceInput = {
   fields: Array<ModSupportedOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -12670,8 +12247,8 @@ export type ModSupportedOrderByWithRelationInput = {
 };
 
 export enum ModSupportedScalarFieldEnum {
-  Code = "code",
-  Name = "name",
+  Code = 'code',
+  Name = 'name'
 }
 
 export type ModSupportedScalarWhereWithAggregatesInput = {
@@ -12704,13 +12281,13 @@ export type ModSupportedWhereUniqueInput = {
   AND?: InputMaybe<Array<ModSupportedWhereInput>>;
   NOT?: InputMaybe<Array<ModSupportedWhereInput>>;
   OR?: InputMaybe<Array<ModSupportedWhereInput>>;
-  code?: InputMaybe<Scalars["String"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<StringFilter>;
 };
 
 export type Mutation = {
-  __typename?: "Mutation";
-  _placeholder?: Maybe<Scalars["String"]["output"]>;
+  __typename?: 'Mutation';
+  _placeholder?: Maybe<Scalars['String']['output']>;
   createManyAction: Array<Action>;
   createManyAward: Array<Award>;
   createManyClan: Array<Clan>;
@@ -13105,1461 +12682,1798 @@ export type Mutation = {
   upsertOneWeapon: Weapon;
 };
 
+
 export type MutationCreateManyActionArgs = {
   data: Array<ActionCreateInput>;
 };
+
 
 export type MutationCreateManyAwardArgs = {
   data: Array<AwardCreateInput>;
 };
 
+
 export type MutationCreateManyClanArgs = {
   data: Array<ClanCreateInput>;
 };
+
 
 export type MutationCreateManyClanTagArgs = {
   data: Array<ClanTagCreateInput>;
 };
 
+
 export type MutationCreateManyCountryArgs = {
   data: Array<CountryCreateInput>;
 };
+
 
 export type MutationCreateManyEventAdminArgs = {
   data: Array<EventAdminCreateInput>;
 };
 
+
 export type MutationCreateManyEventChangeNameArgs = {
   data: Array<EventChangeNameCreateInput>;
 };
+
 
 export type MutationCreateManyEventChangeRoleArgs = {
   data: Array<EventChangeRoleCreateInput>;
 };
 
+
 export type MutationCreateManyEventChangeTeamArgs = {
   data: Array<EventChangeTeamCreateInput>;
 };
+
 
 export type MutationCreateManyEventChatArgs = {
   data: Array<EventChatCreateInput>;
 };
 
+
 export type MutationCreateManyEventConnectArgs = {
   data: Array<EventConnectCreateInput>;
 };
+
 
 export type MutationCreateManyEventDisconnectArgs = {
   data: Array<EventDisconnectCreateInput>;
 };
 
+
 export type MutationCreateManyEventEntryArgs = {
   data: Array<EventEntryCreateInput>;
 };
+
 
 export type MutationCreateManyEventFragArgs = {
   data: Array<EventFragCreateInput>;
 };
 
+
 export type MutationCreateManyEventLatencyArgs = {
   data: Array<EventLatencyCreateInput>;
 };
+
 
 export type MutationCreateManyEventPlayerActionArgs = {
   data: Array<EventPlayerActionCreateInput>;
 };
 
+
 export type MutationCreateManyEventPlayerPlayerActionArgs = {
   data: Array<EventPlayerPlayerActionCreateInput>;
 };
+
 
 export type MutationCreateManyEventRconArgs = {
   data: Array<EventRconCreateInput>;
 };
 
+
 export type MutationCreateManyEventStatsmeArgs = {
   data: Array<EventStatsmeCreateInput>;
 };
+
 
 export type MutationCreateManyEventStatsme2Args = {
   data: Array<EventStatsme2CreateInput>;
 };
 
+
 export type MutationCreateManyEventStatsmeLatencyArgs = {
   data: Array<EventStatsmeLatencyCreateInput>;
 };
+
 
 export type MutationCreateManyEventStatsmeTimeArgs = {
   data: Array<EventStatsmeTimeCreateInput>;
 };
 
+
 export type MutationCreateManyEventSuicideArgs = {
   data: Array<EventSuicideCreateInput>;
 };
+
 
 export type MutationCreateManyEventTeamBonusArgs = {
   data: Array<EventTeamBonusCreateInput>;
 };
 
+
 export type MutationCreateManyEventTeamkillArgs = {
   data: Array<EventTeamkillCreateInput>;
 };
+
 
 export type MutationCreateManyGameArgs = {
   data: Array<GameCreateInput>;
 };
 
+
 export type MutationCreateManyGameDefaultArgs = {
   data: Array<GameDefaultCreateInput>;
 };
+
 
 export type MutationCreateManyGameSupportedArgs = {
   data: Array<GameSupportedCreateInput>;
 };
 
+
 export type MutationCreateManyGeoLiteCityBlockArgs = {
   data: Array<GeoLiteCityBlockCreateInput>;
 };
+
 
 export type MutationCreateManyGeoLiteCityLocationArgs = {
   data: Array<GeoLiteCityLocationCreateInput>;
 };
 
+
 export type MutationCreateManyHeatmapConfigArgs = {
   data: Array<HeatmapConfigCreateInput>;
 };
+
 
 export type MutationCreateManyHostGroupArgs = {
   data: Array<HostGroupCreateInput>;
 };
 
+
 export type MutationCreateManyLivestatArgs = {
   data: Array<LivestatCreateInput>;
 };
+
 
 export type MutationCreateManyMapCountArgs = {
   data: Array<MapCountCreateInput>;
 };
 
+
 export type MutationCreateManyModDefaultArgs = {
   data: Array<ModDefaultCreateInput>;
 };
+
 
 export type MutationCreateManyModSupportedArgs = {
   data: Array<ModSupportedCreateInput>;
 };
 
+
 export type MutationCreateManyOptionArgs = {
   data: Array<OptionCreateInput>;
 };
+
 
 export type MutationCreateManyOptionChoiceArgs = {
   data: Array<OptionChoiceCreateInput>;
 };
 
+
 export type MutationCreateManyPlayerArgs = {
   data: Array<PlayerCreateInput>;
 };
+
 
 export type MutationCreateManyPlayerAwardArgs = {
   data: Array<PlayerAwardCreateInput>;
 };
 
+
 export type MutationCreateManyPlayerHistoryArgs = {
   data: Array<PlayerHistoryCreateInput>;
 };
+
 
 export type MutationCreateManyPlayerNameArgs = {
   data: Array<PlayerNameCreateInput>;
 };
 
+
 export type MutationCreateManyPlayerRibbonArgs = {
   data: Array<PlayerRibbonCreateInput>;
 };
+
 
 export type MutationCreateManyPlayerUniqueIdArgs = {
   data: Array<PlayerUniqueIdCreateInput>;
 };
 
+
 export type MutationCreateManyRankArgs = {
   data: Array<RankCreateInput>;
 };
+
 
 export type MutationCreateManyRibbonArgs = {
   data: Array<RibbonCreateInput>;
 };
 
+
 export type MutationCreateManyRoleArgs = {
   data: Array<RoleCreateInput>;
 };
+
 
 export type MutationCreateManyServerArgs = {
   data: Array<ServerCreateInput>;
 };
 
+
 export type MutationCreateManyServerConfigArgs = {
   data: Array<ServerConfigCreateInput>;
 };
+
 
 export type MutationCreateManyServerConfigDefaultArgs = {
   data: Array<ServerConfigDefaultCreateInput>;
 };
 
+
 export type MutationCreateManyServerLoadArgs = {
   data: Array<ServerLoadCreateInput>;
 };
+
 
 export type MutationCreateManyServerVoiceCommArgs = {
   data: Array<ServerVoiceCommCreateInput>;
 };
 
+
 export type MutationCreateManyTeamArgs = {
   data: Array<TeamCreateInput>;
 };
+
 
 export type MutationCreateManyTrendArgs = {
   data: Array<TrendCreateInput>;
 };
 
+
 export type MutationCreateManyUserArgs = {
   data: Array<UserCreateInput>;
 };
+
 
 export type MutationCreateManyWeaponArgs = {
   data: Array<WeaponCreateInput>;
 };
 
+
 export type MutationCreateOneActionArgs = {
   data: ActionCreateInput;
 };
+
 
 export type MutationCreateOneAwardArgs = {
   data: AwardCreateInput;
 };
 
+
 export type MutationCreateOneClanArgs = {
   data: ClanCreateInput;
 };
+
 
 export type MutationCreateOneClanTagArgs = {
   data: ClanTagCreateInput;
 };
 
+
 export type MutationCreateOneCountryArgs = {
   data: CountryCreateInput;
 };
+
 
 export type MutationCreateOneEventAdminArgs = {
   data: EventAdminCreateInput;
 };
 
+
 export type MutationCreateOneEventChangeNameArgs = {
   data: EventChangeNameCreateInput;
 };
+
 
 export type MutationCreateOneEventChangeRoleArgs = {
   data: EventChangeRoleCreateInput;
 };
 
+
 export type MutationCreateOneEventChangeTeamArgs = {
   data: EventChangeTeamCreateInput;
 };
+
 
 export type MutationCreateOneEventChatArgs = {
   data: EventChatCreateInput;
 };
 
+
 export type MutationCreateOneEventConnectArgs = {
   data: EventConnectCreateInput;
 };
+
 
 export type MutationCreateOneEventDisconnectArgs = {
   data: EventDisconnectCreateInput;
 };
 
+
 export type MutationCreateOneEventEntryArgs = {
   data: EventEntryCreateInput;
 };
+
 
 export type MutationCreateOneEventFragArgs = {
   data: EventFragCreateInput;
 };
 
+
 export type MutationCreateOneEventLatencyArgs = {
   data: EventLatencyCreateInput;
 };
+
 
 export type MutationCreateOneEventPlayerActionArgs = {
   data: EventPlayerActionCreateInput;
 };
 
+
 export type MutationCreateOneEventPlayerPlayerActionArgs = {
   data: EventPlayerPlayerActionCreateInput;
 };
+
 
 export type MutationCreateOneEventRconArgs = {
   data: EventRconCreateInput;
 };
 
+
 export type MutationCreateOneEventStatsmeArgs = {
   data: EventStatsmeCreateInput;
 };
+
 
 export type MutationCreateOneEventStatsme2Args = {
   data: EventStatsme2CreateInput;
 };
 
+
 export type MutationCreateOneEventStatsmeLatencyArgs = {
   data: EventStatsmeLatencyCreateInput;
 };
+
 
 export type MutationCreateOneEventStatsmeTimeArgs = {
   data: EventStatsmeTimeCreateInput;
 };
 
+
 export type MutationCreateOneEventSuicideArgs = {
   data: EventSuicideCreateInput;
 };
+
 
 export type MutationCreateOneEventTeamBonusArgs = {
   data: EventTeamBonusCreateInput;
 };
 
+
 export type MutationCreateOneEventTeamkillArgs = {
   data: EventTeamkillCreateInput;
 };
+
 
 export type MutationCreateOneGameArgs = {
   data: GameCreateInput;
 };
 
+
 export type MutationCreateOneGameDefaultArgs = {
   data: GameDefaultCreateInput;
 };
+
 
 export type MutationCreateOneGameSupportedArgs = {
   data: GameSupportedCreateInput;
 };
 
+
 export type MutationCreateOneGeoLiteCityBlockArgs = {
   data: GeoLiteCityBlockCreateInput;
 };
+
 
 export type MutationCreateOneGeoLiteCityLocationArgs = {
   data: GeoLiteCityLocationCreateInput;
 };
 
+
 export type MutationCreateOneHeatmapConfigArgs = {
   data: HeatmapConfigCreateInput;
 };
+
 
 export type MutationCreateOneHostGroupArgs = {
   data: HostGroupCreateInput;
 };
 
+
 export type MutationCreateOneLivestatArgs = {
   data: LivestatCreateInput;
 };
+
 
 export type MutationCreateOneMapCountArgs = {
   data: MapCountCreateInput;
 };
 
+
 export type MutationCreateOneModDefaultArgs = {
   data: ModDefaultCreateInput;
 };
+
 
 export type MutationCreateOneModSupportedArgs = {
   data: ModSupportedCreateInput;
 };
 
+
 export type MutationCreateOneOptionArgs = {
   data: OptionCreateInput;
 };
+
 
 export type MutationCreateOneOptionChoiceArgs = {
   data: OptionChoiceCreateInput;
 };
 
+
 export type MutationCreateOnePlayerArgs = {
   data: PlayerCreateInput;
 };
+
 
 export type MutationCreateOnePlayerAwardArgs = {
   data: PlayerAwardCreateInput;
 };
 
+
 export type MutationCreateOnePlayerHistoryArgs = {
   data: PlayerHistoryCreateInput;
 };
+
 
 export type MutationCreateOnePlayerNameArgs = {
   data: PlayerNameCreateInput;
 };
 
+
 export type MutationCreateOnePlayerRibbonArgs = {
   data: PlayerRibbonCreateInput;
 };
+
 
 export type MutationCreateOnePlayerUniqueIdArgs = {
   data: PlayerUniqueIdCreateInput;
 };
 
+
 export type MutationCreateOneRankArgs = {
   data: RankCreateInput;
 };
+
 
 export type MutationCreateOneRibbonArgs = {
   data: RibbonCreateInput;
 };
 
+
 export type MutationCreateOneRoleArgs = {
   data: RoleCreateInput;
 };
+
 
 export type MutationCreateOneServerArgs = {
   data: ServerCreateInput;
 };
 
+
 export type MutationCreateOneServerConfigArgs = {
   data: ServerConfigCreateInput;
 };
+
 
 export type MutationCreateOneServerConfigDefaultArgs = {
   data: ServerConfigDefaultCreateInput;
 };
 
+
 export type MutationCreateOneServerLoadArgs = {
   data: ServerLoadCreateInput;
 };
+
 
 export type MutationCreateOneServerVoiceCommArgs = {
   data: ServerVoiceCommCreateInput;
 };
 
+
 export type MutationCreateOneTeamArgs = {
   data: TeamCreateInput;
 };
+
 
 export type MutationCreateOneTrendArgs = {
   data: TrendCreateInput;
 };
 
+
 export type MutationCreateOneUserArgs = {
   data: UserCreateInput;
 };
+
 
 export type MutationCreateOneWeaponArgs = {
   data: WeaponCreateInput;
 };
 
+
 export type MutationDeleteManyActionArgs = {
   where: ActionWhereInput;
 };
+
 
 export type MutationDeleteManyAwardArgs = {
   where: AwardWhereInput;
 };
 
+
 export type MutationDeleteManyClanArgs = {
   where: ClanWhereInput;
 };
+
 
 export type MutationDeleteManyClanTagArgs = {
   where: ClanTagWhereInput;
 };
 
+
 export type MutationDeleteManyCountryArgs = {
   where: CountryWhereInput;
 };
+
 
 export type MutationDeleteManyEventAdminArgs = {
   where: EventAdminWhereInput;
 };
 
+
 export type MutationDeleteManyEventChangeNameArgs = {
   where: EventChangeNameWhereInput;
 };
+
 
 export type MutationDeleteManyEventChangeRoleArgs = {
   where: EventChangeRoleWhereInput;
 };
 
+
 export type MutationDeleteManyEventChangeTeamArgs = {
   where: EventChangeTeamWhereInput;
 };
+
 
 export type MutationDeleteManyEventChatArgs = {
   where: EventChatWhereInput;
 };
 
+
 export type MutationDeleteManyEventConnectArgs = {
   where: EventConnectWhereInput;
 };
+
 
 export type MutationDeleteManyEventDisconnectArgs = {
   where: EventDisconnectWhereInput;
 };
 
+
 export type MutationDeleteManyEventEntryArgs = {
   where: EventEntryWhereInput;
 };
+
 
 export type MutationDeleteManyEventFragArgs = {
   where: EventFragWhereInput;
 };
 
+
 export type MutationDeleteManyEventLatencyArgs = {
   where: EventLatencyWhereInput;
 };
+
 
 export type MutationDeleteManyEventPlayerActionArgs = {
   where: EventPlayerActionWhereInput;
 };
 
+
 export type MutationDeleteManyEventPlayerPlayerActionArgs = {
   where: EventPlayerPlayerActionWhereInput;
 };
+
 
 export type MutationDeleteManyEventRconArgs = {
   where: EventRconWhereInput;
 };
 
+
 export type MutationDeleteManyEventStatsmeArgs = {
   where: EventStatsmeWhereInput;
 };
+
 
 export type MutationDeleteManyEventStatsme2Args = {
   where: EventStatsme2WhereInput;
 };
 
+
 export type MutationDeleteManyEventStatsmeLatencyArgs = {
   where: EventStatsmeLatencyWhereInput;
 };
+
 
 export type MutationDeleteManyEventStatsmeTimeArgs = {
   where: EventStatsmeTimeWhereInput;
 };
 
+
 export type MutationDeleteManyEventSuicideArgs = {
   where: EventSuicideWhereInput;
 };
+
 
 export type MutationDeleteManyEventTeamBonusArgs = {
   where: EventTeamBonusWhereInput;
 };
 
+
 export type MutationDeleteManyEventTeamkillArgs = {
   where: EventTeamkillWhereInput;
 };
+
 
 export type MutationDeleteManyGameArgs = {
   where: GameWhereInput;
 };
 
+
 export type MutationDeleteManyGameDefaultArgs = {
   where: GameDefaultWhereInput;
 };
+
 
 export type MutationDeleteManyGameSupportedArgs = {
   where: GameSupportedWhereInput;
 };
 
+
 export type MutationDeleteManyGeoLiteCityBlockArgs = {
   where: GeoLiteCityBlockWhereInput;
 };
+
 
 export type MutationDeleteManyGeoLiteCityLocationArgs = {
   where: GeoLiteCityLocationWhereInput;
 };
 
+
 export type MutationDeleteManyHeatmapConfigArgs = {
   where: HeatmapConfigWhereInput;
 };
+
 
 export type MutationDeleteManyHostGroupArgs = {
   where: HostGroupWhereInput;
 };
 
+
 export type MutationDeleteManyLivestatArgs = {
   where: LivestatWhereInput;
 };
+
 
 export type MutationDeleteManyMapCountArgs = {
   where: MapCountWhereInput;
 };
 
+
 export type MutationDeleteManyModDefaultArgs = {
   where: ModDefaultWhereInput;
 };
+
 
 export type MutationDeleteManyModSupportedArgs = {
   where: ModSupportedWhereInput;
 };
 
+
 export type MutationDeleteManyOptionArgs = {
   where: OptionWhereInput;
 };
+
 
 export type MutationDeleteManyOptionChoiceArgs = {
   where: OptionChoiceWhereInput;
 };
 
+
 export type MutationDeleteManyPlayerArgs = {
   where: PlayerWhereInput;
 };
+
 
 export type MutationDeleteManyPlayerAwardArgs = {
   where: PlayerAwardWhereInput;
 };
 
+
 export type MutationDeleteManyPlayerHistoryArgs = {
   where: PlayerHistoryWhereInput;
 };
+
 
 export type MutationDeleteManyPlayerNameArgs = {
   where: PlayerNameWhereInput;
 };
 
+
 export type MutationDeleteManyPlayerRibbonArgs = {
   where: PlayerRibbonWhereInput;
 };
+
 
 export type MutationDeleteManyPlayerUniqueIdArgs = {
   where: PlayerUniqueIdWhereInput;
 };
 
+
 export type MutationDeleteManyRankArgs = {
   where: RankWhereInput;
 };
+
 
 export type MutationDeleteManyRibbonArgs = {
   where: RibbonWhereInput;
 };
 
+
 export type MutationDeleteManyRoleArgs = {
   where: RoleWhereInput;
 };
+
 
 export type MutationDeleteManyServerArgs = {
   where: ServerWhereInput;
 };
 
+
 export type MutationDeleteManyServerConfigArgs = {
   where: ServerConfigWhereInput;
 };
+
 
 export type MutationDeleteManyServerConfigDefaultArgs = {
   where: ServerConfigDefaultWhereInput;
 };
 
+
 export type MutationDeleteManyServerLoadArgs = {
   where: ServerLoadWhereInput;
 };
+
 
 export type MutationDeleteManyServerVoiceCommArgs = {
   where: ServerVoiceCommWhereInput;
 };
 
+
 export type MutationDeleteManyTeamArgs = {
   where: TeamWhereInput;
 };
+
 
 export type MutationDeleteManyTrendArgs = {
   where: TrendWhereInput;
 };
 
+
 export type MutationDeleteManyUserArgs = {
   where: UserWhereInput;
 };
+
 
 export type MutationDeleteManyWeaponArgs = {
   where: WeaponWhereInput;
 };
 
+
 export type MutationDeleteOneActionArgs = {
   where: ActionWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneAwardArgs = {
   where: AwardWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneClanArgs = {
   where: ClanWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneClanTagArgs = {
   where: ClanTagWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneCountryArgs = {
   where: CountryWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneEventAdminArgs = {
   where: EventAdminWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneEventChangeNameArgs = {
   where: EventChangeNameWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneEventChangeRoleArgs = {
   where: EventChangeRoleWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneEventChangeTeamArgs = {
   where: EventChangeTeamWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneEventChatArgs = {
   where: EventChatWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneEventConnectArgs = {
   where: EventConnectWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneEventDisconnectArgs = {
   where: EventDisconnectWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneEventEntryArgs = {
   where: EventEntryWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneEventFragArgs = {
   where: EventFragWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneEventLatencyArgs = {
   where: EventLatencyWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneEventPlayerActionArgs = {
   where: EventPlayerActionWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneEventPlayerPlayerActionArgs = {
   where: EventPlayerPlayerActionWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneEventRconArgs = {
   where: EventRconWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneEventStatsmeArgs = {
   where: EventStatsmeWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneEventStatsme2Args = {
   where: EventStatsme2WhereUniqueInput;
 };
 
+
 export type MutationDeleteOneEventStatsmeLatencyArgs = {
   where: EventStatsmeLatencyWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneEventStatsmeTimeArgs = {
   where: EventStatsmeTimeWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneEventSuicideArgs = {
   where: EventSuicideWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneEventTeamBonusArgs = {
   where: EventTeamBonusWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneEventTeamkillArgs = {
   where: EventTeamkillWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneGameArgs = {
   where: GameWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneGameDefaultArgs = {
   where: GameDefaultWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneGameSupportedArgs = {
   where: GameSupportedWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneGeoLiteCityBlockArgs = {
   where: GeoLiteCityBlockWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneGeoLiteCityLocationArgs = {
   where: GeoLiteCityLocationWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneHeatmapConfigArgs = {
   where: HeatmapConfigWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneHostGroupArgs = {
   where: HostGroupWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneLivestatArgs = {
   where: LivestatWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneMapCountArgs = {
   where: MapCountWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneModDefaultArgs = {
   where: ModDefaultWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneModSupportedArgs = {
   where: ModSupportedWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneOptionArgs = {
   where: OptionWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneOptionChoiceArgs = {
   where: OptionChoiceWhereUniqueInput;
 };
 
+
 export type MutationDeleteOnePlayerArgs = {
   where: PlayerWhereUniqueInput;
 };
+
 
 export type MutationDeleteOnePlayerAwardArgs = {
   where: PlayerAwardWhereUniqueInput;
 };
 
+
 export type MutationDeleteOnePlayerHistoryArgs = {
   where: PlayerHistoryWhereUniqueInput;
 };
+
 
 export type MutationDeleteOnePlayerNameArgs = {
   where: PlayerNameWhereUniqueInput;
 };
 
+
 export type MutationDeleteOnePlayerRibbonArgs = {
   where: PlayerRibbonWhereUniqueInput;
 };
+
 
 export type MutationDeleteOnePlayerUniqueIdArgs = {
   where: PlayerUniqueIdWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneRankArgs = {
   where: RankWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneRibbonArgs = {
   where: RibbonWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneRoleArgs = {
   where: RoleWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneServerArgs = {
   where: ServerWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneServerConfigArgs = {
   where: ServerConfigWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneServerConfigDefaultArgs = {
   where: ServerConfigDefaultWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneServerLoadArgs = {
   where: ServerLoadWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneServerVoiceCommArgs = {
   where: ServerVoiceCommWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneTeamArgs = {
   where: TeamWhereUniqueInput;
 };
+
 
 export type MutationDeleteOneTrendArgs = {
   where: TrendWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneUserArgs = {
   where: UserWhereUniqueInput;
 };
 
+
 export type MutationDeleteOneWeaponArgs = {
   where: WeaponWhereUniqueInput;
 };
+
 
 export type MutationUpdateManyActionArgs = {
   data: ActionUpdateManyMutationInput;
   where?: InputMaybe<ActionWhereInput>;
 };
 
+
 export type MutationUpdateManyAwardArgs = {
   data: AwardUpdateManyMutationInput;
   where?: InputMaybe<AwardWhereInput>;
 };
+
 
 export type MutationUpdateManyClanArgs = {
   data: ClanUpdateManyMutationInput;
   where?: InputMaybe<ClanWhereInput>;
 };
 
+
 export type MutationUpdateManyClanTagArgs = {
   data: ClanTagUpdateManyMutationInput;
   where?: InputMaybe<ClanTagWhereInput>;
 };
+
 
 export type MutationUpdateManyCountryArgs = {
   data: CountryUpdateManyMutationInput;
   where?: InputMaybe<CountryWhereInput>;
 };
 
+
 export type MutationUpdateManyEventAdminArgs = {
   data: EventAdminUpdateManyMutationInput;
   where?: InputMaybe<EventAdminWhereInput>;
 };
+
 
 export type MutationUpdateManyEventChangeNameArgs = {
   data: EventChangeNameUpdateManyMutationInput;
   where?: InputMaybe<EventChangeNameWhereInput>;
 };
 
+
 export type MutationUpdateManyEventChangeRoleArgs = {
   data: EventChangeRoleUpdateManyMutationInput;
   where?: InputMaybe<EventChangeRoleWhereInput>;
 };
+
 
 export type MutationUpdateManyEventChangeTeamArgs = {
   data: EventChangeTeamUpdateManyMutationInput;
   where?: InputMaybe<EventChangeTeamWhereInput>;
 };
 
+
 export type MutationUpdateManyEventChatArgs = {
   data: EventChatUpdateManyMutationInput;
   where?: InputMaybe<EventChatWhereInput>;
 };
+
 
 export type MutationUpdateManyEventConnectArgs = {
   data: EventConnectUpdateManyMutationInput;
   where?: InputMaybe<EventConnectWhereInput>;
 };
 
+
 export type MutationUpdateManyEventDisconnectArgs = {
   data: EventDisconnectUpdateManyMutationInput;
   where?: InputMaybe<EventDisconnectWhereInput>;
 };
+
 
 export type MutationUpdateManyEventEntryArgs = {
   data: EventEntryUpdateManyMutationInput;
   where?: InputMaybe<EventEntryWhereInput>;
 };
 
+
 export type MutationUpdateManyEventFragArgs = {
   data: EventFragUpdateManyMutationInput;
   where?: InputMaybe<EventFragWhereInput>;
 };
+
 
 export type MutationUpdateManyEventLatencyArgs = {
   data: EventLatencyUpdateManyMutationInput;
   where?: InputMaybe<EventLatencyWhereInput>;
 };
 
+
 export type MutationUpdateManyEventPlayerActionArgs = {
   data: EventPlayerActionUpdateManyMutationInput;
   where?: InputMaybe<EventPlayerActionWhereInput>;
 };
+
 
 export type MutationUpdateManyEventPlayerPlayerActionArgs = {
   data: EventPlayerPlayerActionUpdateManyMutationInput;
   where?: InputMaybe<EventPlayerPlayerActionWhereInput>;
 };
 
+
 export type MutationUpdateManyEventRconArgs = {
   data: EventRconUpdateManyMutationInput;
   where?: InputMaybe<EventRconWhereInput>;
 };
+
 
 export type MutationUpdateManyEventStatsmeArgs = {
   data: EventStatsmeUpdateManyMutationInput;
   where?: InputMaybe<EventStatsmeWhereInput>;
 };
 
+
 export type MutationUpdateManyEventStatsme2Args = {
   data: EventStatsme2UpdateManyMutationInput;
   where?: InputMaybe<EventStatsme2WhereInput>;
 };
+
 
 export type MutationUpdateManyEventStatsmeLatencyArgs = {
   data: EventStatsmeLatencyUpdateManyMutationInput;
   where?: InputMaybe<EventStatsmeLatencyWhereInput>;
 };
 
+
 export type MutationUpdateManyEventStatsmeTimeArgs = {
   data: EventStatsmeTimeUpdateManyMutationInput;
   where?: InputMaybe<EventStatsmeTimeWhereInput>;
 };
+
 
 export type MutationUpdateManyEventSuicideArgs = {
   data: EventSuicideUpdateManyMutationInput;
   where?: InputMaybe<EventSuicideWhereInput>;
 };
 
+
 export type MutationUpdateManyEventTeamBonusArgs = {
   data: EventTeamBonusUpdateManyMutationInput;
   where?: InputMaybe<EventTeamBonusWhereInput>;
 };
+
 
 export type MutationUpdateManyEventTeamkillArgs = {
   data: EventTeamkillUpdateManyMutationInput;
   where?: InputMaybe<EventTeamkillWhereInput>;
 };
 
+
 export type MutationUpdateManyGameArgs = {
   data: GameUpdateManyMutationInput;
   where?: InputMaybe<GameWhereInput>;
 };
+
 
 export type MutationUpdateManyGameDefaultArgs = {
   data: GameDefaultUpdateManyMutationInput;
   where?: InputMaybe<GameDefaultWhereInput>;
 };
 
+
 export type MutationUpdateManyGameSupportedArgs = {
   data: GameSupportedUpdateManyMutationInput;
   where?: InputMaybe<GameSupportedWhereInput>;
 };
+
 
 export type MutationUpdateManyGeoLiteCityBlockArgs = {
   data: GeoLiteCityBlockUpdateManyMutationInput;
   where?: InputMaybe<GeoLiteCityBlockWhereInput>;
 };
 
+
 export type MutationUpdateManyGeoLiteCityLocationArgs = {
   data: GeoLiteCityLocationUpdateManyMutationInput;
   where?: InputMaybe<GeoLiteCityLocationWhereInput>;
 };
+
 
 export type MutationUpdateManyHeatmapConfigArgs = {
   data: HeatmapConfigUpdateManyMutationInput;
   where?: InputMaybe<HeatmapConfigWhereInput>;
 };
 
+
 export type MutationUpdateManyHostGroupArgs = {
   data: HostGroupUpdateManyMutationInput;
   where?: InputMaybe<HostGroupWhereInput>;
 };
+
 
 export type MutationUpdateManyLivestatArgs = {
   data: LivestatUpdateManyMutationInput;
   where?: InputMaybe<LivestatWhereInput>;
 };
 
+
 export type MutationUpdateManyMapCountArgs = {
   data: MapCountUpdateManyMutationInput;
   where?: InputMaybe<MapCountWhereInput>;
 };
+
 
 export type MutationUpdateManyModDefaultArgs = {
   data: ModDefaultUpdateManyMutationInput;
   where?: InputMaybe<ModDefaultWhereInput>;
 };
 
+
 export type MutationUpdateManyModSupportedArgs = {
   data: ModSupportedUpdateManyMutationInput;
   where?: InputMaybe<ModSupportedWhereInput>;
 };
+
 
 export type MutationUpdateManyOptionArgs = {
   data: OptionUpdateManyMutationInput;
   where?: InputMaybe<OptionWhereInput>;
 };
 
+
 export type MutationUpdateManyOptionChoiceArgs = {
   data: OptionChoiceUpdateManyMutationInput;
   where?: InputMaybe<OptionChoiceWhereInput>;
 };
+
 
 export type MutationUpdateManyPlayerArgs = {
   data: PlayerUpdateManyMutationInput;
   where?: InputMaybe<PlayerWhereInput>;
 };
 
+
 export type MutationUpdateManyPlayerAwardArgs = {
   data: PlayerAwardUpdateManyMutationInput;
   where?: InputMaybe<PlayerAwardWhereInput>;
 };
+
 
 export type MutationUpdateManyPlayerHistoryArgs = {
   data: PlayerHistoryUpdateManyMutationInput;
   where?: InputMaybe<PlayerHistoryWhereInput>;
 };
 
+
 export type MutationUpdateManyPlayerNameArgs = {
   data: PlayerNameUpdateManyMutationInput;
   where?: InputMaybe<PlayerNameWhereInput>;
 };
+
 
 export type MutationUpdateManyPlayerRibbonArgs = {
   data: PlayerRibbonUpdateManyMutationInput;
   where?: InputMaybe<PlayerRibbonWhereInput>;
 };
 
+
 export type MutationUpdateManyPlayerUniqueIdArgs = {
   data: PlayerUniqueIdUpdateManyMutationInput;
   where?: InputMaybe<PlayerUniqueIdWhereInput>;
 };
+
 
 export type MutationUpdateManyRankArgs = {
   data: RankUpdateManyMutationInput;
   where?: InputMaybe<RankWhereInput>;
 };
 
+
 export type MutationUpdateManyRibbonArgs = {
   data: RibbonUpdateManyMutationInput;
   where?: InputMaybe<RibbonWhereInput>;
 };
+
 
 export type MutationUpdateManyRoleArgs = {
   data: RoleUpdateManyMutationInput;
   where?: InputMaybe<RoleWhereInput>;
 };
 
+
 export type MutationUpdateManyServerArgs = {
   data: ServerUpdateManyMutationInput;
   where?: InputMaybe<ServerWhereInput>;
 };
+
 
 export type MutationUpdateManyServerConfigArgs = {
   data: ServerConfigUpdateManyMutationInput;
   where?: InputMaybe<ServerConfigWhereInput>;
 };
 
+
 export type MutationUpdateManyServerConfigDefaultArgs = {
   data: ServerConfigDefaultUpdateManyMutationInput;
   where?: InputMaybe<ServerConfigDefaultWhereInput>;
 };
+
 
 export type MutationUpdateManyServerLoadArgs = {
   data: ServerLoadUpdateManyMutationInput;
   where?: InputMaybe<ServerLoadWhereInput>;
 };
 
+
 export type MutationUpdateManyServerVoiceCommArgs = {
   data: ServerVoiceCommUpdateManyMutationInput;
   where?: InputMaybe<ServerVoiceCommWhereInput>;
 };
+
 
 export type MutationUpdateManyTeamArgs = {
   data: TeamUpdateManyMutationInput;
   where?: InputMaybe<TeamWhereInput>;
 };
 
+
 export type MutationUpdateManyTrendArgs = {
   data: TrendUpdateManyMutationInput;
   where?: InputMaybe<TrendWhereInput>;
 };
+
 
 export type MutationUpdateManyUserArgs = {
   data: UserUpdateManyMutationInput;
   where?: InputMaybe<UserWhereInput>;
 };
 
+
 export type MutationUpdateManyWeaponArgs = {
   data: WeaponUpdateManyMutationInput;
   where?: InputMaybe<WeaponWhereInput>;
 };
+
 
 export type MutationUpdateOneActionArgs = {
   data: ActionUpdateInput;
   where: ActionWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneAwardArgs = {
   data: AwardUpdateInput;
   where: AwardWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneClanArgs = {
   data: ClanUpdateInput;
   where: ClanWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneClanTagArgs = {
   data: ClanTagUpdateInput;
   where: ClanTagWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneCountryArgs = {
   data: CountryUpdateInput;
   where: CountryWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneEventAdminArgs = {
   data: EventAdminUpdateInput;
   where: EventAdminWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneEventChangeNameArgs = {
   data: EventChangeNameUpdateInput;
   where: EventChangeNameWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneEventChangeRoleArgs = {
   data: EventChangeRoleUpdateInput;
   where: EventChangeRoleWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneEventChangeTeamArgs = {
   data: EventChangeTeamUpdateInput;
   where: EventChangeTeamWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneEventChatArgs = {
   data: EventChatUpdateInput;
   where: EventChatWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneEventConnectArgs = {
   data: EventConnectUpdateInput;
   where: EventConnectWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneEventDisconnectArgs = {
   data: EventDisconnectUpdateInput;
   where: EventDisconnectWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneEventEntryArgs = {
   data: EventEntryUpdateInput;
   where: EventEntryWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneEventFragArgs = {
   data: EventFragUpdateInput;
   where: EventFragWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneEventLatencyArgs = {
   data: EventLatencyUpdateInput;
   where: EventLatencyWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneEventPlayerActionArgs = {
   data: EventPlayerActionUpdateInput;
   where: EventPlayerActionWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneEventPlayerPlayerActionArgs = {
   data: EventPlayerPlayerActionUpdateInput;
   where: EventPlayerPlayerActionWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneEventRconArgs = {
   data: EventRconUpdateInput;
   where: EventRconWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneEventStatsmeArgs = {
   data: EventStatsmeUpdateInput;
   where: EventStatsmeWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneEventStatsme2Args = {
   data: EventStatsme2UpdateInput;
   where: EventStatsme2WhereUniqueInput;
 };
+
 
 export type MutationUpdateOneEventStatsmeLatencyArgs = {
   data: EventStatsmeLatencyUpdateInput;
   where: EventStatsmeLatencyWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneEventStatsmeTimeArgs = {
   data: EventStatsmeTimeUpdateInput;
   where: EventStatsmeTimeWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneEventSuicideArgs = {
   data: EventSuicideUpdateInput;
   where: EventSuicideWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneEventTeamBonusArgs = {
   data: EventTeamBonusUpdateInput;
   where: EventTeamBonusWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneEventTeamkillArgs = {
   data: EventTeamkillUpdateInput;
   where: EventTeamkillWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneGameArgs = {
   data: GameUpdateInput;
   where: GameWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneGameDefaultArgs = {
   data: GameDefaultUpdateInput;
   where: GameDefaultWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneGameSupportedArgs = {
   data: GameSupportedUpdateInput;
   where: GameSupportedWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneGeoLiteCityBlockArgs = {
   data: GeoLiteCityBlockUpdateInput;
   where: GeoLiteCityBlockWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneGeoLiteCityLocationArgs = {
   data: GeoLiteCityLocationUpdateInput;
   where: GeoLiteCityLocationWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneHeatmapConfigArgs = {
   data: HeatmapConfigUpdateInput;
   where: HeatmapConfigWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneHostGroupArgs = {
   data: HostGroupUpdateInput;
   where: HostGroupWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneLivestatArgs = {
   data: LivestatUpdateInput;
   where: LivestatWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneMapCountArgs = {
   data: MapCountUpdateInput;
   where: MapCountWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneModDefaultArgs = {
   data: ModDefaultUpdateInput;
   where: ModDefaultWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneModSupportedArgs = {
   data: ModSupportedUpdateInput;
   where: ModSupportedWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneOptionArgs = {
   data: OptionUpdateInput;
   where: OptionWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneOptionChoiceArgs = {
   data: OptionChoiceUpdateInput;
   where: OptionChoiceWhereUniqueInput;
 };
+
 
 export type MutationUpdateOnePlayerArgs = {
   data: PlayerUpdateInput;
   where: PlayerWhereUniqueInput;
 };
 
+
 export type MutationUpdateOnePlayerAwardArgs = {
   data: PlayerAwardUpdateInput;
   where: PlayerAwardWhereUniqueInput;
 };
+
 
 export type MutationUpdateOnePlayerHistoryArgs = {
   data: PlayerHistoryUpdateInput;
   where: PlayerHistoryWhereUniqueInput;
 };
 
+
 export type MutationUpdateOnePlayerNameArgs = {
   data: PlayerNameUpdateInput;
   where: PlayerNameWhereUniqueInput;
 };
+
 
 export type MutationUpdateOnePlayerRibbonArgs = {
   data: PlayerRibbonUpdateInput;
   where: PlayerRibbonWhereUniqueInput;
 };
 
+
 export type MutationUpdateOnePlayerUniqueIdArgs = {
   data: PlayerUniqueIdUpdateInput;
   where: PlayerUniqueIdWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneRankArgs = {
   data: RankUpdateInput;
   where: RankWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneRibbonArgs = {
   data: RibbonUpdateInput;
   where: RibbonWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneRoleArgs = {
   data: RoleUpdateInput;
   where: RoleWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneServerArgs = {
   data: ServerUpdateInput;
   where: ServerWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneServerConfigArgs = {
   data: ServerConfigUpdateInput;
   where: ServerConfigWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneServerConfigDefaultArgs = {
   data: ServerConfigDefaultUpdateInput;
   where: ServerConfigDefaultWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneServerLoadArgs = {
   data: ServerLoadUpdateInput;
   where: ServerLoadWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneServerVoiceCommArgs = {
   data: ServerVoiceCommUpdateInput;
   where: ServerVoiceCommWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneTeamArgs = {
   data: TeamUpdateInput;
   where: TeamWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneTrendArgs = {
   data: TrendUpdateInput;
   where: TrendWhereUniqueInput;
 };
+
 
 export type MutationUpdateOneUserArgs = {
   data: UserUpdateInput;
   where: UserWhereUniqueInput;
 };
 
+
 export type MutationUpdateOneWeaponArgs = {
   data: WeaponUpdateInput;
   where: WeaponWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneActionArgs = {
   create: ActionCreateInput;
@@ -14567,11 +14481,13 @@ export type MutationUpsertOneActionArgs = {
   where: ActionWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneAwardArgs = {
   create: AwardCreateInput;
   update: AwardUpdateInput;
   where: AwardWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneClanArgs = {
   create: ClanCreateInput;
@@ -14579,11 +14495,13 @@ export type MutationUpsertOneClanArgs = {
   where: ClanWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneClanTagArgs = {
   create: ClanTagCreateInput;
   update: ClanTagUpdateInput;
   where: ClanTagWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneCountryArgs = {
   create: CountryCreateInput;
@@ -14591,11 +14509,13 @@ export type MutationUpsertOneCountryArgs = {
   where: CountryWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneEventAdminArgs = {
   create: EventAdminCreateInput;
   update: EventAdminUpdateInput;
   where: EventAdminWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneEventChangeNameArgs = {
   create: EventChangeNameCreateInput;
@@ -14603,11 +14523,13 @@ export type MutationUpsertOneEventChangeNameArgs = {
   where: EventChangeNameWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneEventChangeRoleArgs = {
   create: EventChangeRoleCreateInput;
   update: EventChangeRoleUpdateInput;
   where: EventChangeRoleWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneEventChangeTeamArgs = {
   create: EventChangeTeamCreateInput;
@@ -14615,11 +14537,13 @@ export type MutationUpsertOneEventChangeTeamArgs = {
   where: EventChangeTeamWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneEventChatArgs = {
   create: EventChatCreateInput;
   update: EventChatUpdateInput;
   where: EventChatWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneEventConnectArgs = {
   create: EventConnectCreateInput;
@@ -14627,11 +14551,13 @@ export type MutationUpsertOneEventConnectArgs = {
   where: EventConnectWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneEventDisconnectArgs = {
   create: EventDisconnectCreateInput;
   update: EventDisconnectUpdateInput;
   where: EventDisconnectWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneEventEntryArgs = {
   create: EventEntryCreateInput;
@@ -14639,11 +14565,13 @@ export type MutationUpsertOneEventEntryArgs = {
   where: EventEntryWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneEventFragArgs = {
   create: EventFragCreateInput;
   update: EventFragUpdateInput;
   where: EventFragWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneEventLatencyArgs = {
   create: EventLatencyCreateInput;
@@ -14651,11 +14579,13 @@ export type MutationUpsertOneEventLatencyArgs = {
   where: EventLatencyWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneEventPlayerActionArgs = {
   create: EventPlayerActionCreateInput;
   update: EventPlayerActionUpdateInput;
   where: EventPlayerActionWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneEventPlayerPlayerActionArgs = {
   create: EventPlayerPlayerActionCreateInput;
@@ -14663,11 +14593,13 @@ export type MutationUpsertOneEventPlayerPlayerActionArgs = {
   where: EventPlayerPlayerActionWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneEventRconArgs = {
   create: EventRconCreateInput;
   update: EventRconUpdateInput;
   where: EventRconWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneEventStatsmeArgs = {
   create: EventStatsmeCreateInput;
@@ -14675,11 +14607,13 @@ export type MutationUpsertOneEventStatsmeArgs = {
   where: EventStatsmeWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneEventStatsme2Args = {
   create: EventStatsme2CreateInput;
   update: EventStatsme2UpdateInput;
   where: EventStatsme2WhereUniqueInput;
 };
+
 
 export type MutationUpsertOneEventStatsmeLatencyArgs = {
   create: EventStatsmeLatencyCreateInput;
@@ -14687,11 +14621,13 @@ export type MutationUpsertOneEventStatsmeLatencyArgs = {
   where: EventStatsmeLatencyWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneEventStatsmeTimeArgs = {
   create: EventStatsmeTimeCreateInput;
   update: EventStatsmeTimeUpdateInput;
   where: EventStatsmeTimeWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneEventSuicideArgs = {
   create: EventSuicideCreateInput;
@@ -14699,11 +14635,13 @@ export type MutationUpsertOneEventSuicideArgs = {
   where: EventSuicideWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneEventTeamBonusArgs = {
   create: EventTeamBonusCreateInput;
   update: EventTeamBonusUpdateInput;
   where: EventTeamBonusWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneEventTeamkillArgs = {
   create: EventTeamkillCreateInput;
@@ -14711,11 +14649,13 @@ export type MutationUpsertOneEventTeamkillArgs = {
   where: EventTeamkillWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneGameArgs = {
   create: GameCreateInput;
   update: GameUpdateInput;
   where: GameWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneGameDefaultArgs = {
   create: GameDefaultCreateInput;
@@ -14723,11 +14663,13 @@ export type MutationUpsertOneGameDefaultArgs = {
   where: GameDefaultWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneGameSupportedArgs = {
   create: GameSupportedCreateInput;
   update: GameSupportedUpdateInput;
   where: GameSupportedWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneGeoLiteCityBlockArgs = {
   create: GeoLiteCityBlockCreateInput;
@@ -14735,11 +14677,13 @@ export type MutationUpsertOneGeoLiteCityBlockArgs = {
   where: GeoLiteCityBlockWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneGeoLiteCityLocationArgs = {
   create: GeoLiteCityLocationCreateInput;
   update: GeoLiteCityLocationUpdateInput;
   where: GeoLiteCityLocationWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneHeatmapConfigArgs = {
   create: HeatmapConfigCreateInput;
@@ -14747,11 +14691,13 @@ export type MutationUpsertOneHeatmapConfigArgs = {
   where: HeatmapConfigWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneHostGroupArgs = {
   create: HostGroupCreateInput;
   update: HostGroupUpdateInput;
   where: HostGroupWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneLivestatArgs = {
   create: LivestatCreateInput;
@@ -14759,11 +14705,13 @@ export type MutationUpsertOneLivestatArgs = {
   where: LivestatWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneMapCountArgs = {
   create: MapCountCreateInput;
   update: MapCountUpdateInput;
   where: MapCountWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneModDefaultArgs = {
   create: ModDefaultCreateInput;
@@ -14771,11 +14719,13 @@ export type MutationUpsertOneModDefaultArgs = {
   where: ModDefaultWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneModSupportedArgs = {
   create: ModSupportedCreateInput;
   update: ModSupportedUpdateInput;
   where: ModSupportedWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneOptionArgs = {
   create: OptionCreateInput;
@@ -14783,11 +14733,13 @@ export type MutationUpsertOneOptionArgs = {
   where: OptionWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneOptionChoiceArgs = {
   create: OptionChoiceCreateInput;
   update: OptionChoiceUpdateInput;
   where: OptionChoiceWhereUniqueInput;
 };
+
 
 export type MutationUpsertOnePlayerArgs = {
   create: PlayerCreateInput;
@@ -14795,11 +14747,13 @@ export type MutationUpsertOnePlayerArgs = {
   where: PlayerWhereUniqueInput;
 };
 
+
 export type MutationUpsertOnePlayerAwardArgs = {
   create: PlayerAwardCreateInput;
   update: PlayerAwardUpdateInput;
   where: PlayerAwardWhereUniqueInput;
 };
+
 
 export type MutationUpsertOnePlayerHistoryArgs = {
   create: PlayerHistoryCreateInput;
@@ -14807,11 +14761,13 @@ export type MutationUpsertOnePlayerHistoryArgs = {
   where: PlayerHistoryWhereUniqueInput;
 };
 
+
 export type MutationUpsertOnePlayerNameArgs = {
   create: PlayerNameCreateInput;
   update: PlayerNameUpdateInput;
   where: PlayerNameWhereUniqueInput;
 };
+
 
 export type MutationUpsertOnePlayerRibbonArgs = {
   create: PlayerRibbonCreateInput;
@@ -14819,11 +14775,13 @@ export type MutationUpsertOnePlayerRibbonArgs = {
   where: PlayerRibbonWhereUniqueInput;
 };
 
+
 export type MutationUpsertOnePlayerUniqueIdArgs = {
   create: PlayerUniqueIdCreateInput;
   update: PlayerUniqueIdUpdateInput;
   where: PlayerUniqueIdWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneRankArgs = {
   create: RankCreateInput;
@@ -14831,11 +14789,13 @@ export type MutationUpsertOneRankArgs = {
   where: RankWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneRibbonArgs = {
   create: RibbonCreateInput;
   update: RibbonUpdateInput;
   where: RibbonWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneRoleArgs = {
   create: RoleCreateInput;
@@ -14843,11 +14803,13 @@ export type MutationUpsertOneRoleArgs = {
   where: RoleWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneServerArgs = {
   create: ServerCreateInput;
   update: ServerUpdateInput;
   where: ServerWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneServerConfigArgs = {
   create: ServerConfigCreateInput;
@@ -14855,11 +14817,13 @@ export type MutationUpsertOneServerConfigArgs = {
   where: ServerConfigWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneServerConfigDefaultArgs = {
   create: ServerConfigDefaultCreateInput;
   update: ServerConfigDefaultUpdateInput;
   where: ServerConfigDefaultWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneServerLoadArgs = {
   create: ServerLoadCreateInput;
@@ -14867,11 +14831,13 @@ export type MutationUpsertOneServerLoadArgs = {
   where: ServerLoadWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneServerVoiceCommArgs = {
   create: ServerVoiceCommCreateInput;
   update: ServerVoiceCommUpdateInput;
   where: ServerVoiceCommWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneTeamArgs = {
   create: TeamCreateInput;
@@ -14879,17 +14845,20 @@ export type MutationUpsertOneTeamArgs = {
   where: TeamWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneTrendArgs = {
   create: TrendCreateInput;
   update: TrendUpdateInput;
   where: TrendWhereUniqueInput;
 };
 
+
 export type MutationUpsertOneUserArgs = {
   create: UserCreateInput;
   update: UserUpdateInput;
   where: UserWhereUniqueInput;
 };
+
 
 export type MutationUpsertOneWeaponArgs = {
   create: WeaponCreateInput;
@@ -14898,14 +14867,14 @@ export type MutationUpsertOneWeaponArgs = {
 };
 
 export type NestedBigIntFilter = {
-  equals?: InputMaybe<Scalars["BigInt"]["input"]>;
-  gt?: InputMaybe<Scalars["BigInt"]["input"]>;
-  gte?: InputMaybe<Scalars["BigInt"]["input"]>;
-  in?: InputMaybe<Array<Scalars["BigInt"]["input"]>>;
-  lt?: InputMaybe<Scalars["BigInt"]["input"]>;
-  lte?: InputMaybe<Scalars["BigInt"]["input"]>;
+  equals?: InputMaybe<Scalars['BigInt']['input']>;
+  gt?: InputMaybe<Scalars['BigInt']['input']>;
+  gte?: InputMaybe<Scalars['BigInt']['input']>;
+  in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  lt?: InputMaybe<Scalars['BigInt']['input']>;
+  lte?: InputMaybe<Scalars['BigInt']['input']>;
   not?: InputMaybe<NestedBigIntFilter>;
-  notIn?: InputMaybe<Array<Scalars["BigInt"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['BigInt']['input']>>;
 };
 
 export type NestedBigIntWithAggregatesFilter = {
@@ -14914,75 +14883,75 @@ export type NestedBigIntWithAggregatesFilter = {
   _max?: InputMaybe<NestedBigIntFilter>;
   _min?: InputMaybe<NestedBigIntFilter>;
   _sum?: InputMaybe<NestedBigIntFilter>;
-  equals?: InputMaybe<Scalars["BigInt"]["input"]>;
-  gt?: InputMaybe<Scalars["BigInt"]["input"]>;
-  gte?: InputMaybe<Scalars["BigInt"]["input"]>;
-  in?: InputMaybe<Array<Scalars["BigInt"]["input"]>>;
-  lt?: InputMaybe<Scalars["BigInt"]["input"]>;
-  lte?: InputMaybe<Scalars["BigInt"]["input"]>;
+  equals?: InputMaybe<Scalars['BigInt']['input']>;
+  gt?: InputMaybe<Scalars['BigInt']['input']>;
+  gte?: InputMaybe<Scalars['BigInt']['input']>;
+  in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  lt?: InputMaybe<Scalars['BigInt']['input']>;
+  lte?: InputMaybe<Scalars['BigInt']['input']>;
   not?: InputMaybe<NestedBigIntWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["BigInt"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['BigInt']['input']>>;
 };
 
 export type NestedDateTimeFilter = {
-  equals?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gte?: InputMaybe<Scalars["DateTime"]["input"]>;
-  in?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
-  lt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  equals?: InputMaybe<Scalars['DateTime']['input']>;
+  gt?: InputMaybe<Scalars['DateTime']['input']>;
+  gte?: InputMaybe<Scalars['DateTime']['input']>;
+  in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  lt?: InputMaybe<Scalars['DateTime']['input']>;
+  lte?: InputMaybe<Scalars['DateTime']['input']>;
   not?: InputMaybe<NestedDateTimeFilter>;
-  notIn?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['DateTime']['input']>>;
 };
 
 export type NestedDateTimeNullableFilter = {
-  equals?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gte?: InputMaybe<Scalars["DateTime"]["input"]>;
-  in?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
-  lt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  equals?: InputMaybe<Scalars['DateTime']['input']>;
+  gt?: InputMaybe<Scalars['DateTime']['input']>;
+  gte?: InputMaybe<Scalars['DateTime']['input']>;
+  in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  lt?: InputMaybe<Scalars['DateTime']['input']>;
+  lte?: InputMaybe<Scalars['DateTime']['input']>;
   not?: InputMaybe<NestedDateTimeNullableFilter>;
-  notIn?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['DateTime']['input']>>;
 };
 
 export type NestedDateTimeNullableWithAggregatesFilter = {
   _count?: InputMaybe<NestedIntNullableFilter>;
   _max?: InputMaybe<NestedDateTimeNullableFilter>;
   _min?: InputMaybe<NestedDateTimeNullableFilter>;
-  equals?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gte?: InputMaybe<Scalars["DateTime"]["input"]>;
-  in?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
-  lt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  equals?: InputMaybe<Scalars['DateTime']['input']>;
+  gt?: InputMaybe<Scalars['DateTime']['input']>;
+  gte?: InputMaybe<Scalars['DateTime']['input']>;
+  in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  lt?: InputMaybe<Scalars['DateTime']['input']>;
+  lte?: InputMaybe<Scalars['DateTime']['input']>;
   not?: InputMaybe<NestedDateTimeNullableWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['DateTime']['input']>>;
 };
 
 export type NestedDateTimeWithAggregatesFilter = {
   _count?: InputMaybe<NestedIntFilter>;
   _max?: InputMaybe<NestedDateTimeFilter>;
   _min?: InputMaybe<NestedDateTimeFilter>;
-  equals?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  gte?: InputMaybe<Scalars["DateTime"]["input"]>;
-  in?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
-  lt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  equals?: InputMaybe<Scalars['DateTime']['input']>;
+  gt?: InputMaybe<Scalars['DateTime']['input']>;
+  gte?: InputMaybe<Scalars['DateTime']['input']>;
+  in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  lt?: InputMaybe<Scalars['DateTime']['input']>;
+  lte?: InputMaybe<Scalars['DateTime']['input']>;
   not?: InputMaybe<NestedDateTimeWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["DateTime"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['DateTime']['input']>>;
 };
 
 export type NestedDecimalNullableFilter = {
-  equals?: InputMaybe<Scalars["Decimal"]["input"]>;
-  gt?: InputMaybe<Scalars["Decimal"]["input"]>;
-  gte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Decimal"]["input"]>>;
-  lt?: InputMaybe<Scalars["Decimal"]["input"]>;
-  lte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  equals?: InputMaybe<Scalars['Decimal']['input']>;
+  gt?: InputMaybe<Scalars['Decimal']['input']>;
+  gte?: InputMaybe<Scalars['Decimal']['input']>;
+  in?: InputMaybe<Array<Scalars['Decimal']['input']>>;
+  lt?: InputMaybe<Scalars['Decimal']['input']>;
+  lte?: InputMaybe<Scalars['Decimal']['input']>;
   not?: InputMaybe<NestedDecimalNullableFilter>;
-  notIn?: InputMaybe<Array<Scalars["Decimal"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Decimal']['input']>>;
 };
 
 export type NestedDecimalNullableWithAggregatesFilter = {
@@ -14991,14 +14960,14 @@ export type NestedDecimalNullableWithAggregatesFilter = {
   _max?: InputMaybe<NestedDecimalNullableFilter>;
   _min?: InputMaybe<NestedDecimalNullableFilter>;
   _sum?: InputMaybe<NestedDecimalNullableFilter>;
-  equals?: InputMaybe<Scalars["Decimal"]["input"]>;
-  gt?: InputMaybe<Scalars["Decimal"]["input"]>;
-  gte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Decimal"]["input"]>>;
-  lt?: InputMaybe<Scalars["Decimal"]["input"]>;
-  lte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  equals?: InputMaybe<Scalars['Decimal']['input']>;
+  gt?: InputMaybe<Scalars['Decimal']['input']>;
+  gte?: InputMaybe<Scalars['Decimal']['input']>;
+  in?: InputMaybe<Array<Scalars['Decimal']['input']>>;
+  lt?: InputMaybe<Scalars['Decimal']['input']>;
+  lte?: InputMaybe<Scalars['Decimal']['input']>;
   not?: InputMaybe<NestedDecimalNullableWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["Decimal"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Decimal']['input']>>;
 };
 
 export type NestedEnumClanTagPositionFilter = {
@@ -15019,25 +14988,25 @@ export type NestedEnumClanTagPositionWithAggregatesFilter = {
 };
 
 export type NestedFloatFilter = {
-  equals?: InputMaybe<Scalars["Float"]["input"]>;
-  gt?: InputMaybe<Scalars["Float"]["input"]>;
-  gte?: InputMaybe<Scalars["Float"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Float"]["input"]>>;
-  lt?: InputMaybe<Scalars["Float"]["input"]>;
-  lte?: InputMaybe<Scalars["Float"]["input"]>;
+  equals?: InputMaybe<Scalars['Float']['input']>;
+  gt?: InputMaybe<Scalars['Float']['input']>;
+  gte?: InputMaybe<Scalars['Float']['input']>;
+  in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  lt?: InputMaybe<Scalars['Float']['input']>;
+  lte?: InputMaybe<Scalars['Float']['input']>;
   not?: InputMaybe<NestedFloatFilter>;
-  notIn?: InputMaybe<Array<Scalars["Float"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Float']['input']>>;
 };
 
 export type NestedFloatNullableFilter = {
-  equals?: InputMaybe<Scalars["Float"]["input"]>;
-  gt?: InputMaybe<Scalars["Float"]["input"]>;
-  gte?: InputMaybe<Scalars["Float"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Float"]["input"]>>;
-  lt?: InputMaybe<Scalars["Float"]["input"]>;
-  lte?: InputMaybe<Scalars["Float"]["input"]>;
+  equals?: InputMaybe<Scalars['Float']['input']>;
+  gt?: InputMaybe<Scalars['Float']['input']>;
+  gte?: InputMaybe<Scalars['Float']['input']>;
+  in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  lt?: InputMaybe<Scalars['Float']['input']>;
+  lte?: InputMaybe<Scalars['Float']['input']>;
   not?: InputMaybe<NestedFloatNullableFilter>;
-  notIn?: InputMaybe<Array<Scalars["Float"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Float']['input']>>;
 };
 
 export type NestedFloatNullableWithAggregatesFilter = {
@@ -15046,14 +15015,14 @@ export type NestedFloatNullableWithAggregatesFilter = {
   _max?: InputMaybe<NestedFloatNullableFilter>;
   _min?: InputMaybe<NestedFloatNullableFilter>;
   _sum?: InputMaybe<NestedFloatNullableFilter>;
-  equals?: InputMaybe<Scalars["Float"]["input"]>;
-  gt?: InputMaybe<Scalars["Float"]["input"]>;
-  gte?: InputMaybe<Scalars["Float"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Float"]["input"]>>;
-  lt?: InputMaybe<Scalars["Float"]["input"]>;
-  lte?: InputMaybe<Scalars["Float"]["input"]>;
+  equals?: InputMaybe<Scalars['Float']['input']>;
+  gt?: InputMaybe<Scalars['Float']['input']>;
+  gte?: InputMaybe<Scalars['Float']['input']>;
+  in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  lt?: InputMaybe<Scalars['Float']['input']>;
+  lte?: InputMaybe<Scalars['Float']['input']>;
   not?: InputMaybe<NestedFloatNullableWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["Float"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Float']['input']>>;
 };
 
 export type NestedFloatWithAggregatesFilter = {
@@ -15062,36 +15031,36 @@ export type NestedFloatWithAggregatesFilter = {
   _max?: InputMaybe<NestedFloatFilter>;
   _min?: InputMaybe<NestedFloatFilter>;
   _sum?: InputMaybe<NestedFloatFilter>;
-  equals?: InputMaybe<Scalars["Float"]["input"]>;
-  gt?: InputMaybe<Scalars["Float"]["input"]>;
-  gte?: InputMaybe<Scalars["Float"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Float"]["input"]>>;
-  lt?: InputMaybe<Scalars["Float"]["input"]>;
-  lte?: InputMaybe<Scalars["Float"]["input"]>;
+  equals?: InputMaybe<Scalars['Float']['input']>;
+  gt?: InputMaybe<Scalars['Float']['input']>;
+  gte?: InputMaybe<Scalars['Float']['input']>;
+  in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  lt?: InputMaybe<Scalars['Float']['input']>;
+  lte?: InputMaybe<Scalars['Float']['input']>;
   not?: InputMaybe<NestedFloatWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["Float"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Float']['input']>>;
 };
 
 export type NestedIntFilter = {
-  equals?: InputMaybe<Scalars["Int"]["input"]>;
-  gt?: InputMaybe<Scalars["Int"]["input"]>;
-  gte?: InputMaybe<Scalars["Int"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  lt?: InputMaybe<Scalars["Int"]["input"]>;
-  lte?: InputMaybe<Scalars["Int"]["input"]>;
+  equals?: InputMaybe<Scalars['Int']['input']>;
+  gt?: InputMaybe<Scalars['Int']['input']>;
+  gte?: InputMaybe<Scalars['Int']['input']>;
+  in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lt?: InputMaybe<Scalars['Int']['input']>;
+  lte?: InputMaybe<Scalars['Int']['input']>;
   not?: InputMaybe<NestedIntFilter>;
-  notIn?: InputMaybe<Array<Scalars["Int"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
 
 export type NestedIntNullableFilter = {
-  equals?: InputMaybe<Scalars["Int"]["input"]>;
-  gt?: InputMaybe<Scalars["Int"]["input"]>;
-  gte?: InputMaybe<Scalars["Int"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  lt?: InputMaybe<Scalars["Int"]["input"]>;
-  lte?: InputMaybe<Scalars["Int"]["input"]>;
+  equals?: InputMaybe<Scalars['Int']['input']>;
+  gt?: InputMaybe<Scalars['Int']['input']>;
+  gte?: InputMaybe<Scalars['Int']['input']>;
+  in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lt?: InputMaybe<Scalars['Int']['input']>;
+  lte?: InputMaybe<Scalars['Int']['input']>;
   not?: InputMaybe<NestedIntNullableFilter>;
-  notIn?: InputMaybe<Array<Scalars["Int"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
 
 export type NestedIntNullableWithAggregatesFilter = {
@@ -15100,14 +15069,14 @@ export type NestedIntNullableWithAggregatesFilter = {
   _max?: InputMaybe<NestedIntNullableFilter>;
   _min?: InputMaybe<NestedIntNullableFilter>;
   _sum?: InputMaybe<NestedIntNullableFilter>;
-  equals?: InputMaybe<Scalars["Int"]["input"]>;
-  gt?: InputMaybe<Scalars["Int"]["input"]>;
-  gte?: InputMaybe<Scalars["Int"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  lt?: InputMaybe<Scalars["Int"]["input"]>;
-  lte?: InputMaybe<Scalars["Int"]["input"]>;
+  equals?: InputMaybe<Scalars['Int']['input']>;
+  gt?: InputMaybe<Scalars['Int']['input']>;
+  gte?: InputMaybe<Scalars['Int']['input']>;
+  in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lt?: InputMaybe<Scalars['Int']['input']>;
+  lte?: InputMaybe<Scalars['Int']['input']>;
   not?: InputMaybe<NestedIntNullableWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["Int"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
 
 export type NestedIntWithAggregatesFilter = {
@@ -15116,133 +15085,134 @@ export type NestedIntWithAggregatesFilter = {
   _max?: InputMaybe<NestedIntFilter>;
   _min?: InputMaybe<NestedIntFilter>;
   _sum?: InputMaybe<NestedIntFilter>;
-  equals?: InputMaybe<Scalars["Int"]["input"]>;
-  gt?: InputMaybe<Scalars["Int"]["input"]>;
-  gte?: InputMaybe<Scalars["Int"]["input"]>;
-  in?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  lt?: InputMaybe<Scalars["Int"]["input"]>;
-  lte?: InputMaybe<Scalars["Int"]["input"]>;
+  equals?: InputMaybe<Scalars['Int']['input']>;
+  gt?: InputMaybe<Scalars['Int']['input']>;
+  gte?: InputMaybe<Scalars['Int']['input']>;
+  in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lt?: InputMaybe<Scalars['Int']['input']>;
+  lte?: InputMaybe<Scalars['Int']['input']>;
   not?: InputMaybe<NestedIntWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["Int"]["input"]>>;
+  notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
 
 export type NestedStringFilter = {
-  contains?: InputMaybe<Scalars["String"]["input"]>;
-  endsWith?: InputMaybe<Scalars["String"]["input"]>;
-  equals?: InputMaybe<Scalars["String"]["input"]>;
-  gt?: InputMaybe<Scalars["String"]["input"]>;
-  gte?: InputMaybe<Scalars["String"]["input"]>;
-  in?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  lt?: InputMaybe<Scalars["String"]["input"]>;
-  lte?: InputMaybe<Scalars["String"]["input"]>;
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  equals?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  in?: InputMaybe<Array<Scalars['String']['input']>>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
   not?: InputMaybe<NestedStringFilter>;
-  notIn?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  search?: InputMaybe<Scalars["String"]["input"]>;
-  startsWith?: InputMaybe<Scalars["String"]["input"]>;
+  notIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type NestedStringNullableFilter = {
-  contains?: InputMaybe<Scalars["String"]["input"]>;
-  endsWith?: InputMaybe<Scalars["String"]["input"]>;
-  equals?: InputMaybe<Scalars["String"]["input"]>;
-  gt?: InputMaybe<Scalars["String"]["input"]>;
-  gte?: InputMaybe<Scalars["String"]["input"]>;
-  in?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  lt?: InputMaybe<Scalars["String"]["input"]>;
-  lte?: InputMaybe<Scalars["String"]["input"]>;
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  equals?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  in?: InputMaybe<Array<Scalars['String']['input']>>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
   not?: InputMaybe<NestedStringNullableFilter>;
-  notIn?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  search?: InputMaybe<Scalars["String"]["input"]>;
-  startsWith?: InputMaybe<Scalars["String"]["input"]>;
+  notIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type NestedStringNullableWithAggregatesFilter = {
   _count?: InputMaybe<NestedIntNullableFilter>;
   _max?: InputMaybe<NestedStringNullableFilter>;
   _min?: InputMaybe<NestedStringNullableFilter>;
-  contains?: InputMaybe<Scalars["String"]["input"]>;
-  endsWith?: InputMaybe<Scalars["String"]["input"]>;
-  equals?: InputMaybe<Scalars["String"]["input"]>;
-  gt?: InputMaybe<Scalars["String"]["input"]>;
-  gte?: InputMaybe<Scalars["String"]["input"]>;
-  in?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  lt?: InputMaybe<Scalars["String"]["input"]>;
-  lte?: InputMaybe<Scalars["String"]["input"]>;
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  equals?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  in?: InputMaybe<Array<Scalars['String']['input']>>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
   not?: InputMaybe<NestedStringNullableWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  search?: InputMaybe<Scalars["String"]["input"]>;
-  startsWith?: InputMaybe<Scalars["String"]["input"]>;
+  notIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type NestedStringWithAggregatesFilter = {
   _count?: InputMaybe<NestedIntFilter>;
   _max?: InputMaybe<NestedStringFilter>;
   _min?: InputMaybe<NestedStringFilter>;
-  contains?: InputMaybe<Scalars["String"]["input"]>;
-  endsWith?: InputMaybe<Scalars["String"]["input"]>;
-  equals?: InputMaybe<Scalars["String"]["input"]>;
-  gt?: InputMaybe<Scalars["String"]["input"]>;
-  gte?: InputMaybe<Scalars["String"]["input"]>;
-  in?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  lt?: InputMaybe<Scalars["String"]["input"]>;
-  lte?: InputMaybe<Scalars["String"]["input"]>;
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  equals?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  in?: InputMaybe<Array<Scalars['String']['input']>>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
   not?: InputMaybe<NestedStringWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  search?: InputMaybe<Scalars["String"]["input"]>;
-  startsWith?: InputMaybe<Scalars["String"]["input"]>;
+  notIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: InputMaybe<Scalars["DateTime"]["input"]>;
+  set?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type NullableDecimalFieldUpdateOperationsInput = {
-  decrement?: InputMaybe<Scalars["Decimal"]["input"]>;
-  divide?: InputMaybe<Scalars["Decimal"]["input"]>;
-  increment?: InputMaybe<Scalars["Decimal"]["input"]>;
-  multiply?: InputMaybe<Scalars["Decimal"]["input"]>;
-  set?: InputMaybe<Scalars["Decimal"]["input"]>;
+  decrement?: InputMaybe<Scalars['Decimal']['input']>;
+  divide?: InputMaybe<Scalars['Decimal']['input']>;
+  increment?: InputMaybe<Scalars['Decimal']['input']>;
+  multiply?: InputMaybe<Scalars['Decimal']['input']>;
+  set?: InputMaybe<Scalars['Decimal']['input']>;
 };
 
 export type NullableFloatFieldUpdateOperationsInput = {
-  decrement?: InputMaybe<Scalars["Float"]["input"]>;
-  divide?: InputMaybe<Scalars["Float"]["input"]>;
-  increment?: InputMaybe<Scalars["Float"]["input"]>;
-  multiply?: InputMaybe<Scalars["Float"]["input"]>;
-  set?: InputMaybe<Scalars["Float"]["input"]>;
+  decrement?: InputMaybe<Scalars['Float']['input']>;
+  divide?: InputMaybe<Scalars['Float']['input']>;
+  increment?: InputMaybe<Scalars['Float']['input']>;
+  multiply?: InputMaybe<Scalars['Float']['input']>;
+  set?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type NullableIntFieldUpdateOperationsInput = {
-  decrement?: InputMaybe<Scalars["Int"]["input"]>;
-  divide?: InputMaybe<Scalars["Int"]["input"]>;
-  increment?: InputMaybe<Scalars["Int"]["input"]>;
-  multiply?: InputMaybe<Scalars["Int"]["input"]>;
-  set?: InputMaybe<Scalars["Int"]["input"]>;
+  decrement?: InputMaybe<Scalars['Int']['input']>;
+  divide?: InputMaybe<Scalars['Int']['input']>;
+  increment?: InputMaybe<Scalars['Int']['input']>;
+  multiply?: InputMaybe<Scalars['Int']['input']>;
+  set?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type NullableStringFieldUpdateOperationsInput = {
-  set?: InputMaybe<Scalars["String"]["input"]>;
+  set?: InputMaybe<Scalars['String']['input']>;
 };
 
 export enum NullsOrder {
-  First = "first",
-  Last = "last",
+  First = 'first',
+  Last = 'last'
 }
 
 export type Option = {
-  __typename?: "Option";
+  __typename?: 'Option';
   choices: Array<OptionChoice>;
-  keyname: Scalars["ID"]["output"];
-  opttype: Scalars["Int"]["output"];
-  value: Scalars["String"]["output"];
+  keyname: Scalars['ID']['output'];
+  opttype: Scalars['Int']['output'];
+  value: Scalars['String']['output'];
 };
+
 
 export type OptionChoicesArgs = {
   cursor?: InputMaybe<OptionChoiceWhereUniqueInput>;
   distinct?: InputMaybe<Array<OptionChoiceScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<OptionChoiceOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<OptionChoiceWhereInput>;
 };
 
@@ -15251,12 +15221,12 @@ export type OptionAvgOrderByAggregateInput = {
 };
 
 export type OptionChoice = {
-  __typename?: "OptionChoice";
-  isDefault: Scalars["Int"]["output"];
-  keyname: Scalars["String"]["output"];
+  __typename?: 'OptionChoice';
+  isDefault: Scalars['Int']['output'];
+  keyname: Scalars['String']['output'];
   option: Option;
-  text: Scalars["String"]["output"];
-  value: Scalars["String"]["output"];
+  text: Scalars['String']['output'];
+  value: Scalars['String']['output'];
 };
 
 export type OptionChoiceAvgOrderByAggregateInput = {
@@ -15271,35 +15241,33 @@ export type OptionChoiceCountOrderByAggregateInput = {
 };
 
 export type OptionChoiceCreateInput = {
-  isDefault?: InputMaybe<Scalars["Int"]["input"]>;
+  isDefault?: InputMaybe<Scalars['Int']['input']>;
   option: OptionCreateNestedOneWithoutChoicesInput;
-  text?: InputMaybe<Scalars["String"]["input"]>;
-  value: Scalars["String"]["input"];
+  text?: InputMaybe<Scalars['String']['input']>;
+  value: Scalars['String']['input'];
 };
 
 export type OptionChoiceCreateManyInput = {
-  isDefault?: InputMaybe<Scalars["Int"]["input"]>;
-  keyname: Scalars["String"]["input"];
-  text?: InputMaybe<Scalars["String"]["input"]>;
-  value: Scalars["String"]["input"];
+  isDefault?: InputMaybe<Scalars['Int']['input']>;
+  keyname: Scalars['String']['input'];
+  text?: InputMaybe<Scalars['String']['input']>;
+  value: Scalars['String']['input'];
 };
 
 export type OptionChoiceCreateManyOptionInput = {
-  isDefault?: InputMaybe<Scalars["Int"]["input"]>;
-  text?: InputMaybe<Scalars["String"]["input"]>;
-  value: Scalars["String"]["input"];
+  isDefault?: InputMaybe<Scalars['Int']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  value: Scalars['String']['input'];
 };
 
 export type OptionChoiceCreateManyOptionInputEnvelope = {
   data: Array<OptionChoiceCreateManyOptionInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type OptionChoiceCreateNestedManyWithoutOptionInput = {
   connect?: InputMaybe<Array<OptionChoiceWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<OptionChoiceCreateOrConnectWithoutOptionInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<OptionChoiceCreateOrConnectWithoutOptionInput>>;
   create?: InputMaybe<Array<OptionChoiceCreateWithoutOptionInput>>;
   createMany?: InputMaybe<OptionChoiceCreateManyOptionInputEnvelope>;
 };
@@ -15310,14 +15278,14 @@ export type OptionChoiceCreateOrConnectWithoutOptionInput = {
 };
 
 export type OptionChoiceCreateWithoutOptionInput = {
-  isDefault?: InputMaybe<Scalars["Int"]["input"]>;
-  text?: InputMaybe<Scalars["String"]["input"]>;
-  value: Scalars["String"]["input"];
+  isDefault?: InputMaybe<Scalars['Int']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  value: Scalars['String']['input'];
 };
 
 export type OptionChoiceKeynameValueCompoundUniqueInput = {
-  keyname: Scalars["String"]["input"];
-  value: Scalars["String"]["input"];
+  keyname: Scalars['String']['input'];
+  value: Scalars['String']['input'];
 };
 
 export type OptionChoiceListRelationFilter = {
@@ -15345,14 +15313,14 @@ export type OptionChoiceOrderByRelationAggregateInput = {
 };
 
 export enum OptionChoiceOrderByRelevanceFieldEnum {
-  Keyname = "keyname",
-  Text = "text",
-  Value = "value",
+  Keyname = 'keyname',
+  Text = 'text',
+  Value = 'value'
 }
 
 export type OptionChoiceOrderByRelevanceInput = {
   fields: Array<OptionChoiceOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -15378,10 +15346,10 @@ export type OptionChoiceOrderByWithRelationInput = {
 };
 
 export enum OptionChoiceScalarFieldEnum {
-  IsDefault = "isDefault",
-  Keyname = "keyname",
-  Text = "text",
-  Value = "value",
+  IsDefault = 'isDefault',
+  Keyname = 'keyname',
+  Text = 'text',
+  Value = 'value'
 }
 
 export type OptionChoiceScalarWhereInput = {
@@ -15428,24 +15396,16 @@ export type OptionChoiceUpdateManyWithWhereWithoutOptionInput = {
 
 export type OptionChoiceUpdateManyWithoutOptionNestedInput = {
   connect?: InputMaybe<Array<OptionChoiceWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<OptionChoiceCreateOrConnectWithoutOptionInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<OptionChoiceCreateOrConnectWithoutOptionInput>>;
   create?: InputMaybe<Array<OptionChoiceCreateWithoutOptionInput>>;
   createMany?: InputMaybe<OptionChoiceCreateManyOptionInputEnvelope>;
   delete?: InputMaybe<Array<OptionChoiceWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<OptionChoiceScalarWhereInput>>;
   disconnect?: InputMaybe<Array<OptionChoiceWhereUniqueInput>>;
   set?: InputMaybe<Array<OptionChoiceWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<OptionChoiceUpdateWithWhereUniqueWithoutOptionInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<OptionChoiceUpdateManyWithWhereWithoutOptionInput>
-  >;
-  upsert?: InputMaybe<
-    Array<OptionChoiceUpsertWithWhereUniqueWithoutOptionInput>
-  >;
+  update?: InputMaybe<Array<OptionChoiceUpdateWithWhereUniqueWithoutOptionInput>>;
+  updateMany?: InputMaybe<Array<OptionChoiceUpdateManyWithWhereWithoutOptionInput>>;
+  upsert?: InputMaybe<Array<OptionChoiceUpsertWithWhereUniqueWithoutOptionInput>>;
 };
 
 export type OptionChoiceUpdateWithWhereUniqueWithoutOptionInput = {
@@ -15496,15 +15456,15 @@ export type OptionCountOrderByAggregateInput = {
 
 export type OptionCreateInput = {
   choices?: InputMaybe<OptionChoiceCreateNestedManyWithoutOptionInput>;
-  keyname: Scalars["String"]["input"];
-  opttype?: InputMaybe<Scalars["Int"]["input"]>;
-  value?: InputMaybe<Scalars["String"]["input"]>;
+  keyname: Scalars['String']['input'];
+  opttype?: InputMaybe<Scalars['Int']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type OptionCreateManyInput = {
-  keyname: Scalars["String"]["input"];
-  opttype?: InputMaybe<Scalars["Int"]["input"]>;
-  value?: InputMaybe<Scalars["String"]["input"]>;
+  keyname: Scalars['String']['input'];
+  opttype?: InputMaybe<Scalars['Int']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type OptionCreateNestedOneWithoutChoicesInput = {
@@ -15519,9 +15479,9 @@ export type OptionCreateOrConnectWithoutChoicesInput = {
 };
 
 export type OptionCreateWithoutChoicesInput = {
-  keyname: Scalars["String"]["input"];
-  opttype?: InputMaybe<Scalars["Int"]["input"]>;
-  value?: InputMaybe<Scalars["String"]["input"]>;
+  keyname: Scalars['String']['input'];
+  opttype?: InputMaybe<Scalars['Int']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type OptionMaxOrderByAggregateInput = {
@@ -15537,13 +15497,13 @@ export type OptionMinOrderByAggregateInput = {
 };
 
 export enum OptionOrderByRelevanceFieldEnum {
-  Keyname = "keyname",
-  Value = "value",
+  Keyname = 'keyname',
+  Value = 'value'
 }
 
 export type OptionOrderByRelevanceInput = {
   fields: Array<OptionOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -15567,9 +15527,9 @@ export type OptionOrderByWithRelationInput = {
 };
 
 export enum OptionScalarFieldEnum {
-  Keyname = "keyname",
-  Opttype = "opttype",
-  Value = "value",
+  Keyname = 'keyname',
+  Opttype = 'opttype',
+  Value = 'value'
 }
 
 export type OptionScalarRelationFilter = {
@@ -15643,339 +15603,368 @@ export type OptionWhereUniqueInput = {
   NOT?: InputMaybe<Array<OptionWhereInput>>;
   OR?: InputMaybe<Array<OptionWhereInput>>;
   choices?: InputMaybe<OptionChoiceListRelationFilter>;
-  keyname?: InputMaybe<Scalars["String"]["input"]>;
+  keyname?: InputMaybe<Scalars['String']['input']>;
   opttype?: InputMaybe<IntFilter>;
   value?: InputMaybe<StringFilter>;
 };
 
 export type Player = {
-  __typename?: "Player";
-  activity: Scalars["Int"]["output"];
+  __typename?: 'Player';
+  activity: Scalars['Int']['output'];
   awards: Array<PlayerAward>;
   awardsWonAsDWinner: Array<Award>;
   awardsWonAsGWinner: Array<Award>;
-  blockavatar: Scalars["Int"]["output"];
+  blockavatar: Scalars['Int']['output'];
   chats: Array<EventChat>;
-  city: Scalars["String"]["output"];
-  clan: Scalars["Int"]["output"];
+  city: Scalars['String']['output'];
+  clan: Scalars['Int']['output'];
   clanData?: Maybe<Clan>;
-  connection_time: Scalars["Int"]["output"];
+  connection_time: Scalars['Int']['output'];
   connects: Array<EventConnect>;
-  country: Scalars["String"]["output"];
+  country: Scalars['String']['output'];
   countryData?: Maybe<Country>;
-  createdate: Scalars["Int"]["output"];
-  death_streak: Scalars["Int"]["output"];
-  deaths: Scalars["Int"]["output"];
+  createdate: Scalars['Int']['output'];
+  death_streak: Scalars['Int']['output'];
+  deaths: Scalars['Int']['output'];
   disconnects: Array<EventDisconnect>;
-  displayEvents: Scalars["Int"]["output"];
-  email?: Maybe<Scalars["String"]["output"]>;
+  displayEvents: Scalars['Int']['output'];
+  email?: Maybe<Scalars['String']['output']>;
   entries: Array<EventEntry>;
-  flag: Scalars["String"]["output"];
+  flag: Scalars['String']['output'];
   fragsAsKiller: Array<EventFrag>;
   fragsAsVictim: Array<EventFrag>;
-  fullName?: Maybe<Scalars["String"]["output"]>;
-  game: Scalars["String"]["output"];
+  fullName?: Maybe<Scalars['String']['output']>;
+  game: Scalars['String']['output'];
   gameData: Game;
-  headshots: Scalars["Int"]["output"];
-  hideranking: Scalars["Int"]["output"];
+  headshots: Scalars['Int']['output'];
+  hideranking: Scalars['Int']['output'];
   history: Array<PlayerHistory>;
-  hits: Scalars["Int"]["output"];
-  homepage?: Maybe<Scalars["String"]["output"]>;
-  icq?: Maybe<Scalars["Int"]["output"]>;
-  kill_streak: Scalars["Int"]["output"];
-  kills: Scalars["Int"]["output"];
-  lastAddress: Scalars["String"]["output"];
-  lastName: Scalars["String"]["output"];
-  last_event: Scalars["Int"]["output"];
-  last_skill_change: Scalars["Int"]["output"];
-  lat?: Maybe<Scalars["Float"]["output"]>;
+  hits: Scalars['Int']['output'];
+  homepage?: Maybe<Scalars['String']['output']>;
+  icq?: Maybe<Scalars['Int']['output']>;
+  kill_streak: Scalars['Int']['output'];
+  kills: Scalars['Int']['output'];
+  lastAddress: Scalars['String']['output'];
+  lastName: Scalars['String']['output'];
+  last_event: Scalars['Int']['output'];
+  last_skill_change: Scalars['Int']['output'];
+  lat?: Maybe<Scalars['Float']['output']>;
   latencyEvents: Array<EventLatency>;
-  lng?: Maybe<Scalars["Float"]["output"]>;
-  mmrank?: Maybe<Scalars["Int"]["output"]>;
+  lng?: Maybe<Scalars['Float']['output']>;
+  mmrank?: Maybe<Scalars['Int']['output']>;
   nameChanges: Array<EventChangeName>;
   names: Array<PlayerName>;
   playerActions: Array<EventPlayerAction>;
-  playerId: Scalars["ID"]["output"];
+  playerId: Scalars['ID']['output'];
   playerPlayerActionsAsActor: Array<EventPlayerPlayerAction>;
   playerPlayerActionsAsVictim: Array<EventPlayerPlayerAction>;
   ribbons: Array<PlayerRibbon>;
   roleChanges: Array<EventChangeRole>;
-  shots: Scalars["Int"]["output"];
-  skill: Scalars["Int"]["output"];
-  state: Scalars["String"]["output"];
+  shots: Scalars['Int']['output'];
+  skill: Scalars['Int']['output'];
+  state: Scalars['String']['output'];
   statsme2Events: Array<EventStatsme2>;
   statsmeEvents: Array<EventStatsme>;
   statsmeLatencyEvents: Array<EventStatsmeLatency>;
   statsmeTimeEvents: Array<EventStatsmeTime>;
   suicideEvents: Array<EventSuicide>;
-  suicides: Scalars["Int"]["output"];
+  suicides: Scalars['Int']['output'];
   teamBonuses: Array<EventTeamBonus>;
   teamChanges: Array<EventChangeTeam>;
-  teamkills: Scalars["Int"]["output"];
+  teamkills: Scalars['Int']['output'];
   teamkillsAsKiller: Array<EventTeamkill>;
   teamkillsAsVictim: Array<EventTeamkill>;
   uniqueIds: Array<PlayerUniqueId>;
   users: Array<User>;
 };
 
+
 export type PlayerAwardsArgs = {
   cursor?: InputMaybe<PlayerAwardWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerAwardScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerAwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerAwardWhereInput>;
 };
+
 
 export type PlayerAwardsWonAsDWinnerArgs = {
   cursor?: InputMaybe<AwardWhereUniqueInput>;
   distinct?: InputMaybe<Array<AwardScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<AwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<AwardWhereInput>;
 };
+
 
 export type PlayerAwardsWonAsGWinnerArgs = {
   cursor?: InputMaybe<AwardWhereUniqueInput>;
   distinct?: InputMaybe<Array<AwardScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<AwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<AwardWhereInput>;
 };
+
 
 export type PlayerChatsArgs = {
   cursor?: InputMaybe<EventChatWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChatScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChatOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChatWhereInput>;
 };
+
 
 export type PlayerConnectsArgs = {
   cursor?: InputMaybe<EventConnectWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventConnectScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventConnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventConnectWhereInput>;
 };
+
 
 export type PlayerDisconnectsArgs = {
   cursor?: InputMaybe<EventDisconnectWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventDisconnectScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventDisconnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventDisconnectWhereInput>;
 };
+
 
 export type PlayerEntriesArgs = {
   cursor?: InputMaybe<EventEntryWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventEntryScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventEntryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventEntryWhereInput>;
 };
+
 
 export type PlayerFragsAsKillerArgs = {
   cursor?: InputMaybe<EventFragWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventFragScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventFragOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventFragWhereInput>;
 };
+
 
 export type PlayerFragsAsVictimArgs = {
   cursor?: InputMaybe<EventFragWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventFragScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventFragOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventFragWhereInput>;
 };
+
 
 export type PlayerHistoryArgs = {
   cursor?: InputMaybe<PlayerHistoryWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerHistoryScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerHistoryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerHistoryWhereInput>;
 };
+
 
 export type PlayerLatencyEventsArgs = {
   cursor?: InputMaybe<EventLatencyWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventLatencyScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventLatencyOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventLatencyWhereInput>;
 };
+
 
 export type PlayerNameChangesArgs = {
   cursor?: InputMaybe<EventChangeNameWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeNameScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeNameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeNameWhereInput>;
 };
+
 
 export type PlayerNamesArgs = {
   cursor?: InputMaybe<PlayerNameWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerNameScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerNameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerNameWhereInput>;
 };
+
 
 export type PlayerPlayerActionsArgs = {
   cursor?: InputMaybe<EventPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerActionWhereInput>;
 };
+
 
 export type PlayerPlayerPlayerActionsAsActorArgs = {
   cursor?: InputMaybe<EventPlayerPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerPlayerActionWhereInput>;
 };
+
 
 export type PlayerPlayerPlayerActionsAsVictimArgs = {
   cursor?: InputMaybe<EventPlayerPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerPlayerActionWhereInput>;
 };
+
 
 export type PlayerRibbonsArgs = {
   cursor?: InputMaybe<PlayerRibbonWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerRibbonScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerRibbonOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerRibbonWhereInput>;
 };
+
 
 export type PlayerRoleChangesArgs = {
   cursor?: InputMaybe<EventChangeRoleWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeRoleScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeRoleOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeRoleWhereInput>;
 };
+
 
 export type PlayerStatsme2EventsArgs = {
   cursor?: InputMaybe<EventStatsme2WhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsme2ScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsme2OrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsme2WhereInput>;
 };
+
 
 export type PlayerStatsmeEventsArgs = {
   cursor?: InputMaybe<EventStatsmeWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeWhereInput>;
 };
+
 
 export type PlayerStatsmeLatencyEventsArgs = {
   cursor?: InputMaybe<EventStatsmeLatencyWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeLatencyScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeLatencyOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeLatencyWhereInput>;
 };
+
 
 export type PlayerStatsmeTimeEventsArgs = {
   cursor?: InputMaybe<EventStatsmeTimeWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeTimeScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeTimeOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeTimeWhereInput>;
 };
+
 
 export type PlayerSuicideEventsArgs = {
   cursor?: InputMaybe<EventSuicideWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventSuicideScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventSuicideOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventSuicideWhereInput>;
 };
+
 
 export type PlayerTeamBonusesArgs = {
   cursor?: InputMaybe<EventTeamBonusWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventTeamBonusScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventTeamBonusOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventTeamBonusWhereInput>;
 };
+
 
 export type PlayerTeamChangesArgs = {
   cursor?: InputMaybe<EventChangeTeamWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeTeamScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeTeamOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeTeamWhereInput>;
 };
+
 
 export type PlayerTeamkillsAsKillerArgs = {
   cursor?: InputMaybe<EventTeamkillWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventTeamkillScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventTeamkillOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventTeamkillWhereInput>;
 };
+
 
 export type PlayerTeamkillsAsVictimArgs = {
   cursor?: InputMaybe<EventTeamkillWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventTeamkillScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventTeamkillOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventTeamkillWhereInput>;
 };
+
 
 export type PlayerUniqueIdsArgs = {
   cursor?: InputMaybe<PlayerUniqueIdWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerUniqueIdScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerUniqueIdOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerUniqueIdWhereInput>;
 };
+
 
 export type PlayerUsersArgs = {
   cursor?: InputMaybe<UserWhereUniqueInput>;
   distinct?: InputMaybe<Array<UserScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<UserOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<UserWhereInput>;
 };
 
@@ -16007,14 +15996,14 @@ export type PlayerAvgOrderByAggregateInput = {
 };
 
 export type PlayerAward = {
-  __typename?: "PlayerAward";
+  __typename?: 'PlayerAward';
   award: Award;
-  awardId: Scalars["Int"]["output"];
-  awardTime: Scalars["DateTime"]["output"];
-  count: Scalars["Int"]["output"];
-  game: Scalars["String"]["output"];
+  awardId: Scalars['Int']['output'];
+  awardTime: Scalars['DateTime']['output'];
+  count: Scalars['Int']['output'];
+  game: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
 };
 
 export type PlayerAwardAvgOrderByAggregateInput = {
@@ -16024,10 +16013,10 @@ export type PlayerAwardAvgOrderByAggregateInput = {
 };
 
 export type PlayerAwardAwardTimeAwardIdPlayerIdGameCompoundUniqueInput = {
-  awardId: Scalars["Int"]["input"];
-  awardTime: Scalars["DateTime"]["input"];
-  game: Scalars["String"]["input"];
-  playerId: Scalars["Int"]["input"];
+  awardId: Scalars['Int']['input'];
+  awardTime: Scalars['DateTime']['input'];
+  game: Scalars['String']['input'];
+  playerId: Scalars['Int']['input'];
 };
 
 export type PlayerAwardCountOrderByAggregateInput = {
@@ -16040,58 +16029,54 @@ export type PlayerAwardCountOrderByAggregateInput = {
 
 export type PlayerAwardCreateInput = {
   award: AwardCreateNestedOneWithoutPlayerAwardsInput;
-  awardTime: Scalars["DateTime"]["input"];
-  count?: InputMaybe<Scalars["Int"]["input"]>;
-  game: Scalars["String"]["input"];
+  awardTime: Scalars['DateTime']['input'];
+  count?: InputMaybe<Scalars['Int']['input']>;
+  game: Scalars['String']['input'];
   player: PlayerCreateNestedOneWithoutAwardsInput;
 };
 
 export type PlayerAwardCreateManyAwardInput = {
-  awardTime: Scalars["DateTime"]["input"];
-  count?: InputMaybe<Scalars["Int"]["input"]>;
-  game: Scalars["String"]["input"];
-  playerId: Scalars["Int"]["input"];
+  awardTime: Scalars['DateTime']['input'];
+  count?: InputMaybe<Scalars['Int']['input']>;
+  game: Scalars['String']['input'];
+  playerId: Scalars['Int']['input'];
 };
 
 export type PlayerAwardCreateManyAwardInputEnvelope = {
   data: Array<PlayerAwardCreateManyAwardInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type PlayerAwardCreateManyInput = {
-  awardId: Scalars["Int"]["input"];
-  awardTime: Scalars["DateTime"]["input"];
-  count?: InputMaybe<Scalars["Int"]["input"]>;
-  game: Scalars["String"]["input"];
-  playerId: Scalars["Int"]["input"];
+  awardId: Scalars['Int']['input'];
+  awardTime: Scalars['DateTime']['input'];
+  count?: InputMaybe<Scalars['Int']['input']>;
+  game: Scalars['String']['input'];
+  playerId: Scalars['Int']['input'];
 };
 
 export type PlayerAwardCreateManyPlayerInput = {
-  awardId: Scalars["Int"]["input"];
-  awardTime: Scalars["DateTime"]["input"];
-  count?: InputMaybe<Scalars["Int"]["input"]>;
-  game: Scalars["String"]["input"];
+  awardId: Scalars['Int']['input'];
+  awardTime: Scalars['DateTime']['input'];
+  count?: InputMaybe<Scalars['Int']['input']>;
+  game: Scalars['String']['input'];
 };
 
 export type PlayerAwardCreateManyPlayerInputEnvelope = {
   data: Array<PlayerAwardCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type PlayerAwardCreateNestedManyWithoutAwardInput = {
   connect?: InputMaybe<Array<PlayerAwardWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerAwardCreateOrConnectWithoutAwardInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerAwardCreateOrConnectWithoutAwardInput>>;
   create?: InputMaybe<Array<PlayerAwardCreateWithoutAwardInput>>;
   createMany?: InputMaybe<PlayerAwardCreateManyAwardInputEnvelope>;
 };
 
 export type PlayerAwardCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<PlayerAwardWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerAwardCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerAwardCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<PlayerAwardCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<PlayerAwardCreateManyPlayerInputEnvelope>;
 };
@@ -16107,17 +16092,17 @@ export type PlayerAwardCreateOrConnectWithoutPlayerInput = {
 };
 
 export type PlayerAwardCreateWithoutAwardInput = {
-  awardTime: Scalars["DateTime"]["input"];
-  count?: InputMaybe<Scalars["Int"]["input"]>;
-  game: Scalars["String"]["input"];
+  awardTime: Scalars['DateTime']['input'];
+  count?: InputMaybe<Scalars['Int']['input']>;
+  game: Scalars['String']['input'];
   player: PlayerCreateNestedOneWithoutAwardsInput;
 };
 
 export type PlayerAwardCreateWithoutPlayerInput = {
   award: AwardCreateNestedOneWithoutPlayerAwardsInput;
-  awardTime: Scalars["DateTime"]["input"];
-  count?: InputMaybe<Scalars["Int"]["input"]>;
-  game: Scalars["String"]["input"];
+  awardTime: Scalars['DateTime']['input'];
+  count?: InputMaybe<Scalars['Int']['input']>;
+  game: Scalars['String']['input'];
 };
 
 export type PlayerAwardListRelationFilter = {
@@ -16147,12 +16132,12 @@ export type PlayerAwardOrderByRelationAggregateInput = {
 };
 
 export enum PlayerAwardOrderByRelevanceFieldEnum {
-  Game = "game",
+  Game = 'game'
 }
 
 export type PlayerAwardOrderByRelevanceInput = {
   fields: Array<PlayerAwardOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -16181,11 +16166,11 @@ export type PlayerAwardOrderByWithRelationInput = {
 };
 
 export enum PlayerAwardScalarFieldEnum {
-  AwardId = "awardId",
-  AwardTime = "awardTime",
-  Count = "count",
-  Game = "game",
-  PlayerId = "playerId",
+  AwardId = 'awardId',
+  AwardTime = 'awardTime',
+  Count = 'count',
+  Game = 'game',
+  PlayerId = 'playerId'
 }
 
 export type PlayerAwardScalarWhereInput = {
@@ -16242,9 +16227,7 @@ export type PlayerAwardUpdateManyWithWhereWithoutPlayerInput = {
 
 export type PlayerAwardUpdateManyWithoutAwardNestedInput = {
   connect?: InputMaybe<Array<PlayerAwardWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerAwardCreateOrConnectWithoutAwardInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerAwardCreateOrConnectWithoutAwardInput>>;
   create?: InputMaybe<Array<PlayerAwardCreateWithoutAwardInput>>;
   createMany?: InputMaybe<PlayerAwardCreateManyAwardInputEnvelope>;
   delete?: InputMaybe<Array<PlayerAwardWhereUniqueInput>>;
@@ -16252,32 +16235,22 @@ export type PlayerAwardUpdateManyWithoutAwardNestedInput = {
   disconnect?: InputMaybe<Array<PlayerAwardWhereUniqueInput>>;
   set?: InputMaybe<Array<PlayerAwardWhereUniqueInput>>;
   update?: InputMaybe<Array<PlayerAwardUpdateWithWhereUniqueWithoutAwardInput>>;
-  updateMany?: InputMaybe<
-    Array<PlayerAwardUpdateManyWithWhereWithoutAwardInput>
-  >;
+  updateMany?: InputMaybe<Array<PlayerAwardUpdateManyWithWhereWithoutAwardInput>>;
   upsert?: InputMaybe<Array<PlayerAwardUpsertWithWhereUniqueWithoutAwardInput>>;
 };
 
 export type PlayerAwardUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<PlayerAwardWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerAwardCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerAwardCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<PlayerAwardCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<PlayerAwardCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<PlayerAwardWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<PlayerAwardScalarWhereInput>>;
   disconnect?: InputMaybe<Array<PlayerAwardWhereUniqueInput>>;
   set?: InputMaybe<Array<PlayerAwardWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<PlayerAwardUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<PlayerAwardUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<PlayerAwardUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<PlayerAwardUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<PlayerAwardUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<PlayerAwardUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type PlayerAwardUpdateWithWhereUniqueWithoutAwardInput = {
@@ -16381,45 +16354,45 @@ export type PlayerCountOrderByAggregateInput = {
 };
 
 export type PlayerCreateInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -16427,18 +16400,18 @@ export type PlayerCreateInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -16446,188 +16419,182 @@ export type PlayerCreateInput = {
 };
 
 export type PlayerCreateManyClanDataInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  flag?: InputMaybe<Scalars["String"]["input"]>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
-  game: Scalars["String"]["input"];
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  flag?: InputMaybe<Scalars['String']['input']>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
+  game: Scalars['String']['input'];
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PlayerCreateManyClanDataInputEnvelope = {
   data: Array<PlayerCreateManyClanDataInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type PlayerCreateManyCountryDataInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
-  clan?: InputMaybe<Scalars["Int"]["input"]>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
-  game: Scalars["String"]["input"];
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  clan?: InputMaybe<Scalars['Int']['input']>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
+  game: Scalars['String']['input'];
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PlayerCreateManyCountryDataInputEnvelope = {
   data: Array<PlayerCreateManyCountryDataInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type PlayerCreateManyGameDataInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
-  clan?: InputMaybe<Scalars["Int"]["input"]>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  flag?: InputMaybe<Scalars["String"]["input"]>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  clan?: InputMaybe<Scalars['Int']['input']>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  flag?: InputMaybe<Scalars['String']['input']>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PlayerCreateManyGameDataInputEnvelope = {
   data: Array<PlayerCreateManyGameDataInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type PlayerCreateManyInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
-  clan?: InputMaybe<Scalars["Int"]["input"]>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  flag?: InputMaybe<Scalars["String"]["input"]>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
-  game: Scalars["String"]["input"];
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  clan?: InputMaybe<Scalars['Int']['input']>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  flag?: InputMaybe<Scalars['String']['input']>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
+  game: Scalars['String']['input'];
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PlayerCreateNestedManyWithoutClanDataInput = {
   connect?: InputMaybe<Array<PlayerWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerCreateOrConnectWithoutClanDataInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerCreateOrConnectWithoutClanDataInput>>;
   create?: InputMaybe<Array<PlayerCreateWithoutClanDataInput>>;
   createMany?: InputMaybe<PlayerCreateManyClanDataInputEnvelope>;
 };
 
 export type PlayerCreateNestedManyWithoutCountryDataInput = {
   connect?: InputMaybe<Array<PlayerWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerCreateOrConnectWithoutCountryDataInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerCreateOrConnectWithoutCountryDataInput>>;
   create?: InputMaybe<Array<PlayerCreateWithoutCountryDataInput>>;
   createMany?: InputMaybe<PlayerCreateManyCountryDataInputEnvelope>;
 };
 
 export type PlayerCreateNestedManyWithoutGameDataInput = {
   connect?: InputMaybe<Array<PlayerWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerCreateOrConnectWithoutGameDataInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerCreateOrConnectWithoutGameDataInput>>;
   create?: InputMaybe<Array<PlayerCreateWithoutGameDataInput>>;
   createMany?: InputMaybe<PlayerCreateManyGameDataInputEnvelope>;
 };
@@ -16967,44 +16934,44 @@ export type PlayerCreateOrConnectWithoutUsersInput = {
 };
 
 export type PlayerCreateWithoutAwardsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17012,18 +16979,18 @@ export type PlayerCreateWithoutAwardsInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17031,44 +16998,44 @@ export type PlayerCreateWithoutAwardsInput = {
 };
 
 export type PlayerCreateWithoutAwardsWonAsDWinnerInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17076,18 +17043,18 @@ export type PlayerCreateWithoutAwardsWonAsDWinnerInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17095,44 +17062,44 @@ export type PlayerCreateWithoutAwardsWonAsDWinnerInput = {
 };
 
 export type PlayerCreateWithoutAwardsWonAsGWinnerInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17140,18 +17107,18 @@ export type PlayerCreateWithoutAwardsWonAsGWinnerInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17159,44 +17126,44 @@ export type PlayerCreateWithoutAwardsWonAsGWinnerInput = {
 };
 
 export type PlayerCreateWithoutChatsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17204,18 +17171,18 @@ export type PlayerCreateWithoutChatsInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17223,44 +17190,44 @@ export type PlayerCreateWithoutChatsInput = {
 };
 
 export type PlayerCreateWithoutClanDataInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17268,18 +17235,18 @@ export type PlayerCreateWithoutClanDataInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17287,44 +17254,44 @@ export type PlayerCreateWithoutClanDataInput = {
 };
 
 export type PlayerCreateWithoutConnectsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17332,18 +17299,18 @@ export type PlayerCreateWithoutConnectsInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17351,44 +17318,44 @@ export type PlayerCreateWithoutConnectsInput = {
 };
 
 export type PlayerCreateWithoutCountryDataInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17396,18 +17363,18 @@ export type PlayerCreateWithoutCountryDataInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17415,44 +17382,44 @@ export type PlayerCreateWithoutCountryDataInput = {
 };
 
 export type PlayerCreateWithoutDisconnectsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17460,18 +17427,18 @@ export type PlayerCreateWithoutDisconnectsInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17479,44 +17446,44 @@ export type PlayerCreateWithoutDisconnectsInput = {
 };
 
 export type PlayerCreateWithoutEntriesInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17524,18 +17491,18 @@ export type PlayerCreateWithoutEntriesInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17543,44 +17510,44 @@ export type PlayerCreateWithoutEntriesInput = {
 };
 
 export type PlayerCreateWithoutFragsAsKillerInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17588,18 +17555,18 @@ export type PlayerCreateWithoutFragsAsKillerInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17607,44 +17574,44 @@ export type PlayerCreateWithoutFragsAsKillerInput = {
 };
 
 export type PlayerCreateWithoutFragsAsVictimInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17652,18 +17619,18 @@ export type PlayerCreateWithoutFragsAsVictimInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17671,44 +17638,44 @@ export type PlayerCreateWithoutFragsAsVictimInput = {
 };
 
 export type PlayerCreateWithoutGameDataInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17716,18 +17683,18 @@ export type PlayerCreateWithoutGameDataInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17735,44 +17702,44 @@ export type PlayerCreateWithoutGameDataInput = {
 };
 
 export type PlayerCreateWithoutHistoryInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17780,18 +17747,18 @@ export type PlayerCreateWithoutHistoryInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17799,44 +17766,44 @@ export type PlayerCreateWithoutHistoryInput = {
 };
 
 export type PlayerCreateWithoutLatencyEventsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -17844,18 +17811,18 @@ export type PlayerCreateWithoutLatencyEventsInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17863,63 +17830,63 @@ export type PlayerCreateWithoutLatencyEventsInput = {
 };
 
 export type PlayerCreateWithoutNameChangesInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
   playerPlayerActionsAsActor?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutPlayerInput>;
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17927,63 +17894,63 @@ export type PlayerCreateWithoutNameChangesInput = {
 };
 
 export type PlayerCreateWithoutNamesInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
   playerPlayerActionsAsActor?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutPlayerInput>;
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -17991,63 +17958,63 @@ export type PlayerCreateWithoutNamesInput = {
 };
 
 export type PlayerCreateWithoutPlayerActionsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerPlayerActionsAsActor?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutPlayerInput>;
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -18055,63 +18022,63 @@ export type PlayerCreateWithoutPlayerActionsInput = {
 };
 
 export type PlayerCreateWithoutPlayerPlayerActionsAsActorInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -18119,63 +18086,63 @@ export type PlayerCreateWithoutPlayerPlayerActionsAsActorInput = {
 };
 
 export type PlayerCreateWithoutPlayerPlayerActionsAsVictimInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
   playerPlayerActionsAsActor?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutPlayerInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -18183,63 +18150,63 @@ export type PlayerCreateWithoutPlayerPlayerActionsAsVictimInput = {
 };
 
 export type PlayerCreateWithoutRibbonsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
   playerPlayerActionsAsActor?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutPlayerInput>;
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -18247,63 +18214,63 @@ export type PlayerCreateWithoutRibbonsInput = {
 };
 
 export type PlayerCreateWithoutRoleChangesInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
   playerPlayerActionsAsActor?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutPlayerInput>;
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -18311,45 +18278,45 @@ export type PlayerCreateWithoutRoleChangesInput = {
 };
 
 export type PlayerCreateWithoutStatsme2EventsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -18357,17 +18324,17 @@ export type PlayerCreateWithoutStatsme2EventsInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -18375,45 +18342,45 @@ export type PlayerCreateWithoutStatsme2EventsInput = {
 };
 
 export type PlayerCreateWithoutStatsmeEventsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -18421,17 +18388,17 @@ export type PlayerCreateWithoutStatsmeEventsInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -18439,45 +18406,45 @@ export type PlayerCreateWithoutStatsmeEventsInput = {
 };
 
 export type PlayerCreateWithoutStatsmeLatencyEventsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -18485,17 +18452,17 @@ export type PlayerCreateWithoutStatsmeLatencyEventsInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -18503,45 +18470,45 @@ export type PlayerCreateWithoutStatsmeLatencyEventsInput = {
 };
 
 export type PlayerCreateWithoutStatsmeTimeEventsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -18549,17 +18516,17 @@ export type PlayerCreateWithoutStatsmeTimeEventsInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -18567,45 +18534,45 @@ export type PlayerCreateWithoutStatsmeTimeEventsInput = {
 };
 
 export type PlayerCreateWithoutSuicideEventsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -18613,17 +18580,17 @@ export type PlayerCreateWithoutSuicideEventsInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -18631,45 +18598,45 @@ export type PlayerCreateWithoutSuicideEventsInput = {
 };
 
 export type PlayerCreateWithoutTeamBonusesInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -18677,17 +18644,17 @@ export type PlayerCreateWithoutTeamBonusesInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -18695,45 +18662,45 @@ export type PlayerCreateWithoutTeamBonusesInput = {
 };
 
 export type PlayerCreateWithoutTeamChangesInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -18741,17 +18708,17 @@ export type PlayerCreateWithoutTeamChangesInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
@@ -18759,45 +18726,45 @@ export type PlayerCreateWithoutTeamChangesInput = {
 };
 
 export type PlayerCreateWithoutTeamkillsAsKillerInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -18805,63 +18772,63 @@ export type PlayerCreateWithoutTeamkillsAsKillerInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
   users?: InputMaybe<UserCreateNestedManyWithoutPlayerInput>;
 };
 
 export type PlayerCreateWithoutTeamkillsAsVictimInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -18869,63 +18836,63 @@ export type PlayerCreateWithoutTeamkillsAsVictimInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
   users?: InputMaybe<UserCreateNestedManyWithoutPlayerInput>;
 };
 
 export type PlayerCreateWithoutUniqueIdsInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -18933,63 +18900,63 @@ export type PlayerCreateWithoutUniqueIdsInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   users?: InputMaybe<UserCreateNestedManyWithoutPlayerInput>;
 };
 
 export type PlayerCreateWithoutUsersInput = {
-  activity?: InputMaybe<Scalars["Int"]["input"]>;
+  activity?: InputMaybe<Scalars['Int']['input']>;
   awards?: InputMaybe<PlayerAwardCreateNestedManyWithoutPlayerInput>;
   awardsWonAsDWinner?: InputMaybe<AwardCreateNestedManyWithoutD_WinnerInput>;
   awardsWonAsGWinner?: InputMaybe<AwardCreateNestedManyWithoutG_WinnerInput>;
-  blockavatar?: InputMaybe<Scalars["Int"]["input"]>;
+  blockavatar?: InputMaybe<Scalars['Int']['input']>;
   chats?: InputMaybe<EventChatCreateNestedManyWithoutPlayerInput>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  city?: InputMaybe<Scalars['String']['input']>;
   clanData?: InputMaybe<ClanCreateNestedOneWithoutPlayersInput>;
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
   connects?: InputMaybe<EventConnectCreateNestedManyWithoutPlayerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
   countryData?: InputMaybe<CountryCreateNestedOneWithoutPlayersInput>;
-  createdate?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
+  createdate?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
-  displayEvents?: InputMaybe<Scalars["Int"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
+  displayEvents?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars["String"]["input"]>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hideranking?: InputMaybe<Scalars["Int"]["input"]>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hideranking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  homepage?: InputMaybe<Scalars["String"]["input"]>;
-  icq?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastAddress?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  last_skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  homepage?: InputMaybe<Scalars['String']['input']>;
+  icq?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastAddress?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  last_skill_change?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  mmrank?: InputMaybe<Scalars["Int"]["input"]>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -18997,41 +18964,41 @@ export type PlayerCreateWithoutUsersInput = {
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionCreateNestedManyWithoutVictimInput>;
   ribbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutPlayerInput>;
   roleChanges?: InputMaybe<EventChangeRoleCreateNestedManyWithoutPlayerInput>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  state?: InputMaybe<Scalars["String"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
   statsme2Events?: InputMaybe<EventStatsme2CreateNestedManyWithoutPlayerInput>;
   statsmeEvents?: InputMaybe<EventStatsmeCreateNestedManyWithoutPlayerInput>;
   statsmeLatencyEvents?: InputMaybe<EventStatsmeLatencyCreateNestedManyWithoutPlayerInput>;
   statsmeTimeEvents?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutPlayerInput>;
   suicideEvents?: InputMaybe<EventSuicideCreateNestedManyWithoutPlayerInput>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
   teamBonuses?: InputMaybe<EventTeamBonusCreateNestedManyWithoutPlayerInput>;
   teamChanges?: InputMaybe<EventChangeTeamCreateNestedManyWithoutPlayerInput>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
   teamkillsAsKiller?: InputMaybe<EventTeamkillCreateNestedManyWithoutKillerInput>;
   teamkillsAsVictim?: InputMaybe<EventTeamkillCreateNestedManyWithoutVictimInput>;
   uniqueIds?: InputMaybe<PlayerUniqueIdCreateNestedManyWithoutPlayerInput>;
 };
 
 export type PlayerHistory = {
-  __typename?: "PlayerHistory";
-  connection_time: Scalars["Int"]["output"];
-  death_streak: Scalars["Int"]["output"];
-  deaths: Scalars["Int"]["output"];
-  eventTime: Scalars["DateTime"]["output"];
-  game: Scalars["String"]["output"];
-  headshots: Scalars["Int"]["output"];
-  hits: Scalars["Int"]["output"];
-  kill_streak: Scalars["Int"]["output"];
-  kills: Scalars["Int"]["output"];
+  __typename?: 'PlayerHistory';
+  connection_time: Scalars['Int']['output'];
+  death_streak: Scalars['Int']['output'];
+  deaths: Scalars['Int']['output'];
+  eventTime: Scalars['DateTime']['output'];
+  game: Scalars['String']['output'];
+  headshots: Scalars['Int']['output'];
+  hits: Scalars['Int']['output'];
+  kill_streak: Scalars['Int']['output'];
+  kills: Scalars['Int']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
-  shots: Scalars["Int"]["output"];
-  skill: Scalars["Int"]["output"];
-  skill_change: Scalars["Int"]["output"];
-  suicides: Scalars["Int"]["output"];
-  teamkills: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
+  shots: Scalars['Int']['output'];
+  skill: Scalars['Int']['output'];
+  skill_change: Scalars['Int']['output'];
+  suicides: Scalars['Int']['output'];
+  teamkills: Scalars['Int']['output'];
 };
 
 export type PlayerHistoryAvgOrderByAggregateInput = {
@@ -19069,68 +19036,66 @@ export type PlayerHistoryCountOrderByAggregateInput = {
 };
 
 export type PlayerHistoryCreateInput = {
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime: Scalars["DateTime"]["input"];
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  eventTime: Scalars['DateTime']['input'];
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
   player: PlayerCreateNestedOneWithoutHistoryInput;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  skill_change?: InputMaybe<Scalars['Int']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PlayerHistoryCreateManyInput = {
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime: Scalars["DateTime"]["input"];
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId: Scalars["Int"]["input"];
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  eventTime: Scalars['DateTime']['input'];
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  playerId: Scalars['Int']['input'];
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  skill_change?: InputMaybe<Scalars['Int']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PlayerHistoryCreateManyPlayerInput = {
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime: Scalars["DateTime"]["input"];
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  eventTime: Scalars['DateTime']['input'];
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  skill_change?: InputMaybe<Scalars['Int']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PlayerHistoryCreateManyPlayerInputEnvelope = {
   data: Array<PlayerHistoryCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type PlayerHistoryCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<PlayerHistoryWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerHistoryCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerHistoryCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<PlayerHistoryCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<PlayerHistoryCreateManyPlayerInputEnvelope>;
 };
@@ -19141,26 +19106,26 @@ export type PlayerHistoryCreateOrConnectWithoutPlayerInput = {
 };
 
 export type PlayerHistoryCreateWithoutPlayerInput = {
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  death_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  eventTime: Scalars["DateTime"]["input"];
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  kill_streak?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  skill?: InputMaybe<Scalars["Int"]["input"]>;
-  skill_change?: InputMaybe<Scalars["Int"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  teamkills?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  death_streak?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  eventTime: Scalars['DateTime']['input'];
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  kill_streak?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  skill?: InputMaybe<Scalars['Int']['input']>;
+  skill_change?: InputMaybe<Scalars['Int']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  teamkills?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PlayerHistoryEventTime_PlayerId_GameCompoundUniqueInput = {
-  eventTime: Scalars["DateTime"]["input"];
-  game: Scalars["String"]["input"];
-  playerId: Scalars["Int"]["input"];
+  eventTime: Scalars['DateTime']['input'];
+  game: Scalars['String']['input'];
+  playerId: Scalars['Int']['input'];
 };
 
 export type PlayerHistoryListRelationFilter = {
@@ -19210,12 +19175,12 @@ export type PlayerHistoryOrderByRelationAggregateInput = {
 };
 
 export enum PlayerHistoryOrderByRelevanceFieldEnum {
-  Game = "game",
+  Game = 'game'
 }
 
 export type PlayerHistoryOrderByRelevanceInput = {
   fields: Array<PlayerHistoryOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -19263,21 +19228,21 @@ export type PlayerHistoryOrderByWithRelationInput = {
 };
 
 export enum PlayerHistoryScalarFieldEnum {
-  ConnectionTime = "connection_time",
-  DeathStreak = "death_streak",
-  Deaths = "deaths",
-  EventTime = "eventTime",
-  Game = "game",
-  Headshots = "headshots",
-  Hits = "hits",
-  KillStreak = "kill_streak",
-  Kills = "kills",
-  PlayerId = "playerId",
-  Shots = "shots",
-  Skill = "skill",
-  SkillChange = "skill_change",
-  Suicides = "suicides",
-  Teamkills = "teamkills",
+  ConnectionTime = 'connection_time',
+  DeathStreak = 'death_streak',
+  Deaths = 'deaths',
+  EventTime = 'eventTime',
+  Game = 'game',
+  Headshots = 'headshots',
+  Hits = 'hits',
+  KillStreak = 'kill_streak',
+  Kills = 'kills',
+  PlayerId = 'playerId',
+  Shots = 'shots',
+  Skill = 'skill',
+  SkillChange = 'skill_change',
+  Suicides = 'suicides',
+  Teamkills = 'teamkills'
 }
 
 export type PlayerHistoryScalarWhereInput = {
@@ -19380,24 +19345,16 @@ export type PlayerHistoryUpdateManyWithWhereWithoutPlayerInput = {
 
 export type PlayerHistoryUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<PlayerHistoryWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerHistoryCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerHistoryCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<PlayerHistoryCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<PlayerHistoryCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<PlayerHistoryWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<PlayerHistoryScalarWhereInput>>;
   disconnect?: InputMaybe<Array<PlayerHistoryWhereUniqueInput>>;
   set?: InputMaybe<Array<PlayerHistoryWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<PlayerHistoryUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<PlayerHistoryUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<PlayerHistoryUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<PlayerHistoryUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<PlayerHistoryUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<PlayerHistoryUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type PlayerHistoryUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -19554,19 +19511,19 @@ export type PlayerMinOrderByAggregateInput = {
 };
 
 export type PlayerName = {
-  __typename?: "PlayerName";
-  connection_time: Scalars["Int"]["output"];
-  deaths: Scalars["Int"]["output"];
-  headshots: Scalars["Int"]["output"];
-  hits: Scalars["Int"]["output"];
-  kills: Scalars["Int"]["output"];
-  lastuse?: Maybe<Scalars["DateTime"]["output"]>;
-  name: Scalars["String"]["output"];
-  numuses: Scalars["Int"]["output"];
+  __typename?: 'PlayerName';
+  connection_time: Scalars['Int']['output'];
+  deaths: Scalars['Int']['output'];
+  headshots: Scalars['Int']['output'];
+  hits: Scalars['Int']['output'];
+  kills: Scalars['Int']['output'];
+  lastuse?: Maybe<Scalars['DateTime']['output']>;
+  name: Scalars['String']['output'];
+  numuses: Scalars['Int']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
-  shots: Scalars["Int"]["output"];
-  suicides: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
+  shots: Scalars['Int']['output'];
+  suicides: Scalars['Int']['output'];
 };
 
 export type PlayerNameAvgOrderByAggregateInput = {
@@ -19596,56 +19553,54 @@ export type PlayerNameCountOrderByAggregateInput = {
 };
 
 export type PlayerNameCreateInput = {
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastuse?: InputMaybe<Scalars["DateTime"]["input"]>;
-  name: Scalars["String"]["input"];
-  numuses?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastuse?: InputMaybe<Scalars['DateTime']['input']>;
+  name: Scalars['String']['input'];
+  numuses?: InputMaybe<Scalars['Int']['input']>;
   player: PlayerCreateNestedOneWithoutNamesInput;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PlayerNameCreateManyInput = {
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastuse?: InputMaybe<Scalars["DateTime"]["input"]>;
-  name: Scalars["String"]["input"];
-  numuses?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId: Scalars["Int"]["input"];
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastuse?: InputMaybe<Scalars['DateTime']['input']>;
+  name: Scalars['String']['input'];
+  numuses?: InputMaybe<Scalars['Int']['input']>;
+  playerId: Scalars['Int']['input'];
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PlayerNameCreateManyPlayerInput = {
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastuse?: InputMaybe<Scalars["DateTime"]["input"]>;
-  name: Scalars["String"]["input"];
-  numuses?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastuse?: InputMaybe<Scalars['DateTime']['input']>;
+  name: Scalars['String']['input'];
+  numuses?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PlayerNameCreateManyPlayerInputEnvelope = {
   data: Array<PlayerNameCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type PlayerNameCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<PlayerNameWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerNameCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerNameCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<PlayerNameCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<PlayerNameCreateManyPlayerInputEnvelope>;
 };
@@ -19656,16 +19611,16 @@ export type PlayerNameCreateOrConnectWithoutPlayerInput = {
 };
 
 export type PlayerNameCreateWithoutPlayerInput = {
-  connection_time?: InputMaybe<Scalars["Int"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  hits?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  lastuse?: InputMaybe<Scalars["DateTime"]["input"]>;
-  name: Scalars["String"]["input"];
-  numuses?: InputMaybe<Scalars["Int"]["input"]>;
-  shots?: InputMaybe<Scalars["Int"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
+  connection_time?: InputMaybe<Scalars['Int']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  lastuse?: InputMaybe<Scalars['DateTime']['input']>;
+  name: Scalars['String']['input'];
+  numuses?: InputMaybe<Scalars['Int']['input']>;
+  shots?: InputMaybe<Scalars['Int']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PlayerNameListRelationFilter = {
@@ -19707,12 +19662,12 @@ export type PlayerNameOrderByRelationAggregateInput = {
 };
 
 export enum PlayerNameOrderByRelevanceFieldEnum {
-  Name = "name",
+  Name = 'name'
 }
 
 export type PlayerNameOrderByRelevanceInput = {
   fields: Array<PlayerNameOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -19752,22 +19707,22 @@ export type PlayerNameOrderByWithRelationInput = {
 };
 
 export type PlayerNamePlayerIdNameCompoundUniqueInput = {
-  name: Scalars["String"]["input"];
-  playerId: Scalars["Int"]["input"];
+  name: Scalars['String']['input'];
+  playerId: Scalars['Int']['input'];
 };
 
 export enum PlayerNameScalarFieldEnum {
-  ConnectionTime = "connection_time",
-  Deaths = "deaths",
-  Headshots = "headshots",
-  Hits = "hits",
-  Kills = "kills",
-  Lastuse = "lastuse",
-  Name = "name",
-  Numuses = "numuses",
-  PlayerId = "playerId",
-  Shots = "shots",
-  Suicides = "suicides",
+  ConnectionTime = 'connection_time',
+  Deaths = 'deaths',
+  Headshots = 'headshots',
+  Hits = 'hits',
+  Kills = 'kills',
+  Lastuse = 'lastuse',
+  Name = 'name',
+  Numuses = 'numuses',
+  PlayerId = 'playerId',
+  Shots = 'shots',
+  Suicides = 'suicides'
 }
 
 export type PlayerNameScalarWhereInput = {
@@ -19850,9 +19805,7 @@ export type PlayerNameUpdateManyWithWhereWithoutPlayerInput = {
 
 export type PlayerNameUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<PlayerNameWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerNameCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerNameCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<PlayerNameCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<PlayerNameCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<PlayerNameWhereUniqueInput>>;
@@ -19860,9 +19813,7 @@ export type PlayerNameUpdateManyWithoutPlayerNestedInput = {
   disconnect?: InputMaybe<Array<PlayerNameWhereUniqueInput>>;
   set?: InputMaybe<Array<PlayerNameWhereUniqueInput>>;
   update?: InputMaybe<Array<PlayerNameUpdateWithWhereUniqueWithoutPlayerInput>>;
-  updateMany?: InputMaybe<
-    Array<PlayerNameUpdateManyWithWhereWithoutPlayerInput>
-  >;
+  updateMany?: InputMaybe<Array<PlayerNameUpdateManyWithWhereWithoutPlayerInput>>;
   upsert?: InputMaybe<Array<PlayerNameUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
@@ -19937,21 +19888,21 @@ export type PlayerOrderByRelationAggregateInput = {
 };
 
 export enum PlayerOrderByRelevanceFieldEnum {
-  City = "city",
-  Country = "country",
-  Email = "email",
-  Flag = "flag",
-  FullName = "fullName",
-  Game = "game",
-  Homepage = "homepage",
-  LastAddress = "lastAddress",
-  LastName = "lastName",
-  State = "state",
+  City = 'city',
+  Country = 'country',
+  Email = 'email',
+  Flag = 'flag',
+  FullName = 'fullName',
+  Game = 'game',
+  Homepage = 'homepage',
+  LastAddress = 'lastAddress',
+  LastName = 'lastName',
+  State = 'state'
 }
 
 export type PlayerOrderByRelevanceInput = {
   fields: Array<PlayerOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -20068,12 +20019,12 @@ export type PlayerOrderByWithRelationInput = {
 };
 
 export type PlayerRibbon = {
-  __typename?: "PlayerRibbon";
-  game: Scalars["String"]["output"];
+  __typename?: 'PlayerRibbon';
+  game: Scalars['String']['output'];
   player: Player;
-  playerId: Scalars["Int"]["output"];
+  playerId: Scalars['Int']['output'];
   ribbon: Ribbon;
-  ribbonId: Scalars["Int"]["output"];
+  ribbonId: Scalars['Int']['output'];
 };
 
 export type PlayerRibbonAvgOrderByAggregateInput = {
@@ -20088,51 +20039,47 @@ export type PlayerRibbonCountOrderByAggregateInput = {
 };
 
 export type PlayerRibbonCreateInput = {
-  game: Scalars["String"]["input"];
+  game: Scalars['String']['input'];
   player: PlayerCreateNestedOneWithoutRibbonsInput;
   ribbon: RibbonCreateNestedOneWithoutPlayerRibbonsInput;
 };
 
 export type PlayerRibbonCreateManyInput = {
-  game: Scalars["String"]["input"];
-  playerId: Scalars["Int"]["input"];
-  ribbonId: Scalars["Int"]["input"];
+  game: Scalars['String']['input'];
+  playerId: Scalars['Int']['input'];
+  ribbonId: Scalars['Int']['input'];
 };
 
 export type PlayerRibbonCreateManyPlayerInput = {
-  game: Scalars["String"]["input"];
-  ribbonId: Scalars["Int"]["input"];
+  game: Scalars['String']['input'];
+  ribbonId: Scalars['Int']['input'];
 };
 
 export type PlayerRibbonCreateManyPlayerInputEnvelope = {
   data: Array<PlayerRibbonCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type PlayerRibbonCreateManyRibbonInput = {
-  game: Scalars["String"]["input"];
-  playerId: Scalars["Int"]["input"];
+  game: Scalars['String']['input'];
+  playerId: Scalars['Int']['input'];
 };
 
 export type PlayerRibbonCreateManyRibbonInputEnvelope = {
   data: Array<PlayerRibbonCreateManyRibbonInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type PlayerRibbonCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<PlayerRibbonWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerRibbonCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerRibbonCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<PlayerRibbonCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<PlayerRibbonCreateManyPlayerInputEnvelope>;
 };
 
 export type PlayerRibbonCreateNestedManyWithoutRibbonInput = {
   connect?: InputMaybe<Array<PlayerRibbonWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerRibbonCreateOrConnectWithoutRibbonInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerRibbonCreateOrConnectWithoutRibbonInput>>;
   create?: InputMaybe<Array<PlayerRibbonCreateWithoutRibbonInput>>;
   createMany?: InputMaybe<PlayerRibbonCreateManyRibbonInputEnvelope>;
 };
@@ -20148,12 +20095,12 @@ export type PlayerRibbonCreateOrConnectWithoutRibbonInput = {
 };
 
 export type PlayerRibbonCreateWithoutPlayerInput = {
-  game: Scalars["String"]["input"];
+  game: Scalars['String']['input'];
   ribbon: RibbonCreateNestedOneWithoutPlayerRibbonsInput;
 };
 
 export type PlayerRibbonCreateWithoutRibbonInput = {
-  game: Scalars["String"]["input"];
+  game: Scalars['String']['input'];
   player: PlayerCreateNestedOneWithoutRibbonsInput;
 };
 
@@ -20180,12 +20127,12 @@ export type PlayerRibbonOrderByRelationAggregateInput = {
 };
 
 export enum PlayerRibbonOrderByRelevanceFieldEnum {
-  Game = "game",
+  Game = 'game'
 }
 
 export type PlayerRibbonOrderByRelevanceInput = {
   fields: Array<PlayerRibbonOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -20210,15 +20157,15 @@ export type PlayerRibbonOrderByWithRelationInput = {
 };
 
 export type PlayerRibbonPlayerIdRibbonIdGameCompoundUniqueInput = {
-  game: Scalars["String"]["input"];
-  playerId: Scalars["Int"]["input"];
-  ribbonId: Scalars["Int"]["input"];
+  game: Scalars['String']['input'];
+  playerId: Scalars['Int']['input'];
+  ribbonId: Scalars['Int']['input'];
 };
 
 export enum PlayerRibbonScalarFieldEnum {
-  Game = "game",
-  PlayerId = "playerId",
-  RibbonId = "ribbonId",
+  Game = 'game',
+  PlayerId = 'playerId',
+  RibbonId = 'ribbonId'
 }
 
 export type PlayerRibbonScalarWhereInput = {
@@ -20266,46 +20213,30 @@ export type PlayerRibbonUpdateManyWithWhereWithoutRibbonInput = {
 
 export type PlayerRibbonUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<PlayerRibbonWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerRibbonCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerRibbonCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<PlayerRibbonCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<PlayerRibbonCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<PlayerRibbonWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<PlayerRibbonScalarWhereInput>>;
   disconnect?: InputMaybe<Array<PlayerRibbonWhereUniqueInput>>;
   set?: InputMaybe<Array<PlayerRibbonWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<PlayerRibbonUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<PlayerRibbonUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<PlayerRibbonUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<PlayerRibbonUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<PlayerRibbonUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<PlayerRibbonUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type PlayerRibbonUpdateManyWithoutRibbonNestedInput = {
   connect?: InputMaybe<Array<PlayerRibbonWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerRibbonCreateOrConnectWithoutRibbonInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerRibbonCreateOrConnectWithoutRibbonInput>>;
   create?: InputMaybe<Array<PlayerRibbonCreateWithoutRibbonInput>>;
   createMany?: InputMaybe<PlayerRibbonCreateManyRibbonInputEnvelope>;
   delete?: InputMaybe<Array<PlayerRibbonWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<PlayerRibbonScalarWhereInput>>;
   disconnect?: InputMaybe<Array<PlayerRibbonWhereUniqueInput>>;
   set?: InputMaybe<Array<PlayerRibbonWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<PlayerRibbonUpdateWithWhereUniqueWithoutRibbonInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<PlayerRibbonUpdateManyWithWhereWithoutRibbonInput>
-  >;
-  upsert?: InputMaybe<
-    Array<PlayerRibbonUpsertWithWhereUniqueWithoutRibbonInput>
-  >;
+  update?: InputMaybe<Array<PlayerRibbonUpdateWithWhereUniqueWithoutRibbonInput>>;
+  updateMany?: InputMaybe<Array<PlayerRibbonUpdateManyWithWhereWithoutRibbonInput>>;
+  upsert?: InputMaybe<Array<PlayerRibbonUpsertWithWhereUniqueWithoutRibbonInput>>;
 };
 
 export type PlayerRibbonUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -20364,40 +20295,40 @@ export type PlayerRibbonWhereUniqueInput = {
 };
 
 export enum PlayerScalarFieldEnum {
-  Activity = "activity",
-  Blockavatar = "blockavatar",
-  City = "city",
-  Clan = "clan",
-  ConnectionTime = "connection_time",
-  Country = "country",
-  Createdate = "createdate",
-  DeathStreak = "death_streak",
-  Deaths = "deaths",
-  DisplayEvents = "displayEvents",
-  Email = "email",
-  Flag = "flag",
-  FullName = "fullName",
-  Game = "game",
-  Headshots = "headshots",
-  Hideranking = "hideranking",
-  Hits = "hits",
-  Homepage = "homepage",
-  Icq = "icq",
-  KillStreak = "kill_streak",
-  Kills = "kills",
-  LastAddress = "lastAddress",
-  LastName = "lastName",
-  LastEvent = "last_event",
-  LastSkillChange = "last_skill_change",
-  Lat = "lat",
-  Lng = "lng",
-  Mmrank = "mmrank",
-  PlayerId = "playerId",
-  Shots = "shots",
-  Skill = "skill",
-  State = "state",
-  Suicides = "suicides",
-  Teamkills = "teamkills",
+  Activity = 'activity',
+  Blockavatar = 'blockavatar',
+  City = 'city',
+  Clan = 'clan',
+  ConnectionTime = 'connection_time',
+  Country = 'country',
+  Createdate = 'createdate',
+  DeathStreak = 'death_streak',
+  Deaths = 'deaths',
+  DisplayEvents = 'displayEvents',
+  Email = 'email',
+  Flag = 'flag',
+  FullName = 'fullName',
+  Game = 'game',
+  Headshots = 'headshots',
+  Hideranking = 'hideranking',
+  Hits = 'hits',
+  Homepage = 'homepage',
+  Icq = 'icq',
+  KillStreak = 'kill_streak',
+  Kills = 'kills',
+  LastAddress = 'lastAddress',
+  LastName = 'lastName',
+  LastEvent = 'last_event',
+  LastSkillChange = 'last_skill_change',
+  Lat = 'lat',
+  Lng = 'lng',
+  Mmrank = 'mmrank',
+  PlayerId = 'playerId',
+  Shots = 'shots',
+  Skill = 'skill',
+  State = 'state',
+  Suicides = 'suicides',
+  Teamkills = 'teamkills'
 }
 
 export type PlayerScalarRelationFilter = {
@@ -20513,12 +20444,12 @@ export type PlayerSumOrderByAggregateInput = {
 };
 
 export type PlayerUniqueId = {
-  __typename?: "PlayerUniqueId";
-  game: Scalars["String"]["output"];
-  merge?: Maybe<Scalars["Int"]["output"]>;
+  __typename?: 'PlayerUniqueId';
+  game: Scalars['String']['output'];
+  merge?: Maybe<Scalars['Int']['output']>;
   player: Player;
-  playerId: Scalars["Int"]["output"];
-  uniqueId: Scalars["String"]["output"];
+  playerId: Scalars['Int']['output'];
+  uniqueId: Scalars['String']['output'];
 };
 
 export type PlayerUniqueIdAvgOrderByAggregateInput = {
@@ -20534,35 +20465,33 @@ export type PlayerUniqueIdCountOrderByAggregateInput = {
 };
 
 export type PlayerUniqueIdCreateInput = {
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  merge?: InputMaybe<Scalars["Int"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  merge?: InputMaybe<Scalars['Int']['input']>;
   player: PlayerCreateNestedOneWithoutUniqueIdsInput;
-  uniqueId?: InputMaybe<Scalars["String"]["input"]>;
+  uniqueId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type PlayerUniqueIdCreateManyInput = {
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  merge?: InputMaybe<Scalars["Int"]["input"]>;
-  playerId: Scalars["Int"]["input"];
-  uniqueId?: InputMaybe<Scalars["String"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  merge?: InputMaybe<Scalars['Int']['input']>;
+  playerId: Scalars['Int']['input'];
+  uniqueId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type PlayerUniqueIdCreateManyPlayerInput = {
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  merge?: InputMaybe<Scalars["Int"]["input"]>;
-  uniqueId?: InputMaybe<Scalars["String"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  merge?: InputMaybe<Scalars['Int']['input']>;
+  uniqueId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type PlayerUniqueIdCreateManyPlayerInputEnvelope = {
   data: Array<PlayerUniqueIdCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type PlayerUniqueIdCreateNestedManyWithoutPlayerInput = {
   connect?: InputMaybe<Array<PlayerUniqueIdWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerUniqueIdCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerUniqueIdCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<PlayerUniqueIdCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<PlayerUniqueIdCreateManyPlayerInputEnvelope>;
 };
@@ -20573,9 +20502,9 @@ export type PlayerUniqueIdCreateOrConnectWithoutPlayerInput = {
 };
 
 export type PlayerUniqueIdCreateWithoutPlayerInput = {
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  merge?: InputMaybe<Scalars["Int"]["input"]>;
-  uniqueId?: InputMaybe<Scalars["String"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  merge?: InputMaybe<Scalars['Int']['input']>;
+  uniqueId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type PlayerUniqueIdListRelationFilter = {
@@ -20603,13 +20532,13 @@ export type PlayerUniqueIdOrderByRelationAggregateInput = {
 };
 
 export enum PlayerUniqueIdOrderByRelevanceFieldEnum {
-  Game = "game",
-  UniqueId = "uniqueId",
+  Game = 'game',
+  UniqueId = 'uniqueId'
 }
 
 export type PlayerUniqueIdOrderByRelevanceInput = {
   fields: Array<PlayerUniqueIdOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -20635,10 +20564,10 @@ export type PlayerUniqueIdOrderByWithRelationInput = {
 };
 
 export enum PlayerUniqueIdScalarFieldEnum {
-  Game = "game",
-  Merge = "merge",
-  PlayerId = "playerId",
-  UniqueId = "uniqueId",
+  Game = 'game',
+  Merge = 'merge',
+  PlayerId = 'playerId',
+  UniqueId = 'uniqueId'
 }
 
 export type PlayerUniqueIdScalarWhereInput = {
@@ -20667,8 +20596,8 @@ export type PlayerUniqueIdSumOrderByAggregateInput = {
 };
 
 export type PlayerUniqueIdUniqueIdGameCompoundUniqueInput = {
-  game: Scalars["String"]["input"];
-  uniqueId: Scalars["String"]["input"];
+  game: Scalars['String']['input'];
+  uniqueId: Scalars['String']['input'];
 };
 
 export type PlayerUniqueIdUpdateInput = {
@@ -20691,24 +20620,16 @@ export type PlayerUniqueIdUpdateManyWithWhereWithoutPlayerInput = {
 
 export type PlayerUniqueIdUpdateManyWithoutPlayerNestedInput = {
   connect?: InputMaybe<Array<PlayerUniqueIdWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerUniqueIdCreateOrConnectWithoutPlayerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerUniqueIdCreateOrConnectWithoutPlayerInput>>;
   create?: InputMaybe<Array<PlayerUniqueIdCreateWithoutPlayerInput>>;
   createMany?: InputMaybe<PlayerUniqueIdCreateManyPlayerInputEnvelope>;
   delete?: InputMaybe<Array<PlayerUniqueIdWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<PlayerUniqueIdScalarWhereInput>>;
   disconnect?: InputMaybe<Array<PlayerUniqueIdWhereUniqueInput>>;
   set?: InputMaybe<Array<PlayerUniqueIdWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<PlayerUniqueIdUpdateWithWhereUniqueWithoutPlayerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<PlayerUniqueIdUpdateManyWithWhereWithoutPlayerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<PlayerUniqueIdUpsertWithWhereUniqueWithoutPlayerInput>
-  >;
+  update?: InputMaybe<Array<PlayerUniqueIdUpdateWithWhereUniqueWithoutPlayerInput>>;
+  updateMany?: InputMaybe<Array<PlayerUniqueIdUpdateManyWithWhereWithoutPlayerInput>>;
+  upsert?: InputMaybe<Array<PlayerUniqueIdUpsertWithWhereUniqueWithoutPlayerInput>>;
 };
 
 export type PlayerUniqueIdUpdateWithWhereUniqueWithoutPlayerInput = {
@@ -20866,9 +20787,7 @@ export type PlayerUpdateManyWithWhereWithoutGameDataInput = {
 
 export type PlayerUpdateManyWithoutClanDataNestedInput = {
   connect?: InputMaybe<Array<PlayerWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerCreateOrConnectWithoutClanDataInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerCreateOrConnectWithoutClanDataInput>>;
   create?: InputMaybe<Array<PlayerCreateWithoutClanDataInput>>;
   createMany?: InputMaybe<PlayerCreateManyClanDataInputEnvelope>;
   delete?: InputMaybe<Array<PlayerWhereUniqueInput>>;
@@ -20882,31 +20801,21 @@ export type PlayerUpdateManyWithoutClanDataNestedInput = {
 
 export type PlayerUpdateManyWithoutCountryDataNestedInput = {
   connect?: InputMaybe<Array<PlayerWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerCreateOrConnectWithoutCountryDataInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerCreateOrConnectWithoutCountryDataInput>>;
   create?: InputMaybe<Array<PlayerCreateWithoutCountryDataInput>>;
   createMany?: InputMaybe<PlayerCreateManyCountryDataInputEnvelope>;
   delete?: InputMaybe<Array<PlayerWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<PlayerScalarWhereInput>>;
   disconnect?: InputMaybe<Array<PlayerWhereUniqueInput>>;
   set?: InputMaybe<Array<PlayerWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<PlayerUpdateWithWhereUniqueWithoutCountryDataInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<PlayerUpdateManyWithWhereWithoutCountryDataInput>
-  >;
-  upsert?: InputMaybe<
-    Array<PlayerUpsertWithWhereUniqueWithoutCountryDataInput>
-  >;
+  update?: InputMaybe<Array<PlayerUpdateWithWhereUniqueWithoutCountryDataInput>>;
+  updateMany?: InputMaybe<Array<PlayerUpdateManyWithWhereWithoutCountryDataInput>>;
+  upsert?: InputMaybe<Array<PlayerUpsertWithWhereUniqueWithoutCountryDataInput>>;
 };
 
 export type PlayerUpdateManyWithoutGameDataNestedInput = {
   connect?: InputMaybe<Array<PlayerWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<PlayerCreateOrConnectWithoutGameDataInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<PlayerCreateOrConnectWithoutGameDataInput>>;
   create?: InputMaybe<Array<PlayerCreateWithoutGameDataInput>>;
   createMany?: InputMaybe<PlayerCreateManyGameDataInputEnvelope>;
   delete?: InputMaybe<Array<PlayerWhereUniqueInput>>;
@@ -21014,23 +20923,21 @@ export type PlayerUpdateOneRequiredWithoutPlayerActionsNestedInput = {
   upsert?: InputMaybe<PlayerUpsertWithoutPlayerActionsInput>;
 };
 
-export type PlayerUpdateOneRequiredWithoutPlayerPlayerActionsAsActorNestedInput =
-  {
-    connect?: InputMaybe<PlayerWhereUniqueInput>;
-    connectOrCreate?: InputMaybe<PlayerCreateOrConnectWithoutPlayerPlayerActionsAsActorInput>;
-    create?: InputMaybe<PlayerCreateWithoutPlayerPlayerActionsAsActorInput>;
-    update?: InputMaybe<PlayerUpdateToOneWithWhereWithoutPlayerPlayerActionsAsActorInput>;
-    upsert?: InputMaybe<PlayerUpsertWithoutPlayerPlayerActionsAsActorInput>;
-  };
+export type PlayerUpdateOneRequiredWithoutPlayerPlayerActionsAsActorNestedInput = {
+  connect?: InputMaybe<PlayerWhereUniqueInput>;
+  connectOrCreate?: InputMaybe<PlayerCreateOrConnectWithoutPlayerPlayerActionsAsActorInput>;
+  create?: InputMaybe<PlayerCreateWithoutPlayerPlayerActionsAsActorInput>;
+  update?: InputMaybe<PlayerUpdateToOneWithWhereWithoutPlayerPlayerActionsAsActorInput>;
+  upsert?: InputMaybe<PlayerUpsertWithoutPlayerPlayerActionsAsActorInput>;
+};
 
-export type PlayerUpdateOneRequiredWithoutPlayerPlayerActionsAsVictimNestedInput =
-  {
-    connect?: InputMaybe<PlayerWhereUniqueInput>;
-    connectOrCreate?: InputMaybe<PlayerCreateOrConnectWithoutPlayerPlayerActionsAsVictimInput>;
-    create?: InputMaybe<PlayerCreateWithoutPlayerPlayerActionsAsVictimInput>;
-    update?: InputMaybe<PlayerUpdateToOneWithWhereWithoutPlayerPlayerActionsAsVictimInput>;
-    upsert?: InputMaybe<PlayerUpsertWithoutPlayerPlayerActionsAsVictimInput>;
-  };
+export type PlayerUpdateOneRequiredWithoutPlayerPlayerActionsAsVictimNestedInput = {
+  connect?: InputMaybe<PlayerWhereUniqueInput>;
+  connectOrCreate?: InputMaybe<PlayerCreateOrConnectWithoutPlayerPlayerActionsAsVictimInput>;
+  create?: InputMaybe<PlayerCreateWithoutPlayerPlayerActionsAsVictimInput>;
+  update?: InputMaybe<PlayerUpdateToOneWithWhereWithoutPlayerPlayerActionsAsVictimInput>;
+  upsert?: InputMaybe<PlayerUpsertWithoutPlayerPlayerActionsAsVictimInput>;
+};
 
 export type PlayerUpdateOneRequiredWithoutRibbonsNestedInput = {
   connect?: InputMaybe<PlayerWhereUniqueInput>;
@@ -21233,11 +21140,10 @@ export type PlayerUpdateToOneWithWhereWithoutPlayerPlayerActionsAsActorInput = {
   where?: InputMaybe<PlayerWhereInput>;
 };
 
-export type PlayerUpdateToOneWithWhereWithoutPlayerPlayerActionsAsVictimInput =
-  {
-    data: PlayerUpdateWithoutPlayerPlayerActionsAsVictimInput;
-    where?: InputMaybe<PlayerWhereInput>;
-  };
+export type PlayerUpdateToOneWithWhereWithoutPlayerPlayerActionsAsVictimInput = {
+  data: PlayerUpdateWithoutPlayerPlayerActionsAsVictimInput;
+  where?: InputMaybe<PlayerWhereInput>;
+};
 
 export type PlayerUpdateToOneWithWhereWithoutRibbonsInput = {
   data: PlayerUpdateWithoutRibbonsInput;
@@ -23680,7 +23586,7 @@ export type PlayerWhereUniqueInput = {
   nameChanges?: InputMaybe<EventChangeNameListRelationFilter>;
   names?: InputMaybe<PlayerNameListRelationFilter>;
   playerActions?: InputMaybe<EventPlayerActionListRelationFilter>;
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
   playerPlayerActionsAsActor?: InputMaybe<EventPlayerPlayerActionListRelationFilter>;
   playerPlayerActionsAsVictim?: InputMaybe<EventPlayerPlayerActionListRelationFilter>;
   ribbons?: InputMaybe<PlayerRibbonListRelationFilter>;
@@ -23704,63 +23610,63 @@ export type PlayerWhereUniqueInput = {
 };
 
 export type Query = {
-  __typename?: "Query";
-  countAction: Scalars["Int"]["output"];
-  countAward: Scalars["Int"]["output"];
-  countClan: Scalars["Int"]["output"];
-  countClanTag: Scalars["Int"]["output"];
-  countCountry: Scalars["Int"]["output"];
-  countEventAdmin: Scalars["Int"]["output"];
-  countEventChangeName: Scalars["Int"]["output"];
-  countEventChangeRole: Scalars["Int"]["output"];
-  countEventChangeTeam: Scalars["Int"]["output"];
-  countEventChat: Scalars["Int"]["output"];
-  countEventConnect: Scalars["Int"]["output"];
-  countEventDisconnect: Scalars["Int"]["output"];
-  countEventEntry: Scalars["Int"]["output"];
-  countEventFrag: Scalars["Int"]["output"];
-  countEventLatency: Scalars["Int"]["output"];
-  countEventPlayerAction: Scalars["Int"]["output"];
-  countEventPlayerPlayerAction: Scalars["Int"]["output"];
-  countEventRcon: Scalars["Int"]["output"];
-  countEventStatsme: Scalars["Int"]["output"];
-  countEventStatsme2: Scalars["Int"]["output"];
-  countEventStatsmeLatency: Scalars["Int"]["output"];
-  countEventStatsmeTime: Scalars["Int"]["output"];
-  countEventSuicide: Scalars["Int"]["output"];
-  countEventTeamBonus: Scalars["Int"]["output"];
-  countEventTeamkill: Scalars["Int"]["output"];
-  countGame: Scalars["Int"]["output"];
-  countGameDefault: Scalars["Int"]["output"];
-  countGameSupported: Scalars["Int"]["output"];
-  countGeoLiteCityBlock: Scalars["Int"]["output"];
-  countGeoLiteCityLocation: Scalars["Int"]["output"];
-  countHeatmapConfig: Scalars["Int"]["output"];
-  countHostGroup: Scalars["Int"]["output"];
-  countLivestat: Scalars["Int"]["output"];
-  countMapCount: Scalars["Int"]["output"];
-  countModDefault: Scalars["Int"]["output"];
-  countModSupported: Scalars["Int"]["output"];
-  countOption: Scalars["Int"]["output"];
-  countOptionChoice: Scalars["Int"]["output"];
-  countPlayer: Scalars["Int"]["output"];
-  countPlayerAward: Scalars["Int"]["output"];
-  countPlayerHistory: Scalars["Int"]["output"];
-  countPlayerName: Scalars["Int"]["output"];
-  countPlayerRibbon: Scalars["Int"]["output"];
-  countPlayerUniqueId: Scalars["Int"]["output"];
-  countRank: Scalars["Int"]["output"];
-  countRibbon: Scalars["Int"]["output"];
-  countRole: Scalars["Int"]["output"];
-  countServer: Scalars["Int"]["output"];
-  countServerConfig: Scalars["Int"]["output"];
-  countServerConfigDefault: Scalars["Int"]["output"];
-  countServerLoad: Scalars["Int"]["output"];
-  countServerVoiceComm: Scalars["Int"]["output"];
-  countTeam: Scalars["Int"]["output"];
-  countTrend: Scalars["Int"]["output"];
-  countUser: Scalars["Int"]["output"];
-  countWeapon: Scalars["Int"]["output"];
+  __typename?: 'Query';
+  countAction: Scalars['Int']['output'];
+  countAward: Scalars['Int']['output'];
+  countClan: Scalars['Int']['output'];
+  countClanTag: Scalars['Int']['output'];
+  countCountry: Scalars['Int']['output'];
+  countEventAdmin: Scalars['Int']['output'];
+  countEventChangeName: Scalars['Int']['output'];
+  countEventChangeRole: Scalars['Int']['output'];
+  countEventChangeTeam: Scalars['Int']['output'];
+  countEventChat: Scalars['Int']['output'];
+  countEventConnect: Scalars['Int']['output'];
+  countEventDisconnect: Scalars['Int']['output'];
+  countEventEntry: Scalars['Int']['output'];
+  countEventFrag: Scalars['Int']['output'];
+  countEventLatency: Scalars['Int']['output'];
+  countEventPlayerAction: Scalars['Int']['output'];
+  countEventPlayerPlayerAction: Scalars['Int']['output'];
+  countEventRcon: Scalars['Int']['output'];
+  countEventStatsme: Scalars['Int']['output'];
+  countEventStatsme2: Scalars['Int']['output'];
+  countEventStatsmeLatency: Scalars['Int']['output'];
+  countEventStatsmeTime: Scalars['Int']['output'];
+  countEventSuicide: Scalars['Int']['output'];
+  countEventTeamBonus: Scalars['Int']['output'];
+  countEventTeamkill: Scalars['Int']['output'];
+  countGame: Scalars['Int']['output'];
+  countGameDefault: Scalars['Int']['output'];
+  countGameSupported: Scalars['Int']['output'];
+  countGeoLiteCityBlock: Scalars['Int']['output'];
+  countGeoLiteCityLocation: Scalars['Int']['output'];
+  countHeatmapConfig: Scalars['Int']['output'];
+  countHostGroup: Scalars['Int']['output'];
+  countLivestat: Scalars['Int']['output'];
+  countMapCount: Scalars['Int']['output'];
+  countModDefault: Scalars['Int']['output'];
+  countModSupported: Scalars['Int']['output'];
+  countOption: Scalars['Int']['output'];
+  countOptionChoice: Scalars['Int']['output'];
+  countPlayer: Scalars['Int']['output'];
+  countPlayerAward: Scalars['Int']['output'];
+  countPlayerHistory: Scalars['Int']['output'];
+  countPlayerName: Scalars['Int']['output'];
+  countPlayerRibbon: Scalars['Int']['output'];
+  countPlayerUniqueId: Scalars['Int']['output'];
+  countRank: Scalars['Int']['output'];
+  countRibbon: Scalars['Int']['output'];
+  countRole: Scalars['Int']['output'];
+  countServer: Scalars['Int']['output'];
+  countServerConfig: Scalars['Int']['output'];
+  countServerConfigDefault: Scalars['Int']['output'];
+  countServerLoad: Scalars['Int']['output'];
+  countServerVoiceComm: Scalars['Int']['output'];
+  countTeam: Scalars['Int']['output'];
+  countTrend: Scalars['Int']['output'];
+  countUser: Scalars['Int']['output'];
+  countWeapon: Scalars['Int']['output'];
   findFirstAction?: Maybe<Action>;
   findFirstAward?: Maybe<Award>;
   findFirstClan?: Maybe<Clan>;
@@ -23930,1753 +23836,1977 @@ export type Query = {
   findUniqueUser?: Maybe<User>;
   findUniqueWeapon?: Maybe<Weapon>;
   health?: Maybe<HealthStatus>;
-  hello?: Maybe<Scalars["String"]["output"]>;
+  hello?: Maybe<Scalars['String']['output']>;
 };
+
 
 export type QueryCountActionArgs = {
   cursor?: InputMaybe<ActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<ActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ActionWhereInput>;
 };
+
 
 export type QueryCountAwardArgs = {
   cursor?: InputMaybe<AwardWhereUniqueInput>;
   distinct?: InputMaybe<Array<AwardScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<AwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<AwardWhereInput>;
 };
+
 
 export type QueryCountClanArgs = {
   cursor?: InputMaybe<ClanWhereUniqueInput>;
   distinct?: InputMaybe<Array<ClanScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ClanOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ClanWhereInput>;
 };
+
 
 export type QueryCountClanTagArgs = {
   cursor?: InputMaybe<ClanTagWhereUniqueInput>;
   distinct?: InputMaybe<Array<ClanTagScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ClanTagOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ClanTagWhereInput>;
 };
+
 
 export type QueryCountCountryArgs = {
   cursor?: InputMaybe<CountryWhereUniqueInput>;
   distinct?: InputMaybe<Array<CountryScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<CountryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<CountryWhereInput>;
 };
+
 
 export type QueryCountEventAdminArgs = {
   cursor?: InputMaybe<EventAdminWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventAdminScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventAdminOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventAdminWhereInput>;
 };
+
 
 export type QueryCountEventChangeNameArgs = {
   cursor?: InputMaybe<EventChangeNameWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeNameScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeNameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeNameWhereInput>;
 };
+
 
 export type QueryCountEventChangeRoleArgs = {
   cursor?: InputMaybe<EventChangeRoleWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeRoleScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeRoleOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeRoleWhereInput>;
 };
+
 
 export type QueryCountEventChangeTeamArgs = {
   cursor?: InputMaybe<EventChangeTeamWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeTeamScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeTeamOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeTeamWhereInput>;
 };
+
 
 export type QueryCountEventChatArgs = {
   cursor?: InputMaybe<EventChatWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChatScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChatOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChatWhereInput>;
 };
+
 
 export type QueryCountEventConnectArgs = {
   cursor?: InputMaybe<EventConnectWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventConnectScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventConnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventConnectWhereInput>;
 };
+
 
 export type QueryCountEventDisconnectArgs = {
   cursor?: InputMaybe<EventDisconnectWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventDisconnectScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventDisconnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventDisconnectWhereInput>;
 };
+
 
 export type QueryCountEventEntryArgs = {
   cursor?: InputMaybe<EventEntryWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventEntryScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventEntryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventEntryWhereInput>;
 };
+
 
 export type QueryCountEventFragArgs = {
   cursor?: InputMaybe<EventFragWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventFragScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventFragOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventFragWhereInput>;
 };
+
 
 export type QueryCountEventLatencyArgs = {
   cursor?: InputMaybe<EventLatencyWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventLatencyScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventLatencyOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventLatencyWhereInput>;
 };
+
 
 export type QueryCountEventPlayerActionArgs = {
   cursor?: InputMaybe<EventPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerActionWhereInput>;
 };
+
 
 export type QueryCountEventPlayerPlayerActionArgs = {
   cursor?: InputMaybe<EventPlayerPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerPlayerActionWhereInput>;
 };
+
 
 export type QueryCountEventRconArgs = {
   cursor?: InputMaybe<EventRconWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventRconScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventRconOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventRconWhereInput>;
 };
+
 
 export type QueryCountEventStatsmeArgs = {
   cursor?: InputMaybe<EventStatsmeWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeWhereInput>;
 };
+
 
 export type QueryCountEventStatsme2Args = {
   cursor?: InputMaybe<EventStatsme2WhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsme2ScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsme2OrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsme2WhereInput>;
 };
+
 
 export type QueryCountEventStatsmeLatencyArgs = {
   cursor?: InputMaybe<EventStatsmeLatencyWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeLatencyScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeLatencyOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeLatencyWhereInput>;
 };
+
 
 export type QueryCountEventStatsmeTimeArgs = {
   cursor?: InputMaybe<EventStatsmeTimeWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeTimeScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeTimeOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeTimeWhereInput>;
 };
+
 
 export type QueryCountEventSuicideArgs = {
   cursor?: InputMaybe<EventSuicideWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventSuicideScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventSuicideOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventSuicideWhereInput>;
 };
+
 
 export type QueryCountEventTeamBonusArgs = {
   cursor?: InputMaybe<EventTeamBonusWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventTeamBonusScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventTeamBonusOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventTeamBonusWhereInput>;
 };
+
 
 export type QueryCountEventTeamkillArgs = {
   cursor?: InputMaybe<EventTeamkillWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventTeamkillScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventTeamkillOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventTeamkillWhereInput>;
 };
+
 
 export type QueryCountGameArgs = {
   cursor?: InputMaybe<GameWhereUniqueInput>;
   distinct?: InputMaybe<Array<GameScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GameWhereInput>;
 };
+
 
 export type QueryCountGameDefaultArgs = {
   cursor?: InputMaybe<GameDefaultWhereUniqueInput>;
   distinct?: InputMaybe<Array<GameDefaultScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GameDefaultOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GameDefaultWhereInput>;
 };
+
 
 export type QueryCountGameSupportedArgs = {
   cursor?: InputMaybe<GameSupportedWhereUniqueInput>;
   distinct?: InputMaybe<Array<GameSupportedScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GameSupportedOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GameSupportedWhereInput>;
 };
+
 
 export type QueryCountGeoLiteCityBlockArgs = {
   cursor?: InputMaybe<GeoLiteCityBlockWhereUniqueInput>;
   distinct?: InputMaybe<Array<GeoLiteCityBlockScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GeoLiteCityBlockOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GeoLiteCityBlockWhereInput>;
 };
+
 
 export type QueryCountGeoLiteCityLocationArgs = {
   cursor?: InputMaybe<GeoLiteCityLocationWhereUniqueInput>;
   distinct?: InputMaybe<Array<GeoLiteCityLocationScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GeoLiteCityLocationOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GeoLiteCityLocationWhereInput>;
 };
+
 
 export type QueryCountHeatmapConfigArgs = {
   cursor?: InputMaybe<HeatmapConfigWhereUniqueInput>;
   distinct?: InputMaybe<Array<HeatmapConfigScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<HeatmapConfigOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<HeatmapConfigWhereInput>;
 };
+
 
 export type QueryCountHostGroupArgs = {
   cursor?: InputMaybe<HostGroupWhereUniqueInput>;
   distinct?: InputMaybe<Array<HostGroupScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<HostGroupOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<HostGroupWhereInput>;
 };
+
 
 export type QueryCountLivestatArgs = {
   cursor?: InputMaybe<LivestatWhereUniqueInput>;
   distinct?: InputMaybe<Array<LivestatScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<LivestatOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<LivestatWhereInput>;
 };
+
 
 export type QueryCountMapCountArgs = {
   cursor?: InputMaybe<MapCountWhereUniqueInput>;
   distinct?: InputMaybe<Array<MapCountScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<MapCountOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<MapCountWhereInput>;
 };
+
 
 export type QueryCountModDefaultArgs = {
   cursor?: InputMaybe<ModDefaultWhereUniqueInput>;
   distinct?: InputMaybe<Array<ModDefaultScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ModDefaultOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ModDefaultWhereInput>;
 };
+
 
 export type QueryCountModSupportedArgs = {
   cursor?: InputMaybe<ModSupportedWhereUniqueInput>;
   distinct?: InputMaybe<Array<ModSupportedScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ModSupportedOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ModSupportedWhereInput>;
 };
+
 
 export type QueryCountOptionArgs = {
   cursor?: InputMaybe<OptionWhereUniqueInput>;
   distinct?: InputMaybe<Array<OptionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<OptionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<OptionWhereInput>;
 };
+
 
 export type QueryCountOptionChoiceArgs = {
   cursor?: InputMaybe<OptionChoiceWhereUniqueInput>;
   distinct?: InputMaybe<Array<OptionChoiceScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<OptionChoiceOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<OptionChoiceWhereInput>;
 };
+
 
 export type QueryCountPlayerArgs = {
   cursor?: InputMaybe<PlayerWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerWhereInput>;
 };
+
 
 export type QueryCountPlayerAwardArgs = {
   cursor?: InputMaybe<PlayerAwardWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerAwardScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerAwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerAwardWhereInput>;
 };
+
 
 export type QueryCountPlayerHistoryArgs = {
   cursor?: InputMaybe<PlayerHistoryWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerHistoryScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerHistoryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerHistoryWhereInput>;
 };
+
 
 export type QueryCountPlayerNameArgs = {
   cursor?: InputMaybe<PlayerNameWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerNameScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerNameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerNameWhereInput>;
 };
+
 
 export type QueryCountPlayerRibbonArgs = {
   cursor?: InputMaybe<PlayerRibbonWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerRibbonScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerRibbonOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerRibbonWhereInput>;
 };
+
 
 export type QueryCountPlayerUniqueIdArgs = {
   cursor?: InputMaybe<PlayerUniqueIdWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerUniqueIdScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerUniqueIdOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerUniqueIdWhereInput>;
 };
+
 
 export type QueryCountRankArgs = {
   cursor?: InputMaybe<RankWhereUniqueInput>;
   distinct?: InputMaybe<Array<RankScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<RankOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<RankWhereInput>;
 };
+
 
 export type QueryCountRibbonArgs = {
   cursor?: InputMaybe<RibbonWhereUniqueInput>;
   distinct?: InputMaybe<Array<RibbonScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<RibbonOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<RibbonWhereInput>;
 };
+
 
 export type QueryCountRoleArgs = {
   cursor?: InputMaybe<RoleWhereUniqueInput>;
   distinct?: InputMaybe<Array<RoleScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<RoleOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<RoleWhereInput>;
 };
+
 
 export type QueryCountServerArgs = {
   cursor?: InputMaybe<ServerWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerWhereInput>;
 };
+
 
 export type QueryCountServerConfigArgs = {
   cursor?: InputMaybe<ServerConfigWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerConfigScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerConfigOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerConfigWhereInput>;
 };
+
 
 export type QueryCountServerConfigDefaultArgs = {
   cursor?: InputMaybe<ServerConfigDefaultWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerConfigDefaultScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerConfigDefaultOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerConfigDefaultWhereInput>;
 };
+
 
 export type QueryCountServerLoadArgs = {
   cursor?: InputMaybe<ServerLoadWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerLoadScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerLoadOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerLoadWhereInput>;
 };
+
 
 export type QueryCountServerVoiceCommArgs = {
   cursor?: InputMaybe<ServerVoiceCommWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerVoiceCommScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerVoiceCommOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerVoiceCommWhereInput>;
 };
+
 
 export type QueryCountTeamArgs = {
   cursor?: InputMaybe<TeamWhereUniqueInput>;
   distinct?: InputMaybe<Array<TeamScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<TeamOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<TeamWhereInput>;
 };
+
 
 export type QueryCountTrendArgs = {
   cursor?: InputMaybe<TrendWhereUniqueInput>;
   distinct?: InputMaybe<Array<TrendScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<TrendOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<TrendWhereInput>;
 };
+
 
 export type QueryCountUserArgs = {
   cursor?: InputMaybe<UserWhereUniqueInput>;
   distinct?: InputMaybe<Array<UserScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<UserOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<UserWhereInput>;
 };
+
 
 export type QueryCountWeaponArgs = {
   cursor?: InputMaybe<WeaponWhereUniqueInput>;
   distinct?: InputMaybe<Array<WeaponScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<WeaponOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<WeaponWhereInput>;
 };
+
 
 export type QueryFindFirstActionArgs = {
   cursor?: InputMaybe<ActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<ActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ActionWhereInput>;
 };
+
 
 export type QueryFindFirstAwardArgs = {
   cursor?: InputMaybe<AwardWhereUniqueInput>;
   distinct?: InputMaybe<Array<AwardScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<AwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<AwardWhereInput>;
 };
+
 
 export type QueryFindFirstClanArgs = {
   cursor?: InputMaybe<ClanWhereUniqueInput>;
   distinct?: InputMaybe<Array<ClanScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ClanOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ClanWhereInput>;
 };
+
 
 export type QueryFindFirstClanTagArgs = {
   cursor?: InputMaybe<ClanTagWhereUniqueInput>;
   distinct?: InputMaybe<Array<ClanTagScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ClanTagOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ClanTagWhereInput>;
 };
+
 
 export type QueryFindFirstCountryArgs = {
   cursor?: InputMaybe<CountryWhereUniqueInput>;
   distinct?: InputMaybe<Array<CountryScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<CountryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<CountryWhereInput>;
 };
+
 
 export type QueryFindFirstEventAdminArgs = {
   cursor?: InputMaybe<EventAdminWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventAdminScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventAdminOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventAdminWhereInput>;
 };
+
 
 export type QueryFindFirstEventChangeNameArgs = {
   cursor?: InputMaybe<EventChangeNameWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeNameScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeNameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeNameWhereInput>;
 };
+
 
 export type QueryFindFirstEventChangeRoleArgs = {
   cursor?: InputMaybe<EventChangeRoleWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeRoleScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeRoleOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeRoleWhereInput>;
 };
+
 
 export type QueryFindFirstEventChangeTeamArgs = {
   cursor?: InputMaybe<EventChangeTeamWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeTeamScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeTeamOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeTeamWhereInput>;
 };
+
 
 export type QueryFindFirstEventChatArgs = {
   cursor?: InputMaybe<EventChatWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChatScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChatOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChatWhereInput>;
 };
+
 
 export type QueryFindFirstEventConnectArgs = {
   cursor?: InputMaybe<EventConnectWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventConnectScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventConnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventConnectWhereInput>;
 };
+
 
 export type QueryFindFirstEventDisconnectArgs = {
   cursor?: InputMaybe<EventDisconnectWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventDisconnectScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventDisconnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventDisconnectWhereInput>;
 };
+
 
 export type QueryFindFirstEventEntryArgs = {
   cursor?: InputMaybe<EventEntryWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventEntryScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventEntryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventEntryWhereInput>;
 };
+
 
 export type QueryFindFirstEventFragArgs = {
   cursor?: InputMaybe<EventFragWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventFragScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventFragOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventFragWhereInput>;
 };
+
 
 export type QueryFindFirstEventLatencyArgs = {
   cursor?: InputMaybe<EventLatencyWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventLatencyScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventLatencyOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventLatencyWhereInput>;
 };
+
 
 export type QueryFindFirstEventPlayerActionArgs = {
   cursor?: InputMaybe<EventPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerActionWhereInput>;
 };
+
 
 export type QueryFindFirstEventPlayerPlayerActionArgs = {
   cursor?: InputMaybe<EventPlayerPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerPlayerActionWhereInput>;
 };
+
 
 export type QueryFindFirstEventRconArgs = {
   cursor?: InputMaybe<EventRconWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventRconScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventRconOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventRconWhereInput>;
 };
+
 
 export type QueryFindFirstEventStatsmeArgs = {
   cursor?: InputMaybe<EventStatsmeWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeWhereInput>;
 };
+
 
 export type QueryFindFirstEventStatsme2Args = {
   cursor?: InputMaybe<EventStatsme2WhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsme2ScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsme2OrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsme2WhereInput>;
 };
+
 
 export type QueryFindFirstEventStatsmeLatencyArgs = {
   cursor?: InputMaybe<EventStatsmeLatencyWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeLatencyScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeLatencyOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeLatencyWhereInput>;
 };
+
 
 export type QueryFindFirstEventStatsmeTimeArgs = {
   cursor?: InputMaybe<EventStatsmeTimeWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeTimeScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeTimeOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeTimeWhereInput>;
 };
+
 
 export type QueryFindFirstEventSuicideArgs = {
   cursor?: InputMaybe<EventSuicideWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventSuicideScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventSuicideOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventSuicideWhereInput>;
 };
+
 
 export type QueryFindFirstEventTeamBonusArgs = {
   cursor?: InputMaybe<EventTeamBonusWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventTeamBonusScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventTeamBonusOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventTeamBonusWhereInput>;
 };
+
 
 export type QueryFindFirstEventTeamkillArgs = {
   cursor?: InputMaybe<EventTeamkillWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventTeamkillScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventTeamkillOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventTeamkillWhereInput>;
 };
+
 
 export type QueryFindFirstGameArgs = {
   cursor?: InputMaybe<GameWhereUniqueInput>;
   distinct?: InputMaybe<Array<GameScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GameWhereInput>;
 };
+
 
 export type QueryFindFirstGameDefaultArgs = {
   cursor?: InputMaybe<GameDefaultWhereUniqueInput>;
   distinct?: InputMaybe<Array<GameDefaultScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GameDefaultOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GameDefaultWhereInput>;
 };
+
 
 export type QueryFindFirstGameSupportedArgs = {
   cursor?: InputMaybe<GameSupportedWhereUniqueInput>;
   distinct?: InputMaybe<Array<GameSupportedScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GameSupportedOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GameSupportedWhereInput>;
 };
+
 
 export type QueryFindFirstGeoLiteCityBlockArgs = {
   cursor?: InputMaybe<GeoLiteCityBlockWhereUniqueInput>;
   distinct?: InputMaybe<Array<GeoLiteCityBlockScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GeoLiteCityBlockOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GeoLiteCityBlockWhereInput>;
 };
+
 
 export type QueryFindFirstGeoLiteCityLocationArgs = {
   cursor?: InputMaybe<GeoLiteCityLocationWhereUniqueInput>;
   distinct?: InputMaybe<Array<GeoLiteCityLocationScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GeoLiteCityLocationOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GeoLiteCityLocationWhereInput>;
 };
+
 
 export type QueryFindFirstHeatmapConfigArgs = {
   cursor?: InputMaybe<HeatmapConfigWhereUniqueInput>;
   distinct?: InputMaybe<Array<HeatmapConfigScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<HeatmapConfigOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<HeatmapConfigWhereInput>;
 };
+
 
 export type QueryFindFirstHostGroupArgs = {
   cursor?: InputMaybe<HostGroupWhereUniqueInput>;
   distinct?: InputMaybe<Array<HostGroupScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<HostGroupOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<HostGroupWhereInput>;
 };
+
 
 export type QueryFindFirstLivestatArgs = {
   cursor?: InputMaybe<LivestatWhereUniqueInput>;
   distinct?: InputMaybe<Array<LivestatScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<LivestatOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<LivestatWhereInput>;
 };
+
 
 export type QueryFindFirstMapCountArgs = {
   cursor?: InputMaybe<MapCountWhereUniqueInput>;
   distinct?: InputMaybe<Array<MapCountScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<MapCountOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<MapCountWhereInput>;
 };
+
 
 export type QueryFindFirstModDefaultArgs = {
   cursor?: InputMaybe<ModDefaultWhereUniqueInput>;
   distinct?: InputMaybe<Array<ModDefaultScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ModDefaultOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ModDefaultWhereInput>;
 };
+
 
 export type QueryFindFirstModSupportedArgs = {
   cursor?: InputMaybe<ModSupportedWhereUniqueInput>;
   distinct?: InputMaybe<Array<ModSupportedScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ModSupportedOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ModSupportedWhereInput>;
 };
+
 
 export type QueryFindFirstOptionArgs = {
   cursor?: InputMaybe<OptionWhereUniqueInput>;
   distinct?: InputMaybe<Array<OptionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<OptionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<OptionWhereInput>;
 };
+
 
 export type QueryFindFirstOptionChoiceArgs = {
   cursor?: InputMaybe<OptionChoiceWhereUniqueInput>;
   distinct?: InputMaybe<Array<OptionChoiceScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<OptionChoiceOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<OptionChoiceWhereInput>;
 };
+
 
 export type QueryFindFirstPlayerArgs = {
   cursor?: InputMaybe<PlayerWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerWhereInput>;
 };
+
 
 export type QueryFindFirstPlayerAwardArgs = {
   cursor?: InputMaybe<PlayerAwardWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerAwardScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerAwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerAwardWhereInput>;
 };
+
 
 export type QueryFindFirstPlayerHistoryArgs = {
   cursor?: InputMaybe<PlayerHistoryWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerHistoryScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerHistoryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerHistoryWhereInput>;
 };
+
 
 export type QueryFindFirstPlayerNameArgs = {
   cursor?: InputMaybe<PlayerNameWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerNameScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerNameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerNameWhereInput>;
 };
+
 
 export type QueryFindFirstPlayerRibbonArgs = {
   cursor?: InputMaybe<PlayerRibbonWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerRibbonScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerRibbonOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerRibbonWhereInput>;
 };
+
 
 export type QueryFindFirstPlayerUniqueIdArgs = {
   cursor?: InputMaybe<PlayerUniqueIdWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerUniqueIdScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerUniqueIdOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerUniqueIdWhereInput>;
 };
+
 
 export type QueryFindFirstRankArgs = {
   cursor?: InputMaybe<RankWhereUniqueInput>;
   distinct?: InputMaybe<Array<RankScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<RankOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<RankWhereInput>;
 };
+
 
 export type QueryFindFirstRibbonArgs = {
   cursor?: InputMaybe<RibbonWhereUniqueInput>;
   distinct?: InputMaybe<Array<RibbonScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<RibbonOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<RibbonWhereInput>;
 };
+
 
 export type QueryFindFirstRoleArgs = {
   cursor?: InputMaybe<RoleWhereUniqueInput>;
   distinct?: InputMaybe<Array<RoleScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<RoleOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<RoleWhereInput>;
 };
+
 
 export type QueryFindFirstServerArgs = {
   cursor?: InputMaybe<ServerWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerWhereInput>;
 };
+
 
 export type QueryFindFirstServerConfigArgs = {
   cursor?: InputMaybe<ServerConfigWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerConfigScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerConfigOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerConfigWhereInput>;
 };
+
 
 export type QueryFindFirstServerConfigDefaultArgs = {
   cursor?: InputMaybe<ServerConfigDefaultWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerConfigDefaultScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerConfigDefaultOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerConfigDefaultWhereInput>;
 };
+
 
 export type QueryFindFirstServerLoadArgs = {
   cursor?: InputMaybe<ServerLoadWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerLoadScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerLoadOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerLoadWhereInput>;
 };
+
 
 export type QueryFindFirstServerVoiceCommArgs = {
   cursor?: InputMaybe<ServerVoiceCommWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerVoiceCommScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerVoiceCommOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerVoiceCommWhereInput>;
 };
+
 
 export type QueryFindFirstTeamArgs = {
   cursor?: InputMaybe<TeamWhereUniqueInput>;
   distinct?: InputMaybe<Array<TeamScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<TeamOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<TeamWhereInput>;
 };
+
 
 export type QueryFindFirstTrendArgs = {
   cursor?: InputMaybe<TrendWhereUniqueInput>;
   distinct?: InputMaybe<Array<TrendScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<TrendOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<TrendWhereInput>;
 };
+
 
 export type QueryFindFirstUserArgs = {
   cursor?: InputMaybe<UserWhereUniqueInput>;
   distinct?: InputMaybe<Array<UserScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<UserOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<UserWhereInput>;
 };
+
 
 export type QueryFindFirstWeaponArgs = {
   cursor?: InputMaybe<WeaponWhereUniqueInput>;
   distinct?: InputMaybe<Array<WeaponScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<WeaponOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<WeaponWhereInput>;
 };
+
 
 export type QueryFindManyActionArgs = {
   cursor?: InputMaybe<ActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<ActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ActionWhereInput>;
 };
+
 
 export type QueryFindManyAwardArgs = {
   cursor?: InputMaybe<AwardWhereUniqueInput>;
   distinct?: InputMaybe<Array<AwardScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<AwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<AwardWhereInput>;
 };
+
 
 export type QueryFindManyClanArgs = {
   cursor?: InputMaybe<ClanWhereUniqueInput>;
   distinct?: InputMaybe<Array<ClanScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ClanOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ClanWhereInput>;
 };
+
 
 export type QueryFindManyClanTagArgs = {
   cursor?: InputMaybe<ClanTagWhereUniqueInput>;
   distinct?: InputMaybe<Array<ClanTagScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ClanTagOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ClanTagWhereInput>;
 };
+
 
 export type QueryFindManyCountryArgs = {
   cursor?: InputMaybe<CountryWhereUniqueInput>;
   distinct?: InputMaybe<Array<CountryScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<CountryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<CountryWhereInput>;
 };
+
 
 export type QueryFindManyEventAdminArgs = {
   cursor?: InputMaybe<EventAdminWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventAdminScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventAdminOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventAdminWhereInput>;
 };
+
 
 export type QueryFindManyEventChangeNameArgs = {
   cursor?: InputMaybe<EventChangeNameWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeNameScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeNameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeNameWhereInput>;
 };
+
 
 export type QueryFindManyEventChangeRoleArgs = {
   cursor?: InputMaybe<EventChangeRoleWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeRoleScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeRoleOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeRoleWhereInput>;
 };
+
 
 export type QueryFindManyEventChangeTeamArgs = {
   cursor?: InputMaybe<EventChangeTeamWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeTeamScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeTeamOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeTeamWhereInput>;
 };
+
 
 export type QueryFindManyEventChatArgs = {
   cursor?: InputMaybe<EventChatWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChatScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChatOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChatWhereInput>;
 };
+
 
 export type QueryFindManyEventConnectArgs = {
   cursor?: InputMaybe<EventConnectWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventConnectScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventConnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventConnectWhereInput>;
 };
+
 
 export type QueryFindManyEventDisconnectArgs = {
   cursor?: InputMaybe<EventDisconnectWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventDisconnectScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventDisconnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventDisconnectWhereInput>;
 };
+
 
 export type QueryFindManyEventEntryArgs = {
   cursor?: InputMaybe<EventEntryWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventEntryScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventEntryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventEntryWhereInput>;
 };
+
 
 export type QueryFindManyEventFragArgs = {
   cursor?: InputMaybe<EventFragWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventFragScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventFragOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventFragWhereInput>;
 };
+
 
 export type QueryFindManyEventLatencyArgs = {
   cursor?: InputMaybe<EventLatencyWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventLatencyScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventLatencyOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventLatencyWhereInput>;
 };
+
 
 export type QueryFindManyEventPlayerActionArgs = {
   cursor?: InputMaybe<EventPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerActionWhereInput>;
 };
+
 
 export type QueryFindManyEventPlayerPlayerActionArgs = {
   cursor?: InputMaybe<EventPlayerPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerPlayerActionWhereInput>;
 };
+
 
 export type QueryFindManyEventRconArgs = {
   cursor?: InputMaybe<EventRconWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventRconScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventRconOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventRconWhereInput>;
 };
+
 
 export type QueryFindManyEventStatsmeArgs = {
   cursor?: InputMaybe<EventStatsmeWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeWhereInput>;
 };
+
 
 export type QueryFindManyEventStatsme2Args = {
   cursor?: InputMaybe<EventStatsme2WhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsme2ScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsme2OrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsme2WhereInput>;
 };
+
 
 export type QueryFindManyEventStatsmeLatencyArgs = {
   cursor?: InputMaybe<EventStatsmeLatencyWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeLatencyScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeLatencyOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeLatencyWhereInput>;
 };
+
 
 export type QueryFindManyEventStatsmeTimeArgs = {
   cursor?: InputMaybe<EventStatsmeTimeWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeTimeScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeTimeOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeTimeWhereInput>;
 };
+
 
 export type QueryFindManyEventSuicideArgs = {
   cursor?: InputMaybe<EventSuicideWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventSuicideScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventSuicideOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventSuicideWhereInput>;
 };
+
 
 export type QueryFindManyEventTeamBonusArgs = {
   cursor?: InputMaybe<EventTeamBonusWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventTeamBonusScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventTeamBonusOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventTeamBonusWhereInput>;
 };
+
 
 export type QueryFindManyEventTeamkillArgs = {
   cursor?: InputMaybe<EventTeamkillWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventTeamkillScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventTeamkillOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventTeamkillWhereInput>;
 };
+
 
 export type QueryFindManyGameArgs = {
   cursor?: InputMaybe<GameWhereUniqueInput>;
   distinct?: InputMaybe<Array<GameScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GameWhereInput>;
 };
+
 
 export type QueryFindManyGameDefaultArgs = {
   cursor?: InputMaybe<GameDefaultWhereUniqueInput>;
   distinct?: InputMaybe<Array<GameDefaultScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GameDefaultOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GameDefaultWhereInput>;
 };
+
 
 export type QueryFindManyGameSupportedArgs = {
   cursor?: InputMaybe<GameSupportedWhereUniqueInput>;
   distinct?: InputMaybe<Array<GameSupportedScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GameSupportedOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GameSupportedWhereInput>;
 };
+
 
 export type QueryFindManyGeoLiteCityBlockArgs = {
   cursor?: InputMaybe<GeoLiteCityBlockWhereUniqueInput>;
   distinct?: InputMaybe<Array<GeoLiteCityBlockScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GeoLiteCityBlockOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GeoLiteCityBlockWhereInput>;
 };
+
 
 export type QueryFindManyGeoLiteCityLocationArgs = {
   cursor?: InputMaybe<GeoLiteCityLocationWhereUniqueInput>;
   distinct?: InputMaybe<Array<GeoLiteCityLocationScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<GeoLiteCityLocationOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<GeoLiteCityLocationWhereInput>;
 };
+
 
 export type QueryFindManyHeatmapConfigArgs = {
   cursor?: InputMaybe<HeatmapConfigWhereUniqueInput>;
   distinct?: InputMaybe<Array<HeatmapConfigScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<HeatmapConfigOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<HeatmapConfigWhereInput>;
 };
+
 
 export type QueryFindManyHostGroupArgs = {
   cursor?: InputMaybe<HostGroupWhereUniqueInput>;
   distinct?: InputMaybe<Array<HostGroupScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<HostGroupOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<HostGroupWhereInput>;
 };
+
 
 export type QueryFindManyLivestatArgs = {
   cursor?: InputMaybe<LivestatWhereUniqueInput>;
   distinct?: InputMaybe<Array<LivestatScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<LivestatOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<LivestatWhereInput>;
 };
+
 
 export type QueryFindManyMapCountArgs = {
   cursor?: InputMaybe<MapCountWhereUniqueInput>;
   distinct?: InputMaybe<Array<MapCountScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<MapCountOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<MapCountWhereInput>;
 };
+
 
 export type QueryFindManyModDefaultArgs = {
   cursor?: InputMaybe<ModDefaultWhereUniqueInput>;
   distinct?: InputMaybe<Array<ModDefaultScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ModDefaultOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ModDefaultWhereInput>;
 };
+
 
 export type QueryFindManyModSupportedArgs = {
   cursor?: InputMaybe<ModSupportedWhereUniqueInput>;
   distinct?: InputMaybe<Array<ModSupportedScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ModSupportedOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ModSupportedWhereInput>;
 };
+
 
 export type QueryFindManyOptionArgs = {
   cursor?: InputMaybe<OptionWhereUniqueInput>;
   distinct?: InputMaybe<Array<OptionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<OptionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<OptionWhereInput>;
 };
+
 
 export type QueryFindManyOptionChoiceArgs = {
   cursor?: InputMaybe<OptionChoiceWhereUniqueInput>;
   distinct?: InputMaybe<Array<OptionChoiceScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<OptionChoiceOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<OptionChoiceWhereInput>;
 };
+
 
 export type QueryFindManyPlayerArgs = {
   cursor?: InputMaybe<PlayerWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerWhereInput>;
 };
+
 
 export type QueryFindManyPlayerAwardArgs = {
   cursor?: InputMaybe<PlayerAwardWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerAwardScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerAwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerAwardWhereInput>;
 };
+
 
 export type QueryFindManyPlayerHistoryArgs = {
   cursor?: InputMaybe<PlayerHistoryWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerHistoryScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerHistoryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerHistoryWhereInput>;
 };
+
 
 export type QueryFindManyPlayerNameArgs = {
   cursor?: InputMaybe<PlayerNameWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerNameScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerNameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerNameWhereInput>;
 };
+
 
 export type QueryFindManyPlayerRibbonArgs = {
   cursor?: InputMaybe<PlayerRibbonWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerRibbonScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerRibbonOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerRibbonWhereInput>;
 };
+
 
 export type QueryFindManyPlayerUniqueIdArgs = {
   cursor?: InputMaybe<PlayerUniqueIdWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerUniqueIdScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerUniqueIdOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerUniqueIdWhereInput>;
 };
+
 
 export type QueryFindManyRankArgs = {
   cursor?: InputMaybe<RankWhereUniqueInput>;
   distinct?: InputMaybe<Array<RankScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<RankOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<RankWhereInput>;
 };
+
 
 export type QueryFindManyRibbonArgs = {
   cursor?: InputMaybe<RibbonWhereUniqueInput>;
   distinct?: InputMaybe<Array<RibbonScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<RibbonOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<RibbonWhereInput>;
 };
+
 
 export type QueryFindManyRoleArgs = {
   cursor?: InputMaybe<RoleWhereUniqueInput>;
   distinct?: InputMaybe<Array<RoleScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<RoleOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<RoleWhereInput>;
 };
+
 
 export type QueryFindManyServerArgs = {
   cursor?: InputMaybe<ServerWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerWhereInput>;
 };
+
 
 export type QueryFindManyServerConfigArgs = {
   cursor?: InputMaybe<ServerConfigWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerConfigScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerConfigOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerConfigWhereInput>;
 };
+
 
 export type QueryFindManyServerConfigDefaultArgs = {
   cursor?: InputMaybe<ServerConfigDefaultWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerConfigDefaultScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerConfigDefaultOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerConfigDefaultWhereInput>;
 };
+
 
 export type QueryFindManyServerLoadArgs = {
   cursor?: InputMaybe<ServerLoadWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerLoadScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerLoadOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerLoadWhereInput>;
 };
+
 
 export type QueryFindManyServerVoiceCommArgs = {
   cursor?: InputMaybe<ServerVoiceCommWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerVoiceCommScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerVoiceCommOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerVoiceCommWhereInput>;
 };
+
 
 export type QueryFindManyTeamArgs = {
   cursor?: InputMaybe<TeamWhereUniqueInput>;
   distinct?: InputMaybe<Array<TeamScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<TeamOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<TeamWhereInput>;
 };
+
 
 export type QueryFindManyTrendArgs = {
   cursor?: InputMaybe<TrendWhereUniqueInput>;
   distinct?: InputMaybe<Array<TrendScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<TrendOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<TrendWhereInput>;
 };
+
 
 export type QueryFindManyUserArgs = {
   cursor?: InputMaybe<UserWhereUniqueInput>;
   distinct?: InputMaybe<Array<UserScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<UserOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<UserWhereInput>;
 };
+
 
 export type QueryFindManyWeaponArgs = {
   cursor?: InputMaybe<WeaponWhereUniqueInput>;
   distinct?: InputMaybe<Array<WeaponScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<WeaponOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<WeaponWhereInput>;
 };
+
 
 export type QueryFindUniqueActionArgs = {
   where: ActionWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueAwardArgs = {
   where: AwardWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueClanArgs = {
   where: ClanWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueClanTagArgs = {
   where: ClanTagWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueCountryArgs = {
   where: CountryWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueEventAdminArgs = {
   where: EventAdminWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueEventChangeNameArgs = {
   where: EventChangeNameWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueEventChangeRoleArgs = {
   where: EventChangeRoleWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueEventChangeTeamArgs = {
   where: EventChangeTeamWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueEventChatArgs = {
   where: EventChatWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueEventConnectArgs = {
   where: EventConnectWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueEventDisconnectArgs = {
   where: EventDisconnectWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueEventEntryArgs = {
   where: EventEntryWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueEventFragArgs = {
   where: EventFragWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueEventLatencyArgs = {
   where: EventLatencyWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueEventPlayerActionArgs = {
   where: EventPlayerActionWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueEventPlayerPlayerActionArgs = {
   where: EventPlayerPlayerActionWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueEventRconArgs = {
   where: EventRconWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueEventStatsmeArgs = {
   where: EventStatsmeWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueEventStatsme2Args = {
   where: EventStatsme2WhereUniqueInput;
 };
+
 
 export type QueryFindUniqueEventStatsmeLatencyArgs = {
   where: EventStatsmeLatencyWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueEventStatsmeTimeArgs = {
   where: EventStatsmeTimeWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueEventSuicideArgs = {
   where: EventSuicideWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueEventTeamBonusArgs = {
   where: EventTeamBonusWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueEventTeamkillArgs = {
   where: EventTeamkillWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueGameArgs = {
   where: GameWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueGameDefaultArgs = {
   where: GameDefaultWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueGameSupportedArgs = {
   where: GameSupportedWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueGeoLiteCityBlockArgs = {
   where: GeoLiteCityBlockWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueGeoLiteCityLocationArgs = {
   where: GeoLiteCityLocationWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueHeatmapConfigArgs = {
   where: HeatmapConfigWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueHostGroupArgs = {
   where: HostGroupWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueLivestatArgs = {
   where: LivestatWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueMapCountArgs = {
   where: MapCountWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueModDefaultArgs = {
   where: ModDefaultWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueModSupportedArgs = {
   where: ModSupportedWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueOptionArgs = {
   where: OptionWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueOptionChoiceArgs = {
   where: OptionChoiceWhereUniqueInput;
 };
+
 
 export type QueryFindUniquePlayerArgs = {
   where: PlayerWhereUniqueInput;
 };
 
+
 export type QueryFindUniquePlayerAwardArgs = {
   where: PlayerAwardWhereUniqueInput;
 };
+
 
 export type QueryFindUniquePlayerHistoryArgs = {
   where: PlayerHistoryWhereUniqueInput;
 };
 
+
 export type QueryFindUniquePlayerNameArgs = {
   where: PlayerNameWhereUniqueInput;
 };
+
 
 export type QueryFindUniquePlayerRibbonArgs = {
   where: PlayerRibbonWhereUniqueInput;
 };
 
+
 export type QueryFindUniquePlayerUniqueIdArgs = {
   where: PlayerUniqueIdWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueRankArgs = {
   where: RankWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueRibbonArgs = {
   where: RibbonWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueRoleArgs = {
   where: RoleWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueServerArgs = {
   where: ServerWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueServerConfigArgs = {
   where: ServerConfigWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueServerConfigDefaultArgs = {
   where: ServerConfigDefaultWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueServerLoadArgs = {
   where: ServerLoadWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueServerVoiceCommArgs = {
   where: ServerVoiceCommWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueTeamArgs = {
   where: TeamWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueTrendArgs = {
   where: TrendWhereUniqueInput;
 };
 
+
 export type QueryFindUniqueUserArgs = {
   where: UserWhereUniqueInput;
 };
+
 
 export type QueryFindUniqueWeaponArgs = {
   where: WeaponWhereUniqueInput;
 };
 
 export type Rank = {
-  __typename?: "Rank";
-  game: Scalars["String"]["output"];
-  image: Scalars["String"]["output"];
-  maxKills: Scalars["Int"]["output"];
-  minKills: Scalars["Int"]["output"];
-  rankId: Scalars["ID"]["output"];
-  rankName: Scalars["String"]["output"];
+  __typename?: 'Rank';
+  game: Scalars['String']['output'];
+  image: Scalars['String']['output'];
+  maxKills: Scalars['Int']['output'];
+  minKills: Scalars['Int']['output'];
+  rankId: Scalars['ID']['output'];
+  rankName: Scalars['String']['output'];
 };
 
 export type RankAvgOrderByAggregateInput = {
@@ -25695,20 +25825,20 @@ export type RankCountOrderByAggregateInput = {
 };
 
 export type RankCreateInput = {
-  game: Scalars["String"]["input"];
-  image: Scalars["String"]["input"];
-  maxKills?: InputMaybe<Scalars["Int"]["input"]>;
-  minKills?: InputMaybe<Scalars["Int"]["input"]>;
-  rankName: Scalars["String"]["input"];
+  game: Scalars['String']['input'];
+  image: Scalars['String']['input'];
+  maxKills?: InputMaybe<Scalars['Int']['input']>;
+  minKills?: InputMaybe<Scalars['Int']['input']>;
+  rankName: Scalars['String']['input'];
 };
 
 export type RankCreateManyInput = {
-  game: Scalars["String"]["input"];
-  image: Scalars["String"]["input"];
-  maxKills?: InputMaybe<Scalars["Int"]["input"]>;
-  minKills?: InputMaybe<Scalars["Int"]["input"]>;
-  rankId?: InputMaybe<Scalars["Int"]["input"]>;
-  rankName: Scalars["String"]["input"];
+  game: Scalars['String']['input'];
+  image: Scalars['String']['input'];
+  maxKills?: InputMaybe<Scalars['Int']['input']>;
+  minKills?: InputMaybe<Scalars['Int']['input']>;
+  rankId?: InputMaybe<Scalars['Int']['input']>;
+  rankName: Scalars['String']['input'];
 };
 
 export type RankMaxOrderByAggregateInput = {
@@ -25730,14 +25860,14 @@ export type RankMinOrderByAggregateInput = {
 };
 
 export enum RankOrderByRelevanceFieldEnum {
-  Game = "game",
-  Image = "image",
-  RankName = "rankName",
+  Game = 'game',
+  Image = 'image',
+  RankName = 'rankName'
 }
 
 export type RankOrderByRelevanceInput = {
   fields: Array<RankOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -25766,17 +25896,17 @@ export type RankOrderByWithRelationInput = {
 };
 
 export type RankRankgameCompoundUniqueInput = {
-  game: Scalars["String"]["input"];
-  image: Scalars["String"]["input"];
+  game: Scalars['String']['input'];
+  image: Scalars['String']['input'];
 };
 
 export enum RankScalarFieldEnum {
-  Game = "game",
-  Image = "image",
-  MaxKills = "maxKills",
-  MinKills = "minKills",
-  RankId = "rankId",
-  RankName = "rankName",
+  Game = 'game',
+  Image = 'image',
+  MaxKills = 'maxKills',
+  MinKills = 'minKills',
+  RankId = 'rankId',
+  RankName = 'rankName'
 }
 
 export type RankScalarWhereWithAggregatesInput = {
@@ -25833,29 +25963,30 @@ export type RankWhereUniqueInput = {
   image?: InputMaybe<StringFilter>;
   maxKills?: InputMaybe<IntFilter>;
   minKills?: InputMaybe<IntFilter>;
-  rankId?: InputMaybe<Scalars["Int"]["input"]>;
+  rankId?: InputMaybe<Scalars['Int']['input']>;
   rankName?: InputMaybe<StringFilter>;
   rankgame?: InputMaybe<RankRankgameCompoundUniqueInput>;
 };
 
 export type Ribbon = {
-  __typename?: "Ribbon";
-  awardCode: Scalars["String"]["output"];
-  awardCount: Scalars["Int"]["output"];
-  game: Scalars["String"]["output"];
-  image: Scalars["String"]["output"];
+  __typename?: 'Ribbon';
+  awardCode: Scalars['String']['output'];
+  awardCount: Scalars['Int']['output'];
+  game: Scalars['String']['output'];
+  image: Scalars['String']['output'];
   playerRibbons: Array<PlayerRibbon>;
-  ribbonId: Scalars["ID"]["output"];
-  ribbonName: Scalars["String"]["output"];
-  special: Scalars["Int"]["output"];
+  ribbonId: Scalars['ID']['output'];
+  ribbonName: Scalars['String']['output'];
+  special: Scalars['Int']['output'];
 };
+
 
 export type RibbonPlayerRibbonsArgs = {
   cursor?: InputMaybe<PlayerRibbonWhereUniqueInput>;
   distinct?: InputMaybe<Array<PlayerRibbonScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<PlayerRibbonOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PlayerRibbonWhereInput>;
 };
 
@@ -25866,10 +25997,10 @@ export type RibbonAvgOrderByAggregateInput = {
 };
 
 export type RibbonAwardCompoundUniqueInput = {
-  awardCode: Scalars["String"]["input"];
-  awardCount: Scalars["Int"]["input"];
-  game: Scalars["String"]["input"];
-  special: Scalars["Int"]["input"];
+  awardCode: Scalars['String']['input'];
+  awardCount: Scalars['Int']['input'];
+  game: Scalars['String']['input'];
+  special: Scalars['Int']['input'];
 };
 
 export type RibbonCountOrderByAggregateInput = {
@@ -25883,23 +26014,23 @@ export type RibbonCountOrderByAggregateInput = {
 };
 
 export type RibbonCreateInput = {
-  awardCode: Scalars["String"]["input"];
-  awardCount?: InputMaybe<Scalars["Int"]["input"]>;
-  game: Scalars["String"]["input"];
-  image: Scalars["String"]["input"];
+  awardCode: Scalars['String']['input'];
+  awardCount?: InputMaybe<Scalars['Int']['input']>;
+  game: Scalars['String']['input'];
+  image: Scalars['String']['input'];
   playerRibbons?: InputMaybe<PlayerRibbonCreateNestedManyWithoutRibbonInput>;
-  ribbonName: Scalars["String"]["input"];
-  special?: InputMaybe<Scalars["Int"]["input"]>;
+  ribbonName: Scalars['String']['input'];
+  special?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type RibbonCreateManyInput = {
-  awardCode: Scalars["String"]["input"];
-  awardCount?: InputMaybe<Scalars["Int"]["input"]>;
-  game: Scalars["String"]["input"];
-  image: Scalars["String"]["input"];
-  ribbonId?: InputMaybe<Scalars["Int"]["input"]>;
-  ribbonName: Scalars["String"]["input"];
-  special?: InputMaybe<Scalars["Int"]["input"]>;
+  awardCode: Scalars['String']['input'];
+  awardCount?: InputMaybe<Scalars['Int']['input']>;
+  game: Scalars['String']['input'];
+  image: Scalars['String']['input'];
+  ribbonId?: InputMaybe<Scalars['Int']['input']>;
+  ribbonName: Scalars['String']['input'];
+  special?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type RibbonCreateNestedOneWithoutPlayerRibbonsInput = {
@@ -25914,12 +26045,12 @@ export type RibbonCreateOrConnectWithoutPlayerRibbonsInput = {
 };
 
 export type RibbonCreateWithoutPlayerRibbonsInput = {
-  awardCode: Scalars["String"]["input"];
-  awardCount?: InputMaybe<Scalars["Int"]["input"]>;
-  game: Scalars["String"]["input"];
-  image: Scalars["String"]["input"];
-  ribbonName: Scalars["String"]["input"];
-  special?: InputMaybe<Scalars["Int"]["input"]>;
+  awardCode: Scalars['String']['input'];
+  awardCount?: InputMaybe<Scalars['Int']['input']>;
+  game: Scalars['String']['input'];
+  image: Scalars['String']['input'];
+  ribbonName: Scalars['String']['input'];
+  special?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type RibbonMaxOrderByAggregateInput = {
@@ -25943,15 +26074,15 @@ export type RibbonMinOrderByAggregateInput = {
 };
 
 export enum RibbonOrderByRelevanceFieldEnum {
-  AwardCode = "awardCode",
-  Game = "game",
-  Image = "image",
-  RibbonName = "ribbonName",
+  AwardCode = 'awardCode',
+  Game = 'game',
+  Image = 'image',
+  RibbonName = 'ribbonName'
 }
 
 export type RibbonOrderByRelevanceInput = {
   fields: Array<RibbonOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -25983,13 +26114,13 @@ export type RibbonOrderByWithRelationInput = {
 };
 
 export enum RibbonScalarFieldEnum {
-  AwardCode = "awardCode",
-  AwardCount = "awardCount",
-  Game = "game",
-  Image = "image",
-  RibbonId = "ribbonId",
-  RibbonName = "ribbonName",
-  Special = "special",
+  AwardCode = 'awardCode',
+  AwardCount = 'awardCount',
+  Game = 'game',
+  Image = 'image',
+  RibbonId = 'ribbonId',
+  RibbonName = 'ribbonName',
+  Special = 'special'
 }
 
 export type RibbonScalarRelationFilter = {
@@ -26087,21 +26218,21 @@ export type RibbonWhereUniqueInput = {
   game?: InputMaybe<StringFilter>;
   image?: InputMaybe<StringFilter>;
   playerRibbons?: InputMaybe<PlayerRibbonListRelationFilter>;
-  ribbonId?: InputMaybe<Scalars["Int"]["input"]>;
+  ribbonId?: InputMaybe<Scalars['Int']['input']>;
   ribbonName?: InputMaybe<StringFilter>;
   special?: InputMaybe<IntFilter>;
 };
 
 export type Role = {
-  __typename?: "Role";
-  code: Scalars["String"]["output"];
-  deaths: Scalars["Int"]["output"];
-  game: Scalars["String"]["output"];
-  hidden: Scalars["String"]["output"];
-  kills: Scalars["Int"]["output"];
-  name: Scalars["String"]["output"];
-  picked: Scalars["Int"]["output"];
-  roleId: Scalars["ID"]["output"];
+  __typename?: 'Role';
+  code: Scalars['String']['output'];
+  deaths: Scalars['Int']['output'];
+  game: Scalars['String']['output'];
+  hidden: Scalars['String']['output'];
+  kills: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  picked: Scalars['Int']['output'];
+  roleId: Scalars['ID']['output'];
 };
 
 export type RoleAvgOrderByAggregateInput = {
@@ -26123,29 +26254,29 @@ export type RoleCountOrderByAggregateInput = {
 };
 
 export type RoleCreateInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  hidden?: InputMaybe<Scalars["String"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  picked?: InputMaybe<Scalars["Int"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  hidden?: InputMaybe<Scalars['String']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  picked?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type RoleCreateManyInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  deaths?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  hidden?: InputMaybe<Scalars["String"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  picked?: InputMaybe<Scalars["Int"]["input"]>;
-  roleId?: InputMaybe<Scalars["Int"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  deaths?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  hidden?: InputMaybe<Scalars['String']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  picked?: InputMaybe<Scalars['Int']['input']>;
+  roleId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type RoleGamecodeCompoundUniqueInput = {
-  code: Scalars["String"]["input"];
-  game: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  game: Scalars['String']['input'];
 };
 
 export type RoleMaxOrderByAggregateInput = {
@@ -26171,15 +26302,15 @@ export type RoleMinOrderByAggregateInput = {
 };
 
 export enum RoleOrderByRelevanceFieldEnum {
-  Code = "code",
-  Game = "game",
-  Hidden = "hidden",
-  Name = "name",
+  Code = 'code',
+  Game = 'game',
+  Hidden = 'hidden',
+  Name = 'name'
 }
 
 export type RoleOrderByRelevanceInput = {
   fields: Array<RoleOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -26212,14 +26343,14 @@ export type RoleOrderByWithRelationInput = {
 };
 
 export enum RoleScalarFieldEnum {
-  Code = "code",
-  Deaths = "deaths",
-  Game = "game",
-  Hidden = "hidden",
-  Kills = "kills",
-  Name = "name",
-  Picked = "picked",
-  RoleId = "roleId",
+  Code = 'code',
+  Deaths = 'deaths',
+  Game = 'game',
+  Hidden = 'hidden',
+  Kills = 'kills',
+  Name = 'name',
+  Picked = 'picked',
+  RoleId = 'roleId'
 }
 
 export type RoleScalarWhereWithAggregatesInput = {
@@ -26289,22 +26420,22 @@ export type RoleWhereUniqueInput = {
   kills?: InputMaybe<IntFilter>;
   name?: InputMaybe<StringFilter>;
   picked?: InputMaybe<IntFilter>;
-  roleId?: InputMaybe<Scalars["Int"]["input"]>;
+  roleId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Server = {
-  __typename?: "Server";
-  act_map: Scalars["String"]["output"];
-  act_players: Scalars["Int"]["output"];
-  address: Scalars["String"]["output"];
-  bombs_defused: Scalars["Int"]["output"];
-  bombs_planted: Scalars["Int"]["output"];
-  city: Scalars["String"]["output"];
+  __typename?: 'Server';
+  act_map: Scalars['String']['output'];
+  act_players: Scalars['Int']['output'];
+  address: Scalars['String']['output'];
+  bombs_defused: Scalars['Int']['output'];
+  bombs_planted: Scalars['Int']['output'];
+  city: Scalars['String']['output'];
   configs: Array<ServerConfig>;
-  country: Scalars["String"]["output"];
-  ct_hits: Scalars["Int"]["output"];
-  ct_shots: Scalars["Int"]["output"];
-  ct_wins: Scalars["Int"]["output"];
+  country: Scalars['String']['output'];
+  ct_hits: Scalars['Int']['output'];
+  ct_shots: Scalars['Int']['output'];
+  ct_wins: Scalars['Int']['output'];
   eventsAdmin: Array<EventAdmin>;
   eventsChangeName: Array<EventChangeName>;
   eventsChangeRole: Array<EventChangeRole>;
@@ -26325,239 +26456,261 @@ export type Server = {
   eventsSuicide: Array<EventSuicide>;
   eventsTeamBonus: Array<EventTeamBonus>;
   eventsTeamkill: Array<EventTeamkill>;
-  game: Scalars["String"]["output"];
-  headshots: Scalars["Int"]["output"];
-  kills: Scalars["Int"]["output"];
-  last_event: Scalars["Int"]["output"];
-  lat?: Maybe<Scalars["Float"]["output"]>;
-  lng?: Maybe<Scalars["Float"]["output"]>;
+  game: Scalars['String']['output'];
+  headshots: Scalars['Int']['output'];
+  kills: Scalars['Int']['output'];
+  last_event: Scalars['Int']['output'];
+  lat?: Maybe<Scalars['Float']['output']>;
+  lng?: Maybe<Scalars['Float']['output']>;
   loads: Array<ServerLoad>;
-  map_changes: Scalars["Int"]["output"];
-  map_ct_hits: Scalars["Int"]["output"];
-  map_ct_shots: Scalars["Int"]["output"];
-  map_ct_wins: Scalars["Int"]["output"];
-  map_rounds: Scalars["Int"]["output"];
-  map_started: Scalars["Int"]["output"];
-  map_ts_hits: Scalars["Int"]["output"];
-  map_ts_shots: Scalars["Int"]["output"];
-  map_ts_wins: Scalars["Int"]["output"];
-  max_players: Scalars["Int"]["output"];
-  name: Scalars["String"]["output"];
-  players: Scalars["Int"]["output"];
-  port: Scalars["Int"]["output"];
-  publicaddress: Scalars["String"]["output"];
-  rcon_password: Scalars["String"]["output"];
-  rounds: Scalars["Int"]["output"];
-  serverId: Scalars["ID"]["output"];
-  sortorder: Scalars["Int"]["output"];
-  statusurl?: Maybe<Scalars["String"]["output"]>;
-  suicides: Scalars["Int"]["output"];
-  ts_hits: Scalars["Int"]["output"];
-  ts_shots: Scalars["Int"]["output"];
-  ts_wins: Scalars["Int"]["output"];
+  map_changes: Scalars['Int']['output'];
+  map_ct_hits: Scalars['Int']['output'];
+  map_ct_shots: Scalars['Int']['output'];
+  map_ct_wins: Scalars['Int']['output'];
+  map_rounds: Scalars['Int']['output'];
+  map_started: Scalars['Int']['output'];
+  map_ts_hits: Scalars['Int']['output'];
+  map_ts_shots: Scalars['Int']['output'];
+  map_ts_wins: Scalars['Int']['output'];
+  max_players: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  players: Scalars['Int']['output'];
+  port: Scalars['Int']['output'];
+  publicaddress: Scalars['String']['output'];
+  rcon_password: Scalars['String']['output'];
+  rounds: Scalars['Int']['output'];
+  serverId: Scalars['ID']['output'];
+  sortorder: Scalars['Int']['output'];
+  statusurl?: Maybe<Scalars['String']['output']>;
+  suicides: Scalars['Int']['output'];
+  ts_hits: Scalars['Int']['output'];
+  ts_shots: Scalars['Int']['output'];
+  ts_wins: Scalars['Int']['output'];
 };
+
 
 export type ServerConfigsArgs = {
   cursor?: InputMaybe<ServerConfigWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerConfigScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerConfigOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerConfigWhereInput>;
 };
+
 
 export type ServerEventsAdminArgs = {
   cursor?: InputMaybe<EventAdminWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventAdminScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventAdminOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventAdminWhereInput>;
 };
+
 
 export type ServerEventsChangeNameArgs = {
   cursor?: InputMaybe<EventChangeNameWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeNameScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeNameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeNameWhereInput>;
 };
+
 
 export type ServerEventsChangeRoleArgs = {
   cursor?: InputMaybe<EventChangeRoleWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeRoleScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeRoleOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeRoleWhereInput>;
 };
+
 
 export type ServerEventsChangeTeamArgs = {
   cursor?: InputMaybe<EventChangeTeamWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChangeTeamScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChangeTeamOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChangeTeamWhereInput>;
 };
+
 
 export type ServerEventsChatArgs = {
   cursor?: InputMaybe<EventChatWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventChatScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventChatOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventChatWhereInput>;
 };
+
 
 export type ServerEventsConnectArgs = {
   cursor?: InputMaybe<EventConnectWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventConnectScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventConnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventConnectWhereInput>;
 };
+
 
 export type ServerEventsDisconnectArgs = {
   cursor?: InputMaybe<EventDisconnectWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventDisconnectScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventDisconnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventDisconnectWhereInput>;
 };
+
 
 export type ServerEventsEntryArgs = {
   cursor?: InputMaybe<EventEntryWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventEntryScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventEntryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventEntryWhereInput>;
 };
+
 
 export type ServerEventsFragArgs = {
   cursor?: InputMaybe<EventFragWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventFragScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventFragOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventFragWhereInput>;
 };
+
 
 export type ServerEventsLatencyArgs = {
   cursor?: InputMaybe<EventLatencyWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventLatencyScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventLatencyOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventLatencyWhereInput>;
 };
+
 
 export type ServerEventsPlayerActionArgs = {
   cursor?: InputMaybe<EventPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerActionWhereInput>;
 };
+
 
 export type ServerEventsPlayerPlayerActionArgs = {
   cursor?: InputMaybe<EventPlayerPlayerActionWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventPlayerPlayerActionScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventPlayerPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventPlayerPlayerActionWhereInput>;
 };
+
 
 export type ServerEventsRconArgs = {
   cursor?: InputMaybe<EventRconWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventRconScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventRconOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventRconWhereInput>;
 };
+
 
 export type ServerEventsStatsmeArgs = {
   cursor?: InputMaybe<EventStatsmeWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeWhereInput>;
 };
+
 
 export type ServerEventsStatsme2Args = {
   cursor?: InputMaybe<EventStatsme2WhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsme2ScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsme2OrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsme2WhereInput>;
 };
+
 
 export type ServerEventsStatsmeLatencyArgs = {
   cursor?: InputMaybe<EventStatsmeLatencyWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeLatencyScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeLatencyOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeLatencyWhereInput>;
 };
+
 
 export type ServerEventsStatsmeTimeArgs = {
   cursor?: InputMaybe<EventStatsmeTimeWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventStatsmeTimeScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventStatsmeTimeOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventStatsmeTimeWhereInput>;
 };
+
 
 export type ServerEventsSuicideArgs = {
   cursor?: InputMaybe<EventSuicideWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventSuicideScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventSuicideOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventSuicideWhereInput>;
 };
+
 
 export type ServerEventsTeamBonusArgs = {
   cursor?: InputMaybe<EventTeamBonusWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventTeamBonusScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventTeamBonusOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventTeamBonusWhereInput>;
 };
+
 
 export type ServerEventsTeamkillArgs = {
   cursor?: InputMaybe<EventTeamkillWhereUniqueInput>;
   distinct?: InputMaybe<Array<EventTeamkillScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<EventTeamkillOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventTeamkillWhereInput>;
 };
+
 
 export type ServerLoadsArgs = {
   cursor?: InputMaybe<ServerLoadWhereUniqueInput>;
   distinct?: InputMaybe<Array<ServerLoadScalarFieldEnum>>;
   orderBy?: InputMaybe<Array<ServerLoadOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars["Int"]["input"]>;
-  take?: InputMaybe<Scalars["Int"]["input"]>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<ServerLoadWhereInput>;
 };
 
 export type ServerAddressportCompoundUniqueInput = {
-  address: Scalars["String"]["input"];
-  port: Scalars["Int"]["input"];
+  address: Scalars['String']['input'];
+  port: Scalars['Int']['input'];
 };
 
 export type ServerAvgOrderByAggregateInput = {
@@ -26594,12 +26747,12 @@ export type ServerAvgOrderByAggregateInput = {
 };
 
 export type ServerConfig = {
-  __typename?: "ServerConfig";
-  parameter: Scalars["String"]["output"];
+  __typename?: 'ServerConfig';
+  parameter: Scalars['String']['output'];
   server: Server;
-  serverConfigId: Scalars["Int"]["output"];
-  serverId: Scalars["Int"]["output"];
-  value: Scalars["String"]["output"];
+  serverConfigId: Scalars['Int']['output'];
+  serverId: Scalars['Int']['output'];
+  value: Scalars['String']['output'];
 };
 
 export type ServerConfigAvgOrderByAggregateInput = {
@@ -26615,35 +26768,33 @@ export type ServerConfigCountOrderByAggregateInput = {
 };
 
 export type ServerConfigCreateInput = {
-  parameter: Scalars["String"]["input"];
+  parameter: Scalars['String']['input'];
   server: ServerCreateNestedOneWithoutConfigsInput;
-  serverConfigId?: InputMaybe<Scalars["Int"]["input"]>;
-  value: Scalars["String"]["input"];
+  serverConfigId?: InputMaybe<Scalars['Int']['input']>;
+  value: Scalars['String']['input'];
 };
 
 export type ServerConfigCreateManyInput = {
-  parameter: Scalars["String"]["input"];
-  serverConfigId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId: Scalars["Int"]["input"];
-  value: Scalars["String"]["input"];
+  parameter: Scalars['String']['input'];
+  serverConfigId?: InputMaybe<Scalars['Int']['input']>;
+  serverId: Scalars['Int']['input'];
+  value: Scalars['String']['input'];
 };
 
 export type ServerConfigCreateManyServerInput = {
-  parameter: Scalars["String"]["input"];
-  serverConfigId?: InputMaybe<Scalars["Int"]["input"]>;
-  value: Scalars["String"]["input"];
+  parameter: Scalars['String']['input'];
+  serverConfigId?: InputMaybe<Scalars['Int']['input']>;
+  value: Scalars['String']['input'];
 };
 
 export type ServerConfigCreateManyServerInputEnvelope = {
   data: Array<ServerConfigCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ServerConfigCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<ServerConfigWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<ServerConfigCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<ServerConfigCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<ServerConfigCreateWithoutServerInput>>;
   createMany?: InputMaybe<ServerConfigCreateManyServerInputEnvelope>;
 };
@@ -26654,16 +26805,16 @@ export type ServerConfigCreateOrConnectWithoutServerInput = {
 };
 
 export type ServerConfigCreateWithoutServerInput = {
-  parameter: Scalars["String"]["input"];
-  serverConfigId?: InputMaybe<Scalars["Int"]["input"]>;
-  value: Scalars["String"]["input"];
+  parameter: Scalars['String']['input'];
+  serverConfigId?: InputMaybe<Scalars['Int']['input']>;
+  value: Scalars['String']['input'];
 };
 
 export type ServerConfigDefault = {
-  __typename?: "ServerConfigDefault";
-  description?: Maybe<Scalars["String"]["output"]>;
-  parameter: Scalars["ID"]["output"];
-  value: Scalars["String"]["output"];
+  __typename?: 'ServerConfigDefault';
+  description?: Maybe<Scalars['String']['output']>;
+  parameter: Scalars['ID']['output'];
+  value: Scalars['String']['output'];
 };
 
 export type ServerConfigDefaultCountOrderByAggregateInput = {
@@ -26673,15 +26824,15 @@ export type ServerConfigDefaultCountOrderByAggregateInput = {
 };
 
 export type ServerConfigDefaultCreateInput = {
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  parameter: Scalars["String"]["input"];
-  value: Scalars["String"]["input"];
+  description?: InputMaybe<Scalars['String']['input']>;
+  parameter: Scalars['String']['input'];
+  value: Scalars['String']['input'];
 };
 
 export type ServerConfigDefaultCreateManyInput = {
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  parameter: Scalars["String"]["input"];
-  value: Scalars["String"]["input"];
+  description?: InputMaybe<Scalars['String']['input']>;
+  parameter: Scalars['String']['input'];
+  value: Scalars['String']['input'];
 };
 
 export type ServerConfigDefaultMaxOrderByAggregateInput = {
@@ -26697,14 +26848,14 @@ export type ServerConfigDefaultMinOrderByAggregateInput = {
 };
 
 export enum ServerConfigDefaultOrderByRelevanceFieldEnum {
-  Description = "description",
-  Parameter = "parameter",
-  Value = "value",
+  Description = 'description',
+  Parameter = 'parameter',
+  Value = 'value'
 }
 
 export type ServerConfigDefaultOrderByRelevanceInput = {
   fields: Array<ServerConfigDefaultOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -26725,9 +26876,9 @@ export type ServerConfigDefaultOrderByWithRelationInput = {
 };
 
 export enum ServerConfigDefaultScalarFieldEnum {
-  Description = "description",
-  Parameter = "parameter",
-  Value = "value",
+  Description = 'description',
+  Parameter = 'parameter',
+  Value = 'value'
 }
 
 export type ServerConfigDefaultScalarWhereWithAggregatesInput = {
@@ -26765,7 +26916,7 @@ export type ServerConfigDefaultWhereUniqueInput = {
   NOT?: InputMaybe<Array<ServerConfigDefaultWhereInput>>;
   OR?: InputMaybe<Array<ServerConfigDefaultWhereInput>>;
   description?: InputMaybe<StringNullableFilter>;
-  parameter?: InputMaybe<Scalars["String"]["input"]>;
+  parameter?: InputMaybe<Scalars['String']['input']>;
   value?: InputMaybe<StringFilter>;
 };
 
@@ -26794,13 +26945,13 @@ export type ServerConfigOrderByRelationAggregateInput = {
 };
 
 export enum ServerConfigOrderByRelevanceFieldEnum {
-  Parameter = "parameter",
-  Value = "value",
+  Parameter = 'parameter',
+  Value = 'value'
 }
 
 export type ServerConfigOrderByRelevanceInput = {
   fields: Array<ServerConfigOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -26826,10 +26977,10 @@ export type ServerConfigOrderByWithRelationInput = {
 };
 
 export enum ServerConfigScalarFieldEnum {
-  Parameter = "parameter",
-  ServerConfigId = "serverConfigId",
-  ServerId = "serverId",
-  Value = "value",
+  Parameter = 'parameter',
+  ServerConfigId = 'serverConfigId',
+  ServerId = 'serverId',
+  Value = 'value'
 }
 
 export type ServerConfigScalarWhereInput = {
@@ -26853,8 +27004,8 @@ export type ServerConfigScalarWhereWithAggregatesInput = {
 };
 
 export type ServerConfigServerIdParameterCompoundUniqueInput = {
-  parameter: Scalars["String"]["input"];
-  serverId: Scalars["Int"]["input"];
+  parameter: Scalars['String']['input'];
+  serverId: Scalars['Int']['input'];
 };
 
 export type ServerConfigSumOrderByAggregateInput = {
@@ -26880,24 +27031,16 @@ export type ServerConfigUpdateManyWithWhereWithoutServerInput = {
 
 export type ServerConfigUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<ServerConfigWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<ServerConfigCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<ServerConfigCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<ServerConfigCreateWithoutServerInput>>;
   createMany?: InputMaybe<ServerConfigCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<ServerConfigWhereUniqueInput>>;
   deleteMany?: InputMaybe<Array<ServerConfigScalarWhereInput>>;
   disconnect?: InputMaybe<Array<ServerConfigWhereUniqueInput>>;
   set?: InputMaybe<Array<ServerConfigWhereUniqueInput>>;
-  update?: InputMaybe<
-    Array<ServerConfigUpdateWithWhereUniqueWithoutServerInput>
-  >;
-  updateMany?: InputMaybe<
-    Array<ServerConfigUpdateManyWithWhereWithoutServerInput>
-  >;
-  upsert?: InputMaybe<
-    Array<ServerConfigUpsertWithWhereUniqueWithoutServerInput>
-  >;
+  update?: InputMaybe<Array<ServerConfigUpdateWithWhereUniqueWithoutServerInput>>;
+  updateMany?: InputMaybe<Array<ServerConfigUpdateManyWithWhereWithoutServerInput>>;
+  upsert?: InputMaybe<Array<ServerConfigUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
 export type ServerConfigUpdateWithWhereUniqueWithoutServerInput = {
@@ -26933,7 +27076,7 @@ export type ServerConfigWhereUniqueInput = {
   OR?: InputMaybe<Array<ServerConfigWhereInput>>;
   parameter?: InputMaybe<StringFilter>;
   server?: InputMaybe<ServerWhereInput>;
-  serverConfigId?: InputMaybe<Scalars["Int"]["input"]>;
+  serverConfigId?: InputMaybe<Scalars['Int']['input']>;
   serverId?: InputMaybe<IntFilter>;
   serverId_parameter?: InputMaybe<ServerConfigServerIdParameterCompoundUniqueInput>;
   value?: InputMaybe<StringFilter>;
@@ -26982,17 +27125,17 @@ export type ServerCountOrderByAggregateInput = {
 };
 
 export type ServerCreateInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -27013,77 +27156,77 @@ export type ServerCreateInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateManyInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateNestedOneWithoutConfigsInput = {
@@ -27329,16 +27472,16 @@ export type ServerCreateOrConnectWithoutLoadsInput = {
 };
 
 export type ServerCreateWithoutConfigsInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -27359,49 +27502,49 @@ export type ServerCreateWithoutConfigsInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsAdminInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
   eventsChangeTeam?: InputMaybe<EventChangeTeamCreateNestedManyWithoutServerInput>;
@@ -27421,49 +27564,49 @@ export type ServerCreateWithoutEventsAdminInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsChangeNameInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
   eventsChangeTeam?: InputMaybe<EventChangeTeamCreateNestedManyWithoutServerInput>;
@@ -27483,49 +27626,49 @@ export type ServerCreateWithoutEventsChangeNameInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsChangeRoleInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeTeam?: InputMaybe<EventChangeTeamCreateNestedManyWithoutServerInput>;
@@ -27545,49 +27688,49 @@ export type ServerCreateWithoutEventsChangeRoleInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsChangeTeamInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -27607,49 +27750,49 @@ export type ServerCreateWithoutEventsChangeTeamInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsChatInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -27669,49 +27812,49 @@ export type ServerCreateWithoutEventsChatInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsConnectInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -27731,49 +27874,49 @@ export type ServerCreateWithoutEventsConnectInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsDisconnectInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -27793,49 +27936,49 @@ export type ServerCreateWithoutEventsDisconnectInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsEntryInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -27855,49 +27998,49 @@ export type ServerCreateWithoutEventsEntryInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsFragInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -27917,49 +28060,49 @@ export type ServerCreateWithoutEventsFragInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsLatencyInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -27979,49 +28122,49 @@ export type ServerCreateWithoutEventsLatencyInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsPlayerActionInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -28041,49 +28184,49 @@ export type ServerCreateWithoutEventsPlayerActionInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsPlayerPlayerActionInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -28103,49 +28246,49 @@ export type ServerCreateWithoutEventsPlayerPlayerActionInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsRconInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -28165,49 +28308,49 @@ export type ServerCreateWithoutEventsRconInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsStatsme2Input = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -28227,49 +28370,49 @@ export type ServerCreateWithoutEventsStatsme2Input = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsStatsmeInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -28289,49 +28432,49 @@ export type ServerCreateWithoutEventsStatsmeInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsStatsmeLatencyInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -28351,49 +28494,49 @@ export type ServerCreateWithoutEventsStatsmeLatencyInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsStatsmeTimeInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -28413,49 +28556,49 @@ export type ServerCreateWithoutEventsStatsmeTimeInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsSuicideInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -28475,49 +28618,49 @@ export type ServerCreateWithoutEventsSuicideInput = {
   eventsStatsmeTime?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsTeamBonusInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -28537,49 +28680,49 @@ export type ServerCreateWithoutEventsTeamBonusInput = {
   eventsStatsmeTime?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutServerInput>;
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutEventsTeamkillInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -28599,49 +28742,49 @@ export type ServerCreateWithoutEventsTeamkillInput = {
   eventsStatsmeTime?: InputMaybe<EventStatsmeTimeCreateNestedManyWithoutServerInput>;
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
   loads?: InputMaybe<ServerLoadCreateNestedManyWithoutServerInput>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerCreateWithoutLoadsInput = {
-  act_map?: InputMaybe<Scalars["String"]["input"]>;
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  bombs_defused?: InputMaybe<Scalars["Int"]["input"]>;
-  bombs_planted?: InputMaybe<Scalars["Int"]["input"]>;
-  city?: InputMaybe<Scalars["String"]["input"]>;
+  act_map?: InputMaybe<Scalars['String']['input']>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  bombs_defused?: InputMaybe<Scalars['Int']['input']>;
+  bombs_planted?: InputMaybe<Scalars['Int']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  country?: InputMaybe<Scalars["String"]["input"]>;
-  ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  ct_wins?: InputMaybe<Scalars['Int']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -28662,47 +28805,47 @@ export type ServerCreateWithoutLoadsInput = {
   eventsSuicide?: InputMaybe<EventSuicideCreateNestedManyWithoutServerInput>;
   eventsTeamBonus?: InputMaybe<EventTeamBonusCreateNestedManyWithoutServerInput>;
   eventsTeamkill?: InputMaybe<EventTeamkillCreateNestedManyWithoutServerInput>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  last_event?: InputMaybe<Scalars["Int"]["input"]>;
-  lat?: InputMaybe<Scalars["Float"]["input"]>;
-  lng?: InputMaybe<Scalars["Float"]["input"]>;
-  map_changes?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ct_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  map_rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  map_started?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  map_ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  port?: InputMaybe<Scalars["Int"]["input"]>;
-  publicaddress?: InputMaybe<Scalars["String"]["input"]>;
-  rcon_password?: InputMaybe<Scalars["String"]["input"]>;
-  rounds?: InputMaybe<Scalars["Int"]["input"]>;
-  sortorder?: InputMaybe<Scalars["Int"]["input"]>;
-  statusurl?: InputMaybe<Scalars["String"]["input"]>;
-  suicides?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_hits?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_shots?: InputMaybe<Scalars["Int"]["input"]>;
-  ts_wins?: InputMaybe<Scalars["Int"]["input"]>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  last_event?: InputMaybe<Scalars['Int']['input']>;
+  lat?: InputMaybe<Scalars['Float']['input']>;
+  lng?: InputMaybe<Scalars['Float']['input']>;
+  map_changes?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ct_wins?: InputMaybe<Scalars['Int']['input']>;
+  map_rounds?: InputMaybe<Scalars['Int']['input']>;
+  map_started?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  map_ts_wins?: InputMaybe<Scalars['Int']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  port?: InputMaybe<Scalars['Int']['input']>;
+  publicaddress?: InputMaybe<Scalars['String']['input']>;
+  rcon_password?: InputMaybe<Scalars['String']['input']>;
+  rounds?: InputMaybe<Scalars['Int']['input']>;
+  sortorder?: InputMaybe<Scalars['Int']['input']>;
+  statusurl?: InputMaybe<Scalars['String']['input']>;
+  suicides?: InputMaybe<Scalars['Int']['input']>;
+  ts_hits?: InputMaybe<Scalars['Int']['input']>;
+  ts_shots?: InputMaybe<Scalars['Int']['input']>;
+  ts_wins?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerLoad = {
-  __typename?: "ServerLoad";
-  act_players: Scalars["Int"]["output"];
-  fps: Scalars["String"]["output"];
-  map?: Maybe<Scalars["String"]["output"]>;
-  max_players: Scalars["Int"]["output"];
-  min_players: Scalars["Int"]["output"];
+  __typename?: 'ServerLoad';
+  act_players: Scalars['Int']['output'];
+  fps: Scalars['String']['output'];
+  map?: Maybe<Scalars['String']['output']>;
+  max_players: Scalars['Int']['output'];
+  min_players: Scalars['Int']['output'];
   server: Server;
-  server_id: Scalars["Int"]["output"];
-  timestamp: Scalars["Int"]["output"];
-  uptime: Scalars["String"]["output"];
+  server_id: Scalars['Int']['output'];
+  timestamp: Scalars['Int']['output'];
+  uptime: Scalars['String']['output'];
 };
 
 export type ServerLoadAvgOrderByAggregateInput = {
@@ -28725,47 +28868,45 @@ export type ServerLoadCountOrderByAggregateInput = {
 };
 
 export type ServerLoadCreateInput = {
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  fps?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  min_players?: InputMaybe<Scalars["Int"]["input"]>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  fps?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  min_players?: InputMaybe<Scalars['Int']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutLoadsInput>;
-  timestamp?: InputMaybe<Scalars["Int"]["input"]>;
-  uptime?: InputMaybe<Scalars["String"]["input"]>;
+  timestamp?: InputMaybe<Scalars['Int']['input']>;
+  uptime?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ServerLoadCreateManyInput = {
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  fps?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  min_players?: InputMaybe<Scalars["Int"]["input"]>;
-  server_id?: InputMaybe<Scalars["Int"]["input"]>;
-  timestamp?: InputMaybe<Scalars["Int"]["input"]>;
-  uptime?: InputMaybe<Scalars["String"]["input"]>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  fps?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  min_players?: InputMaybe<Scalars['Int']['input']>;
+  server_id?: InputMaybe<Scalars['Int']['input']>;
+  timestamp?: InputMaybe<Scalars['Int']['input']>;
+  uptime?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ServerLoadCreateManyServerInput = {
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  fps?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  min_players?: InputMaybe<Scalars["Int"]["input"]>;
-  timestamp?: InputMaybe<Scalars["Int"]["input"]>;
-  uptime?: InputMaybe<Scalars["String"]["input"]>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  fps?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  min_players?: InputMaybe<Scalars['Int']['input']>;
+  timestamp?: InputMaybe<Scalars['Int']['input']>;
+  uptime?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ServerLoadCreateManyServerInputEnvelope = {
   data: Array<ServerLoadCreateManyServerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ServerLoadCreateNestedManyWithoutServerInput = {
   connect?: InputMaybe<Array<ServerLoadWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<ServerLoadCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<ServerLoadCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<ServerLoadCreateWithoutServerInput>>;
   createMany?: InputMaybe<ServerLoadCreateManyServerInputEnvelope>;
 };
@@ -28776,13 +28917,13 @@ export type ServerLoadCreateOrConnectWithoutServerInput = {
 };
 
 export type ServerLoadCreateWithoutServerInput = {
-  act_players?: InputMaybe<Scalars["Int"]["input"]>;
-  fps?: InputMaybe<Scalars["String"]["input"]>;
-  map?: InputMaybe<Scalars["String"]["input"]>;
-  max_players?: InputMaybe<Scalars["Int"]["input"]>;
-  min_players?: InputMaybe<Scalars["Int"]["input"]>;
-  timestamp?: InputMaybe<Scalars["Int"]["input"]>;
-  uptime?: InputMaybe<Scalars["String"]["input"]>;
+  act_players?: InputMaybe<Scalars['Int']['input']>;
+  fps?: InputMaybe<Scalars['String']['input']>;
+  map?: InputMaybe<Scalars['String']['input']>;
+  max_players?: InputMaybe<Scalars['Int']['input']>;
+  min_players?: InputMaybe<Scalars['Int']['input']>;
+  timestamp?: InputMaybe<Scalars['Int']['input']>;
+  uptime?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ServerLoadListRelationFilter = {
@@ -28818,14 +28959,14 @@ export type ServerLoadOrderByRelationAggregateInput = {
 };
 
 export enum ServerLoadOrderByRelevanceFieldEnum {
-  Fps = "fps",
-  Map = "map",
-  Uptime = "uptime",
+  Fps = 'fps',
+  Map = 'map',
+  Uptime = 'uptime'
 }
 
 export type ServerLoadOrderByRelevanceInput = {
   fields: Array<ServerLoadOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -28859,14 +29000,14 @@ export type ServerLoadOrderByWithRelationInput = {
 };
 
 export enum ServerLoadScalarFieldEnum {
-  ActPlayers = "act_players",
-  Fps = "fps",
-  Map = "map",
-  MaxPlayers = "max_players",
-  MinPlayers = "min_players",
-  ServerId = "server_id",
-  Timestamp = "timestamp",
-  Uptime = "uptime",
+  ActPlayers = 'act_players',
+  Fps = 'fps',
+  Map = 'map',
+  MaxPlayers = 'max_players',
+  MinPlayers = 'min_players',
+  ServerId = 'server_id',
+  Timestamp = 'timestamp',
+  Uptime = 'uptime'
 }
 
 export type ServerLoadScalarWhereInput = {
@@ -28898,8 +29039,8 @@ export type ServerLoadScalarWhereWithAggregatesInput = {
 };
 
 export type ServerLoadServer_IdTimestampCompoundUniqueInput = {
-  server_id: Scalars["Int"]["input"];
-  timestamp: Scalars["Int"]["input"];
+  server_id: Scalars['Int']['input'];
+  timestamp: Scalars['Int']['input'];
 };
 
 export type ServerLoadSumOrderByAggregateInput = {
@@ -28938,9 +29079,7 @@ export type ServerLoadUpdateManyWithWhereWithoutServerInput = {
 
 export type ServerLoadUpdateManyWithoutServerNestedInput = {
   connect?: InputMaybe<Array<ServerLoadWhereUniqueInput>>;
-  connectOrCreate?: InputMaybe<
-    Array<ServerLoadCreateOrConnectWithoutServerInput>
-  >;
+  connectOrCreate?: InputMaybe<Array<ServerLoadCreateOrConnectWithoutServerInput>>;
   create?: InputMaybe<Array<ServerLoadCreateWithoutServerInput>>;
   createMany?: InputMaybe<ServerLoadCreateManyServerInputEnvelope>;
   delete?: InputMaybe<Array<ServerLoadWhereUniqueInput>>;
@@ -28948,9 +29087,7 @@ export type ServerLoadUpdateManyWithoutServerNestedInput = {
   disconnect?: InputMaybe<Array<ServerLoadWhereUniqueInput>>;
   set?: InputMaybe<Array<ServerLoadWhereUniqueInput>>;
   update?: InputMaybe<Array<ServerLoadUpdateWithWhereUniqueWithoutServerInput>>;
-  updateMany?: InputMaybe<
-    Array<ServerLoadUpdateManyWithWhereWithoutServerInput>
-  >;
+  updateMany?: InputMaybe<Array<ServerLoadUpdateManyWithWhereWithoutServerInput>>;
   upsert?: InputMaybe<Array<ServerLoadUpsertWithWhereUniqueWithoutServerInput>>;
 };
 
@@ -29091,20 +29228,20 @@ export type ServerMinOrderByAggregateInput = {
 };
 
 export enum ServerOrderByRelevanceFieldEnum {
-  ActMap = "act_map",
-  Address = "address",
-  City = "city",
-  Country = "country",
-  Game = "game",
-  Name = "name",
-  Publicaddress = "publicaddress",
-  RconPassword = "rcon_password",
-  Statusurl = "statusurl",
+  ActMap = 'act_map',
+  Address = 'address',
+  City = 'city',
+  Country = 'country',
+  Game = 'game',
+  Name = 'name',
+  Publicaddress = 'publicaddress',
+  RconPassword = 'rcon_password',
+  Statusurl = 'statusurl'
 }
 
 export type ServerOrderByRelevanceInput = {
   fields: Array<ServerOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -29221,45 +29358,45 @@ export type ServerOrderByWithRelationInput = {
 };
 
 export enum ServerScalarFieldEnum {
-  ActMap = "act_map",
-  ActPlayers = "act_players",
-  Address = "address",
-  BombsDefused = "bombs_defused",
-  BombsPlanted = "bombs_planted",
-  City = "city",
-  Country = "country",
-  CtHits = "ct_hits",
-  CtShots = "ct_shots",
-  CtWins = "ct_wins",
-  Game = "game",
-  Headshots = "headshots",
-  Kills = "kills",
-  LastEvent = "last_event",
-  Lat = "lat",
-  Lng = "lng",
-  MapChanges = "map_changes",
-  MapCtHits = "map_ct_hits",
-  MapCtShots = "map_ct_shots",
-  MapCtWins = "map_ct_wins",
-  MapRounds = "map_rounds",
-  MapStarted = "map_started",
-  MapTsHits = "map_ts_hits",
-  MapTsShots = "map_ts_shots",
-  MapTsWins = "map_ts_wins",
-  MaxPlayers = "max_players",
-  Name = "name",
-  Players = "players",
-  Port = "port",
-  Publicaddress = "publicaddress",
-  RconPassword = "rcon_password",
-  Rounds = "rounds",
-  ServerId = "serverId",
-  Sortorder = "sortorder",
-  Statusurl = "statusurl",
-  Suicides = "suicides",
-  TsHits = "ts_hits",
-  TsShots = "ts_shots",
-  TsWins = "ts_wins",
+  ActMap = 'act_map',
+  ActPlayers = 'act_players',
+  Address = 'address',
+  BombsDefused = 'bombs_defused',
+  BombsPlanted = 'bombs_planted',
+  City = 'city',
+  Country = 'country',
+  CtHits = 'ct_hits',
+  CtShots = 'ct_shots',
+  CtWins = 'ct_wins',
+  Game = 'game',
+  Headshots = 'headshots',
+  Kills = 'kills',
+  LastEvent = 'last_event',
+  Lat = 'lat',
+  Lng = 'lng',
+  MapChanges = 'map_changes',
+  MapCtHits = 'map_ct_hits',
+  MapCtShots = 'map_ct_shots',
+  MapCtWins = 'map_ct_wins',
+  MapRounds = 'map_rounds',
+  MapStarted = 'map_started',
+  MapTsHits = 'map_ts_hits',
+  MapTsShots = 'map_ts_shots',
+  MapTsWins = 'map_ts_wins',
+  MaxPlayers = 'max_players',
+  Name = 'name',
+  Players = 'players',
+  Port = 'port',
+  Publicaddress = 'publicaddress',
+  RconPassword = 'rcon_password',
+  Rounds = 'rounds',
+  ServerId = 'serverId',
+  Sortorder = 'sortorder',
+  Statusurl = 'statusurl',
+  Suicides = 'suicides',
+  TsHits = 'ts_hits',
+  TsShots = 'ts_shots',
+  TsWins = 'ts_wins'
 }
 
 export type ServerScalarRelationFilter = {
@@ -29545,14 +29682,13 @@ export type ServerUpdateOneRequiredWithoutEventsPlayerActionNestedInput = {
   upsert?: InputMaybe<ServerUpsertWithoutEventsPlayerActionInput>;
 };
 
-export type ServerUpdateOneRequiredWithoutEventsPlayerPlayerActionNestedInput =
-  {
-    connect?: InputMaybe<ServerWhereUniqueInput>;
-    connectOrCreate?: InputMaybe<ServerCreateOrConnectWithoutEventsPlayerPlayerActionInput>;
-    create?: InputMaybe<ServerCreateWithoutEventsPlayerPlayerActionInput>;
-    update?: InputMaybe<ServerUpdateToOneWithWhereWithoutEventsPlayerPlayerActionInput>;
-    upsert?: InputMaybe<ServerUpsertWithoutEventsPlayerPlayerActionInput>;
-  };
+export type ServerUpdateOneRequiredWithoutEventsPlayerPlayerActionNestedInput = {
+  connect?: InputMaybe<ServerWhereUniqueInput>;
+  connectOrCreate?: InputMaybe<ServerCreateOrConnectWithoutEventsPlayerPlayerActionInput>;
+  create?: InputMaybe<ServerCreateWithoutEventsPlayerPlayerActionInput>;
+  update?: InputMaybe<ServerUpdateToOneWithWhereWithoutEventsPlayerPlayerActionInput>;
+  upsert?: InputMaybe<ServerUpsertWithoutEventsPlayerPlayerActionInput>;
+};
 
 export type ServerUpdateOneRequiredWithoutEventsRconNestedInput = {
   connect?: InputMaybe<ServerWhereUniqueInput>;
@@ -31233,21 +31369,21 @@ export type ServerUpsertWithoutLoadsInput = {
 };
 
 export type ServerVoiceComm = {
-  __typename?: "ServerVoiceComm";
-  UDPPort: Scalars["Int"]["output"];
-  addr: Scalars["String"]["output"];
-  descr?: Maybe<Scalars["String"]["output"]>;
-  name: Scalars["String"]["output"];
-  password?: Maybe<Scalars["String"]["output"]>;
-  queryPort: Scalars["Int"]["output"];
-  serverId: Scalars["ID"]["output"];
-  serverType: Scalars["Int"]["output"];
+  __typename?: 'ServerVoiceComm';
+  UDPPort: Scalars['Int']['output'];
+  addr: Scalars['String']['output'];
+  descr?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  password?: Maybe<Scalars['String']['output']>;
+  queryPort: Scalars['Int']['output'];
+  serverId: Scalars['ID']['output'];
+  serverType: Scalars['Int']['output'];
 };
 
 export type ServerVoiceCommAddressCompoundUniqueInput = {
-  UDPPort: Scalars["Int"]["input"];
-  addr: Scalars["String"]["input"];
-  queryPort: Scalars["Int"]["input"];
+  UDPPort: Scalars['Int']['input'];
+  addr: Scalars['String']['input'];
+  queryPort: Scalars['Int']['input'];
 };
 
 export type ServerVoiceCommAvgOrderByAggregateInput = {
@@ -31269,24 +31405,24 @@ export type ServerVoiceCommCountOrderByAggregateInput = {
 };
 
 export type ServerVoiceCommCreateInput = {
-  UDPPort?: InputMaybe<Scalars["Int"]["input"]>;
-  addr: Scalars["String"]["input"];
-  descr?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
-  password?: InputMaybe<Scalars["String"]["input"]>;
-  queryPort?: InputMaybe<Scalars["Int"]["input"]>;
-  serverType?: InputMaybe<Scalars["Int"]["input"]>;
+  UDPPort?: InputMaybe<Scalars['Int']['input']>;
+  addr: Scalars['String']['input'];
+  descr?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  password?: InputMaybe<Scalars['String']['input']>;
+  queryPort?: InputMaybe<Scalars['Int']['input']>;
+  serverType?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerVoiceCommCreateManyInput = {
-  UDPPort?: InputMaybe<Scalars["Int"]["input"]>;
-  addr: Scalars["String"]["input"];
-  descr?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
-  password?: InputMaybe<Scalars["String"]["input"]>;
-  queryPort?: InputMaybe<Scalars["Int"]["input"]>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
-  serverType?: InputMaybe<Scalars["Int"]["input"]>;
+  UDPPort?: InputMaybe<Scalars['Int']['input']>;
+  addr: Scalars['String']['input'];
+  descr?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  password?: InputMaybe<Scalars['String']['input']>;
+  queryPort?: InputMaybe<Scalars['Int']['input']>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
+  serverType?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ServerVoiceCommMaxOrderByAggregateInput = {
@@ -31312,15 +31448,15 @@ export type ServerVoiceCommMinOrderByAggregateInput = {
 };
 
 export enum ServerVoiceCommOrderByRelevanceFieldEnum {
-  Addr = "addr",
-  Descr = "descr",
-  Name = "name",
-  Password = "password",
+  Addr = 'addr',
+  Descr = 'descr',
+  Name = 'name',
+  Password = 'password'
 }
 
 export type ServerVoiceCommOrderByRelevanceInput = {
   fields: Array<ServerVoiceCommOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -31353,14 +31489,14 @@ export type ServerVoiceCommOrderByWithRelationInput = {
 };
 
 export enum ServerVoiceCommScalarFieldEnum {
-  UdpPort = "UDPPort",
-  Addr = "addr",
-  Descr = "descr",
-  Name = "name",
-  Password = "password",
-  QueryPort = "queryPort",
-  ServerId = "serverId",
-  ServerType = "serverType",
+  UdpPort = 'UDPPort',
+  Addr = 'addr',
+  Descr = 'descr',
+  Name = 'name',
+  Password = 'password',
+  QueryPort = 'queryPort',
+  ServerId = 'serverId',
+  ServerType = 'serverType'
 }
 
 export type ServerVoiceCommScalarWhereWithAggregatesInput = {
@@ -31429,7 +31565,7 @@ export type ServerVoiceCommWhereUniqueInput = {
   name?: InputMaybe<StringFilter>;
   password?: InputMaybe<StringNullableFilter>;
   queryPort?: InputMaybe<IntFilter>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
   serverType?: InputMaybe<IntFilter>;
 };
 
@@ -31559,7 +31695,7 @@ export type ServerWhereUniqueInput = {
   publicaddress?: InputMaybe<StringFilter>;
   rcon_password?: InputMaybe<StringFilter>;
   rounds?: InputMaybe<IntFilter>;
-  serverId?: InputMaybe<Scalars["Int"]["input"]>;
+  serverId?: InputMaybe<Scalars['Int']['input']>;
   sortorder?: InputMaybe<IntFilter>;
   statusurl?: InputMaybe<StringNullableFilter>;
   suicides?: InputMaybe<IntFilter>;
@@ -31569,95 +31705,95 @@ export type ServerWhereUniqueInput = {
 };
 
 export enum SortOrder {
-  Asc = "asc",
-  Desc = "desc",
+  Asc = 'asc',
+  Desc = 'desc'
 }
 
 export type StringFieldUpdateOperationsInput = {
-  set?: InputMaybe<Scalars["String"]["input"]>;
+  set?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type StringFilter = {
-  contains?: InputMaybe<Scalars["String"]["input"]>;
-  endsWith?: InputMaybe<Scalars["String"]["input"]>;
-  equals?: InputMaybe<Scalars["String"]["input"]>;
-  gt?: InputMaybe<Scalars["String"]["input"]>;
-  gte?: InputMaybe<Scalars["String"]["input"]>;
-  in?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  lt?: InputMaybe<Scalars["String"]["input"]>;
-  lte?: InputMaybe<Scalars["String"]["input"]>;
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  equals?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  in?: InputMaybe<Array<Scalars['String']['input']>>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
   not?: InputMaybe<NestedStringFilter>;
-  notIn?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  search?: InputMaybe<Scalars["String"]["input"]>;
-  startsWith?: InputMaybe<Scalars["String"]["input"]>;
+  notIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type StringNullableFilter = {
-  contains?: InputMaybe<Scalars["String"]["input"]>;
-  endsWith?: InputMaybe<Scalars["String"]["input"]>;
-  equals?: InputMaybe<Scalars["String"]["input"]>;
-  gt?: InputMaybe<Scalars["String"]["input"]>;
-  gte?: InputMaybe<Scalars["String"]["input"]>;
-  in?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  lt?: InputMaybe<Scalars["String"]["input"]>;
-  lte?: InputMaybe<Scalars["String"]["input"]>;
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  equals?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  in?: InputMaybe<Array<Scalars['String']['input']>>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
   not?: InputMaybe<NestedStringNullableFilter>;
-  notIn?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  search?: InputMaybe<Scalars["String"]["input"]>;
-  startsWith?: InputMaybe<Scalars["String"]["input"]>;
+  notIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type StringNullableWithAggregatesFilter = {
   _count?: InputMaybe<NestedIntNullableFilter>;
   _max?: InputMaybe<NestedStringNullableFilter>;
   _min?: InputMaybe<NestedStringNullableFilter>;
-  contains?: InputMaybe<Scalars["String"]["input"]>;
-  endsWith?: InputMaybe<Scalars["String"]["input"]>;
-  equals?: InputMaybe<Scalars["String"]["input"]>;
-  gt?: InputMaybe<Scalars["String"]["input"]>;
-  gte?: InputMaybe<Scalars["String"]["input"]>;
-  in?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  lt?: InputMaybe<Scalars["String"]["input"]>;
-  lte?: InputMaybe<Scalars["String"]["input"]>;
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  equals?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  in?: InputMaybe<Array<Scalars['String']['input']>>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
   not?: InputMaybe<NestedStringNullableWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  search?: InputMaybe<Scalars["String"]["input"]>;
-  startsWith?: InputMaybe<Scalars["String"]["input"]>;
+  notIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type StringWithAggregatesFilter = {
   _count?: InputMaybe<NestedIntFilter>;
   _max?: InputMaybe<NestedStringFilter>;
   _min?: InputMaybe<NestedStringFilter>;
-  contains?: InputMaybe<Scalars["String"]["input"]>;
-  endsWith?: InputMaybe<Scalars["String"]["input"]>;
-  equals?: InputMaybe<Scalars["String"]["input"]>;
-  gt?: InputMaybe<Scalars["String"]["input"]>;
-  gte?: InputMaybe<Scalars["String"]["input"]>;
-  in?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  lt?: InputMaybe<Scalars["String"]["input"]>;
-  lte?: InputMaybe<Scalars["String"]["input"]>;
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  equals?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  in?: InputMaybe<Array<Scalars['String']['input']>>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
   not?: InputMaybe<NestedStringWithAggregatesFilter>;
-  notIn?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  search?: InputMaybe<Scalars["String"]["input"]>;
-  startsWith?: InputMaybe<Scalars["String"]["input"]>;
+  notIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Subscription = {
-  __typename?: "Subscription";
-  _placeholder?: Maybe<Scalars["String"]["output"]>;
+  __typename?: 'Subscription';
+  _placeholder?: Maybe<Scalars['String']['output']>;
 };
 
 export type Team = {
-  __typename?: "Team";
-  code: Scalars["String"]["output"];
-  game: Scalars["String"]["output"];
-  hidden: Scalars["String"]["output"];
-  name: Scalars["String"]["output"];
-  playerlist_bgcolor?: Maybe<Scalars["String"]["output"]>;
-  playerlist_color?: Maybe<Scalars["String"]["output"]>;
-  playerlist_index: Scalars["Int"]["output"];
-  teamId: Scalars["ID"]["output"];
+  __typename?: 'Team';
+  code: Scalars['String']['output'];
+  game: Scalars['String']['output'];
+  hidden: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  playerlist_bgcolor?: Maybe<Scalars['String']['output']>;
+  playerlist_color?: Maybe<Scalars['String']['output']>;
+  playerlist_index: Scalars['Int']['output'];
+  teamId: Scalars['ID']['output'];
 };
 
 export type TeamAvgOrderByAggregateInput = {
@@ -31677,29 +31813,29 @@ export type TeamCountOrderByAggregateInput = {
 };
 
 export type TeamCreateInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  hidden?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  playerlist_bgcolor?: InputMaybe<Scalars["String"]["input"]>;
-  playerlist_color?: InputMaybe<Scalars["String"]["input"]>;
-  playerlist_index?: InputMaybe<Scalars["Int"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  hidden?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  playerlist_bgcolor?: InputMaybe<Scalars['String']['input']>;
+  playerlist_color?: InputMaybe<Scalars['String']['input']>;
+  playerlist_index?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type TeamCreateManyInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  hidden?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  playerlist_bgcolor?: InputMaybe<Scalars["String"]["input"]>;
-  playerlist_color?: InputMaybe<Scalars["String"]["input"]>;
-  playerlist_index?: InputMaybe<Scalars["Int"]["input"]>;
-  teamId?: InputMaybe<Scalars["Int"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  hidden?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  playerlist_bgcolor?: InputMaybe<Scalars['String']['input']>;
+  playerlist_color?: InputMaybe<Scalars['String']['input']>;
+  playerlist_index?: InputMaybe<Scalars['Int']['input']>;
+  teamId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type TeamGamecodeCompoundUniqueInput = {
-  code: Scalars["String"]["input"];
-  game: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  game: Scalars['String']['input'];
 };
 
 export type TeamMaxOrderByAggregateInput = {
@@ -31725,17 +31861,17 @@ export type TeamMinOrderByAggregateInput = {
 };
 
 export enum TeamOrderByRelevanceFieldEnum {
-  Code = "code",
-  Game = "game",
-  Hidden = "hidden",
-  Name = "name",
-  PlayerlistBgcolor = "playerlist_bgcolor",
-  PlayerlistColor = "playerlist_color",
+  Code = 'code',
+  Game = 'game',
+  Hidden = 'hidden',
+  Name = 'name',
+  PlayerlistBgcolor = 'playerlist_bgcolor',
+  PlayerlistColor = 'playerlist_color'
 }
 
 export type TeamOrderByRelevanceInput = {
   fields: Array<TeamOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -31768,14 +31904,14 @@ export type TeamOrderByWithRelationInput = {
 };
 
 export enum TeamScalarFieldEnum {
-  Code = "code",
-  Game = "game",
-  Hidden = "hidden",
-  Name = "name",
-  PlayerlistBgcolor = "playerlist_bgcolor",
-  PlayerlistColor = "playerlist_color",
-  PlayerlistIndex = "playerlist_index",
-  TeamId = "teamId",
+  Code = 'code',
+  Game = 'game',
+  Hidden = 'hidden',
+  Name = 'name',
+  PlayerlistBgcolor = 'playerlist_bgcolor',
+  PlayerlistColor = 'playerlist_color',
+  PlayerlistIndex = 'playerlist_index',
+  TeamId = 'teamId'
 }
 
 export type TeamScalarWhereWithAggregatesInput = {
@@ -31843,26 +31979,26 @@ export type TeamWhereUniqueInput = {
   playerlist_bgcolor?: InputMaybe<StringNullableFilter>;
   playerlist_color?: InputMaybe<StringNullableFilter>;
   playerlist_index?: InputMaybe<IntFilter>;
-  teamId?: InputMaybe<Scalars["Int"]["input"]>;
+  teamId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export enum TransactionIsolationLevel {
-  ReadCommitted = "ReadCommitted",
-  ReadUncommitted = "ReadUncommitted",
-  RepeatableRead = "RepeatableRead",
-  Serializable = "Serializable",
+  ReadCommitted = 'ReadCommitted',
+  ReadUncommitted = 'ReadUncommitted',
+  RepeatableRead = 'RepeatableRead',
+  Serializable = 'Serializable'
 }
 
 export type Trend = {
-  __typename?: "Trend";
-  act_slots: Scalars["Int"]["output"];
-  game: Scalars["String"]["output"];
-  headshots: Scalars["Int"]["output"];
-  kills: Scalars["Int"]["output"];
-  max_slots: Scalars["Int"]["output"];
-  players: Scalars["Int"]["output"];
-  servers: Scalars["Int"]["output"];
-  timestamp: Scalars["Int"]["output"];
+  __typename?: 'Trend';
+  act_slots: Scalars['Int']['output'];
+  game: Scalars['String']['output'];
+  headshots: Scalars['Int']['output'];
+  kills: Scalars['Int']['output'];
+  max_slots: Scalars['Int']['output'];
+  players: Scalars['Int']['output'];
+  servers: Scalars['Int']['output'];
+  timestamp: Scalars['Int']['output'];
 };
 
 export type TrendAvgOrderByAggregateInput = {
@@ -31887,25 +32023,25 @@ export type TrendCountOrderByAggregateInput = {
 };
 
 export type TrendCreateInput = {
-  act_slots?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  max_slots?: InputMaybe<Scalars["Int"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  servers?: InputMaybe<Scalars["Int"]["input"]>;
-  timestamp?: InputMaybe<Scalars["Int"]["input"]>;
+  act_slots?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  max_slots?: InputMaybe<Scalars['Int']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  servers?: InputMaybe<Scalars['Int']['input']>;
+  timestamp?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type TrendCreateManyInput = {
-  act_slots?: InputMaybe<Scalars["Int"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  max_slots?: InputMaybe<Scalars["Int"]["input"]>;
-  players?: InputMaybe<Scalars["Int"]["input"]>;
-  servers?: InputMaybe<Scalars["Int"]["input"]>;
-  timestamp?: InputMaybe<Scalars["Int"]["input"]>;
+  act_slots?: InputMaybe<Scalars['Int']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  max_slots?: InputMaybe<Scalars['Int']['input']>;
+  players?: InputMaybe<Scalars['Int']['input']>;
+  servers?: InputMaybe<Scalars['Int']['input']>;
+  timestamp?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type TrendMaxOrderByAggregateInput = {
@@ -31931,12 +32067,12 @@ export type TrendMinOrderByAggregateInput = {
 };
 
 export enum TrendOrderByRelevanceFieldEnum {
-  Game = "game",
+  Game = 'game'
 }
 
 export type TrendOrderByRelevanceInput = {
   fields: Array<TrendOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -31969,14 +32105,14 @@ export type TrendOrderByWithRelationInput = {
 };
 
 export enum TrendScalarFieldEnum {
-  ActSlots = "act_slots",
-  Game = "game",
-  Headshots = "headshots",
-  Kills = "kills",
-  MaxSlots = "max_slots",
-  Players = "players",
-  Servers = "servers",
-  Timestamp = "timestamp",
+  ActSlots = 'act_slots',
+  Game = 'game',
+  Headshots = 'headshots',
+  Kills = 'kills',
+  MaxSlots = 'max_slots',
+  Players = 'players',
+  Servers = 'servers',
+  Timestamp = 'timestamp'
 }
 
 export type TrendScalarWhereWithAggregatesInput = {
@@ -32004,8 +32140,8 @@ export type TrendSumOrderByAggregateInput = {
 };
 
 export type TrendTimestampGameCompoundUniqueInput = {
-  game: Scalars["String"]["input"];
-  timestamp: Scalars["Int"]["input"];
+  game: Scalars['String']['input'];
+  timestamp: Scalars['Int']['input'];
 };
 
 export type TrendUpdateInput = {
@@ -32060,12 +32196,12 @@ export type TrendWhereUniqueInput = {
 };
 
 export type User = {
-  __typename?: "User";
-  acclevel: Scalars["Int"]["output"];
-  password: Scalars["String"]["output"];
+  __typename?: 'User';
+  acclevel: Scalars['Int']['output'];
+  password: Scalars['String']['output'];
   player?: Maybe<Player>;
-  playerId: Scalars["Int"]["output"];
-  username: Scalars["ID"]["output"];
+  playerId: Scalars['Int']['output'];
+  username: Scalars['ID']['output'];
 };
 
 export type UserAvgOrderByAggregateInput = {
@@ -32081,28 +32217,28 @@ export type UserCountOrderByAggregateInput = {
 };
 
 export type UserCreateInput = {
-  acclevel?: InputMaybe<Scalars["Int"]["input"]>;
-  password: Scalars["String"]["input"];
+  acclevel?: InputMaybe<Scalars['Int']['input']>;
+  password: Scalars['String']['input'];
   player?: InputMaybe<PlayerCreateNestedOneWithoutUsersInput>;
-  username: Scalars["String"]["input"];
+  username: Scalars['String']['input'];
 };
 
 export type UserCreateManyInput = {
-  acclevel?: InputMaybe<Scalars["Int"]["input"]>;
-  password: Scalars["String"]["input"];
-  playerId?: InputMaybe<Scalars["Int"]["input"]>;
-  username: Scalars["String"]["input"];
+  acclevel?: InputMaybe<Scalars['Int']['input']>;
+  password: Scalars['String']['input'];
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  username: Scalars['String']['input'];
 };
 
 export type UserCreateManyPlayerInput = {
-  acclevel?: InputMaybe<Scalars["Int"]["input"]>;
-  password: Scalars["String"]["input"];
-  username: Scalars["String"]["input"];
+  acclevel?: InputMaybe<Scalars['Int']['input']>;
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 export type UserCreateManyPlayerInputEnvelope = {
   data: Array<UserCreateManyPlayerInput>;
-  skipDuplicates?: InputMaybe<Scalars["Boolean"]["input"]>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type UserCreateNestedManyWithoutPlayerInput = {
@@ -32118,9 +32254,9 @@ export type UserCreateOrConnectWithoutPlayerInput = {
 };
 
 export type UserCreateWithoutPlayerInput = {
-  acclevel?: InputMaybe<Scalars["Int"]["input"]>;
-  password: Scalars["String"]["input"];
-  username: Scalars["String"]["input"];
+  acclevel?: InputMaybe<Scalars['Int']['input']>;
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 export type UserListRelationFilter = {
@@ -32148,13 +32284,13 @@ export type UserOrderByRelationAggregateInput = {
 };
 
 export enum UserOrderByRelevanceFieldEnum {
-  Password = "password",
-  Username = "username",
+  Password = 'password',
+  Username = 'username'
 }
 
 export type UserOrderByRelevanceInput = {
   fields: Array<UserOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -32180,10 +32316,10 @@ export type UserOrderByWithRelationInput = {
 };
 
 export enum UserScalarFieldEnum {
-  Acclevel = "acclevel",
-  Password = "password",
-  PlayerId = "playerId",
-  Username = "username",
+  Acclevel = 'acclevel',
+  Password = 'password',
+  PlayerId = 'playerId',
+  Username = 'username'
 }
 
 export type UserScalarWhereInput = {
@@ -32279,18 +32415,18 @@ export type UserWhereUniqueInput = {
   password?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
   playerId?: InputMaybe<IntFilter>;
-  username?: InputMaybe<Scalars["String"]["input"]>;
+  username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Weapon = {
-  __typename?: "Weapon";
-  code: Scalars["String"]["output"];
-  game: Scalars["String"]["output"];
-  headshots: Scalars["Int"]["output"];
-  kills: Scalars["Int"]["output"];
-  modifier: Scalars["Float"]["output"];
-  name: Scalars["String"]["output"];
-  weaponId: Scalars["ID"]["output"];
+  __typename?: 'Weapon';
+  code: Scalars['String']['output'];
+  game: Scalars['String']['output'];
+  headshots: Scalars['Int']['output'];
+  kills: Scalars['Int']['output'];
+  modifier: Scalars['Float']['output'];
+  name: Scalars['String']['output'];
+  weaponId: Scalars['ID']['output'];
 };
 
 export type WeaponAvgOrderByAggregateInput = {
@@ -32311,27 +32447,27 @@ export type WeaponCountOrderByAggregateInput = {
 };
 
 export type WeaponCreateInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  modifier?: InputMaybe<Scalars["Float"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  modifier?: InputMaybe<Scalars['Float']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type WeaponCreateManyInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  game?: InputMaybe<Scalars["String"]["input"]>;
-  headshots?: InputMaybe<Scalars["Int"]["input"]>;
-  kills?: InputMaybe<Scalars["Int"]["input"]>;
-  modifier?: InputMaybe<Scalars["Float"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  weaponId?: InputMaybe<Scalars["Int"]["input"]>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
+  headshots?: InputMaybe<Scalars['Int']['input']>;
+  kills?: InputMaybe<Scalars['Int']['input']>;
+  modifier?: InputMaybe<Scalars['Float']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  weaponId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type WeaponGamecodeCompoundUniqueInput = {
-  code: Scalars["String"]["input"];
-  game: Scalars["String"]["input"];
+  code: Scalars['String']['input'];
+  game: Scalars['String']['input'];
 };
 
 export type WeaponMaxOrderByAggregateInput = {
@@ -32355,14 +32491,14 @@ export type WeaponMinOrderByAggregateInput = {
 };
 
 export enum WeaponOrderByRelevanceFieldEnum {
-  Code = "code",
-  Game = "game",
-  Name = "name",
+  Code = 'code',
+  Game = 'game',
+  Name = 'name'
 }
 
 export type WeaponOrderByRelevanceInput = {
   fields: Array<WeaponOrderByRelevanceFieldEnum>;
-  search: Scalars["String"]["input"];
+  search: Scalars['String']['input'];
   sort: SortOrder;
 };
 
@@ -32393,13 +32529,13 @@ export type WeaponOrderByWithRelationInput = {
 };
 
 export enum WeaponScalarFieldEnum {
-  Code = "code",
-  Game = "game",
-  Headshots = "headshots",
-  Kills = "kills",
-  Modifier = "modifier",
-  Name = "name",
-  WeaponId = "weaponId",
+  Code = 'code',
+  Game = 'game',
+  Headshots = 'headshots',
+  Kills = 'kills',
+  Modifier = 'modifier',
+  Name = 'name',
+  WeaponId = 'weaponId'
 }
 
 export type WeaponScalarWhereWithAggregatesInput = {
@@ -32464,39 +32600,13 @@ export type WeaponWhereUniqueInput = {
   kills?: InputMaybe<IntFilter>;
   modifier?: InputMaybe<FloatFilter>;
   name?: InputMaybe<StringFilter>;
-  weaponId?: InputMaybe<Scalars["Int"]["input"]>;
+  weaponId?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type GetGamesQueryVariables = Exact<{ [key: string]: never }>;
+export type GetGamesListQueryVariables = Exact<{ [key: string]: never; }>;
 
-export type GetGamesQuery = {
-  __typename?: "Query";
-  findManyGame: Array<{ __typename?: "Game"; code: string; name: string }>;
-};
 
-export const GetGamesDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "GetGames" },
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "findManyGame" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "code" } },
-                { kind: "Field", name: { kind: "Name", value: "name" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetGamesQuery, GetGamesQueryVariables>;
+export type GetGamesListQuery = { __typename?: 'Query', findManyGame: Array<{ __typename?: 'Game', code: string, name: string, hidden: string }> };
+
+
+export const GetGamesListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesList"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hidden"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"equals"},"value":{"kind":"StringValue","value":"0","block":false}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}}]}}]}}]} as unknown as DocumentNode<GetGamesListQuery, GetGamesListQueryVariables>;

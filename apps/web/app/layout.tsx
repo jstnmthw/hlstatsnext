@@ -1,4 +1,4 @@
-import { ApolloWrapper } from "@/lib/apollo-wrapper";
+import { ApolloWrapper } from "@/components/apollo-wrapper";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";

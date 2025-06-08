@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "db:generate": "prisma generate",
+    "db:generate": "rm -rf generated && prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
@@ -37,6 +37,7 @@
     "./client": "./src/index.ts",
     "./seed": "./src/seed.ts",
     "./reset": "./src/reset.ts",
-    "./generated/graphql": "./generated/graphql/pothos-types.ts"
+    "./graphql/types": "./generated/graphql/pothos-types.ts",
+    "./graphql/input": "./generated/graphql/pothos-input"
   }
 }

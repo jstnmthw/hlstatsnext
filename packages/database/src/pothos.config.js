@@ -7,11 +7,12 @@ module.exports = {
     outputFilePath: "./generated/graphql/pothos-input.ts",
   },
   crud: {
-    outputDir: "./generated/graphql/pothos-types",
-    inputsImporter: `import * as Inputs from './generated/graphql/pothos-input';`,
-    resolverImports: `import prisma from './generated/prisma';`,
-    prismaCaller: "prisma",
-    global: {},
+    outputDir: "./generated/graphql/pothos-input",
+    inputsImporter: `import * as Inputs from '../../../../generated/graphql/pothos-input';`,
+    resolverImports: `\nimport { db } from "../../../../../src";`,
+    prismaCaller: "db",
   },
-  global: {},
+  global: {
+    builderLocation: "../../apps/api/src/builder",
+  },
 };

@@ -9,17 +9,18 @@
     "dist"
   ],
   "exports": {
-    "./styles.css": "./dist/index.css",
+    "./globals.css": "./dist/index.css",
     "./*": "./dist/*.js"
   },
   "scripts": {
-    "build:styles": "tailwindcss -i ./src/styles.css -o ./dist/index.css",
+    "build:styles": "tailwindcss -i ./src/globals.css -o ./dist/index.css",
     "build:components": "tsc",
     "check-types": "tsc --noEmit",
-    "dev:styles": "tailwindcss -i ./src/styles.css -o ./dist/index.css --watch",
+    "dev:styles": "tailwindcss -i ./src/globals.css -o ./dist/index.css --watch",
     "dev:components": "tsc --watch",
     "lint": "eslint src --max-warnings 0",
-    "clean": "rm -rf node_modules"
+    "clean": "rm -rf node_modules",
+    "ui": "pnpm dlx shadcn@latest"
   },
   "peerDependencies": {
     "react": "^19"
@@ -35,7 +36,13 @@
     "typescript": "5.8.2"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.2.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.513.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "tailwind-merge": "^3.3.0",
+    "tw-animate-css": "^1.3.4"
   }
 }

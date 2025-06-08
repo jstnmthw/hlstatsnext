@@ -72,8 +72,6 @@
   }
 }
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -112,14 +110,8 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* TODO: Remove this once we can implement tailwindcss 4 correctly */
-@layer base {
-  body {
-    @apply font-sans;
-  }
-}
-
 body {
   color: var(--foreground);
   background: var(--background);
+  font-family: var(--font-geist-sans);
 }

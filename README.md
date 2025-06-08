@@ -81,6 +81,10 @@ pnpm lint
 
 # Run tests across all apps and packages
 pnpm test
+
+# Add shadcn/ui components to the shared UI package
+cd packages/ui
+pnpm ui add button    # Example: add a button component
 ```
 
 ## Docker Management
@@ -290,7 +294,7 @@ make help               # Show all available commands
 │   ├── daemon/         # Pearl daemon for game server monitoring
 │   └── web/            # Next.js frontend application
 ├── packages/
-│   ├── ui/             # Shared UI components
+│   ├── ui/             # Shared UI components (shadcn/ui + custom components)
 │   ├── config/         # Shared configuration
 │   └── database/       # Database schemas, sql and utilities
 ├── servers/

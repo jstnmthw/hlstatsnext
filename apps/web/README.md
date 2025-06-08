@@ -1,24 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/create-next-app).
+# Web Frontend
 
-## Getting Started
+Next.js frontend application for HLStatsNext.
 
-First, run the development server:
+## Overview
+
+This application provides the user interface for HLStatsNext, built with modern web technologies to deliver a fast, responsive, and type-safe experience.
+
+- **Framework**: Next.js 15 with App Router
+- **UI**: React Server Components & Tailwind CSS
+- **State Management**: Apollo Client for GraphQL state
+- **Type Safety**: Full TypeScript integration with code generation
+
+## Setup
+
+1.  **Install dependencies from the root of the monorepo:**
+    ```bash
+    pnpm install
+    ```
+2.  **Run the development server:**
+    ```bash
+    pnpm dev
+    ```
+
+The application will be available at [http://localhost:3000](http://localhost:3000). The page auto-updates as you edit files.
+
+## Scripts
+
+- `pnpm dev`: Start the development server with hot reload
+- `pnpm build`: Build for production
+- `pnpm start`: Start the production server
+- `pnpm lint`: Run ESLint for code quality checks
+- `pnpm graphql:codegen`: Generate a typed GraphQL client from the API schema
+
+## GraphQL API Consumption
+
+This application connects to the GraphQL API provided by the `api` package. We use Apollo Client for state management and `graphql-codegen` for generating a type-safe SDK.
+
+### Code Generation
+
+To ensure type safety and generate React hooks, we use `graphql-codegen`. Any time you add or change a GraphQL query or mutation, you must regenerate the client SDK.
+
+1.  Make sure the `api` development server is running.
+2.  Run the codegen script from the `apps/web` directory:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm graphql:codegen
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This will generate updated types and hooks in `src/lib/gql/`. The script is configured in `codegen.ts`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Apollo Client Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
+The Apollo Client is configured to work with Next.js App Router, supporting both Server-Side Rendering (SSR) in Server Components and client-side data fetching in Client Components.
+
+- **Client Configuration**: The client instance is created in `src/lib/apollo-client.ts`.
+- **Provider**: The root layout is wrapped in an `ApolloProvider` in `src/components/apollo-provider.tsx` to make the client available throughout the component tree.
+
+### Usage Example (Client Component)
+
+In Client Components, you can use the auto-generated hooks from `graphql-codegen`.
+
+```typescript
+'use client';
+
+import { useQuery } from '@apollo/client';
+import { graphql } from '@/lib/gql';
+
+// This query is defined and typed by graphql-codegen
+const GET_PLAYERS_QUERY = graphql(`
+  query GetPlayers {
+    players(orderBy: { skill: desc }, take: 10) {
+      id
+      name
+      skill
+    }
+  }
+`);
+
+function PlayerList() {
+  const { loading, error, data } = useQuery(GET_PLAYERS_QUERY);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  return (
+    <ul>
+      {data?.players.map(player => (
+        <li key={player.id}>{player.name} ({player.skill})</li>
+      ))}
+    </ul>
+  );
+}
+```
 
 ## Learn More
 

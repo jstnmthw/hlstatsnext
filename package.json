@@ -5,6 +5,7 @@
     "build": "turbo run build",
     "check-types": "turbo run check-types",
     "clean": "turbo run clean && rm -rf node_modules .turbo",
+    "codegen": "turbo run graphql:codegen",
     "db:fresh": "turbo run db:fresh",
     "db:generate": "turbo run db:generate",
     "db:migrate": "turbo run db:migrate",

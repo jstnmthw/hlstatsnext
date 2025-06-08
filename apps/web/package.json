@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint --max-warnings 0",
     "check-types": "tsc --noEmit",
-    "clean": "rm -rf node_modules"
+    "clean": "rm -rf node_modules .next .turbo"
   },
   "dependencies": {
     "@repo/ui": "workspace:*",

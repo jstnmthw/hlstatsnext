@@ -38,6 +38,7 @@
     "./seed": "./src/seed.ts",
     "./reset": "./src/reset.ts",
     "./graphql/types": "./generated/graphql/pothos-types.ts",
-    "./graphql/inputs": "./generated/graphql/pothos-inputs.ts"
+    "./graphql/inputs": "./generated/graphql/pothos-inputs.ts",
+    "./graphql/crud": "./generated/graphql/pothos-inputs/autocrud.ts"
   }
 }

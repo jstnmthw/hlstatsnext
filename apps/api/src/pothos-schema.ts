@@ -1,15 +1,19 @@
 import { builder } from "./builder";
+import { generateAllCrud } from "@repo/database/graphql/crud";
 
 // Import schema types
-import "./schema/game";
-import "./schema/country";
-import "./schema/player";
-import "./schema/clan";
-import "./schema/server";
-import "./schema/award";
-import "./schema/action";
-import "./schema/weapon";
-import "./schema/role";
+// import "./schema/game";
+// import "./schema/country";
+// import "./schema/player";
+// import "./schema/clan";
+// import "./schema/server";
+// import "./schema/award";
+// import "./schema/action";
+// import "./schema/weapon";
+// import "./schema/role";
+
+// Generate all CRUD operations
+generateAllCrud();
 
 // Define HealthStatus type
 const HealthStatus = builder.objectRef<{
@@ -35,15 +39,15 @@ builder.queryField("health", (t) =>
       timestamp: new Date().toISOString(),
       version: "1.0.0",
     }),
-  }),
+  })
 );
 
 // Hello world query
 builder.queryField("hello", (t) =>
   t.string({
     resolve: () => "Hello from HLStatsNext API!",
-  }),
+  })
 );
 
 // Build and export the schema
-export const schema = builder.toSchema();
+export const schema = builder.toSchema({});

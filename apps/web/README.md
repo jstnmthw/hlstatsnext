@@ -1,94 +1,112 @@
-# Web Frontend
+# Web Application
 
-Next.js frontend application for HLStatsNext.
+This Next.js application (`apps/web`) serves as the frontend for the HLStatsNext project. It uses the App Router and is configured for Server-Side Rendering (SSR) with Apollo Client, following the patterns from `@apollo/client-integration-nextjs`.
 
-## Overview
+## GraphQL Setup
 
-This application provides the user interface for HLStatsNext, built with modern web technologies to deliver a fast, responsive, and type-safe experience.
+The project is configured for end-to-end type-safe data fetching using GraphQL, with full support for RSC and Client Components.
 
-- **Framework**: Next.js 15 with App Router
-- **UI**: React Server Components & Tailwind CSS
-- **State Management**: Apollo Client for GraphQL state
-- **Type Safety**: Full TypeScript integration with code generation
+### 1. Code Generation
 
-## Setup
-
-1.  **Install dependencies from the root of the monorepo:**
-    ```bash
-    pnpm install
-    ```
-2.  **Run the development server:**
-    ```bash
-    pnpm dev
-    ```
-
-The application will be available at [http://localhost:3000](http://localhost:3000). The page auto-updates as you edit files.
-
-## Scripts
-
-- `pnpm dev`: Start the development server with hot reload
-- `pnpm build`: Build for production
-- `pnpm start`: Start the production server
-- `pnpm lint`: Run ESLint for code quality checks
-- `pnpm graphql:codegen`: Generate a typed GraphQL client from the API schema
-
-## GraphQL API Consumption
-
-This application connects to the GraphQL API provided by the `api` package. We use Apollo Client for state management and `graphql-codegen` for generating a type-safe SDK.
-
-### Code Generation
-
-To ensure type safety and generate React hooks, we use `graphql-codegen`. Any time you add or change a GraphQL query or mutation, you must regenerate the client SDK.
-
-1.  Make sure the `api` development server is running.
-2.  Run the codegen script from the `apps/web` directory:
+The GraphQL client and typed hooks are automatically generated from the queries and mutations defined within this application. To regenerate the client after adding or changing a GraphQL operation, run the following command from the root of the monorepo:
 
 ```bash
-pnpm graphql:codegen
+pnpm codegen
 ```
 
-This will generate updated types and hooks in `src/lib/gql/`. The script is configured in `codegen.ts`.
+This script reads all `.ts` and `.tsx` files, finds the GraphQL operations defined with the `graphql()` function, and generates the necessary code in `lib/gql/`.
 
-### Apollo Client Setup
+### 2. Fetching Data in Server Components (RSC)
 
-The Apollo Client is configured to work with Next.js App Router, supporting both Server-Side Rendering (SSR) in Server Components and client-side data fetching in Client Components.
+For Server-Side Rendering (SSR), always use the `getClient` function or the `query` shortcut from `@/lib/apollo-client` to fetch data within Server Components. This ensures that a new Apollo Client instance is used for each request.
 
-- **Client Configuration**: The client instance is created in `src/lib/apollo-client.ts`.
-- **Provider**: The root layout is wrapped in an `ApolloProvider` in `src/components/apollo-provider.tsx` to make the client available throughout the component tree.
-
-### Usage Example (Client Component)
-
-In Client Components, you can use the auto-generated hooks from `graphql-codegen`.
+**Example: A Server Component**
 
 ```typescript
-'use client';
+import { getClient } from "@/lib/apollo-client";
+// Or use the shortcut:
+// import { query } from "@/lib/apollo-client";
+import { graphql } from "@/lib/gql";
 
-import { useQuery } from '@apollo/client';
-import { graphql } from '@/lib/gql';
+const GET_GAMES_QUERY = graphql(`...`);
 
-// This query is defined and typed by graphql-codegen
-const GET_PLAYERS_QUERY = graphql(`
-  query GetPlayers {
-    players(orderBy: { skill: desc }, take: 10) {
-      id
-      name
-      skill
-    }
-  }
-`);
-
-function PlayerList() {
-  const { loading, error, data } = useQuery(GET_PLAYERS_QUERY);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+export async function GameList() {
+  // const { data } = await query({ query: GET_GAMES_QUERY });
+  const { data } = await getClient().query({ query: GET_GAMES_QUERY });
 
   return (
-    <ul>
-      {data?.players.map(player => (
-        <li key={player.id}>{player.name} ({player.skill})</li>
-      ))}
-    </ul>
+    //... render component
+  );
+}
+```
+
+### 3. Data in Client Components
+
+The client-side Apollo setup is handled by `app/ApolloWrapper.tsx`, which uses `ApolloNextAppProvider` to make the client available to all Client Components.
+
+#### Using `useSuspenseQuery`
+
+For queries in Client Components that should suspend while loading, use the `useSuspenseQuery` hook.
+
+```typescript
+"use client";
+
+import { useSuspenseQuery } from "@apollo/client";
+import { graphql } from "@/lib/gql";
+
+const GET_PLAYERS_QUERY = graphql(`...`);
+
+function PlayerList() {
+  const { data } = useSuspenseQuery(GET_PLAYERS_QUERY);
+
+  return (
+    //... render component with data
+  );
+}
+```
+
+#### Preloading Data in RSC for Client Components
+
+To avoid client-side request waterfalls, you can preload data in a Server Component and have it available immediately in a Client Component.
+
+**Example: Preloading in a Server Page/Component**
+
+```typescript
+import { PreloadQuery } from "@/lib/apollo-client";
+import { graphql } from "@/lib/gql";
+import { Suspense } from "react";
+import { ClientChild } from "./ClientChild";
+
+const GET_PLAYERS_QUERY = graphql(`...`);
+
+export default function Page() {
+    return (
+        <PreloadQuery query={GET_PLAYERS_QUERY}>
+            <Suspense fallback={<p>Loading...</p>}>
+                <ClientChild />
+            </Suspense>
+        </PreloadQuery>
+    )
+}
+```
+
+**Example: Consuming preloaded data in `ClientChild.tsx`**
+
+```typescript
+"use client";
+
+import { useSuspenseQuery } from "@apollo/client";
+import { graphql } from "@/lib/gql";
+
+const GET_PLAYERS_QUERY = graphql(`...`);
+
+export function ClientChild() {
+  // This hook will not trigger a new network request.
+  // It will use the data preloaded in the parent Server Component.
+  const { data } = useSuspenseQuery(GET_PLAYERS_QUERY);
+
+  return (
+    //... render component
   );
 }
 ```

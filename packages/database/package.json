@@ -27,7 +27,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.8.4",
-    "eslint": "^9.27.0",
+    "eslint": "^9.29.0",
     "prisma-generator-pothos-codegen": "^0.7.1",
     "ts-deepmerge": "^7.0.3",
     "tsx": "^4.7.0",

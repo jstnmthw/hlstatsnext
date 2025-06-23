@@ -4,6 +4,8 @@
 
 Complete rewrite of the Perl-based daemon using **TypeScript/Node.js** with modern architecture patterns, focusing on security, scalability, and maintainability while integrating seamlessly with the existing Turbo monorepo structure.
 
+We are rebuilding the legacy Perl-based HLstatsX daemon (located at `@/daemon`) from scratch as a modern TypeScript/Node.js microservice. The new daemon will collect, process, and aggregate statistics from Half-Life dedicated game servers (such as player stats, matches, maps, events, and more). This rewrite aims to provide a scalable, maintainable, and secure foundation for real-time game analytics, replacing the old HLstatsX Perl program with a robust, testable, and cloud-native solution.
+
 ---
 
 ## **1. Technology Stack**

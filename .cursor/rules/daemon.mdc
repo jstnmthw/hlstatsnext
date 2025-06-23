@@ -3,4 +3,26 @@ description:
 globs: apps/daemon-v2/**/*.*
 alwaysApply: false
 ---
-Review [AI_EXECUTION_PROMPT.md](mdc:apps/daemon-v2/docs/AI_EXECUTION_PROMPT.md) and [PHASES.mmd](mdc:apps/daemon-v2/docs/PHASES.mmd) for a mermain graph of our execution steps. Review [MIGRATION_PLAN.md](mdc:MIGRATION_PLAN.md) for our plan and [MIGRATION_PROGRESS.md](mdc:apps/daemon-v2/docs/MIGRATION_PROGRESS.md) for the current progress.
+# HLStats Daemon v2 - AI Execution Prompt
+
+## **CRITICAL: READ THIS ENTIRE PROMPT BEFORE TAKING ANY ACTION**
+
+You are tasked with implementing the HLStats Daemon v2 following the [MIGRATION_PLAN.md](mdc:apps/daemon-v2/docs/MIGRATION_PLAN.md). This is a complex, multi-phase project that requires careful execution and constant validation.
+
+---
+
+## **Core Directives**
+
+### Execution Principles**
+
+- **ALWAYS** check the current state before proceeding
+- **NEVER** skip validation steps
+- **PAUSE** for user input at designated checkpoints
+- **MAINTAIN** a progress log in `apps/daemon-v2/docs/MIGRATION_PROGRESS.md`
+- **TEST** each component before moving to the next
+- **DOCUMENT** all decisions and deviations
+
+### Documents
+
+- **BEST PRACTICES** Review our best practices in [DEVELOPMENT_BEST_PRACTICES.md](mdc:apps/daemon-v2/docs/DEVELOPMENT_BEST_PRACTICES.md). 
+- **PROGRESS** Review and self update [MIGRATION_PROGRESS.md](mdc:apps/daemon-v2/docs/MIGRATION_PROGRESS.md) when applicablee.

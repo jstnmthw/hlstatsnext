@@ -13,7 +13,7 @@ You are tasked with implementing the HLStats Daemon v2 following the MIGRATION_P
 - **ALWAYS** check the current state before proceeding
 - **NEVER** skip validation steps
 - **PAUSE** for user input at designated checkpoints
-- **MAINTAIN** a progress log in `apps/daemon-v2/MIGRATION_PROGRESS.md`
+- **MAINTAIN** a progress log in `apps/daemon-v2/docs/MIGRATION_PROGRESS.md`
 - **TEST** each component before moving to the next
 - **DOCUMENT** all decisions and deviations
 
@@ -55,7 +55,7 @@ IF error occurs:
 2. **Create Progress Tracker**
 
    ```markdown
-   # apps/daemon/MIGRATION_PROGRESS.md
+   # apps/daemon/docs/MIGRATION_PROGRESS.md
 
    - [ ] Phase 1: Foundation
      - [ ] Turbo structure setup (already in place)

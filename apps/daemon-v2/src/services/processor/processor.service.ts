@@ -5,8 +5,8 @@
   using the database package. At this stage it only exposes an enqueue method.
 */
 
-import type { GameEvent } from "../../types/common/events.types";
-import { DatabaseClient } from "../../database/client";
+import type { GameEvent } from "@/types/common/events";
+import { DatabaseClient } from "@/database/client";
 import { PlayerHandler } from "./handlers/player.handler";
 import { WeaponHandler } from "./handlers/weapon.handler";
 import { MatchHandler } from "./handlers/match.handler";

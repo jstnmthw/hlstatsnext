@@ -9,7 +9,7 @@ import type {
   GameEvent,
   RoundEndEvent,
   MapChangeEvent,
-} from "@/types/common/events.types";
+} from "@/types/common/events";
 import type { DatabaseClient } from "@/database/client";
 
 export interface MatchStats {

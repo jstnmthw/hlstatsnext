@@ -1,5 +1,9 @@
 # HLStats Next - Development Best Practices & Methodologies
 
+## **Project Context & Objective**
+
+We are rebuilding the legacy Perl-based HLstatsX daemon (located at `@/daemon`) from scratch as a modern TypeScript/Node.js microservice. The new daemon will collect, process, and aggregate statistics from Half-Life dedicated game servers (such as player stats, matches, maps, events, and more). This rewrite aims to provide a scalable, maintainable, and secure foundation for real-time game analytics, replacing the old HLstatsX Perl program with a robust, testable, and cloud-native solution.
+
 ## **Table of Contents**
 
 1. [Architecture Principles](#architecture-principles)

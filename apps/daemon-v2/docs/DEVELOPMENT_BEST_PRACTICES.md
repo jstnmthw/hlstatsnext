@@ -51,10 +51,10 @@ export function calculatePlayerStuff() {
 │          (Use Cases, DTOs)                  │
 ├─────────────────────────────────────────────┤
 │             Domain Layer                    │
-│      (Entities, Business Rules)            │
+│      (Entities, Business Rules)             │
 ├─────────────────────────────────────────────┤
 │          Infrastructure Layer               │
-│      (Database, External APIs)             │
+│      (Database, External APIs)              │
 └─────────────────────────────────────────────┘
 ```
 
@@ -108,7 +108,83 @@ class PlayerService {
 
 ---
 
-## **2. Development Workflow**
+## **2. TurboRepo Monorepo Development Workflow**
+
+### **2.1 Package Development Strategy**
+
+**Shared Package First Approach**:
+
+```bash
+# When adding new features, consider package placement
+# 1. Is this logic used by multiple apps? → shared package
+# 2. Is this app-specific? → local app directory
+# 3. Is this a domain concept? → database package or dedicated domain package
+
+# Example: Adding player statistics calculation
+# ✅ GOOD: Shared logic in database package
+packages/database/src/utils/player-stats.ts
+
+# ✅ GOOD: App-specific UI logic in web app
+apps/web/src/components/player-stats-chart.tsx
+
+# ✅ GOOD: App-specific processing logic in daemon
+apps/daemon-v2/src/processors/player-stats-processor.ts
+```
+
+**TurboRepo Commands & Development**:
+
+```bash
+# Install dependencies for all packages
+pnpm install
+
+# Build all packages (respects dependency order)
+pnpm build
+
+# Run specific app
+pnpm --filter @repo/daemon-v2 dev
+pnpm --filter @repo/web dev
+
+# Run command in multiple packages
+pnpm --filter "@repo/daemon-*" test
+pnpm --filter "@repo/*" lint
+
+# Add dependency to specific package
+pnpm --filter @repo/daemon-v2 add lodash
+pnpm --filter @repo/web add @types/react
+
+# Add shared package dependency
+pnpm --filter @repo/daemon-v2 add @repo/database
+
+# Generate types (typically in database package)
+pnpm --filter @repo/database db:generate
+```
+
+**Type-Safe Package Development**:
+
+```typescript
+// When developing shared packages, ensure type exports
+// packages/database/src/index.ts
+export type * from './types/player';
+export type * from './types/game';
+export type * from '@prisma/client';
+
+// Always export both types and runtime values separately
+export { PlayerService } from './services/player.service';
+export { GameEventProcessor } from './services/game.service';
+
+// Validate types work across packages in CI
+// .github/workflows/type-check.yml
+- name: Type check all packages
+  run: pnpm type-check
+
+- name: Build all packages
+  run: pnpm build
+
+- name: Test type compatibility
+  run: pnpm --filter "@repo/*" type-check
+```
+
+## **2.2 Development Workflow**
 
 ### **2.1 Git Workflow**
 
@@ -191,53 +267,1280 @@ This fixes the precision issue reported by users.
 
 ### **3.1 TypeScript Guidelines**
 
-**Strict Type Safety**:
+**Strict Type Safety Configuration**:
 
 ```typescript
-// tsconfig.json
+// tsconfig.json - Maximum strictness
 {
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true
   }
 }
 ```
 
-**Type Definitions**:
+**Never Use `any` - Zero Tolerance Policy**:
 
 ```typescript
-// ✅ GOOD: Explicit, reusable types
-export interface PlayerStats {
-  kills: number;
-  deaths: number;
-  headshots: number;
-  accuracy: number;
+// ❌ NEVER: Using any defeats TypeScript's purpose
+function processData(data: any): any {
+  return data.someProperty.nested.value;
 }
 
-// ❌ BAD: Inline, repetitive types
-function getStats(): { k: number; d: number; hs: number; acc: number } {
+// ✅ ALWAYS: Use proper types, even for complex scenarios
+interface ApiResponse<T> {
+  data: T;
+  status: number;
+  message: string;
+}
+
+interface NestedData {
+  someProperty: {
+    nested: {
+      value: string;
+    };
+  };
+}
+
+function processData(data: NestedData): string {
+  return data.someProperty.nested.value;
+}
+
+// ✅ For truly unknown data, use unknown and type guards
+function processUnknownData(data: unknown): string {
+  if (isNestedData(data)) {
+    return data.someProperty.nested.value;
+  }
+  throw new Error("Invalid data structure");
+}
+
+function isNestedData(data: unknown): data is NestedData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    "someProperty" in data &&
+    typeof (data as any).someProperty.nested.value === "string"
+  );
+}
+```
+
+**TurboRepo Monorepo Type Organization**:
+
+```typescript
+// Monorepo structure with shared types
+hlstatsnext/
+├── packages/
+│   ├── database/                    # Shared database package
+│   │   ├── src/
+│   │   │   ├── index.ts            # Re-export Prisma client & types
+│   │   │   └── types/              # Database-derived types
+│   │   │       ├── generated.ts    # Auto-generated from Prisma
+│   │   │       └── extensions.ts   # Custom extensions
+│   │   └── prisma/
+│   │       └── schema.prisma       # Source of truth for types
+│   │
+│   ├── ui/                         # Shared React components
+│   │   └── src/
+│   │       └── types/
+│   │           └── component.types.ts
+│   │
+│   └── config/                     # Shared configurations
+│       └── src/
+│           └── types/
+│               ├── env.types.ts
+│               └── constants.types.ts
+│
+├── apps/
+│   ├── daemon-v2/                  # Daemon application
+│   │   └── src/
+│   │       ├── types/              # Daemon-specific types only
+│   │       │   ├── events.types.ts
+│   │       │   ├── processing.types.ts
+│   │       │   └── index.ts
+│   │       └── services/
+│   │
+│   ├── web/                        # Next.js web application
+│   │   └── src/
+│   │       ├── types/              # Web-specific types only
+│   │       │   ├── api.types.ts
+│   │       │   ├── ui.types.ts
+│   │       │   └── index.ts
+│   │       └── components/
+│   │
+│   └── api/                        # GraphQL API application
+│       └── src/
+│           ├── types/              # API-specific types only
+│           │   ├── resolvers.types.ts
+│           │   ├── context.types.ts
+│           │   └── index.ts
+│           └── schema/
+
+// Import hierarchy (from most specific to most general)
+// 1. Local app types
+// 2. Shared package types
+// 3. Database types
+// 4. External library types
+```
+
+**Shared Database Types with Auto-Generation**:
+
+```typescript
+// packages/database/src/index.ts
+export * from "@prisma/client";
+export { prisma } from "./client";
+
+// Re-export commonly used auto-generated types
+export type {
+  Player,
+  PlayerStats,
+  GameEvent,
+  Server,
+  Clan,
+  // ... other Prisma-generated types
+} from "@prisma/client";
+
+// Custom type extensions based on Prisma types
+export type PlayerWithStats = Player & {
+  stats: PlayerStats;
+  rank?: number;
+};
+
+export type GameEventWithRelations = GameEvent & {
+  player: Player;
+  server: Server;
+};
+
+// packages/database/src/types/extensions.ts
+import type { Player, PlayerStats, Prisma } from "@prisma/client";
+
+// Utility types for database operations
+export type PlayerCreateInput = Prisma.PlayerCreateInput;
+export type PlayerUpdateInput = Prisma.PlayerUpdateInput;
+export type PlayerWhereInput = Prisma.PlayerWhereInput;
+
+// Custom computed types
+export type PlayerSummary = Pick<Player, "id" | "name" | "rating"> & {
+  kdRatio: number;
+  rank: number;
+};
+
+// Aggregation result types
+export type PlayerStatsAggregation = {
+  totalKills: number;
+  totalDeaths: number;
+  averageRating: number;
+  playerCount: number;
+};
+```
+
+**Cross-Package Type Imports**:
+
+```typescript
+// In apps/daemon-v2/src/services/player.service.ts
+import type {
+  Player,
+  PlayerStats,
+  PlayerCreateInput,
+  PlayerWithStats,
+} from "@repo/database";
+
+// In apps/web/src/components/player-card.tsx
+import type { Player, PlayerSummary } from "@repo/database";
+import type { ComponentProps } from "@repo/ui";
+
+// In apps/api/src/resolvers/player.resolver.ts
+import type {
+  Player,
+  PlayerWhereInput,
+  PlayerStatsAggregation,
+} from "@repo/database";
+```
+
+**Interface vs Type - When to Use Each**:
+
+```typescript
+// ✅ Use INTERFACE for object shapes that might be extended
+export interface BasePlayer {
+  id: number;
+  name: string;
+  steamId: string;
+}
+
+export interface PlayerWithStats extends BasePlayer {
+  stats: PlayerStats;
+  ranking: PlayerRanking;
+}
+
+// ✅ Use TYPE for unions, computed types, and complex operations
+export type GameEventType =
+  | "player_kill"
+  | "player_death"
+  | "round_start"
+  | "round_end";
+
+export type PlayerStatus = "active" | "inactive" | "banned" | "pending";
+
+export type PlayerSearchResult = Pick<Player, "id" | "name" | "rating"> & {
+  matchedFields: Array<keyof Player>;
+};
+
+// ✅ Use TYPE for conditional and mapped types
+export type RequiredPlayer = Required<Player>;
+export type PartialPlayerUpdate = Partial<
+  Pick<Player, "name" | "email" | "settings">
+>;
+
+export type PlayerEventHandlers = {
+  [K in GameEventType as `handle${Capitalize<K>}`]: (
+    event: GameEvent<K>
+  ) => Promise<void>;
+};
+```
+
+**Explicit Type Definitions - Always Prefer Clarity**:
+
+```typescript
+// ✅ GOOD: Explicit, reusable, well-documented types
+export interface PlayerStats {
+  /** Total number of kills */
+  kills: number;
+  /** Total number of deaths */
+  deaths: number;
+  /** Number of headshot kills */
+  headshots: number;
+  /** Accuracy percentage (0-100) */
+  accuracy: number;
+  /** Kill/Death ratio */
+  kdRatio: number;
+  /** Last time stats were updated */
+  lastUpdated: Date;
+}
+
+export interface PlayerStatsFilters {
+  /** Filter by time period */
+  timeframe?: "day" | "week" | "month" | "year" | "all";
+  /** Filter by specific game mode */
+  gameMode?: string;
+  /** Filter by minimum number of matches */
+  minMatches?: number;
+}
+
+// ❌ BAD: Inline, repetitive, unclear types
+function getStats(
+  timeframe?: string,
+  mode?: string
+): { k: number; d: number; hs: number; acc: number } {
   // ...
 }
 ```
 
-**Null Handling**:
+**Strict Null Handling & Optional Properties**:
 
 ```typescript
-// ✅ GOOD: Explicit null handling
-function getPlayer(id: number): Player | null {
-  return players.find((p) => p.id === id) || null;
+// ✅ GOOD: Explicit null/undefined handling
+export interface Player {
+  id: number;
+  name: string;
+  email: string | null; // Explicitly nullable
+  lastLoginAt?: Date; // Optional property
+  settings: PlayerSettings; // Required, never null
 }
 
-// ❌ BAD: Implicit undefined
+function getPlayer(id: number): Player | null {
+  const player = players.find((p) => p.id === id);
+  return player ?? null; // Explicit null return
+}
+
+function getPlayerEmail(player: Player): string {
+  // Handle nullable email properly
+  if (player.email === null) {
+    throw new Error("Player email is not set");
+  }
+  return player.email;
+}
+
+// ✅ Use optional chaining for safe access
+function getLastLoginYear(player: Player): number | undefined {
+  return player.lastLoginAt?.getFullYear();
+}
+
+// ❌ BAD: Implicit undefined/null handling
 function getPlayer(id: number) {
-  return players.find((p) => p.id === id);
+  // Return type unclear
+  return players.find((p) => p.id === id); // Could return undefined
 }
 ```
 
-### **3.2 Error Handling**
+**Generic Types & Constraints**:
+
+```typescript
+// ✅ GOOD: Well-constrained generics
+export interface Repository<T extends { id: number }> {
+  findById(id: number): Promise<T | null>;
+  create(data: Omit<T, "id">): Promise<T>;
+  update(id: number, data: Partial<T>): Promise<T>;
+  delete(id: number): Promise<void>;
+}
+
+export interface ServiceResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+    details?: Record<string, unknown>;
+  };
+}
+
+// ✅ Generic functions with proper constraints
+export async function processEvents<T extends GameEvent>(
+  events: T[],
+  processor: (event: T) => Promise<void>
+): Promise<void> {
+  await Promise.all(events.map(processor));
+}
+
+// ✅ Conditional types for advanced scenarios
+export type DatabaseEntity<T> = T extends { id: infer U }
+  ? T & { createdAt: Date; updatedAt: Date }
+  : never;
+```
+
+**Union Types & Discriminated Unions**:
+
+```typescript
+// ✅ GOOD: Discriminated unions for type safety
+export type GameEvent =
+  | {
+      type: "player_kill";
+      killerId: number;
+      victimId: number;
+      weapon: string;
+      headshot: boolean;
+    }
+  | { type: "player_death"; playerId: number; cause: string }
+  | { type: "round_start"; mapName: string; gameMode: string }
+  | { type: "round_end"; winner: "ct" | "terrorist"; duration: number };
+
+// Type guards for union types
+export function isPlayerKillEvent(
+  event: GameEvent
+): event is Extract<GameEvent, { type: "player_kill" }> {
+  return event.type === "player_kill";
+}
+
+// ✅ Exhaustive type checking
+export function processGameEvent(event: GameEvent): void {
+  switch (event.type) {
+    case "player_kill":
+      handleKill(event.killerId, event.victimId, event.weapon);
+      break;
+    case "player_death":
+      handleDeath(event.playerId, event.cause);
+      break;
+    case "round_start":
+      handleRoundStart(event.mapName, event.gameMode);
+      break;
+    case "round_end":
+      handleRoundEnd(event.winner, event.duration);
+      break;
+    default:
+      // TypeScript will error if we miss a case
+      const _exhaustive: never = event;
+      throw new Error(`Unhandled event type: ${JSON.stringify(_exhaustive)}`);
+  }
+}
+```
+
+**Enum Best Practices**:
+
+```typescript
+// ✅ PREFERRED: Use const assertions for simple enums
+export const PlayerRole = {
+  ADMIN: "admin",
+  MODERATOR: "moderator",
+  USER: "user",
+  BANNED: "banned",
+} as const;
+
+export type PlayerRole = (typeof PlayerRole)[keyof typeof PlayerRole];
+
+// ✅ Use string enums when you need reverse lookup or complex behavior
+export enum GameMode {
+  CLASSIC = "classic",
+  DEATHMATCH = "deathmatch",
+  COMPETITIVE = "competitive",
+  CASUAL = "casual",
+}
+
+// ✅ Avoid numeric enums unless specifically needed
+// ❌ BAD: Numeric enum (harder to debug)
+enum BadPlayerRole {
+  ADMIN,
+  MODERATOR,
+  USER,
+}
+```
+
+**Utility Types Usage**:
+
+```typescript
+// ✅ Leverage TypeScript utility types effectively
+export type CreatePlayerRequest = Omit<
+  Player,
+  "id" | "createdAt" | "updatedAt"
+>;
+export type UpdatePlayerRequest = Partial<
+  Pick<Player, "name" | "email" | "settings">
+>;
+export type PlayerSummary = Pick<
+  Player,
+  "id" | "name" | "rating" | "lastLoginAt"
+>;
+
+// ✅ Custom utility types for domain-specific needs
+export type WithTimestamps<T> = T & {
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type ApiResult<T> = {
+  data: T;
+  pagination?: PaginationInfo;
+  meta?: Record<string, unknown>;
+};
+
+export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
+
+// Usage examples
+export type PlayerWithTimestamps = WithTimestamps<Player>;
+export type PlayerWithRequiredEmail = RequiredFields<Player, "email">;
+```
+
+**Type Guards & Runtime Validation**:
+
+```typescript
+// ✅ Comprehensive type guards
+export function isValidPlayer(obj: unknown): obj is Player {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    typeof (obj as Player).id === "number" &&
+    typeof (obj as Player).name === "string" &&
+    (obj as Player).name.length > 0 &&
+    typeof (obj as Player).steamId === "string" &&
+    /^\d{17}$/.test((obj as Player).steamId)
+  );
+}
+
+export function isGameEventArray(obj: unknown): obj is GameEvent[] {
+  return Array.isArray(obj) && obj.every(isGameEvent);
+}
+
+// ✅ Combine with Zod for runtime validation
+import { z } from "zod";
+
+export const PlayerSchema = z.object({
+  id: z.number().positive(),
+  name: z.string().min(1).max(32),
+  email: z.string().email().nullable(),
+  steamId: z.string().regex(/^\d{17}$/),
+  rating: z.number().min(0).max(5000),
+  settings: z.object({
+    notifications: z.boolean(),
+    privacy: z.enum(["public", "friends", "private"]),
+  }),
+});
+
+export type Player = z.infer<typeof PlayerSchema>;
+```
+
+**TurboRepo Package Exports & Imports**:
+
+```typescript
+// ✅ GOOD: Shared package exports
+// packages/database/src/index.ts
+export { prisma } from "./client";
+export * from "@prisma/client";
+
+// Custom type extensions
+export type * from "./types/extensions";
+export type * from "./types/computed";
+
+// Utility functions that work with types
+export { createPlayer, updatePlayerStats } from "./utils/player";
+export { validateGameEvent } from "./utils/validation";
+
+// packages/ui/src/index.ts
+export * from "./components";
+export type * from "./types";
+
+// packages/config/src/index.ts
+export * from "./constants";
+export * from "./env";
+export type * from "./types";
+
+// ✅ App-level import organization with monorepo packages
+// apps/daemon-v2/src/services/player.service.ts
+import type {
+  Player,
+  PlayerCreateInput,
+  PlayerWhereInput,
+} from "@repo/database";
+import { prisma, createPlayer } from "@repo/database";
+import { GAME_CONSTANTS } from "@repo/config";
+
+// Local app types
+import type { ProcessingResult, EventContext } from "@/types";
+import { EventProcessor } from "@/services/event-processor";
+
+// ✅ Web app imports
+// apps/web/src/components/player-leaderboard.tsx
+import type { Player, PlayerSummary } from "@repo/database";
+import { Button, Card } from "@repo/ui";
+import { API_ENDPOINTS } from "@repo/config";
+
+// Local web types
+import type { LeaderboardProps } from "@/types/ui";
+
+// ❌ BAD: Mixing package boundaries
+import { prisma } from "@repo/database";
+import { PlayerService } from "@/services/player"; // Should be in shared package if used by multiple apps
+```
+
+**Monorepo TypeScript Configuration**:
+
+```typescript
+// Root tsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@repo/*": ["packages/*/src"]
+    }
+  },
+  "references": [
+    { "path": "./packages/database" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/config" },
+    { "path": "./apps/daemon-v2" },
+    { "path": "./apps/web" },
+    { "path": "./apps/api" }
+  ]
+}
+
+// packages/database/tsconfig.json
+{
+  "extends": "@repo/typescript-config/base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["dist", "node_modules"]
+}
+
+// apps/daemon-v2/tsconfig.json
+{
+  "extends": "@repo/typescript-config/base.json",
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"],
+      "@repo/*": ["../../packages/*/src"]
+    }
+  },
+  "references": [
+    { "path": "../../packages/database" },
+    { "path": "../../packages/config" }
+  ],
+  "include": ["src/**/*"],
+  "exclude": ["dist", "node_modules"]
+}
+```
+
+**Package Dependency Management**:
+
+```json
+// packages/database/package.json
+{
+  "name": "@repo/database",
+  "dependencies": {
+    "@prisma/client": "^5.0.0",
+    "prisma": "^5.0.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*"
+  }
+}
+
+// apps/daemon-v2/package.json
+{
+  "name": "@repo/daemon-v2",
+  "dependencies": {
+    "@repo/database": "workspace:*",
+    "@repo/config": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@repo/eslint-config": "workspace:*"
+  }
+}
+
+// apps/web/package.json
+{
+  "name": "@repo/web",
+  "dependencies": {
+    "@repo/database": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "@repo/config": "workspace:*",
+    "next": "latest"
+  }
+}
+```
+
+**Prisma Auto-Generated Types Integration**:
+
+```typescript
+// packages/database/src/client.ts
+import { PrismaClient } from "@prisma/client";
+
+export const prisma = new PrismaClient({
+  log:
+    process.env.NODE_ENV === "development"
+      ? ["query", "error", "warn"]
+      : ["error"],
+});
+
+// packages/database/src/types/computed.ts
+import type { Player, PlayerStats, Prisma } from "@prisma/client";
+
+// Leverage Prisma's auto-generated validator types
+export const PlayerSelectSchema = Prisma.validator<Prisma.PlayerSelect>()({
+  id: true,
+  name: true,
+  steamId: true,
+  rating: true,
+  stats: {
+    select: {
+      kills: true,
+      deaths: true,
+      headshots: true,
+    },
+  },
+});
+
+export type PlayerWithCalculatedStats = Prisma.PlayerGetPayload<{
+  select: typeof PlayerSelectSchema;
+}> & {
+  kdRatio: number;
+  headshotPercentage: number;
+};
+
+// Utility function that maintains type safety
+export function calculatePlayerStats(
+  player: Prisma.PlayerGetPayload<{ include: { stats: true } }>
+): PlayerWithCalculatedStats {
+  const kdRatio =
+    player.stats.deaths > 0
+      ? player.stats.kills / player.stats.deaths
+      : player.stats.kills;
+
+  const headshotPercentage =
+    player.stats.kills > 0
+      ? (player.stats.headshots / player.stats.kills) * 100
+      : 0;
+
+  return {
+    ...player,
+    kdRatio: Math.round(kdRatio * 100) / 100,
+    headshotPercentage: Math.round(headshotPercentage * 100) / 100,
+  };
+}
+```
+
+**TurboRepo Build Integration**:
+
+```json
+// turbo.json
+{
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
+```
+
+**Function Signature Best Practices**:
+
+```typescript
+// ✅ GOOD: Explicit, strict function signatures
+export async function updatePlayerStats(
+  playerId: number,
+  updates: Partial<PlayerStats>,
+  options?: {
+    validateInput?: boolean;
+    notifyChanges?: boolean;
+    userId?: number;
+  }
+): Promise<ServiceResponse<PlayerStats>> {
+  // Implementation
+}
+
+// ✅ Use overloads for complex scenarios
+export function formatPlayerName(player: Player): string;
+export function formatPlayerName(name: string, showId: boolean): string;
+export function formatPlayerName(
+  playerOrName: Player | string,
+  showId?: boolean
+): string {
+  if (typeof playerOrName === "string") {
+    return showId ? `${playerOrName} (ID: unknown)` : playerOrName;
+  }
+  return showId
+    ? `${playerOrName.name} (ID: ${playerOrName.id})`
+    : playerOrName.name;
+}
+
+// ❌ BAD: Loose, unclear signatures
+function updatePlayer(id: any, data?: any, options?: any): Promise<any> {
+  // ...
+}
+```
+
+### **3.2 Advanced TypeScript Patterns**
+
+**Template Literal Types**:
+
+```typescript
+// ✅ Advanced string manipulation with types
+export type EventHandlerName<T extends string> = `handle${Capitalize<T>}`;
+export type EventListenerName<T extends string> = `on${Capitalize<T>}`;
+
+// Generate method names dynamically
+export type PlayerEventHandlers = {
+  [K in GameEventType as EventHandlerName<K>]: (
+    event: GameEvent & { type: K }
+  ) => Promise<void>;
+};
+
+// Usage
+export class EventProcessor implements PlayerEventHandlers {
+  async handlePlayerKill(
+    event: GameEvent & { type: "player_kill" }
+  ): Promise<void> {
+    // Type-safe event handling
+  }
+
+  async handlePlayerDeath(
+    event: GameEvent & { type: "player_death" }
+  ): Promise<void> {
+    // Type-safe event handling
+  }
+}
+```
+
+**Branded Types for Domain Safety**:
+
+```typescript
+// ✅ Prevent mixing different ID types
+export type PlayerId = number & { readonly __brand: "PlayerId" };
+export type ServerId = number & { readonly __brand: "ServerId" };
+export type SteamId = string & { readonly __brand: "SteamId" };
+
+// Constructor functions
+export function createPlayerId(id: number): PlayerId {
+  if (id <= 0) throw new Error("Invalid player ID");
+  return id as PlayerId;
+}
+
+export function createSteamId(steamId: string): SteamId {
+  if (!/^\d{17}$/.test(steamId)) throw new Error("Invalid Steam ID format");
+  return steamId as SteamId;
+}
+
+// Prevents accidental mixing
+function getPlayerStats(playerId: PlayerId): PlayerStats {
+  // Type-safe - only accepts PlayerId
+}
+
+// ❌ This would cause a compile error
+const serverId: ServerId = 123 as ServerId;
+getPlayerStats(serverId); // Error: Argument of type 'ServerId' is not assignable to parameter of type 'PlayerId'
+```
+
+**Recursive Types & Deep Mutations**:
+
+```typescript
+// ✅ Deep readonly types
+export type DeepReadonly<T> = {
+  readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];
+};
+
+// ✅ Deep partial types
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
+// ✅ Nested path types for safe object access
+export type Path<T, K extends keyof T = keyof T> = K extends string
+  ? T[K] extends Record<string, any>
+    ? K | `${K}.${Path<T[K]>}`
+    : K
+  : never;
+
+export type PathValue<
+  T,
+  P extends Path<T>,
+> = P extends `${infer K}.${infer Rest}`
+  ? K extends keyof T
+    ? Rest extends Path<T[K]>
+      ? PathValue<T[K], Rest>
+      : never
+    : never
+  : P extends keyof T
+    ? T[P]
+    : never;
+
+// Usage
+export function getNestedValue<T, P extends Path<T>>(
+  obj: T,
+  path: P
+): PathValue<T, P> {
+  // Type-safe nested object access
+  return path.split(".").reduce((current: any, key) => current?.[key], obj);
+}
+
+// Example usage
+const config = {
+  server: {
+    database: {
+      host: "localhost",
+      port: 3306,
+    },
+  },
+};
+
+const host = getNestedValue(config, "server.database.host"); // Type: string
+```
+
+**Phantom Types for State Management**:
+
+```typescript
+// ✅ State machine types
+export type ConnectionState =
+  | "disconnected"
+  | "connecting"
+  | "connected"
+  | "error";
+
+export interface Connection<State extends ConnectionState = ConnectionState> {
+  readonly state: State;
+  readonly id: string;
+}
+
+export type DisconnectedConnection = Connection<"disconnected">;
+export type ConnectedConnection = Connection<"connected">;
+
+// State transition functions
+export function connect(
+  conn: DisconnectedConnection
+): Promise<ConnectedConnection> {
+  // Implementation
+}
+
+export function disconnect(conn: ConnectedConnection): DisconnectedConnection {
+  // Implementation
+}
+
+// ❌ This would cause compile errors
+// connect(connectedConnection); // Error: connected connection can't be connected again
+```
+
+**Conditional Type Helpers**:
+
+```typescript
+// ✅ Advanced conditional type utilities
+export type NonNullable<T> = T extends null | undefined ? never : T;
+
+export type FunctionKeys<T> = {
+  [K in keyof T]: T[K] extends Function ? K : never;
+}[keyof T];
+
+export type NonFunctionKeys<T> = {
+  [K in keyof T]: T[K] extends Function ? never : K;
+}[keyof T];
+
+export type FunctionProperties<T> = Pick<T, FunctionKeys<T>>;
+export type NonFunctionProperties<T> = Pick<T, NonFunctionKeys<T>>;
+
+// Extract method signatures
+export type MethodSignatures<T> = {
+  [K in FunctionKeys<T>]: T[K] extends (...args: infer Args) => infer Return
+    ? (...args: Args) => Return
+    : never;
+};
+
+// Usage example
+export interface PlayerService {
+  getPlayer(id: number): Promise<Player>;
+  updatePlayer(id: number, data: Partial<Player>): Promise<Player>;
+  playerName: string;
+  playerCount: number;
+}
+
+type ServiceMethods = FunctionProperties<PlayerService>;
+// Result: { getPlayer: ..., updatePlayer: ... }
+
+type ServiceData = NonFunctionProperties<PlayerService>;
+// Result: { playerName: string, playerCount: number }
+```
+
+### **3.3 TypeScript Tooling & Development**
+
+**ESLint TypeScript Rules**:
+
+```javascript
+// eslint.config.js
+module.exports = {
+  extends: [
+    "@typescript-eslint/recommended",
+    "@typescript-eslint/recommended-requiring-type-checking",
+  ],
+  rules: {
+    // Enforce strict typing
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unsafe-any": "error",
+    "@typescript-eslint/no-unsafe-assignment": "error",
+    "@typescript-eslint/no-unsafe-call": "error",
+    "@typescript-eslint/no-unsafe-member-access": "error",
+    "@typescript-eslint/no-unsafe-return": "error",
+
+    // Prefer type imports
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      { prefer: "type-imports", disallowTypeAnnotations: false },
+    ],
+
+    // Naming conventions
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        selector: "interface",
+        format: ["PascalCase"],
+        custom: {
+          regex: "^I[A-Z]",
+          match: false,
+        },
+      },
+      {
+        selector: "typeAlias",
+        format: ["PascalCase"],
+      },
+      {
+        selector: "enum",
+        format: ["PascalCase"],
+      },
+      {
+        selector: "variable",
+        modifiers: ["const"],
+        format: ["camelCase", "UPPER_CASE", "PascalCase"],
+      },
+    ],
+
+    // Function rules
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "@typescript-eslint/explicit-module-boundary-types": "error",
+    "@typescript-eslint/prefer-readonly": "error",
+    "@typescript-eslint/prefer-readonly-parameter-types": "warn",
+
+    // Array and object rules
+    "@typescript-eslint/prefer-for-of": "error",
+    "@typescript-eslint/prefer-includes": "error",
+    "@typescript-eslint/prefer-string-starts-ends-with": "error",
+
+    // Promise rules
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/require-await": "error",
+    "@typescript-eslint/no-misused-promises": "error",
+  },
+};
+```
+
+**Type-Only Imports/Exports**:
+
+```typescript
+// ✅ ALWAYS use type-only imports for types
+import type { Player, PlayerStats } from "@/types/player.types";
+import type { GameEvent } from "@/types/game.types";
+import type { Request, Response } from "express";
+
+// ✅ Regular imports for runtime values
+import { PlayerService } from "@/services/player.service";
+import { validatePlayerData } from "@/utils/validation";
+
+// ✅ Type-only exports
+export type { Player, PlayerStats, PlayerFilters } from "./player.types";
+export type { GameEvent, GameEventType } from "./game.types";
+
+// ✅ Regular exports for runtime values
+export { PlayerService } from "./player.service";
+export { validatePlayer } from "./player.validation";
+
+// ❌ BAD: Mixed imports (can cause circular dependencies)
+import { Player, PlayerService, GameEvent } from "@/types";
+```
+
+**Advanced Type Testing**:
+
+```typescript
+// tests/types/type-tests.ts
+import type { Equal, Expect } from "@type-challenges/utils";
+
+// ✅ Test complex type relationships
+type TestCases = [
+  // Test utility types work correctly
+  Expect<Equal<RequiredPlayer, Required<Player>>>,
+
+  // Test discriminated unions
+  Expect<
+    Equal<Extract<GameEvent, { type: "player_kill" }>["killerId"], number>
+  >,
+
+  // Test conditional types
+  Expect<
+    Equal<
+      DatabaseEntity<{ id: number; name: string }>,
+      { id: number; name: string; createdAt: Date; updatedAt: Date }
+    >
+  >,
+
+  // Test template literal types
+  Expect<Equal<EventHandlerName<"player_kill">, "handlePlayerKill">>,
+];
+
+// ✅ Runtime type validation tests
+describe("Type Guards", () => {
+  it("should correctly identify valid player objects", () => {
+    const validPlayer = {
+      id: 1,
+      name: "TestPlayer",
+      steamId: "12345678901234567",
+      email: "test@example.com",
+      rating: 1500,
+    };
+
+    expect(isValidPlayer(validPlayer)).toBe(true);
+
+    const invalidPlayer = {
+      id: "not-a-number",
+      name: "",
+      steamId: "123", // Invalid format
+    };
+
+    expect(isValidPlayer(invalidPlayer)).toBe(false);
+  });
+});
+```
+
+**TypeScript Performance & Production Considerations**:
+
+```typescript
+// ✅ Optimize compilation performance
+// tsconfig.json
+{
+  "compilerOptions": {
+    // Use project references for large codebases
+    "composite": true,
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
+
+    // Skip type checking of declaration files
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+
+    // Faster but less accurate checking
+    "isolatedModules": true,
+
+    // Module resolution optimization
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+}
+
+// ✅ Use const assertions for performance
+export const GAME_EVENTS = [
+  'player_kill',
+  'player_death',
+  'round_start',
+  'round_end'
+] as const;
+
+// Instead of enum which creates runtime overhead
+enum GameEventEnum {
+  PLAYER_KILL = 'player_kill',
+  PLAYER_DEATH = 'player_death',
+  ROUND_START = 'round_start',
+  ROUND_END = 'round_end'
+}
+```
+
+**Migration Strategies from Existing Code**:
+
+```typescript
+// ✅ Gradual migration approach
+
+// Step 1: Add basic types to existing JavaScript
+// before.js -> after.ts
+function processPlayer(player) {
+  return player.name.toUpperCase();
+}
+
+// After
+function processPlayer(player: { name: string }): string {
+  return player.name.toUpperCase();
+}
+
+// Step 2: Extract and improve types
+interface Player {
+  name: string;
+  id: number;
+  rating: number;
+}
+
+function processPlayer(player: Player): string {
+  return player.name.toUpperCase();
+}
+
+// Step 3: Add comprehensive validation
+export const PlayerSchema = z.object({
+  name: z.string().min(1).max(32),
+  id: z.number().positive(),
+  rating: z.number().min(0).max(5000),
+});
+
+export type Player = z.infer<typeof PlayerSchema>;
+
+export function processPlayer(player: Player): string {
+  const validated = PlayerSchema.parse(player);
+  return validated.name.toUpperCase();
+}
+```
+
+**Documentation Standards for Types**:
+
+````typescript
+/**
+ * Represents a game player with statistics and metadata.
+ *
+ * @example
+ * ```typescript
+ * const player: Player = {
+ *   id: 1,
+ *   name: "ProGamer",
+ *   steamId: "12345678901234567",
+ *   email: "progamer@example.com",
+ *   rating: 1500,
+ *   stats: {
+ *     kills: 100,
+ *     deaths: 50,
+ *     headshots: 25,
+ *     accuracy: 75.5
+ *   }
+ * };
+ * ```
+ */
+export interface Player {
+  /** Unique player identifier */
+  readonly id: PlayerId;
+
+  /** Display name (3-32 characters, alphanumeric + underscore/dash) */
+  name: string;
+
+  /** Steam ID (17 digits) */
+  readonly steamId: SteamId;
+
+  /** Email address for notifications (nullable) */
+  email: string | null;
+
+  /** Skill rating (0-5000 range) */
+  rating: number;
+
+  /** Player statistics */
+  stats: PlayerStats;
+
+  /** Account settings */
+  settings: PlayerSettings;
+
+  /** When the player was first seen */
+  readonly firstSeenAt: Date;
+
+  /** When the player was last active */
+  lastSeenAt: Date;
+}
+
+/**
+ * Configuration options for player statistics calculation.
+ *
+ * @public
+ */
+export interface PlayerStatsOptions {
+  /**
+   * Time period for statistics calculation
+   * @defaultValue 'all'
+   */
+  timeframe?: "day" | "week" | "month" | "year" | "all";
+
+  /**
+   * Include only specific game modes
+   * @defaultValue undefined (all modes)
+   */
+  gameModes?: string[];
+
+  /**
+   * Minimum number of matches required
+   * @defaultValue 1
+   */
+  minMatches?: number;
+
+  /**
+   * Whether to include detailed weapon statistics
+   * @defaultValue false
+   */
+  includeWeaponStats?: boolean;
+}
+````
+
+### **3.4 Error Handling**
 
 **Custom Error Classes**:
 
@@ -246,7 +1549,7 @@ export class DomainError extends Error {
   constructor(
     message: string,
     public code: string,
-    public statusCode: number = 500,
+    public statusCode: number = 500
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -286,7 +1589,7 @@ async function updatePlayerStats(
 // ✅ GOOD: Proper error handling
 async function processEvents(events: GameEvent[]): Promise<void> {
   const results = await Promise.allSettled(
-    events.map((event) => processEvent(event)),
+    events.map((event) => processEvent(event))
   );
 
   const failures = results.filter((r) => r.status === "rejected");
@@ -434,7 +1737,7 @@ test.describe("Player Statistics", () => {
         JSON.stringify({
           type: "player_kill",
           playerId: 123,
-        }),
+        })
       );
     });
 
@@ -641,7 +1944,7 @@ const worker = new Worker(
       max: 100,
       duration: 1000, // 100 jobs per second
     },
-  },
+  }
 );
 ```
 
@@ -705,7 +2008,7 @@ export function generateAccessToken(user: User): string {
       expiresIn: "1h",
       issuer: "hlstats-api",
       audience: "hlstats-client",
-    },
+    }
   );
 }
 
@@ -738,7 +2041,7 @@ const players = await prisma.$queryRaw`
 
 // ❌ BAD: String concatenation
 const players = await prisma.$queryRawUnsafe(
-  `SELECT * FROM players WHERE name = '${userName}'`,
+  `SELECT * FROM players WHERE name = '${userName}'`
 );
 ```
 
@@ -782,7 +2085,7 @@ const logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
-    winston.format.json(),
+    winston.format.json()
   ),
   defaultMeta: {
     service: "hlstats-daemon",
@@ -793,7 +2096,7 @@ const logger = winston.createLogger({
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.simple(),
+        winston.format.simple()
       ),
     }),
     new winston.transports.File({
@@ -1100,7 +2403,7 @@ app.get("/ready", async (req, res) => {
 export function calculateRatingChange(
   winner: Player,
   loser: Player,
-  matchDetails?: MatchContext,
+  matchDetails?: MatchContext
 ): RatingAdjustment {
   // Implementation
 }
@@ -1266,8 +2569,6 @@ pnpm db:reset
 # Check service health
 curl http://localhost:3000/health
 
-# View real-time metrics
-open http://localhost:9090/metrics
 ```
 
 ---

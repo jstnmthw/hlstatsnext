@@ -24,7 +24,7 @@
     "turbo": "^2.5.4",
     "typescript": "5.8.2"
   },
-  "packageManager": "pnpm@10.11.1",
+  "packageManager": "pnpm@10.12.2",
   "engines": {
     "node": ">=18"
   },
@@ -34,6 +34,9 @@
         "@prisma/client": "6.9.0",
         "prisma": "6.9.0"
       }
-    }
+    },
+    "onlyBuiltDependencies": [
+      "msgpackr-extract"
+    ]
   }
 }

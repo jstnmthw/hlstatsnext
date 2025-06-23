@@ -46,6 +46,12 @@
     },
     "db:seed": {
       "cache": false
+    },
+    "test": {
+      "cache": false
+    },
+    "test:coverage": {
+      "cache": false
     }
   }
 }

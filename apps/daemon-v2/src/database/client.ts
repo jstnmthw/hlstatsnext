@@ -124,7 +124,7 @@ export class DatabaseClient {
   async getOrCreatePlayer(
     steamId: string,
     playerName: string,
-    game: string,
+    game: string
   ): Promise<number> {
     try {
       // First, try to find existing player by Steam ID
@@ -178,7 +178,7 @@ export class DatabaseClient {
       shots?: number;
       hits?: number;
       headshots?: number;
-    },
+    }
   ): Promise<void> {
     try {
       const updateData: Record<string, unknown> = {};
@@ -241,8 +241,8 @@ export class DatabaseClient {
         | "$transaction"
         | "$use"
         | "$extends"
-      >,
-    ) => Promise<T>,
+      >
+    ) => Promise<T>
   ): Promise<T> {
     return this.client.$transaction(callback);
   }
@@ -252,5 +252,32 @@ export class DatabaseClient {
    */
   async disconnect(): Promise<void> {
     await this.client.$disconnect();
+  }
+
+  /**
+   * Look up a game server by its IP address and port. This is used by the ingress
+   * service to authenticate that incoming UDP packets originate from a known and
+   * authorised server record that an admin has added via the (future) admin UI.
+   */
+  async getServerByAddress(
+    ipAddress: string,
+    port: number
+  ): Promise<{ serverId: number } | null> {
+    try {
+      const server = await this.client.server.findFirst({
+        where: {
+          address: ipAddress,
+          port,
+        },
+        select: {
+          serverId: true,
+        },
+      });
+
+      return server ?? null;
+    } catch (error) {
+      console.error(`Failed to fetch server by address:`, error);
+      throw error;
+    }
   }
 }

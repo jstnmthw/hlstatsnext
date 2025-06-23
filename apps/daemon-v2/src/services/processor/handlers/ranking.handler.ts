@@ -9,7 +9,7 @@ import type {
   GameEvent,
   PlayerKillEvent,
   RoundEndEvent,
-} from "@/types/common/events.types";
+} from "@/types/common/events";
 import type { DatabaseClient } from "@/database/client";
 import { getWeaponAttributes } from "@/config/weapon-config";
 

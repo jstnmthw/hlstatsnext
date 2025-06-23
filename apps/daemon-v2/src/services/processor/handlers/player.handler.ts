@@ -10,7 +10,7 @@ import type {
   PlayerKillEvent,
   PlayerConnectEvent,
   PlayerDisconnectEvent,
-} from "@/types/common/events.types";
+} from "@/types/common/events";
 import type { DatabaseClient } from "@/database/client";
 
 export interface HandlerResult {

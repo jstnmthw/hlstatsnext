@@ -7,7 +7,7 @@
 
 import { Queue, Worker, QueueEvents } from "bullmq";
 import { Redis } from "ioredis";
-import type { GameEvent } from "../../types/common/events.types";
+import type { GameEvent } from "@/types/common/events";
 
 export interface QueueManagerOptions {
   redis: {

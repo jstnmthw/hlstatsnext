@@ -5,7 +5,7 @@
  * game server log lines into structured events.
  */
 
-import type { GameEvent } from "../../../types/common/events.types";
+import type { GameEvent } from "@/types/common/events";
 
 export interface ParseResult {
   success: boolean;

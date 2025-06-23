@@ -1,12 +1,23 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { PlayerHandler } from "../../src/services/processor/handlers/player.handler.js";
-import { EventType } from "../../src/types/common/events.types.js";
+import { PlayerHandler } from "../../src/services/processor/handlers/player.handler";
+import { EventType } from "../../src/types/common/events";
+import { vi } from "vitest";
+
+vi.mock("../../src/database/client", () => ({
+  DatabaseClient: vi.fn().mockImplementation(() => ({
+    getOrCreatePlayer: vi.fn().mockResolvedValue(123),
+    updatePlayerStats: vi.fn().mockResolvedValue(undefined),
+  })),
+}));
+
+import { DatabaseClient } from "../../src/database/client";
 
 describe("PlayerHandler", () => {
   let handler: PlayerHandler;
 
   beforeEach(() => {
-    handler = new PlayerHandler();
+    const db = new DatabaseClient();
+    handler = new PlayerHandler(db);
   });
 
   describe("handleEvent", () => {

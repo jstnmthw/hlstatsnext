@@ -1,12 +1,27 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { RankingHandler } from "../../src/services/processor/handlers/ranking.handler.js";
-import { EventType } from "../../src/types/common/events.types.js";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { RankingHandler } from "../../src/services/processor/handlers/ranking.handler";
+import { EventType } from "../../src/types/common/events";
+
+vi.mock("../../src/database/client", () => ({
+  DatabaseClient: vi.fn().mockImplementation(() => ({
+    getPlayerRating: vi.fn().mockResolvedValue({
+      playerId: 123,
+      rating: 1000,
+      kFactor: 32,
+      gamesPlayed: 0,
+    }),
+    updatePlayerRating: vi.fn().mockResolvedValue(undefined),
+  })),
+}));
+
+import { DatabaseClient } from "../../src/database/client";
 
 describe("RankingHandler", () => {
   let handler: RankingHandler;
 
   beforeEach(() => {
-    handler = new RankingHandler();
+    const db = new DatabaseClient();
+    handler = new RankingHandler(db);
   });
 
   describe("handleEvent", () => {
@@ -32,10 +47,10 @@ describe("RankingHandler", () => {
       expect(result.ratingChanges).toHaveLength(2);
 
       const killerChange = result.ratingChanges?.find(
-        (r) => r.playerId === 123,
+        (r) => r.playerId === 123
       );
       const victimChange = result.ratingChanges?.find(
-        (r) => r.playerId === 456,
+        (r) => r.playerId === 456
       );
 
       expect(killerChange?.change).toBeGreaterThan(0);

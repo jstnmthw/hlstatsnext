@@ -24,9 +24,9 @@ class HLStatsDaemon {
     console.log("🚀 Initializing HLStats Daemon v2...");
 
     this.db = new DatabaseClient();
-    this.gateway = new GatewayService();
-    this.ingress = new IngressService();
     this.processor = new EventProcessorService();
+    this.gateway = new GatewayService();
+    this.ingress = new IngressService(27500, this.processor, this.db);
     this.rcon = new RconService();
     this.statistics = new StatisticsService();
   }

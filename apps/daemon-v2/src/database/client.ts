@@ -11,7 +11,7 @@ import type {
   PlayerConnectEvent,
   PlayerDisconnectEvent,
   PlayerKillEvent,
-} from "@/types/common/events.types";
+} from "@/types/common/events";
 
 export class DatabaseClient {
   private client: PrismaClient;

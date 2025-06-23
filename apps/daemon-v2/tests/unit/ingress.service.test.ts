@@ -26,7 +26,23 @@ vi.mock("@/database/client", () => {
   };
 });
 
+// Mock CsParser to control its behavior
+const canParseMock = vi.fn().mockReturnValue(true);
+const parseMock = vi.fn().mockResolvedValue({
+  success: true,
+  event: { eventType: "PLAYER_CONNECT", serverId: 1, data: {} },
+});
+vi.mock("@/services/ingress/parsers/cs.parser", () => {
+  return {
+    CsParser: vi.fn().mockImplementation(() => ({
+      canParse: canParseMock,
+      parse: parseMock,
+    })),
+  };
+});
+
 import { IngressService } from "../../src/services/ingress/ingress.service";
+import { DatabaseClient } from "../../src/database/client";
 
 // Mock processor with a stubbed processEvent
 const processEventMock = vi.fn().mockResolvedValue(undefined);
@@ -59,7 +75,9 @@ describe("IngressService", () => {
     await ingress.start();
 
     // Find the logReceived handler registered via onMock.
-    const handler = onMock.mock.calls.find((c) => c[0] === "logReceived")[1];
+    const call = onMock.mock.calls.find((c) => c[0] === "logReceived");
+    expect(call).toBeDefined();
+    const handler = call![1];
 
     // Send first packet (authentication) – should not trigger processEvent
     await handler({
@@ -80,5 +98,80 @@ describe("IngressService", () => {
     });
 
     expect(processEventMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("should reject traffic from an unknown server", async () => {
+    // Override DB mock for this test
+    const dbInstance = new DatabaseClient();
+    vi.mocked(dbInstance.getServerByAddress).mockResolvedValue(null);
+
+    // We need a new ingress service instance to use the new DB mock
+    ingress = new IngressService(27500, processorStub, dbInstance);
+    await ingress.start();
+
+    const call = onMock.mock.calls.find((c) => c[0] === "logReceived");
+    expect(call).toBeDefined();
+    const handler = call![1];
+
+    await handler({
+      logLine: "any log line",
+      serverAddress: "1.1.1.1",
+      serverPort: 1111,
+    });
+
+    expect(processEventMock).not.toHaveBeenCalled();
+  });
+
+  it("should ignore lines the parser cannot handle", async () => {
+    await ingress.start();
+    canParseMock.mockReturnValueOnce(false); // Make the next call fail
+
+    const call = onMock.mock.calls.find((c) => c[0] === "logReceived");
+    expect(call).toBeDefined();
+    const handler = call![1];
+
+    // Authenticate first
+    await handler({
+      logLine: "auth",
+      serverAddress: "127.0.0.1",
+      serverPort: 27015,
+    });
+
+    // This call should be ignored
+    await handler({
+      logLine: "bad line",
+      serverAddress: "127.0.0.1",
+      serverPort: 27015,
+    });
+
+    expect(processEventMock).not.toHaveBeenCalled();
+  });
+
+  it("should ignore parser errors", async () => {
+    await ingress.start();
+    parseMock.mockResolvedValueOnce({
+      success: false,
+      error: "Test Parser Error",
+    });
+
+    const call = onMock.mock.calls.find((c) => c[0] === "logReceived");
+    expect(call).toBeDefined();
+    const handler = call![1];
+
+    // Authenticate first
+    await handler({
+      logLine: "auth",
+      serverAddress: "127.0.0.1",
+      serverPort: 27015,
+    });
+
+    // This call should be ignored
+    await handler({
+      logLine: "parse fail line",
+      serverAddress: "127.0.0.1",
+      serverPort: 27015,
+    });
+
+    expect(processEventMock).not.toHaveBeenCalled();
   });
 });

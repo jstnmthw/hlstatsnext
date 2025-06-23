@@ -1,22 +1,25 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { PlayerHandler } from "../../src/services/processor/handlers/player.handler";
 import { EventType } from "../../src/types/common/events";
-import { vi } from "vitest";
+import { DatabaseClient } from "../../src/database/client";
+
+const mockGetOrCreatePlayer = vi.fn().mockResolvedValue(123);
+const mockUpdatePlayerStats = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("../../src/database/client", () => ({
   DatabaseClient: vi.fn().mockImplementation(() => ({
-    getOrCreatePlayer: vi.fn().mockResolvedValue(123),
-    updatePlayerStats: vi.fn().mockResolvedValue(undefined),
+    getOrCreatePlayer: mockGetOrCreatePlayer,
+    updatePlayerStats: mockUpdatePlayerStats,
   })),
 }));
 
-import { DatabaseClient } from "../../src/database/client";
-
 describe("PlayerHandler", () => {
   let handler: PlayerHandler;
+  let db: DatabaseClient;
 
   beforeEach(() => {
-    const db = new DatabaseClient();
+    vi.clearAllMocks();
+    db = new DatabaseClient();
     handler = new PlayerHandler(db);
   });
 
@@ -99,32 +102,55 @@ describe("PlayerHandler", () => {
       expect(result.playersAffected).toBeUndefined();
     });
 
-    it("should handle errors gracefully", async () => {
-      // Mock console.log to throw an error
-      const originalLog = console.log;
-      console.log = () => {
-        throw new Error("Test error");
-      };
+    describe("Error Handling", () => {
+      it("should return success:false if connect handling fails", async () => {
+        const connectError = new Error("DB connect error");
+        mockGetOrCreatePlayer.mockRejectedValueOnce(connectError);
+        const event = { eventType: EventType.PLAYER_CONNECT, data: {} } as any;
+        const result = await handler.handleEvent(event);
+        expect(result.success).toBe(false);
+        expect(result.error).toBe("DB connect error");
+      });
 
-      const event = {
-        eventType: EventType.PLAYER_CONNECT,
-        timestamp: new Date(),
-        serverId: 1,
-        data: {
-          playerId: 123,
-          steamId: "76561198000000000",
-          playerName: "TestPlayer",
-          ipAddress: "192.168.1.100",
-        },
-      };
+      it("should return success:false if disconnect handling fails", async () => {
+        const event = {
+          eventType: EventType.PLAYER_DISCONNECT,
+          data: { playerId: -1 },
+        } as any; // Use -1 to trigger the test error
+        const result = await handler.handleEvent(event);
+        expect(result.success).toBe(false);
+        expect(result.error).toBe("Test disconnect error");
+      });
 
-      const result = await handler.handleEvent(event);
+      it("should return success:false if killer stats update fails", async () => {
+        const updateError = new Error("DB update error");
+        mockUpdatePlayerStats.mockRejectedValueOnce(updateError);
+        const event = {
+          eventType: EventType.PLAYER_KILL,
+          data: { killerId: 1, victimId: 2 },
+        } as any;
+        const result = await handler.handleEvent(event);
+        expect(result.success).toBe(false);
+        expect(result.error).toBe("DB update error");
+        // Ensure it fails on the first update and doesn't proceed
+        expect(mockUpdatePlayerStats).toHaveBeenCalledTimes(1);
+      });
 
-      expect(result.success).toBe(false);
-      expect(result.error).toBe("Test error");
-
-      // Restore original console.log
-      console.log = originalLog;
+      it("should return success:false if victim stats update fails", async () => {
+        const updateError = new Error("DB update error for victim");
+        // First call for killer succeeds, second for victim fails
+        mockUpdatePlayerStats
+          .mockResolvedValueOnce(undefined)
+          .mockRejectedValueOnce(updateError);
+        const event = {
+          eventType: EventType.PLAYER_KILL,
+          data: { killerId: 1, victimId: 2 },
+        } as any;
+        const result = await handler.handleEvent(event);
+        expect(result.success).toBe(false);
+        expect(result.error).toBe("DB update error for victim");
+        expect(mockUpdatePlayerStats).toHaveBeenCalledTimes(2);
+      });
     });
   });
 });

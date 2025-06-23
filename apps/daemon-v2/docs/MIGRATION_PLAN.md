@@ -391,18 +391,18 @@ const DANGEROUS_COMMANDS = [
 export class AuthService {
   async validateServerToken(
     token: string,
-    serverAddress: string
+    serverAddress: string,
   ): Promise<boolean> {
     const hashedToken = await bcrypt.hash(
       token + serverAddress + this.secret,
-      10
+      10,
     );
     return await this.cache.validateToken(hashedToken);
   }
 
   async validateAdminAccess(
     adminId: number,
-    serverId: number
+    serverId: number,
   ): Promise<boolean> {
     const permissions = await this.db.adminPermission.findMany({
       where: { adminId, serverId, isActive: true },
@@ -468,7 +468,7 @@ export class EventProcessingPipeline {
       normal: Queue<GameEvent>;
       lowPriority: Queue<StatisticsEvent>;
     },
-    private processors: EventProcessor[]
+    private processors: EventProcessor[],
   ) {}
 
   async process(): Promise<void> {
@@ -482,7 +482,7 @@ export class EventProcessingPipeline {
 
   private async processQueue<T>(
     queue: Queue<T>,
-    options: { concurrency: number }
+    options: { concurrency: number },
   ): Promise<void> {
     queue.process(options.concurrency, async (job) => {
       const processor = this.getProcessor(job.data);
@@ -507,15 +507,15 @@ export class OptimizedQueries {
         this.db.gameEvent.createMany({
           data: batch,
           skipDuplicates: true,
-        })
-      )
+        }),
+      ),
     );
   }
 
   // Optimized player statistics calculation
   async calculatePlayerStats(
     playerId: number,
-    timeframe: string
+    timeframe: string,
   ): Promise<PlayerStats> {
     return this.db.$queryRaw`
       SELECT 
@@ -530,7 +530,7 @@ export class OptimizedQueries {
 
   // Connection pooling
   async withTransaction<T>(
-    callback: (tx: PrismaTransaction) => Promise<T>
+    callback: (tx: PrismaTransaction) => Promise<T>,
   ): Promise<T> {
     return this.db.$transaction(callback, {
       maxWait: 5000,
@@ -549,7 +549,7 @@ export class OptimizedQueries {
 export class CacheService {
   constructor(
     private redis: Redis,
-    private memoryCache: NodeCache
+    private memoryCache: NodeCache,
   ) {}
 
   // Multi-tier caching
@@ -602,7 +602,7 @@ export class Logger {
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.errors({ stack: true }),
-        winston.format.json()
+        winston.format.json(),
       ),
       defaultMeta: {
         service: "hlstats-daemon",
@@ -694,7 +694,7 @@ export class HealthService {
   constructor(
     private db: PrismaClient,
     private redis: Redis,
-    private queues: QueueManager
+    private queues: QueueManager,
   ) {}
 
   async checkHealth(): Promise<HealthStatus> {
@@ -998,7 +998,7 @@ export class LoadTest {
     const startTime = Date.now();
 
     await Promise.all(
-      events.map((event) => this.processor.processEvent(event))
+      events.map((event) => this.processor.processEvent(event)),
     );
 
     const endTime = Date.now();

@@ -5,12 +5,12 @@
   using the database package. At this stage it only exposes an enqueue method.
 */
 
-import type { GameEvent } from "../../types/common/events.types.js";
-import { DatabaseClient } from "../../database/client.js";
-import { PlayerHandler } from "./handlers/player.handler.js";
-import { WeaponHandler } from "./handlers/weapon.handler.js";
-import { MatchHandler } from "./handlers/match.handler.js";
-import { RankingHandler } from "./handlers/ranking.handler.js";
+import type { GameEvent } from "../../types/common/events.types";
+import { DatabaseClient } from "../../database/client";
+import { PlayerHandler } from "./handlers/player.handler";
+import { WeaponHandler } from "./handlers/weapon.handler";
+import { MatchHandler } from "./handlers/match.handler";
+import { RankingHandler } from "./handlers/ranking.handler";
 
 export interface IEventProcessor {
   enqueue(event: unknown): Promise<void>;

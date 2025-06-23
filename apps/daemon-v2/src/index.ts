@@ -12,7 +12,7 @@ import { EventProcessorService } from "./services/processor/processor.service";
 import { RconService } from "./services/rcon/rcon.service";
 import { StatisticsService } from "./services/statistics/statistics.service";
 
-class HLStatsDaemon {
+export class HLStatsDaemon {
   private db: DatabaseClient;
   private gateway: GatewayService;
   private ingress: IngressService;
@@ -79,36 +79,44 @@ class HLStatsDaemon {
   }
 }
 
-// Handle graceful shutdown
-const daemon = new HLStatsDaemon();
+function main() {
+  // Handle graceful shutdown
+  const daemon = new HLStatsDaemon();
 
-process.on("SIGINT", async () => {
-  console.log("\n📡 Received SIGINT, shutting down gracefully...");
-  await daemon.stop();
-  process.exit(0);
-});
+  process.on("SIGINT", async () => {
+    console.log("\n📡 Received SIGINT, shutting down gracefully...");
+    await daemon.stop();
+    process.exit(0);
+  });
 
-process.on("SIGTERM", async () => {
-  console.log("\n📡 Received SIGTERM, shutting down gracefully...");
-  await daemon.stop();
-  process.exit(0);
-});
+  process.on("SIGTERM", async () => {
+    console.log("\n📡 Received SIGTERM, shutting down gracefully...");
+    await daemon.stop();
+    process.exit(0);
+  });
 
-// Start the daemon
-daemon.start().catch((error) => {
-  console.error("💥 Fatal error:", error);
-  process.exit(1);
-});
+  // Start the daemon
+  daemon.start().catch((error) => {
+    console.error("💥 Fatal error:", error);
+    process.exit(1);
+  });
 
-console.log("🎯 HLStats Daemon v2 - Phase 1 Complete!");
-console.log("📋 Features implemented:");
-console.log("  ✅ TypeScript microservices architecture");
-console.log("  ✅ Database integration with @repo/database");
-console.log("  ✅ Event processing pipeline");
-console.log("  ✅ UDP log ingress with rate limiting");
-console.log("  ✅ Redis queue management");
-console.log("  ✅ Player statistics tracking");
-console.log("  ✅ ELO ranking system");
-console.log("  ✅ Weapon statistics calculation");
-console.log("  ✅ Match state management");
-console.log("  ✅ Comprehensive test suite");
+  console.log("🎯 HLStats Daemon v2 - Phase 1 Complete!");
+  console.log("📋 Features implemented:");
+  console.log("  ✅ TypeScript microservices architecture");
+  console.log("  ✅ Database integration with @repo/database");
+  console.log("  ✅ Event processing pipeline");
+  console.log("  ✅ UDP log ingress with rate limiting");
+  console.log("  ✅ Redis queue management");
+  console.log("  ✅ Player statistics tracking");
+  console.log("  ✅ ELO ranking system");
+  console.log("  ✅ Weapon statistics calculation");
+  console.log("  ✅ Match state management");
+  console.log("  ✅ Comprehensive test suite");
+}
+
+// This allows the file to be imported for testing without executing the startup logic.
+// Vitest automatically sets the process.env.VITEST variable.
+if (process.env.VITEST === undefined) {
+  main();
+}

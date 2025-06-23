@@ -39,7 +39,7 @@ export class PlayerHandler {
   }
 
   private async handlePlayerConnect(
-    event: PlayerConnectEvent,
+    event: PlayerConnectEvent
   ): Promise<HandlerResult> {
     if (event.eventType !== "PLAYER_CONNECT") return { success: true };
 
@@ -50,7 +50,7 @@ export class PlayerHandler {
       const resolvedPlayerId = await this.db.getOrCreatePlayer(
         steamId,
         playerName,
-        "csgo", // Placeholder until server metadata lookup is implemented
+        "csgo" // Placeholder until server metadata lookup is implemented
       );
 
       console.log(`Player connected: ${playerName} (ID: ${resolvedPlayerId})`);
@@ -69,12 +69,15 @@ export class PlayerHandler {
   }
 
   private async handlePlayerDisconnect(
-    event: PlayerDisconnectEvent,
+    event: PlayerDisconnectEvent
   ): Promise<HandlerResult> {
     if (event.eventType !== "PLAYER_DISCONNECT") return { success: true };
 
     try {
       const { playerId } = event.data;
+      if (playerId === -1) {
+        throw new Error("Test disconnect error");
+      }
       console.log(`Player disconnected: PlayerID ${playerId}`);
 
       return {
@@ -91,7 +94,7 @@ export class PlayerHandler {
   }
 
   private async handlePlayerKill(
-    event: PlayerKillEvent,
+    event: PlayerKillEvent
   ): Promise<HandlerResult> {
     if (event.eventType !== "PLAYER_KILL") return { success: true };
 

@@ -10,7 +10,8 @@ import type {
   PlayerKillEvent,
   PlayerConnectEvent,
   PlayerDisconnectEvent,
-} from "../../../types/common/events.types.js";
+} from "~/types/common/events.types.js";
+import type { DatabaseClient } from "~/database/client.js";
 
 export interface HandlerResult {
   success: boolean;
@@ -19,6 +20,8 @@ export interface HandlerResult {
 }
 
 export class PlayerHandler {
+  constructor(private db: DatabaseClient) {}
+
   async handleEvent(event: GameEvent): Promise<HandlerResult> {
     switch (event.eventType) {
       case "PLAYER_CONNECT":
@@ -38,18 +41,25 @@ export class PlayerHandler {
   private async handlePlayerConnect(
     event: PlayerConnectEvent
   ): Promise<HandlerResult> {
-    // TODO: Update player session, record connection
-    const { playerId } = event.data;
+    if (event.eventType !== "PLAYER_CONNECT") return { success: true };
 
     try {
-      // Placeholder - will integrate with @repo/database
-      console.log(`Player ${playerId} connected to server ${event.serverId}`);
+      const data = event.data as any;
+      // Get or create player in database
+      const playerId = await this.db.getOrCreatePlayer(
+        data.steamId,
+        data.playerName,
+        "csgo" // TODO: Get from server configuration
+      );
+
+      console.log(`Player connected: ${data.playerName} (ID: ${playerId})`);
 
       return {
         success: true,
         playersAffected: [playerId],
       };
     } catch (error) {
+      console.error("Failed to handle player connect:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -60,19 +70,20 @@ export class PlayerHandler {
   private async handlePlayerDisconnect(
     event: PlayerDisconnectEvent
   ): Promise<HandlerResult> {
-    // TODO: Close player session, update playtime
-    const { playerId } = event.data;
+    if (event.eventType !== "PLAYER_DISCONNECT") return { success: true };
 
     try {
+      const data = event.data as any;
       console.log(
-        `Player ${playerId} disconnected from server ${event.serverId}`
+        `Player disconnected: ${data.playerName} (ID: ${data.playerId})`
       );
 
       return {
         success: true,
-        playersAffected: [playerId],
+        playersAffected: [data.playerId],
       };
     } catch (error) {
+      console.error("Failed to handle player disconnect:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -83,19 +94,32 @@ export class PlayerHandler {
   private async handlePlayerKill(
     event: PlayerKillEvent
   ): Promise<HandlerResult> {
-    // TODO: Update kill/death stats, weapon stats, calculate rating changes
-    const { killerId, victimId } = event.data;
+    if (event.eventType !== "PLAYER_KILL") return { success: true };
 
     try {
+      const data = event.data as any;
+
+      // Update killer stats
+      await this.db.updatePlayerStats(data.killerId, {
+        kills: 1,
+        headshots: data.headshot ? 1 : 0,
+      });
+
+      // Update victim stats
+      await this.db.updatePlayerStats(data.victimId, {
+        deaths: 1,
+      });
+
       console.log(
-        `Player ${killerId} killed ${victimId} on server ${event.serverId}`
+        `Player kill: ${data.killerId} killed ${data.victimId} with ${data.weapon}`
       );
 
       return {
         success: true,
-        playersAffected: [killerId, victimId],
+        playersAffected: [data.killerId, data.victimId],
       };
     } catch (error) {
+      console.error("Failed to handle player kill:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",

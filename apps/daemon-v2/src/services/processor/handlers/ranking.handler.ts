@@ -9,7 +9,8 @@ import type {
   GameEvent,
   PlayerKillEvent,
   RoundEndEvent,
-} from "../../../types/common/events.types.js";
+} from "~/types/common/events.types.js";
+import type { DatabaseClient } from "~/database/client.js";
 
 export interface SkillRating {
   playerId: number;
@@ -34,6 +35,8 @@ export interface HandlerResult {
 }
 
 export class RankingHandler {
+  constructor(private db: DatabaseClient) {}
+
   private readonly DEFAULT_RATING = 1000;
   private readonly K_FACTOR = 32;
   private readonly RATING_FLOOR = 100;

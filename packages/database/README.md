@@ -40,7 +40,7 @@ pnpm db:generate
 ## Usage
 
 ```typescript
-import { db } from "@repo/database";
+import { db } from "@repo/database/client";
 
 // Query examples (will be available after schema is defined)
 const players = await db.player.findMany();

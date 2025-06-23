@@ -8,7 +8,8 @@
 import type {
   GameEvent,
   PlayerKillEvent,
-} from "../../../types/common/events.types.js";
+} from "~/types/common/events.types.js";
+import type { DatabaseClient } from "~/database/client.js";
 
 export interface WeaponStats {
   weaponName: string;
@@ -25,6 +26,22 @@ export interface HandlerResult {
 }
 
 export class WeaponHandler {
+  constructor(private db: DatabaseClient) {}
+
+  // Weapon damage values for different games
+  private readonly weaponDamage = {
+    ak47: 36,
+    m4a4: 33,
+    m4a1_silencer: 33,
+    awp: 115,
+    deagle: 53,
+    glock: 28,
+    usp: 35,
+    knife: 42,
+    p90: 26,
+    mp5: 26,
+  } as const;
+
   async handleEvent(event: GameEvent): Promise<HandlerResult> {
     switch (event.eventType) {
       case "PLAYER_KILL":

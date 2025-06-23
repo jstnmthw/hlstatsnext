@@ -9,6 +9,9 @@
 export interface IStatisticsService {
   recalculateAll(): Promise<void>;
   recalculatePlayer(playerId: string): Promise<void>;
+  getPlayerStats(playerId: number): Promise<unknown>;
+  start(): Promise<void>;
+  stop(): Promise<void>;
 }
 
 export class StatisticsService implements IStatisticsService {
@@ -19,5 +22,18 @@ export class StatisticsService implements IStatisticsService {
   async recalculatePlayer(playerId: string): Promise<void> {
     // TODO: Recompute stats for a single player
     void playerId;
+  }
+
+  async getPlayerStats(playerId: number): Promise<unknown> {
+    void playerId; // placeholder to avoid unused param lint
+    return {};
+  }
+
+  async start(): Promise<void> {
+    console.log("📊 Statistics Service started");
+  }
+
+  async stop(): Promise<void> {
+    console.log("🛑 Statistics Service stopped");
   }
 }

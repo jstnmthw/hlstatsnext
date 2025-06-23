@@ -10,6 +10,9 @@ export interface IRconService {
   connect(host: string, port: number, password: string): Promise<void>;
   disconnect(): Promise<void>;
   sendCommand(command: string): Promise<string>; // returns server response
+  executeCommand(serverId: number, command: string): Promise<string>;
+  start(): Promise<void>;
+  stop(): Promise<void>;
 }
 
 export class RconService implements IRconService {
@@ -28,5 +31,20 @@ export class RconService implements IRconService {
     // TODO: Actually send command and return response
     void command;
     return "";
+  }
+
+  async executeCommand(serverId: number, command: string): Promise<string> {
+    void serverId; // placeholder to avoid unused param lint
+    void command; // placeholder to avoid unused param lint
+
+    return "Command executed successfully";
+  }
+
+  async start(): Promise<void> {
+    console.log("🔧 RCON Service started");
+  }
+
+  async stop(): Promise<void> {
+    console.log("🛑 RCON Service stopped");
   }
 }

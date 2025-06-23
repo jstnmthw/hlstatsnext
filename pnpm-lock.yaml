@@ -81,9 +81,6 @@ importers:
 
   apps/daemon-v2:
     dependencies:
-      '@repo/database':
-        specifier: workspace:*
-        version: link:../../packages/database
       bullmq:
         specifier: ^5.1.0
         version: 5.56.0
@@ -100,6 +97,9 @@ importers:
         specifier: ^3.22.0
         version: 3.25.67
     devDependencies:
+      '@repo/database':
+        specifier: workspace:*
+        version: link:../../packages/database
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config

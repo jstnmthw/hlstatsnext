@@ -9,7 +9,8 @@ import type {
   GameEvent,
   RoundEndEvent,
   MapChangeEvent,
-} from "../../../types/common/events.types.js";
+} from "@/types/common/events.types";
+import type { DatabaseClient } from "@/database/client";
 
 export interface MatchStats {
   duration: number;
@@ -26,6 +27,8 @@ export interface HandlerResult {
 }
 
 export class MatchHandler {
+  constructor(private db: DatabaseClient) {}
+
   private currentMatch: Map<number, MatchStats> = new Map(); // serverId -> MatchStats
 
   async handleEvent(event: GameEvent): Promise<HandlerResult> {

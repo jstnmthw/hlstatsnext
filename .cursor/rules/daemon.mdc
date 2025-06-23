@@ -1,0 +1,6 @@
+---
+description: 
+globs: apps/daemon-v2/**/*.*
+alwaysApply: false
+---
+Review [PHASES.mmd](mdc:apps/daemon-v2/docs/PHASES.mmd) for a mermain graph of our execution steps as well as our [MIGRATION_PLAN.md](mdc:MIGRATION_PLAN.md).

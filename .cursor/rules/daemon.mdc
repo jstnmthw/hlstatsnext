@@ -3,4 +3,4 @@ description:
 globs: apps/daemon-v2/**/*.*
 alwaysApply: false
 ---
-Review [PHASES.mmd](mdc:apps/daemon-v2/docs/PHASES.mmd) for a mermain graph of our execution steps as well as our [MIGRATION_PLAN.md](mdc:MIGRATION_PLAN.md).
+Review [AI_EXECUTION_PROMPT.md](mdc:apps/daemon-v2/docs/AI_EXECUTION_PROMPT.md) and [PHASES.mmd](mdc:apps/daemon-v2/docs/PHASES.mmd) for a mermain graph of our execution steps. Review [MIGRATION_PLAN.md](mdc:MIGRATION_PLAN.md) for our plan and [MIGRATION_PROGRESS.md](mdc:apps/daemon-v2/docs/MIGRATION_PROGRESS.md) for the current progress.

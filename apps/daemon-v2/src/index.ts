@@ -5,12 +5,12 @@
  * Collects and processes statistics from Half-Life dedicated game servers.
  */
 
-import { DatabaseClient } from "./database/client.js";
-import { GatewayService } from "./services/gateway/gateway.service.js";
-import { IngressService } from "./services/ingress/ingress.service.js";
-import { EventProcessorService } from "./services/processor/processor.service.js";
-import { RconService } from "./services/rcon/rcon.service.js";
-import { StatisticsService } from "./services/statistics/statistics.service.js";
+import { DatabaseClient } from "./database/client";
+import { GatewayService } from "./services/gateway/gateway.service";
+import { IngressService } from "./services/ingress/ingress.service";
+import { EventProcessorService } from "./services/processor/processor.service";
+import { RconService } from "./services/rcon/rcon.service";
+import { StatisticsService } from "./services/statistics/statistics.service";
 
 class HLStatsDaemon {
   private db: DatabaseClient;

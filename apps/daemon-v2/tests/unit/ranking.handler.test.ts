@@ -32,10 +32,10 @@ describe("RankingHandler", () => {
       expect(result.ratingChanges).toHaveLength(2);
 
       const killerChange = result.ratingChanges?.find(
-        (r) => r.playerId === 123
+        (r) => r.playerId === 123,
       );
       const victimChange = result.ratingChanges?.find(
-        (r) => r.playerId === 456
+        (r) => r.playerId === 456,
       );
 
       expect(killerChange?.change).toBeGreaterThan(0);

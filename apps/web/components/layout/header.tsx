@@ -38,7 +38,7 @@ export async function Header() {
                       "flex items-center space-x-1 px-3 py-2 rounded-md text-sm transition-colors font-medium",
                       pathname === item.href
                         ? "text-zinc-100 bg-zinc-800"
-                        : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900"
+                        : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900",
                     )}
                   >
                     <Icon className="h-4 w-4" />

@@ -7,7 +7,7 @@
 
 import { Queue, Worker, QueueEvents } from "bullmq";
 import { Redis } from "ioredis";
-import type { GameEvent } from "../../types/common/events.types.js";
+import type { GameEvent } from "../../types/common/events.types";
 
 export interface QueueManagerOptions {
   redis: {
@@ -72,7 +72,7 @@ export class QueueManager {
       for (const [priority, queueName] of Object.entries(this.options.queues)) {
         await this.createQueue(
           queueName,
-          priority as keyof typeof this.options.concurrency
+          priority as keyof typeof this.options.concurrency,
         );
       }
 
@@ -85,7 +85,7 @@ export class QueueManager {
 
   private async createQueue(
     queueName: string,
-    priority: keyof typeof this.options.concurrency
+    priority: keyof typeof this.options.concurrency,
   ): Promise<void> {
     // Create queue
     const queue = new Queue(queueName, {
@@ -116,7 +116,7 @@ export class QueueManager {
           max: this.options.concurrency[priority] * 2,
           duration: 1000, // per second
         },
-      }
+      },
     );
 
     // Worker event listeners
@@ -146,7 +146,7 @@ export class QueueManager {
 
   async enqueueEvent(
     event: GameEvent,
-    priority: "high" | "normal" | "low" = "normal"
+    priority: "high" | "normal" | "low" = "normal",
   ): Promise<void> {
     const queueName = this.getQueueName(priority);
     const queue = this.queues.get(queueName);
@@ -181,7 +181,7 @@ export class QueueManager {
       // TODO: Actually process the event through handlers
       // For now, just simulate processing
       console.log(
-        `Processing ${event.eventType} event (priority: ${priority}) from server ${event.serverId}`
+        `Processing ${event.eventType} event (priority: ${priority}) from server ${event.serverId}`,
       );
 
       // Simulate processing time

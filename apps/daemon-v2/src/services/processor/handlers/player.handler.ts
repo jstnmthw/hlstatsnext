@@ -10,8 +10,8 @@ import type {
   PlayerKillEvent,
   PlayerConnectEvent,
   PlayerDisconnectEvent,
-} from "~/types/common/events.types.js";
-import type { DatabaseClient } from "~/database/client.js";
+} from "@/types/common/events.types";
+import type { DatabaseClient } from "@/database/client";
 
 export interface HandlerResult {
   success: boolean;
@@ -39,24 +39,25 @@ export class PlayerHandler {
   }
 
   private async handlePlayerConnect(
-    event: PlayerConnectEvent
+    event: PlayerConnectEvent,
   ): Promise<HandlerResult> {
     if (event.eventType !== "PLAYER_CONNECT") return { success: true };
 
     try {
-      const data = event.data as any;
-      // Get or create player in database
-      const playerId = await this.db.getOrCreatePlayer(
-        data.steamId,
-        data.playerName,
-        "csgo" // TODO: Get from server configuration
+      const { steamId, playerName } = event.data;
+
+      // TODO: Resolve game from serverId -> server record
+      const resolvedPlayerId = await this.db.getOrCreatePlayer(
+        steamId,
+        playerName,
+        "csgo", // Placeholder until server metadata lookup is implemented
       );
 
-      console.log(`Player connected: ${data.playerName} (ID: ${playerId})`);
+      console.log(`Player connected: ${playerName} (ID: ${resolvedPlayerId})`);
 
       return {
         success: true,
-        playersAffected: [playerId],
+        playersAffected: [resolvedPlayerId],
       };
     } catch (error) {
       console.error("Failed to handle player connect:", error);
@@ -68,19 +69,17 @@ export class PlayerHandler {
   }
 
   private async handlePlayerDisconnect(
-    event: PlayerDisconnectEvent
+    event: PlayerDisconnectEvent,
   ): Promise<HandlerResult> {
     if (event.eventType !== "PLAYER_DISCONNECT") return { success: true };
 
     try {
-      const data = event.data as any;
-      console.log(
-        `Player disconnected: ${data.playerName} (ID: ${data.playerId})`
-      );
+      const { playerId } = event.data;
+      console.log(`Player disconnected: PlayerID ${playerId}`);
 
       return {
         success: true,
-        playersAffected: [data.playerId],
+        playersAffected: [playerId],
       };
     } catch (error) {
       console.error("Failed to handle player disconnect:", error);
@@ -92,31 +91,29 @@ export class PlayerHandler {
   }
 
   private async handlePlayerKill(
-    event: PlayerKillEvent
+    event: PlayerKillEvent,
   ): Promise<HandlerResult> {
     if (event.eventType !== "PLAYER_KILL") return { success: true };
 
     try {
-      const data = event.data as any;
+      const { killerId, victimId, weapon, headshot } = event.data;
 
       // Update killer stats
-      await this.db.updatePlayerStats(data.killerId, {
+      await this.db.updatePlayerStats(killerId, {
         kills: 1,
-        headshots: data.headshot ? 1 : 0,
+        headshots: headshot ? 1 : 0,
       });
 
       // Update victim stats
-      await this.db.updatePlayerStats(data.victimId, {
+      await this.db.updatePlayerStats(victimId, {
         deaths: 1,
       });
 
-      console.log(
-        `Player kill: ${data.killerId} killed ${data.victimId} with ${data.weapon}`
-      );
+      console.log(`Player kill: ${killerId} killed ${victimId} with ${weapon}`);
 
       return {
         success: true,
-        playersAffected: [data.killerId, data.victimId],
+        playersAffected: [killerId, victimId],
       };
     } catch (error) {
       console.error("Failed to handle player kill:", error);

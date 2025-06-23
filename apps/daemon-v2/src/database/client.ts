@@ -11,7 +11,7 @@ import type {
   PlayerConnectEvent,
   PlayerDisconnectEvent,
   PlayerKillEvent,
-} from "../types/common/events.types.js";
+} from "@/types/common/events.types";
 
 export class DatabaseClient {
   private client: PrismaClient;
@@ -124,7 +124,7 @@ export class DatabaseClient {
   async getOrCreatePlayer(
     steamId: string,
     playerName: string,
-    game: string
+    game: string,
   ): Promise<number> {
     try {
       // First, try to find existing player by Steam ID
@@ -178,7 +178,7 @@ export class DatabaseClient {
       shots?: number;
       hits?: number;
       headshots?: number;
-    }
+    },
   ): Promise<void> {
     try {
       const updateData: Record<string, unknown> = {};
@@ -241,8 +241,8 @@ export class DatabaseClient {
         | "$transaction"
         | "$use"
         | "$extends"
-      >
-    ) => Promise<T>
+      >,
+    ) => Promise<T>,
   ): Promise<T> {
     return this.client.$transaction(callback);
   }

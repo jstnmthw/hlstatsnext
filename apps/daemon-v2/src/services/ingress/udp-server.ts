@@ -55,7 +55,7 @@ export class UdpServer extends EventEmitter {
       this.server.on("listening", () => {
         const address = this.server?.address();
         console.log(
-          `UDP server listening on ${address?.address}:${address?.port}`
+          `UDP server listening on ${address?.address}:${address?.port}`,
         );
         resolve();
       });
@@ -94,7 +94,7 @@ export class UdpServer extends EventEmitter {
       // Validate packet size
       if (message.length > this.options.maxPacketSize) {
         console.warn(
-          `Oversized packet from ${serverKey}: ${message.length} bytes`
+          `Oversized packet from ${serverKey}: ${message.length} bytes`,
         );
         return;
       }
@@ -146,7 +146,7 @@ export class UdpServer extends EventEmitter {
 
   private updateServerInfo(
     serverKey: string,
-    remoteInfo: dgram.RemoteInfo
+    remoteInfo: dgram.RemoteInfo,
   ): void {
     const existing = this.connectedServers.get(serverKey);
 
@@ -183,7 +183,7 @@ export class UdpServer extends EventEmitter {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
 
     return Array.from(this.connectedServers.values()).filter(
-      (server) => server.lastSeen > fiveMinutesAgo
+      (server) => server.lastSeen > fiveMinutesAgo,
     );
   }
 

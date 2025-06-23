@@ -5,7 +5,7 @@
  * game server log lines into structured events.
  */
 
-import type { GameEvent } from "../../../types/common/events.types.js";
+import type { GameEvent } from "../../../types/common/events.types";
 
 export interface ParseResult {
   success: boolean;
@@ -36,7 +36,7 @@ export abstract class BaseParser {
   protected extractTimestamp(logLine: string): Date | null {
     // Common format: L 12/31/2023 - 23:59:59:
     const timestampMatch = logLine.match(
-      /^L (\d{2}\/\d{2}\/\d{4}) - (\d{2}:\d{2}:\d{2}):/
+      /^L (\d{2}\/\d{2}\/\d{4}) - (\d{2}:\d{2}:\d{2}):/,
     );
 
     if (!timestampMatch) {

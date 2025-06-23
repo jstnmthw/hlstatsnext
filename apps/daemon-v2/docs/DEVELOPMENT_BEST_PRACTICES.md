@@ -246,7 +246,7 @@ export class DomainError extends Error {
   constructor(
     message: string,
     public code: string,
-    public statusCode: number = 500
+    public statusCode: number = 500,
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -286,7 +286,7 @@ async function updatePlayerStats(
 // ✅ GOOD: Proper error handling
 async function processEvents(events: GameEvent[]): Promise<void> {
   const results = await Promise.allSettled(
-    events.map((event) => processEvent(event))
+    events.map((event) => processEvent(event)),
   );
 
   const failures = results.filter((r) => r.status === "rejected");
@@ -434,7 +434,7 @@ test.describe("Player Statistics", () => {
         JSON.stringify({
           type: "player_kill",
           playerId: 123,
-        })
+        }),
       );
     });
 
@@ -641,7 +641,7 @@ const worker = new Worker(
       max: 100,
       duration: 1000, // 100 jobs per second
     },
-  }
+  },
 );
 ```
 
@@ -705,7 +705,7 @@ export function generateAccessToken(user: User): string {
       expiresIn: "1h",
       issuer: "hlstats-api",
       audience: "hlstats-client",
-    }
+    },
   );
 }
 
@@ -738,7 +738,7 @@ const players = await prisma.$queryRaw`
 
 // ❌ BAD: String concatenation
 const players = await prisma.$queryRawUnsafe(
-  `SELECT * FROM players WHERE name = '${userName}'`
+  `SELECT * FROM players WHERE name = '${userName}'`,
 );
 ```
 
@@ -782,7 +782,7 @@ const logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
-    winston.format.json()
+    winston.format.json(),
   ),
   defaultMeta: {
     service: "hlstats-daemon",
@@ -793,7 +793,7 @@ const logger = winston.createLogger({
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.simple()
+        winston.format.simple(),
       ),
     }),
     new winston.transports.File({
@@ -1100,7 +1100,7 @@ app.get("/ready", async (req, res) => {
 export function calculateRatingChange(
   winner: Player,
   loser: Player,
-  matchDetails?: MatchContext
+  matchDetails?: MatchContext,
 ): RatingAdjustment {
   // Implementation
 }

@@ -9,8 +9,9 @@ import type {
   GameEvent,
   PlayerKillEvent,
   RoundEndEvent,
-} from "~/types/common/events.types.js";
-import type { DatabaseClient } from "~/database/client.js";
+} from "@/types/common/events.types";
+import type { DatabaseClient } from "@/database/client";
+import { getWeaponAttributes } from "@/config/weapon-config";
 
 export interface SkillRating {
   playerId: number;
@@ -56,7 +57,7 @@ export class RankingHandler {
   }
 
   private async handleKillRating(
-    event: PlayerKillEvent
+    event: PlayerKillEvent,
   ): Promise<HandlerResult> {
     const { killerId, victimId, headshot, weapon } = event.data;
 
@@ -69,11 +70,11 @@ export class RankingHandler {
       const changes = this.calculateKillRatingChange(
         killerRating,
         victimRating,
-        { headshot, weapon }
+        { headshot, weapon },
       );
 
       console.log(
-        `Rating change for kill: Killer ${killerId} (+${changes.killer}), Victim ${victimId} (${changes.victim})`
+        `Rating change for kill: Killer ${killerId} (+${changes.killer}), Victim ${victimId} (${changes.victim})`,
       );
 
       return {
@@ -105,7 +106,7 @@ export class RankingHandler {
   }
 
   private async handleRoundRating(
-    event: RoundEndEvent
+    event: RoundEndEvent,
   ): Promise<HandlerResult> {
     const { winningTeam, duration } = event.data;
     const serverId = event.serverId;
@@ -116,7 +117,7 @@ export class RankingHandler {
       // TODO: Apply bonus for round participation
 
       console.log(
-        `Round rating update for server ${serverId}: ${winningTeam} team won (${duration}s)`
+        `Round rating update for server ${serverId}: ${winningTeam} team won (${duration}s)`,
       );
 
       return { success: true };
@@ -131,7 +132,7 @@ export class RankingHandler {
   private calculateKillRatingChange(
     killer: SkillRating,
     victim: SkillRating,
-    context: { headshot: boolean; weapon: string }
+    context: { headshot: boolean; weapon: string },
   ): { killer: number; victim: number } {
     // Expected probability of killer winning
     const expectedKiller =
@@ -147,7 +148,7 @@ export class RankingHandler {
 
     // Calculate rating changes
     const killerChange = Math.round(
-      killerK * (1 - expectedKiller) * weaponMultiplier * headshotBonus
+      killerK * (1 - expectedKiller) * weaponMultiplier * headshotBonus,
     );
     const victimChange = Math.round(victimK * (0 - (1 - expectedKiller)) * 0.8); // Smaller penalty
 
@@ -167,19 +168,8 @@ export class RankingHandler {
   }
 
   private getWeaponSkillMultiplier(weapon: string): number {
-    // Skill-based weapon multipliers
-    const skillWeapons: Record<string, number> = {
-      awp: 1.3, // Sniper rifles require more skill
-      deagle: 1.2, // High-skill pistol
-      ak47: 1.1, // Slightly higher skill rifle
-      m4a1: 1.0, // Standard rifle
-      knife: 1.5, // Melee kills are impressive
-      grenade: 1.3, // Grenade kills require timing
-      glock: 0.9, // Lower skill weapons
-      p90: 0.8, // "Spray and pray" weapons
-    };
-
-    return skillWeapons[weapon.toLowerCase()] || 1.0;
+    const { skillMultiplier } = getWeaponAttributes(weapon);
+    return skillMultiplier;
   }
 
   private async getPlayerRating(playerId: number): Promise<SkillRating> {
@@ -211,13 +201,13 @@ export class RankingHandler {
   public async updatePlayerRating(
     playerId: number,
     actualScore: number,
-    expectedScore: number
+    expectedScore: number,
   ): Promise<SkillRating> {
     const currentRating = await this.getPlayerRating(playerId);
     const kFactor = this.getAdjustedKFactor(currentRating);
 
     const newRating = this.clampRating(
-      currentRating.rating + kFactor * (actualScore - expectedScore)
+      currentRating.rating + kFactor * (actualScore - expectedScore),
     );
 
     return {

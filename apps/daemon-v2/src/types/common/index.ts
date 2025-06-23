@@ -1,1 +1,1 @@
-export * from "./events.types.js";
+export * from "./events.types";

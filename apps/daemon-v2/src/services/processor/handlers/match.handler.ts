@@ -96,7 +96,7 @@ export class MatchHandler {
       // TODO: Calculate team performance metrics
 
       console.log(
-        `Round ended on server ${serverId}: ${winningTeam} won (${score.team1}-${score.team2})`
+        `Round ended on server ${serverId}: ${winningTeam} won (${score.team1}-${score.team2})`,
       );
 
       return {
@@ -126,7 +126,7 @@ export class MatchHandler {
       this.currentMatch.delete(serverId);
 
       console.log(
-        `Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`
+        `Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`,
       );
 
       return {
@@ -143,7 +143,7 @@ export class MatchHandler {
   private async finalizeMatch(
     serverId: number,
     mapName: string,
-    stats: MatchStats
+    stats: MatchStats,
   ): Promise<void> {
     // TODO: Save final match statistics to database
     // TODO: Update player ELO/rankings based on match performance

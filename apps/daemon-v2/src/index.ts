@@ -103,16 +103,6 @@ function main() {
 
   console.log("🎯 HLStats Daemon v2 - Phase 1 Complete!");
   console.log("📋 Features implemented:");
-  console.log("  ✅ TypeScript microservices architecture");
-  console.log("  ✅ Database integration with @repo/database");
-  console.log("  ✅ Event processing pipeline");
-  console.log("  ✅ UDP log ingress with rate limiting");
-  console.log("  ✅ Redis queue management");
-  console.log("  ✅ Player statistics tracking");
-  console.log("  ✅ ELO ranking system");
-  console.log("  ✅ Weapon statistics calculation");
-  console.log("  ✅ Match state management");
-  console.log("  ✅ Comprehensive test suite");
 }
 
 // This allows the file to be imported for testing without executing the startup logic.

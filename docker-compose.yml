@@ -1,27 +1,27 @@
 services:
-  daemon:
-    container_name: hlstatsnext-daemon
-    build:
-      dockerfile: docker/daemon/Dockerfile
-      context: .
-      target: dev
-    ports:
-      - 27500:27500/udp
-    networks:
-      default:
-        ipv4_address: 10.5.0.50
-    depends_on:
-      - db
-    command:
-      - --ip=0.0.0.0
-      - --port=27500
-      - --db-host=${DB_HOST:-db:3306}
-      - --db-name=${DB_NAME:-hlstatsnext}
-      - --db-username=${DB_USER:-hlstatsnext}
-      - --db-password=${DB_PASS:-hlstatsnext}
-      - --nodns-resolveip
-      - --debug
-    restart: unless-stopped
+  # daemon:
+  #   container_name: hlstatsnext-daemon
+  #   build:
+  #     dockerfile: docker/daemon/Dockerfile
+  #     context: .
+  #     target: dev
+  #   ports:
+  #     - 27500:27500/udp
+  #   networks:
+  #     default:
+  #       ipv4_address: 10.5.0.50
+  #   depends_on:
+  #     - db
+  #   command:
+  #     - --ip=0.0.0.0
+  #     - --port=27500
+  #     - --db-host=${DB_HOST:-db:3306}
+  #     - --db-name=${DB_NAME:-hlstatsnext}
+  #     - --db-username=${DB_USER:-hlstatsnext}
+  #     - --db-password=${DB_PASS:-hlstatsnext}
+  #     - --nodns-resolveip
+  #     - --debug
+  #   restart: unless-stopped
 
   db:
     image: mysql:5.7

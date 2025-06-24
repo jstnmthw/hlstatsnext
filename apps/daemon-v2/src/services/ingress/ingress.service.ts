@@ -98,10 +98,9 @@ export class IngressService implements IIngressService {
 
       const parseResult = await this.parser.parse(logLine, serverId);
 
-      if (!parseResult.success || !parseResult.event) {
-        if (parseResult.error) {
-          console.debug(`Parser error: ${parseResult.error}`);
-        }
+      if (!parseResult.success) {
+        // Log parser error details for debugging
+        console.debug(`Parser error: ${parseResult.error}`);
         return;
       }
 
@@ -109,7 +108,7 @@ export class IngressService implements IIngressService {
       const event: GameEvent = {
         ...parseResult.event,
         raw: logLine,
-      } as GameEvent;
+      };
 
       await this.processor.processEvent(event);
     } catch (error) {

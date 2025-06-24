@@ -4,6 +4,7 @@ import {
   EventType,
   type RoundEndEvent,
   type MapChangeEvent,
+  type BaseEvent,
 } from "../../src/types/common/events";
 import type { DatabaseClient } from "../../src/database/client";
 
@@ -17,8 +18,12 @@ describe("MatchHandler", () => {
 
   describe("handleEvent", () => {
     it("should handle ROUND_START and initialize stats", async () => {
-      const event = { eventType: EventType.ROUND_START, serverId: 1 };
-      const result = await handler.handleEvent(event as any);
+      const event: BaseEvent = {
+        eventType: EventType.ROUND_START,
+        serverId: 1,
+        timestamp: new Date(),
+      };
+      const result = await handler.handleEvent(event);
 
       expect(result.success).toBe(true);
       const stats = handler.getMatchStats(1);
@@ -31,7 +36,8 @@ describe("MatchHandler", () => {
       await handler.handleEvent({
         eventType: EventType.ROUND_START,
         serverId: 1,
-      } as any);
+        timestamp: new Date(),
+      } as BaseEvent);
 
       const roundEndEvent: RoundEndEvent = {
         eventType: EventType.ROUND_END,
@@ -58,16 +64,18 @@ describe("MatchHandler", () => {
       await handler.handleEvent({
         eventType: EventType.ROUND_START,
         serverId: 1,
-      } as any);
+        timestamp: new Date(),
+      } as BaseEvent);
       await handler.handleEvent({
         eventType: EventType.ROUND_END,
         serverId: 1,
+        timestamp: new Date(),
         data: {
           winningTeam: "CT",
           duration: 100,
           score: { team1: 0, team2: 1 },
         },
-      } as any);
+      } as RoundEndEvent);
 
       const mapChangeEvent: MapChangeEvent = {
         eventType: EventType.MAP_CHANGE,
@@ -80,7 +88,8 @@ describe("MatchHandler", () => {
         },
       };
 
-      const finalizeSpy = vi.spyOn(handler as any, "finalizeMatch");
+      // @ts-expect-error - Testing private method
+      const finalizeSpy = vi.spyOn(handler, "finalizeMatch");
       await handler.handleEvent(mapChangeEvent);
 
       expect(finalizeSpy).toHaveBeenCalledWith(
@@ -94,8 +103,12 @@ describe("MatchHandler", () => {
     });
 
     it("should ignore unhandled events", async () => {
-      const event = { eventType: EventType.PLAYER_CONNECT, serverId: 1 };
-      const result = await handler.handleEvent(event as any);
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_CONNECT,
+        serverId: 1,
+        timestamp: new Date(),
+      };
+      const result = await handler.handleEvent(event);
       expect(result.success).toBe(true);
       expect(result.error).toBeUndefined();
     });

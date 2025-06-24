@@ -7,11 +7,9 @@
 
 import type { GameEvent } from "@/types/common/events";
 
-export interface ParseResult {
-  success: boolean;
-  event?: GameEvent;
-  error?: string;
-}
+export type ParseResult =
+  | { success: true; event: GameEvent }
+  | { success: false; error: string };
 
 export abstract class BaseParser {
   protected readonly gameType: string;
@@ -36,7 +34,7 @@ export abstract class BaseParser {
   protected extractTimestamp(logLine: string): Date | null {
     // Common format: L 12/31/2023 - 23:59:59:
     const timestampMatch = logLine.match(
-      /^L (\d{2}\/\d{2}\/\d{4}) - (\d{2}:\d{2}:\d{2}):/,
+      /^L (\d{2}\/\d{2}\/\d{4}) - (\d{2}:\d{2}:\d{2}):/
     );
 
     if (!timestampMatch) {
@@ -50,7 +48,7 @@ export abstract class BaseParser {
   /**
    * Extract server information if present in log line
    */
-  protected extractServerInfo(logLine: string): {
+  protected extractServerInfo(): {
     address?: string;
     port?: number;
   } {

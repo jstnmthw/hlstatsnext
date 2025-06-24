@@ -31,6 +31,13 @@ export interface BaseEvent {
   timestamp: Date;
   serverId: number;
   raw?: string; // Original log line for debugging
+  /**
+   * Optional payload for events that do not have a specific data structure.
+   * This is primarily to allow ergonomic access in generic code paths (e.g. tests)
+   * without resorting to explicit casts. Event-specific interfaces should override
+   * this with a strongly-typed version.
+   */
+  data?: unknown;
 }
 
 export interface PlayerKillEvent extends BaseEvent {

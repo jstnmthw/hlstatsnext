@@ -12,7 +12,7 @@ vi.mock("../../src/database/client", () => {
 });
 
 import { EventProcessorService } from "../../src/services/processor/processor.service";
-import { EventType } from "../../src/types/common/events";
+import { EventType, type GameEvent } from "../../src/types/common/events";
 
 // Because DatabaseClient is mocked above, importing EventProcessorService now
 // will get the mock injected.
@@ -30,7 +30,7 @@ describe("EventProcessorService", () => {
   });
 
   it("processEvent routes events without throwing", async () => {
-    const event = {
+    const event: GameEvent = {
       eventType: EventType.PLAYER_CONNECT,
       timestamp: new Date(),
       serverId: 1,
@@ -40,10 +40,8 @@ describe("EventProcessorService", () => {
         playerName: "Tester",
         ipAddress: "127.0.0.1",
       },
-    } as const;
+    };
 
-    await expect(
-      processor.processEvent(event as Event)
-    ).resolves.toBeUndefined();
+    await expect(processor.processEvent(event)).resolves.toBeUndefined();
   });
 });

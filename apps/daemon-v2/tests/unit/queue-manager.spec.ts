@@ -42,7 +42,8 @@ describe("QueueManager", () => {
     mockRedisInstance = {
       ping: vi.fn().mockResolvedValue("PONG"),
       quit: vi.fn().mockResolvedValue("OK"),
-    };
+    } as unknown as Mocked<Redis>;
+
     mockQueueInstance = {
       add: vi.fn(),
       close: vi.fn(),
@@ -50,15 +51,17 @@ describe("QueueManager", () => {
       getActive: vi.fn().mockResolvedValue([]),
       getCompleted: vi.fn().mockResolvedValue([]),
       getFailed: vi.fn().mockResolvedValue([]),
-    };
+    } as unknown as Mocked<Queue>;
+
     mockWorkerInstance = {
       close: vi.fn(),
       on: vi.fn(),
-    };
+    } as unknown as Mocked<Worker>;
+
     mockQueueEventsInstance = {
       close: vi.fn(),
       on: vi.fn(),
-    };
+    } as unknown as Mocked<QueueEvents>;
 
     MockedRedis.mockReturnValue(mockRedisInstance);
     MockedQueue.mockReturnValue(mockQueueInstance);

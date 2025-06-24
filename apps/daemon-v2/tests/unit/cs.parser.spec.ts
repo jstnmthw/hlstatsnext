@@ -1,6 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { CsParser } from "../../src/services/ingress/parsers/cs.parser";
-import { EventType } from "../../src/types/common/events";
+import {
+  EventType,
+  type PlayerConnectEvent,
+  type PlayerDisconnectEvent,
+  type PlayerKillEvent,
+} from "../../src/types/common/events";
 
 describe("CsParser", () => {
   const parser = new CsParser("csgo");
@@ -25,10 +30,11 @@ describe("CsParser", () => {
       const result = await parser.parse(logLine, serverId);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.event.eventType).toBe(EventType.PLAYER_CONNECT);
-        expect(result.event.data.playerName).toBe("PlayerName");
-        expect(result.event.data.steamId).toBe("STEAM_1:0:12345");
-        expect(result.event.data.ipAddress).toBe("1.2.3.4");
+        const event = result.event as PlayerConnectEvent;
+        expect(event.eventType).toBe(EventType.PLAYER_CONNECT);
+        expect(event.data.playerName).toBe("PlayerName");
+        expect(event.data.steamId).toBe("STEAM_1:0:12345");
+        expect(event.data.ipAddress).toBe("1.2.3.4");
       }
     });
 
@@ -38,8 +44,9 @@ describe("CsParser", () => {
       const result = await parser.parse(logLine, serverId);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.event.eventType).toBe(EventType.PLAYER_DISCONNECT);
-        expect(result.event.data.reason).toBe("Client left game");
+        const event = result.event as PlayerDisconnectEvent;
+        expect(event.eventType).toBe(EventType.PLAYER_DISCONNECT);
+        expect(event.data.reason).toBe("Client left game");
       }
     });
 
@@ -49,8 +56,9 @@ describe("CsParser", () => {
       const result = await parser.parse(logLine, serverId);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.event.eventType).toBe(EventType.PLAYER_DISCONNECT);
-        expect(result.event.data.reason).toBeUndefined();
+        const event = result.event as PlayerDisconnectEvent;
+        expect(event.eventType).toBe(EventType.PLAYER_DISCONNECT);
+        expect(event.data.reason).toBeUndefined();
       }
     });
 
@@ -60,11 +68,12 @@ describe("CsParser", () => {
       const result = await parser.parse(logLine, serverId);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.event.eventType).toBe(EventType.PLAYER_KILL);
-        expect(result.event.data.weapon).toBe("ak47");
-        expect(result.event.data.headshot).toBe(true);
-        expect(result.event.data.killerTeam).toBe("TERRORIST");
-        expect(result.event.data.victimTeam).toBe("CT");
+        const event = result.event as PlayerKillEvent;
+        expect(event.eventType).toBe(EventType.PLAYER_KILL);
+        expect(event.data.weapon).toBe("ak47");
+        expect(event.data.headshot).toBe(true);
+        expect(event.data.killerTeam).toBe("TERRORIST");
+        expect(event.data.victimTeam).toBe("CT");
       }
     });
 
@@ -74,9 +83,10 @@ describe("CsParser", () => {
       const result = await parser.parse(logLine, serverId);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.event.eventType).toBe(EventType.PLAYER_KILL);
-        expect(result.event.data.weapon).toBe("deagle");
-        expect(result.event.data.headshot).toBe(false);
+        const event = result.event as PlayerKillEvent;
+        expect(event.eventType).toBe(EventType.PLAYER_KILL);
+        expect(event.data.weapon).toBe("deagle");
+        expect(event.data.headshot).toBe(false);
       }
     });
 
@@ -84,7 +94,9 @@ describe("CsParser", () => {
       const logLine = 'L 07/15/2024 - 22:33:10: "Server" say "Hello"';
       const result = await parser.parse(logLine, serverId);
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Unsupported log line");
+      if (!result.success) {
+        expect(result.error).toBe("Unsupported log line");
+      }
     });
   });
 });

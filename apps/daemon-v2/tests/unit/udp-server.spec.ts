@@ -26,7 +26,9 @@ describe("UdpServer", () => {
 
   beforeEach(() => {
     mockSocket = new MockSocket();
-    mockedDgram.createSocket.mockReturnValue(mockSocket as any);
+    mockedDgram.createSocket.mockReturnValue(
+      mockSocket as unknown as dgram.Socket
+    );
     server = new UdpServer({ port: 12345 });
   });
 
@@ -114,7 +116,7 @@ describe("UdpServer", () => {
       expect(connectSpy).toHaveBeenCalledTimes(1);
       const stats = server.getServerStats();
       expect(stats).toHaveLength(1);
-      expect(stats[0].packetCount).toBe(2);
+      expect(stats[0]!.packetCount).toBe(2);
     });
 
     it("should reject oversized packets", () => {
@@ -215,7 +217,7 @@ describe("UdpServer", () => {
 
       const active = server.getActiveServers();
       expect(active).toHaveLength(1);
-      expect(active[0].address).toBe(server2.address);
+      expect(active[0]!.address).toBe(server2.address);
     });
 
     it("should clean up stale servers", () => {
@@ -229,7 +231,7 @@ describe("UdpServer", () => {
 
       const allServers = server.getServerStats();
       expect(allServers).toHaveLength(1);
-      expect(allServers[0].address).toBe(server2.address);
+      expect(allServers[0]!.address).toBe(server2.address);
     });
   });
 });

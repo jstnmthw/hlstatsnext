@@ -11,6 +11,7 @@ import { DatabaseClient } from "@/database/client";
 import { EventProcessorService } from "@/services/processor/processor.service";
 import { UdpServer } from "@/services/ingress/udp-server";
 import { CsParser } from "@/services/ingress/parsers/cs.parser";
+import { logger } from "@/utils/logger";
 
 export interface IIngressService {
   start(): Promise<void>;
@@ -48,7 +49,10 @@ export class IngressService implements IIngressService {
     });
 
     this.udpServer.on("error", (err) => {
-      console.error("UDP Server error:", err);
+      logger.failed(
+        "UDP Server error",
+        err instanceof Error ? err.message : String(err)
+      );
     });
 
     await this.udpServer.start();
@@ -75,14 +79,14 @@ export class IngressService implements IIngressService {
 
       if (!record) {
         // Unknown server – ignore all traffic
-        console.warn(`Rejected log line from unrecognised server ${serverKey}`);
+        logger.warn(`Rejected log line from unrecognised server ${serverKey}`);
         return;
       }
 
       // For legacy auth we trust the IP+port once it has a DB record
       this.authenticatedServers.set(serverKey, record.serverId);
       serverId = record.serverId;
-      console.log(`Authorised server ${serverKey} (serverId=${serverId})`);
+      logger.info(`Authorised server ${serverKey} (serverId=${serverId})`);
 
       // First log line might just be a heartbeat, ignore if it's the authorisation
       // line such as "logaddress_add" etc. Skip processing this first packet.
@@ -100,7 +104,7 @@ export class IngressService implements IIngressService {
 
       if (!parseResult.success) {
         // Log parser error details for debugging
-        console.debug(`Parser error: ${parseResult.error}`);
+        logger.debug(`Parser error: ${parseResult.error}`);
         return;
       }
 
@@ -112,7 +116,10 @@ export class IngressService implements IIngressService {
 
       await this.processor.processEvent(event);
     } catch (error) {
-      console.error(`Failed to process log line from ${serverKey}:`, error);
+      logger.failed(
+        `Failed to process log line from ${serverKey}`,
+        error instanceof Error ? error.message : String(error)
+      );
     }
   }
 }

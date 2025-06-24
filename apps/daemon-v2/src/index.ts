@@ -11,6 +11,7 @@ import { IngressService } from "./services/ingress/ingress.service";
 import { EventProcessorService } from "./services/processor/processor.service";
 import { RconService } from "./services/rcon/rcon.service";
 import { StatisticsService } from "./services/statistics/statistics.service";
+import { logger } from "./utils/logger";
 
 export class HLStatsDaemon {
   private db: DatabaseClient;
@@ -21,7 +22,7 @@ export class HLStatsDaemon {
   private statistics: StatisticsService;
 
   constructor() {
-    console.log("🚀 Initializing HLStats Daemon v2...");
+    logger.info("Initializing HLStats Daemon v2");
 
     this.db = new DatabaseClient();
     this.processor = new EventProcessorService();
@@ -34,17 +35,17 @@ export class HLStatsDaemon {
   async start(): Promise<void> {
     try {
       // Test database connectivity first
-      console.log("📊 Testing database connection...");
+      logger.connecting("database");
       const dbConnected = await this.processor.testDatabaseConnection();
 
       if (!dbConnected) {
         throw new Error("Failed to connect to database");
       }
 
-      console.log("✅ Database connection successful");
+      logger.connected("database");
 
       // Start all services
-      console.log("🔧 Starting services...");
+      logger.info("Starting services");
       await Promise.all([
         this.gateway.start(),
         this.ingress.start(),
@@ -52,16 +53,19 @@ export class HLStatsDaemon {
         this.statistics.start(),
       ]);
 
-      console.log("✅ All services started successfully");
-      console.log("🎮 HLStats Daemon v2 is ready to receive game server data!");
+      logger.ok("All services started successfully");
+      logger.ready("HLStats Daemon v2 is ready to receive game server data");
     } catch (error) {
-      console.error("❌ Failed to start daemon:", error);
+      logger.failed(
+        "Failed to start daemon",
+        error instanceof Error ? error.message : String(error)
+      );
       process.exit(1);
     }
   }
 
   async stop(): Promise<void> {
-    console.log("🛑 Shutting down HLStats Daemon v2...");
+    logger.shutdown();
 
     try {
       await Promise.all([
@@ -72,9 +76,12 @@ export class HLStatsDaemon {
         this.processor.disconnect(),
       ]);
 
-      console.log("✅ Daemon shutdown complete");
+      logger.shutdownComplete();
     } catch (error) {
-      console.error("❌ Error during shutdown:", error);
+      logger.failed(
+        "Error during shutdown",
+        error instanceof Error ? error.message : String(error)
+      );
     }
   }
 }
@@ -84,25 +91,25 @@ function main() {
   const daemon = new HLStatsDaemon();
 
   process.on("SIGINT", async () => {
-    console.log("\n📡 Received SIGINT, shutting down gracefully...");
+    logger.received("SIGINT");
     await daemon.stop();
     process.exit(0);
   });
 
   process.on("SIGTERM", async () => {
-    console.log("\n📡 Received SIGTERM, shutting down gracefully...");
+    logger.received("SIGTERM");
     await daemon.stop();
     process.exit(0);
   });
 
   // Start the daemon
   daemon.start().catch((error) => {
-    console.error("💥 Fatal error:", error);
+    logger.fatal(error instanceof Error ? error.message : String(error));
     process.exit(1);
   });
 
-  console.log("🎯 HLStats Daemon v2 - Phase 1 Complete!");
-  console.log("📋 Features implemented:");
+  logger.ok("HLStats Daemon v2 - Phase 1 Complete");
+  logger.info("Features implemented");
 }
 
 // This allows the file to be imported for testing without executing the startup logic.

@@ -6,6 +6,8 @@
   be added in a later phase.
 */
 
+import { logger } from "@/utils/logger";
+
 export interface IRconService {
   connect(host: string, port: number, password: string): Promise<void>;
   disconnect(): Promise<void>;
@@ -41,10 +43,10 @@ export class RconService implements IRconService {
   }
 
   async start(): Promise<void> {
-    console.log("🔧 RCON Service started");
+    logger.started("RCON Service");
   }
 
   async stop(): Promise<void> {
-    console.log("🛑 RCON Service stopped");
+    logger.stopped("RCON Service");
   }
 }

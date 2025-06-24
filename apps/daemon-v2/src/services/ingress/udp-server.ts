@@ -8,6 +8,7 @@
 import dgram from "dgram";
 import type { AddressInfo } from "net";
 import { EventEmitter } from "events";
+import { logger } from "@/utils/logger";
 
 export interface UdpServerOptions {
   port: number;
@@ -54,8 +55,8 @@ export class UdpServer extends EventEmitter {
       this.server.on("error", this.handleError.bind(this));
       this.server.on("listening", () => {
         const address = this.server?.address();
-        console.log(
-          `🔄 UDP server listening on ${address?.address}:${address?.port}`
+        logger.info(
+          `UDP server listening on ${address?.address}:${address?.port}`
         );
         resolve();
       });
@@ -69,7 +70,7 @@ export class UdpServer extends EventEmitter {
       if (this.server) {
         this.server.close(() => {
           this.server = null;
-          console.log("UDP server stopped");
+          logger.info("UDP server stopped");
           resolve();
         });
       } else {
@@ -84,7 +85,7 @@ export class UdpServer extends EventEmitter {
     try {
       // Check rate limiting
       if (!this.checkRateLimit(serverKey)) {
-        console.warn(`Rate limit exceeded for server ${serverKey}`);
+        logger.warn(`Rate limit exceeded for server ${serverKey}`);
         return;
       }
 
@@ -93,7 +94,7 @@ export class UdpServer extends EventEmitter {
 
       // Validate packet size
       if (message.length > this.options.maxPacketSize) {
-        console.warn(
+        logger.warn(
           `Oversized packet from ${serverKey}: ${message.length} bytes`
         );
         return;
@@ -110,13 +111,16 @@ export class UdpServer extends EventEmitter {
         });
       }
     } catch (error) {
-      console.error(`Error processing message from ${serverKey}:`, error);
+      logger.failed(
+        `Error processing message from ${serverKey}`,
+        error instanceof Error ? error.message : String(error)
+      );
       this.emit("error", error);
     }
   }
 
   private handleError(error: Error): void {
-    console.error("UDP server error:", error);
+    logger.failed("UDP server error", error.message);
     this.emit("error", error);
   }
 
@@ -161,7 +165,7 @@ export class UdpServer extends EventEmitter {
         packetCount: 1,
       });
 
-      console.log(`New game server connected: ${serverKey}`);
+      logger.info(`New game server connected: ${serverKey}`);
       this.emit("serverConnected", {
         address: remoteInfo.address,
         port: remoteInfo.port,
@@ -197,7 +201,7 @@ export class UdpServer extends EventEmitter {
       if (server.lastSeen < oneHourAgo) {
         this.connectedServers.delete(key);
         this.rateLimiters.delete(key);
-        console.log(`Removed stale server: ${key}`);
+        logger.info(`Removed stale server: ${key}`);
       }
     }
   }

@@ -13,6 +13,7 @@ const colors = {
   yellow: "\x1b[33m",
   magenta: "\x1b[35m",
   cyan: "\x1b[36m",
+  gray: "\x1b[90m",
 } as const;
 
 // Status types
@@ -21,19 +22,41 @@ export type LogStatus = "OK" | "ERROR" | "INFO" | "WARN" | "DEBUG";
 interface LoggerOptions {
   enableColors?: boolean;
   timestamp?: boolean;
+  showTimestamp?: boolean;
 }
 
 export class Logger {
   private enableColors: boolean;
   private timestamp: boolean;
+  private showTimestamp: boolean;
 
   constructor(options: LoggerOptions = {}) {
     this.enableColors = options.enableColors ?? true;
     this.timestamp = options.timestamp ?? false;
+    this.showTimestamp = options.showTimestamp ?? true;
+  }
+
+  private formatTimestamp(): string {
+    if (!this.showTimestamp) {
+      return "";
+    }
+
+    const now = new Date();
+    const timestamp = now
+      .toISOString()
+      .replace("T", " ")
+      .replace(/\.\d{3}Z$/, "");
+
+    if (!this.enableColors) {
+      return `[${timestamp}] `;
+    }
+
+    return `${colors.gray}[${timestamp}]${colors.reset} `;
   }
 
   private formatStatus(status: LogStatus): string {
-    const statusText = `[ ${status} ]`;
+    // Pad status to ensure consistent alignment
+    const statusText = `[ ${status.padEnd(1)} ]`;
 
     if (!this.enableColors) {
       return statusText;
@@ -55,18 +78,12 @@ export class Logger {
     }
   }
 
-  private formatMessage(message: string): string {
-    if (this.timestamp) {
-      const timestamp = new Date().toISOString();
-      return `${timestamp} ${message}`;
-    }
-    return message;
-  }
-
   private log(status: LogStatus, message: string): void {
+    const timestamp = this.formatTimestamp();
     const formattedStatus = this.formatStatus(status);
-    const formattedMessage = this.formatMessage(message);
-    console.log(`${formattedStatus} ${formattedMessage}`);
+
+    // Ensure consistent spacing and alignment
+    console.log(`${timestamp}${formattedStatus} ${message}`);
   }
 
   ok(message: string): void {
@@ -141,6 +158,26 @@ export class Logger {
 
   fatal(error: string): void {
     this.error(`Fatal error: ${error}`);
+  }
+
+  // Method to disable timestamps for testing or specific use cases
+  disableTimestamps(): void {
+    this.showTimestamp = false;
+  }
+
+  // Method to enable timestamps
+  enableTimestamps(): void {
+    this.showTimestamp = true;
+  }
+
+  // Method to disable colors (useful for log files)
+  disableColors(): void {
+    this.enableColors = false;
+  }
+
+  // Method to enable colors
+  setColorsEnabled(enabled: boolean): void {
+    this.enableColors = enabled;
   }
 }
 

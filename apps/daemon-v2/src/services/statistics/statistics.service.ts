@@ -6,6 +6,8 @@
   after persistence layer is connected.
 */
 
+import { logger } from "@/utils/logger";
+
 export interface IStatisticsService {
   recalculateAll(): Promise<void>;
   recalculatePlayer(playerId: string): Promise<void>;
@@ -30,10 +32,10 @@ export class StatisticsService implements IStatisticsService {
   }
 
   async start(): Promise<void> {
-    console.log("📊 Statistics Service started");
+    logger.started("Statistics Service");
   }
 
   async stop(): Promise<void> {
-    console.log("🛑 Statistics Service stopped");
+    logger.stopped("Statistics Service");
   }
 }

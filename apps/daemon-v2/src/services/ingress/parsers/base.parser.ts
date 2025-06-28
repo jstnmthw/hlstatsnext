@@ -5,18 +5,12 @@
  * game server log lines into structured events.
  */
 
-import type { GameEvent } from "@/types/common/events"
+import type { GameEvent, EventWithMeta } from "@/types/common/events"
 
 export type ParseResult =
   | {
       success: true
-      event: GameEvent & {
-        meta?: {
-          steamId: string
-          playerName: string
-          isBot: boolean
-        }
-      }
+      event: EventWithMeta
     }
   | { success: false; error: string }
 
@@ -38,18 +32,114 @@ export abstract class BaseParser {
   abstract canParse(logLine: string): boolean
 
   /**
-   * Extract timestamp from log line (common across most formats)
+   * Extract basic event information from a log line
    */
-  protected extractTimestamp(logLine: string): Date | null {
-    // Common format: L 12/31/2023 - 23:59:59:
-    const timestampMatch = logLine.match(/^L (\d{2}\/\d{2}\/\d{4}) - (\d{2}:\d{2}:\d{2}):/)
+  protected extractBasicInfo(logLine: string): {
+    timestamp: Date
+    content: string
+  } {
+    // Match HLStats timestamp format: L MM/DD/YYYY - HH:MM:SS:
+    const timestampMatch = logLine.match(/^L (\d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}):\s*(.*)/)
 
-    if (!timestampMatch) {
-      return null
+    if (!timestampMatch || timestampMatch.length < 3) {
+      throw new Error("Invalid log line format - missing timestamp")
     }
 
-    const [, dateStr, timeStr] = timestampMatch
-    return new Date(`${dateStr} ${timeStr}`)
+    const timestampStr = timestampMatch[1]!
+    const content = timestampMatch[2]!
+    const timestamp = this.parseTimestamp(timestampStr)
+
+    return { timestamp, content }
+  }
+
+  /**
+   * Parse timestamp from HLStats format
+   */
+  private parseTimestamp(timestampStr: string): Date {
+    // Format: MM/DD/YYYY - HH:MM:SS
+    const match = timestampStr.match(/(\d{2})\/(\d{2})\/(\d{4}) - (\d{2}):(\d{2}):(\d{2})/)
+
+    if (!match || match.length < 7) {
+      throw new Error(`Invalid timestamp format: ${timestampStr}`)
+    }
+
+    const month = match[1]!
+    const day = match[2]!
+    const year = match[3]!
+    const hour = match[4]!
+    const minute = match[5]!
+    const second = match[6]!
+
+    return new Date(
+      parseInt(year, 10),
+      parseInt(month, 10) - 1, // Month is 0-indexed
+      parseInt(day, 10),
+      parseInt(hour, 10),
+      parseInt(minute, 10),
+      parseInt(second, 10),
+    )
+  }
+
+  /**
+   * Extract player information from a player string
+   * Format: "PlayerName<uid><STEAM_ID><team>"
+   */
+  protected parsePlayerInfo(playerStr: string): {
+    name: string
+    steamId: string
+    team: string
+    isBot: boolean
+  } {
+    // Match player format: "Name<uid><steamid><team>"
+    const match = playerStr.match(/^"([^"]+)"<(\d+)><([^>]+)><([^>]*)>$/)
+
+    if (!match || match.length < 5) {
+      throw new Error(`Invalid player format: ${playerStr}`)
+    }
+
+    const name = match[1]!
+    const steamId = match[3]!
+    const team = match[4]!
+
+    // Detect bots - they typically have "BOT" as Steam ID or specific patterns
+    const isBot = steamId === "BOT" || steamId.startsWith("BOT_") || name.includes("BOT")
+
+    return {
+      name: name.trim(),
+      steamId: steamId.trim(),
+      team: team.trim(),
+      isBot,
+    }
+  }
+
+  /**
+   * Extract position coordinates from a position string
+   * Format: "x y z"
+   */
+  protected parsePosition(positionStr: string): { x: number; y: number; z: number } | undefined {
+    const match = positionStr.match(/^([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)$/)
+
+    if (!match || match.length < 4) {
+      return undefined
+    }
+
+    const x = match[1]!
+    const y = match[2]!
+    const z = match[3]!
+
+    return {
+      x: parseFloat(x),
+      y: parseFloat(y),
+      z: parseFloat(z),
+    }
+  }
+
+  /**
+   * Check if a string contains a weapon name
+   */
+  protected isValidWeapon(weapon: string): boolean {
+    // Basic weapon validation - can be expanded
+    return weapon.length > 0 && !weapon.includes("<") && !weapon.includes(">")
   }
 
   /**

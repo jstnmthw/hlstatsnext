@@ -6,7 +6,7 @@
 */
 
 import { EventType } from "@/types/common/events"
-import type { GameEvent, PlayerMeta } from "@/types/common/events"
+import type { GameEvent } from "@/types/common/events"
 import { DatabaseClient } from "@/database/client"
 import { PlayerHandler } from "./handlers/player.handler"
 import { WeaponHandler } from "./handlers/weapon.handler"
@@ -23,11 +23,11 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
   private readonly db: DatabaseClient
   private readonly opts: { logBots?: boolean }
 
-  // Retain existing handlers for future expansion, but they are optional in this minimal path
-  private readonly playerHandler?: PlayerHandler
-  private readonly weaponHandler?: WeaponHandler
-  private readonly matchHandler?: MatchHandler
-  private readonly rankingHandler?: RankingHandler
+  // Handlers for processing events
+  private readonly playerHandler: PlayerHandler
+  private readonly weaponHandler: WeaponHandler
+  private readonly matchHandler: MatchHandler
+  private readonly rankingHandler: RankingHandler
 
   constructor(db?: DatabaseClient, opts: { logBots?: boolean } = {}) {
     super()
@@ -35,77 +35,65 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
     // If a DatabaseClient is supplied use it, otherwise create a new one so that
     // existing callers (e.g. production entry-point) remain functional.
     this.db = db ?? new DatabaseClient()
-    this.opts = opts
+    this.opts = { logBots: true, ...opts }
 
-    // Preserve existing handlers for compatibility - they'll be wired up only
-    // when the caller hasn't opted-in to "happy-path" processing (future work).
-    if (!opts || Object.keys(opts).length === 0) {
-      this.playerHandler = new PlayerHandler(this.db)
-      this.weaponHandler = new WeaponHandler(this.db)
-      this.matchHandler = new MatchHandler(this.db)
-      this.rankingHandler = new RankingHandler(this.db)
-    }
+    // Initialize handlers
+    this.playerHandler = new PlayerHandler(this.db)
+    this.weaponHandler = new WeaponHandler(this.db)
+    this.matchHandler = new MatchHandler(this.db)
+    this.rankingHandler = new RankingHandler(this.db)
   }
 
   /* Existing enqueue placeholder (kept for API compatibility).
    * IDEALLY this will be removed in a later refactor when queueing lands. */
-  async enqueue(event: unknown): Promise<void> {
-    void event
+  async enqueue(): Promise<void> {
+    logger.info("Event enqueued for processing")
   }
 
-  async processEvent(event: GameEvent & { meta?: PlayerMeta }): Promise<void> {
-    // 0. Bot gate - allow in dev, ignore in prod unless logBots=true
-    if (event.meta?.isBot && !this.opts.logBots) {
-      return
-    }
-
+  async processEvent(event: GameEvent): Promise<void> {
     try {
+      // Skip bot events if logBots is false
+      if (!this.opts.logBots) {
+        const eventWithMeta = event as GameEvent & { meta?: { isBot?: boolean } }
+        if (eventWithMeta.meta?.isBot) {
+          logger.debug(`Skipping bot event: ${event.eventType}`)
+          return
+        }
+      }
+
+      // Resolve player IDs for events that need them
+      await this.resolvePlayerIds(event)
+
+      // Persist the event to the database
+      await this.db.createGameEvent(event)
+
+      // Route to appropriate handlers
       switch (event.eventType) {
-        case EventType.PLAYER_CONNECT: {
-          const meta = event.meta
-
-          if (!meta) {
-            logger.warn("CONNECT event missing meta - skipped")
-            break
+        case EventType.PLAYER_CONNECT:
+        case EventType.PLAYER_DISCONNECT:
+        case EventType.PLAYER_KILL:
+        case EventType.PLAYER_SUICIDE:
+        case EventType.PLAYER_TEAMKILL:
+          if (this.playerHandler) {
+            await this.playerHandler.handleEvent(event)
           }
-
-          const { steamId, playerName } = meta
-
-          // Leverage existing helper that handles Player & PlayerUniqueId tables.
-          await this.db.getOrCreatePlayer(steamId, playerName, "cstrike")
-
-          break
-        }
-
-        case EventType.PLAYER_KILL: {
-          await this.db.createGameEvent(event)
-
-          break
-        }
-
-        case EventType.CHAT_MESSAGE: {
-          const meta = event.meta
-
-          if (!meta) {
-            logger.warn("CHAT event missing meta - skipped")
-            break
+          if (event.eventType === EventType.PLAYER_KILL) {
+            // Kill events also go to weapon and ranking handlers
+            if (this.weaponHandler) {
+              await this.weaponHandler.handleEvent(event)
+            }
+            if (this.rankingHandler) {
+              await this.rankingHandler.handleEvent(event)
+            }
           }
-
-          const { steamId, playerName } = meta
-
-          // Upsert player
-          const playerId = await this.db.getOrCreatePlayer(steamId, playerName, "cstrike")
-
-          // Assign resolved playerId and persist chat event
-          event.data.playerId = playerId
-
-          await this.db.createGameEvent(event)
-
           break
-        }
+
+        case EventType.CHAT_MESSAGE:
+          // Chat messages don't need additional processing beyond persistence
+          break
 
         default:
-          // Ignore unsupported events in MVP
+          logger.warn(`Unhandled event type: ${event.eventType}`)
           break
       }
 
@@ -122,10 +110,80 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
   }
 
   /**
+   * Resolve player IDs from Steam IDs for events that need them
+   */
+  private async resolvePlayerIds(event: GameEvent): Promise<void> {
+    switch (event.eventType) {
+      case EventType.PLAYER_CONNECT: {
+        if (!event.meta) {
+          throw new Error("CONNECT event missing meta")
+        }
+
+        const { steamId, playerName } = event.meta
+        const playerId = await this.db.getOrCreatePlayer(steamId, playerName, "cstrike")
+        event.data.playerId = playerId
+        break
+      }
+
+      case EventType.PLAYER_DISCONNECT: {
+        // For disconnect, we'd need to look up by Steam ID if we had it
+        // For now, assume playerId is already set or will be resolved elsewhere
+        break
+      }
+
+      case EventType.PLAYER_KILL:
+      case EventType.PLAYER_TEAMKILL: {
+        if (!event.meta) {
+          throw new Error(`${event.eventType} event missing meta`)
+        }
+
+        const { killer, victim } = event.meta
+        const killerId = await this.db.getOrCreatePlayer(killer.steamId, killer.playerName, "cstrike")
+        const victimId = await this.db.getOrCreatePlayer(victim.steamId, victim.playerName, "cstrike")
+
+        event.data.killerId = killerId
+        event.data.victimId = victimId
+        break
+      }
+
+      case EventType.PLAYER_SUICIDE: {
+        if (!event.meta) {
+          throw new Error("SUICIDE event missing meta")
+        }
+
+        const { steamId, playerName } = event.meta
+        const playerId = await this.db.getOrCreatePlayer(steamId, playerName, "cstrike")
+        event.data.playerId = playerId
+        break
+      }
+
+      case EventType.CHAT_MESSAGE: {
+        if (!event.meta) {
+          throw new Error("CHAT event missing meta")
+        }
+
+        const { steamId, playerName } = event.meta
+        const playerId = await this.db.getOrCreatePlayer(steamId, playerName, "cstrike")
+        event.data.playerId = playerId
+        break
+      }
+
+      default:
+        // Other events may not need player ID resolution
+        break
+    }
+  }
+
+  /**
    * Test database connectivity
    */
   async testDatabaseConnection(): Promise<boolean> {
-    return this.db.testConnection()
+    try {
+      await this.db.testConnection()
+      return true
+    } catch {
+      return false
+    }
   }
 
   /**
@@ -133,5 +191,12 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
    */
   async disconnect(): Promise<void> {
     await this.db.disconnect()
+  }
+
+  /**
+   * Get top players by ranking
+   */
+  async getTopPlayers(limit: number = 50, game: string = "cstrike", includeHidden: boolean = false) {
+    return this.db.getTopPlayers(limit, game, includeHidden)
   }
 }

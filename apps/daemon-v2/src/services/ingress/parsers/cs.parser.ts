@@ -4,6 +4,8 @@ import {
   type PlayerConnectEvent,
   type PlayerDisconnectEvent,
   type PlayerKillEvent,
+  type PlayerSuicideEvent,
+  type PlayerTeamkillEvent,
 } from "@/types/common/events"
 
 /**
@@ -12,6 +14,8 @@ import {
  * ✅ PLAYER_CONNECT
  * ✅ PLAYER_DISCONNECT
  * ✅ PLAYER_KILL
+ * ✅ PLAYER_SUICIDE
+ * ✅ PLAYER_TEAMKILL
  *
  * This is intentionally lightweight - regexes are crude but good enough for a
  * phase-1 prototype. They can be hardened later.
@@ -36,9 +40,15 @@ export class CsParser extends BaseParser {
   async parse(rawLogLine: string, serverId: number): Promise<ParseResult> {
     const logLine = this.normaliseLogLine(rawLogLine)
 
-    // Order matters - check for kill first as it also contains a quoted player string.
+    // Order matters - check for teamkill first (most specific), then kill, then suicide
+    const teamkill = await this.parseTeamkill(logLine, serverId)
+    if (teamkill) return { success: true, event: teamkill }
+
     const kill = await this.parseKill(logLine, serverId)
     if (kill) return { success: true, event: kill }
+
+    const suicide = await this.parseSuicide(logLine, serverId)
+    if (suicide) return { success: true, event: suicide }
 
     const connect = await this.parseConnect(logLine, serverId)
     if (connect) return { success: true, event: connect }
@@ -55,9 +65,10 @@ export class CsParser extends BaseParser {
   private async parseConnect(logLine: string, serverId: number): Promise<PlayerConnectEvent | null> {
     /*
       Example:
-      L 07/15/2024 - 22:33:10: "PlayerName<1><STEAM_1:0:12345><CT>" connected, address "1.2.3.4:27005"
+      L 07/15/2024 - 22:35:10: "PlayerName<1><STEAM_1:0:12345><CT>" STEAM USERID validated
+      L 07/15/2024 - 22:35:10: "PlayerName<1><STEAM_1:0:12345><>" connected, address "192.168.1.100:27005"
     */
-    const regex = /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><.*?>" connected, address "([\d.]+):/i
+    const regex = /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><.*?>" connected, address "(.+?)(?::\d+)?"/i
     const match = logLine.match(regex)
     if (!match) return null
 
@@ -66,11 +77,11 @@ export class CsParser extends BaseParser {
     const ipAddress = match[3]!
     const isBot = steamId.toUpperCase() === "BOT"
 
-    const event: PlayerConnectEvent & {
-      meta?: { steamId: string; playerName: string; isBot: boolean }
-    } = {
+    const { timestamp } = this.extractBasicInfo(logLine)
+
+    const event: PlayerConnectEvent = {
       eventType: EventType.PLAYER_CONNECT,
-      timestamp: this.extractTimestamp(logLine) ?? new Date(),
+      timestamp,
       serverId,
       data: {
         playerId: 0, // Will be resolved later by PlayerHandler
@@ -99,9 +110,11 @@ export class CsParser extends BaseParser {
 
     const reason = match[3]
 
+    const { timestamp } = this.extractBasicInfo(logLine)
+
     const event: PlayerDisconnectEvent = {
       eventType: EventType.PLAYER_DISCONNECT,
-      timestamp: this.extractTimestamp(logLine) ?? new Date(),
+      timestamp,
       serverId,
       data: {
         playerId: 0, // Unknown until we correlate - optional in handler
@@ -122,16 +135,23 @@ export class CsParser extends BaseParser {
     const match = logLine.match(regex)
     if (!match) return null
 
-    // const killerSteam = match[2]!;
+    const killerName = match[1]!
+    const killerSteamId = match[2]!
     const killerTeam = match[3]!
-    // const victimSteam = match[5]!;
+    const victimName = match[4]!
+    const victimSteamId = match[5]!
     const victimTeam = match[6]!
     const weapon = match[7]!
     const headshotGroup = match[8]
 
+    // Skip if this is a teamkill (same team)
+    if (killerTeam === victimTeam) return null
+
+    const { timestamp } = this.extractBasicInfo(logLine)
+
     const event: PlayerKillEvent = {
       eventType: EventType.PLAYER_KILL,
-      timestamp: this.extractTimestamp(logLine) ?? new Date(),
+      timestamp,
       serverId,
       data: {
         // player IDs will be resolved by PlayerHandler downstream
@@ -141,6 +161,106 @@ export class CsParser extends BaseParser {
         headshot: Boolean(headshotGroup),
         killerTeam,
         victimTeam,
+      },
+      meta: {
+        killer: {
+          steamId: killerSteamId,
+          playerName: this.sanitizeString(killerName),
+          isBot: killerSteamId.toUpperCase() === "BOT",
+        },
+        victim: {
+          steamId: victimSteamId,
+          playerName: this.sanitizeString(victimName),
+          isBot: victimSteamId.toUpperCase() === "BOT",
+        },
+      },
+    }
+
+    return event
+  }
+
+  private async parseSuicide(logLine: string, serverId: number): Promise<PlayerSuicideEvent | null> {
+    /*
+      Example:
+      L 07/15/2024 - 22:35:05: "Player<2><STEAM_1:0:111><TERRORIST>" [93 303 73] committed suicide with "world"
+    */
+    const regex = /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?committed suicide with "(\w+)"/i
+    const match = logLine.match(regex)
+    if (!match) return null
+
+    const playerName = match[1]!
+    const steamId = match[2]!
+    const team = match[3]!
+    const weapon = match[4]!
+
+    const { timestamp } = this.extractBasicInfo(logLine)
+
+    const event: PlayerSuicideEvent = {
+      eventType: EventType.PLAYER_SUICIDE,
+      timestamp,
+      serverId,
+      data: {
+        playerId: 0, // Will be resolved by PlayerHandler
+        weapon,
+        team,
+      },
+      meta: {
+        steamId,
+        playerName: this.sanitizeString(playerName),
+        isBot: steamId.toUpperCase() === "BOT",
+      },
+    }
+
+    return event
+  }
+
+  private async parseTeamkill(logLine: string, serverId: number): Promise<PlayerTeamkillEvent | null> {
+    /*
+      Example:
+      L 07/15/2024 - 22:35:05: "Killer<2><STEAM_1:0:111><TERRORIST>" [93 303 73] killed "Victim<3><STEAM_1:0:222><TERRORIST>" [35 302 73] with "ak47" (headshot)
+      Note: Same team for both players
+    */
+    const regex =
+      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?killed "(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?with "(\w+)"( \(headshot\))?/i
+    const match = logLine.match(regex)
+    if (!match) return null
+
+    const killerName = match[1]!
+    const killerSteamId = match[2]!
+    const killerTeam = match[3]!
+    const victimName = match[4]!
+    const victimSteamId = match[5]!
+    const victimTeam = match[6]!
+    const weapon = match[7]!
+    const headshotGroup = match[8]
+
+    // Only process if same team (teamkill)
+    if (killerTeam !== victimTeam) return null
+
+    const { timestamp } = this.extractBasicInfo(logLine)
+
+    const event: PlayerTeamkillEvent = {
+      eventType: EventType.PLAYER_TEAMKILL,
+      timestamp,
+      serverId,
+      data: {
+        killerId: 0, // Will be resolved by PlayerHandler
+        victimId: 0, // Will be resolved by PlayerHandler
+        weapon,
+        headshot: Boolean(headshotGroup),
+        team: killerTeam,
+      },
+      meta: {
+        killer: {
+          steamId: killerSteamId,
+          playerName: this.sanitizeString(killerName),
+          isBot: killerSteamId.toUpperCase() === "BOT",
+        },
+        victim: {
+          steamId: victimSteamId,
+          playerName: this.sanitizeString(victimName),
+          isBot: victimSteamId.toUpperCase() === "BOT",
+        },
       },
     }
 
@@ -169,11 +289,11 @@ export class CsParser extends BaseParser {
 
     const isBot = steamId.toUpperCase() === "BOT"
 
-    const event: import("@/types/common/events").PlayerChatEvent & {
-      meta: { steamId: string; playerName: string; isBot: boolean }
-    } = {
+    const { timestamp } = this.extractBasicInfo(logLine)
+
+    const event: import("@/types/common/events").PlayerChatEvent = {
       eventType: EventType.CHAT_MESSAGE,
-      timestamp: this.extractTimestamp(logLine) ?? new Date(),
+      timestamp,
       serverId,
       data: {
         playerId: 0,

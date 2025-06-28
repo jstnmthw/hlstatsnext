@@ -3,10 +3,11 @@ import { CsParser } from "../../src/services/ingress/parsers/cs.parser"
 import {
   EventType,
   PlayerChatEvent,
-  PlayerMeta,
   type PlayerConnectEvent,
   type PlayerDisconnectEvent,
   type PlayerKillEvent,
+  type PlayerSuicideEvent,
+  type PlayerTeamkillEvent,
 } from "../../src/types/common/events"
 
 describe("CsParser", () => {
@@ -90,6 +91,84 @@ describe("CsParser", () => {
       }
     })
 
+    it("should parse a suicide event", async () => {
+      const logLine =
+        'L 07/15/2024 - 22:35:05: "Player<2><STEAM_1:0:111><TERRORIST>" [93 303 73] committed suicide with "world"'
+      const result = await parser.parse(logLine, serverId)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        const event = result.event as PlayerSuicideEvent
+        expect(event.eventType).toBe(EventType.PLAYER_SUICIDE)
+        expect(event.data.weapon).toBe("world")
+        expect(event.data.team).toBe("TERRORIST")
+        if (event.meta && "steamId" in event.meta) {
+          expect(event.meta.steamId).toBe("STEAM_1:0:111")
+          expect(event.meta.playerName).toBe("Player")
+          expect(event.meta.isBot).toBe(false)
+        }
+      }
+    })
+
+    it("should parse a teamkill event", async () => {
+      const logLine =
+        'L 07/15/2024 - 22:35:05: "TeamKiller<2><STEAM_1:0:111><CT>" [93 303 73] killed "TeamMate<3><STEAM_1:0:222><CT>" [35 302 73] with "m4a1"'
+      const result = await parser.parse(logLine, serverId)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        const event = result.event as PlayerTeamkillEvent
+        expect(event.eventType).toBe(EventType.PLAYER_TEAMKILL)
+        expect(event.data.weapon).toBe("m4a1")
+        expect(event.data.headshot).toBe(false)
+        expect(event.data.team).toBe("CT")
+        expect(event.meta?.killer.steamId).toBe("STEAM_1:0:111")
+        expect(event.meta?.killer.playerName).toBe("TeamKiller")
+        expect(event.meta?.victim.steamId).toBe("STEAM_1:0:222")
+        expect(event.meta?.victim.playerName).toBe("TeamMate")
+      }
+    })
+
+    it("should not parse a regular kill as teamkill", async () => {
+      const logLine =
+        'L 07/15/2024 - 22:35:05: "Killer<2><STEAM_1:0:111><TERRORIST>" [93 303 73] killed "Victim<3><STEAM_1:0:222><CT>" [35 302 73] with "ak47"'
+      const result = await parser.parse(logLine, serverId)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        const event = result.event
+        expect(event.eventType).toBe(EventType.PLAYER_KILL) // Not PLAYER_TEAMKILL
+      }
+    })
+
+    it("should parse a bot suicide event", async () => {
+      const logLine = 'L 07/15/2024 - 22:35:05: "BotName<2><BOT><CT>" [93 303 73] committed suicide with "hegrenade"'
+      const result = await parser.parse(logLine, serverId)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        const event = result.event as PlayerSuicideEvent
+        expect(event.eventType).toBe(EventType.PLAYER_SUICIDE)
+        expect(event.data.weapon).toBe("hegrenade")
+        expect(event.data.team).toBe("CT")
+        if (event.meta && "steamId" in event.meta) {
+          expect(event.meta.isBot).toBe(true)
+        }
+      }
+    })
+
+    it("should parse a bot teamkill event", async () => {
+      const logLine =
+        'L 07/15/2024 - 22:35:05: "BotKiller<2><BOT><TERRORIST>" [93 303 73] killed "BotVictim<3><BOT><TERRORIST>" [35 302 73] with "glock" (headshot)'
+      const result = await parser.parse(logLine, serverId)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        const event = result.event as PlayerTeamkillEvent
+        expect(event.eventType).toBe(EventType.PLAYER_TEAMKILL)
+        expect(event.data.weapon).toBe("glock")
+        expect(event.data.headshot).toBe(true)
+        expect(event.data.team).toBe("TERRORIST")
+        expect(event.meta?.killer.isBot).toBe(true)
+        expect(event.meta?.victim.isBot).toBe(true)
+      }
+    })
+
     it("should return success:false for unhandled log lines", async () => {
       const logLine = 'L 07/15/2024 - 22:33:10: "Server" say "Hello"'
       const result = await parser.parse(logLine, serverId)
@@ -113,9 +192,11 @@ describe("CsParser", () => {
 
       const { event } = result
       expect(event.eventType).toBe("PLAYER_CONNECT")
-      expect(event.meta?.isBot).toBe(true)
-      expect(event.meta?.steamId).toBe("BOT")
-      expect(event.meta?.playerName).toBe("BotPlayer")
+      if (event.meta && "steamId" in event.meta) {
+        expect(event.meta.isBot).toBe(true)
+        expect(event.meta.steamId).toBe("BOT")
+        expect(event.meta.playerName).toBe("BotPlayer")
+      }
     })
   })
 
@@ -129,11 +210,12 @@ describe("CsParser", () => {
 
     expect(result.event.eventType).toBe(EventType.CHAT_MESSAGE)
     // meta assertions
-    const chatEvent = result.event as PlayerChatEvent & { meta: PlayerMeta }
-    const meta = chatEvent.meta
-    expect(meta.steamId).toBe("BOT")
-    expect(meta.playerName).toBe("goat")
-    expect(meta.isBot).toBe(true)
+    const chatEvent = result.event as PlayerChatEvent
+    if (chatEvent.meta && "steamId" in chatEvent.meta) {
+      expect(chatEvent.meta.steamId).toBe("BOT")
+      expect(chatEvent.meta.playerName).toBe("goat")
+      expect(chatEvent.meta.isBot).toBe(true)
+    }
 
     const data = chatEvent.data
     expect(data.message).toBe("Too bad NNBot is discontinued...")

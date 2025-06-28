@@ -12,6 +12,8 @@ import type {
   PlayerDisconnectEvent,
   PlayerKillEvent,
   PlayerChatEvent,
+  PlayerSuicideEvent,
+  PlayerTeamkillEvent,
 } from "@/types/common/events"
 
 export class DatabaseClient {
@@ -57,6 +59,12 @@ export class DatabaseClient {
         case "PLAYER_KILL":
           await this.createFragEvent(event)
           break
+        case "PLAYER_SUICIDE":
+          await this.createSuicideEvent(event)
+          break
+        case "PLAYER_TEAMKILL":
+          await this.createTeamkillEvent(event)
+          break
         case "CHAT_MESSAGE":
           await this.createChatEvent(event)
           break
@@ -101,6 +109,40 @@ export class DatabaseClient {
         victimId: event.data.victimId,
         weapon: event.data.weapon,
         headshot: event.data.headshot ? 1 : 0,
+        serverId: event.serverId,
+        map: "", // Will be populated when we have map tracking
+        pos_x: event.data.killerPosition?.x || 0,
+        pos_y: event.data.killerPosition?.y || 0,
+        pos_z: event.data.killerPosition?.z || 0,
+        pos_victim_x: event.data.victimPosition?.x || 0,
+        pos_victim_y: event.data.victimPosition?.y || 0,
+        pos_victim_z: event.data.victimPosition?.z || 0,
+      },
+    })
+  }
+
+  private async createSuicideEvent(event: PlayerSuicideEvent): Promise<void> {
+    await this.client.eventSuicide.create({
+      data: {
+        eventTime: event.timestamp,
+        playerId: event.data.playerId,
+        weapon: event.data.weapon || "world",
+        serverId: event.serverId,
+        map: "", // Will be populated when we have map tracking
+        pos_x: event.data.position?.x || 0,
+        pos_y: event.data.position?.y || 0,
+        pos_z: event.data.position?.z || 0,
+      },
+    })
+  }
+
+  private async createTeamkillEvent(event: PlayerTeamkillEvent): Promise<void> {
+    await this.client.eventTeamkill.create({
+      data: {
+        eventTime: event.timestamp,
+        killerId: event.data.killerId,
+        victimId: event.data.victimId,
+        weapon: event.data.weapon,
         serverId: event.serverId,
         map: "", // Will be populated when we have map tracking
         pos_x: event.data.killerPosition?.x || 0,
@@ -187,10 +229,15 @@ export class DatabaseClient {
     updates: {
       kills?: number
       deaths?: number
+      suicides?: number
+      teamkills?: number
       skill?: number
       shots?: number
       hits?: number
       headshots?: number
+      kill_streak?: number
+      death_streak?: number
+      connection_time?: number
     },
   ): Promise<void> {
     try {
@@ -201,6 +248,12 @@ export class DatabaseClient {
       }
       if (updates.deaths !== undefined) {
         updateData.deaths = { increment: updates.deaths }
+      }
+      if (updates.suicides !== undefined) {
+        updateData.suicides = { increment: updates.suicides }
+      }
+      if (updates.teamkills !== undefined) {
+        updateData.teamkills = { increment: updates.teamkills }
       }
       if (updates.skill !== undefined) {
         updateData.skill = updates.skill
@@ -213,6 +266,15 @@ export class DatabaseClient {
       }
       if (updates.headshots !== undefined) {
         updateData.headshots = { increment: updates.headshots }
+      }
+      if (updates.kill_streak !== undefined) {
+        updateData.kill_streak = updates.kill_streak
+      }
+      if (updates.death_streak !== undefined) {
+        updateData.death_streak = updates.death_streak
+      }
+      if (updates.connection_time !== undefined) {
+        updateData.connection_time = { increment: updates.connection_time }
       }
 
       await this.client.player.update({
@@ -279,6 +341,37 @@ export class DatabaseClient {
       return server ?? null
     } catch (error) {
       console.error(`Failed to fetch server by address:`, error)
+      throw error
+    }
+  }
+
+  /**
+   * Get top players by skill ranking
+   * @param limit Number of players to return (default 50)
+   * @param game Game code to filter by
+   * @param includeHidden Whether to include players with hideranking set
+   */
+  async getTopPlayers(limit: number = 50, game: string = "cstrike", includeHidden: boolean = false): Promise<Player[]> {
+    try {
+      const whereClause: Record<string, unknown> = {
+        game,
+      }
+
+      if (!includeHidden) {
+        whereClause.hideranking = 0
+      }
+
+      const players = await this.client.player.findMany({
+        where: whereClause,
+        orderBy: {
+          skill: "desc",
+        },
+        take: Math.min(limit, 100), // Cap at 100 for safety
+      })
+
+      return players
+    } catch (error) {
+      console.error(`Failed to get top players:`, error)
       throw error
     }
   }

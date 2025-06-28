@@ -27,7 +27,7 @@ describe("UdpServer", () => {
   beforeEach(() => {
     mockSocket = new MockSocket();
     mockedDgram.createSocket.mockReturnValue(
-      mockSocket as unknown as dgram.Socket
+      mockSocket as unknown as dgram.Socket,
     );
     server = new UdpServer({ port: 12345 });
   });

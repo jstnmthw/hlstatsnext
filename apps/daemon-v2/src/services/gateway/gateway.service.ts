@@ -14,7 +14,7 @@ export interface IGatewayService {
 export class GatewayService implements IGatewayService {
   async start(): Promise<void> {
     // TODO: Initialize Fastify server / WebSocket listeners
-    // Placeholder implementation – do nothing for now
+    // Placeholder implementation - do nothing for now
     return;
   }
 

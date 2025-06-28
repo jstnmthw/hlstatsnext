@@ -144,7 +144,7 @@ export class DatabaseClient {
   async getOrCreatePlayer(
     steamId: string,
     playerName: string,
-    game: string
+    game: string,
   ): Promise<number> {
     const isBot = steamId.toUpperCase() === "BOT";
     const normalizedName = playerName
@@ -207,7 +207,7 @@ export class DatabaseClient {
       shots?: number;
       hits?: number;
       headshots?: number;
-    }
+    },
   ): Promise<void> {
     try {
       const updateData: Record<string, unknown> = {};
@@ -270,8 +270,8 @@ export class DatabaseClient {
         | "$transaction"
         | "$use"
         | "$extends"
-      >
-    ) => Promise<T>
+      >,
+    ) => Promise<T>,
   ): Promise<T> {
     return this.client.$transaction(callback);
   }
@@ -290,7 +290,7 @@ export class DatabaseClient {
    */
   async getServerByAddress(
     ipAddress: string,
-    port: number
+    port: number,
   ): Promise<{ serverId: number } | null> {
     try {
       const server = await this.client.server.findFirst({

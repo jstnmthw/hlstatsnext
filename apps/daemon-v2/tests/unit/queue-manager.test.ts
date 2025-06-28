@@ -121,13 +121,13 @@ describe("QueueManager", () => {
       expect(mockQueueInstance.add).toHaveBeenCalledWith(
         "process-PLAYER_CONNECT",
         expect.any(Object),
-        { priority: 100, delay: 0 }
+        { priority: 100, delay: 0 },
       );
       // Ensure the correct queue was used
       const highPriorityQueueName = mockOptions.queues.highPriority;
       expect(MockedQueue).toHaveBeenCalledWith(
         highPriorityQueueName,
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -136,7 +136,7 @@ describe("QueueManager", () => {
       expect(mockQueueInstance.add).toHaveBeenCalledWith(
         "process-PLAYER_CONNECT",
         expect.any(Object),
-        { priority: 50, delay: 0 }
+        { priority: 50, delay: 0 },
       );
     });
 
@@ -145,7 +145,7 @@ describe("QueueManager", () => {
       expect(mockQueueInstance.add).toHaveBeenCalledWith(
         "process-PLAYER_CONNECT",
         expect.any(Object),
-        { priority: 10, delay: 1000 }
+        { priority: 10, delay: 1000 },
       );
     });
 
@@ -153,7 +153,7 @@ describe("QueueManager", () => {
       // "get" on the internal map returns undefined
       vi.spyOn(queueManager["queues"], "get").mockReturnValue(undefined);
       await expect(queueManager.enqueueEvent(mockEvent)).rejects.toThrow(
-        `Queue ${mockOptions.queues.normal} not found`
+        `Queue ${mockOptions.queues.normal} not found`,
       );
     });
   });

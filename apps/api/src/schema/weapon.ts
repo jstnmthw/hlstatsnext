@@ -1,9 +1,6 @@
-import { builder } from "../builder";
-import {
-  handleGraphQLResult,
-  handleGraphQLResultNullable,
-} from "../utils/graphql-result-handler";
-import type { Weapon, Prisma } from "@repo/database/client";
+import { builder } from "../builder"
+import { handleGraphQLResult, handleGraphQLResultNullable } from "../utils/graphql-result-handler"
+import type { Weapon, Prisma } from "@repo/database/client"
 
 // Define Weapon type using Prisma object
 const WeaponType = builder.prismaObject("Weapon", {
@@ -20,7 +17,7 @@ const WeaponType = builder.prismaObject("Weapon", {
     headshotRatio: t.field({
       type: "Float",
       resolve: (weapon) => {
-        return weapon.kills > 0 ? (weapon.headshots / weapon.kills) * 100 : 0;
+        return weapon.kills > 0 ? (weapon.headshots / weapon.kills) * 100 : 0
       },
     }),
 
@@ -28,23 +25,21 @@ const WeaponType = builder.prismaObject("Weapon", {
       type: "Float",
       resolve: (weapon) => {
         // Simple effectiveness calculation based on modifier and usage
-        return (
-          weapon.modifier * (weapon.kills > 0 ? Math.log(weapon.kills + 1) : 1)
-        );
+        return weapon.modifier * (weapon.kills > 0 ? Math.log(weapon.kills + 1) : 1)
       },
     }),
   }),
-});
+})
 
 // Define PaginatedWeapons type
 const PaginatedWeapons = builder.objectRef<{
-  items: Weapon[];
-  total: number;
-  page: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}>("PaginatedWeapons");
+  items: Weapon[]
+  total: number
+  page: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+}>("PaginatedWeapons")
 
 PaginatedWeapons.implement({
   fields: (t) => ({
@@ -58,7 +53,7 @@ PaginatedWeapons.implement({
     hasNextPage: t.exposeBoolean("hasNextPage"),
     hasPreviousPage: t.exposeBoolean("hasPreviousPage"),
   }),
-});
+})
 
 // Weapon queries
 builder.queryFields((t) => ({
@@ -75,8 +70,8 @@ builder.queryFields((t) => ({
         game: args.game ?? undefined,
         page: args.page ?? 1,
         limit: Math.min(args.limit ?? 20, 100), // Cap at 100
-      });
-      return handleGraphQLResult(result);
+      })
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -88,8 +83,8 @@ builder.queryFields((t) => ({
       id: t.arg.int({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.weapon.getWeaponById(args.id);
-      return handleGraphQLResultNullable(result);
+      const result = await context.services.weapon.getWeaponById(args.id)
+      return handleGraphQLResultNullable(result)
     },
   }),
 
@@ -100,8 +95,8 @@ builder.queryFields((t) => ({
       game: t.arg.string({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.weapon.getGameWeapons(args.game);
-      return handleGraphQLResult(result);
+      const result = await context.services.weapon.getGameWeapons(args.game)
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -116,11 +111,11 @@ builder.queryFields((t) => ({
       const result = await context.services.weapon.getWeaponStatistics({
         game: args.game ?? undefined,
         limit: args.limit ?? 10,
-      });
-      return handleGraphQLResult(result);
+      })
+      return handleGraphQLResult(result)
     },
   }),
-}));
+}))
 
 // Define input types for mutations
 const WeaponCreateInput = builder.inputType("WeaponCreateInput", {
@@ -130,14 +125,14 @@ const WeaponCreateInput = builder.inputType("WeaponCreateInput", {
     name: t.string({ required: true }),
     modifier: t.float({ required: false, defaultValue: 1.0 }),
   }),
-});
+})
 
 const WeaponUpdateInput = builder.inputType("WeaponUpdateInput", {
   fields: (t) => ({
     name: t.string({ required: false }),
     modifier: t.float({ required: false }),
   }),
-});
+})
 
 // Weapon mutations
 builder.mutationFields((t) => ({
@@ -153,10 +148,10 @@ builder.mutationFields((t) => ({
         code: args.input.code,
         name: args.input.name,
         modifier: args.input.modifier ?? 1.0,
-      };
+      }
 
-      const result = await context.services.weapon.createWeapon(input);
-      return handleGraphQLResult(result);
+      const result = await context.services.weapon.createWeapon(input)
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -173,10 +168,10 @@ builder.mutationFields((t) => ({
         ...(args.input.modifier !== undefined && {
           modifier: { set: args.input.modifier ?? undefined },
         }),
-      };
+      }
 
-      const result = await context.services.weapon.updateWeapon(args.id, input);
-      return handleGraphQLResult(result);
+      const result = await context.services.weapon.updateWeapon(args.id, input)
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -187,8 +182,8 @@ builder.mutationFields((t) => ({
       id: t.arg.int({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.weapon.deleteWeapon(args.id);
-      return handleGraphQLResult(result);
+      const result = await context.services.weapon.deleteWeapon(args.id)
+      return handleGraphQLResult(result)
     },
   }),
-}));
+}))

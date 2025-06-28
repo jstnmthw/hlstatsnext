@@ -21,158 +21,158 @@ export enum EventType {
 }
 
 export interface Position3D {
-  x: number;
-  y: number;
-  z: number;
+  x: number
+  y: number
+  z: number
 }
 
 export interface BaseEvent {
-  eventType: EventType;
-  timestamp: Date;
-  serverId: number;
-  raw?: string; // Original log line for debugging
+  eventType: EventType
+  timestamp: Date
+  serverId: number
+  raw?: string // Original log line for debugging
   /**
    * Optional payload for events that do not have a specific data structure.
    * This is primarily to allow ergonomic access in generic code paths (e.g. tests)
    * without resorting to explicit casts. Event-specific interfaces should override
    * this with a strongly-typed version.
    */
-  data?: unknown;
+  data?: unknown
 }
 
 export interface PlayerKillEvent extends BaseEvent {
-  eventType: EventType.PLAYER_KILL;
+  eventType: EventType.PLAYER_KILL
   data: {
-    killerId: number;
-    victimId: number;
-    weapon: string;
-    headshot: boolean;
-    distance?: number;
-    killerPosition?: Position3D;
-    victimPosition?: Position3D;
-    killerTeam: string;
-    victimTeam: string;
-  };
+    killerId: number
+    victimId: number
+    weapon: string
+    headshot: boolean
+    distance?: number
+    killerPosition?: Position3D
+    victimPosition?: Position3D
+    killerTeam: string
+    victimTeam: string
+  }
 }
 
 export interface PlayerConnectEvent extends BaseEvent {
-  eventType: EventType.PLAYER_CONNECT;
+  eventType: EventType.PLAYER_CONNECT
   data: {
-    playerId: number;
-    steamId: string;
-    playerName: string;
-    ipAddress: string;
-    country?: string;
-    userAgent?: string;
-  };
+    playerId: number
+    steamId: string
+    playerName: string
+    ipAddress: string
+    country?: string
+    userAgent?: string
+  }
 }
 
 export interface PlayerDisconnectEvent extends BaseEvent {
-  eventType: EventType.PLAYER_DISCONNECT;
+  eventType: EventType.PLAYER_DISCONNECT
   data: {
-    playerId: number;
-    reason?: string;
-    sessionDuration?: number;
-  };
+    playerId: number
+    reason?: string
+    sessionDuration?: number
+  }
 }
 
 export interface PlayerChatEvent extends BaseEvent {
-  eventType: EventType.CHAT_MESSAGE;
+  eventType: EventType.CHAT_MESSAGE
   data: {
-    playerId: number;
-    message: string;
-    team: string;
-    isDead: boolean;
-    messageMode?: number; // 0=normal,1=dead etc.
-  };
+    playerId: number
+    message: string
+    team: string
+    isDead: boolean
+    messageMode?: number // 0=normal,1=dead etc.
+  }
 }
 
 export interface RoundEndEvent extends BaseEvent {
-  eventType: EventType.ROUND_END;
+  eventType: EventType.ROUND_END
   data: {
-    winningTeam: string;
-    duration: number;
+    winningTeam: string
+    duration: number
     score: {
-      team1: number;
-      team2: number;
-    };
-  };
+      team1: number
+      team2: number
+    }
+  }
 }
 
 export interface MapChangeEvent extends BaseEvent {
-  eventType: EventType.MAP_CHANGE;
+  eventType: EventType.MAP_CHANGE
   data: {
-    previousMap?: string;
-    newMap: string;
-    playerCount: number;
-  };
+    previousMap?: string
+    newMap: string
+    playerCount: number
+  }
 }
 
 // Newly-modelled explicit event types replacing the former `UnknownEvent`
 export interface PlayerDeathEvent extends BaseEvent {
-  eventType: EventType.PLAYER_DEATH;
+  eventType: EventType.PLAYER_DEATH
   data: {
-    victimId: number;
-    killerId?: number; // Undefined for world/environmental deaths
-    weapon?: string;
-    headshot?: boolean;
-    victimPosition?: Position3D;
-    killerPosition?: Position3D;
-    victimTeam: string;
-    killerTeam?: string;
-  };
+    victimId: number
+    killerId?: number // Undefined for world/environmental deaths
+    weapon?: string
+    headshot?: boolean
+    victimPosition?: Position3D
+    killerPosition?: Position3D
+    victimTeam: string
+    killerTeam?: string
+  }
 }
 
 export interface PlayerSuicideEvent extends BaseEvent {
-  eventType: EventType.PLAYER_SUICIDE;
+  eventType: EventType.PLAYER_SUICIDE
   data: {
-    playerId: number;
-    weapon?: string;
-    position?: Position3D;
-    team: string;
-  };
+    playerId: number
+    weapon?: string
+    position?: Position3D
+    team: string
+  }
 }
 
 export interface PlayerTeamkillEvent extends BaseEvent {
-  eventType: EventType.PLAYER_TEAMKILL;
+  eventType: EventType.PLAYER_TEAMKILL
   data: {
-    killerId: number;
-    victimId: number;
-    weapon: string;
-    headshot: boolean;
-    distance?: number;
-    killerPosition?: Position3D;
-    victimPosition?: Position3D;
-    team: string; // Shared team for both players
-  };
+    killerId: number
+    victimId: number
+    weapon: string
+    headshot: boolean
+    distance?: number
+    killerPosition?: Position3D
+    victimPosition?: Position3D
+    team: string // Shared team for both players
+  }
 }
 
 export interface RoundStartEvent extends BaseEvent {
-  eventType: EventType.ROUND_START;
+  eventType: EventType.ROUND_START
   data: {
-    map: string;
-    roundNumber: number;
-    maxPlayers: number;
-  };
+    map: string
+    roundNumber: number
+    maxPlayers: number
+  }
 }
 
 export interface ServerShutdownEvent extends BaseEvent {
-  eventType: EventType.SERVER_SHUTDOWN;
+  eventType: EventType.SERVER_SHUTDOWN
   data: {
-    reason?: string;
-    uptimeSeconds?: number;
-    playerCount?: number;
-  };
+    reason?: string
+    uptimeSeconds?: number
+    playerCount?: number
+  }
 }
 
 export interface AdminActionEvent extends BaseEvent {
-  eventType: EventType.ADMIN_ACTION;
+  eventType: EventType.ADMIN_ACTION
   data: {
-    adminId: number;
-    action: string; // e.g. "kick", "ban", "swap"
-    targetPlayerId?: number;
-    reason?: string;
-  };
+    adminId: number
+    action: string // e.g. "kick", "ban", "swap"
+    targetPlayerId?: number
+    reason?: string
+  }
 }
 
 // Updated discriminated union of all supported events
@@ -188,18 +188,18 @@ export type GameEvent =
   | PlayerSuicideEvent
   | PlayerTeamkillEvent
   | ServerShutdownEvent
-  | AdminActionEvent;
+  | AdminActionEvent
 
 export interface ProcessedEvent {
-  id: string;
-  event: GameEvent;
-  processedAt: Date;
-  success: boolean;
-  error?: string;
+  id: string
+  event: GameEvent
+  processedAt: Date
+  success: boolean
+  error?: string
 }
 
 export interface PlayerMeta {
-  steamId: string;
-  playerName: string;
-  isBot: boolean;
+  steamId: string
+  playerName: string
+  isBot: boolean
 }

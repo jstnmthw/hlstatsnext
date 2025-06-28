@@ -1,13 +1,13 @@
-export { seedClans } from "./clans";
-export { seedPlayers } from "./players";
-export { seedPlayerUniqueIds } from "./player-unique-ids";
-export { getSeedConfig, type SeedConfig } from "./config";
-export { seedGames } from "./games";
-export { seedCountries } from "./countries";
-export { seedServers } from "./servers";
-export { seedTeams } from "./teams";
-export { seedWeapons } from "./weapons";
-export { seedActions } from "./actions";
-export { seedRanks } from "./ranks";
-export { seedAwards } from "./awards";
-export { logDatabaseStats } from "./log-stats";
+export { seedClans } from "./clans"
+export { seedPlayers } from "./players"
+export { seedPlayerUniqueIds } from "./player-unique-ids"
+export { getSeedConfig, type SeedConfig } from "./config"
+export { seedGames } from "./games"
+export { seedCountries } from "./countries"
+export { seedServers } from "./servers"
+export { seedTeams } from "./teams"
+export { seedWeapons } from "./weapons"
+export { seedActions } from "./actions"
+export { seedRanks } from "./ranks"
+export { seedAwards } from "./awards"
+export { logDatabaseStats } from "./log-stats"

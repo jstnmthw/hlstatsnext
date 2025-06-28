@@ -5,67 +5,59 @@
  * Collects and processes statistics from Half-Life dedicated game servers.
  */
 
-import { DatabaseClient } from "./database/client";
-import { GatewayService } from "./services/gateway/gateway.service";
-import { IngressService } from "./services/ingress/ingress.service";
-import { EventProcessorService } from "./services/processor/processor.service";
-import { RconService } from "./services/rcon/rcon.service";
-import { StatisticsService } from "./services/statistics/statistics.service";
-import { logger } from "./utils/logger";
+import { DatabaseClient } from "./database/client"
+import { GatewayService } from "./services/gateway/gateway.service"
+import { IngressService } from "./services/ingress/ingress.service"
+import { EventProcessorService } from "./services/processor/processor.service"
+import { RconService } from "./services/rcon/rcon.service"
+import { StatisticsService } from "./services/statistics/statistics.service"
+import { logger } from "./utils/logger"
 
 export class HLStatsDaemon {
-  private db: DatabaseClient;
-  private gateway: GatewayService;
-  private ingress: IngressService;
-  private processor: EventProcessorService;
-  private rcon: RconService;
-  private statistics: StatisticsService;
+  private db: DatabaseClient
+  private gateway: GatewayService
+  private ingress: IngressService
+  private processor: EventProcessorService
+  private rcon: RconService
+  private statistics: StatisticsService
 
   constructor() {
-    logger.info("Initializing HLStats Daemon v2");
+    logger.info("Initializing HLStats Daemon v2")
 
-    this.db = new DatabaseClient();
-    this.processor = new EventProcessorService();
-    this.gateway = new GatewayService();
-    this.ingress = new IngressService(27500, this.processor, this.db);
-    this.rcon = new RconService();
-    this.statistics = new StatisticsService();
+    this.db = new DatabaseClient()
+    this.processor = new EventProcessorService()
+    this.gateway = new GatewayService()
+    this.ingress = new IngressService(27500, this.processor, this.db)
+    this.rcon = new RconService()
+    this.statistics = new StatisticsService()
   }
 
   async start(): Promise<void> {
     try {
       // Test database connectivity first
-      logger.connecting("database");
-      const dbConnected = await this.processor.testDatabaseConnection();
+      logger.connecting("database")
+      const dbConnected = await this.processor.testDatabaseConnection()
 
       if (!dbConnected) {
-        throw new Error("Failed to connect to database");
+        throw new Error("Failed to connect to database")
       }
 
-      logger.connected("database");
+      logger.connected("database")
 
       // Start all services
-      logger.info("Starting services");
-      await Promise.all([
-        this.gateway.start(),
-        this.ingress.start(),
-        this.rcon.start(),
-        this.statistics.start(),
-      ]);
+      logger.info("Starting services")
+      await Promise.all([this.gateway.start(), this.ingress.start(), this.rcon.start(), this.statistics.start()])
 
-      logger.ok("All services started successfully");
-      logger.ready("HLStats Daemon v2 is ready to receive game server data");
+      logger.ok("All services started successfully")
+      logger.ready("HLStats Daemon v2 is ready to receive game server data")
     } catch (error) {
-      logger.failed(
-        "Failed to start daemon",
-        error instanceof Error ? error.message : String(error),
-      );
-      process.exit(1);
+      logger.failed("Failed to start daemon", error instanceof Error ? error.message : String(error))
+      process.exit(1)
     }
   }
 
   async stop(): Promise<void> {
-    logger.shutdown();
+    logger.shutdown()
 
     try {
       await Promise.all([
@@ -74,46 +66,43 @@ export class HLStatsDaemon {
         this.rcon.stop(),
         this.statistics.stop(),
         this.processor.disconnect(),
-      ]);
+      ])
 
-      logger.shutdownComplete();
+      logger.shutdownComplete()
     } catch (error) {
-      logger.failed(
-        "Error during shutdown",
-        error instanceof Error ? error.message : String(error),
-      );
+      logger.failed("Error during shutdown", error instanceof Error ? error.message : String(error))
     }
   }
 }
 
 function main() {
   // Handle graceful shutdown
-  const daemon = new HLStatsDaemon();
+  const daemon = new HLStatsDaemon()
 
   process.on("SIGINT", async () => {
-    logger.received("SIGINT");
-    await daemon.stop();
-    process.exit(0);
-  });
+    logger.received("SIGINT")
+    await daemon.stop()
+    process.exit(0)
+  })
 
   process.on("SIGTERM", async () => {
-    logger.received("SIGTERM");
-    await daemon.stop();
-    process.exit(0);
-  });
+    logger.received("SIGTERM")
+    await daemon.stop()
+    process.exit(0)
+  })
 
   // Start the daemon
   daemon.start().catch((error) => {
-    logger.fatal(error instanceof Error ? error.message : String(error));
-    process.exit(1);
-  });
+    logger.fatal(error instanceof Error ? error.message : String(error))
+    process.exit(1)
+  })
 
-  logger.ok("HLStats Daemon v2 - Phase 1 Complete");
-  logger.info("Features implemented");
+  logger.ok("HLStats Daemon v2 - Phase 1 Complete")
+  logger.info("Features implemented")
 }
 
 // This allows the file to be imported for testing without executing the startup logic.
 // Vitest automatically sets the process.env.VITEST variable.
 if (process.env.VITEST === undefined) {
-  main();
+  main()
 }

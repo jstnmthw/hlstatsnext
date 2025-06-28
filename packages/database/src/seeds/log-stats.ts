@@ -1,5 +1,5 @@
-import { db } from "..";
-import { log, logInfo } from "./logger";
+import { db } from ".."
+import { log, logInfo } from "./logger"
 
 /**
  * A comprehensive stat logger for use in seed and reset scripts.
@@ -8,7 +8,7 @@ import { log, logInfo } from "./logger";
  * @returns An array of the counts in a predefined order.
  */
 export async function logDatabaseStats(title: string) {
-  logInfo(title);
+  logInfo(title)
 
   const stats = await Promise.all([
     // Core data (preserved on reset)
@@ -25,7 +25,7 @@ export async function logDatabaseStats(title: string) {
     db.action.count(),
     db.rank.count(),
     db.award.count(),
-  ]);
+  ])
 
   const labels = [
     "Games",
@@ -40,11 +40,11 @@ export async function logDatabaseStats(title: string) {
     "Actions",
     "Ranks",
     "Awards",
-  ];
+  ]
 
   labels.forEach((label, index) => {
-    log(`  ${label}: ${stats[index]}`);
-  });
+    log(`  ${label}: ${stats[index]}`)
+  })
 
-  return stats;
+  return stats
 }

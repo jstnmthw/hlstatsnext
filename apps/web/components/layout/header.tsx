@@ -1,17 +1,17 @@
-import { BarChart3, Users, Server, Trophy } from "lucide-react";
-import Link from "next/link";
-import { headers } from "next/headers";
-import { cn } from "@repo/ui/lib/utils";
+import { BarChart3, Users, Server, Trophy } from "lucide-react"
+import Link from "next/link"
+import { headers } from "next/headers"
+import { cn } from "@repo/ui/lib/utils"
 
 const navigation = [
   { name: "Games", href: "/", icon: BarChart3 },
   { name: "Players", href: "/players", icon: Users },
   { name: "Servers", href: "/servers", icon: Server },
   { name: "Rankings", href: "/rankings", icon: Trophy },
-];
+]
 
 export async function Header() {
-  const pathname = (await headers()).get("next-url") ?? "/";
+  const pathname = (await headers()).get("next-url") ?? "/"
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800 bg-black/80 backdrop-blur-md">
@@ -29,7 +29,7 @@ export async function Header() {
 
             <nav className="hidden md:flex space-x-6">
               {navigation.map((item) => {
-                const Icon = item.icon;
+                const Icon = item.icon
                 return (
                   <Link
                     key={item.name}
@@ -44,12 +44,12 @@ export async function Header() {
                     <Icon className="h-4 w-4" />
                     <span>{item.name}</span>
                   </Link>
-                );
+                )
               })}
             </nav>
           </div>
         </div>
       </div>
     </header>
-  );
+  )
 }

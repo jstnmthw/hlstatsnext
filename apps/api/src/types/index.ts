@@ -1,8 +1,8 @@
 // Common types
-export * from "./common";
+export * from "./common"
 
 // Database types
-export * from "./database";
+export * from "./database"
 
 // GraphQL types
-export * from "./graphql/resolvers.types";
+export * from "./graphql/resolvers.types"

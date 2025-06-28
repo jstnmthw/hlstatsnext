@@ -314,7 +314,7 @@ model GameEvent {
 _apps/web/codegen.ts_
 
 ```typescript
-import { CodegenConfig } from "@graphql-codegen/cli";
+import { CodegenConfig } from "@graphql-codegen/cli"
 
 const config: CodegenConfig = {
   schema: "http://localhost:4000/graphql",
@@ -325,9 +325,9 @@ const config: CodegenConfig = {
       plugins: [],
     },
   },
-};
+}
 
-export default config;
+export default config
 ```
 
 _apps/web/package.json script_

@@ -1,21 +1,14 @@
-import type {
-  Player,
-  Game,
-  Clan,
-  Country,
-  PlayerUniqueId,
-  Prisma,
-} from "@repo/database/client";
-import type { SortInput } from "../common/pagination.types";
+import type { Player, Game, Clan, Country, PlayerUniqueId, Prisma } from "@repo/database/client"
+import type { SortInput } from "../common/pagination.types"
 
 /**
  * Player entity with all related data loaded
  */
 export interface PlayerWithRelations extends Player {
-  readonly gameData: Game;
-  readonly clanData: Clan | null;
-  readonly countryData: Country | null;
-  readonly uniqueIds: readonly PlayerUniqueId[];
+  readonly gameData: Game
+  readonly clanData: Clan | null
+  readonly countryData: Country | null
+  readonly uniqueIds: readonly PlayerUniqueId[]
 }
 
 /**
@@ -28,39 +21,38 @@ export const PlayerSortField = {
   HEADSHOTS: "headshots",
   CONNECTION_TIME: "connectionTime",
   CREATED_AT: "createdAt",
-} as const;
+} as const
 
-export type PlayerSortFieldType =
-  (typeof PlayerSortField)[keyof typeof PlayerSortField];
+export type PlayerSortFieldType = (typeof PlayerSortField)[keyof typeof PlayerSortField]
 
 /**
  * Player sort input with specific fields
  */
-export type PlayerSortInput = SortInput<PlayerSortFieldType>;
+export type PlayerSortInput = SortInput<PlayerSortFieldType>
 
 /**
  * Player filter parameters
  */
 export interface PlayerFilters {
-  readonly gameId?: string;
-  readonly clanId?: string;
-  readonly countryId?: string;
-  readonly hideRanking?: boolean;
-  readonly minSkill?: number;
-  readonly maxSkill?: number;
-  readonly minKills?: number;
-  readonly search?: string;
+  readonly gameId?: string
+  readonly clanId?: string
+  readonly countryId?: string
+  readonly hideRanking?: boolean
+  readonly minSkill?: number
+  readonly maxSkill?: number
+  readonly minKills?: number
+  readonly search?: string
 }
 
 /**
  * Player statistics with calculated values
  */
 export interface PlayerStatistics {
-  readonly player: Player;
-  readonly killDeathRatio: number;
-  readonly accuracy: number;
-  readonly headshotRatio: number;
-  readonly rank: number | null;
+  readonly player: Player
+  readonly killDeathRatio: number
+  readonly accuracy: number
+  readonly headshotRatio: number
+  readonly rank: number | null
 }
 
 /**
@@ -68,17 +60,17 @@ export interface PlayerStatistics {
  * This is a domain-specific input that extends Prisma's basic create input
  */
 export interface CreatePlayerInput {
-  readonly lastName: string;
-  readonly steamId: string;
-  readonly gameId: string;
-  readonly fullName?: string;
-  readonly email?: string;
-  readonly homepage?: string;
-  readonly clanId?: string;
-  readonly countryId?: string;
-  readonly city?: string;
-  readonly state?: string;
-  readonly lastAddress?: string;
+  readonly lastName: string
+  readonly steamId: string
+  readonly gameId: string
+  readonly fullName?: string
+  readonly email?: string
+  readonly homepage?: string
+  readonly clanId?: string
+  readonly countryId?: string
+  readonly city?: string
+  readonly state?: string
+  readonly lastAddress?: string
 }
 
 /**
@@ -86,42 +78,39 @@ export interface CreatePlayerInput {
  * This is a domain-specific input for stat updates
  */
 export interface UpdatePlayerStatsInput {
-  readonly steamId: string;
-  readonly gameId: string;
-  readonly kills?: number;
-  readonly deaths?: number;
-  readonly suicides?: number;
-  readonly shots?: number;
-  readonly hits?: number;
-  readonly headshots?: number;
-  readonly teamkills?: number;
-  readonly skill?: number;
-  readonly connectionTime?: number;
-  readonly lastEvent?: number;
+  readonly steamId: string
+  readonly gameId: string
+  readonly kills?: number
+  readonly deaths?: number
+  readonly suicides?: number
+  readonly shots?: number
+  readonly hits?: number
+  readonly headshots?: number
+  readonly teamkills?: number
+  readonly skill?: number
+  readonly connectionTime?: number
+  readonly lastEvent?: number
 }
 
 // Re-export Prisma-generated types for direct database operations
-export type PrismaPlayerCreateInput = Prisma.PlayerCreateInput;
-export type PrismaPlayerUncheckedCreateInput =
-  Prisma.PlayerUncheckedCreateInput;
-export type PrismaPlayerUpdateInput = Prisma.PlayerUpdateInput;
-export type PrismaPlayerUncheckedUpdateInput =
-  Prisma.PlayerUncheckedUpdateInput;
-export type PrismaPlayerCreateManyInput = Prisma.PlayerCreateManyInput;
-export type PrismaPlayerUpdateManyMutationInput =
-  Prisma.PlayerUpdateManyMutationInput;
+export type PrismaPlayerCreateInput = Prisma.PlayerCreateInput
+export type PrismaPlayerUncheckedCreateInput = Prisma.PlayerUncheckedCreateInput
+export type PrismaPlayerUpdateInput = Prisma.PlayerUpdateInput
+export type PrismaPlayerUncheckedUpdateInput = Prisma.PlayerUncheckedUpdateInput
+export type PrismaPlayerCreateManyInput = Prisma.PlayerCreateManyInput
+export type PrismaPlayerUpdateManyMutationInput = Prisma.PlayerUpdateManyMutationInput
 
 /**
  * Player query parameters for database operations
  */
 export interface PlayerQueryParams {
-  readonly filters: PlayerFilters;
-  readonly sort: PlayerSortInput;
+  readonly filters: PlayerFilters
+  readonly sort: PlayerSortInput
   readonly pagination: {
-    readonly page: number;
-    readonly limit: number;
-    readonly skip: number;
-  };
+    readonly page: number
+    readonly limit: number
+    readonly skip: number
+  }
 }
 
 /**
@@ -132,7 +121,7 @@ export const PLAYER_INCLUDE = {
   clan: true,
   country: true,
   uniqueIds: true,
-} as const;
+} as const
 
 /**
  * Player validation constraints
@@ -162,4 +151,4 @@ export const PLAYER_CONSTRAINTS = {
     MAX: 10000,
     DEFAULT: 1000,
   },
-} as const;
+} as const

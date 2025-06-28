@@ -82,7 +82,7 @@ class EventValidator {
 ```typescript
 // Open for extension, closed for modification
 abstract class BaseParser {
-  abstract parse(logLine: string): GameEvent;
+  abstract parse(logLine: string): GameEvent
 }
 
 class CS2Parser extends BaseParser {
@@ -97,7 +97,7 @@ class CS2Parser extends BaseParser {
 ```typescript
 // Depend on abstractions, not concretions
 interface IPlayerRepository {
-  findById(id: number): Promise<Player>;
+  findById(id: number): Promise<Player>
 }
 
 class PlayerService {
@@ -295,34 +295,34 @@ This fixes the precision issue reported by users.
 ```typescript
 // ❌ NEVER: Using any defeats TypeScript's purpose
 function processData(data: any): any {
-  return data.someProperty.nested.value;
+  return data.someProperty.nested.value
 }
 
 // ✅ ALWAYS: Use proper types, even for complex scenarios
 interface ApiResponse<T> {
-  data: T;
-  status: number;
-  message: string;
+  data: T
+  status: number
+  message: string
 }
 
 interface NestedData {
   someProperty: {
     nested: {
-      value: string;
-    };
-  };
+      value: string
+    }
+  }
 }
 
 function processData(data: NestedData): string {
-  return data.someProperty.nested.value;
+  return data.someProperty.nested.value
 }
 
 // ✅ For truly unknown data, use unknown and type guards
 function processUnknownData(data: unknown): string {
   if (isNestedData(data)) {
-    return data.someProperty.nested.value;
+    return data.someProperty.nested.value
   }
-  throw new Error("Invalid data structure");
+  throw new Error("Invalid data structure")
 }
 
 function isNestedData(data: unknown): data is NestedData {
@@ -331,7 +331,7 @@ function isNestedData(data: unknown): data is NestedData {
     data !== null &&
     "someProperty" in data &&
     typeof (data as any).someProperty.nested.value === "string"
-  );
+  )
 }
 ```
 
@@ -397,8 +397,8 @@ hlstatsnext/
 
 ```typescript
 // packages/database/src/index.ts
-export * from "@prisma/client";
-export { prisma } from "./client";
+export * from "@prisma/client"
+export { prisma } from "./client"
 
 // Re-export commonly used auto-generated types
 export type {
@@ -408,63 +408,54 @@ export type {
   Server,
   Clan,
   // ... other Prisma-generated types
-} from "@prisma/client";
+} from "@prisma/client"
 
 // Custom type extensions based on Prisma types
 export type PlayerWithStats = Player & {
-  stats: PlayerStats;
-  rank?: number;
-};
+  stats: PlayerStats
+  rank?: number
+}
 
 export type GameEventWithRelations = GameEvent & {
-  player: Player;
-  server: Server;
-};
+  player: Player
+  server: Server
+}
 
 // packages/database/src/types/extensions.ts
-import type { Player, PlayerStats, Prisma } from "@prisma/client";
+import type { Player, PlayerStats, Prisma } from "@prisma/client"
 
 // Utility types for database operations
-export type PlayerCreateInput = Prisma.PlayerCreateInput;
-export type PlayerUpdateInput = Prisma.PlayerUpdateInput;
-export type PlayerWhereInput = Prisma.PlayerWhereInput;
+export type PlayerCreateInput = Prisma.PlayerCreateInput
+export type PlayerUpdateInput = Prisma.PlayerUpdateInput
+export type PlayerWhereInput = Prisma.PlayerWhereInput
 
 // Custom computed types
 export type PlayerSummary = Pick<Player, "id" | "name" | "rating"> & {
-  kdRatio: number;
-  rank: number;
-};
+  kdRatio: number
+  rank: number
+}
 
 // Aggregation result types
 export type PlayerStatsAggregation = {
-  totalKills: number;
-  totalDeaths: number;
-  averageRating: number;
-  playerCount: number;
-};
+  totalKills: number
+  totalDeaths: number
+  averageRating: number
+  playerCount: number
+}
 ```
 
 **Cross-Package Type Imports**:
 
 ```typescript
 // In apps/daemon-v2/src/services/player.service.ts
-import type {
-  Player,
-  PlayerStats,
-  PlayerCreateInput,
-  PlayerWithStats,
-} from "@repo/database";
+import type { Player, PlayerStats, PlayerCreateInput, PlayerWithStats } from "@repo/database"
 
 // In apps/web/src/components/player-card.tsx
-import type { Player, PlayerSummary } from "@repo/database";
-import type { ComponentProps } from "@repo/ui";
+import type { Player, PlayerSummary } from "@repo/database"
+import type { ComponentProps } from "@repo/ui"
 
 // In apps/api/src/resolvers/player.resolver.ts
-import type {
-  Player,
-  PlayerWhereInput,
-  PlayerStatsAggregation,
-} from "@repo/database";
+import type { Player, PlayerWhereInput, PlayerStatsAggregation } from "@repo/database"
 ```
 
 **Interface vs Type - When to Use Each**:
@@ -472,40 +463,32 @@ import type {
 ```typescript
 // ✅ Use INTERFACE for object shapes that might be extended
 export interface BasePlayer {
-  id: number;
-  name: string;
-  steamId: string;
+  id: number
+  name: string
+  steamId: string
 }
 
 export interface PlayerWithStats extends BasePlayer {
-  stats: PlayerStats;
-  ranking: PlayerRanking;
+  stats: PlayerStats
+  ranking: PlayerRanking
 }
 
 // ✅ Use TYPE for unions, computed types, and complex operations
-export type GameEventType =
-  | "player_kill"
-  | "player_death"
-  | "round_start"
-  | "round_end";
+export type GameEventType = "player_kill" | "player_death" | "round_start" | "round_end"
 
-export type PlayerStatus = "active" | "inactive" | "banned" | "pending";
+export type PlayerStatus = "active" | "inactive" | "banned" | "pending"
 
 export type PlayerSearchResult = Pick<Player, "id" | "name" | "rating"> & {
-  matchedFields: Array<keyof Player>;
-};
+  matchedFields: Array<keyof Player>
+}
 
 // ✅ Use TYPE for conditional and mapped types
-export type RequiredPlayer = Required<Player>;
-export type PartialPlayerUpdate = Partial<
-  Pick<Player, "name" | "email" | "settings">
->;
+export type RequiredPlayer = Required<Player>
+export type PartialPlayerUpdate = Partial<Pick<Player, "name" | "email" | "settings">>
 
 export type PlayerEventHandlers = {
-  [K in GameEventType as `handle${Capitalize<K>}`]: (
-    event: GameEvent<K>,
-  ) => Promise<void>;
-};
+  [K in GameEventType as `handle${Capitalize<K>}`]: (event: GameEvent<K>) => Promise<void>
+}
 ```
 
 **Explicit Type Definitions - Always Prefer Clarity**:
@@ -514,33 +497,30 @@ export type PlayerEventHandlers = {
 // ✅ GOOD: Explicit, reusable, well-documented types
 export interface PlayerStats {
   /** Total number of kills */
-  kills: number;
+  kills: number
   /** Total number of deaths */
-  deaths: number;
+  deaths: number
   /** Number of headshot kills */
-  headshots: number;
+  headshots: number
   /** Accuracy percentage (0-100) */
-  accuracy: number;
+  accuracy: number
   /** Kill/Death ratio */
-  kdRatio: number;
+  kdRatio: number
   /** Last time stats were updated */
-  lastUpdated: Date;
+  lastUpdated: Date
 }
 
 export interface PlayerStatsFilters {
   /** Filter by time period */
-  timeframe?: "day" | "week" | "month" | "year" | "all";
+  timeframe?: "day" | "week" | "month" | "year" | "all"
   /** Filter by specific game mode */
-  gameMode?: string;
+  gameMode?: string
   /** Filter by minimum number of matches */
-  minMatches?: number;
+  minMatches?: number
 }
 
 // ❌ BAD: Inline, repetitive, unclear types
-function getStats(
-  timeframe?: string,
-  mode?: string,
-): { k: number; d: number; hs: number; acc: number } {
+function getStats(timeframe?: string, mode?: string): { k: number; d: number; hs: number; acc: number } {
   // ...
 }
 ```
@@ -550,35 +530,35 @@ function getStats(
 ```typescript
 // ✅ GOOD: Explicit null/undefined handling
 export interface Player {
-  id: number;
-  name: string;
-  email: string | null; // Explicitly nullable
-  lastLoginAt?: Date; // Optional property
-  settings: PlayerSettings; // Required, never null
+  id: number
+  name: string
+  email: string | null // Explicitly nullable
+  lastLoginAt?: Date // Optional property
+  settings: PlayerSettings // Required, never null
 }
 
 function getPlayer(id: number): Player | null {
-  const player = players.find((p) => p.id === id);
-  return player ?? null; // Explicit null return
+  const player = players.find((p) => p.id === id)
+  return player ?? null // Explicit null return
 }
 
 function getPlayerEmail(player: Player): string {
   // Handle nullable email properly
   if (player.email === null) {
-    throw new Error("Player email is not set");
+    throw new Error("Player email is not set")
   }
-  return player.email;
+  return player.email
 }
 
 // ✅ Use optional chaining for safe access
 function getLastLoginYear(player: Player): number | undefined {
-  return player.lastLoginAt?.getFullYear();
+  return player.lastLoginAt?.getFullYear()
 }
 
 // ❌ BAD: Implicit undefined/null handling
 function getPlayer(id: number) {
   // Return type unclear
-  return players.find((p) => p.id === id); // Could return undefined
+  return players.find((p) => p.id === id) // Could return undefined
 }
 ```
 
@@ -587,20 +567,20 @@ function getPlayer(id: number) {
 ```typescript
 // ✅ GOOD: Well-constrained generics
 export interface Repository<T extends { id: number }> {
-  findById(id: number): Promise<T | null>;
-  create(data: Omit<T, "id">): Promise<T>;
-  update(id: number, data: Partial<T>): Promise<T>;
-  delete(id: number): Promise<void>;
+  findById(id: number): Promise<T | null>
+  create(data: Omit<T, "id">): Promise<T>
+  update(id: number, data: Partial<T>): Promise<T>
+  delete(id: number): Promise<void>
 }
 
 export interface ServiceResponse<T> {
-  success: boolean;
-  data?: T;
+  success: boolean
+  data?: T
   error?: {
-    code: string;
-    message: string;
-    details?: Record<string, unknown>;
-  };
+    code: string
+    message: string
+    details?: Record<string, unknown>
+  }
 }
 
 // ✅ Generic functions with proper constraints
@@ -608,13 +588,11 @@ export async function processEvents<T extends GameEvent>(
   events: T[],
   processor: (event: T) => Promise<void>,
 ): Promise<void> {
-  await Promise.all(events.map(processor));
+  await Promise.all(events.map(processor))
 }
 
 // ✅ Conditional types for advanced scenarios
-export type DatabaseEntity<T> = T extends { id: infer U }
-  ? T & { createdAt: Date; updatedAt: Date }
-  : never;
+export type DatabaseEntity<T> = T extends { id: infer U } ? T & { createdAt: Date; updatedAt: Date } : never
 ```
 
 **Union Types & Discriminated Unions**:
@@ -623,42 +601,40 @@ export type DatabaseEntity<T> = T extends { id: infer U }
 // ✅ GOOD: Discriminated unions for type safety
 export type GameEvent =
   | {
-      type: "player_kill";
-      killerId: number;
-      victimId: number;
-      weapon: string;
-      headshot: boolean;
+      type: "player_kill"
+      killerId: number
+      victimId: number
+      weapon: string
+      headshot: boolean
     }
   | { type: "player_death"; playerId: number; cause: string }
   | { type: "round_start"; mapName: string; gameMode: string }
-  | { type: "round_end"; winner: "ct" | "terrorist"; duration: number };
+  | { type: "round_end"; winner: "ct" | "terrorist"; duration: number }
 
 // Type guards for union types
-export function isPlayerKillEvent(
-  event: GameEvent,
-): event is Extract<GameEvent, { type: "player_kill" }> {
-  return event.type === "player_kill";
+export function isPlayerKillEvent(event: GameEvent): event is Extract<GameEvent, { type: "player_kill" }> {
+  return event.type === "player_kill"
 }
 
 // ✅ Exhaustive type checking
 export function processGameEvent(event: GameEvent): void {
   switch (event.type) {
     case "player_kill":
-      handleKill(event.killerId, event.victimId, event.weapon);
-      break;
+      handleKill(event.killerId, event.victimId, event.weapon)
+      break
     case "player_death":
-      handleDeath(event.playerId, event.cause);
-      break;
+      handleDeath(event.playerId, event.cause)
+      break
     case "round_start":
-      handleRoundStart(event.mapName, event.gameMode);
-      break;
+      handleRoundStart(event.mapName, event.gameMode)
+      break
     case "round_end":
-      handleRoundEnd(event.winner, event.duration);
-      break;
+      handleRoundEnd(event.winner, event.duration)
+      break
     default:
       // TypeScript will error if we miss a case
-      const _exhaustive: never = event;
-      throw new Error(`Unhandled event type: ${JSON.stringify(_exhaustive)}`);
+      const _exhaustive: never = event
+      throw new Error(`Unhandled event type: ${JSON.stringify(_exhaustive)}`)
   }
 }
 ```
@@ -672,9 +648,9 @@ export const PlayerRole = {
   MODERATOR: "moderator",
   USER: "user",
   BANNED: "banned",
-} as const;
+} as const
 
-export type PlayerRole = (typeof PlayerRole)[keyof typeof PlayerRole];
+export type PlayerRole = (typeof PlayerRole)[keyof typeof PlayerRole]
 
 // ✅ Use string enums when you need reverse lookup or complex behavior
 export enum GameMode {
@@ -697,35 +673,27 @@ enum BadPlayerRole {
 
 ```typescript
 // ✅ Leverage TypeScript utility types effectively
-export type CreatePlayerRequest = Omit<
-  Player,
-  "id" | "createdAt" | "updatedAt"
->;
-export type UpdatePlayerRequest = Partial<
-  Pick<Player, "name" | "email" | "settings">
->;
-export type PlayerSummary = Pick<
-  Player,
-  "id" | "name" | "rating" | "lastLoginAt"
->;
+export type CreatePlayerRequest = Omit<Player, "id" | "createdAt" | "updatedAt">
+export type UpdatePlayerRequest = Partial<Pick<Player, "name" | "email" | "settings">>
+export type PlayerSummary = Pick<Player, "id" | "name" | "rating" | "lastLoginAt">
 
 // ✅ Custom utility types for domain-specific needs
 export type WithTimestamps<T> = T & {
-  createdAt: Date;
-  updatedAt: Date;
-};
+  createdAt: Date
+  updatedAt: Date
+}
 
 export type ApiResult<T> = {
-  data: T;
-  pagination?: PaginationInfo;
-  meta?: Record<string, unknown>;
-};
+  data: T
+  pagination?: PaginationInfo
+  meta?: Record<string, unknown>
+}
 
-export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
+export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>
 
 // Usage examples
-export type PlayerWithTimestamps = WithTimestamps<Player>;
-export type PlayerWithRequiredEmail = RequiredFields<Player, "email">;
+export type PlayerWithTimestamps = WithTimestamps<Player>
+export type PlayerWithRequiredEmail = RequiredFields<Player, "email">
 ```
 
 **Type Guards & Runtime Validation**:
@@ -741,15 +709,15 @@ export function isValidPlayer(obj: unknown): obj is Player {
     (obj as Player).name.length > 0 &&
     typeof (obj as Player).steamId === "string" &&
     /^\d{17}$/.test((obj as Player).steamId)
-  );
+  )
 }
 
 export function isGameEventArray(obj: unknown): obj is GameEvent[] {
-  return Array.isArray(obj) && obj.every(isGameEvent);
+  return Array.isArray(obj) && obj.every(isGameEvent)
 }
 
 // ✅ Combine with Zod for runtime validation
-import { z } from "zod";
+import { z } from "zod"
 
 export const PlayerSchema = z.object({
   id: z.number().positive(),
@@ -761,9 +729,9 @@ export const PlayerSchema = z.object({
     notifications: z.boolean(),
     privacy: z.enum(["public", "friends", "private"]),
   }),
-});
+})
 
-export type Player = z.infer<typeof PlayerSchema>;
+export type Player = z.infer<typeof PlayerSchema>
 ```
 
 **TurboRepo Package Exports & Imports**:
@@ -771,52 +739,48 @@ export type Player = z.infer<typeof PlayerSchema>;
 ```typescript
 // ✅ GOOD: Shared package exports
 // packages/database/src/index.ts
-export { prisma } from "./client";
-export * from "@prisma/client";
+export { prisma } from "./client"
+export * from "@prisma/client"
 
 // Custom type extensions
-export type * from "./types/extensions";
-export type * from "./types/computed";
+export type * from "./types/extensions"
+export type * from "./types/computed"
 
 // Utility functions that work with types
-export { createPlayer, updatePlayerStats } from "./utils/player";
-export { validateGameEvent } from "./utils/validation";
+export { createPlayer, updatePlayerStats } from "./utils/player"
+export { validateGameEvent } from "./utils/validation"
 
 // packages/ui/src/index.ts
-export * from "./components";
-export type * from "./types";
+export * from "./components"
+export type * from "./types"
 
 // packages/config/src/index.ts
-export * from "./constants";
-export * from "./env";
-export type * from "./types";
+export * from "./constants"
+export * from "./env"
+export type * from "./types"
 
 // ✅ App-level import organization with monorepo packages
 // apps/daemon-v2/src/services/player.service.ts
-import type {
-  Player,
-  PlayerCreateInput,
-  PlayerWhereInput,
-} from "@repo/database";
-import { prisma, createPlayer } from "@repo/database";
-import { GAME_CONSTANTS } from "@repo/config";
+import type { Player, PlayerCreateInput, PlayerWhereInput } from "@repo/database"
+import { prisma, createPlayer } from "@repo/database"
+import { GAME_CONSTANTS } from "@repo/config"
 
 // Local app types
-import type { ProcessingResult, EventContext } from "@/types";
-import { EventProcessor } from "@/services/event-processor";
+import type { ProcessingResult, EventContext } from "@/types"
+import { EventProcessor } from "@/services/event-processor"
 
 // ✅ Web app imports
 // apps/web/src/components/player-leaderboard.tsx
-import type { Player, PlayerSummary } from "@repo/database";
-import { Button, Card } from "@repo/ui";
-import { API_ENDPOINTS } from "@repo/config";
+import type { Player, PlayerSummary } from "@repo/database"
+import { Button, Card } from "@repo/ui"
+import { API_ENDPOINTS } from "@repo/config"
 
 // Local web types
-import type { LeaderboardProps } from "@/types/ui";
+import type { LeaderboardProps } from "@/types/ui"
 
 // ❌ BAD: Mixing package boundaries
-import { prisma } from "@repo/database";
-import { PlayerService } from "@/services/player"; // Should be in shared package if used by multiple apps
+import { prisma } from "@repo/database"
+import { PlayerService } from "@/services/player" // Should be in shared package if used by multiple apps
 ```
 
 **Monorepo TypeScript Configuration**:
@@ -915,17 +879,14 @@ import { PlayerService } from "@/services/player"; // Should be in shared packag
 
 ```typescript
 // packages/database/src/client.ts
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client"
 
 export const prisma = new PrismaClient({
-  log:
-    process.env.NODE_ENV === "development"
-      ? ["query", "error", "warn"]
-      : ["error"],
-});
+  log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+})
 
 // packages/database/src/types/computed.ts
-import type { Player, PlayerStats, Prisma } from "@prisma/client";
+import type { Player, PlayerStats, Prisma } from "@prisma/client"
 
 // Leverage Prisma's auto-generated validator types
 export const PlayerSelectSchema = Prisma.validator<Prisma.PlayerSelect>()({
@@ -940,34 +901,28 @@ export const PlayerSelectSchema = Prisma.validator<Prisma.PlayerSelect>()({
       headshots: true,
     },
   },
-});
+})
 
 export type PlayerWithCalculatedStats = Prisma.PlayerGetPayload<{
-  select: typeof PlayerSelectSchema;
+  select: typeof PlayerSelectSchema
 }> & {
-  kdRatio: number;
-  headshotPercentage: number;
-};
+  kdRatio: number
+  headshotPercentage: number
+}
 
 // Utility function that maintains type safety
 export function calculatePlayerStats(
   player: Prisma.PlayerGetPayload<{ include: { stats: true } }>,
 ): PlayerWithCalculatedStats {
-  const kdRatio =
-    player.stats.deaths > 0
-      ? player.stats.kills / player.stats.deaths
-      : player.stats.kills;
+  const kdRatio = player.stats.deaths > 0 ? player.stats.kills / player.stats.deaths : player.stats.kills
 
-  const headshotPercentage =
-    player.stats.kills > 0
-      ? (player.stats.headshots / player.stats.kills) * 100
-      : 0;
+  const headshotPercentage = player.stats.kills > 0 ? (player.stats.headshots / player.stats.kills) * 100 : 0
 
   return {
     ...player,
     kdRatio: Math.round(kdRatio * 100) / 100,
     headshotPercentage: Math.round(headshotPercentage * 100) / 100,
-  };
+  }
 }
 ```
 
@@ -1005,27 +960,22 @@ export async function updatePlayerStats(
   playerId: number,
   updates: Partial<PlayerStats>,
   options?: {
-    validateInput?: boolean;
-    notifyChanges?: boolean;
-    userId?: number;
+    validateInput?: boolean
+    notifyChanges?: boolean
+    userId?: number
   },
 ): Promise<ServiceResponse<PlayerStats>> {
   // Implementation
 }
 
 // ✅ Use overloads for complex scenarios
-export function formatPlayerName(player: Player): string;
-export function formatPlayerName(name: string, showId: boolean): string;
-export function formatPlayerName(
-  playerOrName: Player | string,
-  showId?: boolean,
-): string {
+export function formatPlayerName(player: Player): string
+export function formatPlayerName(name: string, showId: boolean): string
+export function formatPlayerName(playerOrName: Player | string, showId?: boolean): string {
   if (typeof playerOrName === "string") {
-    return showId ? `${playerOrName} (ID: unknown)` : playerOrName;
+    return showId ? `${playerOrName} (ID: unknown)` : playerOrName
   }
-  return showId
-    ? `${playerOrName.name} (ID: ${playerOrName.id})`
-    : playerOrName.name;
+  return showId ? `${playerOrName.name} (ID: ${playerOrName.id})` : playerOrName.name
 }
 
 // ❌ BAD: Loose, unclear signatures
@@ -1040,27 +990,21 @@ function updatePlayer(id: any, data?: any, options?: any): Promise<any> {
 
 ```typescript
 // ✅ Advanced string manipulation with types
-export type EventHandlerName<T extends string> = `handle${Capitalize<T>}`;
-export type EventListenerName<T extends string> = `on${Capitalize<T>}`;
+export type EventHandlerName<T extends string> = `handle${Capitalize<T>}`
+export type EventListenerName<T extends string> = `on${Capitalize<T>}`
 
 // Generate method names dynamically
 export type PlayerEventHandlers = {
-  [K in GameEventType as EventHandlerName<K>]: (
-    event: GameEvent & { type: K },
-  ) => Promise<void>;
-};
+  [K in GameEventType as EventHandlerName<K>]: (event: GameEvent & { type: K }) => Promise<void>
+}
 
 // Usage
 export class EventProcessor implements PlayerEventHandlers {
-  async handlePlayerKill(
-    event: GameEvent & { type: "player_kill" },
-  ): Promise<void> {
+  async handlePlayerKill(event: GameEvent & { type: "player_kill" }): Promise<void> {
     // Type-safe event handling
   }
 
-  async handlePlayerDeath(
-    event: GameEvent & { type: "player_death" },
-  ): Promise<void> {
+  async handlePlayerDeath(event: GameEvent & { type: "player_death" }): Promise<void> {
     // Type-safe event handling
   }
 }
@@ -1070,19 +1014,19 @@ export class EventProcessor implements PlayerEventHandlers {
 
 ```typescript
 // ✅ Prevent mixing different ID types
-export type PlayerId = number & { readonly __brand: "PlayerId" };
-export type ServerId = number & { readonly __brand: "ServerId" };
-export type SteamId = string & { readonly __brand: "SteamId" };
+export type PlayerId = number & { readonly __brand: "PlayerId" }
+export type ServerId = number & { readonly __brand: "ServerId" }
+export type SteamId = string & { readonly __brand: "SteamId" }
 
 // Constructor functions
 export function createPlayerId(id: number): PlayerId {
-  if (id <= 0) throw new Error("Invalid player ID");
-  return id as PlayerId;
+  if (id <= 0) throw new Error("Invalid player ID")
+  return id as PlayerId
 }
 
 export function createSteamId(steamId: string): SteamId {
-  if (!/^\d{17}$/.test(steamId)) throw new Error("Invalid Steam ID format");
-  return steamId as SteamId;
+  if (!/^\d{17}$/.test(steamId)) throw new Error("Invalid Steam ID format")
+  return steamId as SteamId
 }
 
 // Prevents accidental mixing
@@ -1091,8 +1035,8 @@ function getPlayerStats(playerId: PlayerId): PlayerStats {
 }
 
 // ❌ This would cause a compile error
-const serverId: ServerId = 123 as ServerId;
-getPlayerStats(serverId); // Error: Argument of type 'ServerId' is not assignable to parameter of type 'PlayerId'
+const serverId: ServerId = 123 as ServerId
+getPlayerStats(serverId) // Error: Argument of type 'ServerId' is not assignable to parameter of type 'PlayerId'
 ```
 
 **Recursive Types & Deep Mutations**:
@@ -1100,25 +1044,22 @@ getPlayerStats(serverId); // Error: Argument of type 'ServerId' is not assignabl
 ```typescript
 // ✅ Deep readonly types
 export type DeepReadonly<T> = {
-  readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];
-};
+  readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P]
+}
 
 // ✅ Deep partial types
 export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
-};
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
+}
 
 // ✅ Nested path types for safe object access
 export type Path<T, K extends keyof T = keyof T> = K extends string
   ? T[K] extends Record<string, any>
     ? K | `${K}.${Path<T[K]>}`
     : K
-  : never;
+  : never
 
-export type PathValue<
-  T,
-  P extends Path<T>,
-> = P extends `${infer K}.${infer Rest}`
+export type PathValue<T, P extends Path<T>> = P extends `${infer K}.${infer Rest}`
   ? K extends keyof T
     ? Rest extends Path<T[K]>
       ? PathValue<T[K], Rest>
@@ -1126,15 +1067,12 @@ export type PathValue<
     : never
   : P extends keyof T
     ? T[P]
-    : never;
+    : never
 
 // Usage
-export function getNestedValue<T, P extends Path<T>>(
-  obj: T,
-  path: P,
-): PathValue<T, P> {
+export function getNestedValue<T, P extends Path<T>>(obj: T, path: P): PathValue<T, P> {
   // Type-safe nested object access
-  return path.split(".").reduce((current: any, key) => current?.[key], obj);
+  return path.split(".").reduce((current: any, key) => current?.[key], obj)
 }
 
 // Example usage
@@ -1145,33 +1083,27 @@ const config = {
       port: 3306,
     },
   },
-};
+}
 
-const host = getNestedValue(config, "server.database.host"); // Type: string
+const host = getNestedValue(config, "server.database.host") // Type: string
 ```
 
 **Phantom Types for State Management**:
 
 ```typescript
 // ✅ State machine types
-export type ConnectionState =
-  | "disconnected"
-  | "connecting"
-  | "connected"
-  | "error";
+export type ConnectionState = "disconnected" | "connecting" | "connected" | "error"
 
 export interface Connection<State extends ConnectionState = ConnectionState> {
-  readonly state: State;
-  readonly id: string;
+  readonly state: State
+  readonly id: string
 }
 
-export type DisconnectedConnection = Connection<"disconnected">;
-export type ConnectedConnection = Connection<"connected">;
+export type DisconnectedConnection = Connection<"disconnected">
+export type ConnectedConnection = Connection<"connected">
 
 // State transition functions
-export function connect(
-  conn: DisconnectedConnection,
-): Promise<ConnectedConnection> {
+export function connect(conn: DisconnectedConnection): Promise<ConnectedConnection> {
   // Implementation
 }
 
@@ -1187,38 +1119,36 @@ export function disconnect(conn: ConnectedConnection): DisconnectedConnection {
 
 ```typescript
 // ✅ Advanced conditional type utilities
-export type NonNullable<T> = T extends null | undefined ? never : T;
+export type NonNullable<T> = T extends null | undefined ? never : T
 
 export type FunctionKeys<T> = {
-  [K in keyof T]: T[K] extends Function ? K : never;
-}[keyof T];
+  [K in keyof T]: T[K] extends Function ? K : never
+}[keyof T]
 
 export type NonFunctionKeys<T> = {
-  [K in keyof T]: T[K] extends Function ? never : K;
-}[keyof T];
+  [K in keyof T]: T[K] extends Function ? never : K
+}[keyof T]
 
-export type FunctionProperties<T> = Pick<T, FunctionKeys<T>>;
-export type NonFunctionProperties<T> = Pick<T, NonFunctionKeys<T>>;
+export type FunctionProperties<T> = Pick<T, FunctionKeys<T>>
+export type NonFunctionProperties<T> = Pick<T, NonFunctionKeys<T>>
 
 // Extract method signatures
 export type MethodSignatures<T> = {
-  [K in FunctionKeys<T>]: T[K] extends (...args: infer Args) => infer Return
-    ? (...args: Args) => Return
-    : never;
-};
+  [K in FunctionKeys<T>]: T[K] extends (...args: infer Args) => infer Return ? (...args: Args) => Return : never
+}
 
 // Usage example
 export interface PlayerService {
-  getPlayer(id: number): Promise<Player>;
-  updatePlayer(id: number, data: Partial<Player>): Promise<Player>;
-  playerName: string;
-  playerCount: number;
+  getPlayer(id: number): Promise<Player>
+  updatePlayer(id: number, data: Partial<Player>): Promise<Player>
+  playerName: string
+  playerCount: number
 }
 
-type ServiceMethods = FunctionProperties<PlayerService>;
+type ServiceMethods = FunctionProperties<PlayerService>
 // Result: { getPlayer: ..., updatePlayer: ... }
 
-type ServiceData = NonFunctionProperties<PlayerService>;
+type ServiceData = NonFunctionProperties<PlayerService>
 // Result: { playerName: string, playerCount: number }
 ```
 
@@ -1229,10 +1159,7 @@ type ServiceData = NonFunctionProperties<PlayerService>;
 ```javascript
 // eslint.config.js
 module.exports = {
-  extends: [
-    "@typescript-eslint/recommended",
-    "@typescript-eslint/recommended-requiring-type-checking",
-  ],
+  extends: ["@typescript-eslint/recommended", "@typescript-eslint/recommended-requiring-type-checking"],
   rules: {
     // Enforce strict typing
     "@typescript-eslint/no-explicit-any": "error",
@@ -1243,10 +1170,7 @@ module.exports = {
     "@typescript-eslint/no-unsafe-return": "error",
 
     // Prefer type imports
-    "@typescript-eslint/consistent-type-imports": [
-      "error",
-      { prefer: "type-imports", disallowTypeAnnotations: false },
-    ],
+    "@typescript-eslint/consistent-type-imports": ["error", { prefer: "type-imports", disallowTypeAnnotations: false }],
 
     // Naming conventions
     "@typescript-eslint/naming-convention": [
@@ -1290,38 +1214,38 @@ module.exports = {
     "@typescript-eslint/require-await": "error",
     "@typescript-eslint/no-misused-promises": "error",
   },
-};
+}
 ```
 
 **Type-Only Imports/Exports**:
 
 ```typescript
 // ✅ ALWAYS use type-only imports for types
-import type { Player, PlayerStats } from "@/types/player.types";
-import type { GameEvent } from "@/types/game.types";
-import type { Request, Response } from "express";
+import type { Player, PlayerStats } from "@/types/player.types"
+import type { GameEvent } from "@/types/game.types"
+import type { Request, Response } from "express"
 
 // ✅ Regular imports for runtime values
-import { PlayerService } from "@/services/player.service";
-import { validatePlayerData } from "@/utils/validation";
+import { PlayerService } from "@/services/player.service"
+import { validatePlayerData } from "@/utils/validation"
 
 // ✅ Type-only exports
-export type { Player, PlayerStats, PlayerFilters } from "./player.types";
-export type { GameEvent, GameEventType } from "./game.types";
+export type { Player, PlayerStats, PlayerFilters } from "./player.types"
+export type { GameEvent, GameEventType } from "./game.types"
 
 // ✅ Regular exports for runtime values
-export { PlayerService } from "./player.service";
-export { validatePlayer } from "./player.validation";
+export { PlayerService } from "./player.service"
+export { validatePlayer } from "./player.validation"
 
 // ❌ BAD: Mixed imports (can cause circular dependencies)
-import { Player, PlayerService, GameEvent } from "@/types";
+import { Player, PlayerService, GameEvent } from "@/types"
 ```
 
 **Advanced Type Testing**:
 
 ```typescript
 // tests/types/type-tests.ts
-import type { Equal, Expect } from "@type-challenges/utils";
+import type { Equal, Expect } from "@type-challenges/utils"
 
 // ✅ Test complex type relationships
 type TestCases = [
@@ -1329,21 +1253,16 @@ type TestCases = [
   Expect<Equal<RequiredPlayer, Required<Player>>>,
 
   // Test discriminated unions
-  Expect<
-    Equal<Extract<GameEvent, { type: "player_kill" }>["killerId"], number>
-  >,
+  Expect<Equal<Extract<GameEvent, { type: "player_kill" }>["killerId"], number>>,
 
   // Test conditional types
   Expect<
-    Equal<
-      DatabaseEntity<{ id: number; name: string }>,
-      { id: number; name: string; createdAt: Date; updatedAt: Date }
-    >
+    Equal<DatabaseEntity<{ id: number; name: string }>, { id: number; name: string; createdAt: Date; updatedAt: Date }>
   >,
 
   // Test template literal types
   Expect<Equal<EventHandlerName<"player_kill">, "handlePlayerKill">>,
-];
+]
 
 // ✅ Runtime type validation tests
 describe("Type Guards", () => {
@@ -1354,19 +1273,19 @@ describe("Type Guards", () => {
       steamId: "12345678901234567",
       email: "test@example.com",
       rating: 1500,
-    };
+    }
 
-    expect(isValidPlayer(validPlayer)).toBe(true);
+    expect(isValidPlayer(validPlayer)).toBe(true)
 
     const invalidPlayer = {
       id: "not-a-number",
       name: "",
       steamId: "123", // Invalid format
-    };
+    }
 
-    expect(isValidPlayer(invalidPlayer)).toBe(false);
-  });
-});
+    expect(isValidPlayer(invalidPlayer)).toBe(false)
+  })
+})
 ```
 
 **TypeScript Performance & Production Considerations**:
@@ -1422,23 +1341,23 @@ enum GameEventEnum {
 // Step 1: Add basic types to existing JavaScript
 // before.js -> after.ts
 function processPlayer(player) {
-  return player.name.toUpperCase();
+  return player.name.toUpperCase()
 }
 
 // After
 function processPlayer(player: { name: string }): string {
-  return player.name.toUpperCase();
+  return player.name.toUpperCase()
 }
 
 // Step 2: Extract and improve types
 interface Player {
-  name: string;
-  id: number;
-  rating: number;
+  name: string
+  id: number
+  rating: number
 }
 
 function processPlayer(player: Player): string {
-  return player.name.toUpperCase();
+  return player.name.toUpperCase()
 }
 
 // Step 3: Add comprehensive validation
@@ -1446,13 +1365,13 @@ export const PlayerSchema = z.object({
   name: z.string().min(1).max(32),
   id: z.number().positive(),
   rating: z.number().min(0).max(5000),
-});
+})
 
-export type Player = z.infer<typeof PlayerSchema>;
+export type Player = z.infer<typeof PlayerSchema>
 
 export function processPlayer(player: Player): string {
-  const validated = PlayerSchema.parse(player);
-  return validated.name.toUpperCase();
+  const validated = PlayerSchema.parse(player)
+  return validated.name.toUpperCase()
 }
 ```
 
@@ -1481,31 +1400,31 @@ export function processPlayer(player: Player): string {
  */
 export interface Player {
   /** Unique player identifier */
-  readonly id: PlayerId;
+  readonly id: PlayerId
 
   /** Display name (3-32 characters, alphanumeric + underscore/dash) */
-  name: string;
+  name: string
 
   /** Steam ID (17 digits) */
-  readonly steamId: SteamId;
+  readonly steamId: SteamId
 
   /** Email address for notifications (nullable) */
-  email: string | null;
+  email: string | null
 
   /** Skill rating (0-5000 range) */
-  rating: number;
+  rating: number
 
   /** Player statistics */
-  stats: PlayerStats;
+  stats: PlayerStats
 
   /** Account settings */
-  settings: PlayerSettings;
+  settings: PlayerSettings
 
   /** When the player was first seen */
-  readonly firstSeenAt: Date;
+  readonly firstSeenAt: Date
 
   /** When the player was last active */
-  lastSeenAt: Date;
+  lastSeenAt: Date
 }
 
 /**
@@ -1518,25 +1437,25 @@ export interface PlayerStatsOptions {
    * Time period for statistics calculation
    * @defaultValue 'all'
    */
-  timeframe?: "day" | "week" | "month" | "year" | "all";
+  timeframe?: "day" | "week" | "month" | "year" | "all"
 
   /**
    * Include only specific game modes
    * @defaultValue undefined (all modes)
    */
-  gameModes?: string[];
+  gameModes?: string[]
 
   /**
    * Minimum number of matches required
    * @defaultValue 1
    */
-  minMatches?: number;
+  minMatches?: number
 
   /**
    * Whether to include detailed weapon statistics
    * @defaultValue false
    */
-  includeWeaponStats?: boolean;
+  includeWeaponStats?: boolean
 }
 ````
 
@@ -1551,14 +1470,14 @@ export class DomainError extends Error {
     public code: string,
     public statusCode: number = 500,
   ) {
-    super(message);
-    this.name = this.constructor.name;
+    super(message)
+    this.name = this.constructor.name
   }
 }
 
 export class PlayerNotFoundError extends DomainError {
   constructor(playerId: number) {
-    super(`Player with ID ${playerId} not found`, "PLAYER_NOT_FOUND", 404);
+    super(`Player with ID ${playerId} not found`, "PLAYER_NOT_FOUND", 404)
   }
 }
 ```
@@ -1588,19 +1507,17 @@ async function updatePlayerStats(
 ```typescript
 // ✅ GOOD: Proper error handling
 async function processEvents(events: GameEvent[]): Promise<void> {
-  const results = await Promise.allSettled(
-    events.map((event) => processEvent(event)),
-  );
+  const results = await Promise.allSettled(events.map((event) => processEvent(event)))
 
-  const failures = results.filter((r) => r.status === "rejected");
+  const failures = results.filter((r) => r.status === "rejected")
   if (failures.length > 0) {
-    logger.error("Failed to process events", { failures });
+    logger.error("Failed to process events", { failures })
   }
 }
 
 // ❌ BAD: Swallowing errors
 async function processEvents(events: GameEvent[]): Promise<void> {
-  await Promise.all(events.map((event) => processEvent(event).catch(() => {})));
+  await Promise.all(events.map((event) => processEvent(event).catch(() => {})))
 }
 ```
 
@@ -1636,18 +1553,18 @@ describe("PlayerService", () => {
   describe("calculateSkillRating", () => {
     it("should increase rating for wins", async () => {
       // Arrange
-      const player = createMockPlayer({ rating: 1000 });
-      const match = createMockMatch({ winner: player.id });
+      const player = createMockPlayer({ rating: 1000 })
+      const match = createMockMatch({ winner: player.id })
 
       // Act
-      const newRating = await service.calculateSkillRating(player, match);
+      const newRating = await service.calculateSkillRating(player, match)
 
       // Assert
-      expect(newRating).toBeGreaterThan(player.rating);
-      expect(newRating).toBeLessThan(player.rating + 50);
-    });
-  });
-});
+      expect(newRating).toBeGreaterThan(player.rating)
+      expect(newRating).toBeLessThan(player.rating + 50)
+    })
+  })
+})
 ```
 
 **Mock Strategies**:
@@ -1659,7 +1576,7 @@ const mockPrisma = {
     findUnique: vi.fn(),
     update: vi.fn(),
   },
-};
+}
 
 // External service mocks
 vi.mock("@/services/steam-api", () => ({
@@ -1667,7 +1584,7 @@ vi.mock("@/services/steam-api", () => ({
     steamId: "123",
     avatar: "url",
   }),
-}));
+}))
 ```
 
 ### **4.3 Integration Testing**
@@ -1676,16 +1593,16 @@ vi.mock("@/services/steam-api", () => ({
 
 ```typescript
 describe("POST /api/events", () => {
-  let app: FastifyInstance;
+  let app: FastifyInstance
 
   beforeAll(async () => {
-    app = await buildApp({ logger: false });
-    await app.ready();
-  });
+    app = await buildApp({ logger: false })
+    await app.ready()
+  })
 
   afterAll(async () => {
-    await app.close();
-  });
+    await app.close()
+  })
 
   it("should process valid game event", async () => {
     const event = {
@@ -1696,7 +1613,7 @@ describe("POST /api/events", () => {
         victimId: 2,
         weapon: "ak47",
       },
-    };
+    }
 
     const response = await app.inject({
       method: "POST",
@@ -1705,31 +1622,31 @@ describe("POST /api/events", () => {
         Authorization: "Bearer valid-token",
       },
       payload: event,
-    });
+    })
 
-    expect(response.statusCode).toBe(201);
+    expect(response.statusCode).toBe(201)
     expect(response.json()).toMatchObject({
       id: expect.any(String),
       processed: true,
-    });
-  });
-});
+    })
+  })
+})
 ```
 
 ### **4.4 E2E Testing**
 
 ```typescript
 // e2e/player-statistics.spec.ts
-import { test, expect } from "@playwright/test";
+import { test, expect } from "@playwright/test"
 
 test.describe("Player Statistics", () => {
   test("should display real-time stats updates", async ({ page }) => {
     // Navigate to player profile
-    await page.goto("/players/123");
+    await page.goto("/players/123")
 
     // Check initial stats
-    const killCount = await page.locator('[data-testid="kill-count"]');
-    await expect(killCount).toHaveText("50");
+    const killCount = await page.locator('[data-testid="kill-count"]')
+    await expect(killCount).toHaveText("50")
 
     // Simulate game event via WebSocket
     await page.evaluate(() => {
@@ -1738,13 +1655,13 @@ test.describe("Player Statistics", () => {
           type: "player_kill",
           playerId: 123,
         }),
-      );
-    });
+      )
+    })
 
     // Verify real-time update
-    await expect(killCount).toHaveText("51");
-  });
-});
+    await expect(killCount).toHaveText("51")
+  })
+})
 ```
 
 ### **4.5 Test Data Management**
@@ -1759,11 +1676,11 @@ export const playerFactory = Factory.define<Player>(() => ({
   steamId: faker.string.numeric(17),
   rating: faker.number.int({ min: 0, max: 3000 }),
   createdAt: faker.date.past(),
-}));
+}))
 
 // Usage
-const player = playerFactory.build({ rating: 1500 });
-const players = playerFactory.buildList(10);
+const player = playerFactory.build({ rating: 1500 })
+const players = playerFactory.buildList(10)
 ```
 
 **Fixtures**:
@@ -1775,15 +1692,11 @@ export async function seedTestDatabase() {
     prisma.player.createMany({ data: testPlayers }),
     prisma.server.createMany({ data: testServers }),
     prisma.gameEvent.createMany({ data: testEvents }),
-  ]);
+  ])
 }
 
 export async function cleanupDatabase() {
-  await prisma.$transaction([
-    prisma.gameEvent.deleteMany(),
-    prisma.player.deleteMany(),
-    prisma.server.deleteMany(),
-  ]);
+  await prisma.$transaction([prisma.gameEvent.deleteMany(), prisma.player.deleteMany(), prisma.server.deleteMany()])
 }
 ```
 
@@ -1816,14 +1729,14 @@ const topPlayers = await prisma.player.findMany({
       },
     },
   },
-});
+})
 
 // ❌ BAD: N+1 queries
-const players = await prisma.player.findMany();
+const players = await prisma.player.findMany()
 for (const player of players) {
   const stats = await prisma.playerStats.findUnique({
     where: { playerId: player.id },
-  });
+  })
 }
 ```
 
@@ -1840,12 +1753,12 @@ export const prisma = new PrismaClient({
   log: ["error", "warn"],
   // Connection pool configuration
   // These are managed by the underlying engine
-});
+})
 
 // Ensure proper cleanup
 process.on("beforeExit", async () => {
-  await prisma.$disconnect();
-});
+  await prisma.$disconnect()
+})
 ```
 
 ### **5.2 Caching Strategies**
@@ -1857,30 +1770,30 @@ class CacheManager {
   private memoryCache = new LRUCache<string, any>({
     max: 1000,
     ttl: 1000 * 60 * 5, // 5 minutes
-  });
+  })
 
   async get<T>(key: string): Promise<T | null> {
     // L1: Memory cache
-    const memoryHit = this.memoryCache.get(key);
-    if (memoryHit) return memoryHit;
+    const memoryHit = this.memoryCache.get(key)
+    if (memoryHit) return memoryHit
 
     // L2: Redis cache
-    const redisHit = await this.redis.get(key);
+    const redisHit = await this.redis.get(key)
     if (redisHit) {
-      const data = JSON.parse(redisHit);
-      this.memoryCache.set(key, data);
-      return data;
+      const data = JSON.parse(redisHit)
+      this.memoryCache.set(key, data)
+      return data
     }
 
-    return null;
+    return null
   }
 
   async set<T>(key: string, value: T, ttl?: number): Promise<void> {
-    const ttlSeconds = ttl || 3600; // 1 hour default
+    const ttlSeconds = ttl || 3600 // 1 hour default
 
     // Set in both caches
-    this.memoryCache.set(key, value);
-    await this.redis.setex(key, ttlSeconds, JSON.stringify(value));
+    this.memoryCache.set(key, value)
+    await this.redis.setex(key, ttlSeconds, JSON.stringify(value))
   }
 }
 ```
@@ -1890,24 +1803,17 @@ class CacheManager {
 ```typescript
 class PlayerCacheService {
   async invalidatePlayer(playerId: number): Promise<void> {
-    const patterns = [
-      `player:${playerId}:*`,
-      `leaderboard:*`,
-      `stats:global:*`,
-    ];
+    const patterns = [`player:${playerId}:*`, `leaderboard:*`, `stats:global:*`]
 
     // Clear from all cache levels
-    await Promise.all([
-      this.clearMemoryCache(patterns),
-      this.clearRedisCache(patterns),
-    ]);
+    await Promise.all([this.clearMemoryCache(patterns), this.clearRedisCache(patterns)])
 
     // Publish invalidation event
     await this.pubsub.publish("cache.invalidate", {
       type: "player",
       id: playerId,
       patterns,
-    });
+    })
   }
 }
 ```
@@ -1929,13 +1835,13 @@ const eventQueue = new Queue("game-events", {
       delay: 2000,
     },
   },
-});
+})
 
 // Worker with concurrency control
 const worker = new Worker(
   "game-events",
   async (job) => {
-    await processGameEvent(job.data);
+    await processGameEvent(job.data)
   },
   {
     connection: redis,
@@ -1945,7 +1851,7 @@ const worker = new Worker(
       duration: 1000, // 100 jobs per second
     },
   },
-);
+)
 ```
 
 ---
@@ -1971,22 +1877,22 @@ export const PlayerUpdateSchema = z.object({
       privacy: z.enum(["public", "friends", "private"]),
     })
     .optional(),
-});
+})
 
 // API endpoint validation
 app.post("/api/players/:id", async (req, res) => {
-  const validation = PlayerUpdateSchema.safeParse(req.body);
+  const validation = PlayerUpdateSchema.safeParse(req.body)
 
   if (!validation.success) {
     return res.status(400).json({
       error: "Validation failed",
       details: validation.error.flatten(),
-    });
+    })
   }
 
   // Process validated data
-  await updatePlayer(req.params.id, validation.data);
-});
+  await updatePlayer(req.params.id, validation.data)
+})
 ```
 
 ### **6.2 Authentication & Authorization**
@@ -2009,23 +1915,23 @@ export function generateAccessToken(user: User): string {
       issuer: "hlstats-api",
       audience: "hlstats-client",
     },
-  );
+  )
 }
 
 // Middleware with role-based access
 export function requireRole(role: string) {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user;
+    const user = req.user
 
     if (!user || !user.roles.includes(role)) {
       return res.status(403).json({
         error: "Insufficient permissions",
         required: role,
-      });
+      })
     }
 
-    next();
-  };
+    next()
+  }
 }
 ```
 
@@ -2037,12 +1943,10 @@ const players = await prisma.$queryRaw`
   SELECT * FROM players 
   WHERE server_id = ${serverId} 
   AND last_seen > ${minDate}
-`;
+`
 
 // ❌ BAD: String concatenation
-const players = await prisma.$queryRawUnsafe(
-  `SELECT * FROM players WHERE name = '${userName}'`,
-);
+const players = await prisma.$queryRawUnsafe(`SELECT * FROM players WHERE name = '${userName}'`)
 ```
 
 ### **6.4 Rate Limiting**
@@ -2055,19 +1959,19 @@ const rateLimiter = new RateLimiterRedis({
   points: 100, // requests
   duration: 60, // per minute
   blockDuration: 60 * 5, // block for 5 minutes
-});
+})
 
 app.use(async (req, res, next) => {
   try {
-    await rateLimiter.consume(req.ip);
-    next();
+    await rateLimiter.consume(req.ip)
+    next()
   } catch (rejRes) {
     res.status(429).json({
       error: "Too many requests",
       retryAfter: Math.round(rejRes.msBeforeNext / 1000) || 60,
-    });
+    })
   }
-});
+})
 ```
 
 ---
@@ -2094,10 +1998,7 @@ const logger = winston.createLogger({
   },
   transports: [
     new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple(),
-      ),
+      format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
     }),
     new winston.transports.File({
       filename: "logs/error.log",
@@ -2106,7 +2007,7 @@ const logger = winston.createLogger({
       maxFiles: 5,
     }),
   ],
-});
+})
 
 // Contextual logging
 logger.info("Player action processed", {
@@ -2115,7 +2016,7 @@ logger.info("Player action processed", {
   weapon: event.weapon,
   serverId: server.id,
   processingTime: Date.now() - startTime,
-});
+})
 ```
 
 ### **7.2 Metrics Collection**
@@ -2142,38 +2043,36 @@ const metrics = {
     help: "Total number of game events processed",
     labelNames: ["event_type", "game", "status"],
   }),
-};
+}
 
 // Middleware to track metrics
 app.use((req, res, next) => {
-  const start = Date.now();
+  const start = Date.now()
 
   res.on("finish", () => {
-    const duration = (Date.now() - start) / 1000;
+    const duration = (Date.now() - start) / 1000
 
-    metrics.httpRequestDuration
-      .labels(req.method, req.route?.path || "unknown", res.statusCode)
-      .observe(duration);
-  });
+    metrics.httpRequestDuration.labels(req.method, req.route?.path || "unknown", res.statusCode).observe(duration)
+  })
 
-  next();
-});
+  next()
+})
 ```
 
 ### **7.3 Distributed Tracing**
 
 ```typescript
 // OpenTelemetry setup
-import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
-import { Resource } from "@opentelemetry/resources";
-import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
+import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node"
+import { Resource } from "@opentelemetry/resources"
+import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions"
 
 const provider = new NodeTracerProvider({
   resource: new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: "hlstats-daemon",
     [SemanticResourceAttributes.SERVICE_VERSION]: process.env.APP_VERSION,
   }),
-});
+})
 
 // Instrument operations
 export async function processEvent(event: GameEvent): Promise<void> {
@@ -2182,20 +2081,20 @@ export async function processEvent(event: GameEvent): Promise<void> {
       "event.type": event.type,
       "event.server_id": event.serverId,
     },
-  });
+  })
 
   try {
-    await validateEvent(event);
-    await storeEvent(event);
-    await updateStatistics(event);
+    await validateEvent(event)
+    await storeEvent(event)
+    await updateStatistics(event)
 
-    span.setStatus({ code: SpanStatusCode.OK });
+    span.setStatus({ code: SpanStatusCode.OK })
   } catch (error) {
-    span.recordException(error);
-    span.setStatus({ code: SpanStatusCode.ERROR });
-    throw error;
+    span.recordException(error)
+    span.setStatus({ code: SpanStatusCode.ERROR })
+    throw error
   } finally {
-    span.end();
+    span.end()
   }
 }
 ```
@@ -2341,9 +2240,9 @@ export async function healthCheck(): Promise<HealthStatus> {
     redis: await checkRedis(),
     memory: checkMemoryUsage(),
     disk: await checkDiskSpace(),
-  };
+  }
 
-  const allHealthy = Object.values(checks).every((check) => check.healthy);
+  const allHealthy = Object.values(checks).every((check) => check.healthy)
 
   return {
     status: allHealthy ? "healthy" : "unhealthy",
@@ -2351,27 +2250,27 @@ export async function healthCheck(): Promise<HealthStatus> {
     version: process.env.APP_VERSION,
     uptime: process.uptime(),
     checks,
-  };
+  }
 }
 
 // Health check endpoint
 app.get("/health", async (req, res) => {
-  const health = await healthCheck();
-  const statusCode = health.status === "healthy" ? 200 : 503;
+  const health = await healthCheck()
+  const statusCode = health.status === "healthy" ? 200 : 503
 
-  res.status(statusCode).json(health);
-});
+  res.status(statusCode).json(health)
+})
 
 // Readiness check
 app.get("/ready", async (req, res) => {
-  const ready = await isServiceReady();
+  const ready = await isServiceReady()
 
   if (ready) {
-    res.status(200).json({ ready: true });
+    res.status(200).json({ ready: true })
   } else {
-    res.status(503).json({ ready: false });
+    res.status(503).json({ ready: false })
   }
-});
+})
 ```
 
 ---
@@ -2400,11 +2299,7 @@ app.get("/ready", async (req, res) => {
  * );
  * // Returns: { winner: +25, loser: -20 }
  */
-export function calculateRatingChange(
-  winner: Player,
-  loser: Player,
-  matchDetails?: MatchContext,
-): RatingAdjustment {
+export function calculateRatingChange(winner: Player, loser: Player, matchDetails?: MatchContext): RatingAdjustment {
   // Implementation
 }
 ```

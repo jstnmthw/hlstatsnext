@@ -1,10 +1,10 @@
-import { builder } from "../builder";
-import { Player } from "./player";
-import { handleGraphQLResult } from "../utils/graphql-result-handler";
+import { builder } from "../builder"
+import { Player } from "./player"
+import { handleGraphQLResult } from "../utils/graphql-result-handler"
 import type {
   CreateGameInput as CreateGameInputType,
   UpdateGameInput as UpdateGameInputType,
-} from "../types/database/game.types";
+} from "../types/database/game.types"
 
 // Define Game object using Prisma plugin - automatically maps all Prisma fields
 const Game = builder.prismaObject("Game", {
@@ -33,17 +33,17 @@ const Game = builder.prismaObject("Game", {
     players: t.relation("players"),
     clans: t.relation("clans"),
   }),
-});
+})
 
 // Define GameStatistics type for complex queries
 const GameStatistics = builder.objectRef<{
-  totalPlayers: number;
-  activePlayers: number;
-  totalKills: number;
-  totalDeaths: number;
-  averageSkill: number;
-  topPlayers: readonly Player[];
-}>("GameStatistics");
+  totalPlayers: number
+  activePlayers: number
+  totalKills: number
+  totalDeaths: number
+  averageSkill: number
+  topPlayers: readonly Player[]
+}>("GameStatistics")
 
 GameStatistics.implement({
   fields: (t) => ({
@@ -54,7 +54,7 @@ GameStatistics.implement({
     averageSkill: t.exposeInt("averageSkill"),
     topPlayers: t.expose("topPlayers", { type: [Player] }),
   }),
-});
+})
 
 // Query to get all games with automatic Prisma integration
 builder.queryField("games", (t) =>
@@ -68,10 +68,10 @@ builder.queryField("games", (t) =>
       return _context.db.game.findMany({
         ...query,
         where: args.includeHidden ? {} : { hidden: "0" },
-      });
+      })
     },
   }),
-);
+)
 
 // Query to get a single game with automatic Prisma integration
 builder.queryField("game", (t) =>
@@ -86,10 +86,10 @@ builder.queryField("game", (t) =>
       return _context.db.game.findUnique({
         ...query,
         where: { code: args.id },
-      });
+      })
     },
   }),
-);
+)
 
 // Query to get game statistics using the service for complex business logic
 builder.queryField("gameStats", (t) =>
@@ -99,11 +99,11 @@ builder.queryField("gameStats", (t) =>
       gameId: t.arg.string({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.game.getGameStats(args.gameId);
-      return handleGraphQLResult(result);
+      const result = await context.services.game.getGameStats(args.gameId)
+      return handleGraphQLResult(result)
     },
   }),
-);
+)
 
 // Input for creating a game
 const CreateGameInput = builder.inputType("CreateGameInput", {
@@ -113,7 +113,7 @@ const CreateGameInput = builder.inputType("CreateGameInput", {
     realgame: t.string({ required: true }),
     hidden: t.boolean({ required: false, defaultValue: false }),
   }),
-});
+})
 
 // Input for updating a game
 const UpdateGameInput = builder.inputType("UpdateGameInput", {
@@ -122,7 +122,7 @@ const UpdateGameInput = builder.inputType("UpdateGameInput", {
     realgame: t.string({ required: false }),
     hidden: t.boolean({ required: false }),
   }),
-});
+})
 
 // Mutation to create a game
 builder.mutationField("createGame", (t) =>
@@ -132,13 +132,11 @@ builder.mutationField("createGame", (t) =>
       input: t.arg({ type: CreateGameInput, required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.game.createGame(
-        args.input as CreateGameInputType,
-      );
-      return handleGraphQLResult(result);
+      const result = await context.services.game.createGame(args.input as CreateGameInputType)
+      return handleGraphQLResult(result)
     },
   }),
-);
+)
 
 // Mutation to update a game
 builder.mutationField("updateGame", (t) =>
@@ -149,13 +147,10 @@ builder.mutationField("updateGame", (t) =>
       input: t.arg({ type: UpdateGameInput, required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.game.updateGame(
-        args.code,
-        args.input as UpdateGameInputType,
-      );
-      return handleGraphQLResult(result);
+      const result = await context.services.game.updateGame(args.code, args.input as UpdateGameInputType)
+      return handleGraphQLResult(result)
     },
   }),
-);
+)
 
-export { Game };
+export { Game }

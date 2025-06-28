@@ -1,11 +1,7 @@
-import type { PrismaClient, Server } from "@repo/database/client";
-import type { Result, AppError } from "../types/common";
-import { success, failure } from "../types";
-import type {
-  ServerDetails,
-  CreateServerInput,
-  UpdateServerInput,
-} from "../types/database/server.types";
+import type { PrismaClient, Server } from "@repo/database/client"
+import type { Result, AppError } from "../types/common"
+import { success, failure } from "../types"
+import type { ServerDetails, CreateServerInput, UpdateServerInput } from "../types/database/server.types"
 
 /**
  * Service for server-related business logic
@@ -22,15 +18,15 @@ export class ServerService {
     try {
       const servers = await this.db.server.findMany({
         orderBy: { sortorder: "asc" },
-      });
-      return success(servers);
+      })
+      return success(servers)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to fetch servers",
         operation: "getServers",
-      });
+      })
     }
   }
 
@@ -39,19 +35,19 @@ export class ServerService {
    */
   async getServerDetails(id: string): Promise<Result<ServerDetails, AppError>> {
     try {
-      const serverId = parseInt(id);
+      const serverId = parseInt(id)
       if (isNaN(serverId)) {
         return failure({
           type: "VALIDATION_ERROR",
           message: "Invalid server ID format",
           field: "id",
           value: id,
-        });
+        })
       }
 
       const server = await this.db.server.findUnique({
         where: { serverId },
-      });
+      })
 
       if (!server) {
         return failure({
@@ -59,7 +55,7 @@ export class ServerService {
           message: "Server not found",
           resource: "server",
           id,
-        });
+        })
       }
 
       // NOTE: Live player data would be fetched from a cache or the daemon here.
@@ -69,11 +65,11 @@ export class ServerService {
           AND: [{ game: server.game }, { last_event: { gte: 0 } }], // Simplified logic
         },
         take: server.players, // Assumes `players` field on server is current count
-      });
+      })
 
       const gameData = await this.db.game.findUnique({
         where: { code: server.game },
-      });
+      })
 
       const details: ServerDetails = {
         ...server,
@@ -81,25 +77,23 @@ export class ServerService {
         currentPlayers,
         playerCount: server.players,
         isOnline: server.players > 0, // Simplified online status check
-      };
+      }
 
-      return success(details);
+      return success(details)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to fetch server details",
         operation: "getServerDetails",
-      });
+      })
     }
   }
 
   /**
    * Create a new server
    */
-  async createServer(
-    input: CreateServerInput,
-  ): Promise<Result<Server, AppError>> {
+  async createServer(input: CreateServerInput): Promise<Result<Server, AppError>> {
     try {
       const server = await this.db.server.create({
         data: {
@@ -110,34 +104,31 @@ export class ServerService {
           rcon_password: input.rconPassword ?? "",
           publicaddress: input.privateAddress ?? "",
         },
-      });
-      return success(server);
+      })
+      return success(server)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to create server",
         operation: "createServer",
-      });
+      })
     }
   }
 
   /**
    * Update an existing server
    */
-  async updateServer(
-    id: string,
-    input: UpdateServerInput,
-  ): Promise<Result<Server, AppError>> {
+  async updateServer(id: string, input: UpdateServerInput): Promise<Result<Server, AppError>> {
     try {
-      const serverId = parseInt(id);
+      const serverId = parseInt(id)
       if (isNaN(serverId)) {
         return failure({
           type: "VALIDATION_ERROR",
           message: "Invalid server ID format",
           field: "id",
           value: id,
-        });
+        })
       }
 
       const server = await this.db.server.update({
@@ -147,16 +138,16 @@ export class ServerService {
           ...(input.rconPassword && { rcon_password: input.rconPassword }),
           ...(input.privateAddress && { publicaddress: input.privateAddress }),
         },
-      });
+      })
 
-      return success(server);
+      return success(server)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to update server",
         operation: "updateServer",
-      });
+      })
     }
   }
 }

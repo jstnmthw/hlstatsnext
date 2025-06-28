@@ -1,4 +1,4 @@
-import { builder } from "../builder";
+import { builder } from "../builder"
 
 // Define Country object using Prisma plugin
 const Country = builder.prismaObject("Country", {
@@ -15,7 +15,7 @@ const Country = builder.prismaObject("Country", {
     // Expose relation counts
     playerCount: t.relationCount("players"),
   }),
-});
+})
 
 // Query to get all countries
 builder.queryField("countries", (t) =>
@@ -25,10 +25,10 @@ builder.queryField("countries", (t) =>
       return context.db.country.findMany({
         ...query,
         orderBy: { name: "asc" },
-      });
+      })
     },
   }),
-);
+)
 
 // Query to get a single country by id
 builder.queryField("country", (t) =>
@@ -42,9 +42,9 @@ builder.queryField("country", (t) =>
       return context.db.country.findUnique({
         ...query,
         where: { flag: args.id },
-      });
+      })
     },
   }),
-);
+)
 
-export { Country };
+export { Country }

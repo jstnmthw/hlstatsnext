@@ -1,11 +1,7 @@
-import type { Player, PrismaClient } from "@repo/database/client";
-import type {
-  PlayerStatistics,
-  CreatePlayerInput,
-  UpdatePlayerStatsInput,
-} from "../types/database/player.types";
-import type { Result, AppError } from "../types/common";
-import { success, failure } from "../types/common";
+import type { Player, PrismaClient } from "@repo/database/client"
+import type { PlayerStatistics, CreatePlayerInput, UpdatePlayerStatsInput } from "../types/database/player.types"
+import type { Result, AppError } from "../types/common"
+import { success, failure } from "../types/common"
 
 /**
  * Service class for handling player-related business logic operations
@@ -21,13 +17,11 @@ export class PlayerService {
    * Get player statistics summary with rank calculation
    * This involves complex business logic that's better handled in the service layer
    */
-  async getPlayerStats(
-    playerId: string,
-  ): Promise<Result<PlayerStatistics, AppError>> {
+  async getPlayerStats(playerId: string): Promise<Result<PlayerStatistics, AppError>> {
     try {
       const player = await this.db.player.findUnique({
         where: { playerId: Number(playerId) },
-      });
+      })
 
       if (!player) {
         return failure({
@@ -35,16 +29,13 @@ export class PlayerService {
           message: "Player not found",
           resource: "player",
           id: playerId,
-        });
+        })
       }
 
       // Calculate derived statistics
-      const killDeathRatio =
-        player.deaths > 0 ? player.kills / player.deaths : player.kills;
-      const accuracy =
-        player.shots > 0 ? (player.hits / player.shots) * 100 : 0;
-      const headshotRatio =
-        player.kills > 0 ? (player.headshots / player.kills) * 100 : 0;
+      const killDeathRatio = player.deaths > 0 ? player.kills / player.deaths : player.kills
+      const accuracy = player.shots > 0 ? (player.hits / player.shots) * 100 : 0
+      const headshotRatio = player.kills > 0 ? (player.headshots / player.kills) * 100 : 0
 
       // Get player rank within their game - complex query better in service
       const rank =
@@ -56,7 +47,7 @@ export class PlayerService {
             },
             hideranking: 0,
           },
-        })) + 1;
+        })) + 1
 
       const statistics: PlayerStatistics = {
         player,
@@ -64,16 +55,16 @@ export class PlayerService {
         accuracy: Math.round(accuracy * 100) / 100,
         headshotRatio: Math.round(headshotRatio * 100) / 100,
         rank,
-      };
+      }
 
-      return success(statistics);
+      return success(statistics)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to calculate player statistics",
         operation: "getPlayerStats",
-      });
+      })
     }
   }
 
@@ -97,7 +88,7 @@ export class PlayerService {
             },
           },
         },
-      });
+      })
 
       if (!existingPlayer) {
         return failure({
@@ -105,7 +96,7 @@ export class PlayerService {
           message: "Player not found",
           resource: "player",
           id: steamId,
-        });
+        })
       }
 
       // Update player statistics with proper data validation
@@ -125,16 +116,16 @@ export class PlayerService {
           }),
           ...(stats.lastEvent !== undefined && { last_event: stats.lastEvent }),
         },
-      });
+      })
 
-      return success(updatedPlayer);
+      return success(updatedPlayer)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to update player statistics",
         operation: "updatePlayerStats",
-      });
+      })
     }
   }
 
@@ -142,9 +133,7 @@ export class PlayerService {
    * Create a new player with Steam ID association
    * Requires transaction to ensure data consistency across tables
    */
-  async createPlayer(
-    data: CreatePlayerInput,
-  ): Promise<Result<Player, AppError>> {
+  async createPlayer(data: CreatePlayerInput): Promise<Result<Player, AppError>> {
     try {
       const player = await this.db.player.create({
         data: {
@@ -165,16 +154,16 @@ export class PlayerService {
             },
           },
         },
-      });
+      })
 
-      return success(player);
+      return success(player)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to create player",
         operation: "createPlayer",
-      });
+      })
     }
   }
 }

@@ -1,9 +1,6 @@
-import { builder } from "../builder";
-import type { Player, Prisma } from "@repo/database/client";
-import {
-  handleGraphQLResult,
-  handleGraphQLResultNullable,
-} from "../utils/graphql-result-handler";
+import { builder } from "../builder"
+import type { Player, Prisma } from "@repo/database/client"
+import { handleGraphQLResult, handleGraphQLResultNullable } from "../utils/graphql-result-handler"
 
 // Define Player object using Prisma plugin
 const Player = builder.prismaObject("Player", {
@@ -32,18 +29,15 @@ const Player = builder.prismaObject("Player", {
 
     // Computed fields
     killDeathRatio: t.float({
-      resolve: (player) =>
-        player.deaths > 0 ? player.kills / player.deaths : player.kills,
+      resolve: (player) => (player.deaths > 0 ? player.kills / player.deaths : player.kills),
     }),
 
     accuracy: t.float({
-      resolve: (player) =>
-        player.shots > 0 ? (player.hits / player.shots) * 100 : 0,
+      resolve: (player) => (player.shots > 0 ? (player.hits / player.shots) * 100 : 0),
     }),
 
     headshotRatio: t.float({
-      resolve: (player) =>
-        player.kills > 0 ? (player.headshots / player.kills) * 100 : 0,
+      resolve: (player) => (player.kills > 0 ? (player.headshots / player.kills) * 100 : 0),
     }),
 
     // Location data
@@ -73,16 +67,16 @@ const Player = builder.prismaObject("Player", {
     // UniqueIds relation
     // uniqueIds: t.relation("uniqueIds"), // Enable when needed
   }),
-});
+})
 
 // Define PlayerStatistics type for complex queries with rank calculation
 const PlayerStatistics = builder.objectRef<{
-  player: Player;
-  killDeathRatio: number;
-  accuracy: number;
-  headshotRatio: number;
-  rank: number | null;
-}>("PlayerStatistics");
+  player: Player
+  killDeathRatio: number
+  accuracy: number
+  headshotRatio: number
+  rank: number | null
+}>("PlayerStatistics")
 
 PlayerStatistics.implement({
   fields: (t) => ({
@@ -95,7 +89,7 @@ PlayerStatistics.implement({
     headshotRatio: t.exposeFloat("headshotRatio"),
     rank: t.exposeInt("rank", { nullable: true }),
   }),
-});
+})
 
 // Input types for filtering and sorting
 const PlayerSortField = builder.enumType("PlayerSortField", {
@@ -106,14 +100,14 @@ const PlayerSortField = builder.enumType("PlayerSortField", {
     LAST_EVENT: { value: "last_event" },
     CONNECTION_TIME: { value: "connection_time" },
   },
-});
+})
 
 const SortDirection = builder.enumType("SortDirection", {
   values: {
     ASC: { value: "asc" },
     DESC: { value: "desc" },
   },
-});
+})
 
 // Enhanced filter input for players
 const PlayerFiltersInput = builder.inputType("PlayerFiltersInput", {
@@ -127,7 +121,7 @@ const PlayerFiltersInput = builder.inputType("PlayerFiltersInput", {
     minKills: t.int({ required: false }),
     search: t.string({ required: false }),
   }),
-});
+})
 
 // Input for creating a player
 const CreatePlayerInput = builder.inputType("CreatePlayerInput", {
@@ -144,7 +138,7 @@ const CreatePlayerInput = builder.inputType("CreatePlayerInput", {
     state: t.string({ required: false }),
     lastAddress: t.string({ required: false }),
   }),
-});
+})
 
 // Input for updating player stats (daemon use)
 const UpdatePlayerStatsInput = builder.inputType("UpdatePlayerStatsInput", {
@@ -162,7 +156,7 @@ const UpdatePlayerStatsInput = builder.inputType("UpdatePlayerStatsInput", {
     connectionTime: t.int({ required: false }),
     lastEvent: t.int({ required: false }),
   }),
-});
+})
 
 // Query to get all players with enhanced filtering and pagination
 builder.queryField("players", (t) =>
@@ -176,56 +170,47 @@ builder.queryField("players", (t) =>
       sortDirection: t.arg({ type: SortDirection, defaultValue: "desc" }),
     },
     resolve: async (query, _parent, args, context) => {
-      const whereClause: Prisma.PlayerWhereInput = {};
+      const whereClause: Prisma.PlayerWhereInput = {}
 
       if (args.filters) {
         if (args.filters.gameId) {
-          whereClause.game = args.filters.gameId;
+          whereClause.game = args.filters.gameId
         }
         if (args.filters.clanId) {
-          whereClause.clan = Number(args.filters.clanId);
+          whereClause.clan = Number(args.filters.clanId)
         }
         if (args.filters.countryId) {
-          whereClause.flag = args.filters.countryId;
+          whereClause.flag = args.filters.countryId
         }
         if (typeof args.filters.hideRanking === "boolean") {
-          whereClause.hideranking = args.filters.hideRanking ? 1 : 0;
+          whereClause.hideranking = args.filters.hideRanking ? 1 : 0
         }
-        if (
-          args.filters.minSkill !== undefined &&
-          args.filters.minSkill !== null
-        ) {
+        if (args.filters.minSkill !== undefined && args.filters.minSkill !== null) {
           whereClause.skill = {
             ...((whereClause.skill as object) || {}),
             gte: args.filters.minSkill,
-          };
+          }
         }
-        if (
-          args.filters.maxSkill !== undefined &&
-          args.filters.maxSkill !== null
-        ) {
+        if (args.filters.maxSkill !== undefined && args.filters.maxSkill !== null) {
           whereClause.skill = {
             ...((whereClause.skill as object) || {}),
             lte: args.filters.maxSkill,
-          };
+          }
         }
-        if (
-          args.filters.minKills !== undefined &&
-          args.filters.minKills !== null
-        ) {
-          whereClause.kills = { gte: args.filters.minKills };
+        if (args.filters.minKills !== undefined && args.filters.minKills !== null) {
+          whereClause.kills = { gte: args.filters.minKills }
         }
         if (args.filters.search) {
           whereClause.OR = [
             { lastName: { contains: args.filters.search } },
             { fullName: { contains: args.filters.search } },
-          ];
+          ]
         }
       }
 
-      const orderBy: Record<string, string> = {};
+      const orderBy: Record<string, string> = {}
       if (args.sortField && args.sortDirection) {
-        orderBy[args.sortField] = args.sortDirection;
+        orderBy[args.sortField] = args.sortDirection
       }
 
       return context.db.player.findMany({
@@ -234,10 +219,10 @@ builder.queryField("players", (t) =>
         orderBy,
         take: Math.min(args.limit ?? 50, 100), // Cap at 100
         skip: args.offset ?? 0,
-      });
+      })
     },
   }),
-);
+)
 
 // Query to get a single player by ID
 builder.queryField("player", (t) =>
@@ -248,18 +233,18 @@ builder.queryField("player", (t) =>
       id: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, context) => {
-      const playerId = parseInt(args.id);
+      const playerId = parseInt(args.id)
       if (isNaN(playerId)) {
-        return null;
+        return null
       }
 
       return context.db.player.findUnique({
         ...query,
         where: { playerId },
-      });
+      })
     },
   }),
-);
+)
 
 // Query to get a player by Steam ID
 builder.queryField("playerBySteamId", (t) =>
@@ -278,15 +263,15 @@ builder.queryField("playerBySteamId", (t) =>
             ...(args.gameId && { game: args.gameId }),
           },
         },
-      };
+      }
 
       return context.db.player.findFirst({
         ...query,
         where: whereClause,
-      });
+      })
     },
   }),
-);
+)
 
 // Query to get top players for a game
 builder.queryField("topPlayers", (t) =>
@@ -307,10 +292,10 @@ builder.queryField("topPlayers", (t) =>
           skill: "desc",
         },
         take: Math.min(args.limit ?? 10, 100),
-      });
+      })
     },
   }),
-);
+)
 
 // Query to get player statistics with rank calculation
 builder.queryField("playerStats", (t) =>
@@ -321,11 +306,11 @@ builder.queryField("playerStats", (t) =>
       id: t.arg.string({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.player.getPlayerStats(args.id);
-      const data = handleGraphQLResultNullable(result);
+      const result = await context.services.player.getPlayerStats(args.id)
+      const data = handleGraphQLResultNullable(result)
 
       if (!data) {
-        return null;
+        return null
       }
 
       // Ensure the returned data matches our GraphQL type structure
@@ -335,10 +320,10 @@ builder.queryField("playerStats", (t) =>
         accuracy: data.accuracy,
         headshotRatio: data.headshotRatio,
         rank: data.rank,
-      };
+      }
     },
   }),
-);
+)
 
 // Mutation to create a new player
 builder.mutationField("createPlayer", (t) =>
@@ -359,13 +344,13 @@ builder.mutationField("createPlayer", (t) =>
         city: args.input.city ?? undefined,
         state: args.input.state ?? undefined,
         lastAddress: args.input.lastAddress ?? undefined,
-      };
+      }
 
-      const result = await context.services.player.createPlayer(cleanedInput);
-      return handleGraphQLResult(result);
+      const result = await context.services.player.createPlayer(cleanedInput)
+      return handleGraphQLResult(result)
     },
   }),
-);
+)
 
 // Mutation to update player statistics (for daemon use)
 builder.mutationField("updatePlayerStats", (t) =>
@@ -375,28 +360,24 @@ builder.mutationField("updatePlayerStats", (t) =>
       input: t.arg({ type: UpdatePlayerStatsInput, required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.player.updatePlayerStats(
-        args.input.steamId,
-        args.input.gameId,
-        {
-          steamId: args.input.steamId,
-          gameId: args.input.gameId,
-          kills: args.input.kills ?? undefined,
-          deaths: args.input.deaths ?? undefined,
-          suicides: args.input.suicides ?? undefined,
-          shots: args.input.shots ?? undefined,
-          hits: args.input.hits ?? undefined,
-          headshots: args.input.headshots ?? undefined,
-          teamkills: args.input.teamkills ?? undefined,
-          skill: args.input.skill ?? undefined,
-          connectionTime: args.input.connectionTime ?? undefined,
-          lastEvent: args.input.lastEvent ?? undefined,
-        },
-      );
+      const result = await context.services.player.updatePlayerStats(args.input.steamId, args.input.gameId, {
+        steamId: args.input.steamId,
+        gameId: args.input.gameId,
+        kills: args.input.kills ?? undefined,
+        deaths: args.input.deaths ?? undefined,
+        suicides: args.input.suicides ?? undefined,
+        shots: args.input.shots ?? undefined,
+        hits: args.input.hits ?? undefined,
+        headshots: args.input.headshots ?? undefined,
+        teamkills: args.input.teamkills ?? undefined,
+        skill: args.input.skill ?? undefined,
+        connectionTime: args.input.connectionTime ?? undefined,
+        lastEvent: args.input.lastEvent ?? undefined,
+      })
 
-      return handleGraphQLResult(result);
+      return handleGraphQLResult(result)
     },
   }),
-);
+)
 
-export { Player };
+export { Player }

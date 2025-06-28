@@ -7,19 +7,19 @@
 */
 
 export interface IGatewayService {
-  start(): Promise<void>;
-  stop(): Promise<void>;
+  start(): Promise<void>
+  stop(): Promise<void>
 }
 
 export class GatewayService implements IGatewayService {
   async start(): Promise<void> {
     // TODO: Initialize Fastify server / WebSocket listeners
     // Placeholder implementation - do nothing for now
-    return;
+    return
   }
 
   async stop(): Promise<void> {
     // TODO: Gracefully close connections
-    return;
+    return
   }
 }

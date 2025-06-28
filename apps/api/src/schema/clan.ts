@@ -1,10 +1,10 @@
-import { builder } from "../builder";
-import type { Prisma } from "@repo/database/client";
-import { handleGraphQLResult } from "../utils/graphql-result-handler";
+import { builder } from "../builder"
+import type { Prisma } from "@repo/database/client"
+import { handleGraphQLResult } from "../utils/graphql-result-handler"
 import type {
   CreateClanInput as CreateClanInputType,
   UpdateClanInput as UpdateClanInputType,
-} from "../types/database/clan.types";
+} from "../types/database/clan.types"
 
 // Define Clan object using Prisma plugin
 const Clan = builder.prismaObject("Clan", {
@@ -37,7 +37,7 @@ const Clan = builder.prismaObject("Clan", {
       resolve: (clan) => clan.hidden === 1,
     }),
   }),
-});
+})
 
 // Input type for clan filtering
 const ClanFiltersInput = builder.inputType("ClanFiltersInput", {
@@ -47,7 +47,7 @@ const ClanFiltersInput = builder.inputType("ClanFiltersInput", {
     search: t.string({ required: false }),
     hasPlayers: t.boolean({ required: false }),
   }),
-});
+})
 
 // Enhanced query to get all clans with comprehensive filtering
 builder.queryField("clans", (t) =>
@@ -59,28 +59,25 @@ builder.queryField("clans", (t) =>
       offset: t.arg.int({ defaultValue: 0 }),
     },
     resolve: async (query, _parent, args, context) => {
-      const whereClause: Prisma.ClanWhereInput = {};
-      const filters = args.filters;
+      const whereClause: Prisma.ClanWhereInput = {}
+      const filters = args.filters
 
       if (filters?.gameId) {
-        whereClause.game = filters.gameId;
+        whereClause.game = filters.gameId
       }
 
       if (!filters?.includeHidden) {
-        whereClause.hidden = 0;
+        whereClause.hidden = 0
       }
 
       if (filters?.hasPlayers) {
         whereClause.players = {
           some: {},
-        };
+        }
       }
 
       if (filters?.search) {
-        whereClause.OR = [
-          { name: { contains: filters.search } },
-          { tag: { contains: filters.search } },
-        ];
+        whereClause.OR = [{ name: { contains: filters.search } }, { tag: { contains: filters.search } }]
       }
 
       return context.db.clan.findMany({
@@ -89,10 +86,10 @@ builder.queryField("clans", (t) =>
         orderBy: [{ name: "asc" }],
         take: Math.min(args.limit ?? 50, 100), // Cap at 100
         skip: args.offset ?? 0,
-      });
+      })
     },
   }),
-);
+)
 
 // Query to get a single clan by ID
 builder.queryField("clan", (t) =>
@@ -103,18 +100,18 @@ builder.queryField("clan", (t) =>
       id: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, context) => {
-      const clanId = parseInt(args.id);
+      const clanId = parseInt(args.id)
       if (isNaN(clanId)) {
-        return null;
+        return null
       }
 
       return context.db.clan.findUnique({
         ...query,
         where: { clanId },
-      });
+      })
     },
   }),
-);
+)
 
 // Input for creating a clan
 const CreateClanInput = builder.inputType("CreateClanInput", {
@@ -124,7 +121,7 @@ const CreateClanInput = builder.inputType("CreateClanInput", {
     gameId: t.string({ required: true }),
     homepage: t.string({ required: false }),
   }),
-});
+})
 
 // Input for updating a clan
 const UpdateClanInput = builder.inputType("UpdateClanInput", {
@@ -134,7 +131,7 @@ const UpdateClanInput = builder.inputType("UpdateClanInput", {
     homepage: t.string({ required: false }),
     hidden: t.boolean({ required: false }),
   }),
-});
+})
 
 // Mutation to create a clan
 builder.mutationField("createClan", (t) =>
@@ -144,13 +141,11 @@ builder.mutationField("createClan", (t) =>
       input: t.arg({ type: CreateClanInput, required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.clan.createClan(
-        args.input as CreateClanInputType,
-      );
-      return handleGraphQLResult(result);
+      const result = await context.services.clan.createClan(args.input as CreateClanInputType)
+      return handleGraphQLResult(result)
     },
   }),
-);
+)
 
 // Mutation to update a clan
 builder.mutationField("updateClan", (t) =>
@@ -161,13 +156,10 @@ builder.mutationField("updateClan", (t) =>
       input: t.arg({ type: UpdateClanInput, required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.clan.updateClan(
-        args.id,
-        args.input as UpdateClanInputType,
-      );
-      return handleGraphQLResult(result);
+      const result = await context.services.clan.updateClan(args.id, args.input as UpdateClanInputType)
+      return handleGraphQLResult(result)
     },
   }),
-);
+)
 
-export { Clan };
+export { Clan }

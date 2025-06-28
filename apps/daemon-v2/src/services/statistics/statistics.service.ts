@@ -6,14 +6,14 @@
   after persistence layer is connected.
 */
 
-import { logger } from "@/utils/logger";
+import { logger } from "@/utils/logger"
 
 export interface IStatisticsService {
-  recalculateAll(): Promise<void>;
-  recalculatePlayer(playerId: string): Promise<void>;
-  getPlayerStats(playerId: number): Promise<unknown>;
-  start(): Promise<void>;
-  stop(): Promise<void>;
+  recalculateAll(): Promise<void>
+  recalculatePlayer(playerId: string): Promise<void>
+  getPlayerStats(playerId: number): Promise<unknown>
+  start(): Promise<void>
+  stop(): Promise<void>
 }
 
 export class StatisticsService implements IStatisticsService {
@@ -23,19 +23,19 @@ export class StatisticsService implements IStatisticsService {
 
   async recalculatePlayer(playerId: string): Promise<void> {
     // TODO: Recompute stats for a single player
-    void playerId;
+    void playerId
   }
 
   async getPlayerStats(playerId: number): Promise<unknown> {
-    void playerId; // placeholder to avoid unused param lint
-    return {};
+    void playerId // placeholder to avoid unused param lint
+    return {}
   }
 
   async start(): Promise<void> {
-    logger.started("Statistics Service");
+    logger.started("Statistics Service")
   }
 
   async stop(): Promise<void> {
-    logger.stopped("Statistics Service");
+    logger.stopped("Statistics Service")
   }
 }

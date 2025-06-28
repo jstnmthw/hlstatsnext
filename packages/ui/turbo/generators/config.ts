@@ -1,4 +1,4 @@
-import type { PlopTypes } from "@turbo/gen";
+import type { PlopTypes } from "@turbo/gen"
 
 // Learn more about Turborepo Generators at https://turborepo.com/docs/guides/generating-code
 
@@ -26,5 +26,5 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         template: '    "./{{kebabCase name}}": "./src/{{kebabCase name}}.tsx",',
       },
     ],
-  });
+  })
 }

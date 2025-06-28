@@ -170,9 +170,9 @@ Before starting Phase 2:
 ```typescript
 // If queue connection fails
 try {
-  await queue.connect();
+  await queue.connect()
 } catch (error) {
-  console.error("Queue connection failed:", error);
+  console.error("Queue connection failed:", error)
 }
 ```
 
@@ -253,22 +253,22 @@ pnpm run test:integration
 ### **Connection Failures**
 
 ```typescript
-const MAX_RETRIES = 3;
-let retries = 0;
+const MAX_RETRIES = 3
+let retries = 0
 
 while (retries < MAX_RETRIES) {
   try {
-    await connectToService();
-    break;
+    await connectToService()
+    break
   } catch (error) {
-    retries++;
-    console.log(`Retry ${retries}/${MAX_RETRIES}`);
+    retries++
+    console.log(`Retry ${retries}/${MAX_RETRIES}`)
 
     if (retries === MAX_RETRIES) {
       // Log or throw error then stop.
     }
 
-    await sleep(1000 * retries); // Exponential backoff
+    await sleep(1000 * retries) // Exponential backoff
   }
 }
 ```
@@ -279,14 +279,14 @@ while (retries < MAX_RETRIES) {
 function safeFileOperation(operation: () => Promise<void>) {
   try {
     // Check disk space
-    const stats = await checkDiskSpace();
+    const stats = await checkDiskSpace()
     if (stats.free < 100 * 1024 * 1024) {
       // 100MB
-      throw new Error("Insufficient disk space");
+      throw new Error("Insufficient disk space")
     }
 
     // Perform operation
-    await operation();
+    await operation()
   } catch (error) {
     // Log or throw error
   }

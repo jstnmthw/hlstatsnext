@@ -26,3 +26,4 @@ You are tasked with implementing the HLStats Daemon v2 following the [MIGRATION_
 
 - **BEST PRACTICES** Review our best practices in [DEVELOPMENT_BEST_PRACTICES.md](mdc:apps/daemon-v2/docs/DEVELOPMENT_BEST_PRACTICES.md). 
 - **PROGRESS** Review and self update [MIGRATION_PROGRESS.md](mdc:apps/daemon-v2/docs/MIGRATION_PROGRESS.md) when applicablee.
+- **TYPE SCRIPT** Review [typescript.mdc](mdc:.cursor/rules/typescript.mdc) and enforce strict typescript (Important: Never using `any`).

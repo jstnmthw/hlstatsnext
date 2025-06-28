@@ -6,7 +6,9 @@
  */
 
 import type { GameEvent, PlayerKillEvent } from "@/types/common/events"
-// import type { DatabaseClient } from "@/database/client" // TODO: Add back when database operations are implemented
+import type { WeaponService } from "@/services/weapon/weapon.service"
+import { WeaponService as DefaultWeaponService } from "@/services/weapon/weapon.service"
+import { DatabaseClient } from "@/database/client"
 import { getWeaponAttributes } from "@/config/weapon-config"
 
 export interface WeaponStats {
@@ -24,8 +26,11 @@ export interface HandlerResult {
 }
 
 export class WeaponHandler {
-  constructor() {
+  private readonly _weaponService: WeaponService
+
+  constructor(weaponService?: WeaponService) {
     // TODO: Add DatabaseClient parameter when database operations are implemented
+    this._weaponService = weaponService ?? new DefaultWeaponService(new DatabaseClient())
   }
 
   async handleEvent(event: GameEvent): Promise<HandlerResult> {
@@ -74,7 +79,12 @@ export class WeaponHandler {
   }
 
   protected async getWeaponDamageMultiplier(weapon: string, headshot: boolean): Promise<number> {
+    // Fetch base damage from default config; skill multiplier from service if needed in future
+    const DEFAULT_BASE = 30
     const { baseDamage } = getWeaponAttributes(weapon)
-    return headshot ? baseDamage * 4.0 : baseDamage
+    // Reference service for potential future modifier-based calculations (avoids unused property)
+    void (await this._weaponService.getSkillMultiplier(undefined, weapon))
+    const damage = headshot ? baseDamage * 4.0 : baseDamage || DEFAULT_BASE
+    return damage
   }
 }

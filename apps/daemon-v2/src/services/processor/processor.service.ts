@@ -12,6 +12,7 @@ import { PlayerHandler } from "./handlers/player.handler"
 import { WeaponHandler } from "./handlers/weapon.handler"
 import { MatchHandler } from "./handlers/match.handler"
 import { RankingHandler } from "./handlers/ranking.handler"
+import { WeaponService } from "@/services/weapon/weapon.service"
 import { logger } from "@/utils/logger"
 import { EventEmitter } from "events"
 
@@ -25,6 +26,7 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
 
   // Handlers for processing events
   private readonly playerHandler: PlayerHandler
+  private readonly weaponService: WeaponService
   private readonly weaponHandler: WeaponHandler
   private readonly matchHandler: MatchHandler
   private readonly rankingHandler: RankingHandler
@@ -37,11 +39,14 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
     this.db = db ?? new DatabaseClient()
     this.opts = { logBots: true, ...opts }
 
+    // Initialize helpers/services
+    this.weaponService = new WeaponService(this.db)
+
     // Initialize handlers
     this.playerHandler = new PlayerHandler(this.db)
-    this.weaponHandler = new WeaponHandler()
+    this.weaponHandler = new WeaponHandler(this.weaponService)
     this.matchHandler = new MatchHandler()
-    this.rankingHandler = new RankingHandler()
+    this.rankingHandler = new RankingHandler(this.weaponService)
   }
 
   /* Existing enqueue placeholder (kept for API compatibility).

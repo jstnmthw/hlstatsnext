@@ -35,6 +35,7 @@ export interface MockDatabaseClient extends Omit<DatabaseClient, "prisma"> {
   testConnection: ReturnType<typeof vi.fn>
   disconnect: ReturnType<typeof vi.fn>
   prisma: MockPrismaClient
+  getWeaponModifier: ReturnType<typeof vi.fn>
 }
 
 /**
@@ -72,6 +73,7 @@ export function createMockDatabaseClient(overrides?: Partial<MockDatabaseClient>
     createGameEvent: vi.fn().mockResolvedValue(undefined),
     testConnection: vi.fn().mockResolvedValue(true),
     disconnect: vi.fn().mockResolvedValue(undefined),
+    getWeaponModifier: vi.fn().mockResolvedValue(null),
     updatePlayerStats: vi.fn().mockResolvedValue(undefined),
     getPlayerStats: vi.fn().mockResolvedValue(null),
     transaction: vi.fn().mockImplementation((callback) => callback({})),

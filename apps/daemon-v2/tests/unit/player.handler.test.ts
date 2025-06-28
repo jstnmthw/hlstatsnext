@@ -189,15 +189,16 @@ describe("PlayerHandler", () => {
       expect(result.success).toBe(true)
       expect(result.playersAffected).toEqual([123, 456])
 
-      // Check killer update (teamkill penalty)
+      // Check killer update (teamkill penalty & teamkills count)
       expect(mockUpdatePlayerStats).toHaveBeenCalledWith(123, {
         teamkills: 1,
         skill: 990,
       })
 
-      // Check victim update (still counts as death)
+      // Check victim update (death + skill compensation)
       expect(mockUpdatePlayerStats).toHaveBeenCalledWith(456, {
         deaths: 1,
+        skill: expect.any(Number),
         death_streak: 1,
         kill_streak: 0,
       })

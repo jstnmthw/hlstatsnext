@@ -14,6 +14,7 @@ import type {
   PlayerTeamkillEvent,
 } from "@/types/common/events"
 import type { DatabaseClient } from "@/database/client"
+import { resolveGameId } from "@/config/game-config"
 
 export interface HandlerResult {
   success: boolean
@@ -52,12 +53,11 @@ export class PlayerHandler {
     try {
       const { steamId, playerName } = event.data
 
-      // TODO: Resolve game from serverId -> server record
-      const resolvedPlayerId = await this.db.getOrCreatePlayer(
-        steamId,
-        playerName,
-        "cstrike", // Placeholder until server metadata lookup is implemented
-      )
+      // Resolve game from server metadata if available; fallback to default game
+      // TODO: Implement proper server->game lookup in DatabaseClient
+      const serverGame = resolveGameId(undefined) // Placeholder until implemented
+
+      const resolvedPlayerId = await this.db.getOrCreatePlayer(steamId, playerName, serverGame)
 
       // Update last_event timestamp
       await this.db.updatePlayerStats(resolvedPlayerId, {
@@ -132,10 +132,14 @@ export class PlayerHandler {
       // Calculate skill changes using ELO system
       const skillDelta = await this.calculateSkillDelta(killerId, victimId)
 
+      // Clamp new skills to rating bounds (100-3000)
+      const newKillerSkill = Math.min(3000, Math.max(100, killerStats.skill + skillDelta.killer))
+      const newVictimSkill = Math.min(3000, Math.max(100, victimStats.skill + skillDelta.victim))
+
       // Update killer stats
       const killerUpdates = {
         kills: 1,
-        skill: killerStats.skill + skillDelta.killer, // Apply delta to existing skill
+        skill: newKillerSkill,
         kill_streak: killerStats.kill_streak + 1, // Increment existing streak
         death_streak: 0, // Reset death streak on kill
         ...(headshot && { headshots: 1 }),
@@ -144,7 +148,7 @@ export class PlayerHandler {
       // Update victim stats
       const victimUpdates = {
         deaths: 1,
-        skill: victimStats.skill + skillDelta.victim, // Apply delta to existing skill
+        skill: newVictimSkill,
         death_streak: victimStats.death_streak + 1, // Increment death streak
         kill_streak: 0, // Reset kill streak on death
       }
@@ -187,7 +191,7 @@ export class PlayerHandler {
 
       // Suicide penalty: 5 skill points
       const skillPenalty = -5
-      const newSkill = Math.max(100, playerStats.skill + skillPenalty) // Don't go below 100
+      const newSkill = Math.min(3000, Math.max(100, playerStats.skill + skillPenalty))
 
       const updates = {
         suicides: 1,
@@ -232,7 +236,11 @@ export class PlayerHandler {
 
       // Teamkill penalty: 10 skill points for killer
       const skillPenalty = -10
-      const newKillerSkill = Math.max(100, killerStats.skill + skillPenalty) // Don't go below 100
+      const newKillerSkill = Math.min(3000, Math.max(100, killerStats.skill + skillPenalty))
+
+      // Victim receives small compensation (+2 skill points)
+      const COMPENSATION = 2
+      const newVictimSkill = Math.min(3000, victimStats.skill + COMPENSATION)
 
       // Update killer stats (penalty only)
       const killerUpdates = {
@@ -240,9 +248,10 @@ export class PlayerHandler {
         skill: newKillerSkill,
       }
 
-      // Victim gets death but no skill penalty (it's not their fault)
+      // Update victim stats
       const victimUpdates = {
         deaths: 1,
+        skill: newVictimSkill,
         death_streak: victimStats.death_streak + 1, // Increment death streak
         kill_streak: 0, // Reset kill streak
       }

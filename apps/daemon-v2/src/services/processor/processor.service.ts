@@ -5,8 +5,8 @@
   using the database package. At this stage it only exposes an enqueue method.
 */
 
-import { EventType } from "@/types/common/events"
 import type { GameEvent } from "@/types/common/events"
+import { EventType } from "@/types/common/events"
 import { DatabaseClient } from "@/database/client"
 import { PlayerHandler } from "./handlers/player.handler"
 import { WeaponHandler } from "./handlers/weapon.handler"
@@ -55,6 +55,12 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
     logger.info("Event enqueued for processing")
   }
 
+  /**
+   * Process an event from the ingress queue.
+   *
+   * @param event - The event to process
+   * @returns A promise that resolves when the event has been processed
+   */
   async processEvent(event: GameEvent): Promise<void> {
     try {
       // Skip bot events if logBots is false
@@ -83,7 +89,6 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
             await this.playerHandler.handleEvent(event)
           }
           if (event.eventType === EventType.PLAYER_KILL) {
-            // Kill events also go to weapon and ranking handlers
             if (this.weaponHandler) {
               await this.weaponHandler.handleEvent(event)
             }
@@ -102,7 +107,7 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
           break
 
         case EventType.CHAT_MESSAGE:
-          // Chat messages don't need additional processing beyond persistence
+          logger.chat(`${event.meta?.playerName}: ${event.data.message}${event.data.isDead ? " (dead)" : ""}`)
           break
 
         default:
@@ -123,7 +128,9 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
   }
 
   /**
-   * Resolve player IDs from Steam IDs for events that need them
+   * Resolve player IDs from Steam IDs for events that need them.
+   *
+   * @param event - The event to process
    */
   private async resolvePlayerIds(event: GameEvent): Promise<void> {
     switch (event.eventType) {

@@ -13,8 +13,9 @@ import type {
   PlayerSuicideEvent,
   PlayerTeamkillEvent,
 } from "@/types/common/events"
-import type { DatabaseClient } from "@/database/client"
+import { DatabaseClient } from "@/database/client"
 import { resolveGameId } from "@/config/game-config"
+import { logger } from "@/utils/logger"
 
 export interface HandlerResult {
   success: boolean
@@ -64,14 +65,14 @@ export class PlayerHandler {
         connection_time: 0, // Reset connection time on new connect
       })
 
-      console.log(`Player connected: ${playerName} (ID: ${resolvedPlayerId})`)
+      logger.event(`Player connected: ${playerName} (ID: ${resolvedPlayerId})`)
 
       return {
         success: true,
         playersAffected: [resolvedPlayerId],
       }
     } catch (error) {
-      console.error("Failed to handle player connect:", error)
+      logger.error(`Failed to handle player connect: ${error instanceof Error ? error.message : "Unknown error"}`)
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -98,14 +99,14 @@ export class PlayerHandler {
         connection_time: sessionDuration,
       })
 
-      console.log(`Player disconnected (ID: ${playerId}), session duration: ${sessionDuration}s`)
+      logger.event(`Player disconnected (ID: ${playerId}), session duration: ${sessionDuration}s`)
 
       return {
         success: true,
         playersAffected: [playerId],
       }
     } catch (error) {
-      console.error("Failed to handle player disconnect:", error)
+      logger.error(`Failed to handle player disconnect: ${error instanceof Error ? error.message : "Unknown error"}`)
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -157,14 +158,14 @@ export class PlayerHandler {
       await this.db.updatePlayerStats(killerId, killerUpdates)
       await this.db.updatePlayerStats(victimId, victimUpdates)
 
-      console.log(`Kill recorded: Player ${killerId} killed Player ${victimId} with ${weapon}`)
+      logger.event(`Kill recorded: Player ${killerId} killed Player ${victimId} with ${weapon}`)
 
       return {
         success: true,
         playersAffected: [killerId, victimId],
       }
     } catch (error) {
-      console.error("Failed to handle player kill:", error)
+      logger.error(`Failed to handle player kill: ${error instanceof Error ? error.message : "Unknown error"}`)
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -203,14 +204,14 @@ export class PlayerHandler {
 
       await this.db.updatePlayerStats(playerId, updates)
 
-      console.log(`Suicide recorded: Player ${playerId} ${weapon ? `with ${weapon}` : ""}`)
+      logger.event(`Suicide recorded: Player ${playerId} ${weapon ? `with ${weapon}` : ""}`)
 
       return {
         success: true,
         playersAffected: [playerId],
       }
     } catch (error) {
-      console.error("Failed to handle player suicide:", error)
+      logger.error(`Failed to handle player suicide: ${error instanceof Error ? error.message : "Unknown error"}`)
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -261,14 +262,14 @@ export class PlayerHandler {
         this.db.updatePlayerStats(victimId, victimUpdates),
       ])
 
-      console.log(`Teamkill recorded: Player ${killerId} teamkilled Player ${victimId} with ${weapon}`)
+      logger.event(`Teamkill recorded: Player ${killerId} teamkilled Player ${victimId} with ${weapon}`)
 
       return {
         success: true,
         playersAffected: [killerId, victimId],
       }
     } catch (error) {
-      console.error("Failed to handle player teamkill:", error)
+      logger.error(`Failed to handle player teamkill: ${error instanceof Error ? error.message : "Unknown error"}`)
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -310,7 +311,7 @@ export class PlayerHandler {
         victim: Math.max(victimDelta, -(victimRating - 100)), // Don't go below 100 skill
       }
     } catch (error) {
-      console.error("Failed to calculate skill delta:", error)
+      logger.error(`Failed to calculate skill delta: ${error instanceof Error ? error.message : "Unknown error"}`)
       // Return conservative defaults on error
       return { killer: 1, victim: -1 }
     }

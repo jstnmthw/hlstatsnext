@@ -43,12 +43,13 @@ vi.mock("@/services/ingress/parsers/cs.parser", () => {
 
 import { IngressService } from "../../src/services/ingress/ingress.service"
 import { DatabaseClient } from "../../src/database/client"
+import { EventProcessorService } from "@/services/processor/processor.service"
 
 // Mock processor with a stubbed processEvent
 const processEventMock = vi.fn().mockResolvedValue(undefined)
 const processorStub = {
   processEvent: processEventMock,
-} as unknown as import("../../src/services/processor/processor.service").EventProcessorService
+} as unknown as EventProcessorService
 
 // ---------------------------------------------------------------------------
 
@@ -224,5 +225,91 @@ describe("IngressService - dev skipAuth auto-registration", () => {
     // Second packet should not call create again (cached)
     await handler(payload)
     expect(serverCreateMock).toHaveBeenCalledTimes(1)
+  })
+})
+
+/**
+ * Additional coverage for dev skipAuth behaviour and race-condition handling
+ */
+describe("IngressService - skipAuth immediate processing & race condition", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    // Ensure parser mocks are back to successful state
+    canParseMock.mockReset().mockReturnValue(true)
+    parseMock.mockReset().mockResolvedValue({
+      success: true,
+      event: { eventType: "PLAYER_CONNECT", serverId: 1, data: {} },
+    })
+  })
+
+  it("processes first packet immediately when skipAuth=true", async () => {
+    const dbMock = {
+      getServerByAddress: vi.fn().mockResolvedValue({ serverId: 99 }),
+      prisma: {
+        server: {
+          create: vi.fn(),
+        },
+      },
+    } as unknown as DatabaseClient
+
+    const ingress = new IngressService(27500, processorStub, dbMock, {
+      skipAuth: true,
+    })
+
+    await ingress.start()
+
+    // Find the logReceived handler registered via onMock.
+    const handler = onMock.mock.calls.find((c) => c[0] === "logReceived")![1]
+
+    const beforeCount = processEventMock.mock.calls.length
+
+    await handler({
+      logLine: "first line",
+      serverAddress: "10.0.0.1",
+      serverPort: 27015,
+    })
+
+    expect(processEventMock.mock.calls.length).toBe(beforeCount + 1)
+  })
+
+  it("falls back to existing server row when unique constraint race occurs", async () => {
+    const createMock = vi
+      .fn()
+      // First call: throw unique constraint error
+      .mockRejectedValueOnce({ code: "P2002" })
+      // Should not be called again
+      .mockResolvedValue({ serverId: 123 })
+
+    const dbMock = {
+      getServerByAddress: vi
+        .fn()
+        .mockResolvedValueOnce(null) // Before insert, record doesn't exist
+        .mockResolvedValueOnce({ serverId: 55 }), // After race, record exists
+      prisma: {
+        server: {
+          create: createMock,
+        },
+      },
+    } as unknown as DatabaseClient
+
+    const ingress = new IngressService(27500, processorStub, dbMock, {
+      skipAuth: true,
+    })
+
+    await ingress.start()
+
+    const handler = onMock.mock.calls.find((c) => c[0] === "logReceived")![1]
+
+    const beforeCreate = createMock.mock.calls.length
+    const beforeProcess = processEventMock.mock.calls.length
+
+    await handler({
+      logLine: "race test line",
+      serverAddress: "10.0.0.2",
+      serverPort: 27016,
+    })
+
+    expect(createMock.mock.calls.length).toBe(beforeCreate + 1)
+    expect(processEventMock.mock.calls.length).toBe(beforeProcess + 1)
   })
 })

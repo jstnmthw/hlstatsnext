@@ -2,7 +2,6 @@ import { IngressService } from "./services/ingress/ingress.service"
 import { DatabaseClient } from "./database/client"
 import { EventProcessorService } from "./services/processor/processor.service"
 import { logger } from "./utils/logger"
-
 ;(async () => {
   // Determine environment once - fall back to NODE_ENV for convenience
   const appEnv = process.env.NODE_ENV ?? "development"

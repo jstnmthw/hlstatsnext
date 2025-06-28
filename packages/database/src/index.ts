@@ -1,7 +1,6 @@
 import { PrismaClient } from "../generated"
 
 declare global {
-  // eslint-disable-next-line no-var
   var cachedPrisma: PrismaClient
 }
 

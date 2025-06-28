@@ -17,8 +17,9 @@ const colors = {
 } as const
 
 // Status types
-export type LogStatus = "OK" | "ERROR" | "INFO" | "WARN" | "DEBUG" | "EVENT"
+export type LogStatus = "OK" | "ERROR" | "INFO" | "WARN" | "DEBUG" | "EVENT" | "CHAT"
 
+// Options for the logger
 interface LoggerOptions {
   enableColors?: boolean
   timestamp?: boolean
@@ -34,6 +35,11 @@ export class Logger {
     this.showTimestamp = options.showTimestamp ?? true
   }
 
+  /**
+   * Format the timestamp of the message.
+   *
+   * @returns The formatted timestamp
+   */
   private formatTimestamp(): string {
     if (!this.showTimestamp) {
       return ""
@@ -52,9 +58,14 @@ export class Logger {
     return `${colors.gray}[${timestamp}]${colors.reset} `
   }
 
+  /**
+   * Format the status of the message.
+   *
+   * @param status - The status of the message
+   * @returns The formatted status
+   */
   private formatStatus(status: LogStatus): string {
-    // Pad status to ensure consistent alignment
-    const statusText = `[ ${status.padEnd(1)} ]`
+    const statusText = `[ ${status} ]`
 
     if (!this.enableColors) {
       return statusText
@@ -73,16 +84,23 @@ export class Logger {
         return `${colors.magenta}${statusText}${colors.reset}`
       case "EVENT":
         return `${colors.cyan}${colors.bright}${statusText}${colors.reset}`
+      case "CHAT":
+        return `${colors.yellow}${colors.bright}${statusText}${colors.reset}`
       default:
         return statusText
     }
   }
 
+  /**
+   * Log a message with a status and timestamp.
+   *
+   * @param status - The status of the message
+   * @param message - The message to log
+   */
   private log(status: LogStatus, message: string): void {
     const timestamp = this.formatTimestamp()
     const formattedStatus = this.formatStatus(status)
 
-    // Ensure consistent spacing and alignment
     console.log(`${timestamp}${formattedStatus} ${message}`)
   }
 
@@ -106,12 +124,14 @@ export class Logger {
     this.log("DEBUG", message)
   }
 
-  // Log event (e.g., successfully processed game event)
   event(message: string): void {
     this.log("EVENT", message)
   }
 
-  // Special methods for common daemon operations
+  chat(message: string): void {
+    this.log("CHAT", message)
+  }
+
   starting(service: string): void {
     this.info(`Starting ${service}`)
   }
@@ -165,22 +185,18 @@ export class Logger {
     this.error(`Fatal error: ${error}`)
   }
 
-  // Method to disable timestamps for testing or specific use cases
   disableTimestamps(): void {
     this.showTimestamp = false
   }
 
-  // Method to enable timestamps
   enableTimestamps(): void {
     this.showTimestamp = true
   }
 
-  // Method to disable colors (useful for log files)
   disableColors(): void {
     this.enableColors = false
   }
 
-  // Method to enable colors
   setColorsEnabled(enabled: boolean): void {
     this.enableColors = enabled
   }

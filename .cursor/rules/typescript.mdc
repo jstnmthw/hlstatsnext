@@ -15,6 +15,7 @@ alwaysApply: false
 - Prefer interfaces over types for object shapes
 - Use const assertions (`as const`) for immutable data structures
 - Always enable strict TypeScript configuration
+- Do NOT inline import e.g. `import("@/types/common/events").PlayerChatEvent`, import at the top of the file then reference.
 
 ### Null and Undefined Handling
 

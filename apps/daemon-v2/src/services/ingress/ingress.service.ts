@@ -157,7 +157,6 @@ export class IngressService implements IIngressService {
   private async processParsedLine(logLine: string, serverId: number) {
     try {
       if (!this.parser.canParse(logLine)) {
-        // Unhandled line format - ignore for now
         return
       }
 
@@ -171,12 +170,6 @@ export class IngressService implements IIngressService {
         logger.debug(`Parser error - ${parseResult.error}: ${snippet}`)
         return
       }
-
-      // Debug: show concise version of successfully parsed line
-      const cleanedSuccess = logLine.replace(/^L \d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}:\s*/, "")
-      const successSnippet = cleanedSuccess.length > 120 ? `${cleanedSuccess.slice(0, 117)}…` : cleanedSuccess
-
-      logger.debug(`Parser success - ${parseResult.event.eventType}: ${successSnippet}`)
 
       // Attach raw log line for downstream processors
       const eventWithRaw = {

@@ -6,6 +6,7 @@ import {
   type PlayerKillEvent,
   type PlayerSuicideEvent,
   type PlayerTeamkillEvent,
+  type PlayerChatEvent,
 } from "@/types/common/events"
 
 /**
@@ -272,10 +273,7 @@ export class CsParser extends BaseParser {
    * Example:
    * L 06/28/2025 - 09:09:32: "goat<5><BOT><CT>" say "Too bad NNBot is discontinued..." (dead)
    */
-  private async parseChat(
-    logLine: string,
-    serverId: number,
-  ): Promise<import("@/types/common/events").PlayerChatEvent | null> {
+  private async parseChat(logLine: string, serverId: number): Promise<PlayerChatEvent | null> {
     const regex = /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>"\s+say\s+"([^"]+)"(?:\s+\((dead)\))?/i
 
     const match = logLine.match(regex)
@@ -291,7 +289,7 @@ export class CsParser extends BaseParser {
 
     const { timestamp } = this.extractBasicInfo(logLine)
 
-    const event: import("@/types/common/events").PlayerChatEvent = {
+    const event: PlayerChatEvent = {
       eventType: EventType.CHAT_MESSAGE,
       timestamp,
       serverId,

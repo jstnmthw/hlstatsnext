@@ -17,7 +17,7 @@ async function main() {
 main().catch((err: unknown) => {
   logger.failed(
     "UDP dump server failed",
-    err instanceof Error ? err.message : String(err)
+    err instanceof Error ? err.message : String(err),
   );
   console.error(err);
 });

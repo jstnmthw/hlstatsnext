@@ -13,7 +13,7 @@ import {
  * ✅ PLAYER_DISCONNECT
  * ✅ PLAYER_KILL
  *
- * This is intentionally lightweight – regexes are crude but good enough for a
+ * This is intentionally lightweight - regexes are crude but good enough for a
  * phase-1 prototype. They can be hardened later.
  */
 export class CsParser extends BaseParser {
@@ -36,7 +36,7 @@ export class CsParser extends BaseParser {
   async parse(rawLogLine: string, serverId: number): Promise<ParseResult> {
     const logLine = this.normaliseLogLine(rawLogLine);
 
-    // Order matters – check for kill first as it also contains a quoted player string.
+    // Order matters - check for kill first as it also contains a quoted player string.
     const kill = await this.parseKill(logLine, serverId);
     if (kill) return { success: true, event: kill };
 
@@ -54,7 +54,7 @@ export class CsParser extends BaseParser {
 
   private async parseConnect(
     logLine: string,
-    serverId: number
+    serverId: number,
   ): Promise<PlayerConnectEvent | null> {
     /*
       Example:
@@ -94,7 +94,7 @@ export class CsParser extends BaseParser {
 
   private async parseDisconnect(
     logLine: string,
-    serverId: number
+    serverId: number,
   ): Promise<PlayerDisconnectEvent | null> {
     /*
       Example:
@@ -112,7 +112,7 @@ export class CsParser extends BaseParser {
       timestamp: this.extractTimestamp(logLine) ?? new Date(),
       serverId,
       data: {
-        playerId: 0, // Unknown until we correlate – optional in handler
+        playerId: 0, // Unknown until we correlate - optional in handler
         reason,
       },
     };
@@ -122,7 +122,7 @@ export class CsParser extends BaseParser {
 
   private async parseKill(
     logLine: string,
-    serverId: number
+    serverId: number,
   ): Promise<PlayerKillEvent | null> {
     /*
       Example:
@@ -165,7 +165,7 @@ export class CsParser extends BaseParser {
    */
   private async parseChat(
     logLine: string,
-    serverId: number
+    serverId: number,
   ): Promise<import("@/types/common/events").PlayerChatEvent | null> {
     const regex =
       /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>"\s+say\s+"([^"]+)"(?:\s+\((dead)\))?/i;

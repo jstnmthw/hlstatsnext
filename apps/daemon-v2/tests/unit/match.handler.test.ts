@@ -95,7 +95,7 @@ describe("MatchHandler", () => {
       expect(finalizeSpy).toHaveBeenCalledWith(
         1,
         "de_dust2",
-        expect.any(Object)
+        expect.any(Object),
       );
 
       const stats = handler.getMatchStats(1);

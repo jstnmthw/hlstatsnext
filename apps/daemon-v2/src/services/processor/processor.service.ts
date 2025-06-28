@@ -40,7 +40,7 @@ export class EventProcessorService
     this.db = db ?? new DatabaseClient();
     this.opts = opts;
 
-    // Preserve existing handlers for compatibility – they'll be wired up only
+    // Preserve existing handlers for compatibility - they'll be wired up only
     // when the caller hasn't opted-in to "happy-path" processing (future work).
     if (!opts || Object.keys(opts).length === 0) {
       this.playerHandler = new PlayerHandler(this.db);
@@ -57,7 +57,7 @@ export class EventProcessorService
   }
 
   async processEvent(event: GameEvent & { meta?: PlayerMeta }): Promise<void> {
-    // 0. Bot gate – allow in dev, ignore in prod unless logBots=true
+    // 0. Bot gate - allow in dev, ignore in prod unless logBots=true
     if (event.meta?.isBot && !this.opts.logBots) {
       return;
     }
@@ -68,7 +68,7 @@ export class EventProcessorService
           const meta = event.meta;
 
           if (!meta) {
-            logger.warn("CONNECT event missing meta – skipped");
+            logger.warn("CONNECT event missing meta - skipped");
             break;
           }
 
@@ -90,7 +90,7 @@ export class EventProcessorService
           const meta = event.meta;
 
           if (!meta) {
-            logger.warn("CHAT event missing meta – skipped");
+            logger.warn("CHAT event missing meta - skipped");
             break;
           }
 
@@ -100,13 +100,15 @@ export class EventProcessorService
           const playerId = await this.db.getOrCreatePlayer(
             steamId,
             playerName,
-            "cstrike"
+            "cstrike",
           );
 
-          // Assign resolved playerId and persist chat event
-          (event as any).data.playerId = playerId;
+          // Assign resolved playerId and persist chat event with proper type
+          const chatEvent =
+            event as import("@/types/common/events").PlayerChatEvent;
+          chatEvent.data.playerId = playerId;
 
-          await this.db.createGameEvent(event);
+          await this.db.createGameEvent(chatEvent);
 
           break;
         }
@@ -120,7 +122,7 @@ export class EventProcessorService
     } catch (error) {
       logger.failed(
         "Failed to process event",
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? error.message : String(error),
       );
       this.emit("eventProcessed", {
         success: false,

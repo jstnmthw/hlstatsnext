@@ -56,7 +56,7 @@ export class UdpServer extends EventEmitter {
       this.server.on("listening", () => {
         const address = this.server?.address();
         logger.info(
-          `UDP server listening on ${address?.address}:${address?.port}`
+          `UDP server listening on ${address?.address}:${address?.port}`,
         );
         resolve();
       });
@@ -95,7 +95,7 @@ export class UdpServer extends EventEmitter {
       // Validate packet size
       if (message.length > this.options.maxPacketSize) {
         logger.warn(
-          `Oversized packet from ${serverKey}: ${message.length} bytes`
+          `Oversized packet from ${serverKey}: ${message.length} bytes`,
         );
         return;
       }
@@ -115,7 +115,7 @@ export class UdpServer extends EventEmitter {
     } catch (error) {
       logger.failed(
         `Error processing message from ${serverKey}`,
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? error.message : String(error),
       );
       this.emit("error", error);
     }
@@ -152,7 +152,7 @@ export class UdpServer extends EventEmitter {
 
   private updateServerInfo(
     serverKey: string,
-    remoteInfo: dgram.RemoteInfo
+    remoteInfo: dgram.RemoteInfo,
   ): void {
     const existing = this.connectedServers.get(serverKey);
 
@@ -189,7 +189,7 @@ export class UdpServer extends EventEmitter {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
 
     return Array.from(this.connectedServers.values()).filter(
-      (server) => server.lastSeen > fiveMinutesAgo
+      (server) => server.lastSeen > fiveMinutesAgo,
     );
   }
 
@@ -227,7 +227,7 @@ export class UdpServer extends EventEmitter {
    * and return a canonical string that starts with "L " when possible.
    */
   private cleanLogPacket(raw: string): string {
-    // Fast path – most already cleaned by server or test harness
+    // Fast path - most already cleaned by server or test harness
     if (raw.startsWith("L ")) return raw;
 
     // Trim leading whitespace/null chars first

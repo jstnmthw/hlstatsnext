@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import { CsParser } from "../../src/services/ingress/parsers/cs.parser";
 import {
   EventType,
+  PlayerChatEvent,
+  PlayerMeta,
   type PlayerConnectEvent,
   type PlayerDisconnectEvent,
   type PlayerKillEvent,
@@ -118,5 +120,42 @@ describe("CsParser", () => {
       expect(event.meta?.steamId).toBe("BOT");
       expect(event.meta?.playerName).toBe("BotPlayer");
     });
+  });
+
+  it("parses standard chat line", async () => {
+    const logLine =
+      'L 06/28/2025 - 09:09:32: "goat<5><BOT><CT>" say "Too bad NNBot is discontinued..."';
+
+    const result = await parser.parse(logLine, 1);
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+
+    expect(result.event.eventType).toBe(EventType.CHAT_MESSAGE);
+    // meta assertions
+    const chatEvent = result.event as PlayerChatEvent & { meta: PlayerMeta };
+    const meta = chatEvent.meta;
+    expect(meta.steamId).toBe("BOT");
+    expect(meta.playerName).toBe("goat");
+    expect(meta.isBot).toBe(true);
+
+    const data = chatEvent.data;
+    expect(data.message).toBe("Too bad NNBot is discontinued...");
+    expect(data.team).toBe("CT");
+    expect(data.isDead).toBe(false);
+  });
+
+  it("parses dead chat line", async () => {
+    const logLine =
+      'L 06/28/2025 - 09:09:32: "Brandon<2><BOT><TERRORIST>" say "hello" (dead)';
+
+    const result = await parser.parse(logLine, 1);
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+
+    expect(result.event.eventType).toBe(EventType.CHAT_MESSAGE);
+    const deadEvent = result.event as PlayerChatEvent;
+    expect(deadEvent.data.isDead).toBe(true);
   });
 });

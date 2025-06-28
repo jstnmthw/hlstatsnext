@@ -14,14 +14,13 @@ vi.mock("../../src/database/client", () => ({
   })),
 }))
 
-import { DatabaseClient } from "../../src/database/client"
+// import { DatabaseClient } from "../../src/database/client" // TODO: Add back when database operations are implemented
 
 describe("RankingHandler", () => {
   let handler: RankingHandler
 
   beforeEach(() => {
-    const db = new DatabaseClient()
-    handler = new RankingHandler(db)
+    handler = new RankingHandler()
   })
 
   describe("handleEvent", () => {

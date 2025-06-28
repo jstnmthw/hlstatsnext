@@ -7,14 +7,13 @@ import {
   RoundStartEvent,
   PlayerKillEvent,
 } from "../../src/types/common/events"
-import type { DatabaseClient } from "../../src/database/client"
+// import type { DatabaseClient } from "../../src/database/client" // TODO: Add back when database operations are implemented
 
 describe("MatchHandler", () => {
-  const mockDb = {} as DatabaseClient
   let handler: MatchHandler
 
   beforeEach(() => {
-    handler = new MatchHandler(mockDb)
+    handler = new MatchHandler()
   })
 
   describe("handleEvent", () => {

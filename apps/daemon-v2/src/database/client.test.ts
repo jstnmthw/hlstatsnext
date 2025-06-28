@@ -20,29 +20,31 @@ vi.mock("@repo/database/client", () => {
 
 const dbClient = new DatabaseClient()
 
-describe("DatabaseClient - getOrCreatePlayer (bots)", () => {
+describe("DatabaseClient", () => {
   beforeEach(() => {
     // Reset all mocks between tests
     vi.clearAllMocks()
   })
 
-  it("creates unique player per bot name", async () => {
-    const playerId = await dbClient.getOrCreatePlayer("BOT", "RAGE OF THE BOY", "cstrike")
+  describe("getOrCreatePlayer", () => {
+    it("creates unique player per bot name", async () => {
+      const playerId = await dbClient.getOrCreatePlayer("BOT", "RAGE OF THE BOY", "cstrike")
 
-    // Should return mocked id from create
-    expect(playerId).toBe(42)
+      // Should return mocked id from create
+      expect(playerId).toBe(42)
 
-    // The create call should receive a uniqueId starting with BOT_ and containing name
-    const { db: mockedDb } = await import("@repo/database/client")
-    const createMock = (mockedDb as unknown as { player: { create: Mock } }).player.create
-    expect(createMock).toHaveBeenCalled()
+      // The create call should receive a uniqueId starting with BOT_ and containing name
+      const { db: mockedDb } = await import("@repo/database/client")
+      const createMock = (mockedDb as unknown as { player: { create: Mock } }).player.create
+      expect(createMock).toHaveBeenCalled()
 
-    type CreateArgs = {
-      data: {
-        uniqueIds: { create: { uniqueId: string } }
+      type CreateArgs = {
+        data: {
+          uniqueIds: { create: { uniqueId: string } }
+        }
       }
-    }
-    const args = createMock.mock.calls[0]![0]! as CreateArgs
-    expect(args.data.uniqueIds.create.uniqueId).toBe("BOT_RAGE_OF_THE_BOY")
+      const args = createMock.mock.calls[0]![0]! as CreateArgs
+      expect(args.data.uniqueIds.create.uniqueId).toBe("BOT_RAGE_OF_THE_BOY")
+    })
   })
 })

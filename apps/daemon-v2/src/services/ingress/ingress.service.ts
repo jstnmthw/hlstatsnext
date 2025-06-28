@@ -6,7 +6,6 @@
  * objects that are forwarded to the EventProcessor.
  */
 
-import type { GameEvent } from "@/types/common/events";
 import { DatabaseClient } from "@/database/client";
 import { EventProcessorService } from "@/services/processor/processor.service";
 import { UdpServer } from "@/services/ingress/udp-server";
@@ -30,7 +29,8 @@ export class IngressService implements IIngressService {
   constructor(
     private readonly port: number = 27500,
     processor?: EventProcessorService,
-    dbClient?: DatabaseClient
+    dbClient?: DatabaseClient,
+    private readonly opts: { skipAuth?: boolean } = {}
   ) {
     this.db = dbClient ?? new DatabaseClient();
     this.processor = processor ?? new EventProcessorService();
@@ -70,6 +70,41 @@ export class IngressService implements IIngressService {
   ): Promise<void> {
     const serverKey = `${ip}:${port}`;
 
+    // DEV shortcut – if skipAuth is enabled, automatically register unknown servers
+    if (this.opts.skipAuth) {
+      let serverId = this.authenticatedServers.get(serverKey);
+
+      if (!serverId) {
+        // Try to fetch existing server row
+        const existing = await this.db.getServerByAddress(ip, port);
+
+        if (existing) {
+          serverId = existing.serverId;
+        } else {
+          // Auto-create minimal server record for dev
+          const created = await this.db.prisma.server.create({
+            data: {
+              address: ip,
+              port,
+              name: `DEV ${ip}:${port}`,
+              game: "cstrike", // default until map/game detection implemented
+            },
+            select: { serverId: true },
+          });
+          serverId = created.serverId;
+          logger.info(
+            `Auto-added dev server ${serverKey} (serverId=${serverId})`
+          );
+        }
+
+        this.authenticatedServers.set(serverKey, serverId);
+      }
+
+      await this.processParsedLine(logLine, serverId);
+      return;
+    }
+
+    // Normal authentication path
     // Check if server is already authenticated
     let serverId = this.authenticatedServers.get(serverKey);
 
@@ -94,6 +129,10 @@ export class IngressService implements IIngressService {
     }
 
     // From this point the server is authorised – parse the line.
+    await this.processParsedLine(logLine, serverId);
+  }
+
+  private async processParsedLine(logLine: string, serverId: number) {
     try {
       if (!this.parser.canParse(logLine)) {
         // Unhandled line format – ignore for now
@@ -109,15 +148,16 @@ export class IngressService implements IIngressService {
       }
 
       // Attach raw log line for debugging
-      const event: GameEvent = {
+      const eventWithRaw = {
         ...parseResult.event,
         raw: logLine,
-      };
+      } as typeof parseResult.event & { raw: string };
 
-      await this.processor.processEvent(event);
+      // eventWithRaw statically satisfies GameEvent & optional meta
+      await this.processor.processEvent(eventWithRaw);
     } catch (error) {
       logger.failed(
-        `Failed to process log line from ${serverKey}`,
+        `Failed to process log line`,
         error instanceof Error ? error.message : String(error)
       );
     }

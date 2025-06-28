@@ -9,6 +9,7 @@ import { EventProcessorService } from "../../src/services/processor/processor.se
 import { RconService } from "../../src/services/rcon/rcon.service";
 import { StatisticsService } from "../../src/services/statistics/statistics.service";
 import { HLStatsDaemon } from "../../src/index";
+import { logger } from "../../src/utils/logger";
 
 vi.mock("../../src/database/client");
 vi.mock("../../src/services/gateway/gateway.service");
@@ -21,11 +22,10 @@ vi.mock("../../src/services/statistics/statistics.service");
 const mockExit = vi
   .spyOn(process, "exit")
   .mockImplementation((() => {}) as () => never);
-const mockConsoleLog = vi
-  .spyOn(console, "log")
-  .mockImplementation(() => undefined);
-const mockConsoleError = vi
-  .spyOn(console, "error")
+
+const mockLoggerOk = vi.spyOn(logger, "ok").mockImplementation(() => undefined);
+const mockLoggerError = vi
+  .spyOn(logger, "error")
   .mockImplementation(() => undefined);
 
 describe("HLStatsDaemon", () => {
@@ -79,8 +79,8 @@ describe("HLStatsDaemon", () => {
       expect(rconInstance.start).toHaveBeenCalled();
       expect(statisticsInstance.start).toHaveBeenCalled();
 
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        "✅ All services started successfully"
+      expect(mockLoggerOk).toHaveBeenCalledWith(
+        expect.stringContaining("All services started successfully")
       );
     });
 
@@ -91,9 +91,9 @@ describe("HLStatsDaemon", () => {
 
       await daemon.start();
 
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        "❌ Failed to start daemon:",
-        expect.any(Error)
+      expect(mockLoggerError).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to start daemon"),
+        expect.anything()
       );
       expect(mockExit).toHaveBeenCalledWith(1);
     });
@@ -110,8 +110,8 @@ describe("HLStatsDaemon", () => {
 
       await daemon.start();
 
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        "❌ Failed to start daemon:",
+      expect(mockLoggerError).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to start daemon"),
         startError
       );
       expect(mockExit).toHaveBeenCalledWith(1);
@@ -144,8 +144,8 @@ describe("HLStatsDaemon", () => {
       expect(statisticsInstance.stop).toHaveBeenCalled();
       expect(processorInstance.disconnect).toHaveBeenCalled();
 
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        "✅ Daemon shutdown complete"
+      expect(mockLoggerOk).toHaveBeenCalledWith(
+        expect.stringContaining("Daemon shutdown complete")
       );
     });
 
@@ -157,8 +157,8 @@ describe("HLStatsDaemon", () => {
 
       await daemon.stop();
 
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        "❌ Error during shutdown:",
+      expect(mockLoggerError).toHaveBeenCalledWith(
+        expect.stringContaining("Error during shutdown"),
         stopError
       );
     });

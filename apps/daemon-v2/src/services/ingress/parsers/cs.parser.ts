@@ -55,15 +55,18 @@ export class CsParser extends BaseParser {
       L 07/15/2024 - 22:33:10: "PlayerName<1><STEAM_1:0:12345><CT>" connected, address "1.2.3.4:27005"
     */
     const regex =
-      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+)><.*?>" connected, address "([\d.]+):/i;
+      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><.*?>" connected, address "([\d.]+):/i;
     const match = logLine.match(regex);
     if (!match) return null;
 
     const playerName = match[1]!;
     const steamId = match[2]!;
     const ipAddress = match[3]!;
+    const isBot = steamId.toUpperCase() === "BOT";
 
-    const event: PlayerConnectEvent = {
+    const event: PlayerConnectEvent & {
+      meta?: { steamId: string; playerName: string; isBot: boolean };
+    } = {
       eventType: EventType.PLAYER_CONNECT,
       timestamp: this.extractTimestamp(logLine) ?? new Date(),
       serverId,
@@ -72,6 +75,11 @@ export class CsParser extends BaseParser {
         steamId,
         playerName: this.sanitizeString(playerName),
         ipAddress,
+      },
+      meta: {
+        steamId,
+        playerName: this.sanitizeString(playerName),
+        isBot,
       },
     };
 

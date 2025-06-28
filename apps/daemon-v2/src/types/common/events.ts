@@ -108,14 +108,87 @@ export interface MapChangeEvent extends BaseEvent {
   };
 }
 
+// Newly-modelled explicit event types replacing the former `UnknownEvent`
+export interface PlayerDeathEvent extends BaseEvent {
+  eventType: EventType.PLAYER_DEATH;
+  data: {
+    victimId: number;
+    killerId?: number; // Undefined for world/environmental deaths
+    weapon?: string;
+    headshot?: boolean;
+    victimPosition?: Position3D;
+    killerPosition?: Position3D;
+    victimTeam: string;
+    killerTeam?: string;
+  };
+}
+
+export interface PlayerSuicideEvent extends BaseEvent {
+  eventType: EventType.PLAYER_SUICIDE;
+  data: {
+    playerId: number;
+    weapon?: string;
+    position?: Position3D;
+    team: string;
+  };
+}
+
+export interface PlayerTeamkillEvent extends BaseEvent {
+  eventType: EventType.PLAYER_TEAMKILL;
+  data: {
+    killerId: number;
+    victimId: number;
+    weapon: string;
+    headshot: boolean;
+    distance?: number;
+    killerPosition?: Position3D;
+    victimPosition?: Position3D;
+    team: string; // Shared team for both players
+  };
+}
+
+export interface RoundStartEvent extends BaseEvent {
+  eventType: EventType.ROUND_START;
+  data: {
+    map: string;
+    roundNumber: number;
+    maxPlayers: number;
+  };
+}
+
+export interface ServerShutdownEvent extends BaseEvent {
+  eventType: EventType.SERVER_SHUTDOWN;
+  data: {
+    reason?: string;
+    uptimeSeconds?: number;
+    playerCount?: number;
+  };
+}
+
+export interface AdminActionEvent extends BaseEvent {
+  eventType: EventType.ADMIN_ACTION;
+  data: {
+    adminId: number;
+    action: string; // e.g. "kick", "ban", "swap"
+    targetPlayerId?: number;
+    reason?: string;
+  };
+}
+
+// Updated discriminated union of all supported events
 export type GameEvent =
   | PlayerKillEvent
   | PlayerConnectEvent
   | PlayerDisconnectEvent
   | PlayerChatEvent
   | RoundEndEvent
+  | RoundStartEvent
   | MapChangeEvent
-  | BaseEvent; // Fallback for other event types
+  | PlayerDeathEvent
+  | PlayerSuicideEvent
+  | PlayerTeamkillEvent
+  | ServerShutdownEvent
+  | AdminActionEvent;
 
 export interface ProcessedEvent {
   id: string;

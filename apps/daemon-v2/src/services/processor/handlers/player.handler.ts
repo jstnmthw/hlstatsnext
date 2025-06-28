@@ -25,13 +25,13 @@ export class PlayerHandler {
   async handleEvent(event: GameEvent): Promise<HandlerResult> {
     switch (event.eventType) {
       case "PLAYER_CONNECT":
-        return this.handlePlayerConnect(event as PlayerConnectEvent);
+        return this.handlePlayerConnect(event);
 
       case "PLAYER_DISCONNECT":
-        return this.handlePlayerDisconnect(event as PlayerDisconnectEvent);
+        return this.handlePlayerDisconnect(event);
 
       case "PLAYER_KILL":
-        return this.handlePlayerKill(event as PlayerKillEvent);
+        return this.handlePlayerKill(event);
 
       default:
         return { success: true }; // Event not handled by this handler

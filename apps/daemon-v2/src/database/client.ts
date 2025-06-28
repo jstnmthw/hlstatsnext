@@ -69,71 +69,61 @@ export class DatabaseClient {
     }
   }
 
-  private async createConnectEvent(event: GameEvent): Promise<void> {
-    const connectEvent = event as PlayerConnectEvent;
-    if (connectEvent.eventType !== "PLAYER_CONNECT") return;
-
+  private async createConnectEvent(event: PlayerConnectEvent): Promise<void> {
     await this.client.eventConnect.create({
       data: {
         eventTime: event.timestamp,
-        playerId: connectEvent.data.playerId,
-        ipAddress: connectEvent.data.ipAddress || "",
-        hostname: connectEvent.data.playerName || "",
+        playerId: event.data.playerId,
+        ipAddress: event.data.ipAddress || "",
+        hostname: event.data.playerName || "",
         serverId: event.serverId,
         map: "", // Will be populated when we have map tracking
       },
     });
   }
 
-  private async createDisconnectEvent(event: GameEvent): Promise<void> {
-    const disconnectEvent = event as PlayerDisconnectEvent;
-    if (disconnectEvent.eventType !== "PLAYER_DISCONNECT") return;
-
+  private async createDisconnectEvent(
+    event: PlayerDisconnectEvent,
+  ): Promise<void> {
     await this.client.eventDisconnect.create({
       data: {
         eventTime: event.timestamp,
-        playerId: disconnectEvent.data.playerId,
+        playerId: event.data.playerId,
         serverId: event.serverId,
         map: "", // Will be populated when we have map tracking
       },
     });
   }
 
-  private async createFragEvent(event: GameEvent): Promise<void> {
-    const killEvent = event as PlayerKillEvent;
-    if (killEvent.eventType !== "PLAYER_KILL") return;
-
+  private async createFragEvent(event: PlayerKillEvent): Promise<void> {
     await this.client.eventFrag.create({
       data: {
         eventTime: event.timestamp,
-        killerId: killEvent.data.killerId,
-        victimId: killEvent.data.victimId,
-        weapon: killEvent.data.weapon,
-        headshot: killEvent.data.headshot ? 1 : 0,
+        killerId: event.data.killerId,
+        victimId: event.data.victimId,
+        weapon: event.data.weapon,
+        headshot: event.data.headshot ? 1 : 0,
         serverId: event.serverId,
         map: "", // Will be populated when we have map tracking
-        pos_x: killEvent.data.killerPosition?.x || 0,
-        pos_y: killEvent.data.killerPosition?.y || 0,
-        pos_z: killEvent.data.killerPosition?.z || 0,
-        pos_victim_x: killEvent.data.victimPosition?.x || 0,
-        pos_victim_y: killEvent.data.victimPosition?.y || 0,
-        pos_victim_z: killEvent.data.victimPosition?.z || 0,
+        pos_x: event.data.killerPosition?.x || 0,
+        pos_y: event.data.killerPosition?.y || 0,
+        pos_z: event.data.killerPosition?.z || 0,
+        pos_victim_x: event.data.victimPosition?.x || 0,
+        pos_victim_y: event.data.victimPosition?.y || 0,
+        pos_victim_z: event.data.victimPosition?.z || 0,
       },
     });
   }
 
-  private async createChatEvent(event: GameEvent): Promise<void> {
-    const chatEvent = event as PlayerChatEvent;
-    if (chatEvent.eventType !== "CHAT_MESSAGE") return;
-
+  private async createChatEvent(event: PlayerChatEvent): Promise<void> {
     await this.client.eventChat.create({
       data: {
-        eventTime: chatEvent.timestamp,
-        playerId: chatEvent.data.playerId,
-        serverId: chatEvent.serverId,
+        eventTime: event.timestamp,
+        playerId: event.data.playerId,
+        serverId: event.serverId,
         map: "", // Placeholder until map tracking implemented
-        message_mode: chatEvent.data.isDead ? 1 : 0,
-        message: chatEvent.data.message.substring(0, 128),
+        message_mode: event.data.isDead ? 1 : 0,
+        message: event.data.message.substring(0, 128),
       },
     });
   }

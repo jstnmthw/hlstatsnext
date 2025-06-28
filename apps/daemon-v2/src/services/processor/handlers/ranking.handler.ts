@@ -46,10 +46,10 @@ export class RankingHandler {
   async handleEvent(event: GameEvent): Promise<HandlerResult> {
     switch (event.eventType) {
       case "PLAYER_KILL":
-        return this.handleKillRating(event as PlayerKillEvent);
+        return this.handleKillRating(event);
 
       case "ROUND_END":
-        return this.handleRoundRating(event as RoundEndEvent);
+        return this.handleRoundRating(event);
 
       default:
         return { success: true }; // Event not handled by this handler

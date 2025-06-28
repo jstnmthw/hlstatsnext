@@ -74,4 +74,33 @@ export abstract class BaseParser {
       .trim()
       .substring(0, 255); // Limit length
   }
+
+  /**
+   * Normalise a raw UDP log packet into a clean log line that the
+   * individual game parsers can work with.
+   *
+   * Source-engine remote log packets are typically prefixed with four 0xFF
+   * bytes followed by the literal string "log ".  For example:
+   *   "\xff\xff\xff\xfflog L 06/28/2025 - 08:42:47: ..."
+   *
+   * This helper trims those extra bytes/tokens so the resulting string
+   * always starts with the canonical "L " prefix expected by the regexes.
+   */
+  protected normaliseLogLine(raw: string): string {
+    // Trim early to remove leading whitespace
+    let line = raw.trimStart();
+
+    // If the line already starts with "L " no further work is needed
+    if (line.startsWith("L ")) {
+      return line;
+    }
+
+    // Attempt to locate the first occurrence of the canonical prefix.
+    const idx = line.indexOf("L ");
+    if (idx !== -1) {
+      line = line.substring(idx);
+    }
+
+    return line.trimStart();
+  }
 }

@@ -76,6 +76,17 @@ export interface PlayerDisconnectEvent extends BaseEvent {
   };
 }
 
+export interface PlayerChatEvent extends BaseEvent {
+  eventType: EventType.CHAT_MESSAGE;
+  data: {
+    playerId: number;
+    message: string;
+    team: string;
+    isDead: boolean;
+    messageMode?: number; // 0=normal,1=dead etc.
+  };
+}
+
 export interface RoundEndEvent extends BaseEvent {
   eventType: EventType.ROUND_END;
   data: {
@@ -101,6 +112,7 @@ export type GameEvent =
   | PlayerKillEvent
   | PlayerConnectEvent
   | PlayerDisconnectEvent
+  | PlayerChatEvent
   | RoundEndEvent
   | MapChangeEvent
   | BaseEvent; // Fallback for other event types

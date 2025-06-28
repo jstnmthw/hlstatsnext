@@ -10,6 +10,7 @@ import type { WeaponService } from "@/services/weapon/weapon.service"
 import { WeaponService as DefaultWeaponService } from "@/services/weapon/weapon.service"
 import { DatabaseClient } from "@/database/client"
 import { getWeaponAttributes } from "@/config/weapon-config"
+import { logger } from "@/utils/logger"
 
 export interface WeaponStats {
   weaponName: string
@@ -53,7 +54,7 @@ export class WeaponHandler {
       // - Track weapon usage patterns
       // - Update player weapon proficiency
 
-      console.log(`Weapon kill recorded: ${weapon} (headshot: ${headshot}) by player ${killerId} on ${victimId}`)
+      logger.event(`Weapon kill recorded: ${weapon} (headshot: ${headshot}) by player ${killerId} on ${victimId}`)
 
       // Calculate weapon effectiveness score
       // const effectivenessBonus = headshot ? 1.5 : 1.0;

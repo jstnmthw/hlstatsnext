@@ -7,6 +7,7 @@
 
 import type { GameEvent, RoundEndEvent, MapChangeEvent } from "@/types/common/events"
 // import type { DatabaseClient } from "@/database/client" // TODO: Add back when database operations are implemented
+import { logger } from "@/utils/logger"
 
 export interface MatchStats {
   duration: number
@@ -58,7 +59,7 @@ export class MatchHandler {
         })
       }
 
-      console.log(`Round started on server ${serverId}`)
+      logger.event(`Round started on server ${serverId}`)
 
       return {
         success: true,
@@ -79,7 +80,7 @@ export class MatchHandler {
     try {
       const matchStats = this.currentMatch.get(serverId)
       if (!matchStats) {
-        console.warn(`No match stats found for server ${serverId}`)
+        logger.warn(`No match stats found for server ${serverId}`)
         return { success: true }
       }
 
@@ -92,7 +93,7 @@ export class MatchHandler {
       // TODO: Update player round statistics
       // TODO: Calculate team performance metrics
 
-      console.log(`Round ended on server ${serverId}: ${winningTeam} won (${score.team1}-${score.team2})`)
+      logger.event(`Round ended on server ${serverId}: ${winningTeam} won (${score.team1}-${score.team2})`)
 
       return {
         success: true,
@@ -120,7 +121,7 @@ export class MatchHandler {
       // Reset match stats for new map
       this.currentMatch.delete(serverId)
 
-      console.log(`Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`)
+      logger.event(`Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`)
 
       return {
         success: true,
@@ -141,11 +142,11 @@ export class MatchHandler {
     // TODO: Implement MVP calculation when database operations are available
     void this._calculateMVP(serverId)
 
-    console.log(`Match finalized on server ${serverId} for map ${mapName}:`, {
-      rounds: stats.totalRounds,
-      duration: stats.duration,
-      scores: stats.teamScores,
-    })
+    logger.event(
+      `Match finalized on server ${serverId} for map ${mapName}: ${stats.totalRounds} rounds, ${stats.duration}s, scores: ${JSON.stringify(
+        stats.teamScores,
+      )}`,
+    )
   }
 
   private async _calculateMVP(serverId: number): Promise<number | undefined> {

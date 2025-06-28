@@ -17,7 +17,7 @@ const colors = {
 } as const
 
 // Status types
-export type LogStatus = "OK" | "ERROR" | "INFO" | "WARN" | "DEBUG"
+export type LogStatus = "OK" | "ERROR" | "INFO" | "WARN" | "DEBUG" | "EVENT"
 
 interface LoggerOptions {
   enableColors?: boolean
@@ -71,6 +71,8 @@ export class Logger {
         return `${colors.yellow}${statusText}${colors.reset}`
       case "DEBUG":
         return `${colors.magenta}${statusText}${colors.reset}`
+      case "EVENT":
+        return `${colors.cyan}${colors.bright}${statusText}${colors.reset}`
       default:
         return statusText
     }
@@ -102,6 +104,11 @@ export class Logger {
 
   debug(message: string): void {
     this.log("DEBUG", message)
+  }
+
+  // Log event (e.g., successfully processed game event)
+  event(message: string): void {
+    this.log("EVENT", message)
   }
 
   // Special methods for common daemon operations

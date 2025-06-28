@@ -5,7 +5,7 @@ import { logger } from "./utils/logger";
 
 (async () => {
   // Determine environment once – fall back to NODE_ENV for convenience
-  const appEnv = process.env.APP_ENV ?? process.env.NODE_ENV ?? "development";
+  const appEnv = process.env.NODE_ENV ?? "development";
   const isDev = appEnv === "development";
 
   // 1. DB
@@ -23,7 +23,9 @@ import { logger } from "./utils/logger";
   });
 
   await ingress.start();
-  logger.ready("🚀 DEV daemon listening on UDP 27500");
+  logger.ready(
+    "🚀 DEV daemon initialised; log processing active on port 27500"
+  );
 
   process.on("SIGINT", async () => {
     await ingress.stop();

@@ -86,6 +86,31 @@ export class EventProcessorService
           break;
         }
 
+        case EventType.CHAT_MESSAGE: {
+          const meta = event.meta;
+
+          if (!meta) {
+            logger.warn("CHAT event missing meta – skipped");
+            break;
+          }
+
+          const { steamId, playerName } = meta;
+
+          // Upsert player
+          const playerId = await this.db.getOrCreatePlayer(
+            steamId,
+            playerName,
+            "cstrike"
+          );
+
+          // Assign resolved playerId and persist chat event
+          (event as any).data.playerId = playerId;
+
+          await this.db.createGameEvent(event);
+
+          break;
+        }
+
         default:
           // Ignore unsupported events in MVP
           break;

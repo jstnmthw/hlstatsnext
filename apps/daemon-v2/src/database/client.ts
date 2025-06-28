@@ -11,6 +11,7 @@ import type {
   PlayerConnectEvent,
   PlayerDisconnectEvent,
   PlayerKillEvent,
+  PlayerChatEvent,
 } from "@/types/common/events";
 
 export class DatabaseClient {
@@ -55,6 +56,9 @@ export class DatabaseClient {
           break;
         case "PLAYER_KILL":
           await this.createFragEvent(event);
+          break;
+        case "CHAT_MESSAGE":
+          await this.createChatEvent(event);
           break;
         default:
           console.warn(`Unhandled event type: ${event.eventType}`);
@@ -118,6 +122,22 @@ export class DatabaseClient {
     });
   }
 
+  private async createChatEvent(event: GameEvent): Promise<void> {
+    const chatEvent = event as PlayerChatEvent;
+    if (chatEvent.eventType !== "CHAT_MESSAGE") return;
+
+    await this.client.eventChat.create({
+      data: {
+        eventTime: chatEvent.timestamp,
+        playerId: chatEvent.data.playerId,
+        serverId: chatEvent.serverId,
+        map: "", // Placeholder until map tracking implemented
+        message_mode: chatEvent.data.isDead ? 1 : 0,
+        message: chatEvent.data.message.substring(0, 128),
+      },
+    });
+  }
+
   /**
    * Get or create a player by Steam ID
    */
@@ -126,12 +146,21 @@ export class DatabaseClient {
     playerName: string,
     game: string
   ): Promise<number> {
+    const isBot = steamId.toUpperCase() === "BOT";
+    const normalizedName = playerName
+      .trim()
+      .replace(/\s+/g, "_") // Spaces → underscores
+      .replace(/[^A-Za-z0-9_-]/g, "") // Remove exotic chars
+      .substring(0, 48); // Leave room for "BOT_" prefix within 64-char limit
+
+    const effectiveId = isBot ? `BOT_${normalizedName}` : steamId;
+
     try {
       // First, try to find existing player by Steam ID
       const uniqueId = await this.client.playerUniqueId.findUnique({
         where: {
           uniqueId_game: {
-            uniqueId: steamId,
+            uniqueId: effectiveId,
             game: game,
           },
         },
@@ -152,7 +181,7 @@ export class DatabaseClient {
           skill: 1000, // Default skill rating
           uniqueIds: {
             create: {
-              uniqueId: steamId,
+              uniqueId: effectiveId,
               game: game,
             },
           },

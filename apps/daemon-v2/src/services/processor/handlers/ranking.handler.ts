@@ -6,7 +6,7 @@
  */
 
 import type { GameEvent, PlayerKillEvent, RoundEndEvent } from "@/types/common/events"
-import type { DatabaseClient } from "@/database/client"
+// import type { DatabaseClient } from "@/database/client" // TODO: Add back when database operations are implemented
 import { getWeaponAttributes } from "@/config/weapon-config"
 
 export interface SkillRating {
@@ -32,7 +32,9 @@ export interface HandlerResult {
 }
 
 export class RankingHandler {
-  constructor(private db: DatabaseClient) {}
+  constructor() {
+    // TODO: Add DatabaseClient parameter when database operations are implemented
+  }
 
   private readonly DEFAULT_RATING = 1000
   private readonly K_FACTOR = 32

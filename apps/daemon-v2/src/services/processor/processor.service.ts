@@ -39,9 +39,9 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
 
     // Initialize handlers
     this.playerHandler = new PlayerHandler(this.db)
-    this.weaponHandler = new WeaponHandler(this.db)
-    this.matchHandler = new MatchHandler(this.db)
-    this.rankingHandler = new RankingHandler(this.db)
+    this.weaponHandler = new WeaponHandler()
+    this.matchHandler = new MatchHandler()
+    this.rankingHandler = new RankingHandler()
   }
 
   /* Existing enqueue placeholder (kept for API compatibility).
@@ -85,6 +85,14 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
             if (this.rankingHandler) {
               await this.rankingHandler.handleEvent(event)
             }
+          }
+          break
+
+        case EventType.ROUND_START:
+        case EventType.ROUND_END:
+        case EventType.MAP_CHANGE:
+          if (this.matchHandler) {
+            await this.matchHandler.handleEvent(event)
           }
           break
 

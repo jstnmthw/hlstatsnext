@@ -10,7 +10,7 @@ import {
   type PlayerTeamkillEvent,
 } from "../../src/types/common/events"
 
-describe("CsParser", () => {
+describe("Counster Strike Parser", () => {
   const parser = new CsParser("csgo")
   const serverId = 1
 
@@ -177,6 +177,42 @@ describe("CsParser", () => {
         expect(result.error).toBe("Unsupported log line")
       }
     })
+
+    it("should parse standard chat line", async () => {
+      const logLine = 'L 06/28/2025 - 09:09:32: "goat<5><BOT><CT>" say "Too bad NNBot is discontinued..."'
+
+      const result = await parser.parse(logLine, 1)
+
+      expect(result.success).toBe(true)
+      if (!result.success) return
+
+      expect(result.event.eventType).toBe(EventType.CHAT_MESSAGE)
+      // meta assertions
+      const chatEvent = result.event as PlayerChatEvent
+      if (chatEvent.meta && "steamId" in chatEvent.meta) {
+        expect(chatEvent.meta.steamId).toBe("BOT")
+        expect(chatEvent.meta.playerName).toBe("goat")
+        expect(chatEvent.meta.isBot).toBe(true)
+      }
+
+      const data = chatEvent.data
+      expect(data.message).toBe("Too bad NNBot is discontinued...")
+      expect(data.team).toBe("CT")
+      expect(data.isDead).toBe(false)
+    })
+
+    it("should parse dead chat line", async () => {
+      const logLine = 'L 06/28/2025 - 09:09:32: "Brandon<2><BOT><TERRORIST>" say "hello" (dead)'
+
+      const result = await parser.parse(logLine, 1)
+
+      expect(result.success).toBe(true)
+      if (!result.success) return
+
+      expect(result.event.eventType).toBe(EventType.CHAT_MESSAGE)
+      const deadEvent = result.event as PlayerChatEvent
+      expect(deadEvent.data.isDead).toBe(true)
+    })
   })
 
   describe("BOT detection", () => {
@@ -192,47 +228,12 @@ describe("CsParser", () => {
 
       const { event } = result
       expect(event.eventType).toBe("PLAYER_CONNECT")
-      if (event.meta && "steamId" in event.meta) {
-        expect(event.meta.isBot).toBe(true)
-        expect(event.meta.steamId).toBe("BOT")
-        expect(event.meta.playerName).toBe("BotPlayer")
+      const eventWithMeta = event as { meta?: { steamId: string; playerName: string; isBot: boolean } }
+      if (eventWithMeta.meta && "steamId" in eventWithMeta.meta) {
+        expect(eventWithMeta.meta.isBot).toBe(true)
+        expect(eventWithMeta.meta.steamId).toBe("BOT")
+        expect(eventWithMeta.meta.playerName).toBe("BotPlayer")
       }
     })
-  })
-
-  it("parses standard chat line", async () => {
-    const logLine = 'L 06/28/2025 - 09:09:32: "goat<5><BOT><CT>" say "Too bad NNBot is discontinued..."'
-
-    const result = await parser.parse(logLine, 1)
-
-    expect(result.success).toBe(true)
-    if (!result.success) return
-
-    expect(result.event.eventType).toBe(EventType.CHAT_MESSAGE)
-    // meta assertions
-    const chatEvent = result.event as PlayerChatEvent
-    if (chatEvent.meta && "steamId" in chatEvent.meta) {
-      expect(chatEvent.meta.steamId).toBe("BOT")
-      expect(chatEvent.meta.playerName).toBe("goat")
-      expect(chatEvent.meta.isBot).toBe(true)
-    }
-
-    const data = chatEvent.data
-    expect(data.message).toBe("Too bad NNBot is discontinued...")
-    expect(data.team).toBe("CT")
-    expect(data.isDead).toBe(false)
-  })
-
-  it("parses dead chat line", async () => {
-    const logLine = 'L 06/28/2025 - 09:09:32: "Brandon<2><BOT><TERRORIST>" say "hello" (dead)'
-
-    const result = await parser.parse(logLine, 1)
-
-    expect(result.success).toBe(true)
-    if (!result.success) return
-
-    expect(result.event.eventType).toBe(EventType.CHAT_MESSAGE)
-    const deadEvent = result.event as PlayerChatEvent
-    expect(deadEvent.data.isDead).toBe(true)
   })
 })

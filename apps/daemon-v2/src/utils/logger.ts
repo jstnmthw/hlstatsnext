@@ -27,12 +27,10 @@ interface LoggerOptions {
 
 export class Logger {
   private enableColors: boolean;
-  private timestamp: boolean;
   private showTimestamp: boolean;
 
   constructor(options: LoggerOptions = {}) {
     this.enableColors = options.enableColors ?? true;
-    this.timestamp = options.timestamp ?? false;
     this.showTimestamp = options.showTimestamp ?? true;
   }
 

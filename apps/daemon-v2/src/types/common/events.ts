@@ -112,3 +112,9 @@ export interface ProcessedEvent {
   success: boolean;
   error?: string;
 }
+
+export interface PlayerMeta {
+  steamId: string;
+  playerName: string;
+  isBot: boolean;
+}

@@ -1,7 +1,14 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
-  "globalEnv": ["NODE_ENV", "FRONTEND_URL", "PORT", "VITEST"],
+  "globalEnv": [
+    "NODE_ENV",
+    "FRONTEND_URL",
+    "PORT",
+    "VITEST",
+    "APP_ENV",
+    "LOG_BOTS"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

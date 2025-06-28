@@ -8,7 +8,16 @@
 import type { GameEvent } from "@/types/common/events";
 
 export type ParseResult =
-  | { success: true; event: GameEvent }
+  | {
+      success: true;
+      event: GameEvent & {
+        meta?: {
+          steamId: string;
+          playerName: string;
+          isBot: boolean;
+        };
+      };
+    }
   | { success: false; error: string };
 
 export abstract class BaseParser {

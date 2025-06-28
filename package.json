@@ -17,7 +17,8 @@
     "lint": "turbo run lint",
     "ui": "pnpm --filter @repo/ui ui",
     "test": "turbo run test",
-    "test:coverage": "turbo run test:coverage"
+    "test:coverage": "turbo run test:coverage",
+    "dev:daemon": "tsx apps/daemon-v2/src/main.dev.ts"
   },
   "devDependencies": {
     "prettier": "^3.6.0",

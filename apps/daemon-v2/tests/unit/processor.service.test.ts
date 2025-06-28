@@ -5,7 +5,7 @@ import { WeaponHandler } from "../../src/services/processor/handlers/weapon.hand
 import { MatchHandler } from "../../src/services/processor/handlers/match.handler"
 import { RankingHandler } from "../../src/services/processor/handlers/ranking.handler"
 import { DatabaseClient } from "../../src/database/client"
-import { EventType, PlayerKillEvent, PlayerConnectEvent, PlayerMeta } from "../../src/types/common/events"
+import { EventType, PlayerConnectEvent, PlayerKillEvent, GameEvent } from "../../src/types/common/events"
 
 // Mock all dependencies
 vi.mock("../../src/database/client")
@@ -37,7 +37,7 @@ describe("EventProcessorService", () => {
   })
 
   describe("processEvent", () => {
-    const mockEvent: PlayerKillEvent = {
+    const mockKillEvent: PlayerKillEvent = {
       eventType: EventType.PLAYER_KILL,
       serverId: 1,
       timestamp: new Date(),
@@ -49,24 +49,50 @@ describe("EventProcessorService", () => {
         killerTeam: "TERRORIST",
         victimTeam: "CT",
       },
+      meta: {
+        killer: {
+          steamId: "STEAM_1:0:111",
+          playerName: "Killer",
+          isBot: false,
+        },
+        victim: {
+          steamId: "STEAM_1:0:222",
+          playerName: "Victim",
+          isBot: false,
+        },
+      },
     }
 
     it("should persist event via DatabaseClient", async () => {
-      await processor.processEvent(mockEvent)
-
       const dbInstance = MockedDatabaseClient.mock.instances[0]!
-      expect(dbInstance.createGameEvent).toHaveBeenCalledWith(mockEvent)
+      vi.mocked(dbInstance.getOrCreatePlayer)
+        .mockResolvedValueOnce(1) // killer
+        .mockResolvedValueOnce(2) // victim
 
-      // No handler invocations expected in minimal path
-      expect(MockedPlayerHandler.mock.instances[0]!.handleEvent).not.toHaveBeenCalled()
+      await processor.processEvent(mockKillEvent)
+
+      expect(dbInstance.createGameEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: EventType.PLAYER_KILL,
+          data: expect.objectContaining({
+            killerId: 1,
+            victimId: 2,
+          }),
+        }),
+      )
+
+      // Handler invocations expected
+      expect(MockedPlayerHandler.mock.instances[0]!.handleEvent).toHaveBeenCalledWith(mockKillEvent)
+      expect(MockedWeaponHandler.mock.instances[0]!.handleEvent).toHaveBeenCalledWith(mockKillEvent)
+      expect(MockedRankingHandler.mock.instances[0]!.handleEvent).toHaveBeenCalledWith(mockKillEvent)
     })
 
     it("should throw if the database call fails", async () => {
       const dbInstance = MockedDatabaseClient.mock.instances[0]!
       const dbError = new Error("DB Error")
-      vi.mocked(dbInstance.createGameEvent).mockRejectedValue(dbError)
+      vi.mocked(dbInstance.getOrCreatePlayer).mockRejectedValue(dbError)
 
-      await expect(processor.processEvent(mockEvent)).rejects.toThrow(dbError)
+      await expect(processor.processEvent(mockKillEvent)).rejects.toThrow(dbError)
     })
   })
 
@@ -103,7 +129,7 @@ describe("EventProcessorService", () => {
     it("ignores bot events when logBots=false", async () => {
       const service = new EventProcessorService(mockDb, { logBots: false })
 
-      const event: PlayerConnectEvent & { meta: PlayerMeta } = {
+      const event: PlayerConnectEvent = {
         eventType: EventType.PLAYER_CONNECT,
         serverId: 1,
         timestamp: new Date(),
@@ -125,7 +151,7 @@ describe("EventProcessorService", () => {
     it("processes bot events when logBots=true", async () => {
       const service = new EventProcessorService(mockDb, { logBots: true })
 
-      const event: PlayerConnectEvent & { meta: PlayerMeta } = {
+      const event: PlayerConnectEvent = {
         eventType: EventType.PLAYER_CONNECT,
         serverId: 1,
         timestamp: new Date(),

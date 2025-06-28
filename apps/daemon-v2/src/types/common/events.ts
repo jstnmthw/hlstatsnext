@@ -26,6 +26,19 @@ export interface Position3D {
   z: number
 }
 
+// Base player metadata structure
+export interface PlayerMeta {
+  steamId: string
+  playerName: string
+  isBot: boolean
+}
+
+// Two-player metadata for events involving multiple players
+export interface DualPlayerMeta {
+  killer: PlayerMeta
+  victim: PlayerMeta
+}
+
 export interface BaseEvent {
   eventType: EventType
   timestamp: Date
@@ -53,6 +66,7 @@ export interface PlayerKillEvent extends BaseEvent {
     killerTeam: string
     victimTeam: string
   }
+  meta?: DualPlayerMeta
 }
 
 export interface PlayerConnectEvent extends BaseEvent {
@@ -65,6 +79,7 @@ export interface PlayerConnectEvent extends BaseEvent {
     country?: string
     userAgent?: string
   }
+  meta?: PlayerMeta
 }
 
 export interface PlayerDisconnectEvent extends BaseEvent {
@@ -74,6 +89,7 @@ export interface PlayerDisconnectEvent extends BaseEvent {
     reason?: string
     sessionDuration?: number
   }
+  meta?: PlayerMeta
 }
 
 export interface PlayerChatEvent extends BaseEvent {
@@ -85,6 +101,7 @@ export interface PlayerChatEvent extends BaseEvent {
     isDead: boolean
     messageMode?: number // 0=normal,1=dead etc.
   }
+  meta?: PlayerMeta
 }
 
 export interface RoundEndEvent extends BaseEvent {
@@ -97,6 +114,7 @@ export interface RoundEndEvent extends BaseEvent {
       team2: number
     }
   }
+  // No meta needed for round events
 }
 
 export interface MapChangeEvent extends BaseEvent {
@@ -106,6 +124,7 @@ export interface MapChangeEvent extends BaseEvent {
     newMap: string
     playerCount: number
   }
+  // No meta needed for map events
 }
 
 // Newly-modelled explicit event types replacing the former `UnknownEvent`
@@ -121,6 +140,7 @@ export interface PlayerDeathEvent extends BaseEvent {
     victimTeam: string
     killerTeam?: string
   }
+  meta?: DualPlayerMeta | PlayerMeta // Dual if killer exists, single for world deaths
 }
 
 export interface PlayerSuicideEvent extends BaseEvent {
@@ -131,6 +151,7 @@ export interface PlayerSuicideEvent extends BaseEvent {
     position?: Position3D
     team: string
   }
+  meta?: PlayerMeta
 }
 
 export interface PlayerTeamkillEvent extends BaseEvent {
@@ -145,6 +166,7 @@ export interface PlayerTeamkillEvent extends BaseEvent {
     victimPosition?: Position3D
     team: string // Shared team for both players
   }
+  meta?: DualPlayerMeta
 }
 
 export interface RoundStartEvent extends BaseEvent {
@@ -154,6 +176,7 @@ export interface RoundStartEvent extends BaseEvent {
     roundNumber: number
     maxPlayers: number
   }
+  // No meta needed for round events
 }
 
 export interface ServerShutdownEvent extends BaseEvent {
@@ -163,6 +186,7 @@ export interface ServerShutdownEvent extends BaseEvent {
     uptimeSeconds?: number
     playerCount?: number
   }
+  // No meta needed for server events
 }
 
 export interface AdminActionEvent extends BaseEvent {
@@ -173,6 +197,7 @@ export interface AdminActionEvent extends BaseEvent {
     targetPlayerId?: number
     reason?: string
   }
+  // No meta needed for admin events (admin info should be in data)
 }
 
 // Updated discriminated union of all supported events
@@ -198,8 +223,11 @@ export interface ProcessedEvent {
   error?: string
 }
 
-export interface PlayerMeta {
-  steamId: string
-  playerName: string
-  isBot: boolean
-}
+// Helper type to extract events that have metadata
+export type EventWithMeta = Extract<GameEvent, { meta?: any }>
+
+// Helper type to extract events with single player metadata
+export type SinglePlayerEvent = Extract<GameEvent, { meta?: PlayerMeta }>
+
+// Helper type to extract events with dual player metadata
+export type DualPlayerEvent = Extract<GameEvent, { meta?: DualPlayerMeta }>

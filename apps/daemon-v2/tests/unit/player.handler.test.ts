@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { PlayerHandler } from "../../src/services/processor/handlers/player.handler";
-import { EventType } from "../../src/types/common/events";
+import {
+  EventType,
+  PlayerConnectEvent,
+  PlayerDisconnectEvent,
+  PlayerKillEvent,
+} from "../../src/types/common/events";
 import { DatabaseClient } from "../../src/database/client";
 
 const mockGetOrCreatePlayer = vi.fn().mockResolvedValue(123);
@@ -106,7 +111,10 @@ describe("PlayerHandler", () => {
       it("should return success:false if connect handling fails", async () => {
         const connectError = new Error("DB connect error");
         mockGetOrCreatePlayer.mockRejectedValueOnce(connectError);
-        const event = { eventType: EventType.PLAYER_CONNECT, data: {} } as any;
+        const event = {
+          eventType: EventType.PLAYER_CONNECT,
+          data: {},
+        } as PlayerConnectEvent;
         const result = await handler.handleEvent(event);
         expect(result.success).toBe(false);
         expect(result.error).toBe("DB connect error");
@@ -116,7 +124,7 @@ describe("PlayerHandler", () => {
         const event = {
           eventType: EventType.PLAYER_DISCONNECT,
           data: { playerId: -1 },
-        } as any; // Use -1 to trigger the test error
+        } as PlayerDisconnectEvent;
         const result = await handler.handleEvent(event);
         expect(result.success).toBe(false);
         expect(result.error).toBe("Test disconnect error");
@@ -128,7 +136,7 @@ describe("PlayerHandler", () => {
         const event = {
           eventType: EventType.PLAYER_KILL,
           data: { killerId: 1, victimId: 2 },
-        } as any;
+        } as PlayerKillEvent;
         const result = await handler.handleEvent(event);
         expect(result.success).toBe(false);
         expect(result.error).toBe("DB update error");
@@ -145,7 +153,7 @@ describe("PlayerHandler", () => {
         const event = {
           eventType: EventType.PLAYER_KILL,
           data: { killerId: 1, victimId: 2 },
-        } as any;
+        } as PlayerKillEvent;
         const result = await handler.handleEvent(event);
         expect(result.success).toBe(false);
         expect(result.error).toBe("DB update error for victim");

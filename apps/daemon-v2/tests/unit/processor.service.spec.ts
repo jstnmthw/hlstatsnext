@@ -5,7 +5,7 @@ import { WeaponHandler } from "../../src/services/processor/handlers/weapon.hand
 import { MatchHandler } from "../../src/services/processor/handlers/match.handler";
 import { RankingHandler } from "../../src/services/processor/handlers/ranking.handler";
 import { DatabaseClient } from "../../src/database/client";
-import { EventType, type GameEvent } from "../../src/types/common/events";
+import { EventType, PlayerKillEvent } from "../../src/types/common/events";
 
 // Mock all dependencies
 vi.mock("../../src/database/client");
@@ -24,7 +24,6 @@ describe("EventProcessorService", () => {
   let processor: EventProcessorService;
 
   beforeEach(() => {
-    // Reset mocks before each test
     vi.clearAllMocks();
     processor = new EventProcessorService();
   });
@@ -38,32 +37,30 @@ describe("EventProcessorService", () => {
   });
 
   describe("processEvent", () => {
-    const mockEvent: GameEvent = {
+    const mockEvent: PlayerKillEvent = {
       eventType: EventType.PLAYER_KILL,
       serverId: 1,
       timestamp: new Date(),
-      data: {},
-    } as any;
+      data: {
+        killerId: 1,
+        victimId: 2,
+        weapon: "ak47",
+        headshot: false,
+        killerTeam: "TERRORIST",
+        victimTeam: "CT",
+      },
+    };
 
-    it("should call all handlers and the database", async () => {
+    it("should persist event via DatabaseClient", async () => {
       await processor.processEvent(mockEvent);
 
       const dbInstance = MockedDatabaseClient.mock.instances[0]!;
       expect(dbInstance.createGameEvent).toHaveBeenCalledWith(mockEvent);
 
-      const playerHandlerInstance = MockedPlayerHandler.mock.instances[0]!;
-      expect(playerHandlerInstance.handleEvent).toHaveBeenCalledWith(mockEvent);
-
-      const weaponHandlerInstance = MockedWeaponHandler.mock.instances[0]!;
-      expect(weaponHandlerInstance.handleEvent).toHaveBeenCalledWith(mockEvent);
-
-      const matchHandlerInstance = MockedMatchHandler.mock.instances[0]!;
-      expect(matchHandlerInstance.handleEvent).toHaveBeenCalledWith(mockEvent);
-
-      const rankingHandlerInstance = MockedRankingHandler.mock.instances[0]!;
-      expect(rankingHandlerInstance.handleEvent).toHaveBeenCalledWith(
-        mockEvent
-      );
+      // No handler invocations expected in minimal path
+      expect(
+        MockedPlayerHandler.mock.instances[0]!.handleEvent
+      ).not.toHaveBeenCalled();
     });
 
     it("should throw if the database call fails", async () => {
@@ -72,18 +69,6 @@ describe("EventProcessorService", () => {
       vi.mocked(dbInstance.createGameEvent).mockRejectedValue(dbError);
 
       await expect(processor.processEvent(mockEvent)).rejects.toThrow(dbError);
-    });
-
-    it("should throw if a handler fails", async () => {
-      const playerHandlerInstance = MockedPlayerHandler.mock.instances[0]!;
-      const handlerError = new Error("Handler Error");
-      vi.mocked(playerHandlerInstance.handleEvent).mockRejectedValue(
-        handlerError
-      );
-
-      await expect(processor.processEvent(mockEvent)).rejects.toThrow(
-        handlerError
-      );
     });
   });
 

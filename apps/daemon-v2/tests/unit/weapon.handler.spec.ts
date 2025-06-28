@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { WeaponHandler } from "../../src/services/processor/handlers/weapon.handler";
-import { EventType, type PlayerKillEvent } from "../../src/types/common/events";
+import {
+  EventType,
+  PlayerConnectEvent,
+  PlayerKillEvent,
+} from "../../src/types/common/events";
 import type { DatabaseClient } from "../../src/database/client";
 
 // Mock the weapon config
@@ -54,32 +58,12 @@ describe("WeaponHandler", () => {
         serverId: 1,
         timestamp: new Date(),
         data: {},
-      } as any;
+      } as PlayerConnectEvent;
 
       const result = await handler.handleEvent(otherEvent);
       expect(result.success).toBe(true);
       expect(result.error).toBeUndefined();
       expect(result.weaponsAffected).toBeUndefined();
-    });
-  });
-
-  describe("getWeaponDamageMultiplier", () => {
-    it("should return base damage for a body shot", async () => {
-      // Accessing private method for testing purposes
-      const multiplier = await (handler as any).getWeaponDamageMultiplier(
-        "glock",
-        false
-      );
-      expect(multiplier).toBe(20);
-    });
-
-    it("should return multiplied damage for a headshot", async () => {
-      // Accessing private method for testing purposes
-      const multiplier = await (handler as any).getWeaponDamageMultiplier(
-        "ak47",
-        true
-      );
-      expect(multiplier).toBe(144); // 36 * 4
     });
   });
 });

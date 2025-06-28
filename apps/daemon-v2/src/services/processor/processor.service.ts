@@ -103,12 +103,10 @@ export class EventProcessorService
             "cstrike",
           );
 
-          // Assign resolved playerId and persist chat event with proper type
-          const chatEvent =
-            event as import("@/types/common/events").PlayerChatEvent;
-          chatEvent.data.playerId = playerId;
+          // Assign resolved playerId and persist chat event
+          event.data.playerId = playerId;
 
-          await this.db.createGameEvent(chatEvent);
+          await this.db.createGameEvent(event);
 
           break;
         }

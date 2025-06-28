@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { RankingHandler } from "../../src/services/processor/handlers/ranking.handler";
-import { EventType } from "../../src/types/common/events";
+import {
+  EventType,
+  PlayerConnectEvent,
+  PlayerKillEvent,
+  RoundEndEvent,
+} from "../../src/types/common/events";
 
 vi.mock("../../src/database/client", () => ({
   DatabaseClient: vi.fn().mockImplementation(() => ({
@@ -38,7 +43,7 @@ describe("RankingHandler", () => {
           killerTeam: "CT",
           victimTeam: "T",
         },
-      };
+      } as PlayerKillEvent;
 
       const result = await handler.handleEvent(event);
 
@@ -69,7 +74,7 @@ describe("RankingHandler", () => {
           duration: 120,
           score: { team1: 16, team2: 14 },
         },
-      };
+      } as RoundEndEvent;
 
       const result = await handler.handleEvent(event);
 
@@ -87,7 +92,7 @@ describe("RankingHandler", () => {
           playerName: "TestPlayer",
           ipAddress: "192.168.1.100",
         },
-      };
+      } as PlayerConnectEvent;
 
       const result = await handler.handleEvent(event);
 

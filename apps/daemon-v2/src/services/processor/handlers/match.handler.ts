@@ -37,10 +37,10 @@ export class MatchHandler {
         return this.handleRoundStart(event);
 
       case "ROUND_END":
-        return this.handleRoundEnd(event as RoundEndEvent);
+        return this.handleRoundEnd(event);
 
       case "MAP_CHANGE":
-        return this.handleMapChange(event as MapChangeEvent);
+        return this.handleMapChange(event);
 
       default:
         return { success: true }; // Event not handled by this handler

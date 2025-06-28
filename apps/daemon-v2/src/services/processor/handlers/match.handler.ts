@@ -6,7 +6,7 @@
  */
 
 import type { GameEvent, RoundEndEvent, MapChangeEvent } from "@/types/common/events"
-import type { DatabaseClient } from "@/database/client"
+// import type { DatabaseClient } from "@/database/client" // TODO: Add back when database operations are implemented
 
 export interface MatchStats {
   duration: number
@@ -23,7 +23,9 @@ export interface HandlerResult {
 }
 
 export class MatchHandler {
-  constructor(private db: DatabaseClient) {}
+  constructor() {
+    // TODO: Add DatabaseClient parameter when database operations are implemented
+  }
 
   private currentMatch: Map<number, MatchStats> = new Map() // serverId -> MatchStats
 
@@ -136,6 +138,9 @@ export class MatchHandler {
     // TODO: Update player ELO/rankings based on match performance
     // TODO: Calculate map-specific statistics
 
+    // TODO: Implement MVP calculation when database operations are available
+    void this._calculateMVP(serverId)
+
     console.log(`Match finalized on server ${serverId} for map ${mapName}:`, {
       rounds: stats.totalRounds,
       duration: stats.duration,
@@ -143,7 +148,7 @@ export class MatchHandler {
     })
   }
 
-  private async calculateMVP(serverId: number): Promise<number | undefined> {
+  private async _calculateMVP(serverId: number): Promise<number | undefined> {
     // TODO: Implement MVP calculation based on:
     // - Kill/Death ratio for the match
     // - Objective completions (bomb plants/defuses, etc.)

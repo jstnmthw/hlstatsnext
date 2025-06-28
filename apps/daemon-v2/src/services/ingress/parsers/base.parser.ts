@@ -5,12 +5,12 @@
  * game server log lines into structured events.
  */
 
-import type { GameEvent, EventWithMeta } from "@/types/common/events"
+import type { GameEvent } from "@/types/common/events"
 
 export type ParseResult =
   | {
       success: true
-      event: EventWithMeta
+      event: GameEvent
     }
   | { success: false; error: string }
 

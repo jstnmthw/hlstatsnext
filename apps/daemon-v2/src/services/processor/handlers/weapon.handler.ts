@@ -6,7 +6,7 @@
  */
 
 import type { GameEvent, PlayerKillEvent } from "@/types/common/events"
-import type { DatabaseClient } from "@/database/client"
+// import type { DatabaseClient } from "@/database/client" // TODO: Add back when database operations are implemented
 import { getWeaponAttributes } from "@/config/weapon-config"
 
 export interface WeaponStats {
@@ -24,7 +24,9 @@ export interface HandlerResult {
 }
 
 export class WeaponHandler {
-  constructor(private db: DatabaseClient) {}
+  constructor() {
+    // TODO: Add DatabaseClient parameter when database operations are implemented
+  }
 
   async handleEvent(event: GameEvent): Promise<HandlerResult> {
     switch (event.eventType) {
@@ -36,7 +38,7 @@ export class WeaponHandler {
     }
   }
 
-  private async handleWeaponKill(event: PlayerKillEvent): Promise<HandlerResult> {
+  protected async handleWeaponKill(event: PlayerKillEvent): Promise<HandlerResult> {
     const { weapon, headshot, killerId, victimId } = event.data
 
     try {
@@ -63,7 +65,7 @@ export class WeaponHandler {
     }
   }
 
-  private async updateWeaponAccuracy(playerId: number, weapon: string, hit: boolean): Promise<void> {
+  protected async updateWeaponAccuracy(playerId: number, weapon: string, hit: boolean): Promise<void> {
     // TODO: Implement accuracy tracking
     // This would be called from shot events when available
     void playerId
@@ -71,7 +73,7 @@ export class WeaponHandler {
     void hit
   }
 
-  private async getWeaponDamageMultiplier(weapon: string, headshot: boolean): Promise<number> {
+  protected async getWeaponDamageMultiplier(weapon: string, headshot: boolean): Promise<number> {
     const { baseDamage } = getWeaponAttributes(weapon)
     return headshot ? baseDamage * 4.0 : baseDamage
   }

@@ -5,7 +5,7 @@ import { WeaponHandler } from "../../src/services/processor/handlers/weapon.hand
 import { MatchHandler } from "../../src/services/processor/handlers/match.handler"
 import { RankingHandler } from "../../src/services/processor/handlers/ranking.handler"
 import { DatabaseClient } from "../../src/database/client"
-import { EventType, PlayerConnectEvent, PlayerKillEvent, GameEvent } from "../../src/types/common/events"
+import { EventType, PlayerConnectEvent, PlayerKillEvent } from "../../src/types/common/events"
 
 // Mock all dependencies
 vi.mock("../../src/database/client")

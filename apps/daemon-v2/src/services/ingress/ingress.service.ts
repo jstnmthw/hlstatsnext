@@ -57,66 +57,101 @@ export class IngressService implements IIngressService {
   }
 
   private async handleLogLine(logLine: string, ip: string, port: number): Promise<void> {
+    const authResult = await this.authenticateServer(ip, port)
+
+    if (!authResult.authorised) {
+      // Unknown server or failed auth – nothing more to do.
+      return
+    }
+
+    // Skip parsing the first line after authorisation (legacy behaviour) unless
+    // we're running in dev/skipAuth mode.
+    if (authResult.skipCurrentLine) {
+      return
+    }
+
+    await this.processParsedLine(logLine, authResult.serverId)
+  }
+
+  /**
+   * Authenticates an incoming server based on its IP + port.
+   * Returns an object describing the result.
+   */
+  private async authenticateServer(
+    ip: string,
+    port: number,
+  ): Promise<{ authorised: false } | { authorised: true; serverId: number; skipCurrentLine: boolean }> {
     const serverKey = `${ip}:${port}`
 
-    // DEV shortcut - if skipAuth is enabled, automatically register unknown servers
+    // Fast-path – server already authenticated.
+    const cachedId = this.authenticatedServers.get(serverKey)
+    if (cachedId) {
+      return { authorised: true, serverId: cachedId, skipCurrentLine: false }
+    }
+
     if (this.opts.skipAuth) {
-      let serverId = this.authenticatedServers.get(serverKey)
+      // Development mode: create or fetch server record automatically.
+      const serverId = await this.ensureDevServer(ip, port)
+      this.authenticatedServers.set(serverKey, serverId)
+      return { authorised: true, serverId, skipCurrentLine: false }
+    }
 
-      if (!serverId) {
-        // Try to fetch existing server row
-        const existing = await this.db.getServerByAddress(ip, port)
+    // Production/normal path – verify server exists in DB.
+    const record = await this.db.getServerByAddress(ip, port)
 
-        if (existing) {
-          serverId = existing.serverId
-        } else {
-          // Auto-create minimal server record for dev
-          const created = await this.db.prisma.server.create({
-            data: {
-              address: ip,
-              port,
-              name: `DEV ${ip}:${port}`,
-              game: "cstrike", // default until map/game detection implemented
-            },
-            select: { serverId: true },
-          })
-          serverId = created.serverId
-          logger.info(`Auto-added dev server ${serverKey} (serverId=${serverId})`)
+    if (!record) {
+      logger.warn(`Rejected log line from unrecognised server ${serverKey}`)
+      return { authorised: false }
+    }
+
+    // Mark as authenticated.
+    this.authenticatedServers.set(serverKey, record.serverId)
+    logger.info(`Authorised server ${serverKey} (serverId=${record.serverId})`)
+
+    // As per legacy behaviour we ignore the first packet after authorization.
+    return { authorised: true, serverId: record.serverId, skipCurrentLine: true }
+  }
+
+  /**
+   * In development (skipAuth) mode, guarantee a server record exists for the
+   * given IP + port and return its ID. Handles potential race conditions where
+   * multiple packets attempt to insert the same server concurrently.
+   */
+  private async ensureDevServer(ip: string, port: number): Promise<number> {
+    const serverKey = `${ip}:${port}`
+
+    // 1. Attempt to fetch an existing record to avoid unnecessary writes.
+    const existing = await this.db.getServerByAddress(ip, port)
+    if (existing) {
+      return existing.serverId
+    }
+
+    // 2. Insert minimal placeholder record, handling unique-constraint races.
+    try {
+      const created = await this.db.prisma.server.create({
+        data: {
+          address: ip,
+          port,
+          name: `DEV ${serverKey}`,
+          game: "cstrike", // Default until map/game detection implemented
+        },
+        select: { serverId: true },
+      })
+
+      logger.info(`Auto-added dev server ${serverKey} (serverId=${created.serverId})`)
+      return created.serverId
+    } catch (err: unknown) {
+      // Prisma uses P2002 for unique-constraint violations.
+      if (typeof err === "object" && err !== null && (err as { code?: string }).code === "P2002") {
+        const raceExisting = await this.db.getServerByAddress(ip, port)
+        if (raceExisting) {
+          return raceExisting.serverId
         }
-
-        this.authenticatedServers.set(serverKey, serverId)
       }
 
-      await this.processParsedLine(logLine, serverId)
-      return
+      // Anything else – propagate up.
+      throw err
     }
-
-    // Normal authentication path
-    // Check if server is already authenticated
-    let serverId = this.authenticatedServers.get(serverKey)
-
-    if (!serverId) {
-      // Attempt to find server in DB
-      const record = await this.db.getServerByAddress(ip, port)
-
-      if (!record) {
-        // Unknown server - ignore all traffic
-        logger.warn(`Rejected log line from unrecognised server ${serverKey}`)
-        return
-      }
-
-      // For legacy auth we trust the IP+port once it has a DB record
-      this.authenticatedServers.set(serverKey, record.serverId)
-      serverId = record.serverId
-      logger.info(`Authorised server ${serverKey} (serverId=${serverId})`)
-
-      // First log line might just be a heartbeat, ignore if it's the authorisation
-      // line such as "logaddress_add" etc. Skip processing this first packet.
-      return
-    }
-
-    // From this point the server is authorised - parse the line.
-    await this.processParsedLine(logLine, serverId)
   }
 
   private async processParsedLine(logLine: string, serverId: number) {

@@ -32,9 +32,7 @@ describe("HLStatsDaemon", () => {
   let daemon: HLStatsDaemon;
 
   beforeEach(() => {
-    // Clear mocks before each test to have a clean state
     vi.clearAllMocks();
-    // Instantiate the real daemon; its dependencies are mocked above
     daemon = new HLStatsDaemon();
   });
 
@@ -92,8 +90,7 @@ describe("HLStatsDaemon", () => {
       await daemon.start();
 
       expect(mockLoggerError).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to start daemon"),
-        expect.anything()
+        expect.stringContaining("Failed to start daemon")
       );
       expect(mockExit).toHaveBeenCalledWith(1);
     });
@@ -111,8 +108,7 @@ describe("HLStatsDaemon", () => {
       await daemon.start();
 
       expect(mockLoggerError).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to start daemon"),
-        startError
+        expect.stringContaining("Failed to start daemon")
       );
       expect(mockExit).toHaveBeenCalledWith(1);
     });
@@ -158,8 +154,7 @@ describe("HLStatsDaemon", () => {
       await daemon.stop();
 
       expect(mockLoggerError).toHaveBeenCalledWith(
-        expect.stringContaining("Error during shutdown"),
-        stopError
+        expect.stringContaining("Error during shutdown")
       );
     });
   });

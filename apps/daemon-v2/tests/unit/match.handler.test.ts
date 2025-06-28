@@ -4,7 +4,8 @@ import {
   EventType,
   type RoundEndEvent,
   type MapChangeEvent,
-  type BaseEvent,
+  RoundStartEvent,
+  PlayerKillEvent,
 } from "../../src/types/common/events";
 import type { DatabaseClient } from "../../src/database/client";
 
@@ -18,10 +19,15 @@ describe("MatchHandler", () => {
 
   describe("handleEvent", () => {
     it("should handle ROUND_START and initialize stats", async () => {
-      const event: BaseEvent = {
+      const event: RoundStartEvent = {
         eventType: EventType.ROUND_START,
         serverId: 1,
         timestamp: new Date(),
+        data: {
+          map: "de_dust2",
+          roundNumber: 1,
+          maxPlayers: 10,
+        },
       };
       const result = await handler.handleEvent(event);
 
@@ -37,7 +43,12 @@ describe("MatchHandler", () => {
         eventType: EventType.ROUND_START,
         serverId: 1,
         timestamp: new Date(),
-      } as BaseEvent);
+        data: {
+          map: "de_dust2",
+          roundNumber: 1,
+          maxPlayers: 10,
+        },
+      } as RoundStartEvent);
 
       const roundEndEvent: RoundEndEvent = {
         eventType: EventType.ROUND_END,
@@ -65,7 +76,12 @@ describe("MatchHandler", () => {
         eventType: EventType.ROUND_START,
         serverId: 1,
         timestamp: new Date(),
-      } as BaseEvent);
+        data: {
+          map: "de_dust2",
+          roundNumber: 1,
+          maxPlayers: 10,
+        },
+      } as RoundStartEvent);
       await handler.handleEvent({
         eventType: EventType.ROUND_END,
         serverId: 1,
@@ -103,14 +119,26 @@ describe("MatchHandler", () => {
     });
 
     it("should ignore unhandled events", async () => {
-      const event: BaseEvent = {
-        eventType: EventType.PLAYER_CONNECT,
+      // Create a PLAYER_KILL event which MatchHandler does **not** process
+      const unhandledEvent: PlayerKillEvent = {
+        eventType: EventType.PLAYER_KILL,
         serverId: 1,
         timestamp: new Date(),
+        data: {
+          killerId: 1,
+          victimId: 2,
+          weapon: "ak47",
+          headshot: false,
+          killerTeam: "TERRORIST",
+          victimTeam: "CT",
+        },
       };
-      const result = await handler.handleEvent(event);
+
+      const result = await handler.handleEvent(unhandledEvent);
+
+      // Should report success but **not** mutate internal match state
       expect(result.success).toBe(true);
-      expect(result.error).toBeUndefined();
+      expect(handler.getMatchStats(1)).toBeUndefined();
     });
 
     it("should not throw on ROUND_END if no match stats exist", async () => {
@@ -123,7 +151,7 @@ describe("MatchHandler", () => {
           duration: 120,
           score: { team1: 1, team2: 0 },
         },
-      };
+      } as RoundEndEvent;
       const result = await handler.handleEvent(roundEndEvent);
       expect(result.success).toBe(true);
     });

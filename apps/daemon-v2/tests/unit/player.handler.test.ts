@@ -5,6 +5,7 @@ import {
   PlayerConnectEvent,
   PlayerDisconnectEvent,
   PlayerKillEvent,
+  MapChangeEvent,
 } from "../../src/types/common/events";
 import { DatabaseClient } from "../../src/database/client";
 
@@ -41,7 +42,7 @@ describe("PlayerHandler", () => {
           ipAddress: "192.168.1.100",
           country: "US",
         },
-      };
+      } as PlayerConnectEvent;
 
       const result = await handler.handleEvent(event);
 
@@ -60,7 +61,7 @@ describe("PlayerHandler", () => {
           reason: "Disconnect by user",
           sessionDuration: 1800,
         },
-      };
+      } as PlayerDisconnectEvent;
 
       const result = await handler.handleEvent(event);
 
@@ -81,7 +82,7 @@ describe("PlayerHandler", () => {
           killerTeam: "CT",
           victimTeam: "T",
         },
-      };
+      } as PlayerKillEvent;
 
       const result = await handler.handleEvent(event);
 
@@ -99,7 +100,7 @@ describe("PlayerHandler", () => {
           newMap: "de_inferno",
           playerCount: 10,
         },
-      };
+      } as MapChangeEvent;
 
       const result = await handler.handleEvent(event);
 

@@ -11,8 +11,17 @@ vi.mock("../../src/database/client", () => ({
       gamesPlayed: 0,
     }),
     updatePlayerRating: vi.fn().mockResolvedValue(undefined),
+    getWeaponModifier: vi.fn().mockResolvedValue(null),
   })),
 }))
+
+vi.mock("@/services/weapon/weapon.service", () => {
+  return {
+    WeaponService: vi.fn().mockImplementation(() => ({
+      getSkillMultiplier: vi.fn().mockResolvedValue(1.0),
+    })),
+  }
+})
 
 // import { DatabaseClient } from "../../src/database/client" // TODO: Add back when database operations are implemented
 

@@ -6,8 +6,10 @@
  */
 
 import type { GameEvent, PlayerKillEvent, RoundEndEvent } from "@/types/common/events"
+import type { WeaponService } from "@/services/weapon/weapon.service"
+import { WeaponService as DefaultWeaponService } from "@/services/weapon/weapon.service"
+import { DatabaseClient } from "@/database/client"
 // import type { DatabaseClient } from "@/database/client" // TODO: Add back when database operations are implemented
-import { getWeaponAttributes } from "@/config/weapon-config"
 
 export interface SkillRating {
   playerId: number
@@ -32,12 +34,15 @@ export interface HandlerResult {
 }
 
 export class RankingHandler {
-  constructor() {
+  private readonly weaponService: WeaponService
+
+  constructor(weaponService?: WeaponService) {
     // TODO: Add DatabaseClient parameter when database operations are implemented
+    this.weaponService = weaponService ?? new DefaultWeaponService(new DatabaseClient())
   }
 
   private readonly DEFAULT_RATING = 1000
-  private readonly K_FACTOR = 32
+  private readonly DEFAULT_K_FACTOR = 32
   private readonly RATING_FLOOR = 100
   private readonly RATING_CEILING = 3000
 
@@ -62,8 +67,14 @@ export class RankingHandler {
       const killerRating = await this.getPlayerRating(killerId)
       const victimRating = await this.getPlayerRating(victimId)
 
+      // Resolve weapon multiplier (db → static fallback)
+      const weaponMultiplier = await this.weaponService.getSkillMultiplier(undefined, weapon)
+
       // Calculate rating changes for kill/death
-      const changes = this.calculateKillRatingChange(killerRating, victimRating, { headshot, weapon })
+      const changes = this.calculateKillRatingChange(killerRating, victimRating, {
+        headshot,
+        weaponMultiplier,
+      })
 
       console.log(
         `Rating change for kill: Killer ${killerId} (+${changes.killer}), Victim ${victimId} (${changes.victim})`,
@@ -119,7 +130,7 @@ export class RankingHandler {
   private calculateKillRatingChange(
     killer: SkillRating,
     victim: SkillRating,
-    context: { headshot: boolean; weapon: string },
+    context: { headshot: boolean; weaponMultiplier: number },
   ): { killer: number; victim: number } {
     // Expected probability of killer winning
     const expectedKiller = 1 / (1 + Math.pow(10, (victim.rating - killer.rating) / 400))
@@ -129,7 +140,7 @@ export class RankingHandler {
     const victimK = this.getAdjustedKFactor(victim)
 
     // Weapon and headshot modifiers
-    const weaponMultiplier = this.getWeaponSkillMultiplier(context.weapon)
+    const weaponMultiplier = context.weaponMultiplier
     const headshotBonus = context.headshot ? 1.2 : 1.0
 
     // Calculate rating changes
@@ -143,17 +154,11 @@ export class RankingHandler {
   }
 
   private getAdjustedKFactor(player: SkillRating): number {
-    // Higher K-factor for new players (less confidence)
-    if (player.gamesPlayed < 10) return this.K_FACTOR * 1.5
-    if (player.gamesPlayed < 50) return this.K_FACTOR * 1.2
-    if (player.rating > 2000) return this.K_FACTOR * 0.8 // Slower changes for high-rated players
+    if (player.gamesPlayed < 10) return this.DEFAULT_K_FACTOR * 1.5
+    if (player.gamesPlayed < 50) return this.DEFAULT_K_FACTOR * 1.2
+    if (player.rating > 2000) return this.DEFAULT_K_FACTOR * 0.8 // Slower changes for high-rated players
 
-    return this.K_FACTOR
-  }
-
-  private getWeaponSkillMultiplier(weapon: string): number {
-    const { skillMultiplier } = getWeaponAttributes(weapon)
-    return skillMultiplier
+    return this.DEFAULT_K_FACTOR
   }
 
   private async getPlayerRating(playerId: number): Promise<SkillRating> {

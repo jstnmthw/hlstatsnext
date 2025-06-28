@@ -5,6 +5,8 @@ alwaysApply: true
 ---
 # Core Principles
 
+Review [DEVELOPMENT_BEST_PRACTICES.md](mdc:apps/daemon-v2/docs/DEVELOPMENT_BEST_PRACTICES.md).
+
 ## 1. Clean Architecture from Day One
 
 - **Turbo Repo monorepo** - Shared packages and applications for maximum code reuse

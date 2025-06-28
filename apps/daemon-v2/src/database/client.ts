@@ -375,4 +375,27 @@ export class DatabaseClient {
       throw error
     }
   }
+
+  /**
+   * Fetch weapon modifier (skill multiplier) for a given game + weapon code.
+   * Returns null if the weapon is not present in the database.
+   */
+  async getWeaponModifier(game: string, code: string): Promise<number | null> {
+    try {
+      const weapon = await this.client.weapon.findFirst({
+        where: {
+          game,
+          code,
+        },
+        select: {
+          modifier: true,
+        },
+      })
+
+      return weapon?.modifier ?? null
+    } catch (error) {
+      console.error("Failed to fetch weapon modifier:", error)
+      return null
+    }
+  }
 }

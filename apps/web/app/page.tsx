@@ -1,5 +1,5 @@
-import { Header } from "@/components/layout/header";
-import { GameList } from "@/components/game-list";
+import { Header } from "@/components/layout/header"
+import { GameList } from "@/components/game-list"
 
 export default function Page() {
   return (
@@ -9,5 +9,5 @@ export default function Page() {
         <GameList />
       </main>
     </>
-  );
+  )
 }

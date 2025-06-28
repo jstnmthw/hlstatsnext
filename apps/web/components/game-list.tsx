@@ -1,5 +1,5 @@
-import { query } from "@/lib/apollo-client";
-import { graphql } from "@/lib/gql";
+import { query } from "@/lib/apollo-client"
+import { graphql } from "@/lib/gql"
 
 const GET_GAMES_QUERY = graphql(`
   query GetGamesList {
@@ -9,10 +9,10 @@ const GET_GAMES_QUERY = graphql(`
       hidden
     }
   }
-`);
+`)
 
 export async function GameList() {
-  const { data } = await query({ query: GET_GAMES_QUERY });
+  const { data } = await query({ query: GET_GAMES_QUERY })
 
   return (
     <div>
@@ -25,5 +25,5 @@ export async function GameList() {
         ))}
       </ul>
     </div>
-  );
+  )
 }

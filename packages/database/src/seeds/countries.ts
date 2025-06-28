@@ -1,5 +1,5 @@
-import { db } from "..";
-import { log, logWarning } from "./logger";
+import { db } from ".."
+import { log, logWarning } from "./logger"
 
 const countries = [
   { flag: "US", name: "United States" },
@@ -13,19 +13,19 @@ const countries = [
   { flag: "RU", name: "Russia" },
   { flag: "BR", name: "Brazil" },
   { flag: "OT", name: "Other" },
-];
+]
 
 export async function seedCountries() {
-  const existingCount = await db.country.count();
+  const existingCount = await db.country.count()
   if (existingCount > 0) {
-    logWarning("Countries already exist, skipping seed.");
-    return;
+    logWarning("Countries already exist, skipping seed.")
+    return
   }
 
   const result = await db.country.createMany({
     data: countries,
     skipDuplicates: true,
-  });
+  })
 
-  log(`✔ Created ${result.count} countries.`);
+  log(`✔ Created ${result.count} countries.`)
 }

@@ -1,21 +1,21 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MatchHandler } from "../../src/services/processor/handlers/match.handler";
+import { describe, it, expect, vi, beforeEach } from "vitest"
+import { MatchHandler } from "../../src/services/processor/handlers/match.handler"
 import {
   EventType,
   type RoundEndEvent,
   type MapChangeEvent,
   RoundStartEvent,
   PlayerKillEvent,
-} from "../../src/types/common/events";
-import type { DatabaseClient } from "../../src/database/client";
+} from "../../src/types/common/events"
+import type { DatabaseClient } from "../../src/database/client"
 
 describe("MatchHandler", () => {
-  const mockDb = {} as DatabaseClient;
-  let handler: MatchHandler;
+  const mockDb = {} as DatabaseClient
+  let handler: MatchHandler
 
   beforeEach(() => {
-    handler = new MatchHandler(mockDb);
-  });
+    handler = new MatchHandler(mockDb)
+  })
 
   describe("handleEvent", () => {
     it("should handle ROUND_START and initialize stats", async () => {
@@ -28,14 +28,14 @@ describe("MatchHandler", () => {
           roundNumber: 1,
           maxPlayers: 10,
         },
-      };
-      const result = await handler.handleEvent(event);
+      }
+      const result = await handler.handleEvent(event)
 
-      expect(result.success).toBe(true);
-      const stats = handler.getMatchStats(1);
-      expect(stats).toBeDefined();
-      expect(stats?.totalRounds).toBe(0);
-    });
+      expect(result.success).toBe(true)
+      const stats = handler.getMatchStats(1)
+      expect(stats).toBeDefined()
+      expect(stats?.totalRounds).toBe(0)
+    })
 
     it("should handle ROUND_END and update stats", async () => {
       // First, start a round to initialize
@@ -48,7 +48,7 @@ describe("MatchHandler", () => {
           roundNumber: 1,
           maxPlayers: 10,
         },
-      } as RoundStartEvent);
+      } as RoundStartEvent)
 
       const roundEndEvent: RoundEndEvent = {
         eventType: EventType.ROUND_END,
@@ -59,16 +59,16 @@ describe("MatchHandler", () => {
           duration: 120,
           score: { team1: 1, team2: 0 },
         },
-      };
+      }
 
-      const result = await handler.handleEvent(roundEndEvent);
-      expect(result.success).toBe(true);
+      const result = await handler.handleEvent(roundEndEvent)
+      expect(result.success).toBe(true)
 
-      const stats = handler.getMatchStats(1);
-      expect(stats?.totalRounds).toBe(1);
-      expect(stats?.duration).toBe(120);
-      expect(stats?.teamScores["TERRORIST"]).toBe(1);
-    });
+      const stats = handler.getMatchStats(1)
+      expect(stats?.totalRounds).toBe(1)
+      expect(stats?.duration).toBe(120)
+      expect(stats?.teamScores["TERRORIST"]).toBe(1)
+    })
 
     it("should handle MAP_CHANGE and finalize/reset stats", async () => {
       // Start a round and end it to create stats
@@ -81,7 +81,7 @@ describe("MatchHandler", () => {
           roundNumber: 1,
           maxPlayers: 10,
         },
-      } as RoundStartEvent);
+      } as RoundStartEvent)
       await handler.handleEvent({
         eventType: EventType.ROUND_END,
         serverId: 1,
@@ -91,7 +91,7 @@ describe("MatchHandler", () => {
           duration: 100,
           score: { team1: 0, team2: 1 },
         },
-      } as RoundEndEvent);
+      } as RoundEndEvent)
 
       const mapChangeEvent: MapChangeEvent = {
         eventType: EventType.MAP_CHANGE,
@@ -102,21 +102,17 @@ describe("MatchHandler", () => {
           newMap: "de_inferno",
           playerCount: 10,
         },
-      };
+      }
 
       // @ts-expect-error - Testing private method
-      const finalizeSpy = vi.spyOn(handler, "finalizeMatch");
-      await handler.handleEvent(mapChangeEvent);
+      const finalizeSpy = vi.spyOn(handler, "finalizeMatch")
+      await handler.handleEvent(mapChangeEvent)
 
-      expect(finalizeSpy).toHaveBeenCalledWith(
-        1,
-        "de_dust2",
-        expect.any(Object),
-      );
+      expect(finalizeSpy).toHaveBeenCalledWith(1, "de_dust2", expect.any(Object))
 
-      const stats = handler.getMatchStats(1);
-      expect(stats).toBeUndefined();
-    });
+      const stats = handler.getMatchStats(1)
+      expect(stats).toBeUndefined()
+    })
 
     it("should ignore unhandled events", async () => {
       // Create a PLAYER_KILL event which MatchHandler does **not** process
@@ -132,14 +128,14 @@ describe("MatchHandler", () => {
           killerTeam: "TERRORIST",
           victimTeam: "CT",
         },
-      };
+      }
 
-      const result = await handler.handleEvent(unhandledEvent);
+      const result = await handler.handleEvent(unhandledEvent)
 
       // Should report success but **not** mutate internal match state
-      expect(result.success).toBe(true);
-      expect(handler.getMatchStats(1)).toBeUndefined();
-    });
+      expect(result.success).toBe(true)
+      expect(handler.getMatchStats(1)).toBeUndefined()
+    })
 
     it("should not throw on ROUND_END if no match stats exist", async () => {
       const roundEndEvent: RoundEndEvent = {
@@ -151,9 +147,9 @@ describe("MatchHandler", () => {
           duration: 120,
           score: { team1: 1, team2: 0 },
         },
-      } as RoundEndEvent;
-      const result = await handler.handleEvent(roundEndEvent);
-      expect(result.success).toBe(true);
-    });
-  });
-});
+      } as RoundEndEvent
+      const result = await handler.handleEvent(roundEndEvent)
+      expect(result.success).toBe(true)
+    })
+  })
+})

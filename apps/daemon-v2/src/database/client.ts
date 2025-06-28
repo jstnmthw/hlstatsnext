@@ -5,27 +5,27 @@
  * error handling, and transaction support for the daemon services.
  */
 
-import { db, Player, type PrismaClient } from "@repo/database/client";
+import { db, Player, type PrismaClient } from "@repo/database/client"
 import type {
   GameEvent,
   PlayerConnectEvent,
   PlayerDisconnectEvent,
   PlayerKillEvent,
   PlayerChatEvent,
-} from "@/types/common/events";
+} from "@/types/common/events"
 
 export class DatabaseClient {
-  private client: PrismaClient;
+  private client: PrismaClient
 
   constructor() {
-    this.client = db;
+    this.client = db
   }
 
   /**
    * Get the Prisma client instance
    */
   get prisma(): PrismaClient {
-    return this.client;
+    return this.client
   }
 
   /**
@@ -33,11 +33,11 @@ export class DatabaseClient {
    */
   async testConnection(): Promise<boolean> {
     try {
-      await this.client.$queryRaw`SELECT 1`;
-      return true;
+      await this.client.$queryRaw`SELECT 1`
+      return true
     } catch (error) {
-      console.error("Database connection test failed:", error);
-      return false;
+      console.error("Database connection test failed:", error)
+      return false
     }
   }
 
@@ -49,23 +49,23 @@ export class DatabaseClient {
       // Map our event types to legacy HLStatsX event tables
       switch (event.eventType) {
         case "PLAYER_CONNECT":
-          await this.createConnectEvent(event);
-          break;
+          await this.createConnectEvent(event)
+          break
         case "PLAYER_DISCONNECT":
-          await this.createDisconnectEvent(event);
-          break;
+          await this.createDisconnectEvent(event)
+          break
         case "PLAYER_KILL":
-          await this.createFragEvent(event);
-          break;
+          await this.createFragEvent(event)
+          break
         case "CHAT_MESSAGE":
-          await this.createChatEvent(event);
-          break;
+          await this.createChatEvent(event)
+          break
         default:
-          console.warn(`Unhandled event type: ${event.eventType}`);
+          console.warn(`Unhandled event type: ${event.eventType}`)
       }
     } catch (error) {
-      console.error(`Failed to create game event:`, error);
-      throw error;
+      console.error(`Failed to create game event:`, error)
+      throw error
     }
   }
 
@@ -79,12 +79,10 @@ export class DatabaseClient {
         serverId: event.serverId,
         map: "", // Will be populated when we have map tracking
       },
-    });
+    })
   }
 
-  private async createDisconnectEvent(
-    event: PlayerDisconnectEvent,
-  ): Promise<void> {
+  private async createDisconnectEvent(event: PlayerDisconnectEvent): Promise<void> {
     await this.client.eventDisconnect.create({
       data: {
         eventTime: event.timestamp,
@@ -92,7 +90,7 @@ export class DatabaseClient {
         serverId: event.serverId,
         map: "", // Will be populated when we have map tracking
       },
-    });
+    })
   }
 
   private async createFragEvent(event: PlayerKillEvent): Promise<void> {
@@ -112,7 +110,7 @@ export class DatabaseClient {
         pos_victim_y: event.data.victimPosition?.y || 0,
         pos_victim_z: event.data.victimPosition?.z || 0,
       },
-    });
+    })
   }
 
   private async createChatEvent(event: PlayerChatEvent): Promise<void> {
@@ -125,25 +123,21 @@ export class DatabaseClient {
         message_mode: event.data.isDead ? 1 : 0,
         message: event.data.message.substring(0, 128),
       },
-    });
+    })
   }
 
   /**
    * Get or create a player by Steam ID
    */
-  async getOrCreatePlayer(
-    steamId: string,
-    playerName: string,
-    game: string,
-  ): Promise<number> {
-    const isBot = steamId.toUpperCase() === "BOT";
+  async getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number> {
+    const isBot = steamId.toUpperCase() === "BOT"
     const normalizedName = playerName
       .trim()
       .replace(/\s+/g, "_") // Spaces → underscores
       .replace(/[^A-Za-z0-9_-]/g, "") // Remove exotic chars
-      .substring(0, 48); // Leave room for "BOT_" prefix within 64-char limit
+      .substring(0, 48) // Leave room for "BOT_" prefix within 64-char limit
 
-    const effectiveId = isBot ? `BOT_${normalizedName}` : steamId;
+    const effectiveId = isBot ? `BOT_${normalizedName}` : steamId
 
     try {
       // First, try to find existing player by Steam ID
@@ -157,10 +151,10 @@ export class DatabaseClient {
         include: {
           player: true,
         },
-      });
+      })
 
       if (uniqueId) {
-        return uniqueId.playerId;
+        return uniqueId.playerId
       }
 
       // Create new player
@@ -176,12 +170,12 @@ export class DatabaseClient {
             },
           },
         },
-      });
+      })
 
-      return player.playerId;
+      return player.playerId
     } catch (error) {
-      console.error(`Failed to get or create player:`, error);
-      throw error;
+      console.error(`Failed to get or create player:`, error)
+      throw error
     }
   }
 
@@ -191,43 +185,43 @@ export class DatabaseClient {
   async updatePlayerStats(
     playerId: number,
     updates: {
-      kills?: number;
-      deaths?: number;
-      skill?: number;
-      shots?: number;
-      hits?: number;
-      headshots?: number;
+      kills?: number
+      deaths?: number
+      skill?: number
+      shots?: number
+      hits?: number
+      headshots?: number
     },
   ): Promise<void> {
     try {
-      const updateData: Record<string, unknown> = {};
+      const updateData: Record<string, unknown> = {}
 
       if (updates.kills !== undefined) {
-        updateData.kills = { increment: updates.kills };
+        updateData.kills = { increment: updates.kills }
       }
       if (updates.deaths !== undefined) {
-        updateData.deaths = { increment: updates.deaths };
+        updateData.deaths = { increment: updates.deaths }
       }
       if (updates.skill !== undefined) {
-        updateData.skill = updates.skill;
+        updateData.skill = updates.skill
       }
       if (updates.shots !== undefined) {
-        updateData.shots = { increment: updates.shots };
+        updateData.shots = { increment: updates.shots }
       }
       if (updates.hits !== undefined) {
-        updateData.hits = { increment: updates.hits };
+        updateData.hits = { increment: updates.hits }
       }
       if (updates.headshots !== undefined) {
-        updateData.headshots = { increment: updates.headshots };
+        updateData.headshots = { increment: updates.headshots }
       }
 
       await this.client.player.update({
         where: { playerId },
         data: updateData,
-      });
+      })
     } catch (error) {
-      console.error(`Failed to update player stats:`, error);
-      throw error;
+      console.error(`Failed to update player stats:`, error)
+      throw error
     }
   }
 
@@ -238,12 +232,12 @@ export class DatabaseClient {
     try {
       const player = await this.client.player.findUnique({
         where: { playerId },
-      });
+      })
 
-      return player;
+      return player
     } catch (error) {
-      console.error(`Failed to get player stats:`, error);
-      throw error;
+      console.error(`Failed to get player stats:`, error)
+      throw error
     }
   }
 
@@ -252,25 +246,17 @@ export class DatabaseClient {
    */
   async transaction<T>(
     callback: (
-      tx: Omit<
-        PrismaClient,
-        | "$connect"
-        | "$disconnect"
-        | "$on"
-        | "$transaction"
-        | "$use"
-        | "$extends"
-      >,
+      tx: Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">,
     ) => Promise<T>,
   ): Promise<T> {
-    return this.client.$transaction(callback);
+    return this.client.$transaction(callback)
   }
 
   /**
    * Close database connection
    */
   async disconnect(): Promise<void> {
-    await this.client.$disconnect();
+    await this.client.$disconnect()
   }
 
   /**
@@ -278,10 +264,7 @@ export class DatabaseClient {
    * service to authenticate that incoming UDP packets originate from a known and
    * authorised server record that an admin has added via the (future) admin UI.
    */
-  async getServerByAddress(
-    ipAddress: string,
-    port: number,
-  ): Promise<{ serverId: number } | null> {
+  async getServerByAddress(ipAddress: string, port: number): Promise<{ serverId: number } | null> {
     try {
       const server = await this.client.server.findFirst({
         where: {
@@ -291,12 +274,12 @@ export class DatabaseClient {
         select: {
           serverId: true,
         },
-      });
+      })
 
-      return server ?? null;
+      return server ?? null
     } catch (error) {
-      console.error(`Failed to fetch server by address:`, error);
-      throw error;
+      console.error(`Failed to fetch server by address:`, error)
+      throw error
     }
   }
 }

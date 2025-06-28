@@ -1,9 +1,6 @@
-import { builder } from "../builder";
-import {
-  handleGraphQLResult,
-  handleGraphQLResultNullable,
-} from "../utils/graphql-result-handler";
-import type { Role, Prisma } from "@repo/database/client";
+import { builder } from "../builder"
+import { handleGraphQLResult, handleGraphQLResultNullable } from "../utils/graphql-result-handler"
+import type { Role, Prisma } from "@repo/database/client"
 
 // Define Role type using Prisma object
 const RoleType = builder.prismaObject("Role", {
@@ -24,21 +21,21 @@ const RoleType = builder.prismaObject("Role", {
     killDeathRatio: t.field({
       type: "Float",
       resolve: (role) => {
-        return role.deaths > 0 ? role.kills / role.deaths : role.kills;
+        return role.deaths > 0 ? role.kills / role.deaths : role.kills
       },
     }),
   }),
-});
+})
 
 // Define PaginatedRoles type
 const PaginatedRoles = builder.objectRef<{
-  items: Role[];
-  total: number;
-  page: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}>("PaginatedRoles");
+  items: Role[]
+  total: number
+  page: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+}>("PaginatedRoles")
 
 PaginatedRoles.implement({
   fields: (t) => ({
@@ -52,7 +49,7 @@ PaginatedRoles.implement({
     hasNextPage: t.exposeBoolean("hasNextPage"),
     hasPreviousPage: t.exposeBoolean("hasPreviousPage"),
   }),
-});
+})
 
 // Role queries
 builder.queryFields((t) => ({
@@ -71,8 +68,8 @@ builder.queryFields((t) => ({
         hidden: args.hidden ?? undefined,
         page: args.page ?? 1,
         limit: Math.min(args.limit ?? 20, 100),
-      });
-      return handleGraphQLResult(result);
+      })
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -84,8 +81,8 @@ builder.queryFields((t) => ({
       id: t.arg.int({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.role.getRoleById(args.id);
-      return handleGraphQLResultNullable(result);
+      const result = await context.services.role.getRoleById(args.id)
+      return handleGraphQLResultNullable(result)
     },
   }),
 
@@ -96,8 +93,8 @@ builder.queryFields((t) => ({
       game: t.arg.string({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.role.getGameRoles(args.game);
-      return handleGraphQLResult(result);
+      const result = await context.services.role.getGameRoles(args.game)
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -112,11 +109,11 @@ builder.queryFields((t) => ({
       const result = await context.services.role.getRoleStatistics({
         game: args.game ?? undefined,
         limit: args.limit ?? 10,
-      });
-      return handleGraphQLResult(result);
+      })
+      return handleGraphQLResult(result)
     },
   }),
-}));
+}))
 
 // Define input types for mutations
 const RoleCreateInput = builder.inputType("RoleCreateInput", {
@@ -126,14 +123,14 @@ const RoleCreateInput = builder.inputType("RoleCreateInput", {
     name: t.string({ required: true }),
     hidden: t.boolean({ required: false, defaultValue: false }),
   }),
-});
+})
 
 const RoleUpdateInput = builder.inputType("RoleUpdateInput", {
   fields: (t) => ({
     name: t.string({ required: false }),
     hidden: t.boolean({ required: false }),
   }),
-});
+})
 
 // Role mutations
 builder.mutationFields((t) => ({
@@ -149,10 +146,10 @@ builder.mutationFields((t) => ({
         code: args.input.code,
         name: args.input.name,
         hidden: args.input.hidden ? "1" : "0",
-      };
+      }
 
-      const result = await context.services.role.createRole(input);
-      return handleGraphQLResult(result);
+      const result = await context.services.role.createRole(input)
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -169,10 +166,10 @@ builder.mutationFields((t) => ({
         ...(args.input.hidden !== undefined && {
           hidden: { set: args.input.hidden ? "1" : "0" },
         }),
-      };
+      }
 
-      const result = await context.services.role.updateRole(args.id, input);
-      return handleGraphQLResult(result);
+      const result = await context.services.role.updateRole(args.id, input)
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -183,8 +180,8 @@ builder.mutationFields((t) => ({
       id: t.arg.int({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.role.deleteRole(args.id);
-      return handleGraphQLResult(result);
+      const result = await context.services.role.deleteRole(args.id)
+      return handleGraphQLResult(result)
     },
   }),
-}));
+}))

@@ -1,14 +1,8 @@
-import type { PrismaClient, Clan } from "@repo/database/client";
-import type {
-  ClanWithAverageSkill,
-  ClanStatistics,
-} from "../types/database/clan.types";
-import type { Result, AppError } from "../types/common";
-import { success, failure } from "../types";
-import type {
-  CreateClanInput,
-  UpdateClanInput,
-} from "../types/database/clan.types";
+import type { PrismaClient, Clan } from "@repo/database/client"
+import type { ClanWithAverageSkill, ClanStatistics } from "../types/database/clan.types"
+import type { Result, AppError } from "../types/common"
+import { success, failure } from "../types"
+import type { CreateClanInput, UpdateClanInput } from "../types/database/clan.types"
 
 /**
  * Service class for handling clan-related business logic
@@ -20,9 +14,7 @@ export class ClanService {
   /**
    * Get clan statistics - Complex business logic for statistical calculations
    */
-  async getClanStats(
-    clanId: string,
-  ): Promise<Result<ClanStatistics, AppError>> {
+  async getClanStats(clanId: string): Promise<Result<ClanStatistics, AppError>> {
     try {
       const clan = await this.db.clan.findUnique({
         where: { clanId: Number(clanId) },
@@ -31,7 +23,7 @@ export class ClanService {
             orderBy: { skill: "desc" },
           },
         },
-      });
+      })
 
       if (!clan) {
         return failure({
@@ -39,7 +31,7 @@ export class ClanService {
           message: "Clan not found",
           resource: "clan",
           id: clanId,
-        });
+        })
       }
 
       const stats = await this.db.player.aggregate({
@@ -51,19 +43,18 @@ export class ClanService {
         _avg: {
           skill: true,
         },
-      });
+      })
 
       const topPlayer = await this.db.player.findFirst({
         where: { clan: clan.clanId },
         orderBy: {
           skill: "desc",
         },
-      });
+      })
 
-      const totalKills = stats?._sum?.kills || 0;
-      const totalDeaths = stats?._sum?.deaths || 0;
-      const killDeathRatio =
-        totalDeaths > 0 ? totalKills / totalDeaths : totalKills;
+      const totalKills = stats?._sum?.kills || 0
+      const totalDeaths = stats?._sum?.deaths || 0
+      const killDeathRatio = totalDeaths > 0 ? totalKills / totalDeaths : totalKills
 
       const clanStatistics: ClanStatistics = {
         clan: {
@@ -82,26 +73,23 @@ export class ClanService {
         averageSkill: Math.round(stats?._avg?.skill || 1000),
         topPlayer,
         killDeathRatio: Math.round(killDeathRatio * 100) / 100,
-      };
+      }
 
-      return success(clanStatistics);
+      return success(clanStatistics)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to calculate clan statistics",
         operation: "getClanStats",
-      });
+      })
     }
   }
 
   /**
    * Get top clans by average skill - Complex business logic for ranking
    */
-  async getTopClans(
-    gameId: string,
-    limit: number = 10,
-  ): Promise<Result<readonly ClanWithAverageSkill[], AppError>> {
+  async getTopClans(gameId: string, limit: number = 10): Promise<Result<readonly ClanWithAverageSkill[], AppError>> {
     try {
       const clans = await this.db.clan.findMany({
         where: {
@@ -116,16 +104,12 @@ export class ClanService {
             select: { skill: true },
           },
         },
-      });
+      })
 
       // Calculate average skill for each clan - this is business logic
       const clansWithAvgSkill = clans.map((clan): ClanWithAverageSkill => {
-        const totalSkill = clan.players.reduce(
-          (sum, player) => sum + player.skill,
-          0,
-        );
-        const averageSkill =
-          clan.players.length > 0 ? totalSkill / clan.players.length : 1000;
+        const totalSkill = clan.players.reduce((sum, player) => sum + player.skill, 0)
+        const averageSkill = clan.players.length > 0 ? totalSkill / clan.players.length : 1000
 
         return {
           ...clan,
@@ -138,22 +122,20 @@ export class ClanService {
           players: [], // Don't expose all players in listing
           _count: { players: clan.players.length },
           averageSkill: Math.round(averageSkill),
-        };
-      });
+        }
+      })
 
       // Sort by average skill and return top clans - business logic
-      const topClans = clansWithAvgSkill
-        .sort((a, b) => b.averageSkill - a.averageSkill)
-        .slice(0, Math.min(limit, 50)); // Cap at 50 for performance
+      const topClans = clansWithAvgSkill.sort((a, b) => b.averageSkill - a.averageSkill).slice(0, Math.min(limit, 50)) // Cap at 50 for performance
 
-      return success(topClans);
+      return success(topClans)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to fetch top clans",
         operation: "getTopClans",
-      });
+      })
     }
   }
 
@@ -170,33 +152,30 @@ export class ClanService {
           homepage: input.homepage ?? "",
           hidden: 0,
         },
-      });
-      return success(clan);
+      })
+      return success(clan)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       if (error instanceof Error && "code" in error && error.code === "P2002") {
         return failure({
           type: "VALIDATION_ERROR",
           message: `A clan with tag '${input.tag}' for this game already exists.`,
           field: "tag",
           value: input.tag,
-        });
+        })
       }
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to create clan",
         operation: "createClan",
-      });
+      })
     }
   }
 
   /**
    * Update an existing clan
    */
-  async updateClan(
-    id: number,
-    input: UpdateClanInput,
-  ): Promise<Result<Clan, AppError>> {
+  async updateClan(id: number, input: UpdateClanInput): Promise<Result<Clan, AppError>> {
     try {
       const clan = await this.db.clan.update({
         where: { clanId: id },
@@ -206,15 +185,15 @@ export class ClanService {
           ...(input.homepage && { homepage: input.homepage }),
           ...(input.hidden !== undefined && { hidden: input.hidden ? 1 : 0 }),
         },
-      });
-      return success(clan);
+      })
+      return success(clan)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to update clan",
         operation: "updateClan",
-      });
+      })
     }
   }
 }

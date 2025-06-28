@@ -1,6 +1,6 @@
-import { db } from "./index";
-import { logError, logInfo, logStep, logSuccess } from "./seeds/logger";
-import { logDatabaseStats } from "./seeds";
+import { db } from "./index"
+import { logError, logInfo, logStep, logSuccess } from "./seeds/logger"
+import { logDatabaseStats } from "./seeds"
 
 /**
  * Reset development data from the database.
@@ -8,30 +8,28 @@ import { logDatabaseStats } from "./seeds";
  * while preserving the initial seeded data (Games, Countries).
  */
 async function resetDatabase() {
-  logStep("Starting database reset...");
-  logInfo(
-    "This will clear development data while preserving initial seeded data.",
-  );
+  logStep("Starting database reset...")
+  logInfo("This will clear development data while preserving initial seeded data.")
 
   try {
-    const beforeStats = await logDatabaseStats("Current database statistics:");
+    const beforeStats = await logDatabaseStats("Current database statistics:")
 
     // Check only resettable stats (ignore first 2: Games, Countries)
     if (beforeStats.slice(2).every((count: number) => count === 0)) {
-      logSuccess("Database is already clean - no development data to reset.");
-      return;
+      logSuccess("Database is already clean - no development data to reset.")
+      return
     }
 
-    const startTime = Date.now();
+    const startTime = Date.now()
 
-    logStep("Step 1: Clearing player-related data...");
-    await db.playerUniqueId.deleteMany();
-    await db.player.deleteMany();
+    logStep("Step 1: Clearing player-related data...")
+    await db.playerUniqueId.deleteMany()
+    await db.player.deleteMany()
 
-    logStep("Step 2: Clearing community and server data...");
-    await db.clan.deleteMany();
-    await db.serverConfig.deleteMany();
-    await db.server.deleteMany();
+    logStep("Step 2: Clearing community and server data...")
+    await db.clan.deleteMany()
+    await db.serverConfig.deleteMany()
+    await db.server.deleteMany()
 
     // logStep("Step 3: Clearing game-specific definitions...");
     // await db.team.deleteMany();
@@ -40,27 +38,27 @@ async function resetDatabase() {
     // await db.rank.deleteMany();
     // await db.award.deleteMany();
 
-    const duration = Math.round((Date.now() - startTime) / 1000);
-    logSuccess(`Database reset completed successfully in ${duration}s!`);
+    const duration = Math.round((Date.now() - startTime) / 1000)
+    logSuccess(`Database reset completed successfully in ${duration}s!`)
 
-    await logDatabaseStats("Final database statistics:");
+    await logDatabaseStats("Final database statistics:")
   } catch (error) {
-    logError("Database reset failed:");
-    console.error(error);
-    throw error;
+    logError("Database reset failed:")
+    console.error(error)
+    throw error
   }
 }
 
 async function main() {
   try {
-    await resetDatabase();
+    await resetDatabase()
   } catch (error) {
-    logError("Reset failed with unhandled error:");
-    console.error(error);
-    process.exit(1);
+    logError("Reset failed with unhandled error:")
+    console.error(error)
+    process.exit(1)
   } finally {
-    await db.$disconnect();
+    await db.$disconnect()
   }
 }
 
-main();
+main()

@@ -1,11 +1,11 @@
 export interface WeaponAttributes {
   /** Base body-shot damage for the weapon */
-  baseDamage: number;
+  baseDamage: number
   /** Skill multiplier used for ranking calculations */
-  skillMultiplier: number;
+  skillMultiplier: number
 }
 
-export type WeaponConfig = Record<string, WeaponAttributes>;
+export type WeaponConfig = Record<string, WeaponAttributes>
 
 /**
  * Counter-Strike-style default weapon configuration.
@@ -24,27 +24,22 @@ export const CSGO_WEAPONS: WeaponConfig = {
   p90: { baseDamage: 26, skillMultiplier: 0.8 },
   mp5: { baseDamage: 26, skillMultiplier: 0.8 },
   grenade: { baseDamage: 140, skillMultiplier: 1.3 },
-};
+}
 
 /** Generic fallback configuration */
 export const DEFAULT_WEAPONS: WeaponConfig = {
   unknown: { baseDamage: 30, skillMultiplier: 1.0 },
-};
+}
 
 /**
  * Retrieve weapon attributes for a given weapon and game.
  * If the weapon or game is unknown we fall back to sensible defaults so that
  * the processing pipeline never crashes on missing data.
  */
-export function getWeaponAttributes(
-  weapon: string,
-  game: string = "csgo",
-): WeaponAttributes {
-  const config = game.toLowerCase().includes("cs")
-    ? CSGO_WEAPONS
-    : DEFAULT_WEAPONS;
+export function getWeaponAttributes(weapon: string, game: string = "csgo"): WeaponAttributes {
+  const config = game.toLowerCase().includes("cs") ? CSGO_WEAPONS : DEFAULT_WEAPONS
 
-  const attr = config[weapon.toLowerCase()];
-  if (attr) return attr;
-  return DEFAULT_WEAPONS.unknown as WeaponAttributes;
+  const attr = config[weapon.toLowerCase()]
+  if (attr) return attr
+  return DEFAULT_WEAPONS.unknown as WeaponAttributes
 }

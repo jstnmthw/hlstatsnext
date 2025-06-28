@@ -1,9 +1,6 @@
-import { builder } from "../builder";
-import {
-  handleGraphQLResult,
-  handleGraphQLResultNullable,
-} from "../utils/graphql-result-handler";
-import type { Prisma } from "@repo/database/client";
+import { builder } from "../builder"
+import { handleGraphQLResult, handleGraphQLResultNullable } from "../utils/graphql-result-handler"
+import type { Prisma } from "@repo/database/client"
 
 // Define PlayerAward type first since Award references it
 const PlayerAward = builder.prismaObject("PlayerAward", {
@@ -19,7 +16,7 @@ const PlayerAward = builder.prismaObject("PlayerAward", {
     award: t.relation("award"),
     player: t.relation("player"),
   }),
-});
+})
 
 // Define Award type using Prisma object
 const Award = builder.prismaObject("Award", {
@@ -46,32 +43,32 @@ const Award = builder.prismaObject("Award", {
           include: { player: true },
           orderBy: { count: "desc" },
           take: 10,
-        });
+        })
       },
     }),
   }),
-});
+})
 
 // Define PaginatedAwards type
 const PaginatedAwards = builder.objectRef<{
   items: {
-    awardId: number;
-    awardType: string;
-    game: string;
-    code: string;
-    name: string;
-    verb: string;
-    d_winner_id: number | null;
-    d_winner_count: number | null;
-    g_winner_id: number | null;
-    g_winner_count: number | null;
-  }[];
-  total: number;
-  page: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}>("PaginatedAwards");
+    awardId: number
+    awardType: string
+    game: string
+    code: string
+    name: string
+    verb: string
+    d_winner_id: number | null
+    d_winner_count: number | null
+    g_winner_id: number | null
+    g_winner_count: number | null
+  }[]
+  total: number
+  page: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+}>("PaginatedAwards")
 
 PaginatedAwards.implement({
   fields: (t) => ({
@@ -85,7 +82,7 @@ PaginatedAwards.implement({
     hasNextPage: t.exposeBoolean("hasNextPage"),
     hasPreviousPage: t.exposeBoolean("hasPreviousPage"),
   }),
-});
+})
 
 // Award queries
 builder.queryFields((t) => ({
@@ -104,8 +101,8 @@ builder.queryFields((t) => ({
         awardType: args.awardType ?? undefined,
         page: args.page ?? 1,
         limit: Math.min(args.limit ?? 20, 100), // Cap at 100
-      });
-      return handleGraphQLResult(result);
+      })
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -117,8 +114,8 @@ builder.queryFields((t) => ({
       id: t.arg.int({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.award.getAwardById(args.id);
-      return handleGraphQLResultNullable(result);
+      const result = await context.services.award.getAwardById(args.id)
+      return handleGraphQLResultNullable(result)
     },
   }),
 
@@ -129,11 +126,11 @@ builder.queryFields((t) => ({
       game: t.arg.string({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.award.getGameAwards(args.game);
-      return handleGraphQLResult(result);
+      const result = await context.services.award.getGameAwards(args.game)
+      return handleGraphQLResult(result)
     },
   }),
-}));
+}))
 
 // Define input types for mutations
 const AwardCreateInput = builder.inputType("AwardCreateInput", {
@@ -144,7 +141,7 @@ const AwardCreateInput = builder.inputType("AwardCreateInput", {
     name: t.string({ required: true }),
     verb: t.string({ required: true }),
   }),
-});
+})
 
 const AwardUpdateInput = builder.inputType("AwardUpdateInput", {
   fields: (t) => ({
@@ -152,7 +149,7 @@ const AwardUpdateInput = builder.inputType("AwardUpdateInput", {
     name: t.string({ required: false }),
     verb: t.string({ required: false }),
   }),
-});
+})
 
 // Award mutations
 builder.mutationFields((t) => ({
@@ -169,10 +166,10 @@ builder.mutationFields((t) => ({
         code: args.input.code,
         name: args.input.name,
         verb: args.input.verb,
-      };
+      }
 
-      const result = await context.services.award.createAward(input);
-      return handleGraphQLResult(result);
+      const result = await context.services.award.createAward(input)
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -188,10 +185,10 @@ builder.mutationFields((t) => ({
         ...(args.input.awardType && { awardType: args.input.awardType }),
         ...(args.input.name && { name: args.input.name }),
         ...(args.input.verb && { verb: args.input.verb }),
-      };
+      }
 
-      const result = await context.services.award.updateAward(args.id, input);
-      return handleGraphQLResult(result);
+      const result = await context.services.award.updateAward(args.id, input)
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -202,8 +199,8 @@ builder.mutationFields((t) => ({
       id: t.arg.int({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.award.deleteAward(args.id);
-      return handleGraphQLResult(result);
+      const result = await context.services.award.deleteAward(args.id)
+      return handleGraphQLResult(result)
     },
   }),
-}));
+}))

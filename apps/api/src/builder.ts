@@ -1,14 +1,14 @@
-import SchemaBuilder from "@pothos/core";
-import PrismaPlugin from "@pothos/plugin-prisma";
-import RelayPlugin from "@pothos/plugin-relay";
-import WithInputPlugin from "@pothos/plugin-with-input";
-import { db } from "@repo/database/client";
-import type PrismaTypes from "@repo/database/graphql/types";
-import type { Context } from "./context";
+import SchemaBuilder from "@pothos/core"
+import PrismaPlugin from "@pothos/plugin-prisma"
+import RelayPlugin from "@pothos/plugin-relay"
+import WithInputPlugin from "@pothos/plugin-with-input"
+import { db } from "@repo/database/client"
+import type PrismaTypes from "@repo/database/graphql/types"
+import type { Context } from "./context"
 
 export const builder = new SchemaBuilder<{
-  Context: Context;
-  PrismaTypes: PrismaTypes;
+  Context: Context
+  PrismaTypes: PrismaTypes
 }>({
   plugins: [PrismaPlugin, RelayPlugin, WithInputPlugin],
   prisma: {
@@ -22,10 +22,10 @@ export const builder = new SchemaBuilder<{
     // warn when not using a query parameter correctly
     onUnusedQuery: process.env.NODE_ENV === "production" ? null : "warn",
   },
-});
+})
 
 // Add base types
-builder.queryType({});
+builder.queryType({})
 
 // Add mutation type with a placeholder field
 builder.mutationType({
@@ -35,7 +35,7 @@ builder.mutationType({
       resolve: () => "Mutations will be implemented in future phases",
     }),
   }),
-});
+})
 
 // Add subscription type with a placeholder field
 builder.subscriptionType({
@@ -45,10 +45,10 @@ builder.subscriptionType({
       subscribe: () => {
         // Simple async generator that yields once
         return (async function* () {
-          yield "Subscriptions will be implemented in future phases";
-        })();
+          yield "Subscriptions will be implemented in future phases"
+        })()
       },
       resolve: (value) => value,
     }),
   }),
-});
+})

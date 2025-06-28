@@ -1,11 +1,7 @@
-import { describe, it, expect, vi } from "vitest";
-import { WeaponHandler } from "../../src/services/processor/handlers/weapon.handler";
-import {
-  EventType,
-  PlayerConnectEvent,
-  PlayerKillEvent,
-} from "../../src/types/common/events";
-import type { DatabaseClient } from "../../src/database/client";
+import { describe, it, expect, vi } from "vitest"
+import { WeaponHandler } from "../../src/services/processor/handlers/weapon.handler"
+import { EventType, PlayerConnectEvent, PlayerKillEvent } from "../../src/types/common/events"
+import type { DatabaseClient } from "../../src/database/client"
 
 // Mock the weapon config
 vi.mock("../../src/config/weapon-config", () => ({
@@ -16,20 +12,20 @@ vi.mock("../../src/config/weapon-config", () => ({
         headshotMultiplier: 4,
         shotsFired: 100,
         shotsHit: 50,
-      };
+      }
     }
     return {
       baseDamage: 20,
       headshotMultiplier: 3,
       shotsFired: 0,
       shotsHit: 0,
-    };
+    }
   }),
-}));
+}))
 
 describe("WeaponHandler", () => {
-  const mockDb = {} as DatabaseClient;
-  const handler = new WeaponHandler(mockDb);
+  const mockDb = {} as DatabaseClient
+  const handler = new WeaponHandler(mockDb)
 
   describe("handleEvent", () => {
     it("should call handleWeaponKill for PLAYER_KILL events", async () => {
@@ -45,12 +41,12 @@ describe("WeaponHandler", () => {
           killerTeam: "TERRORIST",
           victimTeam: "CT",
         },
-      };
+      }
 
-      const result = await handler.handleEvent(killEvent);
-      expect(result.success).toBe(true);
-      expect(result.weaponsAffected).toEqual(["ak47"]);
-    });
+      const result = await handler.handleEvent(killEvent)
+      expect(result.success).toBe(true)
+      expect(result.weaponsAffected).toEqual(["ak47"])
+    })
 
     it("should ignore events other than PLAYER_KILL", async () => {
       const otherEvent = {
@@ -58,12 +54,12 @@ describe("WeaponHandler", () => {
         serverId: 1,
         timestamp: new Date(),
         data: {},
-      } as PlayerConnectEvent;
+      } as PlayerConnectEvent
 
-      const result = await handler.handleEvent(otherEvent);
-      expect(result.success).toBe(true);
-      expect(result.error).toBeUndefined();
-      expect(result.weaponsAffected).toBeUndefined();
-    });
-  });
-});
+      const result = await handler.handleEvent(otherEvent)
+      expect(result.success).toBe(true)
+      expect(result.error).toBeUndefined()
+      expect(result.weaponsAffected).toBeUndefined()
+    })
+  })
+})

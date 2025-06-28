@@ -220,8 +220,8 @@ Add new components to the main export file:
 
 ```typescript
 // src/components/index.ts
-export { Button } from "./button";
-export { Breadcrumb, BreadcrumbList, BreadcrumbItem } from "./breadcrumb";
+export { Button } from "./button"
+export { Breadcrumb, BreadcrumbList, BreadcrumbItem } from "./breadcrumb"
 // ... other exports
 ```
 
@@ -283,14 +283,14 @@ Your apps should extend the shared Tailwind config:
 
 ```javascript
 // tailwind.config.js
-import { createConfig } from "@repo/tailwind-config";
+import { createConfig } from "@repo/tailwind-config"
 
 export default createConfig({
   content: [
     "./src/**/*.{js,ts,jsx,tsx}",
     "../../packages/ui/src/**/*.{js,ts,jsx,tsx}", // Include UI package
   ],
-});
+})
 ```
 
 ## Styling & Theming
@@ -322,11 +322,11 @@ The package uses CSS variables for theming, defined in `globals.css`:
 Utility functions in `lib/utils.ts`:
 
 ```typescript
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 ```
 

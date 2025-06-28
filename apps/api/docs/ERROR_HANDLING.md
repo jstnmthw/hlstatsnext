@@ -17,16 +17,16 @@ This document outlines the comprehensive error handling strategy implemented in 
 All service methods return a `Result<T, E>` type that represents either success or failure:
 
 ```typescript
-type Result<T, E> = Success<T> | Failure<E>;
+type Result<T, E> = Success<T> | Failure<E>
 
 interface Success<T> {
-  readonly success: true;
-  readonly data: T;
+  readonly success: true
+  readonly data: T
 }
 
 interface Failure<E> {
-  readonly success: false;
-  readonly error: E;
+  readonly success: false
+  readonly error: E
 }
 ```
 
@@ -66,35 +66,31 @@ async getGameStats(gameId: string): Promise<Result<GameStatistics, AppError>> {
 All application errors implement the `AppError` type with specific error types:
 
 ```typescript
-type AppError =
-  | NotFoundError
-  | ValidationError
-  | DatabaseError
-  | UnauthorizedError;
+type AppError = NotFoundError | ValidationError | DatabaseError | UnauthorizedError
 
 interface NotFoundError {
-  readonly type: "NOT_FOUND";
-  readonly message: string;
-  readonly resource: string;
-  readonly id: string;
+  readonly type: "NOT_FOUND"
+  readonly message: string
+  readonly resource: string
+  readonly id: string
 }
 
 interface ValidationError {
-  readonly type: "VALIDATION_ERROR";
-  readonly message: string;
-  readonly field: string;
-  readonly value: unknown;
+  readonly type: "VALIDATION_ERROR"
+  readonly message: string
+  readonly field: string
+  readonly value: unknown
 }
 
 interface DatabaseError {
-  readonly type: "DATABASE_ERROR";
-  readonly message: string;
-  readonly operation: string;
+  readonly type: "DATABASE_ERROR"
+  readonly message: string
+  readonly operation: string
 }
 
 interface UnauthorizedError {
-  readonly type: "UNAUTHORIZED";
-  readonly message: string;
+  readonly type: "UNAUTHORIZED"
+  readonly message: string
 }
 ```
 
@@ -103,24 +99,21 @@ interface UnauthorizedError {
 Application errors are transformed into standard GraphQL errors following GraphQL Yoga patterns:
 
 ```typescript
-import { GraphQLError } from "graphql";
+import { GraphQLError } from "graphql"
 
 // Simple function that maps service errors to GraphQL errors
 export function mapAppErrorToGraphQLError(error: AppError): GraphQLError {
   switch (error.type) {
     case "NOT_FOUND":
-      return new GraphQLError(
-        `The requested ${error.resource} was not found.`,
-        {
-          extensions: {
-            code: "NOT_FOUND",
-            details: {
-              resource: error.resource,
-              id: error.id,
-            },
+      return new GraphQLError(`The requested ${error.resource} was not found.`, {
+        extensions: {
+          code: "NOT_FOUND",
+          details: {
+            resource: error.resource,
+            id: error.id,
           },
         },
-      );
+      })
     // ... other error types
   }
 }
@@ -141,10 +134,7 @@ GraphQL Yoga automatically handles error security:
 Use the provided utility functions to handle Result types in resolvers:
 
 ```typescript
-import {
-  handleGraphQLResult,
-  handleGraphQLResultNullable,
-} from "../utils/graphql-result-handler";
+import { handleGraphQLResult, handleGraphQLResultNullable } from "../utils/graphql-result-handler"
 
 // For non-nullable fields (will throw GraphQLError on failure)
 builder.queryField("gameStats", (t) =>
@@ -154,11 +144,11 @@ builder.queryField("gameStats", (t) =>
       gameId: t.arg.string({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.game.getGameStats(args.gameId);
-      return handleGraphQLResult(result); // Throws GraphQLError if failed
+      const result = await context.services.game.getGameStats(args.gameId)
+      return handleGraphQLResult(result) // Throws GraphQLError if failed
     },
   }),
-);
+)
 
 // For nullable fields (will return null on error)
 builder.queryField("playerStats", (t) =>
@@ -169,11 +159,11 @@ builder.queryField("playerStats", (t) =>
       id: t.arg.string({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.player.getPlayerStats(args.id);
-      return handleGraphQLResultNullable(result); // Returns null if failed
+      const result = await context.services.player.getPlayerStats(args.id)
+      return handleGraphQLResultNullable(result) // Returns null if failed
     },
   }),
-);
+)
 ```
 
 ### 2. **Error Response Format**
@@ -261,18 +251,14 @@ Clients receive structured error responses automatically formatted by GraphQL Yo
 
 ```typescript
 // Throws GraphQLError on failure, returns data on success
-function handleGraphQLResult<T>(result: Result<T, AppError>): T;
+function handleGraphQLResult<T>(result: Result<T, AppError>): T
 
 // Returns null on failure (with warning log), returns data on success
-function handleGraphQLResultNullable<T>(result: Result<T, AppError>): T | null;
+function handleGraphQLResultNullable<T>(result: Result<T, AppError>): T | null
 
 // Async versions
-async function handleGraphQLResultAsync<T>(
-  resultPromise: Promise<Result<T, AppError>>,
-): Promise<T>;
-async function handleGraphQLResultNullableAsync<T>(
-  resultPromise: Promise<Result<T, AppError>>,
-): Promise<T | null>;
+async function handleGraphQLResultAsync<T>(resultPromise: Promise<Result<T, AppError>>): Promise<T>
+async function handleGraphQLResultNullableAsync<T>(resultPromise: Promise<Result<T, AppError>>): Promise<T | null>
 ```
 
 ### 2. **Direct GraphQLError Creation**
@@ -280,7 +266,7 @@ async function handleGraphQLResultNullableAsync<T>(
 For cases where you need to create errors directly in resolvers:
 
 ```typescript
-import { GraphQLError } from "graphql";
+import { GraphQLError } from "graphql"
 
 // Create a GraphQL error with proper extensions
 throw new GraphQLError("User not found", {
@@ -290,7 +276,7 @@ throw new GraphQLError("User not found", {
       userId: "123",
     },
   },
-});
+})
 ```
 
 ## Server Configuration
@@ -303,7 +289,7 @@ const yoga = createYoga({
   context: createContext,
   // GraphQL Yoga automatically masks unexpected errors
   // GraphQLError instances pass through unchanged
-});
+})
 ```
 
 ## Logging Strategy
@@ -327,7 +313,7 @@ const yoga = createYoga({
 console.warn(`GraphQL nullable result failed:`, {
   error: result.error,
   timestamp: new Date().toISOString(),
-});
+})
 ```
 
 ## Security Considerations
@@ -379,15 +365,15 @@ if (!resource) {
     message: `${resourceType} not found`,
     resource: resourceType,
     id: resourceId,
-  });
+  })
 }
 
 // Resolver (nullable field - returns null gracefully)
-const data = handleGraphQLResultNullable(result);
-if (!data) return null;
+const data = handleGraphQLResultNullable(result)
+if (!data) return null
 
 // Resolver (non-nullable field - throws GraphQLError)
-return handleGraphQLResult(result);
+return handleGraphQLResult(result)
 ```
 
 ### 2. **Validation Errors**
@@ -400,11 +386,11 @@ if (!isValidEmail(email)) {
     message: "Invalid email format",
     field: "email",
     value: email,
-  });
+  })
 }
 
 // Resolver (will throw GraphQLError with BAD_USER_INPUT code)
-return handleGraphQLResult(result);
+return handleGraphQLResult(result)
 ```
 
 ### 3. **Database Errors**
@@ -412,14 +398,14 @@ return handleGraphQLResult(result);
 ```typescript
 // Service
 try {
-  const result = await this.db.operation();
-  return success(result);
+  const result = await this.db.operation()
+  return success(result)
 } catch (error) {
   return failure({
     type: "DATABASE_ERROR",
     message: "Operation failed",
     operation: "operationName",
-  });
+  })
 }
 
 // Result becomes GraphQLError with INTERNAL_SERVER_ERROR code

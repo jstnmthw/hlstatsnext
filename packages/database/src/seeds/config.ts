@@ -1,39 +1,39 @@
-import { merge } from "ts-deepmerge";
+import { merge } from "ts-deepmerge"
 
 export interface SeedConfig {
   clans: {
-    count: number;
-    maxMembers: number;
-  };
+    count: number
+    maxMembers: number
+  }
   players: {
-    count: number;
+    count: number
     clanDistribution?: {
-      withClan: number; // percentage (0-1) of players that should have a clan
-      withoutClan: number; // percentage (0-1) of players without clan
-    };
-  };
+      withClan: number // percentage (0-1) of players that should have a clan
+      withoutClan: number // percentage (0-1) of players without clan
+    }
+  }
   playerUniqueIds: {
-    additionalIdsPerPlayer?: number; // how many additional Steam IDs per player (for cross-game play)
-    multiGamePlayersPercentage: number; // percentage (0-1) of players that play multiple games
-  };
+    additionalIdsPerPlayer?: number // how many additional Steam IDs per player (for cross-game play)
+    multiGamePlayersPercentage: number // percentage (0-1) of players that play multiple games
+  }
   servers: {
-    count: number;
-  };
+    count: number
+  }
   teams: {
-    count: number;
-  };
+    count: number
+  }
   weapons: {
-    count: number;
-  };
+    count: number
+  }
   actions: {
-    count: number;
-  };
+    count: number
+  }
   ranks: {
-    count: number;
-  };
+    count: number
+  }
   awards: {
-    count: number;
-  };
+    count: number
+  }
 }
 
 const baseConfig: SeedConfig = {
@@ -70,7 +70,7 @@ const baseConfig: SeedConfig = {
   awards: {
     count: 50,
   },
-};
+}
 
 const productionConfig: Partial<SeedConfig> = {
   clans: {
@@ -83,7 +83,7 @@ const productionConfig: Partial<SeedConfig> = {
   servers: {
     count: 5,
   },
-};
+}
 
 // Environment-specific configs
 export const CONFIGS = {
@@ -98,12 +98,12 @@ export const CONFIGS = {
     clans: { ...baseConfig.clans, count: 50 },
     players: { ...baseConfig.players, count: 2000 },
   },
-} as const;
+} as const
 
 export function getSeedConfig(): SeedConfig {
-  const env = process.env.NODE_ENV || "development";
+  const env = process.env.NODE_ENV || "development"
   if (env === "production") {
-    return merge(baseConfig, productionConfig) as SeedConfig;
+    return merge(baseConfig, productionConfig) as SeedConfig
   }
-  return CONFIGS[env as keyof typeof CONFIGS] || baseConfig;
+  return CONFIGS[env as keyof typeof CONFIGS] || baseConfig
 }

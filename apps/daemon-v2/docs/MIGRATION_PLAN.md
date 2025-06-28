@@ -304,43 +304,43 @@ enum EventType {
 // packages/database/src/types/events.ts
 
 export interface BaseEvent {
-  eventType: EventType;
-  timestamp: Date;
-  serverId: number;
-  raw?: string; // Original log line for debugging
+  eventType: EventType
+  timestamp: Date
+  serverId: number
+  raw?: string // Original log line for debugging
 }
 
 export interface PlayerKillEvent extends BaseEvent {
-  eventType: EventType.PLAYER_KILL;
+  eventType: EventType.PLAYER_KILL
   data: {
-    killerId: number;
-    victimId: number;
-    weapon: string;
-    headshot: boolean;
-    distance?: number;
-    killerPosition?: Position3D;
-    victimPosition?: Position3D;
-    killerTeam: string;
-    victimTeam: string;
-  };
+    killerId: number
+    victimId: number
+    weapon: string
+    headshot: boolean
+    distance?: number
+    killerPosition?: Position3D
+    victimPosition?: Position3D
+    killerTeam: string
+    victimTeam: string
+  }
 }
 
 export interface PlayerConnectEvent extends BaseEvent {
-  eventType: EventType.PLAYER_CONNECT;
+  eventType: EventType.PLAYER_CONNECT
   data: {
-    playerId: number;
-    steamId: string;
-    playerName: string;
-    ipAddress: string;
-    country?: string;
-    userAgent?: string;
-  };
+    playerId: number
+    steamId: string
+    playerName: string
+    ipAddress: string
+    country?: string
+    userAgent?: string
+  }
 }
 
 export interface Position3D {
-  x: number;
-  y: number;
-  z: number;
+  x: number
+  y: number
+  z: number
 }
 ```
 
@@ -353,14 +353,14 @@ export interface Position3D {
 ```typescript
 // packages/daemon-v2/src/security/validators.ts
 
-import { z } from "zod";
+import { z } from "zod"
 
 export const LogLineSchema = z.object({
   timestamp: z.string().regex(/^\d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}/),
   content: z.string().max(2048), // Prevent buffer overflow
   serverAddress: z.string().ip(),
   serverPort: z.number().int().min(1).max(65535),
-});
+})
 
 export const RconCommandSchema = z.object({
   command: z
@@ -370,17 +370,9 @@ export const RconCommandSchema = z.object({
     .refine((cmd) => !DANGEROUS_COMMANDS.includes(cmd.split(" ")[0])),
   serverId: z.number().int().positive(),
   adminId: z.number().int().positive(),
-});
+})
 
-const DANGEROUS_COMMANDS = [
-  "exec",
-  "alias",
-  "bind",
-  "unbind",
-  "quit",
-  "exit",
-  "restart",
-];
+const DANGEROUS_COMMANDS = ["exec", "alias", "bind", "unbind", "quit", "exit", "restart"]
 ```
 
 ### **5.2 Authentication & Authorization**
@@ -389,25 +381,16 @@ const DANGEROUS_COMMANDS = [
 // packages/daemon-v2/src/security/auth.service.ts
 
 export class AuthService {
-  async validateServerToken(
-    token: string,
-    serverAddress: string,
-  ): Promise<boolean> {
-    const hashedToken = await bcrypt.hash(
-      token + serverAddress + this.secret,
-      10,
-    );
-    return await this.cache.validateToken(hashedToken);
+  async validateServerToken(token: string, serverAddress: string): Promise<boolean> {
+    const hashedToken = await bcrypt.hash(token + serverAddress + this.secret, 10)
+    return await this.cache.validateToken(hashedToken)
   }
 
-  async validateAdminAccess(
-    adminId: number,
-    serverId: number,
-  ): Promise<boolean> {
+  async validateAdminAccess(adminId: number, serverId: number): Promise<boolean> {
     const permissions = await this.db.adminPermission.findMany({
       where: { adminId, serverId, isActive: true },
-    });
-    return permissions.length > 0;
+    })
+    return permissions.length > 0
   }
 
   generateJWT(payload: JWTPayload): string {
@@ -415,7 +398,7 @@ export class AuthService {
       expiresIn: "24h",
       issuer: "hlstats-daemon",
       audience: "hlstats-api",
-    });
+    })
   }
 }
 ```
@@ -426,28 +409,28 @@ export class AuthService {
 // packages/daemon-v2/src/security/rate-limiter.ts
 
 export class RateLimiter {
-  private redis: Redis;
+  private redis: Redis
 
   async checkUdpRateLimit(serverAddress: string): Promise<boolean> {
-    const key = `udp_rate:${serverAddress}`;
-    const current = await this.redis.incr(key);
+    const key = `udp_rate:${serverAddress}`
+    const current = await this.redis.incr(key)
 
     if (current === 1) {
-      await this.redis.expire(key, 60); // 1 minute window
+      await this.redis.expire(key, 60) // 1 minute window
     }
 
-    return current <= MAX_UDP_PACKETS_PER_MINUTE;
+    return current <= MAX_UDP_PACKETS_PER_MINUTE
   }
 
   async checkRconRateLimit(adminId: number): Promise<boolean> {
-    const key = `rcon_rate:${adminId}`;
-    const current = await this.redis.incr(key);
+    const key = `rcon_rate:${adminId}`
+    const current = await this.redis.incr(key)
 
     if (current === 1) {
-      await this.redis.expire(key, 60);
+      await this.redis.expire(key, 60)
     }
 
-    return current <= MAX_RCON_COMMANDS_PER_MINUTE;
+    return current <= MAX_RCON_COMMANDS_PER_MINUTE
   }
 }
 ```
@@ -464,9 +447,9 @@ export class RateLimiter {
 export class EventProcessingPipeline {
   constructor(
     private queues: {
-      highPriority: Queue<HighPriorityEvent>;
-      normal: Queue<GameEvent>;
-      lowPriority: Queue<StatisticsEvent>;
+      highPriority: Queue<HighPriorityEvent>
+      normal: Queue<GameEvent>
+      lowPriority: Queue<StatisticsEvent>
     },
     private processors: EventProcessor[],
   ) {}
@@ -477,17 +460,14 @@ export class EventProcessingPipeline {
       this.processQueue(this.queues.highPriority, { concurrency: 50 }),
       this.processQueue(this.queues.normal, { concurrency: 20 }),
       this.processQueue(this.queues.lowPriority, { concurrency: 5 }),
-    ]);
+    ])
   }
 
-  private async processQueue<T>(
-    queue: Queue<T>,
-    options: { concurrency: number },
-  ): Promise<void> {
+  private async processQueue<T>(queue: Queue<T>, options: { concurrency: number }): Promise<void> {
     queue.process(options.concurrency, async (job) => {
-      const processor = this.getProcessor(job.data);
-      await processor.process(job.data);
-    });
+      const processor = this.getProcessor(job.data)
+      await processor.process(job.data)
+    })
   }
 }
 ```
@@ -500,7 +480,7 @@ export class EventProcessingPipeline {
 export class OptimizedQueries {
   // Batch insert for high-volume events
   async batchInsertEvents(events: GameEvent[]): Promise<void> {
-    const batches = chunk(events, 1000);
+    const batches = chunk(events, 1000)
 
     await Promise.all(
       batches.map((batch) =>
@@ -509,14 +489,11 @@ export class OptimizedQueries {
           skipDuplicates: true,
         }),
       ),
-    );
+    )
   }
 
   // Optimized player statistics calculation
-  async calculatePlayerStats(
-    playerId: number,
-    timeframe: string,
-  ): Promise<PlayerStats> {
+  async calculatePlayerStats(playerId: number, timeframe: string): Promise<PlayerStats> {
     return this.db.$queryRaw`
       SELECT 
         SUM(CASE WHEN event_type = 'PLAYER_KILL' THEN 1 ELSE 0 END) as kills,
@@ -525,18 +502,16 @@ export class OptimizedQueries {
       FROM game_events 
       WHERE player_id = ${playerId} 
         AND timestamp >= ${getTimeframeStart(timeframe)}
-    `;
+    `
   }
 
   // Connection pooling
-  async withTransaction<T>(
-    callback: (tx: PrismaTransaction) => Promise<T>,
-  ): Promise<T> {
+  async withTransaction<T>(callback: (tx: PrismaTransaction) => Promise<T>): Promise<T> {
     return this.db.$transaction(callback, {
       maxWait: 5000,
       timeout: 30000,
       isolationLevel: "ReadCommitted",
-    });
+    })
   }
 }
 ```
@@ -555,31 +530,31 @@ export class CacheService {
   // Multi-tier caching
   async get<T>(key: string): Promise<T | null> {
     // L1: Memory cache (fastest)
-    let value = this.memoryCache.get<T>(key);
-    if (value) return value;
+    let value = this.memoryCache.get<T>(key)
+    if (value) return value
 
     // L2: Redis cache
-    const redisValue = await this.redis.get(key);
+    const redisValue = await this.redis.get(key)
     if (redisValue) {
-      value = JSON.parse(redisValue);
-      this.memoryCache.set(key, value, 300); // 5 min TTL
-      return value;
+      value = JSON.parse(redisValue)
+      this.memoryCache.set(key, value, 300) // 5 min TTL
+      return value
     }
 
-    return null;
+    return null
   }
 
   async set<T>(key: string, value: T, ttl: number = 3600): Promise<void> {
     // Set in both caches
-    this.memoryCache.set(key, value, ttl);
-    await this.redis.setex(key, ttl, JSON.stringify(value));
+    this.memoryCache.set(key, value, ttl)
+    await this.redis.setex(key, ttl, JSON.stringify(value))
   }
 
   // Cache invalidation patterns
   async invalidatePlayerStats(playerId: number): Promise<void> {
-    const patterns = [`player:${playerId}:*`, `leaderboard:*`, `ranking:*`];
+    const patterns = [`player:${playerId}:*`, `leaderboard:*`, `ranking:*`]
 
-    await Promise.all(patterns.map((pattern) => this.redis.del(pattern)));
+    await Promise.all(patterns.map((pattern) => this.redis.del(pattern)))
   }
 }
 ```
@@ -594,7 +569,7 @@ export class CacheService {
 // packages/daemon-v2/src/monitoring/logger.ts
 
 export class Logger {
-  private winston: Winston.Logger;
+  private winston: Winston.Logger
 
   constructor() {
     this.winston = winston.createLogger({
@@ -616,7 +591,7 @@ export class Logger {
           maxFiles: 10,
         }),
       ],
-    });
+    })
   }
 
   logEvent(event: GameEvent, metadata?: Record<string, any>): void {
@@ -626,7 +601,7 @@ export class Logger {
       playerId: event.playerId,
       timestamp: event.timestamp,
       ...metadata,
-    });
+    })
   }
 
   logError(error: Error, context: Record<string, any>): void {
@@ -634,7 +609,7 @@ export class Logger {
       error: error.message,
       stack: error.stack,
       ...context,
-    });
+    })
   }
 }
 ```
@@ -645,7 +620,7 @@ export class Logger {
 // packages/daemon-v2/src/monitoring/metrics.ts
 
 export class MetricsCollector {
-  private prometheus = require("prom-client");
+  private prometheus = require("prom-client")
 
   private metrics = {
     eventsProcessed: new this.prometheus.Counter({
@@ -670,17 +645,17 @@ export class MetricsCollector {
       help: "Current queue size",
       labelNames: ["queue_type"],
     }),
-  };
+  }
 
   recordEventProcessed(eventType: string, serverId: number): void {
     this.metrics.eventsProcessed.inc({
       event_type: eventType,
       server_id: serverId,
-    });
+    })
   }
 
   recordProcessingTime(duration: number): void {
-    this.metrics.processingLatency.observe(duration);
+    this.metrics.processingLatency.observe(duration)
   }
 }
 ```
@@ -704,12 +679,10 @@ export class HealthService {
       this.checkQueues(),
       this.checkMemoryUsage(),
       this.checkEventProcessingRate(),
-    ]);
+    ])
 
     return {
-      status: checks.every((c) => c.status === "fulfilled")
-        ? "healthy"
-        : "unhealthy",
+      status: checks.every((c) => c.status === "fulfilled") ? "healthy" : "unhealthy",
       timestamp: new Date(),
       checks: {
         database: this.getCheckResult(checks[0]),
@@ -718,15 +691,15 @@ export class HealthService {
         memory: this.getCheckResult(checks[3]),
         processing: this.getCheckResult(checks[4]),
       },
-    };
+    }
   }
 
   private async checkDatabase(): Promise<boolean> {
     try {
-      await this.db.$queryRaw`SELECT 1`;
-      return true;
+      await this.db.$queryRaw`SELECT 1`
+      return true
     } catch {
-      return false;
+      return false
     }
   }
 }
@@ -824,7 +797,7 @@ export const productionConfig = {
     enableTracing: true,
     logLevel: "info",
   },
-};
+}
 ```
 
 ---
@@ -842,23 +815,23 @@ export class MigrationManager {
     await this.deployNewDaemon({
       mode: "read-only",
       mirrorTraffic: true,
-    });
+    })
 
     // Phase 2: Compare outputs for consistency
     await this.validateConsistency({
       duration: "48h",
       tolerance: 0.01,
-    });
+    })
 
     // Phase 3: Gradually shift traffic
     await this.shiftTraffic([
       { percentage: 10, duration: "1h" },
       { percentage: 50, duration: "4h" },
       { percentage: 100, duration: "permanent" },
-    ]);
+    ])
 
     // Phase 4: Decommission old daemon
-    await this.decommissionOldDaemon();
+    await this.decommissionOldDaemon()
   }
 }
 ```
@@ -870,21 +843,21 @@ export class MigrationManager {
 
 export class DataMigration {
   async migrateHistoricalData(): Promise<void> {
-    const batches = await this.createMigrationBatches();
+    const batches = await this.createMigrationBatches()
 
     for (const batch of batches) {
-      await this.migrateBatch(batch);
-      await this.validateBatch(batch);
-      await this.markBatchComplete(batch);
+      await this.migrateBatch(batch)
+      await this.validateBatch(batch)
+      await this.markBatchComplete(batch)
     }
   }
 
   private async migrateBatch(batch: MigrationBatch): Promise<void> {
     // Transform old schema to new schema
-    const transformedData = await this.transformData(batch.data);
+    const transformedData = await this.transformData(batch.data)
 
     // Insert with conflict resolution
-    await this.insertWithConflictResolution(transformedData);
+    await this.insertWithConflictResolution(transformedData)
   }
 }
 ```
@@ -899,13 +872,13 @@ export class DataMigration {
 // apps/daemon-v2/tests/unit/event-processor.test.ts
 
 describe("EventProcessor", () => {
-  let processor: EventProcessor;
-  let mockDb: jest.Mocked<PrismaClient>;
+  let processor: EventProcessor
+  let mockDb: jest.Mocked<PrismaClient>
 
   beforeEach(() => {
-    mockDb = createMockPrismaClient();
-    processor = new EventProcessor(mockDb);
-  });
+    mockDb = createMockPrismaClient()
+    processor = new EventProcessor(mockDb)
+  })
 
   it("should process player kill event correctly", async () => {
     const killEvent: PlayerKillEvent = {
@@ -920,18 +893,18 @@ describe("EventProcessor", () => {
         killerTeam: "CT",
         victimTeam: "T",
       },
-    };
+    }
 
-    await processor.processEvent(killEvent);
+    await processor.processEvent(killEvent)
 
     expect(mockDb.gameEvent.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         eventType: EventType.PLAYER_KILL,
         serverId: 1,
       }),
-    });
-  });
-});
+    })
+  })
+})
 ```
 
 ### **10.2 Integration Tests**
@@ -940,14 +913,14 @@ describe("EventProcessor", () => {
 // apps/daemon-v2/tests/integration/udp-server.test.ts
 
 describe("UDP Server Integration", () => {
-  let server: UdpServer;
-  let testDatabase: PrismaClient;
+  let server: UdpServer
+  let testDatabase: PrismaClient
 
   beforeAll(async () => {
-    testDatabase = await setupTestDatabase();
-    server = new UdpServer(testDatabase);
-    await server.start();
-  });
+    testDatabase = await setupTestDatabase()
+    server = new UdpServer(testDatabase)
+    await server.start()
+  })
 
   it("should receive and process game server logs", async () => {
     const logMessage = createTestLogMessage({
@@ -955,22 +928,22 @@ describe("UDP Server Integration", () => {
       killer: "Player1",
       victim: "Player2",
       weapon: "ak47",
-    });
+    })
 
-    await sendUdpMessage(server.port, logMessage);
+    await sendUdpMessage(server.port, logMessage)
 
-    await waitForProcessing();
+    await waitForProcessing()
 
     const events = await testDatabase.gameEvent.findMany({
       where: { eventType: EventType.PLAYER_KILL },
-    });
+    })
 
-    expect(events).toHaveLength(1);
+    expect(events).toHaveLength(1)
     expect(events[0].data).toMatchObject({
       weapon: "ak47",
-    });
-  });
-});
+    })
+  })
+})
 ```
 
 ---
@@ -994,15 +967,13 @@ describe("UDP Server Integration", () => {
 
 export class LoadTest {
   async runEventProcessingTest(): Promise<LoadTestResults> {
-    const events = generateTestEvents(10000);
-    const startTime = Date.now();
+    const events = generateTestEvents(10000)
+    const startTime = Date.now()
 
-    await Promise.all(
-      events.map((event) => this.processor.processEvent(event)),
-    );
+    await Promise.all(events.map((event) => this.processor.processEvent(event)))
 
-    const endTime = Date.now();
-    const duration = endTime - startTime;
+    const endTime = Date.now()
+    const duration = endTime - startTime
 
     return {
       eventsProcessed: events.length,
@@ -1010,7 +981,7 @@ export class LoadTest {
       eventsPerSecond: events.length / (duration / 1000),
       memoryUsage: process.memoryUsage(),
       cpuUsage: process.cpuUsage(),
-    };
+    }
   }
 }
 ```

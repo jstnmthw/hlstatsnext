@@ -1,9 +1,6 @@
-import { builder } from "../builder";
-import {
-  handleGraphQLResult,
-  handleGraphQLResultNullable,
-} from "../utils/graphql-result-handler";
-import type { Action, Prisma } from "@repo/database/client";
+import { builder } from "../builder"
+import { handleGraphQLResult, handleGraphQLResultNullable } from "../utils/graphql-result-handler"
+import type { Action, Prisma } from "@repo/database/client"
 
 // Define Action type using Prisma object
 const Action = builder.prismaObject("Action", {
@@ -21,17 +18,17 @@ const Action = builder.prismaObject("Action", {
     forWorldActions: t.exposeString("for_WorldActions"),
     count: t.exposeInt("count"),
   }),
-});
+})
 
 // Define PaginatedActions type
 const PaginatedActions = builder.objectRef<{
-  items: Action[];
-  total: number;
-  page: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}>("PaginatedActions");
+  items: Action[]
+  total: number
+  page: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+}>("PaginatedActions")
 
 PaginatedActions.implement({
   fields: (t) => ({
@@ -45,7 +42,7 @@ PaginatedActions.implement({
     hasNextPage: t.exposeBoolean("hasNextPage"),
     hasPreviousPage: t.exposeBoolean("hasPreviousPage"),
   }),
-});
+})
 
 // Action queries
 builder.queryFields((t) => ({
@@ -64,8 +61,8 @@ builder.queryFields((t) => ({
         team: args.team ?? undefined,
         page: args.page ?? 1,
         limit: Math.min(args.limit ?? 20, 100), // Cap at 100
-      });
-      return handleGraphQLResult(result);
+      })
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -77,8 +74,8 @@ builder.queryFields((t) => ({
       id: t.arg.int({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.action.getActionById(args.id);
-      return handleGraphQLResultNullable(result);
+      const result = await context.services.action.getActionById(args.id)
+      return handleGraphQLResultNullable(result)
     },
   }),
 
@@ -89,11 +86,11 @@ builder.queryFields((t) => ({
       game: t.arg.string({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.action.getGameActions(args.game);
-      return handleGraphQLResult(result);
+      const result = await context.services.action.getGameActions(args.game)
+      return handleGraphQLResult(result)
     },
   }),
-}));
+}))
 
 // Define input types for mutations
 const ActionCreateInput = builder.inputType("ActionCreateInput", {
@@ -109,7 +106,7 @@ const ActionCreateInput = builder.inputType("ActionCreateInput", {
     forTeamActions: t.string({ required: false, defaultValue: "0" }),
     forWorldActions: t.string({ required: false, defaultValue: "0" }),
   }),
-});
+})
 
 const ActionUpdateInput = builder.inputType("ActionUpdateInput", {
   fields: (t) => ({
@@ -121,7 +118,7 @@ const ActionUpdateInput = builder.inputType("ActionUpdateInput", {
     forTeamActions: t.string({ required: false }),
     forWorldActions: t.string({ required: false }),
   }),
-});
+})
 
 // Action mutations
 builder.mutationFields((t) => ({
@@ -143,10 +140,10 @@ builder.mutationFields((t) => ({
         for_PlayerPlayerActions: args.input.forPlayerPlayerActions ?? "0",
         for_TeamActions: args.input.forTeamActions ?? "0",
         for_WorldActions: args.input.forWorldActions ?? "0",
-      };
+      }
 
-      const result = await context.services.action.createAction(input);
-      return handleGraphQLResult(result);
+      const result = await context.services.action.createAction(input)
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -190,10 +187,10 @@ builder.mutationFields((t) => ({
             set: args.input.forWorldActions ?? undefined,
           },
         }),
-      };
+      }
 
-      const result = await context.services.action.updateAction(args.id, input);
-      return handleGraphQLResult(result);
+      const result = await context.services.action.updateAction(args.id, input)
+      return handleGraphQLResult(result)
     },
   }),
 
@@ -204,8 +201,8 @@ builder.mutationFields((t) => ({
       id: t.arg.int({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.action.deleteAction(args.id);
-      return handleGraphQLResult(result);
+      const result = await context.services.action.deleteAction(args.id)
+      return handleGraphQLResult(result)
     },
   }),
-}));
+}))

@@ -6,23 +6,23 @@
   be added in a later phase.
 */
 
-import { logger } from "@/utils/logger";
+import { logger } from "@/utils/logger"
 
 export interface IRconService {
-  connect(host: string, port: number, password: string): Promise<void>;
-  disconnect(): Promise<void>;
-  sendCommand(command: string): Promise<string>; // returns server response
-  executeCommand(serverId: number, command: string): Promise<string>;
-  start(): Promise<void>;
-  stop(): Promise<void>;
+  connect(host: string, port: number, password: string): Promise<void>
+  disconnect(): Promise<void>
+  sendCommand(command: string): Promise<string> // returns server response
+  executeCommand(serverId: number, command: string): Promise<string>
+  start(): Promise<void>
+  stop(): Promise<void>
 }
 
 export class RconService implements IRconService {
   async connect(host: string, port: number, password: string): Promise<void> {
     // TODO: Implement proper RCON client connection
-    void host;
-    void port;
-    void password;
+    void host
+    void port
+    void password
   }
 
   async disconnect(): Promise<void> {
@@ -31,22 +31,22 @@ export class RconService implements IRconService {
 
   async sendCommand(command: string): Promise<string> {
     // TODO: Actually send command and return response
-    void command;
-    return "";
+    void command
+    return ""
   }
 
   async executeCommand(serverId: number, command: string): Promise<string> {
-    void serverId; // placeholder to avoid unused param lint
-    void command; // placeholder to avoid unused param lint
+    void serverId // placeholder to avoid unused param lint
+    void command // placeholder to avoid unused param lint
 
-    return "Command executed successfully";
+    return "Command executed successfully"
   }
 
   async start(): Promise<void> {
-    logger.started("RCON Service");
+    logger.started("RCON Service")
   }
 
   async stop(): Promise<void> {
-    logger.stopped("RCON Service");
+    logger.stopped("RCON Service")
   }
 }

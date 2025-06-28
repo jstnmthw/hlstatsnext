@@ -1,5 +1,5 @@
-import { db } from "..";
-import { log, logWarning } from "./logger";
+import { db } from ".."
+import { log, logWarning } from "./logger"
 
 const games = [
   {
@@ -27,19 +27,19 @@ const games = [
     name: "Half-Life 2: Deathmatch",
     realgame: "hl2mp",
   },
-];
+]
 
 export async function seedGames() {
-  const existingCount = await db.game.count();
+  const existingCount = await db.game.count()
   if (existingCount > 0) {
-    logWarning("Games already exist, skipping seed.");
-    return;
+    logWarning("Games already exist, skipping seed.")
+    return
   }
 
   const result = await db.game.createMany({
     data: games,
     skipDuplicates: true,
-  });
+  })
 
-  log(`✔ Created ${result.count} games.`);
+  log(`✔ Created ${result.count} games.`)
 }

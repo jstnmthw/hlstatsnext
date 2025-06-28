@@ -1,15 +1,12 @@
-import { builder } from "../builder";
-import { Game } from "./game";
-import { Player } from "./player";
-import {
-  handleGraphQLResult,
-  handleGraphQLResultNullable,
-} from "../utils/graphql-result-handler";
-import type { ServerDetails as ServerDetailsType } from "../types/database/server.types";
+import { builder } from "../builder"
+import { Game } from "./game"
+import { Player } from "./player"
+import { handleGraphQLResult, handleGraphQLResultNullable } from "../utils/graphql-result-handler"
+import type { ServerDetails as ServerDetailsType } from "../types/database/server.types"
 import {
   CreateServerInput as CreateServerInputType,
   UpdateServerInput as UpdateServerInputType,
-} from "../types/database/server.types";
+} from "../types/database/server.types"
 
 // Define Server object from Prisma model
 const Server = builder.prismaObject("Server", {
@@ -27,14 +24,13 @@ const Server = builder.prismaObject("Server", {
     // Manually resolve relation to Game
     game: t.field({
       type: Game,
-      resolve: async (server, _args, context) =>
-        context.db.game.findUniqueOrThrow({ where: { code: server.game } }),
+      resolve: async (server, _args, context) => context.db.game.findUniqueOrThrow({ where: { code: server.game } }),
     }),
   }),
-});
+})
 
 // Define ServerDetails for the detailed query
-const ServerDetails = builder.objectRef<ServerDetailsType>("ServerDetails");
+const ServerDetails = builder.objectRef<ServerDetailsType>("ServerDetails")
 
 ServerDetails.implement({
   fields: (t) => ({
@@ -60,7 +56,7 @@ ServerDetails.implement({
       resolve: (server) => server.currentPlayers,
     }),
   }),
-});
+})
 
 // Input for creating a server
 const CreateServerInput = builder.inputType("CreateServerInput", {
@@ -72,7 +68,7 @@ const CreateServerInput = builder.inputType("CreateServerInput", {
     rconPassword: t.string({ required: false }),
     privateAddress: t.string({ required: false }),
   }),
-});
+})
 
 // Input for updating a server
 const UpdateServerInput = builder.inputType("UpdateServerInput", {
@@ -81,18 +77,18 @@ const UpdateServerInput = builder.inputType("UpdateServerInput", {
     rconPassword: t.string({ required: false }),
     privateAddress: t.string({ required: false }),
   }),
-});
+})
 
 // Query to get all servers
 builder.queryField("servers", (t) =>
   t.field({
     type: [Server],
     resolve: async (_parent, _args, context) => {
-      const result = await context.services.server.getServers();
-      return handleGraphQLResult(result);
+      const result = await context.services.server.getServers()
+      return handleGraphQLResult(result)
     },
   }),
-);
+)
 
 // Query to get a single server's details
 builder.queryField("server", (t) =>
@@ -103,11 +99,11 @@ builder.queryField("server", (t) =>
       id: t.arg.string({ required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.server.getServerDetails(args.id);
-      return handleGraphQLResultNullable(result);
+      const result = await context.services.server.getServerDetails(args.id)
+      return handleGraphQLResultNullable(result)
     },
   }),
-);
+)
 
 // Mutation to create a server
 builder.mutationField("createServer", (t) =>
@@ -117,13 +113,11 @@ builder.mutationField("createServer", (t) =>
       input: t.arg({ type: CreateServerInput, required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.server.createServer(
-        args.input as CreateServerInputType,
-      );
-      return handleGraphQLResult(result);
+      const result = await context.services.server.createServer(args.input as CreateServerInputType)
+      return handleGraphQLResult(result)
     },
   }),
-);
+)
 
 // Mutation to update a server
 builder.mutationField("updateServer", (t) =>
@@ -134,11 +128,8 @@ builder.mutationField("updateServer", (t) =>
       input: t.arg({ type: UpdateServerInput, required: true }),
     },
     resolve: async (_parent, args, context) => {
-      const result = await context.services.server.updateServer(
-        args.id,
-        args.input as UpdateServerInputType,
-      );
-      return handleGraphQLResult(result);
+      const result = await context.services.server.updateServer(args.id, args.input as UpdateServerInputType)
+      return handleGraphQLResult(result)
     },
   }),
-);
+)

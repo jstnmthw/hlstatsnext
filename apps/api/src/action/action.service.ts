@@ -1,12 +1,6 @@
-import type { PrismaClient, Action, Prisma } from "@repo/database/client";
-import {
-  Result,
-  success,
-  failure,
-  AppError,
-  PaginatedResult,
-} from "../types/common";
-import { isRecordNotFoundError } from "../utils/prisma-error-handler";
+import type { PrismaClient, Action, Prisma } from "@repo/database/client"
+import { Result, success, failure, AppError, PaginatedResult } from "../types/common"
+import { isRecordNotFoundError } from "../utils/prisma-error-handler"
 
 export class ActionService {
   constructor(private readonly db: PrismaClient) {}
@@ -15,19 +9,19 @@ export class ActionService {
    * Get all actions with optional filtering
    */
   async getActions(params: {
-    game?: string;
-    team?: string;
-    page?: number;
-    limit?: number;
+    game?: string
+    team?: string
+    page?: number
+    limit?: number
   }): Promise<Result<PaginatedResult<Action>, AppError>> {
     try {
-      const { game, team, page = 1, limit = 20 } = params;
-      const skip = (page - 1) * limit;
+      const { game, team, page = 1, limit = 20 } = params
+      const skip = (page - 1) * limit
 
       const where: Prisma.ActionWhereInput = {
         ...(game && { game }),
         ...(team && { team }),
-      };
+      }
 
       const [actions, total] = await Promise.all([
         this.db.action.findMany({
@@ -37,9 +31,9 @@ export class ActionService {
           orderBy: { description: "asc" },
         }),
         this.db.action.count({ where }),
-      ]);
+      ])
 
-      const totalPages = Math.ceil(total / limit);
+      const totalPages = Math.ceil(total / limit)
 
       return success({
         items: actions,
@@ -48,14 +42,14 @@ export class ActionService {
         totalPages,
         hasNextPage: page < totalPages,
         hasPreviousPage: page > 1,
-      });
+      })
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to fetch actions",
         operation: "getActions",
-      });
+      })
     }
   }
 
@@ -66,7 +60,7 @@ export class ActionService {
     try {
       const action = await this.db.action.findUnique({
         where: { id },
-      });
+      })
 
       if (!action) {
         return failure({
@@ -74,17 +68,17 @@ export class ActionService {
           message: "Action not found",
           resource: "action",
           id: id.toString(),
-        });
+        })
       }
 
-      return success(action);
+      return success(action)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to fetch action",
         operation: "getActionById",
-      });
+      })
     }
   }
 
@@ -96,71 +90,66 @@ export class ActionService {
       const actions = await this.db.action.findMany({
         where: { game },
         orderBy: { description: "asc" },
-      });
+      })
 
-      return success(actions);
+      return success(actions)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to fetch game actions",
         operation: "getGameActions",
-      });
+      })
     }
   }
 
   /**
    * Create a new action
    */
-  async createAction(
-    input: Prisma.ActionCreateInput,
-  ): Promise<Result<Action, AppError>> {
+  async createAction(input: Prisma.ActionCreateInput): Promise<Result<Action, AppError>> {
     try {
       const action = await this.db.action.create({
         data: input,
-      });
+      })
 
-      return success(action);
+      return success(action)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to create action",
         operation: "createAction",
-      });
+      })
     }
   }
 
   /**
    * Update an action
    */
-  async updateAction(
-    id: number,
-    input: Prisma.ActionUpdateInput,
-  ): Promise<Result<Action, AppError>> {
+  async updateAction(id: number, input: Prisma.ActionUpdateInput): Promise<Result<Action, AppError>> {
     try {
       const action = await this.db.action.update({
         where: { id },
         data: input,
-      });
+      })
 
-      return success(action);
+      return success(action)
     } catch (error: unknown) {
-      console.error(error);
+      console.error(error)
       if (isRecordNotFoundError(error)) {
         return failure({
           type: "NOT_FOUND",
           message: "Action not found",
           resource: "action",
           id: id.toString(),
-        });
+        })
       }
 
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to update action",
         operation: "updateAction",
-      });
+      })
     }
   }
 
@@ -171,25 +160,25 @@ export class ActionService {
     try {
       await this.db.action.delete({
         where: { id },
-      });
+      })
 
-      return success(true);
+      return success(true)
     } catch (error: unknown) {
-      console.error(error);
+      console.error(error)
       if (isRecordNotFoundError(error)) {
         return failure({
           type: "NOT_FOUND",
           message: "Action not found",
           resource: "action",
           id: id.toString(),
-        });
+        })
       }
 
       return failure({
         type: "DATABASE_ERROR",
         message: "Failed to delete action",
         operation: "deleteAction",
-      });
+      })
     }
   }
 }

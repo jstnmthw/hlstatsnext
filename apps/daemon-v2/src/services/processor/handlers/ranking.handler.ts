@@ -6,9 +6,10 @@
  */
 
 import type { GameEvent, PlayerKillEvent, RoundEndEvent } from "@/types/common/events"
-import type { WeaponService } from "@/services/weapon/weapon.service"
+import { WeaponService } from "@/services/weapon/weapon.service"
 import { WeaponService as DefaultWeaponService } from "@/services/weapon/weapon.service"
 import { DatabaseClient } from "@/database/client"
+import { logger } from "@/utils/logger"
 // import type { DatabaseClient } from "@/database/client" // TODO: Add back when database operations are implemented
 
 export interface SkillRating {
@@ -76,7 +77,7 @@ export class RankingHandler {
         weaponMultiplier,
       })
 
-      console.log(
+      logger.event(
         `Rating change for kill: Killer ${killerId} (+${changes.killer}), Victim ${victimId} (${changes.victim})`,
       )
 
@@ -116,7 +117,7 @@ export class RankingHandler {
       // TODO: Calculate team-based rating adjustments
       // TODO: Apply bonus for round participation
 
-      console.log(`Round rating update for server ${serverId}: ${winningTeam} team won (${duration}s)`)
+      logger.event(`Round rating update for server ${serverId}: ${winningTeam} team won (${duration}s)`)
 
       return { success: true }
     } catch (error) {

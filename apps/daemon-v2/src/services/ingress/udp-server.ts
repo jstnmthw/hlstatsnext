@@ -100,11 +100,13 @@ export class UdpServer extends EventEmitter {
         return;
       }
 
-      // Convert to string and emit for processing
-      const logLine = message.toString("utf8").trim();
+      // Convert to string and clean common UDP header bytes (0xFF\xFF\xFF\xFFlog )
+      const rawLine = message.toString("utf8");
+      const logLine = this.cleanLogPacket(rawLine);
+
       if (logLine.length > 0) {
         this.emit("logReceived", {
-          logLine,
+          logLine: logLine.trimEnd(),
           serverAddress: remoteInfo.address,
           serverPort: remoteInfo.port,
           timestamp: new Date(),
@@ -218,5 +220,25 @@ export class UdpServer extends EventEmitter {
    */
   public address(): AddressInfo | null {
     return this.server?.address() || null;
+  }
+
+  /**
+   * Remove typical Source-engine UDP log packet header (four 0xFF bytes + "log ")
+   * and return a canonical string that starts with "L " when possible.
+   */
+  private cleanLogPacket(raw: string): string {
+    // Fast path – most already cleaned by server or test harness
+    if (raw.startsWith("L ")) return raw;
+
+    // Trim leading whitespace/null chars first
+    let line = raw.trimStart();
+
+    // Look for first occurrence of "L " which always precedes the timestamp
+    const idx = line.indexOf("L ");
+    if (idx !== -1) {
+      line = line.substring(idx);
+    }
+
+    return line;
   }
 }

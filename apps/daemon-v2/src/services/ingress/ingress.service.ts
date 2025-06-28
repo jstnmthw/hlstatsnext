@@ -142,18 +142,38 @@ export class IngressService implements IIngressService {
       const parseResult = await this.parser.parse(logLine, serverId);
 
       if (!parseResult.success) {
-        // Log parser error details for debugging
-        logger.debug(`Parser error: ${parseResult.error}`);
+        // Strip the Source log timestamp ("L 06/28/2025 - 09:00:55: ") for clarity –
+        // we already have our own timestamp from the logger.
+        const cleaned = logLine.replace(
+          /^L \d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}:\s*/,
+          ""
+        );
+        const snippet =
+          cleaned.length > 120 ? `${cleaned.slice(0, 117)}…` : cleaned;
+        logger.debug(`Parser error - ${parseResult.error}: ${snippet}`);
         return;
       }
 
-      // Attach raw log line for debugging
+      // Debug: show concise version of successfully parsed line
+      const cleanedSuccess = logLine.replace(
+        /^L \d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}:\s*/,
+        ""
+      );
+      const successSnippet =
+        cleanedSuccess.length > 120
+          ? `${cleanedSuccess.slice(0, 117)}…`
+          : cleanedSuccess;
+
+      logger.debug(
+        `Parser success - ${parseResult.event.eventType}: ${successSnippet}`
+      );
+
+      // Attach raw log line for downstream processors
       const eventWithRaw = {
         ...parseResult.event,
         raw: logLine,
       } as typeof parseResult.event & { raw: string };
 
-      // eventWithRaw statically satisfies GameEvent & optional meta
       await this.processor.processEvent(eventWithRaw);
     } catch (error) {
       logger.failed(

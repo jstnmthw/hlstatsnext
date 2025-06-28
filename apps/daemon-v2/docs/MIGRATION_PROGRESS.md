@@ -177,18 +177,8 @@ Extend parser support to all Half-Life engine games and implement advanced event
 
 - [ ] Team Fortress Classic parser
 - [ ] Day of Defeat parser
-- [ ] Team Fortress 2 parser
-  - [ ] Class-specific events
-  - [ ] Capture point events
-  - [ ] Über tracking
-- [ ] Counter-Strike: Source parser
-  - [ ] Legacy log format support
-  - [ ] Backward compatibility
-- [ ] Day of Defeat: Source parser
-- [ ] Left 4 Dead 1/2 parser
-  - [ ] Special infected events
-  - [ ] Campaign progress
-- [ ] Generic Source engine parser
+- [ ] Half Life Server parser
+- [ ] Deathmatch Server parser
 
 #### **Advanced Event Types**
 

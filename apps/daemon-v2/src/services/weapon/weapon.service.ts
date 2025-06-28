@@ -1,4 +1,4 @@
-import { getWeaponAttributes } from "@/config/weapon-config"
+import { getWeaponAttributes, DEFAULT_SKILL_MULTIPLIER } from "@/config/weapon-config"
 import { resolveGameId } from "@/config/game-config"
 import type { DatabaseClient } from "@/database/client"
 
@@ -35,7 +35,7 @@ export class WeaponService {
     }
 
     // Guarantee a sensible default even if both sources fail (shouldn't happen)
-    if (multiplier == null) multiplier = 1.0
+    if (multiplier == null) multiplier = DEFAULT_SKILL_MULTIPLIER
 
     this.cache.set(key, multiplier)
     return multiplier

@@ -16,7 +16,7 @@ describe("RconService", () => {
 
   it("connect() resolves without errors", async () => {
     await expect(
-      rcon.connect("localhost", 27015, "password")
+      rcon.connect("localhost", 27015, "password"),
     ).resolves.toBeUndefined();
   });
 

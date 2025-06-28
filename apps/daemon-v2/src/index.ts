@@ -58,7 +58,7 @@ export class HLStatsDaemon {
     } catch (error) {
       logger.failed(
         "Failed to start daemon",
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? error.message : String(error),
       );
       process.exit(1);
     }
@@ -80,7 +80,7 @@ export class HLStatsDaemon {
     } catch (error) {
       logger.failed(
         "Error during shutdown",
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? error.message : String(error),
       );
     }
   }

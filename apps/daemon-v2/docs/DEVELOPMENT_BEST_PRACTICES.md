@@ -503,7 +503,7 @@ export type PartialPlayerUpdate = Partial<
 
 export type PlayerEventHandlers = {
   [K in GameEventType as `handle${Capitalize<K>}`]: (
-    event: GameEvent<K>
+    event: GameEvent<K>,
   ) => Promise<void>;
 };
 ```
@@ -539,7 +539,7 @@ export interface PlayerStatsFilters {
 // ❌ BAD: Inline, repetitive, unclear types
 function getStats(
   timeframe?: string,
-  mode?: string
+  mode?: string,
 ): { k: number; d: number; hs: number; acc: number } {
   // ...
 }
@@ -606,7 +606,7 @@ export interface ServiceResponse<T> {
 // ✅ Generic functions with proper constraints
 export async function processEvents<T extends GameEvent>(
   events: T[],
-  processor: (event: T) => Promise<void>
+  processor: (event: T) => Promise<void>,
 ): Promise<void> {
   await Promise.all(events.map(processor));
 }
@@ -635,7 +635,7 @@ export type GameEvent =
 
 // Type guards for union types
 export function isPlayerKillEvent(
-  event: GameEvent
+  event: GameEvent,
 ): event is Extract<GameEvent, { type: "player_kill" }> {
   return event.type === "player_kill";
 }
@@ -951,7 +951,7 @@ export type PlayerWithCalculatedStats = Prisma.PlayerGetPayload<{
 
 // Utility function that maintains type safety
 export function calculatePlayerStats(
-  player: Prisma.PlayerGetPayload<{ include: { stats: true } }>
+  player: Prisma.PlayerGetPayload<{ include: { stats: true } }>,
 ): PlayerWithCalculatedStats {
   const kdRatio =
     player.stats.deaths > 0
@@ -1008,7 +1008,7 @@ export async function updatePlayerStats(
     validateInput?: boolean;
     notifyChanges?: boolean;
     userId?: number;
-  }
+  },
 ): Promise<ServiceResponse<PlayerStats>> {
   // Implementation
 }
@@ -1018,7 +1018,7 @@ export function formatPlayerName(player: Player): string;
 export function formatPlayerName(name: string, showId: boolean): string;
 export function formatPlayerName(
   playerOrName: Player | string,
-  showId?: boolean
+  showId?: boolean,
 ): string {
   if (typeof playerOrName === "string") {
     return showId ? `${playerOrName} (ID: unknown)` : playerOrName;
@@ -1046,20 +1046,20 @@ export type EventListenerName<T extends string> = `on${Capitalize<T>}`;
 // Generate method names dynamically
 export type PlayerEventHandlers = {
   [K in GameEventType as EventHandlerName<K>]: (
-    event: GameEvent & { type: K }
+    event: GameEvent & { type: K },
   ) => Promise<void>;
 };
 
 // Usage
 export class EventProcessor implements PlayerEventHandlers {
   async handlePlayerKill(
-    event: GameEvent & { type: "player_kill" }
+    event: GameEvent & { type: "player_kill" },
   ): Promise<void> {
     // Type-safe event handling
   }
 
   async handlePlayerDeath(
-    event: GameEvent & { type: "player_death" }
+    event: GameEvent & { type: "player_death" },
   ): Promise<void> {
     // Type-safe event handling
   }
@@ -1131,7 +1131,7 @@ export type PathValue<
 // Usage
 export function getNestedValue<T, P extends Path<T>>(
   obj: T,
-  path: P
+  path: P,
 ): PathValue<T, P> {
   // Type-safe nested object access
   return path.split(".").reduce((current: any, key) => current?.[key], obj);
@@ -1170,7 +1170,7 @@ export type ConnectedConnection = Connection<"connected">;
 
 // State transition functions
 export function connect(
-  conn: DisconnectedConnection
+  conn: DisconnectedConnection,
 ): Promise<ConnectedConnection> {
   // Implementation
 }
@@ -1549,7 +1549,7 @@ export class DomainError extends Error {
   constructor(
     message: string,
     public code: string,
-    public statusCode: number = 500
+    public statusCode: number = 500,
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -1589,7 +1589,7 @@ async function updatePlayerStats(
 // ✅ GOOD: Proper error handling
 async function processEvents(events: GameEvent[]): Promise<void> {
   const results = await Promise.allSettled(
-    events.map((event) => processEvent(event))
+    events.map((event) => processEvent(event)),
   );
 
   const failures = results.filter((r) => r.status === "rejected");
@@ -1737,7 +1737,7 @@ test.describe("Player Statistics", () => {
         JSON.stringify({
           type: "player_kill",
           playerId: 123,
-        })
+        }),
       );
     });
 
@@ -1944,7 +1944,7 @@ const worker = new Worker(
       max: 100,
       duration: 1000, // 100 jobs per second
     },
-  }
+  },
 );
 ```
 
@@ -2008,7 +2008,7 @@ export function generateAccessToken(user: User): string {
       expiresIn: "1h",
       issuer: "hlstats-api",
       audience: "hlstats-client",
-    }
+    },
   );
 }
 
@@ -2041,7 +2041,7 @@ const players = await prisma.$queryRaw`
 
 // ❌ BAD: String concatenation
 const players = await prisma.$queryRawUnsafe(
-  `SELECT * FROM players WHERE name = '${userName}'`
+  `SELECT * FROM players WHERE name = '${userName}'`,
 );
 ```
 
@@ -2085,7 +2085,7 @@ const logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
-    winston.format.json()
+    winston.format.json(),
   ),
   defaultMeta: {
     service: "hlstats-daemon",
@@ -2096,7 +2096,7 @@ const logger = winston.createLogger({
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.simple()
+        winston.format.simple(),
       ),
     }),
     new winston.transports.File({
@@ -2403,7 +2403,7 @@ app.get("/ready", async (req, res) => {
 export function calculateRatingChange(
   winner: Player,
   loser: Player,
-  matchDetails?: MatchContext
+  matchDetails?: MatchContext,
 ): RatingAdjustment {
   // Implementation
 }

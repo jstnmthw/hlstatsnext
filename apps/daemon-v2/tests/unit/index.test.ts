@@ -78,7 +78,7 @@ describe("HLStatsDaemon", () => {
       expect(statisticsInstance.start).toHaveBeenCalled();
 
       expect(mockLoggerOk).toHaveBeenCalledWith(
-        expect.stringContaining("All services started successfully")
+        expect.stringContaining("All services started successfully"),
       );
     });
 
@@ -90,7 +90,7 @@ describe("HLStatsDaemon", () => {
       await daemon.start();
 
       expect(mockLoggerError).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to start daemon")
+        expect.stringContaining("Failed to start daemon"),
       );
       expect(mockExit).toHaveBeenCalledWith(1);
     });
@@ -108,7 +108,7 @@ describe("HLStatsDaemon", () => {
       await daemon.start();
 
       expect(mockLoggerError).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to start daemon")
+        expect.stringContaining("Failed to start daemon"),
       );
       expect(mockExit).toHaveBeenCalledWith(1);
     });
@@ -141,7 +141,7 @@ describe("HLStatsDaemon", () => {
       expect(processorInstance.disconnect).toHaveBeenCalled();
 
       expect(mockLoggerOk).toHaveBeenCalledWith(
-        expect.stringContaining("Daemon shutdown complete")
+        expect.stringContaining("Daemon shutdown complete"),
       );
     });
 
@@ -154,7 +154,7 @@ describe("HLStatsDaemon", () => {
       await daemon.stop();
 
       expect(mockLoggerError).toHaveBeenCalledWith(
-        expect.stringContaining("Error during shutdown")
+        expect.stringContaining("Error during shutdown"),
       );
     });
   });

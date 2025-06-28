@@ -64,7 +64,7 @@ describe("EventProcessorService", () => {
 
       // No handler invocations expected in minimal path
       expect(
-        MockedPlayerHandler.mock.instances[0]!.handleEvent
+        MockedPlayerHandler.mock.instances[0]!.handleEvent,
       ).not.toHaveBeenCalled();
     });
 
@@ -91,7 +91,7 @@ describe("EventProcessorService", () => {
     });
   });
 
-  describe("EventProcessorService – bot gating", () => {
+  describe("EventProcessorService - bot gating", () => {
     const upsertMock = vi.fn();
     const createFragMock = vi.fn();
     const mockDb = {
@@ -150,7 +150,7 @@ describe("EventProcessorService", () => {
       expect(mockDb.getOrCreatePlayer).toHaveBeenCalledWith(
         "BOT",
         "BotPlayer",
-        "cstrike"
+        "cstrike",
       );
     });
   });

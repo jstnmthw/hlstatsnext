@@ -79,7 +79,7 @@ describe("IngressService", () => {
     expect(call).toBeDefined();
     const handler = call![1];
 
-    // Send first packet (authentication) – should not trigger processEvent
+    // Send first packet (authentication) - should not trigger processEvent
     await handler({
       logLine:
         'L 07/15/2024 - 22:33:10: "Player<1><STEAM_1:0:111><CT>" connected, address "127.0.0.1:27005"',
@@ -177,9 +177,9 @@ describe("IngressService", () => {
 });
 
 /**
- * Dev environment behaviour – skipAuth & auto server registration
+ * Dev environment behaviour - skipAuth & auto server registration
  */
-describe("IngressService – dev skipAuth auto-registration", () => {
+describe("IngressService - dev skipAuth auto-registration", () => {
   const serverCreateMock = vi.fn().mockResolvedValue({ serverId: 42 });
 
   const dbMock = {
@@ -221,7 +221,7 @@ describe("IngressService – dev skipAuth auto-registration", () => {
     expect(serverCreateMock).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ address: "172.17.0.2", port: 27015 }),
-      })
+      }),
     );
 
     // Second packet should not call create again (cached)

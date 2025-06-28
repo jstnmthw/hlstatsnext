@@ -157,7 +157,17 @@ Implement complete player tracking, event processing, and ranking system.
 
 ## **Phase 3: Multi-Game Support & Advanced Parsing** 🚧
 
-### Objectives
+### Completed Features ✅
+
+- ✅ **WeaponService**: DB-first weapon multiplier service with in-memory cache
+- ✅ Static **weapon-config** aligned with PLAYER_RANKINGS and per-game maps
+- ✅ **Game alias resolver** (e.g. `cstrike` → `csgo`) for legacy log support
+- ✅ Refactored **RankingHandler**, **WeaponHandler**, and Processor to use WeaponService and be game-aware
+- ✅ Rating logic updated for weapon multipliers & team-kill skill compensation
+- ✅ Unit-test coverage added (WeaponService tests) – total tests: **147** all passing
+- ✅ Type-check & ESLint pipelines green
+
+### Remaining Objectives
 
 Extend parser support to all Half-Life engine games and implement advanced event tracking.
 
@@ -390,7 +400,7 @@ Comprehensive testing, bug fixes, and RC preparation.
 
 ### In Progress 🚧
 
-- **Phase 3**: Multi-Game Support & Advanced Parsing (0%)
+- **Phase 3**: Multi-Game Support & Advanced Parsing (**~20% complete**)
 
 ### Upcoming 🔄
 

@@ -1,35 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { WeaponHandler } from "../../src/services/processor/handlers/weapon.handler"
 import { EventType, PlayerConnectEvent, PlayerKillEvent } from "../../src/types/common/events"
-// import type { DatabaseClient } from "../../src/database/client" // TODO: Add back when database operations are implemented
 
 // Mock the weapon config
-vi.mock("../../src/config/weapon-config", () => ({
-  getWeaponAttributes: vi.fn((weapon) => {
-    if (weapon === "ak47") {
-      return {
-        baseDamage: 36,
-        headshotMultiplier: 4,
-        shotsFired: 100,
-        shotsHit: 50,
+vi.mock("../../src/config/weapon-config", async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    DEFAULT_SKILL_MULTIPLIER: 1.0,
+    DEFAULT_BASE_DAMAGE: 20,
+    getWeaponAttributes: vi.fn((weapon: string) => {
+      if (weapon === "ak47") {
+        return { baseDamage: 36, skillMultiplier: 1.0 }
       }
-    }
-    if (weapon === "knife") {
-      return {
-        baseDamage: 65,
-        headshotMultiplier: 1,
-        shotsFired: 0,
-        shotsHit: 0,
+      if (weapon === "knife") {
+        return { baseDamage: 65, skillMultiplier: 2.0 }
       }
-    }
-    return {
-      baseDamage: 20,
-      headshotMultiplier: 3,
-      shotsFired: 0,
-      shotsHit: 0,
-    }
-  }),
-}))
+      return { baseDamage: 20, skillMultiplier: 1.0 }
+    }),
+  }
+})
 
 // Extended WeaponHandler class to access private methods for testing
 class TestableWeaponHandler extends WeaponHandler {

@@ -3,7 +3,7 @@ import { WeaponService } from "../../src/services/weapon/weapon.service"
 import type { DatabaseClient } from "../../src/database/client"
 
 // Re-use the default weapon-config for fallback assertions
-import { getWeaponAttributes } from "../../src/config/weapon-config"
+import { getWeaponAttributes, DEFAULT_SKILL_MULTIPLIER } from "../../src/config/weapon-config"
 
 // Helper to build a mock DatabaseClient that only implements getWeaponModifier
 function createDbMock(): { db: DatabaseClient; spy: ReturnType<typeof vi.fn> } {
@@ -47,7 +47,7 @@ describe("WeaponService", () => {
     const fallback = await service.getSkillMultiplier("csgo", "ak47")
     const { skillMultiplier } = getWeaponAttributes("ak47", "csgo")
 
-    expect(fallback).toBeCloseTo(skillMultiplier)
+    expect(fallback).toBeCloseTo(skillMultiplier ?? DEFAULT_SKILL_MULTIPLIER)
   })
 
   it("resolves game aliases (e.g., cstrike → csgo)", async () => {

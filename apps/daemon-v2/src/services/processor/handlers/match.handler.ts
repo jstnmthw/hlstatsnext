@@ -6,8 +6,8 @@
  */
 
 import type { GameEvent, RoundEndEvent, MapChangeEvent } from "@/types/common/events"
-// import type { DatabaseClient } from "@/database/client" // TODO: Add back when database operations are implemented
-import { logger } from "@/utils/logger"
+import type { ILogger } from "@/utils/logger.types"
+import { IMatchHandler } from "./match.handler.types"
 
 export interface MatchStats {
   duration: number
@@ -23,10 +23,8 @@ export interface HandlerResult {
   roundsAffected?: number
 }
 
-export class MatchHandler {
-  constructor() {
-    // TODO: Add DatabaseClient parameter when database operations are implemented
-  }
+export class MatchHandler implements IMatchHandler {
+  constructor(private readonly logger: ILogger) {}
 
   private currentMatch: Map<number, MatchStats> = new Map() // serverId -> MatchStats
 
@@ -59,7 +57,7 @@ export class MatchHandler {
         })
       }
 
-      logger.event(`Round started on server ${serverId}`)
+      this.logger.event(`Round started on server ${serverId}`)
 
       return {
         success: true,
@@ -80,7 +78,7 @@ export class MatchHandler {
     try {
       const matchStats = this.currentMatch.get(serverId)
       if (!matchStats) {
-        logger.warn(`No match stats found for server ${serverId}`)
+        this.logger.warn(`No match stats found for server ${serverId}`)
         return { success: true }
       }
 
@@ -93,7 +91,7 @@ export class MatchHandler {
       // TODO: Update player round statistics
       // TODO: Calculate team performance metrics
 
-      logger.event(`Round ended on server ${serverId}: ${winningTeam} won (${score.team1}-${score.team2})`)
+      this.logger.event(`Round ended on server ${serverId}: ${winningTeam} won (${score.team1}-${score.team2})`)
 
       return {
         success: true,
@@ -121,7 +119,7 @@ export class MatchHandler {
       // Reset match stats for new map
       this.currentMatch.delete(serverId)
 
-      logger.event(`Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`)
+      this.logger.event(`Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`)
 
       return {
         success: true,
@@ -142,7 +140,7 @@ export class MatchHandler {
     // TODO: Implement MVP calculation when database operations are available
     void this._calculateMVP(serverId)
 
-    logger.event(
+    this.logger.event(
       `Match finalized on server ${serverId} for map ${mapName}: ${stats.totalRounds} rounds, ${stats.duration}s, scores: ${JSON.stringify(
         stats.teamScores,
       )}`,

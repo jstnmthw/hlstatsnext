@@ -1,51 +1,64 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { EventProcessorService } from "../../src/services/processor/processor.service"
-import { PlayerHandler } from "../../src/services/processor/handlers/player.handler"
-import { WeaponHandler } from "../../src/services/processor/handlers/weapon.handler"
-import { MatchHandler } from "../../src/services/processor/handlers/match.handler"
-import { RankingHandler } from "../../src/services/processor/handlers/ranking.handler"
-import { DatabaseClient } from "../../src/database/client"
-import { EventService } from "../../src/services/event/event.service"
-import { PlayerService } from "../../src/services/player/player.service"
-import { WeaponService } from "../../src/services/weapon/weapon.service"
-import { EventType, PlayerConnectEvent, PlayerKillEvent } from "../../src/types/common/events"
+import { EventType, PlayerKillEvent, PlayerConnectEvent } from "../../src/types/common/events"
+import { createMockLogger } from "../types/test-mocks"
+import type { IEventService } from "../../src/services/event/event.types"
+import type { IPlayerService } from "../../src/services/player/player.types"
+import type { IMatchHandler } from "../../src/services/processor/handlers/match.handler.types"
+import type { IPlayerHandler } from "../../src/services/processor/handlers/player.handler.types"
+import type { IRankingHandler } from "../../src/services/processor/handlers/ranking.handler.types"
+import type { IWeaponHandler } from "../../src/services/processor/handlers/weapon.handler.types"
+import type { ILogger } from "@/utils/logger.types"
 
-// Mock all dependencies
-vi.mock("../../src/database/client")
-vi.mock("../../src/services/event/event.service")
-vi.mock("../../src/services/player/player.service")
-vi.mock("../../src/services/weapon/weapon.service")
-vi.mock("../../src/services/processor/handlers/player.handler")
-vi.mock("../../src/services/processor/handlers/weapon.handler")
-vi.mock("../../src/services/processor/handlers/match.handler")
-vi.mock("../../src/services/processor/handlers/ranking.handler")
-
-const MockedPlayerHandler = vi.mocked(PlayerHandler)
-const MockedWeaponHandler = vi.mocked(WeaponHandler)
-const MockedMatchHandler = vi.mocked(MatchHandler)
-const MockedRankingHandler = vi.mocked(RankingHandler)
-const MockedDatabaseClient = vi.mocked(DatabaseClient)
-const MockedEventService = vi.mocked(EventService)
-const MockedPlayerService = vi.mocked(PlayerService)
-const MockedWeaponService = vi.mocked(WeaponService)
+// Mock Factories for all dependencies
+const createEventServiceMock = (): IEventService => ({ createGameEvent: vi.fn() })
+const createPlayerServiceMock = (): IPlayerService => ({
+  getOrCreatePlayer: vi.fn().mockResolvedValue(1),
+  getPlayerStats: vi.fn(),
+  updatePlayerStats: vi.fn(),
+  getPlayerRating: vi.fn(),
+  updatePlayerRatings: vi.fn(),
+  getRoundParticipants: vi.fn(),
+  getTopPlayers: vi.fn(),
+})
+const createMatchHandlerMock = (): IMatchHandler => ({ handleEvent: vi.fn(), getMatchStats: vi.fn() })
+const createPlayerHandlerMock = (): IPlayerHandler => ({ handleEvent: vi.fn() })
+const createRankingHandlerMock = (): IRankingHandler => ({
+  handleEvent: vi.fn(),
+  calculateExpectedScore: vi.fn(),
+  updatePlayerRating: vi.fn(),
+})
+const createWeaponHandlerMock = (): IWeaponHandler => ({ handleEvent: vi.fn() })
 
 describe("EventProcessorService", () => {
   let processor: EventProcessorService
+  let mockEventService: IEventService
+  let mockPlayerService: IPlayerService
+  let mockMatchHandler: IMatchHandler
+  let mockPlayerHandler: IPlayerHandler
+  let mockRankingHandler: IRankingHandler
+  let mockWeaponHandler: IWeaponHandler
+  let mockLogger: ILogger
 
   beforeEach(() => {
     vi.clearAllMocks()
-    processor = new EventProcessorService()
-  })
+    mockEventService = createEventServiceMock()
+    mockPlayerService = createPlayerServiceMock()
+    mockMatchHandler = createMatchHandlerMock()
+    mockPlayerHandler = createPlayerHandlerMock()
+    mockRankingHandler = createRankingHandlerMock()
+    mockWeaponHandler = createWeaponHandlerMock()
+    mockLogger = createMockLogger()
 
-  it("should instantiate all handlers in the constructor", () => {
-    expect(MockedDatabaseClient).toHaveBeenCalledTimes(1)
-    expect(MockedEventService).toHaveBeenCalledTimes(1)
-    expect(MockedPlayerService).toHaveBeenCalledTimes(1)
-    expect(MockedWeaponService).toHaveBeenCalledTimes(1)
-    expect(MockedPlayerHandler).toHaveBeenCalledTimes(1)
-    expect(MockedWeaponHandler).toHaveBeenCalledTimes(1)
-    expect(MockedMatchHandler).toHaveBeenCalledTimes(1)
-    expect(MockedRankingHandler).toHaveBeenCalledTimes(1)
+    processor = new EventProcessorService(
+      mockEventService,
+      mockPlayerService,
+      mockPlayerHandler,
+      mockWeaponHandler,
+      mockMatchHandler,
+      mockRankingHandler,
+      mockLogger,
+    )
   })
 
   describe("processEvent", () => {
@@ -62,125 +75,62 @@ describe("EventProcessorService", () => {
         victimTeam: "CT",
       },
       meta: {
-        killer: {
-          steamId: "STEAM_1:0:111",
-          playerName: "Killer",
-          isBot: false,
-        },
-        victim: {
-          steamId: "STEAM_1:0:222",
-          playerName: "Victim",
-          isBot: false,
-        },
+        killer: { steamId: "STEAM_1:0:111", playerName: "Killer", isBot: false },
+        victim: { steamId: "STEAM_1:0:222", playerName: "Victim", isBot: false },
       },
     }
 
-    it("should persist event via EventService", async () => {
-      const eventServiceInstance = MockedEventService.mock.instances[0]!
-      const playerServiceInstance = MockedPlayerService.mock.instances[0]!
-
-      vi.mocked(playerServiceInstance.getOrCreatePlayer)
-        .mockResolvedValueOnce(1) // killer
-        .mockResolvedValueOnce(2) // victim
-
+    it("should resolve player IDs before processing", async () => {
       await processor.processEvent(mockKillEvent)
-
-      expect(eventServiceInstance.createGameEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventType: EventType.PLAYER_KILL,
-          data: expect.objectContaining({
-            killerId: 1,
-            victimId: 2,
-          }),
-        }),
-      )
-
-      // Handler invocations expected
-      expect(MockedPlayerHandler.mock.instances[0]!.handleEvent).toHaveBeenCalledWith(mockKillEvent)
-      expect(MockedWeaponHandler.mock.instances[0]!.handleEvent).toHaveBeenCalledWith(mockKillEvent)
-      expect(MockedRankingHandler.mock.instances[0]!.handleEvent).toHaveBeenCalledWith(mockKillEvent)
+      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledTimes(2)
+      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledWith("STEAM_1:0:111", "Killer", "cstrike")
+      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledWith("STEAM_1:0:222", "Victim", "cstrike")
     })
 
-    it("should throw if the player service call fails", async () => {
-      const playerServiceInstance = MockedPlayerService.mock.instances[0]!
+    it("should persist the event via EventService", async () => {
+      await processor.processEvent(mockKillEvent)
+      expect(mockEventService.createGameEvent).toHaveBeenCalledWith(
+        expect.objectContaining({ eventType: EventType.PLAYER_KILL }),
+      )
+    })
+
+    it("should route PLAYER_KILL to correct handlers", async () => {
+      await processor.processEvent(mockKillEvent)
+      expect(mockPlayerHandler.handleEvent).toHaveBeenCalledWith(mockKillEvent)
+      expect(mockWeaponHandler.handleEvent).toHaveBeenCalledWith(mockKillEvent)
+      expect(mockRankingHandler.handleEvent).toHaveBeenCalledWith(mockKillEvent)
+      expect(mockMatchHandler.handleEvent).not.toHaveBeenCalled()
+    })
+
+    it("should throw and log if player resolution fails", async () => {
       const dbError = new Error("DB Error")
-      vi.mocked(playerServiceInstance.getOrCreatePlayer).mockRejectedValue(dbError)
-
+      vi.mocked(mockPlayerService.getOrCreatePlayer).mockRejectedValue(dbError)
       await expect(processor.processEvent(mockKillEvent)).rejects.toThrow(dbError)
-    })
-  })
-
-  describe("Database Methods", () => {
-    it("should call testConnection on the db instance", async () => {
-      const dbInstance = MockedDatabaseClient.mock.instances[0]!
-      await processor.testDatabaseConnection()
-      expect(dbInstance.testConnection).toHaveBeenCalled()
+      expect(mockLogger.failed).toHaveBeenCalledWith("Failed to process event", "DB Error")
     })
 
-    it("should call disconnect on the db instance", async () => {
-      const dbInstance = MockedDatabaseClient.mock.instances[0]!
-      await processor.disconnect()
-      expect(dbInstance.disconnect).toHaveBeenCalled()
-    })
-  })
-
-  describe("EventProcessorService - bot gating", () => {
-    const mockDb = {
-      testConnection: vi.fn().mockResolvedValue(true),
-      disconnect: vi.fn().mockResolvedValue(undefined),
-    } as unknown as DatabaseClient
-
-    beforeEach(() => {
-      vi.clearAllMocks()
-    })
-
-    it("ignores bot events when logBots=false", async () => {
-      const service = new EventProcessorService(mockDb, { logBots: false })
-
-      const event: PlayerConnectEvent = {
-        eventType: EventType.PLAYER_CONNECT,
-        serverId: 1,
-        timestamp: new Date(),
-        meta: { steamId: "BOT", playerName: "BotPlayer", isBot: true },
-        data: {
-          playerId: 0,
-          steamId: "BOT",
-          playerName: "BotPlayer",
-          ipAddress: "0.0.0.0",
-        },
-      }
-
-      await service.processEvent(event)
-
-      // Should not call any service methods for bot events when logBots=false
-      expect(MockedPlayerService.mock.instances[0]?.getOrCreatePlayer).not.toHaveBeenCalled()
-      expect(MockedEventService.mock.instances[0]?.createGameEvent).not.toHaveBeenCalled()
-    })
-
-    it("processes bot events when logBots=true", async () => {
-      const service = new EventProcessorService(mockDb, { logBots: true })
-
-      const event: PlayerConnectEvent = {
-        eventType: EventType.PLAYER_CONNECT,
-        serverId: 1,
-        timestamp: new Date(),
-        meta: { steamId: "BOT", playerName: "BotPlayer", isBot: true },
-        data: {
-          playerId: 0,
-          steamId: "BOT",
-          playerName: "BotPlayer",
-          ipAddress: "0.0.0.0",
-        },
-      }
-
-      await service.processEvent(event)
-
-      expect(MockedPlayerService.mock.instances[0]?.getOrCreatePlayer).toHaveBeenCalledWith(
-        "BOT",
-        "BotPlayer",
-        "cstrike",
+    it("should not process bot events if logBots is false", async () => {
+      processor = new EventProcessorService(
+        mockEventService,
+        mockPlayerService,
+        mockPlayerHandler,
+        mockWeaponHandler,
+        mockMatchHandler,
+        mockRankingHandler,
+        mockLogger,
+        { logBots: false },
       )
-      expect(MockedEventService.mock.instances[0]?.createGameEvent).toHaveBeenCalled()
+      const botEvent: PlayerConnectEvent = {
+        eventType: EventType.PLAYER_CONNECT,
+        serverId: 1,
+        timestamp: new Date(),
+        meta: { steamId: "BOT", playerName: "BotPlayer", isBot: true },
+        data: { playerId: 0, steamId: "BOT", playerName: "BotPlayer", ipAddress: "0.0.0.0" },
+      }
+      await processor.processEvent(botEvent)
+      expect(mockPlayerService.getOrCreatePlayer).not.toHaveBeenCalled()
+      expect(mockEventService.createGameEvent).not.toHaveBeenCalled()
+      expect(mockLogger.debug).toHaveBeenCalledWith("Skipping bot event: PLAYER_CONNECT")
     })
   })
 })

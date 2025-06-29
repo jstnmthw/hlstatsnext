@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { WeaponService } from "../../src/services/weapon/weapon.service"
-import { createMockDatabaseClient } from "../types/test-mocks"
+import { createMockDatabaseClient, createMockLogger } from "../types/test-mocks"
 import type { DatabaseClient } from "../../src/database/client"
 
 // Re-use the default weapon-config for fallback assertions
@@ -21,10 +21,12 @@ function createDbMock() {
 describe("WeaponService", () => {
   let service: WeaponService
   let dbMock: ReturnType<typeof createDbMock>
+  const loggerMock = createMockLogger()
 
   beforeEach(() => {
     dbMock = createDbMock()
-    service = new WeaponService(dbMock.db)
+    service = new WeaponService(dbMock.db, loggerMock)
+    service.clearCache() // Ensure cache is clean before each test
   })
 
   describe("getSkillMultiplier", () => {
@@ -56,6 +58,15 @@ describe("WeaponService", () => {
       // Should fall back to static config
       const { skillMultiplier } = getWeaponAttributes("ak47", "csgo")
       expect(result).toBeCloseTo(skillMultiplier)
+    })
+
+    it("handles database errors gracefully", async () => {
+      const dbError = new Error("DB connection failed")
+      dbMock.spies.weaponFindFirst.mockRejectedValue(dbError)
+      const multiplier = await service.getSkillMultiplier("csgo", "awp")
+      // Should not throw, but log an error and return default
+      expect(loggerMock.error).toHaveBeenCalledWith(`Failed to fetch weapon modifier for csgo:awp: ${dbError}`)
+      expect(multiplier).toBe(1.0) // Default skill multiplier
     })
 
     it("resolves game aliases (e.g., cstrike → csgo)", async () => {
@@ -106,6 +117,7 @@ describe("WeaponService", () => {
       // Should hit DB again after cache clear
       await service.getSkillMultiplier("csgo", "m4a1")
       expect(dbMock.spies.weaponFindFirst).toHaveBeenCalledTimes(2)
+      expect(loggerMock.info).toHaveBeenCalledWith("Weapon service cache cleared")
     })
 
     it("tracks cache size correctly", async () => {

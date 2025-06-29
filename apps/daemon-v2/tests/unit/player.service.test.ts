@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { PlayerService } from "../../src/services/player/player.service"
-import { createMockDatabaseClient } from "../types/test-mocks"
+import { createMockDatabaseClient, createMockLogger } from "../types/test-mocks"
 import type { DatabaseClient } from "../../src/database/client"
 
 // Helper to build a mock DatabaseClient
@@ -23,10 +23,11 @@ function createDbMock() {
 describe("PlayerService", () => {
   let service: PlayerService
   let dbMock: ReturnType<typeof createDbMock>
+  const loggerMock = createMockLogger()
 
   beforeEach(() => {
     dbMock = createDbMock()
-    service = new PlayerService(dbMock.db)
+    service = new PlayerService(dbMock.db, loggerMock)
   })
 
   describe("getPlayerRating", () => {
@@ -111,6 +112,7 @@ describe("PlayerService", () => {
         volatility: 0.06,
         gamesPlayed: 0,
       })
+      expect(loggerMock.error).toHaveBeenCalledWith(`Failed to get player rating for 123: ${dbError}`)
     })
   })
 
@@ -139,6 +141,7 @@ describe("PlayerService", () => {
       const updates = [{ playerId: 1, newRating: 1200, gamesPlayed: 10 }]
 
       await expect(service.updatePlayerRatings(updates)).rejects.toThrow(dbError)
+      expect(loggerMock.error).toHaveBeenCalledWith(`Failed to update player ratings: ${dbError}`)
     })
   })
 
@@ -224,6 +227,7 @@ describe("PlayerService", () => {
       dbMock.spies.eventEntryFindMany.mockRejectedValueOnce(dbError)
 
       await expect(service.getRoundParticipants(123, 120)).rejects.toThrow(dbError)
+      expect(loggerMock.error).toHaveBeenCalledWith(`Failed to get round participants: ${dbError}`)
     })
   })
 
@@ -296,6 +300,13 @@ describe("PlayerService", () => {
         },
       })
     })
+
+    it("handles database errors", async () => {
+      const dbError = new Error("DB connection failed")
+      dbMock.spies.playerUniqueIdFindUnique.mockRejectedValue(dbError)
+      await expect(service.getOrCreatePlayer("STEAM_ID_UNKNOWN", "New Player", "csgo")).rejects.toThrow(dbError)
+      expect(loggerMock.error).toHaveBeenCalledWith(`Failed to get or create player: ${dbError}`)
+    })
   })
 
   describe("updatePlayerStats", () => {
@@ -340,6 +351,7 @@ describe("PlayerService", () => {
       dbMock.spies.playerUpdate.mockRejectedValueOnce(dbError)
 
       await expect(service.updatePlayerStats(123, { kills: 1 })).rejects.toThrow(dbError)
+      expect(loggerMock.error).toHaveBeenCalledWith(`Failed to update player stats for 123: ${dbError}`)
     })
   })
 })

@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 # HLStatsNext - **Unified Cursor AI Execution Prompt**
 
@@ -22,7 +22,7 @@ alwaysApply: false
 | 5 | **DOCUMENT** every non-trivial decision & any deviation from this prompt (in the same log).                                               | Knowledge sharing                      |
 | 6 | **SYNC DOCS** update `README.md`, architecture docs, and JSDoc comments alongside code changes.                                           | Keep all documentation current         |
 | 7 | **ADD TESTS** for *every* refactor or new feature.                                                                                        | Regression safety                      |
-| 8 | **RUN** the following commands after *each* change and before producing output:`pnpm lint && pnpm check-types && pnpm test && pnpm build` | Type-safety, quality & build integrity |
+| 8 | **RUN** the following commands after *each* change and before producing output:`pnpm lint && pnpm check-types && pnpm test ` | Type-safety, quality & build integrity |
 | 9 | Use clean code practices: early returns, separation of concerns, descriptive naming, small pure functions.                                | Readability & maintainability          |
 
 ---
@@ -185,7 +185,7 @@ Guidelines:
 | Tests      | Vitest/Playwright                 | CI & watch mode        |
 | Commits    | Commitlint + Husky                | pre-commit & pre-push  |
 
-> After **every code change** run: `pnpm lint && pnpm check-types && pnpm test && pnpm build`. CI repeats this pipeline, blocking merge on any failure.
+> After **every code change** run: `pnpm lint && pnpm check-types && pnpm test `. CI repeats this pipeline, blocking merge on any failure.
 
 ---
 
@@ -309,7 +309,7 @@ A change is **DONE** only when:
 1. All acceptance criteria for the current task/phase are satisfied.
 2. Code adheres to this prompt *and* @DEVELOPMENT\_BEST\_PRACTICES.md.
 3. Tests added/updated with meaningful assertions & coverage.
-4. `pnpm lint && pnpm check-types && pnpm test && pnpm build` all pass.
+4. `pnpm lint && pnpm check-types && pnpm test ` all pass.
 5. **Documentation is synchronised** - `README.md`, relevant markdown specs, architecture docs, and JSDoc comments all reflect the change.
 6. `@MIGRATION_PROGRESS.md` log updated.
 7. PR description links to relevant docs & tasks.

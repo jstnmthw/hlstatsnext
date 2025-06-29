@@ -13,10 +13,10 @@ import type {
   PlayerSuicideEvent,
   PlayerTeamkillEvent,
 } from "@/types/common/events"
-import { DatabaseClient } from "@/database/client"
-import { PlayerService } from "@/services/player/player.service"
+import type { IPlayerService } from "@/services/player/player.types"
 import { resolveGameId } from "@/config/game-config"
-import { logger } from "@/utils/logger"
+import type { ILogger } from "@/utils/logger.types"
+import { IPlayerHandler } from "./player.handler.types"
 
 export interface HandlerResult {
   success: boolean
@@ -24,18 +24,14 @@ export interface HandlerResult {
   playersAffected?: number[]
 }
 
-export class PlayerHandler {
-  private readonly playerService: PlayerService
-
+export class PlayerHandler implements IPlayerHandler {
   /**
    * Creates a new PlayerHandler instance
-   *
-   * @param db - Database client for creating default PlayerService
-   * @param playerService - Optional PlayerService instance for dependency injection (useful for testing)
    */
-  constructor(db: DatabaseClient, playerService?: PlayerService) {
-    this.playerService = playerService ?? new PlayerService(db)
-  }
+  constructor(
+    private readonly playerService: IPlayerService,
+    private readonly logger: ILogger,
+  ) {}
 
   async handleEvent(event: GameEvent): Promise<HandlerResult> {
     switch (event.eventType) {
@@ -76,14 +72,14 @@ export class PlayerHandler {
         connection_time: 0, // Reset connection time on new connect
       })
 
-      logger.event(`Player connected: ${playerName} (ID: ${resolvedPlayerId})`)
+      this.logger.event(`Player connected: ${playerName} (ID: ${resolvedPlayerId})`)
 
       return {
         success: true,
         playersAffected: [resolvedPlayerId],
       }
     } catch (error) {
-      logger.error(`Failed to handle player connect: ${error instanceof Error ? error.message : "Unknown error"}`)
+      this.logger.error(`Failed to handle player connect: ${error instanceof Error ? error.message : "Unknown error"}`)
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -110,14 +106,16 @@ export class PlayerHandler {
         connection_time: sessionDuration,
       })
 
-      logger.event(`Player disconnected (ID: ${playerId}), session duration: ${sessionDuration}s`)
+      this.logger.event(`Player disconnected (ID: ${playerId}), session duration: ${sessionDuration}s`)
 
       return {
         success: true,
         playersAffected: [playerId],
       }
     } catch (error) {
-      logger.error(`Failed to handle player disconnect: ${error instanceof Error ? error.message : "Unknown error"}`)
+      this.logger.error(
+        `Failed to handle player disconnect: ${error instanceof Error ? error.message : "Unknown error"}`,
+      )
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -169,14 +167,14 @@ export class PlayerHandler {
       await this.playerService.updatePlayerStats(killerId, killerUpdates)
       await this.playerService.updatePlayerStats(victimId, victimUpdates)
 
-      logger.event(`Kill recorded: Player ${killerId} killed Player ${victimId} with ${weapon}`)
+      this.logger.event(`Kill recorded: Player ${killerId} killed Player ${victimId} with ${weapon}`)
 
       return {
         success: true,
         playersAffected: [killerId, victimId],
       }
     } catch (error) {
-      logger.error(`Failed to handle player kill: ${error instanceof Error ? error.message : "Unknown error"}`)
+      this.logger.error(`Failed to handle player kill: ${error instanceof Error ? error.message : "Unknown error"}`)
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -215,14 +213,14 @@ export class PlayerHandler {
 
       await this.playerService.updatePlayerStats(playerId, updates)
 
-      logger.event(`Suicide recorded: Player ${playerId} with ${weapon}`)
+      this.logger.event(`Suicide recorded: Player ${playerId} with ${weapon}`)
 
       return {
         success: true,
         playersAffected: [playerId],
       }
     } catch (error) {
-      logger.error(`Failed to handle player suicide: ${error instanceof Error ? error.message : "Unknown error"}`)
+      this.logger.error(`Failed to handle player suicide: ${error instanceof Error ? error.message : "Unknown error"}`)
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -270,14 +268,14 @@ export class PlayerHandler {
         this.playerService.updatePlayerStats(victimId, victimUpdates),
       ])
 
-      logger.event(`Teamkill recorded: Player ${killerId} teamkilled Player ${victimId} with ${weapon}`)
+      this.logger.event(`Teamkill recorded: Player ${killerId} teamkilled Player ${victimId} with ${weapon}`)
 
       return {
         success: true,
         playersAffected: [killerId, victimId],
       }
     } catch (error) {
-      logger.error(`Failed to handle player teamkill: ${error instanceof Error ? error.message : "Unknown error"}`)
+      this.logger.error(`Failed to handle player teamkill: ${error instanceof Error ? error.message : "Unknown error"}`)
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -285,8 +283,11 @@ export class PlayerHandler {
     }
   }
 
+  /**
+   * Calculate skill change between two players using ELO formula.
+   * @returns The change in skill for each player
+   */
   private async calculateSkillDelta(killerId: number, victimId: number): Promise<{ killer: number; victim: number }> {
-    // Get player stats to calculate ELO-based skill changes
     const [killer, victim] = await Promise.all([
       this.playerService.getPlayerStats(killerId),
       this.playerService.getPlayerStats(victimId),

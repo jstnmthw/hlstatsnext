@@ -53,3 +53,5 @@ export class DatabaseClient {
     await this.client.$disconnect()
   }
 }
+
+export const databaseClient = new DatabaseClient()

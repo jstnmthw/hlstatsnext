@@ -1,55 +1,59 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { RankingHandler } from "../../src/services/processor/handlers/ranking.handler"
-import { EventType, PlayerConnectEvent, PlayerKillEvent, RoundEndEvent } from "../../src/types/common/events"
-import { PlayerService } from "@/services/player/player.service"
-import { WeaponService } from "@/services/weapon/weapon.service"
-import { DatabaseClient } from "@/database/client"
+import { EventType, PlayerKillEvent, RoundEndEvent, PlayerConnectEvent } from "../../src/types/common/events"
+import { createMockLogger } from "../types/test-mocks"
+import type { IPlayerService } from "@/services/player/player.types"
+import type { IWeaponService } from "@/services/weapon/weapon.types"
 
-// Mock PlayerService
-vi.mock("@/services/player/player.service", () => ({
-  PlayerService: vi.fn().mockImplementation(() => ({
-    getPlayerRating: vi.fn().mockResolvedValue({
+const createPlayerServiceMock = (): IPlayerService => ({
+  getPlayerRating: vi.fn().mockResolvedValue({
+    playerId: 123,
+    rating: 1000,
+    confidence: 350,
+    volatility: 0.06,
+    gamesPlayed: 0,
+  }),
+  updatePlayerRatings: vi.fn().mockResolvedValue(undefined),
+  getRoundParticipants: vi.fn().mockResolvedValue([
+    {
       playerId: 123,
-      rating: 1000,
-      confidence: 350,
-      volatility: 0.06,
-      gamesPlayed: 0,
-    }),
-    updatePlayerRatings: vi.fn().mockResolvedValue(undefined),
-    getRoundParticipants: vi.fn().mockResolvedValue([
-      {
-        playerId: 123,
-        player: {
-          skill: 1000,
-          teamkills: 0,
-        },
+      player: {
+        skill: 1000,
+        teamkills: 0,
       },
-    ]),
-  })),
-}))
+    },
+  ]),
+  getOrCreatePlayer: vi.fn(),
+  updatePlayerStats: vi.fn(),
+  getPlayerStats: vi.fn(),
+  getTopPlayers: vi.fn(),
+})
 
-// Mock WeaponService
-vi.mock("@/services/weapon/weapon.service", () => ({
-  WeaponService: vi.fn().mockImplementation(() => ({
-    getSkillMultiplier: vi.fn().mockResolvedValue(1.0),
-  })),
-}))
+const createWeaponServiceMock = (): IWeaponService => ({
+  getSkillMultiplier: vi.fn().mockResolvedValue(1.0),
+  getWeaponModifier: vi.fn(),
+  getDamageMultiplier: vi.fn(),
+  clearCache: vi.fn(),
+  getCacheSize: vi.fn(),
+})
 
 describe("RankingHandler", () => {
   let handler: RankingHandler
-  let playerService: PlayerService
-  let weaponService: WeaponService
+  let mockPlayerService: IPlayerService
+  let mockWeaponService: IWeaponService
+  const loggerMock = createMockLogger()
 
   beforeEach(() => {
-    playerService = new PlayerService({} as DatabaseClient)
-    weaponService = new WeaponService({} as DatabaseClient)
-    handler = new RankingHandler(playerService, weaponService)
+    vi.clearAllMocks()
+    mockPlayerService = createPlayerServiceMock()
+    mockWeaponService = createWeaponServiceMock()
+    handler = new RankingHandler(mockPlayerService, mockWeaponService, loggerMock)
   })
 
   describe("handleEvent", () => {
     it("should handle PLAYER_KILL events and calculate rating changes", async () => {
       // Mock different ratings for killer and victim
-      vi.spyOn(playerService, "getPlayerRating")
+      vi.mocked(mockPlayerService.getPlayerRating)
         .mockResolvedValueOnce({
           playerId: 123,
           rating: 1200,
@@ -74,8 +78,6 @@ describe("RankingHandler", () => {
           victimId: 456,
           weapon: "ak47",
           headshot: true,
-          killerTeam: "CT",
-          victimTeam: "T",
         },
       } as PlayerKillEvent
 
@@ -145,7 +147,7 @@ describe("RankingHandler", () => {
     })
 
     it("should handle errors from PlayerService gracefully", async () => {
-      vi.spyOn(playerService, "getPlayerRating").mockRejectedValueOnce(new Error("DB Error"))
+      vi.mocked(mockPlayerService.getPlayerRating).mockRejectedValueOnce(new Error("DB Error"))
 
       const event = {
         eventType: EventType.PLAYER_KILL,
@@ -156,8 +158,6 @@ describe("RankingHandler", () => {
           victimId: 456,
           weapon: "ak47",
           headshot: false,
-          killerTeam: "CT",
-          victimTeam: "T",
         },
       } as PlayerKillEvent
 

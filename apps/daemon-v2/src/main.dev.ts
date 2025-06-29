@@ -1,6 +1,6 @@
 import { IngressService } from "./services/ingress/ingress.service"
 import { DatabaseClient } from "./database/client"
-import { EventProcessorService } from "./services/processor/processor.service"
+import { createEventProcessorService } from "./services/processor/processor.service"
 import { logger } from "./utils/logger"
 ;(async () => {
   // Determine environment once - fall back to NODE_ENV for convenience
@@ -12,7 +12,7 @@ import { logger } from "./utils/logger"
   await db.testConnection()
 
   // 2. Processor
-  const processor = new EventProcessorService(db, {
+  const processor = createEventProcessorService(db, logger, {
     logBots: process.env.LOG_BOTS ? process.env.LOG_BOTS === "true" : isDev,
   })
 

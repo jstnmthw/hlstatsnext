@@ -1,7 +1,9 @@
 import { getWeaponAttributes, DEFAULT_SKILL_MULTIPLIER } from "@/config/weapon-config"
 import { resolveGameId } from "@/config/game-config"
-import type { DatabaseClient } from "@/database/client"
-import { logger } from "@/utils/logger"
+import { DatabaseClient, databaseClient as defaultDb } from "@/database/client"
+import { ILogger } from "@/utils/logger.types"
+import { logger as defaultLogger } from "@/utils/logger"
+import { IWeaponService } from "./weapon.types"
 
 /**
  * Centralised access point for weapon metadata and multipliers.
@@ -10,14 +12,17 @@ import { logger } from "@/utils/logger"
  *   – Falls back to static defaults to guarantee coverage.
  *   – Caches look-ups in memory for the lifetime of the daemon.
  */
-export class WeaponService {
+export class WeaponService implements IWeaponService {
   private readonly cache = new Map<string, number>()
 
   // Weapon damage constants
   private readonly HEADSHOT_DAMAGE_MULTIPLIER = 4.0
   private readonly BODY_SHOT_MULTIPLIER = 1.0
 
-  constructor(private readonly db: DatabaseClient) {}
+  constructor(
+    private readonly db: DatabaseClient,
+    private readonly logger: ILogger,
+  ) {}
 
   /**
    * Fetch weapon modifier (skill multiplier) for a given game + weapon code.
@@ -37,7 +42,7 @@ export class WeaponService {
 
       return weapon?.modifier ?? null
     } catch (error) {
-      console.error("Failed to fetch weapon modifier:", error)
+      this.logger.error(`Failed to fetch weapon modifier for ${game}:${code}: ${error as string}`)
       return null
     }
   }
@@ -83,7 +88,7 @@ export class WeaponService {
    */
   clearCache(): void {
     this.cache.clear()
-    logger.info("Weapon service cache cleared")
+    this.logger.info("Weapon service cache cleared")
   }
 
   /**
@@ -92,4 +97,11 @@ export class WeaponService {
   getCacheSize(): number {
     return this.cache.size
   }
+}
+
+export function createWeaponService(
+  databaseClient: DatabaseClient = defaultDb,
+  logger: ILogger = defaultLogger,
+): IWeaponService {
+  return new WeaponService(databaseClient, logger)
 }

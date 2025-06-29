@@ -8,7 +8,8 @@
 
 import { DatabaseClient } from "@/database/client"
 import { ServerService } from "@/services/server/server.service"
-import { EventProcessorService } from "@/services/processor/processor.service"
+import { createEventProcessorService } from "@/services/processor/processor.service"
+import type { IEventProcessor } from "@/services/processor/processor.types"
 import { UdpServer } from "@/services/ingress/udp-server"
 import { CsParser } from "@/services/ingress/parsers/cs.parser"
 import { logger } from "@/utils/logger"
@@ -22,7 +23,7 @@ export class IngressService implements IIngressService {
   private readonly udpServer: UdpServer
   private readonly db: DatabaseClient
   private readonly serverService: ServerService
-  private readonly processor: EventProcessorService
+  private readonly processor: IEventProcessor
   private readonly parser: CsParser
 
   /** Tracks authenticated servers - key = "ip:port", value = serverId */
@@ -30,13 +31,13 @@ export class IngressService implements IIngressService {
 
   constructor(
     private readonly port: number = 27500,
-    processor?: EventProcessorService,
+    processor?: IEventProcessor,
     dbClient?: DatabaseClient,
     private readonly opts: { skipAuth?: boolean } = {},
   ) {
     this.db = dbClient ?? new DatabaseClient()
     this.serverService = new ServerService(this.db)
-    this.processor = processor ?? new EventProcessorService()
+    this.processor = processor ?? createEventProcessorService()
     this.udpServer = new UdpServer({ port: this.port })
     this.parser = new CsParser("csgo")
   }

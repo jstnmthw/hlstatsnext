@@ -20,6 +20,29 @@ export class WeaponService {
   constructor(private readonly db: DatabaseClient) {}
 
   /**
+   * Fetch weapon modifier (skill multiplier) for a given game + weapon code.
+   * Returns null if the weapon is not present in the database.
+   */
+  async getWeaponModifier(game: string, code: string): Promise<number | null> {
+    try {
+      const weapon = await this.db.prisma.weapon.findFirst({
+        where: {
+          game,
+          code,
+        },
+        select: {
+          modifier: true,
+        },
+      })
+
+      return weapon?.modifier ?? null
+    } catch (error) {
+      console.error("Failed to fetch weapon modifier:", error)
+      return null
+    }
+  }
+
+  /**
    * Get the skill multiplier used in ranking calculations for a given game/weapon.
    * @param game  Canonical or alias game identifier.
    * @param weapon Weapon code from log/event (case-insensitive).
@@ -30,7 +53,7 @@ export class WeaponService {
     if (this.cache.has(key)) return this.cache.get(key)!
 
     // 1) Try DB first
-    const dbModifier = await this.db.getWeaponModifier(canonicalGame, weapon.toLowerCase())
+    const dbModifier = await this.getWeaponModifier(canonicalGame, weapon.toLowerCase())
     let multiplier: number | null = dbModifier
 
     // 2) Fallback → static defaults

@@ -8,7 +8,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { EventProcessorService } from "../../src/services/processor/processor.service"
 import { DatabaseClient } from "../../src/database/client"
-import type { PrismaClient } from "@repo/database/client"
+import { EventService } from "../../src/services/event/event.service"
+import { PlayerService } from "../../src/services/player/player.service"
+import { WeaponService } from "../../src/services/weapon/weapon.service"
 import {
   EventType,
   PlayerKillEvent,
@@ -23,33 +25,34 @@ import { asUnknownEvent } from "../types/test-mocks"
 
 // Mock all dependencies
 vi.mock("../../src/database/client")
-// const MockedDatabaseClient = vi.mocked(DatabaseClient)
+vi.mock("../../src/services/event/event.service")
+vi.mock("../../src/services/player/player.service")
+vi.mock("../../src/services/weapon/weapon.service")
+vi.mock("../../src/services/processor/handlers/player.handler")
+vi.mock("../../src/services/processor/handlers/weapon.handler")
+vi.mock("../../src/services/processor/handlers/match.handler")
+vi.mock("../../src/services/processor/handlers/ranking.handler")
+
+const MockedDatabaseClient = vi.mocked(DatabaseClient)
+const MockedEventService = vi.mocked(EventService)
+const MockedPlayerService = vi.mocked(PlayerService)
+const MockedWeaponService = vi.mocked(WeaponService)
 
 describe("Event Processing Integration", () => {
   let processor: EventProcessorService
   let mockDb: DatabaseClient
+  let mockEventService: EventService
+  let mockPlayerService: PlayerService
+  let mockWeaponService: WeaponService
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    // Setup mock database with basic responses
+    // Setup mock database
     mockDb = {
-      getOrCreatePlayer: vi.fn().mockResolvedValue(1),
-      createGameEvent: vi.fn().mockResolvedValue(undefined),
       testConnection: vi.fn().mockResolvedValue(true),
       disconnect: vi.fn().mockResolvedValue(undefined),
-      updatePlayerStats: vi.fn().mockResolvedValue(undefined),
-      getPlayerStats: vi.fn().mockResolvedValue(null),
       transaction: vi.fn().mockImplementation((callback) => callback({})),
-      getServerByAddress: vi.fn().mockResolvedValue(null),
-      getTopPlayers: vi.fn().mockResolvedValue([]),
-      createConnectEvent: vi.fn().mockResolvedValue(undefined),
-      createDisconnectEvent: vi.fn().mockResolvedValue(undefined),
-      createFragEvent: vi.fn().mockResolvedValue(undefined),
-      createSuicideEvent: vi.fn().mockResolvedValue(undefined),
-      createTeamkillEvent: vi.fn().mockResolvedValue(undefined),
-      createChatEvent: vi.fn().mockResolvedValue(undefined),
-      client: {} as Partial<PrismaClient>, // Private property we don't need for tests
       prisma: {
         player: {
           update: vi.fn().mockResolvedValue({}),
@@ -60,6 +63,28 @@ describe("Event Processing Integration", () => {
         },
       },
     } as unknown as DatabaseClient
+
+    // Setup mock services
+    mockEventService = {
+      createGameEvent: vi.fn().mockResolvedValue(undefined),
+    } as unknown as EventService
+
+    mockPlayerService = {
+      getOrCreatePlayer: vi.fn().mockResolvedValue(1),
+      updatePlayerStats: vi.fn().mockResolvedValue(undefined),
+      getPlayerStats: vi.fn().mockResolvedValue(null),
+      getTopPlayers: vi.fn().mockResolvedValue([]),
+    } as unknown as PlayerService
+
+    mockWeaponService = {
+      getWeaponModifier: vi.fn().mockResolvedValue(1.0),
+    } as unknown as WeaponService
+
+    // Mock the constructor calls
+    MockedDatabaseClient.mockImplementation(() => mockDb)
+    MockedEventService.mockImplementation(() => mockEventService)
+    MockedPlayerService.mockImplementation(() => mockPlayerService)
+    MockedWeaponService.mockImplementation(() => mockWeaponService)
 
     processor = new EventProcessorService(mockDb)
   })
@@ -133,9 +158,9 @@ describe("Event Processing Integration", () => {
       await processor.processEvent(chatEvent)
       await processor.processEvent(disconnectEvent)
 
-      // Verify database interactions
-      expect(mockDb.getOrCreatePlayer).toHaveBeenCalledWith(steamId, playerName, "cstrike")
-      expect(mockDb.createGameEvent).toHaveBeenCalledTimes(4)
+      // Verify service interactions
+      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledWith(steamId, playerName, "cstrike")
+      expect(mockEventService.createGameEvent).toHaveBeenCalledTimes(4)
     })
 
     it("should handle bot players correctly when logging is disabled", async () => {
@@ -157,8 +182,8 @@ describe("Event Processing Integration", () => {
       await botProcessor.processEvent(botEvent)
 
       // Bot events should be ignored
-      expect(mockDb.getOrCreatePlayer).not.toHaveBeenCalled()
-      expect(mockDb.createGameEvent).not.toHaveBeenCalled()
+      expect(mockPlayerService.getOrCreatePlayer).not.toHaveBeenCalled()
+      expect(mockEventService.createGameEvent).not.toHaveBeenCalled()
     })
   })
 
@@ -220,8 +245,8 @@ describe("Event Processing Integration", () => {
       // Process all events concurrently to test race conditions
       await Promise.all(events.map((event) => processor.processEvent(event)))
 
-      expect(mockDb.createGameEvent).toHaveBeenCalledTimes(4)
-      expect(mockDb.getOrCreatePlayer).toHaveBeenCalledTimes(8) // 2 connects + 6 event players (kill + teamkill each have 2 players)
+      expect(mockEventService.createGameEvent).toHaveBeenCalledTimes(4)
+      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledTimes(6) // 2 connects + 4 event players (kill + teamkill each have 2 players)
     })
 
     it("should handle edge case event sequences", async () => {
@@ -249,19 +274,21 @@ describe("Event Processing Integration", () => {
       await processor.processEvent(suicideEvent)
       await processor.processEvent(disconnectEvent)
 
-      expect(mockDb.createGameEvent).toHaveBeenCalledTimes(2)
+      expect(mockEventService.createGameEvent).toHaveBeenCalledTimes(2)
     })
   })
 
   describe("Error Handling and Recovery", () => {
     it("should handle database connection failures gracefully", async () => {
-      // Mock database failure
-      const failingDb = {
-        ...mockDb,
+      // Mock PlayerService failure
+      const failingPlayerService = {
         getOrCreatePlayer: vi.fn().mockRejectedValue(new Error("Database connection failed")),
-      } as unknown as DatabaseClient
+      } as unknown as PlayerService
 
-      const failingProcessor = new EventProcessorService(failingDb)
+      // Mock the failing service
+      MockedPlayerService.mockImplementation(() => failingPlayerService)
+
+      const failingProcessor = new EventProcessorService(mockDb)
 
       const event: PlayerConnectEvent = {
         eventType: EventType.PLAYER_CONNECT,
@@ -319,7 +346,7 @@ describe("Event Processing Integration", () => {
       // Process all events concurrently
       await Promise.all(concurrentEvents.map((event) => processor.processEvent(event)))
 
-      expect(mockDb.createGameEvent).toHaveBeenCalledTimes(5)
+      expect(mockEventService.createGameEvent).toHaveBeenCalledTimes(5)
     })
   })
 
@@ -349,7 +376,7 @@ describe("Event Processing Integration", () => {
 
       // Should process 100 events in under 2 seconds
       expect(duration).toBeLessThan(2000)
-      expect(mockDb.createGameEvent).toHaveBeenCalledTimes(100)
+      expect(mockEventService.createGameEvent).toHaveBeenCalledTimes(100)
     })
 
     it("should handle mixed event types efficiently", async () => {
@@ -394,7 +421,7 @@ describe("Event Processing Integration", () => {
 
       // Should process 100 mixed events efficiently
       expect(duration).toBeLessThan(3000)
-      expect(mockDb.createGameEvent).toHaveBeenCalledTimes(100)
+      expect(mockEventService.createGameEvent).toHaveBeenCalledTimes(100)
     })
   })
 
@@ -406,7 +433,7 @@ describe("Event Processing Integration", () => {
       const victimSteamId = "STEAM_1:0:222"
 
       // Setup mock to return consistent player IDs
-      mockDb.getOrCreatePlayer = vi
+      mockPlayerService.getOrCreatePlayer = vi
         .fn()
         .mockResolvedValueOnce(killerId) // First call for killer
         .mockResolvedValueOnce(victimId) // Second call for victim
@@ -432,11 +459,11 @@ describe("Event Processing Integration", () => {
       await processor.processEvent(killEvent)
 
       // Verify correct player resolution
-      expect(mockDb.getOrCreatePlayer).toHaveBeenCalledWith(killerSteamId, "Killer", "cstrike")
-      expect(mockDb.getOrCreatePlayer).toHaveBeenCalledWith(victimSteamId, "Victim", "cstrike")
+      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledWith(killerSteamId, "Killer", "cstrike")
+      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledWith(victimSteamId, "Victim", "cstrike")
 
       // Verify event creation with correct player IDs
-      expect(mockDb.createGameEvent).toHaveBeenCalledWith(
+      expect(mockEventService.createGameEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           eventType: EventType.PLAYER_KILL,
           data: expect.objectContaining({

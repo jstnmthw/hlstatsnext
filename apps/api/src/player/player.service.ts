@@ -5,17 +5,12 @@ import { success, failure } from "../types/common"
 
 /**
  * Service class for handling player-related business logic operations
- *
- * Note: Basic CRUD operations (getPlayer, getPlayers, getTopPlayers, getPlayerBySteamId)
- * are now handled directly by GraphQL resolvers for better performance and consistency.
- * This service focuses on complex business logic and operations requiring transaction handling.
  */
 export class PlayerService {
   constructor(private readonly db: PrismaClient) {}
 
   /**
    * Get player statistics summary with rank calculation
-   * This involves complex business logic that's better handled in the service layer
    */
   async getPlayerStats(playerId: string): Promise<Result<PlayerStatistics, AppError>> {
     try {
@@ -70,7 +65,6 @@ export class PlayerService {
 
   /**
    * Update player statistics (called by daemon)
-   * Requires transaction handling and complex business logic
    */
   async updatePlayerStats(
     steamId: string,
@@ -131,7 +125,6 @@ export class PlayerService {
 
   /**
    * Create a new player with Steam ID association
-   * Requires transaction to ensure data consistency across tables
    */
   async createPlayer(data: CreatePlayerInput): Promise<Result<Player, AppError>> {
     try {

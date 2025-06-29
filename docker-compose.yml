@@ -1,31 +1,8 @@
 services:
-  # daemon:
-  #   container_name: hlstatsnext-daemon
-  #   build:
-  #     dockerfile: docker/daemon/Dockerfile
-  #     context: .
-  #     target: dev
-  #   ports:
-  #     - 27500:27500/udp
-  #   networks:
-  #     default:
-  #       ipv4_address: 10.5.0.50
-  #   depends_on:
-  #     - db
-  #   command:
-  #     - --ip=0.0.0.0
-  #     - --port=27500
-  #     - --db-host=${DB_HOST:-db:3306}
-  #     - --db-name=${DB_NAME:-hlstatsnext}
-  #     - --db-username=${DB_USER:-hlstatsnext}
-  #     - --db-password=${DB_PASS:-hlstatsnext}
-  #     - --nodns-resolveip
-  #     - --debug
-  #   restart: unless-stopped
-
   db:
-    image: mysql:5.7
+    image: mysql:8.4
     container_name: hlstatsnext-db
+    command: mysqld --mysql-native-password=ON
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root}
       - MYSQL_USER=${DB_USER:-hlstatsnext}
@@ -33,33 +10,23 @@ services:
       - MYSQL_DATABASE=${DB_NAME:-hlstatsnext}
     volumes:
       - db-volume:/var/lib/mysql
-      - ./packages/database/src/sql/install.sql:/docker-entrypoint-initdb.d/01-install.sql:ro
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      # - ./packages/database/src/sql/install.sql:/docker-entrypoint-initdb.d/01-install.sql:ro
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     ports:
       - 3306:3306
     networks:
       - default
-    command: --default-authentication-plugin=mysql_native_password
     restart: unless-stopped
     healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-u",
-          "root",
-          "-p${DB_ROOT_PASSWORD:-root}",
-        ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  cs1:
+  cstrike:
     image: gameservermanagers/gameserver:cs
-    container_name: hlstatsnext-cs-1
+    container_name: hlstatsnext-cstrike
     networks:
       - default
     environment:
@@ -74,18 +41,18 @@ services:
       - "27015:27015/tcp"
     restart: unless-stopped
 
-  cs2:
-    image: gameservermanagers/gameserver:cs
-    container_name: hlstatsnext-cs-2
+  tfc:
+    image: gameservermanagers/gameserver:tfc
+    container_name: hlstatsnext-tfc
     networks:
       - default
     environment:
       - UID=${USER_ID:-1000}
       - GID=${GROUP_ID:-1000}
-      - GAME=cs
-      - LGSM_GAMESERVER=csserver
+      - GAME=tfc
+      - LGSM_GAMESERVER=tfcserver
     volumes:
-      - ./servers/cs2:/data
+      - ./servers/tfc:/data
     ports:
       - "27016:27015/udp"
       - "27016:27015/tcp"

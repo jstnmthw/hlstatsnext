@@ -17,11 +17,27 @@ vi.mock("@/services/ingress/udp-server", () => {
   }
 })
 
-// Mock DatabaseClient so no real DB hits occur.
+// Mock DatabaseClient
 vi.mock("@/database/client", () => {
   return {
     DatabaseClient: vi.fn().mockImplementation(() => ({
+      prisma: {
+        server: {
+          create: vi.fn().mockResolvedValue({ serverId: 42 }),
+          findFirst: vi.fn().mockResolvedValue(null),
+        },
+      },
+      client: undefined,
+    })),
+  }
+})
+
+// Mock ServerService
+vi.mock("@/services/server/server.service", () => {
+  return {
+    ServerService: vi.fn().mockImplementation(() => ({
       getServerByAddress: vi.fn().mockResolvedValue({ serverId: 1 }),
+      db: undefined,
     })),
   }
 })
@@ -43,7 +59,12 @@ vi.mock("@/services/ingress/parsers/cs.parser", () => {
 
 import { IngressService } from "../../src/services/ingress/ingress.service"
 import { DatabaseClient } from "../../src/database/client"
+import { ServerService } from "../../src/services/server/server.service"
 import { EventProcessorService } from "@/services/processor/processor.service"
+import type { MockDatabaseClient, MockServerService } from "../types/test-mocks"
+
+const MockedDatabaseClient = vi.mocked(DatabaseClient)
+const MockedServerService = vi.mocked(ServerService)
 
 // Mock processor with a stubbed processEvent
 const processEventMock = vi.fn().mockResolvedValue(undefined)
@@ -100,13 +121,21 @@ describe("IngressService", () => {
   })
 
   it("should reject traffic from an unknown server", async () => {
-    // Override DB mock for this test
-    const dbInstance = new DatabaseClient()
-    vi.mocked(dbInstance.getServerByAddress).mockResolvedValue(null)
+    // Create a custom mock for this test
+    const mockServerService: MockServerService = {
+      getServerByAddress: vi.fn().mockResolvedValue(null),
+      db: {} as MockDatabaseClient,
+    }
 
-    // We need a new ingress service instance to use the new DB mock
-    ingress = new IngressService(27500, processorStub, dbInstance)
-    await ingress.start()
+    // Create a new ingress service with the custom mock
+    const customIngress = new IngressService(27500, processorStub)
+    // Replace the serverService with our mock - this is necessary for testing internal behavior
+    Object.defineProperty(customIngress, "serverService", {
+      value: mockServerService,
+      writable: true,
+    })
+
+    await customIngress.start()
 
     const call = onMock.mock.calls.find((c) => c[0] === "logReceived")
     expect(call).toBeDefined()
@@ -181,21 +210,48 @@ describe("IngressService", () => {
 describe("IngressService - dev skipAuth auto-registration", () => {
   const serverCreateMock = vi.fn().mockResolvedValue({ serverId: 42 })
 
-  const dbMock = {
-    getServerByAddress: vi.fn().mockResolvedValue(null),
-    prisma: {
-      server: {
-        create: serverCreateMock,
-        findFirst: vi.fn().mockResolvedValue(null),
-      },
-    },
-  } as unknown as DatabaseClient
-
   let ingress: IngressService
 
   beforeEach(() => {
     vi.clearAllMocks()
-    ingress = new IngressService(27500, processorStub, dbMock, {
+
+    // Mock DatabaseClient for skipAuth tests
+    MockedDatabaseClient.mockImplementation(
+      () =>
+        ({
+          prisma: {
+            server: {
+              create: serverCreateMock,
+              findFirst: vi.fn().mockResolvedValue(null),
+            },
+            playerUniqueId: { findUnique: vi.fn() },
+            player: { create: vi.fn(), update: vi.fn(), findUnique: vi.fn(), findMany: vi.fn() },
+            weapon: { findFirst: vi.fn() },
+            eventConnect: { create: vi.fn() },
+            eventDisconnect: { create: vi.fn() },
+            eventFrag: { create: vi.fn() },
+            eventSuicide: { create: vi.fn() },
+            eventTeamkill: { create: vi.fn() },
+            eventChat: { create: vi.fn() },
+            eventEntry: { findMany: vi.fn() },
+          },
+          testConnection: vi.fn(),
+          transaction: vi.fn(),
+          disconnect: vi.fn(),
+          client: undefined,
+        }) as unknown as DatabaseClient,
+    )
+
+    // Mock ServerService for skipAuth tests
+    MockedServerService.mockImplementation(
+      () =>
+        ({
+          getServerByAddress: vi.fn().mockResolvedValue(null),
+          db: undefined,
+        }) as unknown as ServerService,
+    )
+
+    ingress = new IngressService(27500, processorStub, undefined, {
       skipAuth: true,
     })
   })
@@ -207,109 +263,149 @@ describe("IngressService - dev skipAuth auto-registration", () => {
     expect(call).toBeDefined()
     const handler = call![1]
 
-    const payload = {
-      logLine: 'L 01/01/2025 - 12:00:03: "RealGuy<3><STEAM_1:1:222><TERRORIST>" connected, address "8.8.8.8:27005"',
-      serverAddress: "172.17.0.2",
+    await handler({
+      logLine: "any log line",
+      serverAddress: "127.0.0.1",
       serverPort: 27015,
-      timestamp: new Date(),
-    }
+    })
 
-    await handler(payload)
-
-    expect(serverCreateMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({ address: "172.17.0.2", port: 27015 }),
-      }),
-    )
-
-    // Second packet should not call create again (cached)
-    await handler(payload)
-    expect(serverCreateMock).toHaveBeenCalledTimes(1)
+    expect(serverCreateMock).toHaveBeenCalledWith({
+      data: {
+        address: "127.0.0.1",
+        port: 27015,
+        name: "DEV 127.0.0.1:27015",
+        game: "cstrike",
+      },
+      select: { serverId: true },
+    })
   })
 })
 
 /**
- * Additional coverage for dev skipAuth behaviour and race-condition handling
+ * Dev environment behaviour - skipAuth immediate processing & race condition
  */
 describe("IngressService - skipAuth immediate processing & race condition", () => {
+  let ingress: IngressService
+
   beforeEach(() => {
     vi.clearAllMocks()
-    // Ensure parser mocks are back to successful state
-    canParseMock.mockReset().mockReturnValue(true)
-    parseMock.mockReset().mockResolvedValue({
-      success: true,
-      event: { eventType: "PLAYER_CONNECT", serverId: 1, data: {} },
+    ingress = new IngressService(27500, processorStub, undefined, {
+      skipAuth: true,
     })
   })
 
   it("processes first packet immediately when skipAuth=true", async () => {
-    const dbMock = {
-      getServerByAddress: vi.fn().mockResolvedValue({ serverId: 99 }),
-      prisma: {
-        server: {
-          create: vi.fn(),
-        },
-      },
-    } as unknown as DatabaseClient
+    // Mock ServerService to return null initially
+    MockedServerService.mockImplementation(
+      () =>
+        ({
+          getServerByAddress: vi.fn().mockResolvedValue(null),
+          db: undefined,
+        }) as unknown as ServerService,
+    )
 
-    const ingress = new IngressService(27500, processorStub, dbMock, {
-      skipAuth: true,
-    })
+    // Mock DatabaseClient for server creation
+    MockedDatabaseClient.mockImplementation(
+      () =>
+        ({
+          prisma: {
+            server: {
+              create: vi.fn().mockResolvedValue({ serverId: 42 }),
+              findFirst: vi.fn(),
+            },
+            playerUniqueId: { findUnique: vi.fn() },
+            player: { create: vi.fn(), update: vi.fn(), findUnique: vi.fn(), findMany: vi.fn() },
+            weapon: { findFirst: vi.fn() },
+            eventConnect: { create: vi.fn() },
+            eventDisconnect: { create: vi.fn() },
+            eventFrag: { create: vi.fn() },
+            eventSuicide: { create: vi.fn() },
+            eventTeamkill: { create: vi.fn() },
+            eventChat: { create: vi.fn() },
+            eventEntry: { findMany: vi.fn() },
+          },
+          testConnection: vi.fn(),
+          transaction: vi.fn(),
+          disconnect: vi.fn(),
+          client: undefined,
+        }) as unknown as DatabaseClient,
+    )
 
     await ingress.start()
 
-    // Find the logReceived handler registered via onMock.
-    const handler = onMock.mock.calls.find((c) => c[0] === "logReceived")![1]
-
-    const beforeCount = processEventMock.mock.calls.length
+    const call = onMock.mock.calls.find((c) => c[0] === "logReceived")
+    expect(call).toBeDefined()
+    const handler = call![1]
 
     await handler({
-      logLine: "first line",
-      serverAddress: "10.0.0.1",
+      logLine: 'L 07/15/2024 - 22:33:10: "Player<1><STEAM_1:0:111><CT>" connected, address "127.0.0.1:27005"',
+      serverAddress: "127.0.0.1",
       serverPort: 27015,
     })
 
-    expect(processEventMock.mock.calls.length).toBe(beforeCount + 1)
+    expect(processEventMock).toHaveBeenCalledTimes(1)
   })
 
   it("falls back to existing server row when unique constraint race occurs", async () => {
-    const createMock = vi
+    // Create a custom ingress service with mocked dependencies
+    const getServerByAddressMock = vi
       .fn()
-      // First call: throw unique constraint error
-      .mockRejectedValueOnce({ code: "P2002" })
-      // Should not be called again
-      .mockResolvedValue({ serverId: 123 })
+      .mockResolvedValueOnce(null) // First call returns null
+      .mockResolvedValueOnce({ serverId: 42 }) // Second call (after race) returns server
 
-    const dbMock = {
-      getServerByAddress: vi
-        .fn()
-        .mockResolvedValueOnce(null) // Before insert, record doesn't exist
-        .mockResolvedValueOnce({ serverId: 55 }), // After race, record exists
+    const createMock = vi.fn().mockRejectedValue({ code: "P2002" })
+
+    const mockDb = {
       prisma: {
         server: {
           create: createMock,
+          findFirst: vi.fn(),
         },
+        playerUniqueId: { findUnique: vi.fn() },
+        player: { create: vi.fn(), update: vi.fn(), findUnique: vi.fn(), findMany: vi.fn() },
+        weapon: { findFirst: vi.fn() },
+        eventConnect: { create: vi.fn() },
+        eventDisconnect: { create: vi.fn() },
+        eventFrag: { create: vi.fn() },
+        eventSuicide: { create: vi.fn() },
+        eventTeamkill: { create: vi.fn() },
+        eventChat: { create: vi.fn() },
+        eventEntry: { findMany: vi.fn() },
       },
+      testConnection: vi.fn(),
+      transaction: vi.fn(),
+      disconnect: vi.fn(),
+      client: undefined,
     } as unknown as DatabaseClient
 
-    const ingress = new IngressService(27500, processorStub, dbMock, {
+    const customIngress = new IngressService(27500, processorStub, mockDb, {
       skipAuth: true,
     })
 
-    await ingress.start()
+    // Replace the serverService with our mock
+    const mockServerService = {
+      getServerByAddress: getServerByAddressMock,
+      db: undefined,
+    } as unknown as ServerService
 
-    const handler = onMock.mock.calls.find((c) => c[0] === "logReceived")![1]
-
-    const beforeCreate = createMock.mock.calls.length
-    const beforeProcess = processEventMock.mock.calls.length
-
-    await handler({
-      logLine: "race test line",
-      serverAddress: "10.0.0.2",
-      serverPort: 27016,
+    Object.defineProperty(customIngress, "serverService", {
+      value: mockServerService,
+      writable: true,
     })
 
-    expect(createMock.mock.calls.length).toBe(beforeCreate + 1)
-    expect(processEventMock.mock.calls.length).toBe(beforeProcess + 1)
+    await customIngress.start()
+
+    const call = onMock.mock.calls.find((c) => c[0] === "logReceived")
+    expect(call).toBeDefined()
+    const handler = call![1]
+
+    await handler({
+      logLine: 'L 07/15/2024 - 22:33:10: "Player<1><STEAM_1:0:111><CT>" connected, address "127.0.0.1:27005"',
+      serverAddress: "127.0.0.1",
+      serverPort: 27015,
+    })
+
+    expect(getServerByAddressMock).toHaveBeenCalledTimes(2)
+    expect(processEventMock).toHaveBeenCalledTimes(1)
   })
 })

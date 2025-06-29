@@ -3,6 +3,7 @@ import { Logger } from "@/utils/logger"
 import { PlayerHandler } from "@/services/processor/handlers/player.handler"
 import { type GameEvent } from "@/types/common/events"
 import type { DatabaseClient } from "@/database/client"
+import { PlayerService } from "@/services/player/player.service"
 
 /* eslint-disable no-control-regex */ // Allow ANSI escape regex used in test helper
 // Utility to strip ANSI color codes for easier assertions
@@ -300,19 +301,39 @@ describe("Logger", () => {
 describe("PlayerHandler logging", () => {
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.clearAllMocks()
   })
 
   it("should emit an EVENT log when a kill is successfully recorded", async () => {
     // Spy on console.log used by global logger instance
     const spy = vi.spyOn(console, "log").mockImplementation(() => undefined)
 
-    // Mock DatabaseClient with minimal functionality
-    const dbMock = {
-      getPlayerStats: vi.fn().mockResolvedValue({ skill: 100, kill_streak: 0, death_streak: 0 }),
+    // Create mock PlayerService using clean dependency injection
+    const mockPlayerService = {
+      getPlayerStats: vi
+        .fn()
+        .mockResolvedValueOnce({ skill: 1000, kill_streak: 0, death_streak: 0 }) // killer stats
+        .mockResolvedValueOnce({ skill: 1000, kill_streak: 0, death_streak: 0 }) // victim stats
+        .mockResolvedValueOnce({ skill: 1000, kill_streak: 0, death_streak: 0 }) // killer stats for skill calculation
+        .mockResolvedValueOnce({ skill: 1000, kill_streak: 0, death_streak: 0 }), // victim stats for skill calculation
       updatePlayerStats: vi.fn().mockResolvedValue(undefined),
+      getOrCreatePlayer: vi.fn(),
+      getPlayerRating: vi.fn(),
+      updatePlayerRatings: vi.fn(),
+      getRoundParticipants: vi.fn(),
+      getTopPlayers: vi.fn(),
+    } as unknown as PlayerService
+
+    // Mock DatabaseClient constructor
+    const dbMock = {
+      prisma: {},
+      testConnection: vi.fn(),
+      transaction: vi.fn(),
+      disconnect: vi.fn(),
     } as unknown as DatabaseClient
 
-    const handler = new PlayerHandler(dbMock)
+    // Use clean dependency injection!
+    const handler = new PlayerHandler(dbMock, mockPlayerService)
 
     const event: GameEvent = {
       eventType: "PLAYER_KILL",
@@ -323,15 +344,19 @@ describe("PlayerHandler logging", () => {
         victimId: 2,
         weapon: "ak47",
         headshot: false,
+        killerTeam: "CT",
+        victimTeam: "T",
       },
     } as unknown as GameEvent
 
     await handler.handleEvent(event)
 
-    // Expect at least one log containing our EVENT tag and kill message
+    // Check what was logged
     const logged = spy.mock.calls.map((c) => stripAnsi(c[0]))
+
+    // Expect at least one log containing our EVENT tag and kill message
     const match = logged.find((l) => l.includes("[ EVENT ]") && l.includes("Kill recorded"))
 
-    expect(match, "Expected an EVENT log for Kill recorded").toBeDefined()
+    expect(match, `Expected an EVENT log for Kill recorded. Actual logs: ${JSON.stringify(logged)}`).toBeDefined()
   })
 })

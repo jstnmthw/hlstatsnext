@@ -10,27 +10,44 @@ import {
   MapChangeEvent,
 } from "../../src/types/common/events"
 import { DatabaseClient } from "../../src/database/client"
+import { PlayerService } from "../../src/services/player/player.service"
 
 const mockGetOrCreatePlayer = vi.fn().mockResolvedValue(123)
 const mockUpdatePlayerStats = vi.fn().mockResolvedValue(undefined)
 const mockGetPlayerStats = vi.fn()
 
+// Mock DatabaseClient constructor
 vi.mock("../../src/database/client", () => ({
   DatabaseClient: vi.fn().mockImplementation(() => ({
-    getOrCreatePlayer: mockGetOrCreatePlayer,
-    updatePlayerStats: mockUpdatePlayerStats,
-    getPlayerStats: mockGetPlayerStats,
+    prisma: {},
+    testConnection: vi.fn(),
+    transaction: vi.fn(),
+    disconnect: vi.fn(),
   })),
 }))
 
 describe("PlayerHandler", () => {
   let handler: PlayerHandler
   let db: DatabaseClient
+  let mockPlayerService: PlayerService
 
   beforeEach(() => {
     vi.clearAllMocks()
     db = new DatabaseClient()
-    handler = new PlayerHandler(db)
+
+    // Create mock PlayerService using type assertion for testing
+    mockPlayerService = {
+      getOrCreatePlayer: mockGetOrCreatePlayer,
+      updatePlayerStats: mockUpdatePlayerStats,
+      getPlayerStats: mockGetPlayerStats,
+      getPlayerRating: vi.fn(),
+      updatePlayerRatings: vi.fn(),
+      getRoundParticipants: vi.fn(),
+      getTopPlayers: vi.fn(),
+    } as unknown as PlayerService
+
+    // Use dependency injection - clean and simple!
+    handler = new PlayerHandler(db, mockPlayerService)
 
     // Default player stats
     mockGetPlayerStats.mockResolvedValue({
@@ -65,6 +82,7 @@ describe("PlayerHandler", () => {
       expect(result.success).toBe(true)
       expect(result.playersAffected).toEqual([123])
       expect(result.error).toBeUndefined()
+      expect(mockGetOrCreatePlayer).toHaveBeenCalledWith("76561198000000000", "TestPlayer", "csgo")
       expect(mockUpdatePlayerStats).toHaveBeenCalledWith(123, {
         connection_time: 0,
       })
@@ -189,16 +207,16 @@ describe("PlayerHandler", () => {
       expect(result.success).toBe(true)
       expect(result.playersAffected).toEqual([123, 456])
 
-      // Check killer update (teamkill penalty & teamkills count)
+      // Check killer update (teamkill penalty & reset kill_streak)
       expect(mockUpdatePlayerStats).toHaveBeenCalledWith(123, {
         teamkills: 1,
         skill: 990,
+        kill_streak: 0,
       })
 
-      // Check victim update (death + skill compensation)
+      // Check victim update (death + death_streak increment + reset kill_streak)
       expect(mockUpdatePlayerStats).toHaveBeenCalledWith(456, {
         deaths: 1,
-        skill: expect.any(Number),
         death_streak: 1,
         kill_streak: 0,
       })
@@ -260,7 +278,12 @@ describe("PlayerHandler", () => {
         mockGetOrCreatePlayer.mockRejectedValueOnce(connectError)
         const event = {
           eventType: EventType.PLAYER_CONNECT,
-          data: {},
+          timestamp: new Date(),
+          serverId: 1,
+          data: {
+            steamId: "76561198000000000",
+            playerName: "TestPlayer",
+          },
         } as PlayerConnectEvent
         const result = await handler.handleEvent(event)
         expect(result.success).toBe(false)
@@ -270,6 +293,8 @@ describe("PlayerHandler", () => {
       it("should return success:false if disconnect handling fails", async () => {
         const event = {
           eventType: EventType.PLAYER_DISCONNECT,
+          timestamp: new Date(),
+          serverId: 1,
           data: { playerId: -1 },
         } as PlayerDisconnectEvent
         const result = await handler.handleEvent(event)
@@ -279,10 +304,15 @@ describe("PlayerHandler", () => {
 
       it("should return success:false if killer stats update fails", async () => {
         const updateError = new Error("DB update error")
+        mockGetPlayerStats
+          .mockResolvedValueOnce({ playerId: 123, skill: 1000, kill_streak: 0, death_streak: 0 }) // killer
+          .mockResolvedValueOnce({ playerId: 456, skill: 1000, kill_streak: 0, death_streak: 0 }) // victim
         mockUpdatePlayerStats.mockRejectedValueOnce(updateError)
         const event = {
           eventType: EventType.PLAYER_KILL,
-          data: { killerId: 1, victimId: 2 },
+          timestamp: new Date(),
+          serverId: 1,
+          data: { killerId: 123, victimId: 456, weapon: "ak47", headshot: false },
         } as PlayerKillEvent
         const result = await handler.handleEvent(event)
         expect(result.success).toBe(false)
@@ -295,7 +325,9 @@ describe("PlayerHandler", () => {
         mockGetPlayerStats.mockResolvedValueOnce(null)
         const event = {
           eventType: EventType.PLAYER_SUICIDE,
-          data: { playerId: 999 },
+          timestamp: new Date(),
+          serverId: 1,
+          data: { playerId: 999, weapon: "world", team: "CT" },
         } as PlayerSuicideEvent
         const result = await handler.handleEvent(event)
         expect(result.success).toBe(false)
@@ -303,14 +335,16 @@ describe("PlayerHandler", () => {
       })
 
       it("should return success:false if teamkill players not found", async () => {
-        mockGetPlayerStats.mockResolvedValueOnce(null)
+        mockGetPlayerStats.mockResolvedValueOnce(null) // First call returns null (killer not found)
         const event = {
           eventType: EventType.PLAYER_TEAMKILL,
-          data: { killerId: 1, victimId: 2 },
+          timestamp: new Date(),
+          serverId: 1,
+          data: { killerId: 123, victimId: 456, weapon: "m4a1", headshot: false, team: "CT" },
         } as PlayerTeamkillEvent
         const result = await handler.handleEvent(event)
         expect(result.success).toBe(false)
-        expect(result.error).toBe("Failed to fetch player stats")
+        expect(result.error).toBe("Could not find killer or victim player records")
       })
     })
   })

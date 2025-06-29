@@ -6,9 +6,10 @@
  */
 
 import type { GameEvent, PlayerKillEvent, RoundEndEvent } from "@/types/common/events"
-import { WeaponService } from "@/services/weapon/weapon.service"
-import { PlayerService } from "@/services/player/player.service"
-import { logger } from "@/utils/logger"
+import type { IWeaponService } from "@/services/weapon/weapon.types"
+import type { IPlayerService } from "@/services/player/player.types"
+import type { ILogger } from "@/utils/logger.types"
+import type { IRankingHandler } from "./ranking.handler.types"
 
 export interface SkillRating {
   playerId: number
@@ -32,10 +33,11 @@ export interface HandlerResult {
   ratingChanges?: RatingChange[]
 }
 
-export class RankingHandler {
+export class RankingHandler implements IRankingHandler {
   constructor(
-    private readonly playerService: PlayerService,
-    private readonly weaponService: WeaponService,
+    private readonly playerService: IPlayerService,
+    private readonly weaponService: IWeaponService,
+    private readonly logger: ILogger,
   ) {}
 
   // ELO rating system constants
@@ -117,7 +119,7 @@ export class RankingHandler {
         },
       ])
 
-      logger.event(
+      this.logger.event(
         `Rating change for kill: Killer ${killerId} (+${changes.killer}), Victim ${victimId} (${changes.victim})`,
       )
 
@@ -192,7 +194,7 @@ export class RankingHandler {
         })
       }
 
-      logger.event(`Round rating update for server ${serverId}: ${winningTeam} team won (${duration}s)`)
+      this.logger.event(`Round rating update for server ${serverId}: ${winningTeam} team won (${duration}s)`)
 
       return {
         success: true,

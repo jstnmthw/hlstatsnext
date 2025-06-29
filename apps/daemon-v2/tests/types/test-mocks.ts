@@ -6,7 +6,7 @@
  */
 
 import { vi } from "vitest"
-import type { GameEvent } from "../../src/types/common/events"
+import { EventType, PlayerDeathEvent, type GameEvent } from "../../src/types/common/events"
 import type { UdpServer } from "../../src/services/ingress/udp-server"
 import type { CsParser } from "../../src/services/ingress/parsers/cs.parser"
 import type { EventProcessorService } from "../../src/services/processor/processor.service"
@@ -15,6 +15,8 @@ import type { ServerService } from "../../src/services/server/server.service"
 import type { PlayerService } from "../../src/services/player/player.service"
 import type { EventService } from "../../src/services/event/event.service"
 import type { WeaponService } from "../../src/services/weapon/weapon.service"
+import type { ILogger } from "../../src/utils/logger.types"
+import type { Player } from "@repo/database/client"
 
 /**
  * Mock UdpServer for testing
@@ -273,5 +275,96 @@ export interface MalformedEvent {
  */
 export function asUnknownEvent(event: MalformedEvent): GameEvent {
   // This is only for testing malformed events - we know it's not really a GameEvent
-  return event as unknown as GameEvent
+  return event as GameEvent
+}
+
+/**
+ * Creates a mock logger for testing services that require ILogger.
+ */
+export const createMockLogger = (): ILogger => ({
+  ok: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  event: vi.fn(),
+  chat: vi.fn(),
+  starting: vi.fn(),
+  started: vi.fn(),
+  stopping: vi.fn(),
+  stopped: vi.fn(),
+  connecting: vi.fn(),
+  connected: vi.fn(),
+  disconnected: vi.fn(),
+  failed: vi.fn(),
+  ready: vi.fn(),
+  received: vi.fn(),
+  shutdown: vi.fn(),
+  shutdownComplete: vi.fn(),
+  fatal: vi.fn(),
+  disableTimestamps: vi.fn(),
+  enableTimestamps: vi.fn(),
+  disableColors: vi.fn(),
+  setColorsEnabled: vi.fn(),
+})
+
+/**
+ * Helper to build a mock Player object
+ */
+export const createMockPlayer = (overrides: Partial<Player> = {}): Player => ({
+  playerId: 1,
+  last_event: 0,
+  connection_time: 0,
+  last_skill_change: 0,
+  lastName: "Player",
+  lastAddress: "127.0.0.1",
+  fullName: null,
+  email: null,
+  homepage: null,
+  icq: null,
+  city: "",
+  state: "",
+  country: "",
+  flag: "",
+  lat: null,
+  lng: null,
+  clan: 0,
+  kills: 0,
+  deaths: 0,
+  suicides: 0,
+  skill: 1000,
+  shots: 0,
+  hits: 0,
+  teamkills: 0,
+  headshots: 0,
+  kill_streak: 0,
+  death_streak: 0,
+  activity: 100,
+  game: "cstrike",
+  hideranking: 0,
+  displayEvents: 1,
+  blockavatar: 0,
+  mmrank: null,
+  createdate: 0,
+  ...overrides,
+})
+
+/**
+ * Creates a mock GameEvent for testing event handlers.
+ */
+export const createMockGameEvent = (args: Partial<GameEvent> = {}): GameEvent => {
+  const event: GameEvent = {
+    eventType: EventType.PLAYER_DEATH,
+    data: {
+      killerId: 1,
+      victimId: 2,
+      weapon: "ak47",
+      headshot: false,
+      victimTeam: "T",
+      killerTeam: "T",
+    },
+    ...args,
+  } as PlayerDeathEvent
+
+  return event
 }

@@ -6,11 +6,10 @@
  */
 
 import type { GameEvent, PlayerKillEvent } from "@/types/common/events"
-import type { WeaponService } from "@/services/weapon/weapon.service"
-import { WeaponService as DefaultWeaponService } from "@/services/weapon/weapon.service"
-import { DatabaseClient } from "@/database/client"
+import type { IWeaponService } from "@/services/weapon/weapon.types"
 import { getWeaponAttributes } from "@/config/weapon-config"
-import { logger } from "@/utils/logger"
+import type { ILogger } from "@/utils/logger.types"
+import type { IWeaponHandler } from "./weapon.handler.types"
 
 export interface WeaponStats {
   weaponName: string
@@ -18,6 +17,7 @@ export interface WeaponStats {
   headshots: number
   accuracy: number
   damage: number
+  weaponsAffected?: string[]
 }
 
 export interface HandlerResult {
@@ -26,13 +26,11 @@ export interface HandlerResult {
   weaponsAffected?: string[]
 }
 
-export class WeaponHandler {
-  private readonly _weaponService: WeaponService
-
-  constructor(weaponService?: WeaponService) {
-    // TODO: Add DatabaseClient parameter when database operations are implemented
-    this._weaponService = weaponService ?? new DefaultWeaponService(new DatabaseClient())
-  }
+export class WeaponHandler implements IWeaponHandler {
+  constructor(
+    private readonly weaponService: IWeaponService,
+    private readonly logger: ILogger,
+  ) {}
 
   async handleEvent(event: GameEvent): Promise<HandlerResult> {
     switch (event.eventType) {
@@ -54,7 +52,7 @@ export class WeaponHandler {
       // - Track weapon usage patterns
       // - Update player weapon proficiency
 
-      logger.event(`Weapon kill recorded: ${weapon} (headshot: ${headshot}) by player ${killerId} on ${victimId}`)
+      this.logger.event(`Weapon kill recorded: ${weapon} (headshot: ${headshot}) by player ${killerId} on ${victimId}`)
 
       // Calculate weapon effectiveness score
       // const effectivenessBonus = headshot ? 1.5 : 1.0;
@@ -84,7 +82,7 @@ export class WeaponHandler {
     const DEFAULT_BASE = 30
     const { baseDamage } = getWeaponAttributes(weapon)
     // Reference service for potential future modifier-based calculations (avoids unused property)
-    void (await this._weaponService.getSkillMultiplier(undefined, weapon))
+    void (await this.weaponService.getSkillMultiplier(undefined, weapon))
     const damage = headshot ? baseDamage * 4.0 : baseDamage || DEFAULT_BASE
     return damage
   }

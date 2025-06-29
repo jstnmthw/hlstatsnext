@@ -3,6 +3,8 @@
  * Provides colored status messages in the format: [ STATUS ] Message
  */
 
+import type { ILogger } from "./logger.types"
+
 // ANSI color codes
 const colors = {
   reset: "\x1b[0m",
@@ -26,7 +28,7 @@ interface LoggerOptions {
   showTimestamp?: boolean
 }
 
-export class Logger {
+export class Logger implements ILogger {
   private enableColors: boolean
   private showTimestamp: boolean
 

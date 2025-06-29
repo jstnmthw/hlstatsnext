@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { MatchHandler } from "../../src/services/processor/handlers/match.handler"
+import { createMockLogger } from "../types/test-mocks"
 import {
   EventType,
   type RoundEndEvent,
@@ -11,9 +12,10 @@ import {
 
 describe("MatchHandler", () => {
   let handler: MatchHandler
+  const loggerMock = createMockLogger()
 
   beforeEach(() => {
-    handler = new MatchHandler()
+    handler = new MatchHandler(loggerMock)
   })
 
   describe("handleEvent", () => {
@@ -149,6 +151,7 @@ describe("MatchHandler", () => {
       } as RoundEndEvent
       const result = await handler.handleEvent(roundEndEvent)
       expect(result.success).toBe(true)
+      expect(loggerMock.warn).toHaveBeenCalledWith("No match stats found for server 99")
     })
   })
 })

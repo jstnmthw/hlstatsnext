@@ -8,8 +8,9 @@
  */
 
 import { DatabaseClient } from "../src/database/client"
-import { EventProcessorService } from "../src/services/processor/processor.service"
+import { createEventProcessorService } from "../src/services/processor/processor.service"
 import { PlayerService } from "../src/services/player/player.service"
+import { logger } from "../src/utils/logger"
 import {
   EventType,
   type PlayerConnectEvent,
@@ -22,8 +23,8 @@ import {
 
 async function testPlayerLifecycle() {
   const db = new DatabaseClient()
-  const processor = new EventProcessorService(db, { logBots: true }) // Include bots in testing
-  const playerService = new PlayerService(db)
+  const processor = createEventProcessorService(db, logger, { logBots: true }) // Include bots in testing
+  const playerService = new PlayerService(db, logger)
 
   try {
     console.log("🧪 Testing Player Lifecycle...\n")

@@ -1,7 +1,9 @@
-import type { DatabaseClient } from "@/database/client"
+import { DatabaseClient, databaseClient as defaultDb } from "@/database/client"
 import type { SkillRating } from "@/services/processor/handlers/ranking.handler"
-import { logger } from "@/utils/logger"
+import type { ILogger } from "@/utils/logger.types"
+import { logger as defaultLogger } from "@/utils/logger"
 import type { Player } from "@repo/database/client"
+import type { IPlayerService } from "./player.types"
 
 /**
  * Player Service for Daemon v2
@@ -11,7 +13,7 @@ import type { Player } from "@repo/database/client"
  * - Player statistics updates
  * - Player lookup and creation
  */
-export class PlayerService {
+export class PlayerService implements IPlayerService {
   // Rating system constants
   private readonly DEFAULT_RATING = 1000
   private readonly DEFAULT_CONFIDENCE = 350
@@ -19,7 +21,10 @@ export class PlayerService {
   private readonly MAX_CONFIDENCE_REDUCTION = 300
   private readonly UNIX_TIMESTAMP_DIVISOR = 1000
 
-  constructor(private readonly db: DatabaseClient) {}
+  constructor(
+    private readonly db: DatabaseClient,
+    private readonly logger: ILogger,
+  ) {}
 
   /**
    * Get a player's current skill rating and stats
@@ -62,7 +67,7 @@ export class PlayerService {
         gamesPlayed: player._count.fragsAsKiller,
       }
     } catch (error) {
-      logger.error(`Failed to get player rating for ${playerId}: ${error}`)
+      this.logger.error(`Failed to get player rating for ${playerId}: ${error as string}`)
       // Return default rating on error
       return {
         playerId,
@@ -96,7 +101,7 @@ export class PlayerService {
         )
       })
     } catch (error) {
-      logger.error(`Failed to update player ratings: ${error}`)
+      this.logger.error(`Failed to update player ratings: ${error as string}`)
       throw error
     }
   }
@@ -129,7 +134,7 @@ export class PlayerService {
         },
       })
     } catch (error) {
-      logger.error(`Failed to get round participants: ${error}`)
+      this.logger.error(`Failed to get round participants: ${error as string}`)
       throw error
     }
   }
@@ -182,7 +187,7 @@ export class PlayerService {
 
       return player.playerId
     } catch (error) {
-      console.error(`Failed to get or create player:`, error)
+      this.logger.error(`Failed to get or create player: ${error as string}`)
       throw error
     }
   }
@@ -248,7 +253,7 @@ export class PlayerService {
         data: updateData,
       })
     } catch (error) {
-      console.error(`Failed to update player stats:`, error)
+      this.logger.error(`Failed to update player stats for ${playerId}: ${error as string}`)
       throw error
     }
   }
@@ -264,8 +269,8 @@ export class PlayerService {
 
       return player
     } catch (error) {
-      console.error(`Failed to get player stats:`, error)
-      throw error
+      this.logger.error(`Failed to get player stats for ${playerId}: ${error as string}`)
+      return null
     }
   }
 
@@ -290,13 +295,23 @@ export class PlayerService {
         orderBy: {
           skill: "desc",
         },
-        take: Math.min(limit, 100), // Cap at 100 for safety
+        take: Math.min(limit, 100),
       })
 
       return players
     } catch (error) {
-      console.error(`Failed to get top players:`, error)
-      throw error
+      this.logger.error(`Failed to get top players: ${error as string}`)
+      return []
     }
   }
+}
+
+/**
+ * Factory function for creating a PlayerService instance
+ */
+export function createPlayerService(
+  databaseClient: DatabaseClient = defaultDb,
+  logger: ILogger = defaultLogger,
+): IPlayerService {
+  return new PlayerService(databaseClient, logger)
 }

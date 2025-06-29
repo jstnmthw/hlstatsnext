@@ -8,10 +8,11 @@
 
 import { DatabaseClient } from "../src/database/client"
 import { PlayerService } from "../src/services/player/player.service"
+import { logger } from "../src/utils/logger"
 
 async function testPlayerRanking() {
   const db = new DatabaseClient()
-  const playerService = new PlayerService(db)
+  const playerService = new PlayerService(db, logger)
 
   try {
     console.log("Testing database connection...")

@@ -5,6 +5,7 @@
  */
 
 import type { DatabaseClient } from "@/database/client"
+import { ILogger } from "@/utils/logger.types"
 import type {
   GameEvent,
   PlayerConnectEvent,
@@ -14,9 +15,13 @@ import type {
   PlayerSuicideEvent,
   PlayerTeamkillEvent,
 } from "@/types/common/events"
+import { IEventService } from "./event.types"
 
-export class EventService {
-  constructor(private readonly db: DatabaseClient) {}
+export class EventService implements IEventService {
+  constructor(
+    private readonly db: DatabaseClient,
+    private readonly logger: ILogger,
+  ) {}
 
   /**
    * Create a new game event record
@@ -44,10 +49,10 @@ export class EventService {
           await this.createChatEvent(event)
           break
         default:
-          console.warn(`Unhandled event type: ${event.eventType}`)
+          this.logger.warn(`Unhandled event type: ${event.eventType}`)
       }
     } catch (error) {
-      console.error(`Failed to create game event:`, error)
+      this.logger.error(`Failed to create game event: ${error as string}`)
       throw error
     }
   }

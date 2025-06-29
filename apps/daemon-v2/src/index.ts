@@ -8,16 +8,17 @@
 import { DatabaseClient } from "./database/client"
 import { GatewayService } from "./services/gateway/gateway.service"
 import { IngressService } from "./services/ingress/ingress.service"
-import { EventProcessorService } from "./services/processor/processor.service"
+import { createEventProcessorService } from "./services/processor/processor.service"
 import { RconService } from "./services/rcon/rcon.service"
 import { StatisticsService } from "./services/statistics/statistics.service"
 import { logger } from "./utils/logger"
+import type { IEventProcessor } from "./services/processor/processor.types"
 
 export class HLStatsDaemon {
   private db: DatabaseClient
   private gateway: GatewayService
   private ingress: IngressService
-  private processor: EventProcessorService
+  private processor: IEventProcessor
   private rcon: RconService
   private statistics: StatisticsService
 
@@ -25,7 +26,7 @@ export class HLStatsDaemon {
     logger.info("Initializing HLStats Daemon v2")
 
     this.db = new DatabaseClient()
-    this.processor = new EventProcessorService()
+    this.processor = createEventProcessorService()
     this.gateway = new GatewayService()
     this.ingress = new IngressService(27500, this.processor, this.db)
     this.rcon = new RconService()

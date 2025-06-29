@@ -2,6 +2,7 @@ import { defineConfig } from "vitest/config"
 
 export default defineConfig({
   test: {
+    setupFiles: ["./tests/setup-test-env.ts"],
     environment: "node",
     globals: true,
     coverage: {

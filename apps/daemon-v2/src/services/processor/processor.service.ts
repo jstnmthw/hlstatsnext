@@ -13,6 +13,7 @@ import { WeaponHandler } from "./handlers/weapon.handler"
 import { MatchHandler } from "./handlers/match.handler"
 import { RankingHandler } from "./handlers/ranking.handler"
 import { WeaponService } from "@/services/weapon/weapon.service"
+import { PlayerService } from "@/services/player/player.service"
 import { logger } from "@/utils/logger"
 import { EventEmitter } from "events"
 
@@ -24,12 +25,19 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
   private readonly db: DatabaseClient
   private readonly opts: { logBots?: boolean }
 
+  // Services
+  private readonly playerService: PlayerService
+  private readonly weaponService: WeaponService
+
   // Handlers for processing events
   private readonly playerHandler: PlayerHandler
-  private readonly weaponService: WeaponService
   private readonly weaponHandler: WeaponHandler
   private readonly matchHandler: MatchHandler
   private readonly rankingHandler: RankingHandler
+
+  // Game and configuration constants
+  private readonly DEFAULT_GAME_ID = "cstrike"
+  private readonly DEFAULT_TOP_PLAYERS_LIMIT = 50
 
   constructor(db?: DatabaseClient, opts: { logBots?: boolean } = {}) {
     super()
@@ -39,14 +47,15 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
     this.db = db ?? new DatabaseClient()
     this.opts = { logBots: true, ...opts }
 
-    // Initialize helpers/services
+    // Initialize services
+    this.playerService = new PlayerService(this.db)
     this.weaponService = new WeaponService(this.db)
 
     // Initialize handlers
     this.playerHandler = new PlayerHandler(this.db)
     this.weaponHandler = new WeaponHandler(this.weaponService)
     this.matchHandler = new MatchHandler()
-    this.rankingHandler = new RankingHandler(this.weaponService)
+    this.rankingHandler = new RankingHandler(this.playerService, this.weaponService)
   }
 
   /* Existing enqueue placeholder (kept for API compatibility).
@@ -106,9 +115,12 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
           }
           break
 
-        case EventType.CHAT_MESSAGE:
-          logger.chat(`${event.meta?.playerName}: ${event.data.message}${event.data.isDead ? " (dead)" : ""}`)
+        case EventType.CHAT_MESSAGE: {
+          const chatData = event.data as { message: string; isDead: boolean }
+          const deadIndicator = chatData.isDead ? " (dead)" : ""
+          logger.chat(`${event.meta?.playerName}: ${chatData.message}${deadIndicator}`)
           break
+        }
 
         default:
           logger.warn(`Unhandled event type: ${event.eventType}`)
@@ -140,7 +152,7 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
         }
 
         const { steamId, playerName } = event.meta
-        const playerId = await this.db.getOrCreatePlayer(steamId, playerName, "cstrike")
+        const playerId = await this.playerService.getOrCreatePlayer(steamId, playerName, this.DEFAULT_GAME_ID)
         event.data.playerId = playerId
         break
       }
@@ -158,8 +170,16 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
         }
 
         const { killer, victim } = event.meta
-        const killerId = await this.db.getOrCreatePlayer(killer.steamId, killer.playerName, "cstrike")
-        const victimId = await this.db.getOrCreatePlayer(victim.steamId, victim.playerName, "cstrike")
+        const killerId = await this.playerService.getOrCreatePlayer(
+          killer.steamId,
+          killer.playerName,
+          this.DEFAULT_GAME_ID,
+        )
+        const victimId = await this.playerService.getOrCreatePlayer(
+          victim.steamId,
+          victim.playerName,
+          this.DEFAULT_GAME_ID,
+        )
 
         event.data.killerId = killerId
         event.data.victimId = victimId
@@ -172,7 +192,7 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
         }
 
         const { steamId, playerName } = event.meta
-        const playerId = await this.db.getOrCreatePlayer(steamId, playerName, "cstrike")
+        const playerId = await this.playerService.getOrCreatePlayer(steamId, playerName, this.DEFAULT_GAME_ID)
         event.data.playerId = playerId
         break
       }
@@ -183,7 +203,7 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
         }
 
         const { steamId, playerName } = event.meta
-        const playerId = await this.db.getOrCreatePlayer(steamId, playerName, "cstrike")
+        const playerId = await this.playerService.getOrCreatePlayer(steamId, playerName, this.DEFAULT_GAME_ID)
         event.data.playerId = playerId
         break
       }
@@ -216,7 +236,11 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
   /**
    * Get top players by ranking
    */
-  async getTopPlayers(limit: number = 50, game: string = "cstrike", includeHidden: boolean = false) {
+  async getTopPlayers(
+    limit: number = this.DEFAULT_TOP_PLAYERS_LIMIT,
+    game: string = this.DEFAULT_GAME_ID,
+    includeHidden: boolean = false,
+  ) {
     return this.db.getTopPlayers(limit, game, includeHidden)
   }
 }

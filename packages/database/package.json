@@ -3,18 +3,20 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "build": "tsc",
     "db:generate": "rm -rf generated && prisma generate",
+    "db:fresh": "tsx src/reset.ts",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset --force && prisma db push",
     "db:seed": "tsx src/seed.ts",
-    "db:fresh": "tsx src/reset.ts",
-    "db:test:prepare": "dotenv -e .env.test -- prisma db push",
-    "build": "tsc",
+    "db:test:prepare": "dotenv -e .env.test -- prisma db push --skip-generate",
+    "db:test:reset": "dotenv -e .env.test -- prisma migrate reset --force --skip-generate && dotenv -e .env.test -- prisma db push --skip-generate",
     "dev": "tsc --watch",
     "check-types": "tsc --noEmit",
-    "lint": "eslint src/**/*.ts",
-    "clean": "rm -rf node_modules"
+    "clean": "rm -rf node_modules",
+    "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",

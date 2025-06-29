@@ -47,6 +47,15 @@
     "db:seed": {
       "cache": false
     },
+    "db:reset": {
+      "cache": false
+    },
+    "db:test:prepare": {
+      "cache": false
+    },
+    "db:test:reset": {
+      "cache": false
+    },
     "test": {
       "cache": false
     },

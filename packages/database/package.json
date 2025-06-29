@@ -11,6 +11,7 @@
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset --force && prisma db push",
     "db:seed": "tsx src/seed.ts",
+    "db:run-sql": "tsx src/scripts/run-sql.ts",
     "db:test:prepare": "dotenv -e .env.test -- prisma db push --skip-generate",
     "db:test:reset": "dotenv -e .env.test -- prisma migrate reset --force --skip-generate && dotenv -e .env.test -- prisma db push --skip-generate",
     "dev": "tsc --watch",
@@ -20,6 +21,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
+    "dbgate-query-splitter": "^4.11.5",
     "prisma": "^6.9.0"
   },
   "devDependencies": {

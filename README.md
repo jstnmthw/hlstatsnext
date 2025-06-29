@@ -1,14 +1,12 @@
 # HLStatsNext
 
-HLStatsNext is a modern rewrite of HLstatsX Community Edition, building upon its
-foundation as a real-time stats and ranking system for Half Life engine
-based games. While the original HLstatsX:CE used dated PHP for frontend & backend,
-HLStatsNext is being completely refactored using Turbo Monorepo with Next.js for
-frontend and, Yoga GraphQL for backend. This project aims to modernize and
-enhance the proven concepts of HLstatsX:CE.
+**HLStatsNext** is the next-generation game statistics platform that transforms how players and communities experience Half-Life engine games. Built from the ground up with modern web technologies, HLStatsNext delivers lightning-fast real-time statistics, beautiful analytics dashboards, and powerful server management tools that make running gaming communities effortless.
+
+Born from the proven foundation of HLstatsX Community Edition—trusted by thousands of servers worldwide—HLStatsNext completely reimagines the platform with a cutting-edge TypeScript stack, sleek Next.js interface, and robust GraphQL API. Whether you're a player tracking your performance, a server admin managing multiple communities, or a developer extending the platform, HLStatsNext provides the modern, scalable, and user-friendly experience you've been waiting for.
 
 ## Table of Contents
 
+- [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
 - [Development](#development)
@@ -27,10 +25,41 @@ enhance the proven concepts of HLstatsX:CE.
 - [Project Structure](#project-structure)
 - [Adding Your Own Game Servers](#adding-your-own-game-servers)
 - [Port Reference](#port-reference)
-- [Features](#features)
 - [Contributing](#contributing)
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
+
+## Features
+
+### Core Platform
+
+- **Complete HLstatsX:CE Modernization**: Full architectural rewrite from legacy PHP to modern TypeScript stack
+- **Turborepo Monorepo Architecture**: Scalable workspace management with shared packages and optimized builds
+- **Modern Web Interface**: Responsive Next.js frontend with shadcn/ui components and excellent UX
+- **GraphQL API**: Flexible, type-safe data layer built with Yoga GraphQL for efficient client-server communication
+
+### Real-time Statistics Engine
+
+- **Completely Rewritten Daemon**: Ground-up Pearl implementation replacing legacy Perl daemon for enhanced performance and reliability
+- **Real-time Game Event Processing**: Live statistics tracking with sub-second latency for immediate player feedback
+- **Multi-Game Support**: Extensible architecture supporting various Half-Life engine games
+- **Advanced Player Analytics**: Comprehensive ranking systems, weapon statistics, and performance metrics
+
+### Infrastructure & DevOps
+
+- **Production-Ready Containerization**: Comprehensive Docker Compose setup with service orchestration
+- **Automated Game Server Management**: Integrated LinuxGSM support for seamless server deployment and management
+- **Custom Network Architecture**: Isolated container networking with static IP allocation for reliable service communication
+- **Database Management**: MySQL 5.7 integration with automated schema management and persistent storage
+- **Health Monitoring**: Built-in health checks and automatic service recovery for maximum uptime
+
+### Developer Experience
+
+- **Hot-Reload Development**: Instant feedback during development with Turbo-powered builds
+- **Type Safety**: End-to-end TypeScript implementation with GraphQL code generation
+- **Comprehensive Tooling**: Makefile-driven Docker management with 25+ utility commands
+- **Modular Package System**: Shared UI components, configurations, and database utilities
+- **Easy Server Addition**: Streamlined process for adding new game servers with templated configurations
 
 ## Prerequisites
 
@@ -298,7 +327,7 @@ make help               # Show all available commands
 │   └── web/            # Next.js frontend application
 ├── packages/
 │   ├── ui/             # Shared UI components (shadcn/ui + custom components)
-│   ├── config/         # Shared configuration
+│   ├── *-config/       # Shared configurations
 │   └── database/       # Database schemas, sql and utilities
 ├── servers/
 │   ├── cs1/            # Example Counter-Strike server 1 data
@@ -361,20 +390,6 @@ cs3-details:
 | cs2     | 27016     | 27015          | TCP/UDP  | Counter-Strike server 2 |
 
 > **Note**: When adding new servers, increment the host port to avoid conflicts (e.g., 27017, 27018, etc.)
-
-## Features
-
-- Modern, responsive web interface built with Next.js
-- Real-time game statistics and rankings
-- GraphQL API for flexible data querying
-- Efficient game server monitoring daemon
-- Customizable player and server statistics
-- Containerized development environment with Docker
-- Easy server management through LinuxGSM integration
-- Scalable multi-server support
-- Persistent data storage with Docker volumes
-- Custom network configuration for service isolation
-- Health checks and automatic restarts for reliability
 
 ## Contributing
 

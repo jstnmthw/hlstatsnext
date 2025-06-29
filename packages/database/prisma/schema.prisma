@@ -108,12 +108,12 @@ model Player {
   icq         Int?    @db.UnsignedInt // Legacy ICQ number
 
   // Location data
-  city    String @default("") @db.VarChar(64)
-  state   String @default("") @db.VarChar(64)
-  country String @default("") @db.VarChar(64)
-  flag    String @default("") @db.VarChar(16)
-  lat     Float? @db.Float
-  lng     Float? @db.Float
+  city    String  @default("") @db.VarChar(64)
+  state   String  @default("") @db.VarChar(64)
+  country String  @default("") @db.VarChar(64)
+  flag    String? @db.VarChar(16)
+  lat     Float?  @db.Float
+  lng     Float?  @db.Float
 
   // Country relationship
   countryData Country? @relation(fields: [flag], references: [flag])

@@ -31,21 +31,21 @@ Born from the proven foundation of HLstatsX Community Edition—trusted by thous
 
 ## Features
 
-### Core Platform
+**Core Platform:**
 
 - **Complete HLstatsX:CE Modernization**: Full architectural rewrite from legacy PHP to modern TypeScript stack
 - **Turborepo Monorepo Architecture**: Scalable workspace management with shared packages and optimized builds
 - **Modern Web Interface**: Responsive Next.js frontend with shadcn/ui components and excellent UX
 - **GraphQL API**: Flexible, type-safe data layer built with Yoga GraphQL for efficient client-server communication
 
-### Real-time Statistics Engine
+**Real-time Statistics Engine:**
 
 - **Completely Rewritten Daemon**: Ground-up Pearl implementation replacing legacy Perl daemon for enhanced performance and reliability
 - **Real-time Game Event Processing**: Live statistics tracking with sub-second latency for immediate player feedback
 - **Multi-Game Support**: Extensible architecture supporting various Half-Life engine games
 - **Advanced Player Analytics**: Comprehensive ranking systems, weapon statistics, and performance metrics
 
-### Infrastructure & DevOps
+**Infrastructure & DevOps:**
 
 - **Production-Ready Containerization**: Comprehensive Docker Compose setup with service orchestration
 - **Automated Game Server Management**: Integrated LinuxGSM support for seamless server deployment and management
@@ -53,7 +53,7 @@ Born from the proven foundation of HLstatsX Community Edition—trusted by thous
 - **Database Management**: MySQL 5.7 integration with automated schema management and persistent storage
 - **Health Monitoring**: Built-in health checks and automatic service recovery for maximum uptime
 
-### Developer Experience
+**Developer Experience:**
 
 - **Hot-Reload Development**: Instant feedback during development with Turbo-powered builds
 - **Type Safety**: End-to-end TypeScript implementation with GraphQL code generation

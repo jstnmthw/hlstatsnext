@@ -1,6 +1,6 @@
 ---
 description: 
-globs: apps/daemon-v2/**/*.*
+globs: 
 alwaysApply: false
 ---
 # HLStats Daemon v2 - AI Execution Prompt

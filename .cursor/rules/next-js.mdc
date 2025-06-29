@@ -1,6 +1,6 @@
 ---
 description: 
-globs: apps/web/*/**
+globs: 
 alwaysApply: false
 ---
 # Next.js 15 SSR Standards

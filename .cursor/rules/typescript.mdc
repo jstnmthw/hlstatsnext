@@ -1,6 +1,6 @@
 ---
 description: 
-globs: *.tsx,*.ts
+globs: 
 alwaysApply: false
 ---
 # TypeScript Best Practices for HLStatsNext

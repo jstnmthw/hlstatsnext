@@ -5,32 +5,33 @@
   using the database package. At this stage it only exposes an enqueue method.
 */
 
-import type { GameEvent } from "@/types/common/events"
+import { EventEmitter } from "events"
 import { EventType } from "@/types/common/events"
-import { DatabaseClient, databaseClient } from "@/database/client"
+import { MatchHandler } from "@/services/processor/handlers/match.handler"
 import { EventService } from "@/services/event/event.service"
-import { PlayerHandler } from "./handlers/player.handler"
-import { WeaponHandler } from "./handlers/weapon.handler"
-import { MatchHandler } from "./handlers/match.handler"
-import { RankingHandler } from "./handlers/ranking.handler"
+import { PlayerHandler } from "@/services/processor/handlers/player.handler"
+import { WeaponHandler } from "@/services/processor/handlers/weapon.handler"
 import { WeaponService } from "@/services/weapon/weapon.service"
 import { PlayerService } from "@/services/player/player.service"
+import { RankingHandler } from "@/services/processor/handlers/ranking.handler"
 import { logger as defaultLogger } from "@/utils/logger"
-import { EventEmitter } from "events"
-import type { IEventProcessor } from "./processor.types"
-import type { IEventService } from "../event/event.types"
-import type { IPlayerHandler } from "./handlers/player.handler.types"
-import type { IWeaponHandler } from "./handlers/weapon.handler.types"
-import type { IMatchHandler } from "./handlers/match.handler.types"
-import type { IRankingHandler } from "./handlers/ranking.handler.types"
-import type { IPlayerService } from "../player/player.types"
+import { DatabaseClient, databaseClient } from "@/database/client"
+
+import type { GameEvent } from "@/types/common/events"
+import type { IEventProcessor } from "@/services/processor/processor.types"
+import type { IEventService } from "@/services/event/event.types"
+import type { IPlayerHandler } from "@/services/processor/handlers/player.handler.types"
+import type { IWeaponHandler } from "@/services/processor/handlers/weapon.handler.types"
+import type { IMatchHandler } from "@/services/processor/handlers/match.handler.types"
+import type { IRankingHandler } from "@/services/processor/handlers/ranking.handler.types"
+import type { IPlayerService } from "@/services/player/player.types"
 import type { ILogger } from "@/utils/logger.types"
 
 export class EventProcessorService extends EventEmitter implements IEventProcessor {
   private readonly opts: { logBots?: boolean }
 
   // Game and configuration constants
-  private readonly DEFAULT_GAME_ID = "cstrike"
+  private readonly DEFAULT_GAME_ID = "csgo"
   private readonly DEFAULT_TOP_PLAYERS_LIMIT = 50
 
   constructor(

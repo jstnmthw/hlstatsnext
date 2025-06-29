@@ -8,17 +8,19 @@
 
 import { db, type PrismaClient } from "@repo/database/client"
 
-export class DatabaseClient {
-  private client: PrismaClient
+type TransactionalPrisma = Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">
 
-  constructor() {
-    this.client = db
+export class DatabaseClient {
+  private client: PrismaClient | TransactionalPrisma
+
+  constructor(client: PrismaClient | TransactionalPrisma = db) {
+    this.client = client
   }
 
   /**
    * Get the Prisma client instance
    */
-  get prisma(): PrismaClient {
+  get prisma(): TransactionalPrisma {
     return this.client
   }
 
@@ -38,19 +40,20 @@ export class DatabaseClient {
   /**
    * Execute a transaction
    */
-  async transaction<T>(
-    callback: (
-      tx: Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">,
-    ) => Promise<T>,
-  ): Promise<T> {
-    return this.client.$transaction(callback)
+  async transaction<T>(callback: (tx: TransactionalPrisma) => Promise<T>): Promise<T> {
+    if ("$transaction" in this.client) {
+      return this.client.$transaction(callback)
+    }
+    throw new Error("Cannot start a transaction within a transaction.")
   }
 
   /**
    * Close database connection
    */
   async disconnect(): Promise<void> {
-    await this.client.$disconnect()
+    if ("$disconnect" in this.client) {
+      await this.client.$disconnect()
+    }
   }
 }
 

@@ -124,6 +124,7 @@ describe("IngressService", () => {
     // Create a custom mock for this test
     const mockServerService: MockServerService = {
       getServerByAddress: vi.fn().mockResolvedValue(null),
+      getGameByServerId: vi.fn().mockResolvedValue(null),
       db: {} as MockDatabaseClient,
     }
 

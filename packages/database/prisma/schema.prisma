@@ -22,8 +22,33 @@ generator pothosCodegen {
   generatorConfigPath = "../src/pothos.config.js"
 }
 
-// Legacy HLStatsX database schema - exact mirror for compatibility
+// GeoIP Tables
+model GeoLiteCityBlock {
+  startIpNum BigInt @db.UnsignedBigInt
+  endIpNum   BigInt @db.UnsignedBigInt
+  locId      BigInt @db.UnsignedBigInt
 
+  location GeoLiteCityLocation @relation(fields: [locId], references: [locId])
+
+  @@id([startIpNum, endIpNum])
+  @@map("geoLiteCity_Blocks")
+}
+
+model GeoLiteCityLocation {
+  locId      BigInt   @id @db.UnsignedBigInt
+  country    String   @db.VarChar(2)
+  region     String?  @db.VarChar(50)
+  city       String?  @db.VarChar(50)
+  postalCode String?  @db.VarChar(10)
+  latitude   Decimal? @db.Decimal(14, 4)
+  longitude  Decimal? @db.Decimal(14, 4)
+
+  blocks GeoLiteCityBlock[]
+
+  @@map("geoLiteCity_Location")
+}
+
+// Core Tables
 model Game {
   code     String @id // Primary key, e.g., "tf", "css", "csgo"
   name     String @db.VarChar(128) // e.g., "Team Fortress 2"
@@ -178,35 +203,6 @@ model PlayerUniqueId {
   @@map("PlayerUniqueIds")
 }
 
-// HLStatsX:CE Schema Additions
-
-// GeoIP Tables
-model GeoLiteCityBlock {
-  startIpNum BigInt @db.UnsignedBigInt
-  endIpNum   BigInt @db.UnsignedBigInt
-  locId      BigInt @db.UnsignedBigInt
-
-  location GeoLiteCityLocation @relation(fields: [locId], references: [locId])
-
-  @@id([startIpNum, endIpNum])
-  @@map("geoLiteCity_Blocks")
-}
-
-model GeoLiteCityLocation {
-  locId      BigInt   @id @db.UnsignedBigInt
-  country    String   @db.VarChar(2)
-  region     String?  @db.VarChar(50)
-  city       String?  @db.VarChar(50)
-  postalCode String?  @db.VarChar(10)
-  latitude   Decimal? @db.Decimal(14, 4)
-  longitude  Decimal? @db.Decimal(14, 4)
-
-  blocks GeoLiteCityBlock[]
-
-  @@map("geoLiteCity_Location")
-}
-
-// Core Tables
 model Action {
   id                      Int     @id @default(autoincrement()) @db.UnsignedInt
   game                    String  @default("valve") @db.VarChar(32)

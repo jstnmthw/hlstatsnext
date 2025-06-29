@@ -77,7 +77,6 @@ help:
 
 # Default target: restart (down + up)
 restart: down up
-	@echo "$(GREEN)✓ All containers restarted$(NC)"
 
 # Start all containers
 up:

@@ -34,7 +34,7 @@ model Game {
   players Player[]
   clans   Clan[]
 
-  @@map("hlstats_Games")
+  @@map("Games")
 }
 
 model Country {
@@ -44,7 +44,7 @@ model Country {
   // Relationships
   players Player[]
 
-  @@map("hlstats_Countries")
+  @@map("Countries")
 }
 
 model Clan {
@@ -63,7 +63,7 @@ model Clan {
   // Constraints
   @@unique([game, tag], name: "game_tag") // Unique tag per game
   @@index([game], name: "game")
-  @@map("hlstats_Clans")
+  @@map("Clans")
 }
 
 model Player {
@@ -94,7 +94,7 @@ model Player {
   countryData Country? @relation(fields: [flag], references: [flag])
 
   // Clan relationship
-  clan     Int   @default(0) @db.UnsignedInt
+  clan     Int?  @db.UnsignedInt
   clanData Clan? @relation(fields: [clan], references: [clanId])
 
   // Core statistics
@@ -162,7 +162,7 @@ model Player {
   @@index([game], name: "game")
   @@index([kills], name: "kills")
   @@index([hideranking], name: "hideranking")
-  @@map("hlstats_Players")
+  @@map("Players")
 }
 
 model PlayerUniqueId {
@@ -175,7 +175,7 @@ model PlayerUniqueId {
   // Constraints - unique ID per game (PRIMARY KEY in legacy)
   @@id([uniqueId, game])
   @@index([playerId], name: "playerId")
-  @@map("hlstats_PlayerUniqueIds")
+  @@map("PlayerUniqueIds")
 }
 
 // HLStatsX:CE Schema Additions
@@ -227,7 +227,7 @@ model Action {
 
   @@unique([code, game, team], name: "gamecode")
   @@index([code])
-  @@map("hlstats_Actions")
+  @@map("Actions")
 }
 
 model Award {
@@ -247,7 +247,7 @@ model Award {
   playerAwards PlayerAward[]
 
   @@unique([game, awardType, code], name: "game_awardType_code")
-  @@map("hlstats_Awards")
+  @@map("Awards")
 }
 
 enum ClanTagPosition {
@@ -261,7 +261,7 @@ model ClanTag {
   pattern  String          @unique @db.VarChar(64)
   position ClanTagPosition @default(EITHER)
 
-  @@map("hlstats_ClanTags")
+  @@map("ClanTags")
 }
 
 // Event Tables
@@ -276,7 +276,7 @@ model EventAdmin {
 
   server Server @relation(fields: [serverId], references: [serverId])
 
-  @@map("hlstats_Events_Admin")
+  @@map("Events_Admin")
 }
 
 model EventChangeName {
@@ -292,7 +292,7 @@ model EventChangeName {
   server Server @relation(fields: [serverId], references: [serverId])
 
   @@index([playerId])
-  @@map("hlstats_Events_ChangeName")
+  @@map("Events_ChangeName")
 }
 
 model EventChangeRole {
@@ -307,7 +307,7 @@ model EventChangeRole {
   server Server @relation(fields: [serverId], references: [serverId])
 
   @@index([playerId])
-  @@map("hlstats_Events_ChangeRole")
+  @@map("Events_ChangeRole")
 }
 
 model EventChangeTeam {
@@ -322,7 +322,7 @@ model EventChangeTeam {
   server Server @relation(fields: [serverId], references: [serverId])
 
   @@index([playerId])
-  @@map("hlstats_Events_ChangeTeam")
+  @@map("Events_ChangeTeam")
 }
 
 model EventChat {
@@ -340,7 +340,7 @@ model EventChat {
   @@index([playerId])
   @@index([serverId])
   @@fulltext([message])
-  @@map("hlstats_Events_Chat")
+  @@map("Events_Chat")
 }
 
 model EventConnect {
@@ -358,7 +358,7 @@ model EventConnect {
   server Server @relation(fields: [serverId], references: [serverId])
 
   @@index([playerId])
-  @@map("hlstats_Events_Connects")
+  @@map("Events_Connects")
 }
 
 model EventDisconnect {
@@ -371,7 +371,7 @@ model EventDisconnect {
   player Player @relation(fields: [playerId], references: [playerId])
   server Server @relation(fields: [serverId], references: [serverId])
 
-  @@map("hlstats_Events_Disconnects")
+  @@map("Events_Disconnects")
 }
 
 model EventEntry {
@@ -385,7 +385,7 @@ model EventEntry {
   server Server @relation(fields: [serverId], references: [serverId])
 
   @@index([playerId])
-  @@map("hlstats_Events_Entries")
+  @@map("Events_Entries")
 }
 
 model EventFrag {
@@ -417,7 +417,7 @@ model EventFrag {
   @@index([map])
   @@index([weapon])
   @@index([killerRole])
-  @@map("hlstats_Events_Frags")
+  @@map("Events_Frags")
 }
 
 model EventLatency {
@@ -432,7 +432,7 @@ model EventLatency {
   server Server @relation(fields: [serverId], references: [serverId])
 
   @@index([playerId])
-  @@map("hlstats_Events_Latency")
+  @@map("Events_Latency")
 }
 
 model EventPlayerAction {
@@ -453,7 +453,7 @@ model EventPlayerAction {
 
   @@index([playerId])
   @@index([actionId])
-  @@map("hlstats_Events_PlayerActions")
+  @@map("Events_PlayerActions")
 }
 
 model EventPlayerPlayerAction {
@@ -480,7 +480,7 @@ model EventPlayerPlayerAction {
   @@index([playerId])
   @@index([actionId])
   @@index([victimId])
-  @@map("hlstats_Events_PlayerPlayerActions")
+  @@map("Events_PlayerPlayerActions")
 }
 
 model EventRcon {
@@ -495,7 +495,7 @@ model EventRcon {
 
   server Server @relation(fields: [serverId], references: [serverId])
 
-  @@map("hlstats_Events_Rcon")
+  @@map("Events_Rcon")
 }
 
 model EventStatsme {
@@ -517,7 +517,7 @@ model EventStatsme {
 
   @@index([playerId])
   @@index([weapon])
-  @@map("hlstats_Events_Statsme")
+  @@map("Events_Statsme")
 }
 
 model EventStatsme2 {
@@ -540,7 +540,7 @@ model EventStatsme2 {
 
   @@index([playerId])
   @@index([weapon])
-  @@map("hlstats_Events_Statsme2")
+  @@map("Events_Statsme2")
 }
 
 model EventStatsmeLatency {
@@ -555,7 +555,7 @@ model EventStatsmeLatency {
   server Server @relation(fields: [serverId], references: [serverId])
 
   @@index([playerId])
-  @@map("hlstats_Events_StatsmeLatency")
+  @@map("Events_StatsmeLatency")
 }
 
 model EventStatsmeTime {
@@ -570,7 +570,7 @@ model EventStatsmeTime {
   server Server @relation(fields: [serverId], references: [serverId])
 
   @@index([playerId])
-  @@map("hlstats_Events_StatsmeTime")
+  @@map("Events_StatsmeTime")
 }
 
 model EventSuicide {
@@ -588,7 +588,7 @@ model EventSuicide {
   server Server @relation(fields: [serverId], references: [serverId])
 
   @@index([playerId])
-  @@map("hlstats_Events_Suicides")
+  @@map("Events_Suicides")
 }
 
 model EventTeamBonus {
@@ -606,7 +606,7 @@ model EventTeamBonus {
 
   @@index([playerId])
   @@index([actionId])
-  @@map("hlstats_Events_TeamBonuses")
+  @@map("Events_TeamBonuses")
 }
 
 model EventTeamkill {
@@ -629,7 +629,7 @@ model EventTeamkill {
   server Server @relation(fields: [serverId], references: [serverId])
 
   @@index([killerId])
-  @@map("hlstats_Events_Teamkills")
+  @@map("Events_Teamkills")
 }
 
 // Game and Server Config Tables
@@ -639,14 +639,14 @@ model GameDefault {
   value     String @db.VarChar(128)
 
   @@id([code, parameter])
-  @@map("hlstats_Games_Defaults")
+  @@map("Games_Defaults")
 }
 
 model GameSupported {
   code String @id @db.VarChar(32)
   name String @db.VarChar(128)
 
-  @@map("hlstats_Games_Supported")
+  @@map("Games_Supported")
 }
 
 model HeatmapConfig {
@@ -670,7 +670,7 @@ model HeatmapConfig {
   cropy2  Int    @default(0)
 
   @@unique([map, game], name: "gamemap")
-  @@map("hlstats_Heatmap_Config")
+  @@map("Heatmap_Config")
 }
 
 model HostGroup {
@@ -678,7 +678,7 @@ model HostGroup {
   pattern String @default("") @db.VarChar(255)
   name    String @default("") @db.VarChar(255)
 
-  @@map("hlstats_HostGroups")
+  @@map("HostGroups")
 }
 
 // Live Stats (Memory Table)
@@ -708,7 +708,7 @@ model Livestat {
   skill_change Int    @default(0)
   skill        Int    @default(0)
 
-  @@map("hlstats_Livestats")
+  @@map("Livestats")
 }
 
 model MapCount {
@@ -719,7 +719,7 @@ model MapCount {
   headshots Int
 
   @@id([game, map])
-  @@map("hlstats_Maps_Counts")
+  @@map("Maps_Counts")
 }
 
 model ModDefault {
@@ -728,14 +728,14 @@ model ModDefault {
   value     String @db.VarChar(128)
 
   @@id([code, parameter])
-  @@map("hlstats_Mods_Defaults")
+  @@map("Mods_Defaults")
 }
 
 model ModSupported {
   code String @id @db.VarChar(32)
   name String @db.VarChar(128)
 
-  @@map("hlstats_Mods_Supported")
+  @@map("Mods_Supported")
 }
 
 model Option {
@@ -746,7 +746,7 @@ model Option {
   choices OptionChoice[]
 
   @@index([opttype])
-  @@map("hlstats_Options")
+  @@map("Options")
 }
 
 model OptionChoice {
@@ -759,7 +759,7 @@ model OptionChoice {
 
   @@id([keyname, value])
   @@index([keyname])
-  @@map("hlstats_Options_Choices")
+  @@map("Options_Choices")
 }
 
 model PlayerName {
@@ -779,7 +779,7 @@ model PlayerName {
 
   @@id([playerId, name])
   @@index([name(length: 16)], name: "name16")
-  @@map("hlstats_PlayerNames")
+  @@map("PlayerNames")
 }
 
 model PlayerAward {
@@ -793,7 +793,7 @@ model PlayerAward {
   player Player @relation(fields: [playerId], references: [playerId])
 
   @@id([awardTime, awardId, playerId, game])
-  @@map("hlstats_Players_Awards")
+  @@map("Players_Awards")
 }
 
 model PlayerHistory {
@@ -817,7 +817,7 @@ model PlayerHistory {
 
   @@unique([eventTime, playerId, game], name: "eventTime_playerId_game")
   @@index([playerId])
-  @@map("hlstats_Players_History")
+  @@map("Players_History")
 }
 
 model PlayerRibbon {
@@ -829,7 +829,7 @@ model PlayerRibbon {
   ribbon Ribbon @relation(fields: [ribbonId], references: [ribbonId])
 
   @@id([playerId, ribbonId, game])
-  @@map("hlstats_Players_Ribbons")
+  @@map("Players_Ribbons")
 }
 
 model Rank {
@@ -842,7 +842,7 @@ model Rank {
 
   @@unique([image, game], name: "rankgame")
   @@index([game(length: 8)], name: "game")
-  @@map("hlstats_Ranks")
+  @@map("Ranks")
 }
 
 model Ribbon {
@@ -857,7 +857,7 @@ model Ribbon {
   playerRibbons PlayerRibbon[]
 
   @@unique([awardCode, awardCount, game, special], name: "award")
-  @@map("hlstats_Ribbons")
+  @@map("Ribbons")
 }
 
 model Role {
@@ -871,7 +871,7 @@ model Role {
   deaths Int    @default(0) @db.UnsignedInt
 
   @@unique([game, code], name: "gamecode")
-  @@map("hlstats_Roles")
+  @@map("Roles")
 }
 
 model Server {
@@ -939,7 +939,7 @@ model Server {
   loads                    ServerLoad[]
 
   @@unique([address, port], name: "addressport")
-  @@map("hlstats_Servers")
+  @@map("Servers")
 }
 
 model ServerConfig {
@@ -951,7 +951,7 @@ model ServerConfig {
   server Server @relation(fields: [serverId], references: [serverId])
 
   @@id([serverId, parameter])
-  @@map("hlstats_Servers_Config")
+  @@map("Servers_Config")
 }
 
 model ServerConfigDefault {
@@ -959,7 +959,7 @@ model ServerConfigDefault {
   value       String  @db.VarChar(128)
   description String? @db.MediumText
 
-  @@map("hlstats_Servers_Config_Default")
+  @@map("Servers_Config_Default")
 }
 
 model ServerVoiceComm {
@@ -973,11 +973,11 @@ model ServerVoiceComm {
   serverType Int     @default(0) @db.TinyInt
 
   @@unique([addr, UDPPort, queryPort], name: "address")
-  @@map("hlstats_Servers_VoiceComm")
+  @@map("Servers_VoiceComm")
 }
 
 model ServerLoad {
-  server_id   Int     @default(0)
+  server_id   Int     @default(0) @db.UnsignedInt
   timestamp   Int     @default(0)
   act_players Int     @default(0) @db.TinyInt
   min_players Int     @default(0) @db.TinyInt
@@ -991,7 +991,7 @@ model ServerLoad {
   @@id([server_id, timestamp])
   @@index([server_id])
   @@index([timestamp])
-  @@map("hlstats_server_load")
+  @@map("server_load")
 }
 
 model Team {
@@ -1005,7 +1005,7 @@ model Team {
   playerlist_index   Int     @default(0) @db.UnsignedTinyInt
 
   @@unique([game, code], name: "gamecode")
-  @@map("hlstats_Teams")
+  @@map("Teams")
 }
 
 model Trend {
@@ -1021,18 +1021,18 @@ model Trend {
   @@id([timestamp, game])
   @@index([game])
   @@index([timestamp])
-  @@map("hlstats_Trend")
+  @@map("Trend")
 }
 
 model User {
   username String @id @db.VarChar(16)
   password String @db.VarChar(32)
   acclevel Int    @default(0)
-  playerId Int    @default(0)
+  playerId Int    @default(0) @db.UnsignedInt
 
   player Player? @relation(fields: [playerId], references: [playerId])
 
-  @@map("hlstats_Users")
+  @@map("Users")
 }
 
 model Weapon {
@@ -1047,5 +1047,5 @@ model Weapon {
   @@unique([game, code], name: "gamecode")
   @@index([code])
   @@index([modifier])
-  @@map("hlstats_Weapons")
+  @@map("Weapons")
 }

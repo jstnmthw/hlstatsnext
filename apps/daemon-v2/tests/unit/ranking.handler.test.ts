@@ -1,39 +1,70 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { RankingHandler } from "../../src/services/processor/handlers/ranking.handler"
 import { EventType, PlayerConnectEvent, PlayerKillEvent, RoundEndEvent } from "../../src/types/common/events"
+import { PlayerService } from "@/services/player/player.service"
+import { WeaponService } from "@/services/weapon/weapon.service"
+import { DatabaseClient } from "@/database/client"
 
-vi.mock("../../src/database/client", () => ({
-  DatabaseClient: vi.fn().mockImplementation(() => ({
+// Mock PlayerService
+vi.mock("@/services/player/player.service", () => ({
+  PlayerService: vi.fn().mockImplementation(() => ({
     getPlayerRating: vi.fn().mockResolvedValue({
       playerId: 123,
       rating: 1000,
-      kFactor: 32,
+      confidence: 350,
+      volatility: 0.06,
       gamesPlayed: 0,
     }),
-    updatePlayerRating: vi.fn().mockResolvedValue(undefined),
-    getWeaponModifier: vi.fn().mockResolvedValue(null),
+    updatePlayerRatings: vi.fn().mockResolvedValue(undefined),
+    getRoundParticipants: vi.fn().mockResolvedValue([
+      {
+        playerId: 123,
+        player: {
+          skill: 1000,
+          teamkills: 0,
+        },
+      },
+    ]),
   })),
 }))
 
-vi.mock("@/services/weapon/weapon.service", () => {
-  return {
-    WeaponService: vi.fn().mockImplementation(() => ({
-      getSkillMultiplier: vi.fn().mockResolvedValue(1.0),
-    })),
-  }
-})
-
-// import { DatabaseClient } from "../../src/database/client" // TODO: Add back when database operations are implemented
+// Mock WeaponService
+vi.mock("@/services/weapon/weapon.service", () => ({
+  WeaponService: vi.fn().mockImplementation(() => ({
+    getSkillMultiplier: vi.fn().mockResolvedValue(1.0),
+  })),
+}))
 
 describe("RankingHandler", () => {
   let handler: RankingHandler
+  let playerService: PlayerService
+  let weaponService: WeaponService
 
   beforeEach(() => {
-    handler = new RankingHandler()
+    playerService = new PlayerService({} as DatabaseClient)
+    weaponService = new WeaponService({} as DatabaseClient)
+    handler = new RankingHandler(playerService, weaponService)
   })
 
   describe("handleEvent", () => {
     it("should handle PLAYER_KILL events and calculate rating changes", async () => {
+      // Mock different ratings for killer and victim
+      vi.spyOn(playerService, "getPlayerRating")
+        .mockResolvedValueOnce({
+          playerId: 123,
+          rating: 1200,
+          confidence: 300,
+          volatility: 0.06,
+          gamesPlayed: 10,
+        })
+        .mockResolvedValueOnce({
+          playerId: 456,
+          rating: 1000,
+          confidence: 350,
+          volatility: 0.06,
+          gamesPlayed: 5,
+        })
+
       const event = {
         eventType: EventType.PLAYER_KILL,
         timestamp: new Date(),
@@ -54,13 +85,24 @@ describe("RankingHandler", () => {
       expect(result.ratingChanges).toBeDefined()
       expect(result.ratingChanges).toHaveLength(2)
 
-      const killerChange = result.ratingChanges?.find((r) => r.playerId === 123)
-      const victimChange = result.ratingChanges?.find((r) => r.playerId === 456)
+      if (!result.ratingChanges) {
+        throw new Error("Rating changes should be defined")
+      }
 
-      expect(killerChange?.change).toBeGreaterThan(0)
-      expect(victimChange?.change).toBeLessThan(0)
-      expect(killerChange?.reason).toContain("ak47")
-      expect(killerChange?.reason).toContain("headshot")
+      const killerChange = result.ratingChanges.find((r) => r.playerId === 123)
+      const victimChange = result.ratingChanges.find((r) => r.playerId === 456)
+
+      expect(killerChange).toBeDefined()
+      expect(victimChange).toBeDefined()
+
+      if (!killerChange || !victimChange) {
+        throw new Error("Both killer and victim changes should be defined")
+      }
+
+      expect(killerChange.change).toBeGreaterThan(0)
+      expect(victimChange.change).toBeLessThan(0)
+      expect(killerChange.reason).toContain("ak47")
+      expect(killerChange.reason).toContain("headshot")
     })
 
     it("should handle ROUND_END events", async () => {
@@ -78,6 +120,9 @@ describe("RankingHandler", () => {
       const result = await handler.handleEvent(event)
 
       expect(result.success).toBe(true)
+      expect(result.ratingChanges).toBeDefined()
+      expect(result.ratingChanges).toHaveLength(1)
+      expect(result.ratingChanges?.[0]?.reason).toContain("clean round")
     })
 
     it("should return success for unhandled event types", async () => {
@@ -97,6 +142,29 @@ describe("RankingHandler", () => {
 
       expect(result.success).toBe(true)
       expect(result.ratingChanges).toBeUndefined()
+    })
+
+    it("should handle errors from PlayerService gracefully", async () => {
+      vi.spyOn(playerService, "getPlayerRating").mockRejectedValueOnce(new Error("DB Error"))
+
+      const event = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 1,
+        data: {
+          killerId: 123,
+          victimId: 456,
+          weapon: "ak47",
+          headshot: false,
+          killerTeam: "CT",
+          victimTeam: "T",
+        },
+      } as PlayerKillEvent
+
+      const result = await handler.handleEvent(event)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toBe("DB Error")
     })
   })
 

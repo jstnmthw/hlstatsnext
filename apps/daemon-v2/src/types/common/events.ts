@@ -114,7 +114,6 @@ export interface RoundEndEvent extends BaseEvent {
       team2: number
     }
   }
-  // No meta needed for round events
 }
 
 export interface MapChangeEvent extends BaseEvent {
@@ -124,10 +123,8 @@ export interface MapChangeEvent extends BaseEvent {
     newMap: string
     playerCount: number
   }
-  // No meta needed for map events
 }
 
-// Newly-modelled explicit event types replacing the former `UnknownEvent`
 export interface PlayerDeathEvent extends BaseEvent {
   eventType: EventType.PLAYER_DEATH
   data: {
@@ -224,7 +221,7 @@ export interface ProcessedEvent {
 }
 
 // Helper type to extract events that have metadata
-export type EventWithMeta = Extract<GameEvent, { meta?: any }>
+export type EventWithMeta = Extract<GameEvent, { meta?: PlayerMeta | DualPlayerMeta }>
 
 // Helper type to extract events with single player metadata
 export type SinglePlayerEvent = Extract<GameEvent, { meta?: PlayerMeta }>

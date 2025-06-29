@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "tsx watch src/main.dev.ts",
     "build": "tsc",
-    "lint": "eslint src/**/*.ts --max-warnings 0",
-    "lint:fix": "eslint src/**/*.ts --fix",
+    "lint": "eslint . --ext .ts --max-warnings 0",
+    "lint:fix": "eslint . --ext .ts --fix",
     "udp-dump": "tsx scripts/udp-dump.ts",
     "check-types": "tsc --noEmit",
     "test": "vitest run --silent",

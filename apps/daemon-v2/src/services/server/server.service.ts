@@ -12,9 +12,7 @@ export class ServerService {
   constructor(private readonly db: DatabaseClient) {}
 
   /**
-   * Look up a game server by its IP address and port. This is used by the ingress
-   * service to authenticate that incoming UDP packets originate from a known and
-   * authorised server record that an admin has added via the (future) admin UI.
+   * Look up a game server by its IP address and port.
    */
   async getServerByAddress(ipAddress: string, port: number): Promise<{ serverId: number } | null> {
     try {
@@ -31,6 +29,27 @@ export class ServerService {
       return server ?? null
     } catch (error) {
       console.error(`Failed to fetch server by address:`, error)
+      throw error
+    }
+  }
+
+  /**
+   * Get the game associated with a server by its ID.
+   */
+  async getGameByServerId(serverId: number): Promise<string | null> {
+    try {
+      const server = await this.db.prisma.server.findUnique({
+        where: {
+          serverId,
+        },
+        select: {
+          game: true,
+        },
+      })
+
+      return server?.game ?? null
+    } catch (error) {
+      console.error(`Failed to fetch server game for serverId: ${serverId}`, error)
       throw error
     }
   }

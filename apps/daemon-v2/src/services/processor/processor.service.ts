@@ -8,6 +8,7 @@
 import type { GameEvent } from "@/types/common/events"
 import { EventType } from "@/types/common/events"
 import { DatabaseClient } from "@/database/client"
+import { EventService } from "@/services/event/event.service"
 import { PlayerHandler } from "./handlers/player.handler"
 import { WeaponHandler } from "./handlers/weapon.handler"
 import { MatchHandler } from "./handlers/match.handler"
@@ -23,6 +24,7 @@ export interface IEventProcessor {
 
 export class EventProcessorService extends EventEmitter implements IEventProcessor {
   private readonly db: DatabaseClient
+  private readonly eventService: EventService
   private readonly opts: { logBots?: boolean }
 
   // Services
@@ -45,6 +47,7 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
     // If a DatabaseClient is supplied use it, otherwise create a new one so that
     // existing callers (e.g. production entry-point) remain functional.
     this.db = db ?? new DatabaseClient()
+    this.eventService = new EventService(this.db)
     this.opts = { logBots: true, ...opts }
 
     // Initialize services
@@ -85,7 +88,7 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
       await this.resolvePlayerIds(event)
 
       // Persist the event to the database
-      await this.db.createGameEvent(event)
+      await this.eventService.createGameEvent(event)
 
       // Route to appropriate handlers
       switch (event.eventType) {
@@ -241,6 +244,6 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
     game: string = this.DEFAULT_GAME_ID,
     includeHidden: boolean = false,
   ) {
-    return this.db.getTopPlayers(limit, game, includeHidden)
+    return this.playerService.getTopPlayers(limit, game, includeHidden)
   }
 }

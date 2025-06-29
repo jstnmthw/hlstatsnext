@@ -7,6 +7,7 @@
  */
 
 import { DatabaseClient } from "@/database/client"
+import { ServerService } from "@/services/server/server.service"
 import { EventProcessorService } from "@/services/processor/processor.service"
 import { UdpServer } from "@/services/ingress/udp-server"
 import { CsParser } from "@/services/ingress/parsers/cs.parser"
@@ -20,6 +21,7 @@ export interface IIngressService {
 export class IngressService implements IIngressService {
   private readonly udpServer: UdpServer
   private readonly db: DatabaseClient
+  private readonly serverService: ServerService
   private readonly processor: EventProcessorService
   private readonly parser: CsParser
 
@@ -33,6 +35,7 @@ export class IngressService implements IIngressService {
     private readonly opts: { skipAuth?: boolean } = {},
   ) {
     this.db = dbClient ?? new DatabaseClient()
+    this.serverService = new ServerService(this.db)
     this.processor = processor ?? new EventProcessorService()
     this.udpServer = new UdpServer({ port: this.port })
     this.parser = new CsParser("csgo")
@@ -97,7 +100,7 @@ export class IngressService implements IIngressService {
     }
 
     // Production/normal path – verify server exists in DB.
-    const record = await this.db.getServerByAddress(ip, port)
+    const record = await this.serverService.getServerByAddress(ip, port)
 
     if (!record) {
       logger.warn(`Rejected log line from unrecognised server ${serverKey}`)
@@ -121,7 +124,7 @@ export class IngressService implements IIngressService {
     const serverKey = `${ip}:${port}`
 
     // 1. Attempt to fetch an existing record to avoid unnecessary writes.
-    const existing = await this.db.getServerByAddress(ip, port)
+    const existing = await this.serverService.getServerByAddress(ip, port)
     if (existing) {
       return existing.serverId
     }
@@ -143,7 +146,7 @@ export class IngressService implements IIngressService {
     } catch (err: unknown) {
       // Prisma uses P2002 for unique-constraint violations.
       if (typeof err === "object" && err !== null && (err as { code?: string }).code === "P2002") {
-        const raceExisting = await this.db.getServerByAddress(ip, port)
+        const raceExisting = await this.serverService.getServerByAddress(ip, port)
         if (raceExisting) {
           return raceExisting.serverId
         }

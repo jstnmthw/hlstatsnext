@@ -7,8 +7,9 @@
  * Usage: pnpm tsx scripts/test-player-lifecycle.ts
  */
 
-import { EventProcessorService } from "../src/services/processor/processor.service"
 import { DatabaseClient } from "../src/database/client"
+import { EventProcessorService } from "../src/services/processor/processor.service"
+import { PlayerService } from "../src/services/player/player.service"
 import {
   EventType,
   type PlayerConnectEvent,
@@ -22,6 +23,7 @@ import {
 async function testPlayerLifecycle() {
   const db = new DatabaseClient()
   const processor = new EventProcessorService(db, { logBots: true }) // Include bots in testing
+  const playerService = new PlayerService(db)
 
   try {
     console.log("🧪 Testing Player Lifecycle...\n")
@@ -175,7 +177,7 @@ async function testPlayerLifecycle() {
     console.log("📊 Final Player Statistics:")
     console.log("=".repeat(60))
 
-    const player1 = await db.getPlayerStats(1)
+    const player1 = await playerService.getPlayerStats(1)
 
     if (player1) {
       console.log(`Player: ${player1.lastName}`)

@@ -7,9 +7,11 @@
  */
 
 import { DatabaseClient } from "../src/database/client"
+import { PlayerService } from "../src/services/player/player.service"
 
 async function testPlayerRanking() {
   const db = new DatabaseClient()
+  const playerService = new PlayerService(db)
 
   try {
     console.log("Testing database connection...")
@@ -21,7 +23,7 @@ async function testPlayerRanking() {
 
     // Query top 50 players by ranking
     console.log("Querying top 50 players by skill ranking...")
-    const topPlayers = await db.getTopPlayers(50, "cstrike", true) // Include hidden players for testing
+    const topPlayers = await playerService.getTopPlayers(50, "cstrike", true) // Include hidden players for testing
 
     if (topPlayers.length === 0) {
       console.log("No players found in database. Creating test data...")
@@ -36,13 +38,13 @@ async function testPlayerRanking() {
       ]
 
       for (const player of testPlayers) {
-        const playerId = await db.getOrCreatePlayer(player.steamId, player.name, "cstrike")
-        await db.updatePlayerStats(playerId, { skill: player.skill })
+        const playerId = await playerService.getOrCreatePlayer(player.steamId, player.name, "cstrike")
+        await playerService.updatePlayerStats(playerId, { skill: player.skill })
         console.log(`Created player: ${player.name} (ID: ${playerId}, Skill: ${player.skill})`)
       }
 
       // Query again
-      const newTopPlayers = await db.getTopPlayers(50, "cstrike", true)
+      const newTopPlayers = await playerService.getTopPlayers(50, "cstrike", true)
       displayRankings(newTopPlayers)
     } else {
       displayRankings(topPlayers)
@@ -50,7 +52,7 @@ async function testPlayerRanking() {
 
     // Test filtering by game
     console.log("\nTesting game filtering...")
-    const csPlayers = await db.getTopPlayers(10, "cstrike", false)
+    const csPlayers = await playerService.getTopPlayers(10, "cstrike", false)
     console.log(`Found ${csPlayers.length} Counter-Strike players (excluding hidden)`)
   } catch (error) {
     console.error("Error:", error)

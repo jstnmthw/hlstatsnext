@@ -1,6 +1,7 @@
 import type { DatabaseClient } from "@/database/client"
 import type { SkillRating } from "@/services/processor/handlers/ranking.handler"
 import { logger } from "@/utils/logger"
+import type { Player } from "@repo/database/client"
 
 /**
  * Player Service for Daemon v2
@@ -137,7 +138,53 @@ export class PlayerService {
    * Get or create a player by Steam ID
    */
   async getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number> {
-    return this.db.getOrCreatePlayer(steamId, playerName, game)
+    const isBot = steamId.toUpperCase() === "BOT"
+    const normalizedName = playerName
+      .trim()
+      .replace(/\s+/g, "_") // Spaces → underscores
+      .replace(/[^A-Za-z0-9_-]/g, "") // Remove exotic chars
+      .substring(0, 48) // Leave room for "BOT_" prefix within 64-char limit
+
+    const effectiveId = isBot ? `BOT_${normalizedName}` : steamId
+
+    try {
+      // First, try to find existing player by Steam ID
+      const uniqueId = await this.db.prisma.playerUniqueId.findUnique({
+        where: {
+          uniqueId_game: {
+            uniqueId: effectiveId,
+            game: game,
+          },
+        },
+        include: {
+          player: true,
+        },
+      })
+
+      if (uniqueId) {
+        return uniqueId.playerId
+      }
+
+      // Create new player
+      const player = await this.db.prisma.player.create({
+        data: {
+          lastName: playerName,
+          game: game,
+          skill: 1000, // Default skill rating
+          uniqueIds: {
+            create: {
+              uniqueId: effectiveId,
+              game: game,
+            },
+          },
+        },
+      })
+
+      return player.playerId
+    } catch (error) {
+      console.error(`Failed to get or create player:`, error)
+      throw error
+    }
   }
 
   /**
@@ -145,26 +192,110 @@ export class PlayerService {
    */
   async updatePlayerStats(
     playerId: number,
-    stats: Partial<{
-      kills: number
-      deaths: number
-      headshots: number
-      shots: number
-      hits: number
-      suicides: number
-      teamkills: number
-    }>,
+    updates: {
+      kills?: number
+      deaths?: number
+      suicides?: number
+      teamkills?: number
+      skill?: number
+      shots?: number
+      hits?: number
+      headshots?: number
+      kill_streak?: number
+      death_streak?: number
+      connection_time?: number
+    },
   ): Promise<void> {
     try {
+      const updateData: Record<string, unknown> = {}
+
+      if (updates.kills !== undefined) {
+        updateData.kills = { increment: updates.kills }
+      }
+      if (updates.deaths !== undefined) {
+        updateData.deaths = { increment: updates.deaths }
+      }
+      if (updates.suicides !== undefined) {
+        updateData.suicides = { increment: updates.suicides }
+      }
+      if (updates.teamkills !== undefined) {
+        updateData.teamkills = { increment: updates.teamkills }
+      }
+      if (updates.skill !== undefined) {
+        updateData.skill = updates.skill
+      }
+      if (updates.shots !== undefined) {
+        updateData.shots = { increment: updates.shots }
+      }
+      if (updates.hits !== undefined) {
+        updateData.hits = { increment: updates.hits }
+      }
+      if (updates.headshots !== undefined) {
+        updateData.headshots = { increment: updates.headshots }
+      }
+      if (updates.kill_streak !== undefined) {
+        updateData.kill_streak = updates.kill_streak
+      }
+      if (updates.death_streak !== undefined) {
+        updateData.death_streak = updates.death_streak
+      }
+      if (updates.connection_time !== undefined) {
+        updateData.connection_time = { increment: updates.connection_time }
+      }
+
       await this.db.prisma.player.update({
         where: { playerId },
-        data: {
-          ...stats,
-          last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
-        },
+        data: updateData,
       })
     } catch (error) {
-      logger.error(`Failed to update player stats for ${playerId}: ${error}`)
+      console.error(`Failed to update player stats:`, error)
+      throw error
+    }
+  }
+
+  /**
+   * Get player statistics
+   */
+  async getPlayerStats(playerId: number): Promise<Player | null> {
+    try {
+      const player = await this.db.prisma.player.findUnique({
+        where: { playerId },
+      })
+
+      return player
+    } catch (error) {
+      console.error(`Failed to get player stats:`, error)
+      throw error
+    }
+  }
+
+  /**
+   * Get top players by skill ranking
+   * @param limit Number of players to return (default 50)
+   * @param game Game code to filter by
+   * @param includeHidden Whether to include players with hideranking set
+   */
+  async getTopPlayers(limit: number = 50, game: string = "cstrike", includeHidden: boolean = false): Promise<Player[]> {
+    try {
+      const whereClause: Record<string, unknown> = {
+        game,
+      }
+
+      if (!includeHidden) {
+        whereClause.hideranking = 0
+      }
+
+      const players = await this.db.prisma.player.findMany({
+        where: whereClause,
+        orderBy: {
+          skill: "desc",
+        },
+        take: Math.min(limit, 100), // Cap at 100 for safety
+      })
+
+      return players
+    } catch (error) {
+      console.error(`Failed to get top players:`, error)
       throw error
     }
   }

@@ -14,6 +14,7 @@ import type {
   PlayerTeamkillEvent,
 } from "@/types/common/events"
 import { DatabaseClient } from "@/database/client"
+import { PlayerService } from "@/services/player/player.service"
 import { resolveGameId } from "@/config/game-config"
 import { logger } from "@/utils/logger"
 
@@ -24,7 +25,17 @@ export interface HandlerResult {
 }
 
 export class PlayerHandler {
-  constructor(private db: DatabaseClient) {}
+  private readonly playerService: PlayerService
+
+  /**
+   * Creates a new PlayerHandler instance
+   *
+   * @param db - Database client for creating default PlayerService
+   * @param playerService - Optional PlayerService instance for dependency injection (useful for testing)
+   */
+  constructor(db: DatabaseClient, playerService?: PlayerService) {
+    this.playerService = playerService ?? new PlayerService(db)
+  }
 
   async handleEvent(event: GameEvent): Promise<HandlerResult> {
     switch (event.eventType) {
@@ -58,10 +69,10 @@ export class PlayerHandler {
       // TODO: Implement proper server->game lookup in DatabaseClient
       const serverGame = resolveGameId(undefined) // Placeholder until implemented
 
-      const resolvedPlayerId = await this.db.getOrCreatePlayer(steamId, playerName, serverGame)
+      const resolvedPlayerId = await this.playerService.getOrCreatePlayer(steamId, playerName, serverGame)
 
       // Update last_event timestamp
-      await this.db.updatePlayerStats(resolvedPlayerId, {
+      await this.playerService.updatePlayerStats(resolvedPlayerId, {
         connection_time: 0, // Reset connection time on new connect
       })
 
@@ -95,7 +106,7 @@ export class PlayerHandler {
       const sessionDuration = 1800 // 30 minutes in seconds
 
       // Update player's total connection time
-      await this.db.updatePlayerStats(playerId, {
+      await this.playerService.updatePlayerStats(playerId, {
         connection_time: sessionDuration,
       })
 
@@ -122,8 +133,8 @@ export class PlayerHandler {
 
       // Get current player stats first
       const [killerStats, victimStats] = await Promise.all([
-        this.db.getPlayerStats(killerId),
-        this.db.getPlayerStats(victimId),
+        this.playerService.getPlayerStats(killerId),
+        this.playerService.getPlayerStats(victimId),
       ])
 
       if (!killerStats || !victimStats) {
@@ -155,8 +166,8 @@ export class PlayerHandler {
       }
 
       // Update killer first, then victim (fail fast if killer update fails)
-      await this.db.updatePlayerStats(killerId, killerUpdates)
-      await this.db.updatePlayerStats(victimId, victimUpdates)
+      await this.playerService.updatePlayerStats(killerId, killerUpdates)
+      await this.playerService.updatePlayerStats(victimId, victimUpdates)
 
       logger.event(`Kill recorded: Player ${killerId} killed Player ${victimId} with ${weapon}`)
 
@@ -185,7 +196,7 @@ export class PlayerHandler {
       }
 
       // Get current player stats
-      const playerStats = await this.db.getPlayerStats(playerId)
+      const playerStats = await this.playerService.getPlayerStats(playerId)
       if (!playerStats) {
         throw new Error(`Player not found: ${playerId}`)
       }
@@ -199,12 +210,12 @@ export class PlayerHandler {
         deaths: 1, // Suicide counts as a death
         skill: newSkill,
         death_streak: playerStats.death_streak + 1, // Increment death streak
-        kill_streak: 0, // Reset kill streak
+        kill_streak: 0, // Reset kill streak on suicide
       }
 
-      await this.db.updatePlayerStats(playerId, updates)
+      await this.playerService.updatePlayerStats(playerId, updates)
 
-      logger.event(`Suicide recorded: Player ${playerId} ${weapon ? `with ${weapon}` : ""}`)
+      logger.event(`Suicide recorded: Player ${playerId} with ${weapon}`)
 
       return {
         success: true,
@@ -225,41 +236,38 @@ export class PlayerHandler {
     try {
       const { killerId, victimId, weapon } = event.data
 
-      // Get current player stats
+      // Get current player stats first
       const [killerStats, victimStats] = await Promise.all([
-        this.db.getPlayerStats(killerId),
-        this.db.getPlayerStats(victimId),
+        this.playerService.getPlayerStats(killerId),
+        this.playerService.getPlayerStats(victimId),
       ])
 
       if (!killerStats || !victimStats) {
-        throw new Error("Failed to fetch player stats")
+        throw new Error("Could not find killer or victim player records")
       }
 
-      // Teamkill penalty: 10 skill points for killer
+      // Teamkill penalty: -10 skill points for killer
       const skillPenalty = -10
       const newKillerSkill = Math.min(3000, Math.max(100, killerStats.skill + skillPenalty))
 
-      // Victim receives small compensation (+2 skill points)
-      const COMPENSATION = 2
-      const newVictimSkill = Math.min(3000, victimStats.skill + COMPENSATION)
-
-      // Update killer stats (penalty only)
+      // Killer updates: teamkills increment, skill penalty
       const killerUpdates = {
         teamkills: 1,
         skill: newKillerSkill,
+        kill_streak: 0, // Reset kill streak on teamkill
       }
 
-      // Update victim stats
+      // Victim updates: deaths increment (teamkill still counts as death)
       const victimUpdates = {
         deaths: 1,
-        skill: newVictimSkill,
-        death_streak: victimStats.death_streak + 1, // Increment death streak
-        kill_streak: 0, // Reset kill streak
+        death_streak: victimStats.death_streak + 1,
+        kill_streak: 0, // Reset kill streak on death
       }
 
+      // Update both players in parallel
       await Promise.all([
-        this.db.updatePlayerStats(killerId, killerUpdates),
-        this.db.updatePlayerStats(victimId, victimUpdates),
+        this.playerService.updatePlayerStats(killerId, killerUpdates),
+        this.playerService.updatePlayerStats(victimId, victimUpdates),
       ])
 
       logger.event(`Teamkill recorded: Player ${killerId} teamkilled Player ${victimId} with ${weapon}`)
@@ -277,43 +285,29 @@ export class PlayerHandler {
     }
   }
 
-  /**
-   * Calculate ELO-based skill changes for kill events
-   */
   private async calculateSkillDelta(killerId: number, victimId: number): Promise<{ killer: number; victim: number }> {
-    try {
-      // Get current skill ratings
-      const [killer, victim] = await Promise.all([this.db.getPlayerStats(killerId), this.db.getPlayerStats(victimId)])
+    // Get player stats to calculate ELO-based skill changes
+    const [killer, victim] = await Promise.all([
+      this.playerService.getPlayerStats(killerId),
+      this.playerService.getPlayerStats(victimId),
+    ])
 
-      if (!killer || !victim) {
-        throw new Error("Could not find killer or victim player records")
-      }
+    if (!killer || !victim) {
+      throw new Error("Could not find player stats for skill calculation")
+    }
 
-      // ELO calculation with K-factor of 16
-      const K = 16
-      const killerRating = killer.skill
-      const victimRating = victim.skill
+    // Simple ELO calculation
+    const K = 32 // ELO K-factor
+    const expectedKiller = 1 / (1 + Math.pow(10, (victim.skill - killer.skill) / 400))
+    const expectedVictim = 1 - expectedKiller
 
-      // Expected scores (probability of winning)
-      const killerExpected = 1 / (1 + Math.pow(10, (victimRating - killerRating) / 400))
-      const victimExpected = 1 - killerExpected
+    // Killer won (score = 1), victim lost (score = 0)
+    const killerDelta = Math.round(K * (1 - expectedKiller))
+    const victimDelta = Math.round(K * (0 - expectedVictim))
 
-      // Actual scores (killer won, victim lost)
-      const killerActual = 1
-      const victimActual = 0
-
-      // Calculate rating changes
-      const killerDelta = Math.round(K * (killerActual - killerExpected))
-      const victimDelta = Math.round(K * (victimActual - victimExpected))
-
-      return {
-        killer: Math.max(killerDelta, -(killerRating - 100)), // Don't go below 100 skill
-        victim: Math.max(victimDelta, -(victimRating - 100)), // Don't go below 100 skill
-      }
-    } catch (error) {
-      logger.error(`Failed to calculate skill delta: ${error instanceof Error ? error.message : "Unknown error"}`)
-      // Return conservative defaults on error
-      return { killer: 1, victim: -1 }
+    return {
+      killer: killerDelta,
+      victim: victimDelta,
     }
   }
 }

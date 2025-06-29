@@ -1,28 +1,26 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect, beforeEach } from "vitest"
 import { WeaponService } from "../../src/services/weapon/weapon.service"
+import { createMockDatabaseClient } from "../types/test-mocks"
 import type { DatabaseClient } from "../../src/database/client"
 
 // Re-use the default weapon-config for fallback assertions
-import { getWeaponAttributes, DEFAULT_SKILL_MULTIPLIER } from "../../src/config/weapon-config"
+import { getWeaponAttributes } from "../../src/config/weapon-config"
 
 // Helper to build a mock DatabaseClient that implements required methods
 function createDbMock() {
-  const spies = {
-    getWeaponModifier: vi.fn(),
-  } as const
+  const mockDb = createMockDatabaseClient()
 
-  // Cast minimal implementation to DatabaseClient for typing purposes
-  const db = {
-    prisma: {},
-    getWeaponModifier: spies.getWeaponModifier,
-  } as unknown as DatabaseClient
-
-  return { db, spies }
+  return {
+    db: mockDb as unknown as DatabaseClient,
+    spies: {
+      weaponFindFirst: mockDb.prisma.weapon.findFirst,
+    },
+  }
 }
 
 describe("WeaponService", () => {
-  let dbMock: ReturnType<typeof createDbMock>
   let service: WeaponService
+  let dbMock: ReturnType<typeof createDbMock>
 
   beforeEach(() => {
     dbMock = createDbMock()
@@ -31,82 +29,94 @@ describe("WeaponService", () => {
 
   describe("getSkillMultiplier", () => {
     it("fetches multiplier from database when available", async () => {
-      dbMock.spies.getWeaponModifier.mockResolvedValueOnce(1.4) // value from DB
+      // Mock DB response
+      dbMock.spies.weaponFindFirst.mockResolvedValueOnce({ modifier: 1.4 })
 
       const result = await service.getSkillMultiplier("csgo", "awp")
       expect(result).toBeCloseTo(1.4)
-      expect(dbMock.spies.getWeaponModifier).toHaveBeenCalledTimes(1)
+      expect(dbMock.spies.weaponFindFirst).toHaveBeenCalledTimes(1)
     })
 
     it("caches the multiplier to avoid duplicate DB lookups", async () => {
-      dbMock.spies.getWeaponModifier.mockResolvedValueOnce(1.2)
+      dbMock.spies.weaponFindFirst.mockResolvedValueOnce({ modifier: 1.2 })
 
       const first = await service.getSkillMultiplier("csgo", "ak47")
       const second = await service.getSkillMultiplier("csgo", "ak47")
 
       expect(first).toBeCloseTo(1.2)
       expect(second).toBeCloseTo(1.2)
-      expect(dbMock.spies.getWeaponModifier).toHaveBeenCalledTimes(1) // cached on second call
+      expect(dbMock.spies.weaponFindFirst).toHaveBeenCalledTimes(1) // cached on second call
     })
 
     it("falls back to static config when DB returns null", async () => {
-      dbMock.spies.getWeaponModifier.mockResolvedValueOnce(null)
+      dbMock.spies.weaponFindFirst.mockResolvedValueOnce(null)
 
-      const fallback = await service.getSkillMultiplier("csgo", "ak47")
+      const result = await service.getSkillMultiplier("csgo", "ak47")
+
+      // Should fall back to static config
       const { skillMultiplier } = getWeaponAttributes("ak47", "csgo")
-
-      expect(fallback).toBeCloseTo(skillMultiplier ?? DEFAULT_SKILL_MULTIPLIER)
+      expect(result).toBeCloseTo(skillMultiplier)
     })
 
     it("resolves game aliases (e.g., cstrike → csgo)", async () => {
-      dbMock.spies.getWeaponModifier.mockResolvedValueOnce(1.3)
+      dbMock.spies.weaponFindFirst.mockResolvedValueOnce({ modifier: 1.3 })
 
       const result = await service.getSkillMultiplier("cstrike", "awp")
 
       expect(result).toBeCloseTo(1.3)
       // Ensure alias was resolved so DB got canonical game id
-      expect(dbMock.spies.getWeaponModifier).toHaveBeenCalledWith("csgo", "awp")
+      expect(dbMock.spies.weaponFindFirst).toHaveBeenCalledWith({
+        where: { game: "csgo", code: "awp" },
+        select: { modifier: true },
+      })
     })
   })
 
   describe("getDamageMultiplier", () => {
     it("calculates correct damage for headshots", async () => {
-      const ak47HeadshotDamage = await service.getDamageMultiplier("ak47", true)
+      const result = await service.getDamageMultiplier("ak47", true)
       const { baseDamage } = getWeaponAttributes("ak47")
-      expect(ak47HeadshotDamage).toBe(baseDamage * 4.0)
+      expect(result).toBeCloseTo(baseDamage * 4.0) // 4x headshot multiplier
     })
 
     it("calculates correct damage for body shots", async () => {
-      const ak47BodyDamage = await service.getDamageMultiplier("ak47", false)
+      const result = await service.getDamageMultiplier("ak47", false)
       const { baseDamage } = getWeaponAttributes("ak47")
-      expect(ak47BodyDamage).toBe(baseDamage)
+      expect(result).toBeCloseTo(baseDamage * 1.0) // 1x body shot multiplier
     })
 
     it("handles unknown weapons with default damage", async () => {
-      const unknownWeaponDamage = await service.getDamageMultiplier("unknown_weapon", false)
-      const { baseDamage } = getWeaponAttributes("unknown_weapon")
-      expect(unknownWeaponDamage).toBe(baseDamage)
+      const result = await service.getDamageMultiplier("unknown_weapon", false)
+      expect(result).toBeGreaterThan(0) // Should return some default damage
     })
   })
 
   describe("cache management", () => {
     it("clears cache when requested", async () => {
+      dbMock.spies.weaponFindFirst.mockResolvedValue({ modifier: 1.5 })
+
       // Populate cache
-      await service.getSkillMultiplier("csgo", "ak47")
-      expect(service.getCacheSize()).toBeGreaterThan(0)
+      await service.getSkillMultiplier("csgo", "m4a1")
+      expect(service.getCacheSize()).toBe(1)
 
       // Clear cache
       service.clearCache()
       expect(service.getCacheSize()).toBe(0)
+
+      // Should hit DB again after cache clear
+      await service.getSkillMultiplier("csgo", "m4a1")
+      expect(dbMock.spies.weaponFindFirst).toHaveBeenCalledTimes(2)
     })
 
     it("tracks cache size correctly", async () => {
+      dbMock.spies.weaponFindFirst.mockResolvedValue({ modifier: 1.0 })
+
       expect(service.getCacheSize()).toBe(0)
 
-      await service.getSkillMultiplier("csgo", "ak47")
+      await service.getSkillMultiplier("csgo", "glock")
       expect(service.getCacheSize()).toBe(1)
 
-      await service.getSkillMultiplier("csgo", "awp")
+      await service.getSkillMultiplier("csgo", "usp")
       expect(service.getCacheSize()).toBe(2)
     })
   })

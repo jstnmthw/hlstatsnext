@@ -5,10 +5,16 @@ import { WeaponHandler } from "../../src/services/processor/handlers/weapon.hand
 import { MatchHandler } from "../../src/services/processor/handlers/match.handler"
 import { RankingHandler } from "../../src/services/processor/handlers/ranking.handler"
 import { DatabaseClient } from "../../src/database/client"
+import { EventService } from "../../src/services/event/event.service"
+import { PlayerService } from "../../src/services/player/player.service"
+import { WeaponService } from "../../src/services/weapon/weapon.service"
 import { EventType, PlayerConnectEvent, PlayerKillEvent } from "../../src/types/common/events"
 
 // Mock all dependencies
 vi.mock("../../src/database/client")
+vi.mock("../../src/services/event/event.service")
+vi.mock("../../src/services/player/player.service")
+vi.mock("../../src/services/weapon/weapon.service")
 vi.mock("../../src/services/processor/handlers/player.handler")
 vi.mock("../../src/services/processor/handlers/weapon.handler")
 vi.mock("../../src/services/processor/handlers/match.handler")
@@ -19,6 +25,9 @@ const MockedWeaponHandler = vi.mocked(WeaponHandler)
 const MockedMatchHandler = vi.mocked(MatchHandler)
 const MockedRankingHandler = vi.mocked(RankingHandler)
 const MockedDatabaseClient = vi.mocked(DatabaseClient)
+const MockedEventService = vi.mocked(EventService)
+const MockedPlayerService = vi.mocked(PlayerService)
+const MockedWeaponService = vi.mocked(WeaponService)
 
 describe("EventProcessorService", () => {
   let processor: EventProcessorService
@@ -30,6 +39,9 @@ describe("EventProcessorService", () => {
 
   it("should instantiate all handlers in the constructor", () => {
     expect(MockedDatabaseClient).toHaveBeenCalledTimes(1)
+    expect(MockedEventService).toHaveBeenCalledTimes(1)
+    expect(MockedPlayerService).toHaveBeenCalledTimes(1)
+    expect(MockedWeaponService).toHaveBeenCalledTimes(1)
     expect(MockedPlayerHandler).toHaveBeenCalledTimes(1)
     expect(MockedWeaponHandler).toHaveBeenCalledTimes(1)
     expect(MockedMatchHandler).toHaveBeenCalledTimes(1)
@@ -63,15 +75,17 @@ describe("EventProcessorService", () => {
       },
     }
 
-    it("should persist event via DatabaseClient", async () => {
-      const dbInstance = MockedDatabaseClient.mock.instances[0]!
-      vi.mocked(dbInstance.getOrCreatePlayer)
+    it("should persist event via EventService", async () => {
+      const eventServiceInstance = MockedEventService.mock.instances[0]!
+      const playerServiceInstance = MockedPlayerService.mock.instances[0]!
+
+      vi.mocked(playerServiceInstance.getOrCreatePlayer)
         .mockResolvedValueOnce(1) // killer
         .mockResolvedValueOnce(2) // victim
 
       await processor.processEvent(mockKillEvent)
 
-      expect(dbInstance.createGameEvent).toHaveBeenCalledWith(
+      expect(eventServiceInstance.createGameEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           eventType: EventType.PLAYER_KILL,
           data: expect.objectContaining({
@@ -87,10 +101,10 @@ describe("EventProcessorService", () => {
       expect(MockedRankingHandler.mock.instances[0]!.handleEvent).toHaveBeenCalledWith(mockKillEvent)
     })
 
-    it("should throw if the database call fails", async () => {
-      const dbInstance = MockedDatabaseClient.mock.instances[0]!
+    it("should throw if the player service call fails", async () => {
+      const playerServiceInstance = MockedPlayerService.mock.instances[0]!
       const dbError = new Error("DB Error")
-      vi.mocked(dbInstance.getOrCreatePlayer).mockRejectedValue(dbError)
+      vi.mocked(playerServiceInstance.getOrCreatePlayer).mockRejectedValue(dbError)
 
       await expect(processor.processEvent(mockKillEvent)).rejects.toThrow(dbError)
     })
@@ -111,15 +125,9 @@ describe("EventProcessorService", () => {
   })
 
   describe("EventProcessorService - bot gating", () => {
-    const upsertMock = vi.fn()
-    const createFragMock = vi.fn()
     const mockDb = {
-      prisma: {
-        player: { upsert: upsertMock },
-        eventFrag: { create: createFragMock },
-      },
-      getOrCreatePlayer: vi.fn().mockResolvedValue(1),
-      createGameEvent: vi.fn().mockResolvedValue(undefined),
+      testConnection: vi.fn().mockResolvedValue(true),
+      disconnect: vi.fn().mockResolvedValue(undefined),
     } as unknown as DatabaseClient
 
     beforeEach(() => {
@@ -144,8 +152,9 @@ describe("EventProcessorService", () => {
 
       await service.processEvent(event)
 
-      expect(upsertMock).not.toHaveBeenCalled()
-      expect(createFragMock).not.toHaveBeenCalled()
+      // Should not call any service methods for bot events when logBots=false
+      expect(MockedPlayerService.mock.instances[0]?.getOrCreatePlayer).not.toHaveBeenCalled()
+      expect(MockedEventService.mock.instances[0]?.createGameEvent).not.toHaveBeenCalled()
     })
 
     it("processes bot events when logBots=true", async () => {
@@ -166,7 +175,12 @@ describe("EventProcessorService", () => {
 
       await service.processEvent(event)
 
-      expect(mockDb.getOrCreatePlayer).toHaveBeenCalledWith("BOT", "BotPlayer", "cstrike")
+      expect(MockedPlayerService.mock.instances[0]?.getOrCreatePlayer).toHaveBeenCalledWith(
+        "BOT",
+        "BotPlayer",
+        "cstrike",
+      )
+      expect(MockedEventService.mock.instances[0]?.createGameEvent).toHaveBeenCalled()
     })
   })
 })

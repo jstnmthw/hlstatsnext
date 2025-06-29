@@ -8,7 +8,10 @@
 
 import { db, type PrismaClient } from "@repo/database/client"
 
-type TransactionalPrisma = Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">
+export type TransactionalPrisma = Omit<
+  PrismaClient,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+>
 
 export class DatabaseClient {
   private client: PrismaClient | TransactionalPrisma

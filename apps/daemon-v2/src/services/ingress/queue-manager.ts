@@ -207,8 +207,10 @@ export class QueueManager {
     }
   }
 
-  async getQueueStats(): Promise<Record<string, any>> {
-    const stats: Record<string, any> = {}
+  async getQueueStats(): Promise<
+    Record<string, { waiting: number; active: number; completed: number; failed: number }>
+  > {
+    const stats: Record<string, { waiting: number; active: number; completed: number; failed: number }> = {}
 
     for (const [name, queue] of this.queues) {
       const waiting = await queue.getWaiting()

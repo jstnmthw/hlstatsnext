@@ -1,16 +1,21 @@
 import { getWeaponAttributes, DEFAULT_SKILL_MULTIPLIER } from "@/config/weapon-config"
 import { resolveGameId } from "@/config/game-config"
 import type { DatabaseClient } from "@/database/client"
+import { logger } from "@/utils/logger"
 
 /**
- * Centralised access point for weapon metadata (skill multipliers, base damage …).
+ * Centralised access point for weapon metadata and multipliers.
  *
- *   – Prefers authoritative data from the `hlstats_Weapons` table.
- *   – Falls back to the static defaults in `weapon-config` to guarantee coverage.
+ *   – Prefers authoritative data from the database.
+ *   – Falls back to static defaults to guarantee coverage.
  *   – Caches look-ups in memory for the lifetime of the daemon.
  */
 export class WeaponService {
   private readonly cache = new Map<string, number>()
+
+  // Weapon damage constants
+  private readonly HEADSHOT_DAMAGE_MULTIPLIER = 4.0
+  private readonly BODY_SHOT_MULTIPLIER = 1.0
 
   constructor(private readonly db: DatabaseClient) {}
 
@@ -39,5 +44,29 @@ export class WeaponService {
 
     this.cache.set(key, multiplier)
     return multiplier
+  }
+
+  /**
+   * Get weapon damage multiplier for damage calculations
+   */
+  async getDamageMultiplier(weapon: string, headshot: boolean): Promise<number> {
+    const { baseDamage } = getWeaponAttributes(weapon)
+    const headshotMultiplier = headshot ? this.HEADSHOT_DAMAGE_MULTIPLIER : this.BODY_SHOT_MULTIPLIER
+    return baseDamage * headshotMultiplier
+  }
+
+  /**
+   * Clear the weapon multiplier cache
+   */
+  clearCache(): void {
+    this.cache.clear()
+    logger.info("Weapon service cache cleared")
+  }
+
+  /**
+   * Get cached weapon count for monitoring
+   */
+  getCacheSize(): number {
+    return this.cache.size
   }
 }

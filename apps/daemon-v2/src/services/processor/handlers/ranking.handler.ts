@@ -7,10 +7,8 @@
 
 import type { GameEvent, PlayerKillEvent, RoundEndEvent } from "@/types/common/events"
 import { WeaponService } from "@/services/weapon/weapon.service"
-import { WeaponService as DefaultWeaponService } from "@/services/weapon/weapon.service"
-import { DatabaseClient } from "@/database/client"
+import { PlayerService } from "@/services/player/player.service"
 import { logger } from "@/utils/logger"
-// import type { DatabaseClient } from "@/database/client" // TODO: Add back when database operations are implemented
 
 export interface SkillRating {
   playerId: number
@@ -35,24 +33,50 @@ export interface HandlerResult {
 }
 
 export class RankingHandler {
-  private readonly weaponService: WeaponService
+  constructor(
+    private readonly playerService: PlayerService,
+    private readonly weaponService: WeaponService,
+  ) {}
 
-  constructor(weaponService?: WeaponService) {
-    // TODO: Add DatabaseClient parameter when database operations are implemented
-    this.weaponService = weaponService ?? new DefaultWeaponService(new DatabaseClient())
-  }
-
-  private readonly DEFAULT_RATING = 1000
+  // ELO rating system constants
   private readonly DEFAULT_K_FACTOR = 32
   private readonly RATING_FLOOR = 100
   private readonly RATING_CEILING = 3000
 
+  // ELO calculation constants
+  private readonly ELO_BASE = 10
+  private readonly ELO_DIVISOR = 400
+
+  // K-factor adjustments
+  private readonly NEW_PLAYER_GAMES_THRESHOLD = 10
+  private readonly INTERMEDIATE_PLAYER_GAMES_THRESHOLD = 50
+  private readonly HIGH_RATING_THRESHOLD = 2000
+  private readonly NEW_PLAYER_K_MULTIPLIER = 1.5
+  private readonly INTERMEDIATE_PLAYER_K_MULTIPLIER = 1.2
+  private readonly HIGH_RATING_K_MULTIPLIER = 0.8
+
+  // Rating change modifiers
+  private readonly HEADSHOT_BONUS_MULTIPLIER = 1.2
+  private readonly VICTIM_PENALTY_MULTIPLIER = 0.8
+  private readonly MAX_RATING_GAIN = 50
+  private readonly MAX_RATING_LOSS = -40
+
+  // Round-based rating constants
+  private readonly ROUND_DURATION_DIVISOR = 60
+  private readonly MAX_ROUND_BONUS = 5
+  private readonly CLEAN_ROUND_BONUS = 2
+  private readonly ZERO_TEAMKILLS = 0
+
+  // Event type constants
+  private readonly PLAYER_KILL_EVENT = "PLAYER_KILL"
+  private readonly ROUND_END_EVENT = "ROUND_END"
+
   async handleEvent(event: GameEvent): Promise<HandlerResult> {
     switch (event.eventType) {
-      case "PLAYER_KILL":
+      case this.PLAYER_KILL_EVENT:
         return this.handleKillRating(event)
 
-      case "ROUND_END":
+      case this.ROUND_END_EVENT:
         return this.handleRoundRating(event)
 
       default:
@@ -64,11 +88,13 @@ export class RankingHandler {
     const { killerId, victimId, headshot, weapon } = event.data
 
     try {
-      // TODO: Get current ratings from database
-      const killerRating = await this.getPlayerRating(killerId)
-      const victimRating = await this.getPlayerRating(victimId)
+      // Get current ratings from player service
+      const [killerRating, victimRating] = await Promise.all([
+        this.playerService.getPlayerRating(killerId),
+        this.playerService.getPlayerRating(victimId),
+      ])
 
-      // Resolve weapon multiplier (db → static fallback)
+      // Resolve weapon multiplier from weapon service
       const weaponMultiplier = await this.weaponService.getSkillMultiplier(undefined, weapon)
 
       // Calculate rating changes for kill/death
@@ -77,10 +103,25 @@ export class RankingHandler {
         weaponMultiplier,
       })
 
+      // Update ratings in database via player service
+      await this.playerService.updatePlayerRatings([
+        {
+          playerId: killerId,
+          newRating: killerRating.rating + changes.killer,
+          gamesPlayed: killerRating.gamesPlayed + 1,
+        },
+        {
+          playerId: victimId,
+          newRating: victimRating.rating + changes.victim,
+          gamesPlayed: victimRating.gamesPlayed + 1,
+        },
+      ])
+
       logger.event(
         `Rating change for kill: Killer ${killerId} (+${changes.killer}), Victim ${victimId} (${changes.victim})`,
       )
 
+      const headshotText = headshot ? " (headshot)" : ""
       return {
         success: true,
         ratingChanges: [
@@ -89,14 +130,14 @@ export class RankingHandler {
             oldRating: killerRating.rating,
             newRating: killerRating.rating + changes.killer,
             change: changes.killer,
-            reason: `Kill with ${weapon}${headshot ? " (headshot)" : ""}`,
+            reason: `Kill with ${weapon}${headshotText}`,
           },
           {
             playerId: victimId,
             oldRating: victimRating.rating,
             newRating: victimRating.rating + changes.victim,
             change: changes.victim,
-            reason: `Death to ${weapon}${headshot ? " (headshot)" : ""}`,
+            reason: `Death to ${weapon}${headshotText}`,
           },
         ],
       }
@@ -113,13 +154,50 @@ export class RankingHandler {
     const serverId = event.serverId
 
     try {
-      // TODO: Get all players who participated in the round
-      // TODO: Calculate team-based rating adjustments
-      // TODO: Apply bonus for round participation
+      // Get all players who participated in the round via player service
+      const participants = await this.playerService.getRoundParticipants(serverId, duration)
+
+      // Calculate team-based rating adjustments
+      const ratingChanges: RatingChange[] = []
+      const baseBonus = Math.min(Math.floor(duration / this.ROUND_DURATION_DIVISOR), this.MAX_ROUND_BONUS)
+
+      for (const participant of participants) {
+        const oldRating = participant.player.skill
+        let ratingChange = baseBonus
+
+        // Winning team gets extra points
+        if (participant.player.teamkills === this.ZERO_TEAMKILLS) {
+          // Only reward players who didn't teamkill
+          ratingChange += this.CLEAN_ROUND_BONUS
+        }
+
+        const playerRating = await this.playerService.getPlayerRating(participant.playerId)
+
+        // Update player rating via player service
+        await this.playerService.updatePlayerRatings([
+          {
+            playerId: participant.playerId,
+            newRating: this.clampRating(oldRating + ratingChange),
+            gamesPlayed: playerRating.gamesPlayed + 1,
+          },
+        ])
+
+        const cleanRoundText = participant.player.teamkills === this.ZERO_TEAMKILLS ? " (clean round)" : ""
+        ratingChanges.push({
+          playerId: participant.playerId,
+          oldRating,
+          newRating: oldRating + ratingChange,
+          change: ratingChange,
+          reason: `Round participation${cleanRoundText}`,
+        })
+      }
 
       logger.event(`Round rating update for server ${serverId}: ${winningTeam} team won (${duration}s)`)
 
-      return { success: true }
+      return {
+        success: true,
+        ratingChanges,
+      }
     } catch (error) {
       return {
         success: false,
@@ -133,8 +211,9 @@ export class RankingHandler {
     victim: SkillRating,
     context: { headshot: boolean; weaponMultiplier: number },
   ): { killer: number; victim: number } {
-    // Expected probability of killer winning
-    const expectedKiller = 1 / (1 + Math.pow(10, (victim.rating - killer.rating) / 400))
+    // Expected probability of killer winning (ELO formula)
+    const ratingDifference = victim.rating - killer.rating
+    const expectedKiller = 1 / (1 + Math.pow(this.ELO_BASE, ratingDifference / this.ELO_DIVISOR))
 
     // Base K-factor adjusted by confidence and game experience
     const killerK = this.getAdjustedKFactor(killer)
@@ -142,36 +221,35 @@ export class RankingHandler {
 
     // Weapon and headshot modifiers
     const weaponMultiplier = context.weaponMultiplier
-    const headshotBonus = context.headshot ? 1.2 : 1.0
+    const headshotBonus = context.headshot ? this.HEADSHOT_BONUS_MULTIPLIER : 1.0
 
     // Calculate rating changes
-    const killerChange = Math.round(killerK * (1 - expectedKiller) * weaponMultiplier * headshotBonus)
-    const victimChange = Math.round(victimK * (0 - (1 - expectedKiller)) * 0.8) // Smaller penalty
+    const killerActualScore = 1 // Killer won
+    const victimActualScore = 0 // Victim lost
+
+    const killerChange = Math.round(killerK * (killerActualScore - expectedKiller) * weaponMultiplier * headshotBonus)
+    const victimChange = Math.round(
+      victimK * (victimActualScore - (1 - expectedKiller)) * this.VICTIM_PENALTY_MULTIPLIER,
+    )
 
     return {
-      killer: Math.min(killerChange, 50), // Cap gains
-      victim: Math.max(victimChange, -40), // Cap losses
+      killer: Math.min(killerChange, this.MAX_RATING_GAIN),
+      victim: Math.max(victimChange, this.MAX_RATING_LOSS),
     }
   }
 
   private getAdjustedKFactor(player: SkillRating): number {
-    if (player.gamesPlayed < 10) return this.DEFAULT_K_FACTOR * 1.5
-    if (player.gamesPlayed < 50) return this.DEFAULT_K_FACTOR * 1.2
-    if (player.rating > 2000) return this.DEFAULT_K_FACTOR * 0.8 // Slower changes for high-rated players
+    if (player.gamesPlayed < this.NEW_PLAYER_GAMES_THRESHOLD) {
+      return this.DEFAULT_K_FACTOR * this.NEW_PLAYER_K_MULTIPLIER
+    }
+    if (player.gamesPlayed < this.INTERMEDIATE_PLAYER_GAMES_THRESHOLD) {
+      return this.DEFAULT_K_FACTOR * this.INTERMEDIATE_PLAYER_K_MULTIPLIER
+    }
+    if (player.rating > this.HIGH_RATING_THRESHOLD) {
+      return this.DEFAULT_K_FACTOR * this.HIGH_RATING_K_MULTIPLIER
+    }
 
     return this.DEFAULT_K_FACTOR
-  }
-
-  private async getPlayerRating(playerId: number): Promise<SkillRating> {
-    // TODO: Fetch from database, implement caching
-    // For now, return default rating
-    return {
-      playerId,
-      rating: this.DEFAULT_RATING,
-      confidence: 350, // Standard deviation
-      volatility: 0.06,
-      gamesPlayed: 0,
-    }
   }
 
   private clampRating(rating: number): number {
@@ -182,17 +260,27 @@ export class RankingHandler {
    * Calculate expected match outcome between two players
    */
   public calculateExpectedScore(ratingA: number, ratingB: number): number {
-    return 1 / (1 + Math.pow(10, (ratingB - ratingA) / 400))
+    const ratingDifference = ratingB - ratingA
+    return 1 / (1 + Math.pow(this.ELO_BASE, ratingDifference / this.ELO_DIVISOR))
   }
 
   /**
    * Update player rating based on match outcome
    */
   public async updatePlayerRating(playerId: number, actualScore: number, expectedScore: number): Promise<SkillRating> {
-    const currentRating = await this.getPlayerRating(playerId)
+    const currentRating = await this.playerService.getPlayerRating(playerId)
     const kFactor = this.getAdjustedKFactor(currentRating)
 
-    const newRating = this.clampRating(currentRating.rating + kFactor * (actualScore - expectedScore))
+    const ratingChange = kFactor * (actualScore - expectedScore)
+    const newRating = this.clampRating(currentRating.rating + ratingChange)
+
+    await this.playerService.updatePlayerRatings([
+      {
+        playerId,
+        newRating,
+        gamesPlayed: currentRating.gamesPlayed + 1,
+      },
+    ])
 
     return {
       ...currentRating,

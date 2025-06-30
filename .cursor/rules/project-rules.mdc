@@ -78,6 +78,7 @@ hlstatsnext/
 3.  Cross-cutting helpers that are used by multiple applications live in `packages/` (e.g. `packages/ui`, `packages/config`, `package/database`).
 4.  No circular dependencies - enforced via ESLint plugin.
 5.  Domain types (`*.domain.ts`) live beside implementation.
+6.  You can review [ADR-001-modular-architecture.md](mdc:docs/architecture-decision-log/ADR-001-modular-architecture.md) for more indepth look into the principles.
 
 ### 4.3 TypeScript (Strict)
 

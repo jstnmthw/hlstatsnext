@@ -1,6 +1,6 @@
 import type { PrismaClient, Rank, Prisma } from "@repo/database/client"
-import { Result, success, failure, AppError } from "../types/common"
-import { isRecordNotFoundError } from "../utils/prisma-error-handler"
+import { Result, success, failure, AppError } from "@/shared/types"
+import { isRecordNotFoundError } from "@/shared/utils/prisma-error-handler"
 
 export class RankService {
   constructor(private readonly db: PrismaClient) {}

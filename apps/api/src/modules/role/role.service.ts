@@ -1,6 +1,6 @@
 import type { PrismaClient, Role, Prisma } from "@repo/database/client"
-import { Result, success, failure, AppError, PaginatedResult } from "../types/common"
-import { isRecordNotFoundError } from "../utils/prisma-error-handler"
+import { Result, success, failure, AppError, PaginatedResult } from "@/shared/types"
+import { isRecordNotFoundError } from "@/shared/utils/prisma-error-handler"
 
 export class RoleService {
   constructor(private readonly db: PrismaClient) {}

@@ -1,8 +1,6 @@
 # Modular Architecture
 
-The HLStatsNext monorepo contains multiple applications (API, web, daemon) that need a consistent and scalable project structure. The initial structure was a hybrid of layer-first (e.g., `src/services`, `src/types`) and feature-first (`src/player`, `src/server`). This ambiguity can make it difficult to locate related code, understand boundaries, and maintain a clean architecture as the project grows.
-
-A clear, unified pattern is needed that aligns with modern best practices, feels familiar to developers with experience in frameworks like Nest.js, and can be adapted for both backend services and the Next.js frontend.
+The HLStatsNext monorepo contains multiple applications (API, web, daemon) that need a consistent and scalable project structure. A clear, unified pattern is needed that aligns with modern best practices, feels familiar to developers with experience in frameworks like Nest.js, and can be adapted for both backend services and the Next.js frontend.
 
 ## Decision
 

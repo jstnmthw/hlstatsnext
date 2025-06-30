@@ -1,13 +1,13 @@
 import { db } from "@repo/database/client"
 import { PlayerService } from "./player/player.service"
 import { GameService } from "./game/game.service"
-import { ClanService } from "./clan/clan.service"
+import { ClanService } from "./modules/clan/clan.service"
 import { ServerService } from "./server/server.service"
 import { AwardService } from "./award/award.service"
 import { ActionService } from "./action/action.service"
 import { WeaponService } from "./weapon/weapon.service"
 import { RoleService } from "./role/role.service"
-import { TeamService } from "./team/team.service"
+import { TeamService } from "./modules/team/team.service"
 import { RankService } from "./rank/rank.service"
 
 /**

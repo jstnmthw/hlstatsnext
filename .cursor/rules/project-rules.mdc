@@ -75,7 +75,7 @@ hlstatsnext/
 ### 4.2 Project Organization Rules
 
 1. **Feature-first** inside each app: `player/`, `match/`, `server/`. Each folder contains `components/`, `services/`, `types/`, `tests/`.
-2. Cross-cutting helpers live in `packages/` (e.g. `packages/ui`, `packages/config`).
+2. Cross-cutting helpers live in `packages/` (e.g. `packages/ui`, `packages/config`, `package/database`).
 3. No circular dependencies - enforced via ESLint plugin.
 4. Domain types (`*.domain.ts`) live beside implementation.
 

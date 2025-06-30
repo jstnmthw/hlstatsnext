@@ -1,9 +1,4 @@
-# ADR-001: Modular Architecture
-
-**Date**: 2024-08-18
-**Status**: Accepted
-
-## Context
+# Modular Architecture
 
 The HLStatsNext monorepo contains multiple applications (API, web, daemon) that need a consistent and scalable project structure. The initial structure was a hybrid of layer-first (e.g., `src/services`, `src/types`) and feature-first (`src/player`, `src/server`). This ambiguity can make it difficult to locate related code, understand boundaries, and maintain a clean architecture as the project grows.
 

@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf node_modules dist .turbo",
     "db:generate": "rm -rf generated && prisma generate",
     "db:fresh": "tsx src/reset.ts",
     "db:push": "prisma db push",
@@ -16,8 +18,6 @@
     "db:test:prepare": "dotenv -e .env.test -- prisma db push --skip-generate",
     "db:test:reset": "dotenv -e .env.test -- prisma migrate reset --force --skip-generate && dotenv -e .env.test -- prisma db push --skip-generate",
     "dev": "tsc --watch",
-    "check-types": "tsc --noEmit",
-    "clean": "rm -rf node_modules dist .turbo",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix"
   },
@@ -45,8 +45,8 @@
     "./client": "./dist/client.js",
     "./seed": "./dist/seed.js",
     "./reset": "./dist/reset.js",
-    "./graphql/types": "./dist/generated/pothos-types.js",
-    "./graphql/inputs": "./dist/generated/pothos-inputs.js",
-    "./graphql/crud": "./dist/generated/pothos-inputs/autocrud.ts"
+    "./graphql/types": "./generated/graphql/pothos-types.js",
+    "./graphql/inputs": "./generated/graphql/pothos-inputs.js",
+    "./graphql/crud": "./generated/graphql/pothos-inputs/autocrud.js"
   }
 }

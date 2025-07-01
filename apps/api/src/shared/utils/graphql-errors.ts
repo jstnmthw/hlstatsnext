@@ -1,4 +1,4 @@
-import type { AppError } from "./result.types"
+import type { AppError } from "@/shared/types"
 import { GraphQLError } from "graphql"
 
 /**

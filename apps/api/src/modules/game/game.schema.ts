@@ -1,6 +1,6 @@
 import { builder } from "@/builder"
 import { Player } from "@/modules/player/player.schema"
-import { mapAppErrorToGraphQLError } from "@/shared/types/graphql-errors.types"
+import { mapAppErrorToGraphQLError } from "@/shared/utils/graphql-errors"
 import type { Player as PrismaPlayer } from "@repo/database/client"
 import type { CreateGameInput as CreateGameInputType, UpdateGameInput as UpdateGameInputType } from "./game.types"
 

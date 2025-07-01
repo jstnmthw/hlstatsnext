@@ -1,7 +1,7 @@
-import type { Player, PrismaClient } from "@repo/database/client"
-import type { PlayerStatistics, CreatePlayerInput, UpdatePlayerStatsInput } from "./player.types"
-import type { Result, AppError } from "../../shared/types"
-import { success, failure } from "../../shared/types"
+import type { PrismaClient } from "@repo/database/client"
+import type { PlayerStatistics } from "./player.types"
+import type { Result, AppError } from "@/shared/types"
+import { success, failure } from "@/shared/types"
 
 /**
  * Service class for handling player-related business logic operations
@@ -59,103 +59,6 @@ export class PlayerService {
         type: "DATABASE_ERROR",
         message: "Failed to calculate player statistics",
         operation: "getPlayerStats",
-      })
-    }
-  }
-
-  /**
-   * Update player statistics (called by daemon)
-   */
-  async updatePlayerStats(
-    steamId: string,
-    gameId: string,
-    stats: UpdatePlayerStatsInput,
-  ): Promise<Result<Player, AppError>> {
-    try {
-      // Find player by Steam ID - complex relation query
-      const existingPlayer = await this.db.player.findFirst({
-        where: {
-          uniqueIds: {
-            some: {
-              uniqueId: steamId,
-              game: gameId,
-            },
-          },
-        },
-      })
-
-      if (!existingPlayer) {
-        return failure({
-          type: "NOT_FOUND",
-          message: "Player not found",
-          resource: "player",
-          id: steamId,
-        })
-      }
-
-      // Update player statistics with proper data validation
-      const updatedPlayer = await this.db.player.update({
-        where: { playerId: existingPlayer.playerId },
-        data: {
-          ...(stats.kills !== undefined && { kills: stats.kills }),
-          ...(stats.deaths !== undefined && { deaths: stats.deaths }),
-          ...(stats.suicides !== undefined && { suicides: stats.suicides }),
-          ...(stats.shots !== undefined && { shots: stats.shots }),
-          ...(stats.hits !== undefined && { hits: stats.hits }),
-          ...(stats.headshots !== undefined && { headshots: stats.headshots }),
-          ...(stats.teamkills !== undefined && { teamkills: stats.teamkills }),
-          ...(stats.skill !== undefined && { skill: stats.skill }),
-          ...(stats.connectionTime !== undefined && {
-            connection_time: stats.connectionTime,
-          }),
-          ...(stats.lastEvent !== undefined && { last_event: stats.lastEvent }),
-        },
-      })
-
-      return success(updatedPlayer)
-    } catch (error) {
-      console.error(error)
-      return failure({
-        type: "DATABASE_ERROR",
-        message: "Failed to update player statistics",
-        operation: "updatePlayerStats",
-      })
-    }
-  }
-
-  /**
-   * Create a new player with Steam ID association
-   */
-  async createPlayer(data: CreatePlayerInput): Promise<Result<Player, AppError>> {
-    try {
-      const player = await this.db.player.create({
-        data: {
-          lastName: data.lastName,
-          game: data.gameId,
-          fullName: data.fullName,
-          email: data.email,
-          homepage: data.homepage,
-          clan: data.clanId ? Number(data.clanId) : undefined,
-          flag: data.countryId,
-          city: data.city,
-          state: data.state,
-          lastAddress: data.lastAddress,
-          uniqueIds: {
-            create: {
-              uniqueId: data.steamId,
-              game: data.gameId,
-            },
-          },
-        },
-      })
-
-      return success(player)
-    } catch (error) {
-      console.error(error)
-      return failure({
-        type: "DATABASE_ERROR",
-        message: "Failed to create player",
-        operation: "createPlayer",
       })
     }
   }

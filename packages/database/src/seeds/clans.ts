@@ -1,4 +1,4 @@
-import { db } from ".."
+import { db } from "../client"
 import { getSeedConfig } from "./config"
 import { generateClanData } from "./utils"
 import { log } from "./logger"

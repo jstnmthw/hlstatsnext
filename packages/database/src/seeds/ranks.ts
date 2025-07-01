@@ -1,4 +1,4 @@
-import { db } from ".."
+import { db } from "../client"
 import { getSeedConfig } from "./config"
 import { log } from "./logger"
 import { faker } from "@faker-js/faker"

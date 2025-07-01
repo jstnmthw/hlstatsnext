@@ -2,14 +2,16 @@
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",
     "paths": {
       "@repo/database/client": ["./src/client"],
-      "@repo/database/sql": ["./src/sql"]
-    },
-    "baseUrl": ".",
-    "types": ["node"]
+      "@repo/database/builder": ["./src/builder"],
+      "@repo/database/sql": ["./src/sql"],
+      "@repo/database/graphql/types": ["./generated/graphql/pothos-types"],
+      "@repo/database/graphql/inputs": ["./generated/graphql/pothos-inputs"],
+      "@repo/database/graphql/crud": ["./generated/graphql/pothos-inputs/autocrud"]
+    }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "generated/**/*"],
   "exclude": ["node_modules", "dist"]
 }

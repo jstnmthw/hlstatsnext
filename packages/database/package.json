@@ -17,7 +17,7 @@
     "db:test:reset": "dotenv -e .env.test -- prisma migrate reset --force --skip-generate && dotenv -e .env.test -- prisma db push --skip-generate",
     "dev": "tsc --watch",
     "check-types": "tsc --noEmit",
-    "clean": "rm -rf node_modules",
+    "clean": "rm -rf node_modules dist .turbo",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix"
   },
@@ -42,11 +42,11 @@
     "typescript": "5.8.2"
   },
   "exports": {
-    "./client": "./dist/index.js",
+    "./client": "./dist/client.js",
     "./seed": "./dist/seed.js",
     "./reset": "./dist/reset.js",
-    "./graphql/types": "./dist/generated/graphql/pothos-types.js",
-    "./graphql/inputs": "./dist/generated/graphql/pothos-inputs.js",
-    "./graphql/crud": "./dist/generated/graphql/pothos-inputs/autocrud.js"
+    "./graphql/types": "./dist/generated/pothos-types.js",
+    "./graphql/inputs": "./dist/generated/pothos-inputs.js",
+    "./graphql/crud": "./dist/generated/pothos-inputs/autocrud.ts"
   }
 }

@@ -1,4 +1,4 @@
-import { db } from "./index"
+import { db } from "./client"
 import { logError, logInfo, logStep, logSuccess } from "./seeds/logger"
 import { logDatabaseStats } from "./seeds"
 

@@ -1,4 +1,4 @@
-import { db } from ".."
+import { db } from "../client"
 import { log, logWarning } from "./logger"
 
 const countries = [

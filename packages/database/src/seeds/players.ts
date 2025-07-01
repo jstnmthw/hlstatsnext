@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import { db } from "../index"
+import { db } from "../client"
 import { getSeedConfig } from "./config"
 import { generatePlayerData, generateGameStats } from "./utils"
 import { log } from "./logger"

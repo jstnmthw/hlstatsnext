@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import type { Prisma } from "../index"
+import type { Prisma } from "../client"
 
 // Type for game statistics
 type GameStats = Pick<

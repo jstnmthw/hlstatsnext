@@ -33,7 +33,9 @@ export function handleGraphQLResultNullable<T>(result: Result<T, AppError>): T |
 /**
  * Async version of handleGraphQLResult for promise-based operations
  */
-export async function handleGraphQLResultAsync<T>(resultPromise: Promise<Result<T, AppError>>): Promise<T> {
+export async function handleGraphQLResultAsync<T>(
+  resultPromise: Promise<Result<T, AppError>>,
+): Promise<T> {
   const result = await resultPromise
   return handleGraphQLResult(result)
 }

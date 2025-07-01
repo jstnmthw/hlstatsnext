@@ -68,7 +68,8 @@ describe("HLStatsDaemon", () => {
       const rconInstance = vi.mocked(RconService).mock.instances[0] as Mocked<RconService>
       rconInstance.start.mockResolvedValue(undefined)
 
-      const statisticsInstance = vi.mocked(StatisticsService).mock.instances[0] as Mocked<StatisticsService>
+      const statisticsInstance = vi.mocked(StatisticsService).mock
+        .instances[0] as Mocked<StatisticsService>
       statisticsInstance.start.mockResolvedValue(undefined)
 
       await daemon.start()
@@ -79,7 +80,9 @@ describe("HLStatsDaemon", () => {
       expect(rconInstance.start).toHaveBeenCalled()
       expect(statisticsInstance.start).toHaveBeenCalled()
 
-      expect(mockLoggerOk).toHaveBeenCalledWith(expect.stringContaining("All services started successfully"))
+      expect(mockLoggerOk).toHaveBeenCalledWith(
+        expect.stringContaining("All services started successfully"),
+      )
     })
 
     it("should exit if database connection fails", async () => {
@@ -116,7 +119,8 @@ describe("HLStatsDaemon", () => {
       ingressInstance.stop.mockResolvedValue(undefined)
       const rconInstance = vi.mocked(RconService).mock.instances[0] as Mocked<RconService>
       rconInstance.stop.mockResolvedValue(undefined)
-      const statisticsInstance = vi.mocked(StatisticsService).mock.instances[0] as Mocked<StatisticsService>
+      const statisticsInstance = vi.mocked(StatisticsService).mock
+        .instances[0] as Mocked<StatisticsService>
       statisticsInstance.stop.mockResolvedValue(undefined)
       mockProcessor.disconnect.mockResolvedValue(undefined)
 

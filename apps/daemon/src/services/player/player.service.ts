@@ -56,7 +56,10 @@ export class PlayerService implements IPlayerService {
       }
 
       // Confidence decreases with experience (more games = more confident rating)
-      const confidenceReduction = Math.min(player._count.fragsAsKiller, this.MAX_CONFIDENCE_REDUCTION)
+      const confidenceReduction = Math.min(
+        player._count.fragsAsKiller,
+        this.MAX_CONFIDENCE_REDUCTION,
+      )
       const adjustedConfidence = this.DEFAULT_CONFIDENCE - confidenceReduction
 
       return {
@@ -280,7 +283,11 @@ export class PlayerService implements IPlayerService {
    * @param game Game code to filter by
    * @param includeHidden Whether to include players with hideranking set
    */
-  async getTopPlayers(limit: number = 50, game: string = "cstrike", includeHidden: boolean = false): Promise<Player[]> {
+  async getTopPlayers(
+    limit: number = 50,
+    game: string = "cstrike",
+    includeHidden: boolean = false,
+  ): Promise<Player[]> {
     try {
       const whereClause: Record<string, unknown> = {
         game,

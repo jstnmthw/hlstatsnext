@@ -9,7 +9,8 @@ const yoga = createYoga({
   schema,
   // context: createContext,
   cors: {
-    origin: process.env.NODE_ENV === "production" ? process.env.FRONTEND_URL : "http://localhost:3000",
+    origin:
+      process.env.NODE_ENV === "production" ? process.env.FRONTEND_URL : "http://localhost:3000",
     credentials: true,
   },
   // GraphQL endpoint

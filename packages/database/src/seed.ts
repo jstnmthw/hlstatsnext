@@ -1,5 +1,12 @@
 import { db } from "./index"
-import { seedClans, seedPlayers, seedPlayerUniqueIds, getSeedConfig, seedServers, logDatabaseStats } from "./seeds"
+import {
+  seedClans,
+  seedPlayers,
+  seedPlayerUniqueIds,
+  getSeedConfig,
+  seedServers,
+  logDatabaseStats,
+} from "./seeds"
 import { log, logError, logStep, logSuccess, logInfo } from "./seeds/logger"
 
 async function main() {
@@ -11,7 +18,9 @@ async function main() {
   logInfo(`Using ${env} configuration:`)
   log(`  Clans: ${config.clans.count}`)
   log(`  Players: ${config.players.count}`)
-  log(`  Multi-game players: ${Math.round(config.playerUniqueIds.multiGamePlayersPercentage * 100)}%`)
+  log(
+    `  Multi-game players: ${Math.round(config.playerUniqueIds.multiGamePlayersPercentage * 100)}%`,
+  )
   log(`  Servers: ${config.servers.count}`)
 
   try {

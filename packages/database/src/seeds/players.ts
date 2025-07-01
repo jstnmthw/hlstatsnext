@@ -7,7 +7,11 @@ import { log } from "./logger"
 export async function seedPlayers() {
   const config = getSeedConfig()
 
-  const [games, countries, clans] = await Promise.all([db.game.findMany(), db.country.findMany(), db.clan.findMany()])
+  const [games, countries, clans] = await Promise.all([
+    db.game.findMany(),
+    db.country.findMany(),
+    db.clan.findMany(),
+  ])
 
   if (games.length === 0 || countries.length === 0) {
     throw new Error("Games and Countries must be seeded first.")

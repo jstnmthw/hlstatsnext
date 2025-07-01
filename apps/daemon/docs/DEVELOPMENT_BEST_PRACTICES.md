@@ -520,7 +520,10 @@ export interface PlayerStatsFilters {
 }
 
 // ❌ BAD: Inline, repetitive, unclear types
-function getStats(timeframe?: string, mode?: string): { k: number; d: number; hs: number; acc: number } {
+function getStats(
+  timeframe?: string,
+  mode?: string,
+): { k: number; d: number; hs: number; acc: number } {
   // ...
 }
 ```
@@ -592,7 +595,9 @@ export async function processEvents<T extends GameEvent>(
 }
 
 // ✅ Conditional types for advanced scenarios
-export type DatabaseEntity<T> = T extends { id: infer U } ? T & { createdAt: Date; updatedAt: Date } : never
+export type DatabaseEntity<T> = T extends { id: infer U }
+  ? T & { createdAt: Date; updatedAt: Date }
+  : never
 ```
 
 **Union Types & Discriminated Unions**:
@@ -612,7 +617,9 @@ export type GameEvent =
   | { type: "round_end"; winner: "ct" | "terrorist"; duration: number }
 
 // Type guards for union types
-export function isPlayerKillEvent(event: GameEvent): event is Extract<GameEvent, { type: "player_kill" }> {
+export function isPlayerKillEvent(
+  event: GameEvent,
+): event is Extract<GameEvent, { type: "player_kill" }> {
   return event.type === "player_kill"
 }
 
@@ -914,9 +921,11 @@ export type PlayerWithCalculatedStats = Prisma.PlayerGetPayload<{
 export function calculatePlayerStats(
   player: Prisma.PlayerGetPayload<{ include: { stats: true } }>,
 ): PlayerWithCalculatedStats {
-  const kdRatio = player.stats.deaths > 0 ? player.stats.kills / player.stats.deaths : player.stats.kills
+  const kdRatio =
+    player.stats.deaths > 0 ? player.stats.kills / player.stats.deaths : player.stats.kills
 
-  const headshotPercentage = player.stats.kills > 0 ? (player.stats.headshots / player.stats.kills) * 100 : 0
+  const headshotPercentage =
+    player.stats.kills > 0 ? (player.stats.headshots / player.stats.kills) * 100 : 0
 
   return {
     ...player,
@@ -1134,7 +1143,9 @@ export type NonFunctionProperties<T> = Pick<T, NonFunctionKeys<T>>
 
 // Extract method signatures
 export type MethodSignatures<T> = {
-  [K in FunctionKeys<T>]: T[K] extends (...args: infer Args) => infer Return ? (...args: Args) => Return : never
+  [K in FunctionKeys<T>]: T[K] extends (...args: infer Args) => infer Return
+    ? (...args: Args) => Return
+    : never
 }
 
 // Usage example
@@ -1159,7 +1170,10 @@ type ServiceData = NonFunctionProperties<PlayerService>
 ```javascript
 // eslint.config.js
 module.exports = {
-  extends: ["@typescript-eslint/recommended", "@typescript-eslint/recommended-requiring-type-checking"],
+  extends: [
+    "@typescript-eslint/recommended",
+    "@typescript-eslint/recommended-requiring-type-checking",
+  ],
   rules: {
     // Enforce strict typing
     "@typescript-eslint/no-explicit-any": "error",
@@ -1170,7 +1184,10 @@ module.exports = {
     "@typescript-eslint/no-unsafe-return": "error",
 
     // Prefer type imports
-    "@typescript-eslint/consistent-type-imports": ["error", { prefer: "type-imports", disallowTypeAnnotations: false }],
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      { prefer: "type-imports", disallowTypeAnnotations: false },
+    ],
 
     // Naming conventions
     "@typescript-eslint/naming-convention": [
@@ -1257,7 +1274,10 @@ type TestCases = [
 
   // Test conditional types
   Expect<
-    Equal<DatabaseEntity<{ id: number; name: string }>, { id: number; name: string; createdAt: Date; updatedAt: Date }>
+    Equal<
+      DatabaseEntity<{ id: number; name: string }>,
+      { id: number; name: string; createdAt: Date; updatedAt: Date }
+    >
   >,
 
   // Test template literal types
@@ -1696,7 +1716,11 @@ export async function seedTestDatabase() {
 }
 
 export async function cleanupDatabase() {
-  await prisma.$transaction([prisma.gameEvent.deleteMany(), prisma.player.deleteMany(), prisma.server.deleteMany()])
+  await prisma.$transaction([
+    prisma.gameEvent.deleteMany(),
+    prisma.player.deleteMany(),
+    prisma.server.deleteMany(),
+  ])
 }
 ```
 
@@ -2052,7 +2076,9 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = (Date.now() - start) / 1000
 
-    metrics.httpRequestDuration.labels(req.method, req.route?.path || "unknown", res.statusCode).observe(duration)
+    metrics.httpRequestDuration
+      .labels(req.method, req.route?.path || "unknown", res.statusCode)
+      .observe(duration)
   })
 
   next()
@@ -2299,7 +2325,11 @@ app.get("/ready", async (req, res) => {
  * );
  * // Returns: { winner: +25, loser: -20 }
  */
-export function calculateRatingChange(winner: Player, loser: Player, matchDetails?: MatchContext): RatingAdjustment {
+export function calculateRatingChange(
+  winner: Player,
+  loser: Player,
+  matchDetails?: MatchContext,
+): RatingAdjustment {
   // Implementation
 }
 ```

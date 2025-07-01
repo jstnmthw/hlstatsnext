@@ -181,7 +181,9 @@ export class UdpServer extends EventEmitter {
   public getActiveServers(): ServerInfo[] {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000)
 
-    return Array.from(this.connectedServers.values()).filter((server) => server.lastSeen > fiveMinutesAgo)
+    return Array.from(this.connectedServers.values()).filter(
+      (server) => server.lastSeen > fiveMinutesAgo,
+    )
   }
 
   /**

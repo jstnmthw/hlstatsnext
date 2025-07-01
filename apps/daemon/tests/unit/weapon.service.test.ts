@@ -65,7 +65,9 @@ describe("WeaponService", () => {
       dbMock.spies.weaponFindFirst.mockRejectedValue(dbError)
       const multiplier = await service.getSkillMultiplier("csgo", "awp")
       // Should not throw, but log an error and return default
-      expect(loggerMock.error).toHaveBeenCalledWith(`Failed to fetch weapon modifier for csgo:awp: ${dbError}`)
+      expect(loggerMock.error).toHaveBeenCalledWith(
+        `Failed to fetch weapon modifier for csgo:awp: ${dbError}`,
+      )
       expect(multiplier).toBe(1.0) // Default skill multiplier
     })
 

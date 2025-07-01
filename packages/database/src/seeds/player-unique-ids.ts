@@ -14,7 +14,9 @@ export async function seedPlayerUniqueIds() {
   }
 
   const uniqueIds = []
-  const multiGamePlayerCount = Math.floor(players.length * config.playerUniqueIds.multiGamePlayersPercentage)
+  const multiGamePlayerCount = Math.floor(
+    players.length * config.playerUniqueIds.multiGamePlayersPercentage,
+  )
 
   for (const player of players) {
     // Each player gets at least one ID for their primary game

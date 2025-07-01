@@ -120,7 +120,16 @@ export function generateClanData(): ClanData {
 // Type for player data
 type PlayerData = Pick<
   Prisma.PlayerCreateInput,
-  "lastName" | "fullName" | "email" | "homepage" | "city" | "state" | "lat" | "lng" | "last_event" | "createdate"
+  | "lastName"
+  | "fullName"
+  | "email"
+  | "homepage"
+  | "city"
+  | "state"
+  | "lat"
+  | "lng"
+  | "last_event"
+  | "createdate"
 >
 
 /**

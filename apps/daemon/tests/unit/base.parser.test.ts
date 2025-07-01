@@ -237,7 +237,10 @@ describe("BaseParser", () => {
     it("should handle lines with extra whitespace", () => {
       const tests = [
         { input: "  L 06/28/2025 - 08:42:47: Event", expected: "L 06/28/2025 - 08:42:47: Event" },
-        { input: "\t\n L 06/28/2025 - 08:42:47: Event", expected: "L 06/28/2025 - 08:42:47: Event" },
+        {
+          input: "\t\n L 06/28/2025 - 08:42:47: Event",
+          expected: "L 06/28/2025 - 08:42:47: Event",
+        },
       ]
 
       tests.forEach(({ input, expected }) => {

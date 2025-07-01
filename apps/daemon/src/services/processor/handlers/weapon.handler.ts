@@ -52,7 +52,9 @@ export class WeaponHandler implements IWeaponHandler {
       // - Track weapon usage patterns
       // - Update player weapon proficiency
 
-      this.logger.event(`Weapon kill recorded: ${weapon} (headshot: ${headshot}) by player ${killerId} on ${victimId}`)
+      this.logger.event(
+        `Weapon kill recorded: ${weapon} (headshot: ${headshot}) by player ${killerId} on ${victimId}`,
+      )
 
       // Calculate weapon effectiveness score
       // const effectivenessBonus = headshot ? 1.5 : 1.0;
@@ -69,7 +71,11 @@ export class WeaponHandler implements IWeaponHandler {
     }
   }
 
-  protected async updateWeaponAccuracy(playerId: number, weapon: string, hit: boolean): Promise<void> {
+  protected async updateWeaponAccuracy(
+    playerId: number,
+    weapon: string,
+    hit: boolean,
+  ): Promise<void> {
     // TODO: Implement accuracy tracking
     // This would be called from shot events when available
     void playerId

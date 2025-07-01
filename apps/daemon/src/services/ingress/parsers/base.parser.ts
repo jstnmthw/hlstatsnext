@@ -117,7 +117,9 @@ export abstract class BaseParser {
    * Format: "x y z"
    */
   protected parsePosition(positionStr: string): { x: number; y: number; z: number } | undefined {
-    const match = positionStr.match(/^([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)$/)
+    const match = positionStr.match(
+      /^([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)$/,
+    )
 
     if (!match || match.length < 4) {
       return undefined

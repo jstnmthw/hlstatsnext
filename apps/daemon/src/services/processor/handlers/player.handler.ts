@@ -65,7 +65,11 @@ export class PlayerHandler implements IPlayerHandler {
       // TODO: Implement proper server->game lookup in DatabaseClient
       const serverGame = resolveGameId(undefined) // Placeholder until implemented
 
-      const resolvedPlayerId = await this.playerService.getOrCreatePlayer(steamId, playerName, serverGame)
+      const resolvedPlayerId = await this.playerService.getOrCreatePlayer(
+        steamId,
+        playerName,
+        serverGame,
+      )
 
       // Update last_event timestamp
       await this.playerService.updatePlayerStats(resolvedPlayerId, {
@@ -79,7 +83,9 @@ export class PlayerHandler implements IPlayerHandler {
         playersAffected: [resolvedPlayerId],
       }
     } catch (error) {
-      this.logger.error(`Failed to handle player connect: ${error instanceof Error ? error.message : "Unknown error"}`)
+      this.logger.error(
+        `Failed to handle player connect: ${error instanceof Error ? error.message : "Unknown error"}`,
+      )
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -106,7 +112,9 @@ export class PlayerHandler implements IPlayerHandler {
         connection_time: sessionDuration,
       })
 
-      this.logger.event(`Player disconnected (ID: ${playerId}), session duration: ${sessionDuration}s`)
+      this.logger.event(
+        `Player disconnected (ID: ${playerId}), session duration: ${sessionDuration}s`,
+      )
 
       return {
         success: true,
@@ -167,14 +175,18 @@ export class PlayerHandler implements IPlayerHandler {
       await this.playerService.updatePlayerStats(killerId, killerUpdates)
       await this.playerService.updatePlayerStats(victimId, victimUpdates)
 
-      this.logger.event(`Kill recorded: Player ${killerId} killed Player ${victimId} with ${weapon}`)
+      this.logger.event(
+        `Kill recorded: Player ${killerId} killed Player ${victimId} with ${weapon}`,
+      )
 
       return {
         success: true,
         playersAffected: [killerId, victimId],
       }
     } catch (error) {
-      this.logger.error(`Failed to handle player kill: ${error instanceof Error ? error.message : "Unknown error"}`)
+      this.logger.error(
+        `Failed to handle player kill: ${error instanceof Error ? error.message : "Unknown error"}`,
+      )
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -220,7 +232,9 @@ export class PlayerHandler implements IPlayerHandler {
         playersAffected: [playerId],
       }
     } catch (error) {
-      this.logger.error(`Failed to handle player suicide: ${error instanceof Error ? error.message : "Unknown error"}`)
+      this.logger.error(
+        `Failed to handle player suicide: ${error instanceof Error ? error.message : "Unknown error"}`,
+      )
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -268,14 +282,18 @@ export class PlayerHandler implements IPlayerHandler {
         this.playerService.updatePlayerStats(victimId, victimUpdates),
       ])
 
-      this.logger.event(`Teamkill recorded: Player ${killerId} teamkilled Player ${victimId} with ${weapon}`)
+      this.logger.event(
+        `Teamkill recorded: Player ${killerId} teamkilled Player ${victimId} with ${weapon}`,
+      )
 
       return {
         success: true,
         playersAffected: [killerId, victimId],
       }
     } catch (error) {
-      this.logger.error(`Failed to handle player teamkill: ${error instanceof Error ? error.message : "Unknown error"}`)
+      this.logger.error(
+        `Failed to handle player teamkill: ${error instanceof Error ? error.message : "Unknown error"}`,
+      )
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -287,7 +305,10 @@ export class PlayerHandler implements IPlayerHandler {
    * Calculate skill change between two players using ELO formula.
    * @returns The change in skill for each player
    */
-  private async calculateSkillDelta(killerId: number, victimId: number): Promise<{ killer: number; victim: number }> {
+  private async calculateSkillDelta(
+    killerId: number,
+    victimId: number,
+  ): Promise<{ killer: number; victim: number }> {
     const [killer, victim] = await Promise.all([
       this.playerService.getPlayerStats(killerId),
       this.playerService.getPlayerStats(victimId),

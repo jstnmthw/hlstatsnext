@@ -79,7 +79,9 @@ export class WeaponService implements IWeaponService {
    */
   async getDamageMultiplier(weapon: string, headshot: boolean): Promise<number> {
     const { baseDamage } = getWeaponAttributes(weapon)
-    const headshotMultiplier = headshot ? this.HEADSHOT_DAMAGE_MULTIPLIER : this.BODY_SHOT_MULTIPLIER
+    const headshotMultiplier = headshot
+      ? this.HEADSHOT_DAMAGE_MULTIPLIER
+      : this.BODY_SHOT_MULTIPLIER
     return baseDamage * headshotMultiplier
   }
 

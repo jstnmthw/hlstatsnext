@@ -84,7 +84,9 @@ export class IngressService implements IIngressService {
   private async authenticateServer(
     ip: string,
     port: number,
-  ): Promise<{ authorised: false } | { authorised: true; serverId: number; skipCurrentLine: boolean }> {
+  ): Promise<
+    { authorised: false } | { authorised: true; serverId: number; skipCurrentLine: boolean }
+  > {
     const serverKey = `${ip}:${port}`
 
     // Fast-path – server already authenticated.
@@ -183,7 +185,10 @@ export class IngressService implements IIngressService {
 
       await this.processor.processEvent(eventWithRaw)
     } catch (error) {
-      logger.failed(`Failed to process log line`, error instanceof Error ? error.message : String(error))
+      logger.failed(
+        `Failed to process log line`,
+        error instanceof Error ? error.message : String(error),
+      )
     }
   }
 }

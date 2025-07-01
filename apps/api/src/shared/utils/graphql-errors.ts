@@ -18,7 +18,11 @@ enum GraphQLErrorCode {
  * Creates GraphQL errors from application errors following GraphQL Yoga patterns
  * Internal function - only used within this module
  */
-function createGraphQLError(message: string, code: GraphQLErrorCode, details?: Record<string, unknown>): GraphQLError {
+function createGraphQLError(
+  message: string,
+  code: GraphQLErrorCode,
+  details?: Record<string, unknown>,
+): GraphQLError {
   return new GraphQLError(message, {
     extensions: {
       code,
@@ -34,19 +38,30 @@ function createGraphQLError(message: string, code: GraphQLErrorCode, details?: R
 export function mapAppErrorToGraphQLError(error: AppError): GraphQLError {
   switch (error.type) {
     case "NOT_FOUND":
-      return createGraphQLError(`The requested ${error.resource} was not found.`, GraphQLErrorCode.NOT_FOUND, {
-        resource: error.resource,
-        id: error.id,
-      })
+      return createGraphQLError(
+        `The requested ${error.resource} was not found.`,
+        GraphQLErrorCode.NOT_FOUND,
+        {
+          resource: error.resource,
+          id: error.id,
+        },
+      )
 
     case "VALIDATION_ERROR":
-      return createGraphQLError(`Invalid input for ${error.field}.`, GraphQLErrorCode.BAD_USER_INPUT, {
-        field: error.field,
-        value: error.value,
-      })
+      return createGraphQLError(
+        `Invalid input for ${error.field}.`,
+        GraphQLErrorCode.BAD_USER_INPUT,
+        {
+          field: error.field,
+          value: error.value,
+        },
+      )
 
     case "UNAUTHORIZED":
-      return createGraphQLError("Authentication required to access this resource.", GraphQLErrorCode.UNAUTHORIZED)
+      return createGraphQLError(
+        "Authentication required to access this resource.",
+        GraphQLErrorCode.UNAUTHORIZED,
+      )
 
     case "DATABASE_ERROR":
       return createGraphQLError(

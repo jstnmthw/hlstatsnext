@@ -24,6 +24,3 @@ export type {
 } from "./pagination.types"
 
 export { SortDirection, DEFAULT_PAGINATION } from "./pagination.types"
-
-// GraphQL error handling
-export * from "./graphql-errors.types"

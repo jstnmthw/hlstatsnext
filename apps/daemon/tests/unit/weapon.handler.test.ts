@@ -42,7 +42,9 @@ describe("WeaponHandler", () => {
       const result = await handler.handleEvent(killEvent)
       expect(result.success).toBe(true)
       expect(result.weaponsAffected).toEqual(["ak47"])
-      expect(loggerMock.event).toHaveBeenCalledWith("Weapon kill recorded: ak47 (headshot: true) by player 1 on 2")
+      expect(loggerMock.event).toHaveBeenCalledWith(
+        "Weapon kill recorded: ak47 (headshot: true) by player 1 on 2",
+      )
     })
 
     it("should ignore events other than PLAYER_KILL", async () => {

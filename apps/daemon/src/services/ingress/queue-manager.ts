@@ -80,7 +80,10 @@ export class QueueManager {
     }
   }
 
-  private async createQueue(queueName: string, priority: keyof typeof this.options.concurrency): Promise<void> {
+  private async createQueue(
+    queueName: string,
+    priority: keyof typeof this.options.concurrency,
+  ): Promise<void> {
     // Create queue
     const queue = new Queue(queueName, {
       connection: this.redis,
@@ -138,7 +141,10 @@ export class QueueManager {
     this.queueEvents.set(queueName, queueEvents)
   }
 
-  async enqueueEvent(event: GameEvent, priority: "high" | "normal" | "low" = "normal"): Promise<void> {
+  async enqueueEvent(
+    event: GameEvent,
+    priority: "high" | "normal" | "low" = "normal",
+  ): Promise<void> {
     const queueName = this.getQueueName(priority)
     const queue = this.queues.get(queueName)
 
@@ -171,7 +177,9 @@ export class QueueManager {
     try {
       // TODO: Actually process the event through handlers
       // For now, just simulate processing
-      console.log(`Processing ${event.eventType} event (priority: ${priority}) from server ${event.serverId}`)
+      console.log(
+        `Processing ${event.eventType} event (priority: ${priority}) from server ${event.serverId}`,
+      )
 
       // Simulate processing time
       await new Promise((resolve) => setTimeout(resolve, Math.random() * 100))
@@ -210,7 +218,10 @@ export class QueueManager {
   async getQueueStats(): Promise<
     Record<string, { waiting: number; active: number; completed: number; failed: number }>
   > {
-    const stats: Record<string, { waiting: number; active: number; completed: number; failed: number }> = {}
+    const stats: Record<
+      string,
+      { waiting: number; active: number; completed: number; failed: number }
+    > = {}
 
     for (const [name, queue] of this.queues) {
       const waiting = await queue.getWaiting()

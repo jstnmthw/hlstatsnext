@@ -8,7 +8,12 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest"
 import { createEventProcessorService } from "../../src/services/processor/processor.service"
 import { DatabaseClient, databaseClient } from "../../src/database/client"
-import { EventType, PlayerKillEvent, PlayerConnectEvent, PlayerDisconnectEvent } from "../../src/types/common/events"
+import {
+  EventType,
+  PlayerKillEvent,
+  PlayerConnectEvent,
+  PlayerDisconnectEvent,
+} from "../../src/types/common/events"
 import type { MalformedEvent } from "../types/test-mocks"
 import { asUnknownEvent, createMockLogger } from "../types/test-mocks"
 
@@ -64,7 +69,9 @@ describe("Event Processing Integration", () => {
           await processor.processEvent(connectEvent)
 
           // Verify player was created
-          const player = await tx.player.findFirst({ where: { uniqueIds: { some: { uniqueId: steamId } } } })
+          const player = await tx.player.findFirst({
+            where: { uniqueIds: { some: { uniqueId: steamId } } },
+          })
           expect(player).toBeDefined()
           expect(player?.lastName).toBe(playerName)
           const playerId = player!.playerId
@@ -78,7 +85,14 @@ describe("Event Processing Integration", () => {
               killer: { steamId, playerName, isBot: false },
               victim: { steamId: "STEAM_1:0:67890", playerName: "Victim", isBot: false },
             },
-            data: { killerId: 0, victimId: 0, weapon: "ak47", headshot: true, killerTeam: "T", victimTeam: "CT" },
+            data: {
+              killerId: 0,
+              victimId: 0,
+              weapon: "ak47",
+              headshot: true,
+              killerTeam: "T",
+              victimTeam: "CT",
+            },
           }
           await processor.processEvent(killEvent)
 
@@ -133,7 +147,9 @@ describe("Event Processing Integration", () => {
             meta: { steamId: "STEAM_1:0:111", playerName: "Player1", isBot: false },
             data: {},
           }
-          await expect(processor.processEvent(asUnknownEvent(malformedEvent))).resolves.not.toThrow()
+          await expect(
+            processor.processEvent(asUnknownEvent(malformedEvent)),
+          ).resolves.not.toThrow()
 
           throw new Error("Rollback")
         })

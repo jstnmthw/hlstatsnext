@@ -3,7 +3,9 @@ import type { Player } from "@repo/database/client"
 
 export interface IPlayerService {
   getPlayerRating(playerId: number): Promise<SkillRating>
-  updatePlayerRatings(updates: Array<{ playerId: number; newRating: number; gamesPlayed: number }>): Promise<void>
+  updatePlayerRatings(
+    updates: Array<{ playerId: number; newRating: number; gamesPlayed: number }>,
+  ): Promise<void>
   getRoundParticipants(
     serverId: number,
     duration: number,

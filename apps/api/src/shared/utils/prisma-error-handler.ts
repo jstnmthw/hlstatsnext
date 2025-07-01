@@ -3,8 +3,14 @@ import type { Prisma } from "@repo/database/client"
 /**
  * Type guard to check if an error is a Prisma known request error
  */
-export function isPrismaClientKnownRequestError(error: unknown): error is Prisma.PrismaClientKnownRequestError {
-  return error instanceof Error && "code" in error && typeof (error as { code?: unknown }).code === "string"
+export function isPrismaClientKnownRequestError(
+  error: unknown,
+): error is Prisma.PrismaClientKnownRequestError {
+  return (
+    error instanceof Error &&
+    "code" in error &&
+    typeof (error as { code?: unknown }).code === "string"
+  )
 }
 
 /**

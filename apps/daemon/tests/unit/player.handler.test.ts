@@ -61,7 +61,11 @@ describe("PlayerHandler", () => {
       expect(result.success).toBe(true)
       expect(result.playersAffected).toEqual([123])
       expect(result.error).toBeUndefined()
-      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledWith("76561198000000000", "TestPlayer", "csgo")
+      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledWith(
+        "76561198000000000",
+        "TestPlayer",
+        "csgo",
+      )
       expect(mockPlayerService.updatePlayerStats).toHaveBeenCalledWith(123, {
         connection_time: 0,
       })
@@ -90,11 +94,27 @@ describe("PlayerHandler", () => {
 
     it("should handle PLAYER_KILL events with skill calculation", async () => {
       vi.mocked(mockPlayerService.getPlayerStats)
-        .mockResolvedValueOnce(createMockPlayer({ playerId: 123, skill: 1200, kill_streak: 2, death_streak: 0 })) // killer
-        .mockResolvedValueOnce(createMockPlayer({ playerId: 456, skill: 1000, kill_streak: 0, death_streak: 1 })) // victim
+        .mockResolvedValueOnce(
+          createMockPlayer({ playerId: 123, skill: 1200, kill_streak: 2, death_streak: 0 }),
+        ) // killer
+        .mockResolvedValueOnce(
+          createMockPlayer({ playerId: 456, skill: 1000, kill_streak: 0, death_streak: 1 }),
+        ) // victim
       vi.mocked(mockPlayerService.getPlayerRating)
-        .mockResolvedValueOnce({ playerId: 123, rating: 1200, confidence: 350, volatility: 0.06, gamesPlayed: 10 }) // killer
-        .mockResolvedValueOnce({ playerId: 456, rating: 1000, confidence: 350, volatility: 0.06, gamesPlayed: 10 }) // victim
+        .mockResolvedValueOnce({
+          playerId: 123,
+          rating: 1200,
+          confidence: 350,
+          volatility: 0.06,
+          gamesPlayed: 10,
+        }) // killer
+        .mockResolvedValueOnce({
+          playerId: 456,
+          rating: 1000,
+          confidence: 350,
+          volatility: 0.06,
+          gamesPlayed: 10,
+        }) // victim
 
       const event = {
         eventType: EventType.PLAYER_KILL,
@@ -170,8 +190,12 @@ describe("PlayerHandler", () => {
 
     it("should handle PLAYER_TEAMKILL events", async () => {
       vi.mocked(mockPlayerService.getPlayerStats)
-        .mockResolvedValueOnce(createMockPlayer({ playerId: 123, skill: 1000, kill_streak: 3, death_streak: 0 })) // killer
-        .mockResolvedValueOnce(createMockPlayer({ playerId: 456, skill: 1000, kill_streak: 0, death_streak: 0 })) // victim
+        .mockResolvedValueOnce(
+          createMockPlayer({ playerId: 123, skill: 1000, kill_streak: 3, death_streak: 0 }),
+        ) // killer
+        .mockResolvedValueOnce(
+          createMockPlayer({ playerId: 456, skill: 1000, kill_streak: 0, death_streak: 0 }),
+        ) // victim
 
       const event = {
         eventType: EventType.PLAYER_TEAMKILL,
@@ -293,8 +317,12 @@ describe("PlayerHandler", () => {
       it("should return success:false if killer stats update fails", async () => {
         const updateError = new Error("DB update error")
         vi.mocked(mockPlayerService.getPlayerStats)
-          .mockResolvedValueOnce(createMockPlayer({ playerId: 123, skill: 1000, kill_streak: 0, death_streak: 0 })) // killer
-          .mockResolvedValueOnce(createMockPlayer({ playerId: 456, skill: 1000, kill_streak: 0, death_streak: 0 })) // victim
+          .mockResolvedValueOnce(
+            createMockPlayer({ playerId: 123, skill: 1000, kill_streak: 0, death_streak: 0 }),
+          ) // killer
+          .mockResolvedValueOnce(
+            createMockPlayer({ playerId: 456, skill: 1000, kill_streak: 0, death_streak: 0 }),
+          ) // victim
         vi.mocked(mockPlayerService.updatePlayerStats).mockRejectedValueOnce(updateError)
         const event = {
           eventType: EventType.PLAYER_KILL,
@@ -346,8 +374,20 @@ describe("PlayerHandler", () => {
         .mockResolvedValueOnce(createMockPlayer({ playerId: 1, skill: 1000 }))
         .mockResolvedValueOnce(createMockPlayer({ playerId: 2, skill: 1000 }))
       vi.mocked(mockPlayerService.getPlayerRating)
-        .mockResolvedValueOnce({ playerId: 1, rating: 1000, confidence: 350, volatility: 0.06, gamesPlayed: 10 })
-        .mockResolvedValueOnce({ playerId: 2, rating: 1000, confidence: 350, volatility: 0.06, gamesPlayed: 10 })
+        .mockResolvedValueOnce({
+          playerId: 1,
+          rating: 1000,
+          confidence: 350,
+          volatility: 0.06,
+          gamesPlayed: 10,
+        })
+        .mockResolvedValueOnce({
+          playerId: 2,
+          rating: 1000,
+          confidence: 350,
+          volatility: 0.06,
+          gamesPlayed: 10,
+        })
 
       const event: PlayerKillEvent = {
         eventType: EventType.PLAYER_KILL,
@@ -365,7 +405,9 @@ describe("PlayerHandler", () => {
 
       await handler.handleEvent(event)
 
-      expect(loggerMock.event).toHaveBeenCalledWith("Kill recorded: Player 1 killed Player 2 with ak47")
+      expect(loggerMock.event).toHaveBeenCalledWith(
+        "Kill recorded: Player 1 killed Player 2 with ak47",
+      )
     })
   })
 })

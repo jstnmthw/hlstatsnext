@@ -39,7 +39,11 @@ async function testPlayerRanking() {
       ]
 
       for (const player of testPlayers) {
-        const playerId = await playerService.getOrCreatePlayer(player.steamId, player.name, "cstrike")
+        const playerId = await playerService.getOrCreatePlayer(
+          player.steamId,
+          player.name,
+          "cstrike",
+        )
         await playerService.updatePlayerStats(playerId, { skill: player.skill })
         console.log(`Created player: ${player.name} (ID: ${playerId}, Skill: ${player.skill})`)
       }
@@ -80,7 +84,8 @@ function displayRankings(
   console.log("-".repeat(80))
 
   players.slice(0, 50).forEach((player, index) => {
-    const kd = player.deaths > 0 ? (player.kills / player.deaths).toFixed(2) : player.kills.toFixed(2)
+    const kd =
+      player.deaths > 0 ? (player.kills / player.deaths).toFixed(2) : player.kills.toFixed(2)
     console.log(
       `${String(index + 1).padStart(4)} | ` +
         `${String(player.playerId).padStart(9)} | ` +

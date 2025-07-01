@@ -112,7 +112,9 @@ describe("PlayerService", () => {
         volatility: 0.06,
         gamesPlayed: 0,
       })
-      expect(loggerMock.error).toHaveBeenCalledWith(`Failed to get player rating for 123: ${dbError}`)
+      expect(loggerMock.error).toHaveBeenCalledWith(
+        `Failed to get player rating for 123: ${dbError}`,
+      )
     })
   })
 
@@ -304,7 +306,9 @@ describe("PlayerService", () => {
     it("handles database errors", async () => {
       const dbError = new Error("DB connection failed")
       dbMock.spies.playerUniqueIdFindUnique.mockRejectedValue(dbError)
-      await expect(service.getOrCreatePlayer("STEAM_ID_UNKNOWN", "New Player", "csgo")).rejects.toThrow(dbError)
+      await expect(
+        service.getOrCreatePlayer("STEAM_ID_UNKNOWN", "New Player", "csgo"),
+      ).rejects.toThrow(dbError)
       expect(loggerMock.error).toHaveBeenCalledWith(`Failed to get or create player: ${dbError}`)
     })
   })
@@ -351,7 +355,9 @@ describe("PlayerService", () => {
       dbMock.spies.playerUpdate.mockRejectedValueOnce(dbError)
 
       await expect(service.updatePlayerStats(123, { kills: 1 })).rejects.toThrow(dbError)
-      expect(loggerMock.error).toHaveBeenCalledWith(`Failed to update player stats for 123: ${dbError}`)
+      expect(loggerMock.error).toHaveBeenCalledWith(
+        `Failed to update player stats for 123: ${dbError}`,
+      )
     })
   })
 })

@@ -55,7 +55,10 @@ export interface MockServerService extends Omit<ServerService, "getServerByAddre
  * Mock PlayerService for testing
  */
 export interface MockPlayerService
-  extends Omit<PlayerService, "getOrCreatePlayer" | "updatePlayerStats" | "getPlayerStats" | "getTopPlayers"> {
+  extends Omit<
+    PlayerService,
+    "getOrCreatePlayer" | "updatePlayerStats" | "getPlayerStats" | "getTopPlayers"
+  > {
   getOrCreatePlayer: ReturnType<typeof vi.fn>
   updatePlayerStats: ReturnType<typeof vi.fn>
   getPlayerStats: ReturnType<typeof vi.fn>
@@ -138,7 +141,9 @@ export interface PartialMockDatabaseClient {
 /**
  * Create a mock DatabaseClient with all methods stubbed
  */
-export function createMockDatabaseClient(overrides?: Partial<MockDatabaseClient>): MockDatabaseClient {
+export function createMockDatabaseClient(
+  overrides?: Partial<MockDatabaseClient>,
+): MockDatabaseClient {
   const mockPrisma = {
     playerUniqueId: {
       findUnique: vi.fn(),

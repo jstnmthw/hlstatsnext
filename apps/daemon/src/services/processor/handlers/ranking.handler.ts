@@ -161,7 +161,10 @@ export class RankingHandler implements IRankingHandler {
 
       // Calculate team-based rating adjustments
       const ratingChanges: RatingChange[] = []
-      const baseBonus = Math.min(Math.floor(duration / this.ROUND_DURATION_DIVISOR), this.MAX_ROUND_BONUS)
+      const baseBonus = Math.min(
+        Math.floor(duration / this.ROUND_DURATION_DIVISOR),
+        this.MAX_ROUND_BONUS,
+      )
 
       for (const participant of participants) {
         const oldRating = participant.player.skill
@@ -184,7 +187,8 @@ export class RankingHandler implements IRankingHandler {
           },
         ])
 
-        const cleanRoundText = participant.player.teamkills === this.ZERO_TEAMKILLS ? " (clean round)" : ""
+        const cleanRoundText =
+          participant.player.teamkills === this.ZERO_TEAMKILLS ? " (clean round)" : ""
         ratingChanges.push({
           playerId: participant.playerId,
           oldRating,
@@ -194,7 +198,9 @@ export class RankingHandler implements IRankingHandler {
         })
       }
 
-      this.logger.event(`Round rating update for server ${serverId}: ${winningTeam} team won (${duration}s)`)
+      this.logger.event(
+        `Round rating update for server ${serverId}: ${winningTeam} team won (${duration}s)`,
+      )
 
       return {
         success: true,
@@ -229,7 +235,9 @@ export class RankingHandler implements IRankingHandler {
     const killerActualScore = 1 // Killer won
     const victimActualScore = 0 // Victim lost
 
-    const killerChange = Math.round(killerK * (killerActualScore - expectedKiller) * weaponMultiplier * headshotBonus)
+    const killerChange = Math.round(
+      killerK * (killerActualScore - expectedKiller) * weaponMultiplier * headshotBonus,
+    )
     const victimChange = Math.round(
       victimK * (victimActualScore - (1 - expectedKiller)) * this.VICTIM_PENALTY_MULTIPLIER,
     )
@@ -269,7 +277,11 @@ export class RankingHandler implements IRankingHandler {
   /**
    * Update player rating based on match outcome
    */
-  public async updatePlayerRating(playerId: number, actualScore: number, expectedScore: number): Promise<SkillRating> {
+  public async updatePlayerRating(
+    playerId: number,
+    actualScore: number,
+    expectedScore: number,
+  ): Promise<SkillRating> {
     const currentRating = await this.playerService.getPlayerRating(playerId)
     const kFactor = this.getAdjustedKFactor(currentRating)
 

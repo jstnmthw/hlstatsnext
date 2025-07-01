@@ -47,12 +47,20 @@ export class HLStatsDaemon {
 
       // Start all services
       logger.info("Starting services")
-      await Promise.all([this.gateway.start(), this.ingress.start(), this.rcon.start(), this.statistics.start()])
+      await Promise.all([
+        this.gateway.start(),
+        this.ingress.start(),
+        this.rcon.start(),
+        this.statistics.start(),
+      ])
 
       logger.ok("All services started successfully")
       logger.ready("HLStats Daemon v2 is ready to receive game server data")
     } catch (error) {
-      logger.failed("Failed to start daemon", error instanceof Error ? error.message : String(error))
+      logger.failed(
+        "Failed to start daemon",
+        error instanceof Error ? error.message : String(error),
+      )
       process.exit(1)
     }
   }

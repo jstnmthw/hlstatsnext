@@ -45,8 +45,8 @@
     "./client": "./dist/index.js",
     "./seed": "./dist/seed.js",
     "./reset": "./dist/reset.js",
-    "./graphql/types": "./generated/graphql/pothos-types.ts",
-    "./graphql/inputs": "./generated/graphql/pothos-inputs.ts",
-    "./graphql/crud": "./generated/graphql/pothos-inputs/autocrud.ts"
+    "./graphql/types": "./dist/generated/graphql/pothos-types.js",
+    "./graphql/inputs": "./dist/generated/graphql/pothos-inputs.js",
+    "./graphql/crud": "./dist/generated/graphql/pothos-inputs/autocrud.js"
   }
 }

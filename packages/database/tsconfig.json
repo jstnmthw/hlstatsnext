@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    "module": "ESNext",
+    "module": "esnext",
     "paths": {
       "@repo/database/sql": ["./src/sql"]
     },

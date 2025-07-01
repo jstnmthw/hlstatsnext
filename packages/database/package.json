@@ -22,9 +22,9 @@
     "lint:fix": "eslint src/**/*.ts --fix"
   },
   "dependencies": {
-    "@prisma/client": "^6.9.0",
+    "@prisma/client": "^6.10.0",
     "dbgate-query-splitter": "^4.11.5",
-    "prisma": "^6.9.0"
+    "prisma": "^6.10.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.8.0",

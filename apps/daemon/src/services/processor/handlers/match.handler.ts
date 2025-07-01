@@ -91,7 +91,9 @@ export class MatchHandler implements IMatchHandler {
       // TODO: Update player round statistics
       // TODO: Calculate team performance metrics
 
-      this.logger.event(`Round ended on server ${serverId}: ${winningTeam} won (${score.team1}-${score.team2})`)
+      this.logger.event(
+        `Round ended on server ${serverId}: ${winningTeam} won (${score.team1}-${score.team2})`,
+      )
 
       return {
         success: true,
@@ -119,7 +121,9 @@ export class MatchHandler implements IMatchHandler {
       // Reset match stats for new map
       this.currentMatch.delete(serverId)
 
-      this.logger.event(`Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`)
+      this.logger.event(
+        `Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`,
+      )
 
       return {
         success: true,

@@ -111,7 +111,10 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
 
       this.emit("eventProcessed", { success: true, event })
     } catch (error) {
-      this.logger.failed("Failed to process event", error instanceof Error ? error.message : String(error))
+      this.logger.failed(
+        "Failed to process event",
+        error instanceof Error ? error.message : String(error),
+      )
       this.emit("eventProcessed", {
         success: false,
         event,
@@ -134,7 +137,11 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
         }
 
         const { steamId, playerName } = event.meta
-        const playerId = await this.playerService.getOrCreatePlayer(steamId, playerName, this.DEFAULT_GAME_ID)
+        const playerId = await this.playerService.getOrCreatePlayer(
+          steamId,
+          playerName,
+          this.DEFAULT_GAME_ID,
+        )
         event.data.playerId = playerId
         break
       }
@@ -174,7 +181,11 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
         }
 
         const { steamId, playerName } = event.meta
-        const playerId = await this.playerService.getOrCreatePlayer(steamId, playerName, this.DEFAULT_GAME_ID)
+        const playerId = await this.playerService.getOrCreatePlayer(
+          steamId,
+          playerName,
+          this.DEFAULT_GAME_ID,
+        )
         event.data.playerId = playerId
         break
       }
@@ -185,7 +196,11 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
         }
 
         const { steamId, playerName } = event.meta
-        const playerId = await this.playerService.getOrCreatePlayer(steamId, playerName, this.DEFAULT_GAME_ID)
+        const playerId = await this.playerService.getOrCreatePlayer(
+          steamId,
+          playerName,
+          this.DEFAULT_GAME_ID,
+        )
         event.data.playerId = playerId
         break
       }

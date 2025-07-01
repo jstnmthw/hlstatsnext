@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { RankingHandler } from "../../src/services/processor/handlers/ranking.handler"
-import { EventType, PlayerKillEvent, RoundEndEvent, PlayerConnectEvent } from "../../src/types/common/events"
+import {
+  EventType,
+  PlayerKillEvent,
+  RoundEndEvent,
+  PlayerConnectEvent,
+} from "../../src/types/common/events"
 import { createMockLogger } from "../types/test-mocks"
 import type { IPlayerService } from "@/services/player/player.types"
 import type { IWeaponService } from "@/services/weapon/weapon.types"

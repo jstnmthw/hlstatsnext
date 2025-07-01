@@ -258,7 +258,9 @@ function handleGraphQLResultNullable<T>(result: Result<T, AppError>): T | null
 
 // Async versions
 async function handleGraphQLResultAsync<T>(resultPromise: Promise<Result<T, AppError>>): Promise<T>
-async function handleGraphQLResultNullableAsync<T>(resultPromise: Promise<Result<T, AppError>>): Promise<T | null>
+async function handleGraphQLResultNullableAsync<T>(
+  resultPromise: Promise<Result<T, AppError>>,
+): Promise<T | null>
 ```
 
 ### 2. **Direct GraphQLError Creation**

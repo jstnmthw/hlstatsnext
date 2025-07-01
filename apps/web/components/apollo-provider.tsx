@@ -1,7 +1,12 @@
 "use client"
 
 import { ApolloLink, HttpLink } from "@apollo/client"
-import { ApolloNextAppProvider, InMemoryCache, SSRMultipartLink, ApolloClient } from "@apollo/client-integration-nextjs"
+import {
+  ApolloNextAppProvider,
+  InMemoryCache,
+  SSRMultipartLink,
+  ApolloClient,
+} from "@apollo/client-integration-nextjs"
 
 function makeClient() {
   const httpLink = new HttpLink({

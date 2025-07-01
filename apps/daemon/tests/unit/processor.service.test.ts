@@ -21,7 +21,10 @@ const createPlayerServiceMock = (): IPlayerService => ({
   getRoundParticipants: vi.fn(),
   getTopPlayers: vi.fn(),
 })
-const createMatchHandlerMock = (): IMatchHandler => ({ handleEvent: vi.fn(), getMatchStats: vi.fn() })
+const createMatchHandlerMock = (): IMatchHandler => ({
+  handleEvent: vi.fn(),
+  getMatchStats: vi.fn(),
+})
 const createPlayerHandlerMock = (): IPlayerHandler => ({ handleEvent: vi.fn() })
 const createRankingHandlerMock = (): IRankingHandler => ({
   handleEvent: vi.fn(),
@@ -83,8 +86,16 @@ describe("EventProcessorService", () => {
     it("should resolve player IDs before processing", async () => {
       await processor.processEvent(mockKillEvent)
       expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledTimes(2)
-      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledWith("STEAM_1:0:111", "Killer", "csgo")
-      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledWith("STEAM_1:0:222", "Victim", "csgo")
+      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledWith(
+        "STEAM_1:0:111",
+        "Killer",
+        "csgo",
+      )
+      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledWith(
+        "STEAM_1:0:222",
+        "Victim",
+        "csgo",
+      )
     })
 
     it("should persist the event via EventService", async () => {

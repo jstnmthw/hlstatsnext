@@ -28,7 +28,8 @@ describe("Counster Strike Parser", () => {
 
   describe("parse", () => {
     it("should parse a connect event", async () => {
-      const logLine = 'L 07/15/2024 - 22:33:10: "PlayerName<1><STEAM_1:0:12345><CT>" connected, address "1.2.3.4:27005"'
+      const logLine =
+        'L 07/15/2024 - 22:33:10: "PlayerName<1><STEAM_1:0:12345><CT>" connected, address "1.2.3.4:27005"'
       const result = await parser.parse(logLine, serverId)
       expect(result.success).toBe(true)
       if (result.success) {
@@ -139,7 +140,8 @@ describe("Counster Strike Parser", () => {
     })
 
     it("should parse a bot suicide event", async () => {
-      const logLine = 'L 07/15/2024 - 22:35:05: "BotName<2><BOT><CT>" [93 303 73] committed suicide with "hegrenade"'
+      const logLine =
+        'L 07/15/2024 - 22:35:05: "BotName<2><BOT><CT>" [93 303 73] committed suicide with "hegrenade"'
       const result = await parser.parse(logLine, serverId)
       expect(result.success).toBe(true)
       if (result.success) {
@@ -179,7 +181,8 @@ describe("Counster Strike Parser", () => {
     })
 
     it("should parse standard chat line", async () => {
-      const logLine = 'L 06/28/2025 - 09:09:32: "goat<5><BOT><CT>" say "Too bad NNBot is discontinued..."'
+      const logLine =
+        'L 06/28/2025 - 09:09:32: "goat<5><BOT><CT>" say "Too bad NNBot is discontinued..."'
 
       const result = await parser.parse(logLine, 1)
 
@@ -219,7 +222,8 @@ describe("Counster Strike Parser", () => {
     const parser = new CsParser("cstrike")
 
     it("flags meta.isBot when the Steam ID token is BOT", async () => {
-      const line = 'L 01/01/2025 - 12:00:00: "BotPlayer<1><BOT><CT>" connected, address "7.7.7.7:27005"'
+      const line =
+        'L 01/01/2025 - 12:00:00: "BotPlayer<1><BOT><CT>" connected, address "7.7.7.7:27005"'
 
       const result = await parser.parse(line, 99)
       if (!result.success) {
@@ -228,7 +232,9 @@ describe("Counster Strike Parser", () => {
 
       const { event } = result
       expect(event.eventType).toBe("PLAYER_CONNECT")
-      const eventWithMeta = event as { meta?: { steamId: string; playerName: string; isBot: boolean } }
+      const eventWithMeta = event as {
+        meta?: { steamId: string; playerName: string; isBot: boolean }
+      }
       if (eventWithMeta.meta && "steamId" in eventWithMeta.meta) {
         expect(eventWithMeta.meta.isBot).toBe(true)
         expect(eventWithMeta.meta.steamId).toBe("BOT")

@@ -118,10 +118,14 @@ describe("QueueManager", () => {
 
     it("should enqueue a high-priority event to the correct queue", async () => {
       await queueManager.enqueueEvent(mockEvent, "high")
-      expect(mockQueueInstance.add).toHaveBeenCalledWith("process-PLAYER_CONNECT", expect.any(Object), {
-        priority: 100,
-        delay: 0,
-      })
+      expect(mockQueueInstance.add).toHaveBeenCalledWith(
+        "process-PLAYER_CONNECT",
+        expect.any(Object),
+        {
+          priority: 100,
+          delay: 0,
+        },
+      )
       // Ensure the correct queue was used
       const highPriorityQueueName = mockOptions.queues.highPriority
       expect(MockedQueue).toHaveBeenCalledWith(highPriorityQueueName, expect.any(Object))
@@ -129,24 +133,34 @@ describe("QueueManager", () => {
 
     it("should enqueue a normal-priority event by default", async () => {
       await queueManager.enqueueEvent(mockEvent)
-      expect(mockQueueInstance.add).toHaveBeenCalledWith("process-PLAYER_CONNECT", expect.any(Object), {
-        priority: 50,
-        delay: 0,
-      })
+      expect(mockQueueInstance.add).toHaveBeenCalledWith(
+        "process-PLAYER_CONNECT",
+        expect.any(Object),
+        {
+          priority: 50,
+          delay: 0,
+        },
+      )
     })
 
     it("should enqueue a low-priority event with a delay", async () => {
       await queueManager.enqueueEvent(mockEvent, "low")
-      expect(mockQueueInstance.add).toHaveBeenCalledWith("process-PLAYER_CONNECT", expect.any(Object), {
-        priority: 10,
-        delay: 1000,
-      })
+      expect(mockQueueInstance.add).toHaveBeenCalledWith(
+        "process-PLAYER_CONNECT",
+        expect.any(Object),
+        {
+          priority: 10,
+          delay: 1000,
+        },
+      )
     })
 
     it("should throw if queue is not found", async () => {
       // "get" on the internal map returns undefined
       vi.spyOn(queueManager["queues"], "get").mockReturnValue(undefined)
-      await expect(queueManager.enqueueEvent(mockEvent)).rejects.toThrow(`Queue ${mockOptions.queues.normal} not found`)
+      await expect(queueManager.enqueueEvent(mockEvent)).rejects.toThrow(
+        `Queue ${mockOptions.queues.normal} not found`,
+      )
     })
   })
 

@@ -103,7 +103,8 @@ describe("IngressService", () => {
 
     // Send first packet (authentication) - should not trigger processEvent
     await handler({
-      logLine: 'L 07/15/2024 - 22:33:10: "Player<1><STEAM_1:0:111><CT>" connected, address "127.0.0.1:27005"',
+      logLine:
+        'L 07/15/2024 - 22:33:10: "Player<1><STEAM_1:0:111><CT>" connected, address "127.0.0.1:27005"',
       serverAddress: "127.0.0.1",
       serverPort: 27015,
       timestamp: new Date(),
@@ -111,7 +112,8 @@ describe("IngressService", () => {
 
     // Second packet should be processed
     await handler({
-      logLine: 'L 07/15/2024 - 22:33:12: "Player<1><STEAM_1:0:111><CT>" connected, address "127.0.0.1:27005"',
+      logLine:
+        'L 07/15/2024 - 22:33:12: "Player<1><STEAM_1:0:111><CT>" connected, address "127.0.0.1:27005"',
       serverAddress: "127.0.0.1",
       serverPort: 27015,
       timestamp: new Date(),
@@ -339,7 +341,8 @@ describe("IngressService - skipAuth immediate processing & race condition", () =
     const handler = call![1]
 
     await handler({
-      logLine: 'L 07/15/2024 - 22:33:10: "Player<1><STEAM_1:0:111><CT>" connected, address "127.0.0.1:27005"',
+      logLine:
+        'L 07/15/2024 - 22:33:10: "Player<1><STEAM_1:0:111><CT>" connected, address "127.0.0.1:27005"',
       serverAddress: "127.0.0.1",
       serverPort: 27015,
     })
@@ -401,7 +404,8 @@ describe("IngressService - skipAuth immediate processing & race condition", () =
     const handler = call![1]
 
     await handler({
-      logLine: 'L 07/15/2024 - 22:33:10: "Player<1><STEAM_1:0:111><CT>" connected, address "127.0.0.1:27005"',
+      logLine:
+        'L 07/15/2024 - 22:33:10: "Player<1><STEAM_1:0:111><CT>" connected, address "127.0.0.1:27005"',
       serverAddress: "127.0.0.1",
       serverPort: 27015,
     })

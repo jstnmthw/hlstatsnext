@@ -63,13 +63,17 @@ export class CsParser extends BaseParser {
     return { success: false, error: "Unsupported log line" }
   }
 
-  private async parseConnect(logLine: string, serverId: number): Promise<PlayerConnectEvent | null> {
+  private async parseConnect(
+    logLine: string,
+    serverId: number,
+  ): Promise<PlayerConnectEvent | null> {
     /*
       Example:
       L 07/15/2024 - 22:35:10: "PlayerName<1><STEAM_1:0:12345><CT>" STEAM USERID validated
       L 07/15/2024 - 22:35:10: "PlayerName<1><STEAM_1:0:12345><>" connected, address "192.168.1.100:27005"
     */
-    const regex = /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><.*?>" connected, address "(.+?)(?::\d+)?"/i
+    const regex =
+      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><.*?>" connected, address "(.+?)(?::\d+)?"/i
     const match = logLine.match(regex)
     if (!match) return null
 
@@ -100,12 +104,16 @@ export class CsParser extends BaseParser {
     return event
   }
 
-  private async parseDisconnect(logLine: string, serverId: number): Promise<PlayerDisconnectEvent | null> {
+  private async parseDisconnect(
+    logLine: string,
+    serverId: number,
+  ): Promise<PlayerDisconnectEvent | null> {
     /*
       Example:
       L 07/15/2024 - 22:35:10: "PlayerName<1><STEAM_1:0:12345><CT>" disconnected (reason "Client left game")
     */
-    const regex = /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><.*?>" disconnected(?: \(reason\s+"(.+?)"\))?/i
+    const regex =
+      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><.*?>" disconnected(?: \(reason\s+"(.+?)"\))?/i
     const match = logLine.match(regex)
     if (!match) return null
 
@@ -180,12 +188,16 @@ export class CsParser extends BaseParser {
     return event
   }
 
-  private async parseSuicide(logLine: string, serverId: number): Promise<PlayerSuicideEvent | null> {
+  private async parseSuicide(
+    logLine: string,
+    serverId: number,
+  ): Promise<PlayerSuicideEvent | null> {
     /*
       Example:
       L 07/15/2024 - 22:35:05: "Player<2><STEAM_1:0:111><TERRORIST>" [93 303 73] committed suicide with "world"
     */
-    const regex = /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?committed suicide with "(\w+)"/i
+    const regex =
+      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?committed suicide with "(\w+)"/i
     const match = logLine.match(regex)
     if (!match) return null
 
@@ -215,7 +227,10 @@ export class CsParser extends BaseParser {
     return event
   }
 
-  private async parseTeamkill(logLine: string, serverId: number): Promise<PlayerTeamkillEvent | null> {
+  private async parseTeamkill(
+    logLine: string,
+    serverId: number,
+  ): Promise<PlayerTeamkillEvent | null> {
     /*
       Example:
       L 07/15/2024 - 22:35:05: "Killer<2><STEAM_1:0:111><TERRORIST>" [93 303 73] killed "Victim<3><STEAM_1:0:222><TERRORIST>" [35 302 73] with "ak47" (headshot)
@@ -274,7 +289,8 @@ export class CsParser extends BaseParser {
    * L 06/28/2025 - 09:09:32: "goat<5><BOT><CT>" say "Too bad NNBot is discontinued..." (dead)
    */
   private async parseChat(logLine: string, serverId: number): Promise<PlayerChatEvent | null> {
-    const regex = /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>"\s+say\s+"([^"]+)"(?:\s+\((dead)\))?/i
+    const regex =
+      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>"\s+say\s+"([^"]+)"(?:\s+\((dead)\))?/i
 
     const match = logLine.match(regex)
     if (!match) return null

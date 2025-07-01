@@ -18,33 +18,39 @@ describe("Logger", () => {
     { name: "CHAT", method: (l, m) => l.chat(m) },
   ]
 
-  it.each(STATUSES)("should format %s logs correctly (no timestamp, no colors)", ({ name, method }) => {
-    const testLogger = new Logger({ enableColors: false, showTimestamp: false })
-    const spy = vi.spyOn(console, "log").mockImplementation(() => undefined)
+  it.each(STATUSES)(
+    "should format %s logs correctly (no timestamp, no colors)",
+    ({ name, method }) => {
+      const testLogger = new Logger({ enableColors: false, showTimestamp: false })
+      const spy = vi.spyOn(console, "log").mockImplementation(() => undefined)
 
-    const msg = `Test ${name} message`
-    method(testLogger, msg)
+      const msg = `Test ${name} message`
+      method(testLogger, msg)
 
-    expect(spy).toHaveBeenCalledTimes(1)
-    expect(spy.mock.calls[0]![0]).toBe(`[ ${name} ] ${msg}`)
-  })
+      expect(spy).toHaveBeenCalledTimes(1)
+      expect(spy.mock.calls[0]![0]).toBe(`[ ${name} ] ${msg}`)
+    },
+  )
 
-  it.each(STATUSES)("should format %s logs correctly (with colors, no timestamp)", ({ name, method }) => {
-    const testLogger = new Logger({ enableColors: true, showTimestamp: false })
-    const spy = vi.spyOn(console, "log").mockImplementation(() => undefined)
+  it.each(STATUSES)(
+    "should format %s logs correctly (with colors, no timestamp)",
+    ({ name, method }) => {
+      const testLogger = new Logger({ enableColors: true, showTimestamp: false })
+      const spy = vi.spyOn(console, "log").mockImplementation(() => undefined)
 
-    const msg = `Test ${name} message`
-    method(testLogger, msg)
+      const msg = `Test ${name} message`
+      method(testLogger, msg)
 
-    expect(spy).toHaveBeenCalledTimes(1)
+      expect(spy).toHaveBeenCalledTimes(1)
 
-    const loggedMessage = spy.mock.calls[0]![0] as string
-    expect(loggedMessage).toContain(`[ ${name} ]`)
-    expect(loggedMessage).toContain(msg)
+      const loggedMessage = spy.mock.calls[0]![0] as string
+      expect(loggedMessage).toContain(`[ ${name} ]`)
+      expect(loggedMessage).toContain(msg)
 
-    // Should contain ANSI color codes when colors are enabled
-    expect(loggedMessage).toMatch(/\u001b\[[0-9;]*m/)
-  })
+      // Should contain ANSI color codes when colors are enabled
+      expect(loggedMessage).toMatch(/\u001b\[[0-9;]*m/)
+    },
+  )
 
   it("should include timestamp when enabled", () => {
     const testLogger = new Logger({ enableColors: false, showTimestamp: true })

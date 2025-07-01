@@ -188,7 +188,9 @@ async function testPlayerLifecycle() {
       console.log(`  Suicides: ${player1.suicides}`)
       console.log(`  Teamkills: ${player1.teamkills}`)
       console.log(`  Headshots: ${player1.headshots}`)
-      console.log(`  K/D Ratio: ${player1.deaths > 0 ? (player1.kills / player1.deaths).toFixed(2) : player1.kills}`)
+      console.log(
+        `  K/D Ratio: ${player1.deaths > 0 ? (player1.kills / player1.deaths).toFixed(2) : player1.kills}`,
+      )
       console.log()
     }
 

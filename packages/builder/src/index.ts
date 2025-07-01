@@ -1,26 +1,15 @@
 import SchemaBuilder from "@pothos/core"
 import PrismaPlugin from "@pothos/plugin-prisma"
-import RelayPlugin from "@pothos/plugin-relay"
-import WithInputPlugin from "@pothos/plugin-with-input"
 import type PrismaTypes from "@repo/database/graphql/types"
 import { db } from "@repo/database/client"
 
 export const builder = new SchemaBuilder<{
   PrismaTypes: PrismaTypes
 }>({
-  plugins: [PrismaPlugin, RelayPlugin, WithInputPlugin],
+  plugins: [PrismaPlugin],
   prisma: {
     // The prisma client to use
     client: db,
-
-    // The crud generator requires this explicit exposure
-    exposeDescriptions: true,
-
-    // Use where clause from prismaRelatedConnection for totalCount (defaults to true)
-    filterConnectionTotalCount: true,
-
-    // Warn when not using a query parameter correctly
-    onUnusedQuery: process.env.NODE_ENV === "production" ? null : "warn",
   },
 })
 

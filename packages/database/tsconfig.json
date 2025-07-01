@@ -4,6 +4,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "paths": {
+      "@repo/database/client": ["./src/client"],
       "@repo/database/sql": ["./src/sql"]
     },
     "baseUrl": ".",

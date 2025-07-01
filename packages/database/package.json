@@ -2,6 +2,7 @@
   "name": "@repo/database",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "db:generate": "rm -rf generated && prisma generate",
@@ -17,7 +18,8 @@
     "dev": "tsc --watch",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf node_modules",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
@@ -31,7 +33,7 @@
     "@pothos/plugin-relay": "^4.4.2",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^22.8.4",
+    "@types/node": "^24.0.0",
     "dotenv-cli": "^8.0.0",
     "eslint": "^9.29.0",
     "prisma-generator-pothos-codegen": "^0.7.1",
@@ -40,9 +42,18 @@
     "typescript": "5.8.2"
   },
   "exports": {
-    "./client": "./src/index.ts",
-    "./seed": "./src/seed.ts",
-    "./reset": "./src/reset.ts",
+    "./client": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./seed": {
+      "types": "./dist/seed.d.ts",
+      "import": "./dist/seed.js"
+    },
+    "./reset": {
+      "types": "./dist/reset.d.ts",
+      "import": "./dist/reset.js"
+    },
     "./graphql/types": "./generated/graphql/pothos-types.ts",
     "./graphql/inputs": "./generated/graphql/pothos-inputs.ts",
     "./graphql/crud": "./generated/graphql/pothos-inputs/autocrud.ts"

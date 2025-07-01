@@ -1,5 +1,5 @@
-import { builder } from "@/builder"
 import type { Player, Prisma } from "@repo/database/client"
+import { builder } from "@/builder"
 import { handleGraphQLResult, handleGraphQLResultNullable } from "@/shared/utils/graphql-result-handler"
 
 // Define Player object using Prisma plugin

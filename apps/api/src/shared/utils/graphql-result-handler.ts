@@ -1,5 +1,5 @@
-import type { Result, AppError } from "../types/common"
-import { mapAppErrorToGraphQLError } from "../types/common"
+import type { Result, AppError } from "@/shared/types"
+import { mapAppErrorToGraphQLError } from "@/shared/utils/graphql-errors"
 
 /**
  * Handles Result types in GraphQL resolvers by throwing appropriate errors for failures

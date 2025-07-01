@@ -1,13 +1,13 @@
 import { createYoga } from "graphql-yoga"
 import { createServer } from "node:http"
 import { schema } from "./pothos-schema"
-import { createContext } from "./context"
+// import { createContext } from "./context"
 
 // Create GraphQL Yoga server
 const yoga = createYoga({
   landingPage: false,
   schema,
-  context: createContext,
+  // context: createContext,
   cors: {
     origin: process.env.NODE_ENV === "production" ? process.env.FRONTEND_URL : "http://localhost:3000",
     credentials: true,

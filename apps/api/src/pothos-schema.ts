@@ -1,4 +1,4 @@
-import { builder } from "./builder"
+import { builder } from "@repo/builder"
 import { generateAllCrud } from "@repo/database/graphql/crud"
 
 // Generate all CRUD operations

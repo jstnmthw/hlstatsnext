@@ -35,16 +35,16 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^24.0.0",
     "dotenv-cli": "^8.0.0",
-    "eslint": "^9.29.0",
+    "eslint": "^9.30.0",
     "prisma-generator-pothos-codegen": "^0.7.1",
     "ts-deepmerge": "^7.0.3",
     "tsx": "^4.7.0",
-    "typescript": "5.8.2"
+    "typescript": "^5.8.3"
   },
   "exports": {
-    "./client": "./dist/client.js",
-    "./seed": "./dist/seed.js",
-    "./reset": "./dist/reset.js",
+    "./client": "./src/client.ts",
+    "./seed": "./src/seed.ts",
+    "./reset": "./src/reset.ts",
     "./graphql/types": "./generated/graphql/pothos-types.js",
     "./graphql/inputs": "./generated/graphql/pothos-inputs.js",
     "./graphql/crud": "./generated/graphql/pothos-inputs/autocrud.js"

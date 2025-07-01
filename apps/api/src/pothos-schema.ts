@@ -1,8 +1,5 @@
 import { builder } from "@repo/builder"
-import { generateAllCrud } from "@repo/database/graphql/crud"
-
-// Generate all CRUD operations
-generateAllCrud()
+import "@repo/database/graphql/crud"
 
 // Define HealthStatus type
 const HealthStatus = builder.objectRef<{

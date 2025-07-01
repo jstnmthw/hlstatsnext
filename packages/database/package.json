@@ -36,6 +36,7 @@
     "@types/node": "^24.0.0",
     "dotenv-cli": "^8.0.0",
     "eslint": "^9.30.0",
+    "glob": "^11.0.0",
     "prisma-generator-pothos-codegen": "^0.7.1",
     "ts-deepmerge": "^7.0.3",
     "tsx": "^4.7.0",
@@ -45,8 +46,8 @@
     "./client": "./src/client.ts",
     "./seed": "./src/seed.ts",
     "./reset": "./src/reset.ts",
-    "./graphql/types": "./generated/graphql/pothos-types.js",
-    "./graphql/inputs": "./generated/graphql/pothos-inputs.js",
-    "./graphql/crud": "./generated/graphql/pothos-inputs/autocrud.js"
+    "./graphql/types": "./generated/graphql/pothos-types.ts",
+    "./graphql/inputs": "./generated/graphql/pothos-inputs.ts",
+    "./graphql/crud": "./generated/graphql/pothos-inputs/autocrud.ts"
   }
 }

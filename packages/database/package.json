@@ -7,7 +7,7 @@
     "build": "tsc",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf node_modules dist .turbo",
-    "db:generate": "rm -rf generated && prisma generate",
+    "db:generate": "rm -rf generated && prisma generate --no-hints",
     "db:fresh": "tsx src/reset.ts",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",

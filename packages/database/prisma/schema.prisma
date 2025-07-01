@@ -19,7 +19,7 @@ generator pothos {
 
 generator pothosCodegen {
   provider            = "prisma-generator-pothos-codegen"
-  generatorConfigPath = "../src/pothos.config.cjs"
+  generatorConfigPath = "../src/pothos.config.js"
 }
 
 // GeoIP Tables

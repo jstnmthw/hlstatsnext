@@ -17,10 +17,8 @@ export { isSuccess, isFailure, success, failure } from "./result.types"
 export type {
   PaginationInput,
   PaginationConfig,
-  SortDirectionType,
-  SortInput,
   PaginationMetadata,
   PaginatedResponse,
 } from "./pagination.types"
 
-export { SortDirection, DEFAULT_PAGINATION } from "./pagination.types"
+export { DEFAULT_PAGINATION } from "./pagination.types"

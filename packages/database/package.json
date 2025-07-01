@@ -2,7 +2,6 @@
   "name": "@repo/database",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "db:generate": "rm -rf generated && prisma generate",
@@ -42,18 +41,9 @@
     "typescript": "5.8.2"
   },
   "exports": {
-    "./client": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./seed": {
-      "types": "./dist/seed.d.ts",
-      "import": "./dist/seed.js"
-    },
-    "./reset": {
-      "types": "./dist/reset.d.ts",
-      "import": "./dist/reset.js"
-    },
+    "./client": "./dist/index.js",
+    "./seed": "./dist/seed.js",
+    "./reset": "./dist/reset.js",
     "./graphql/types": "./generated/graphql/pothos-types.ts",
     "./graphql/inputs": "./generated/graphql/pothos-inputs.ts",
     "./graphql/crud": "./generated/graphql/pothos-inputs/autocrud.ts"

@@ -1,4 +1,4 @@
-import { PrismaClient } from "../../generated"
+import { PrismaClient } from "../generated"
 import fs from "fs/promises"
 import path from "path"
 import { mysqlSplitterOptions, splitQuery } from "dbgate-query-splitter"

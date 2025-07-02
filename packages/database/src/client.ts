@@ -15,4 +15,5 @@ if (process.env.NODE_ENV === "production") {
 }
 
 export const db = prisma
+export { PrismaClient } from "../src/generated"
 export type * from "../src/generated"

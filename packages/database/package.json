@@ -44,20 +44,20 @@
   },
   "exports": {
     "./client": {
-      "types": "./dist/src/client.d.ts",
-      "default": "./dist/src/client.js"
+      "types": "./dist/client.d.ts",
+      "default": "./dist/client.js"
     },
     "./builder": {
-      "types": "./dist/src/builder.d.ts",
-      "default": "./dist/src/builder.js"
+      "types": "./dist/builder.d.ts",
+      "default": "./dist/builder.js"
     },
     "./seed": {
-      "types": "./dist/src/seed.d.ts",
-      "default": "./dist/src/seed.js"
+      "types": "./dist/seed.d.ts",
+      "default": "./dist/seed.js"
     },
     "./reset": {
-      "types": "./dist/src/reset.d.ts",
-      "default": "./dist/src/reset.js"
+      "types": "./dist/reset.d.ts",
+      "default": "./dist/reset.js"
     },
     "./graphql/types": {
       "types": "./dist/generated/graphql/pothos-types.d.ts",

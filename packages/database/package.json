@@ -7,7 +7,7 @@
     "build": "tsc",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf node_modules dist .turbo",
-    "db:generate": "rm -rf generated && prisma generate --no-hints",
+    "db:generate": "rm -rf src/generated && prisma generate --no-hints",
     "db:fresh": "tsx src/reset.ts",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -43,12 +43,33 @@
     "typescript": "^5.8.3"
   },
   "exports": {
-    "./client": "./src/client.ts",
-    "./builder": "./src/builder.ts",
-    "./seed": "./src/seed.ts",
-    "./reset": "./src/reset.ts",
-    "./graphql/types": "./generated/graphql/pothos-types.ts",
-    "./graphql/inputs/*": "./generated/graphql/pothos-inputs/*",
-    "./graphql/crud": "./generated/graphql/pothos-inputs/autocrud.ts"
+    "./client": {
+      "types": "./dist/src/client.d.ts",
+      "default": "./dist/src/client.js"
+    },
+    "./builder": {
+      "types": "./dist/src/builder.d.ts",
+      "default": "./dist/src/builder.js"
+    },
+    "./seed": {
+      "types": "./dist/src/seed.d.ts",
+      "default": "./dist/src/seed.js"
+    },
+    "./reset": {
+      "types": "./dist/src/reset.d.ts",
+      "default": "./dist/src/reset.js"
+    },
+    "./graphql/types": {
+      "types": "./dist/generated/graphql/pothos-types.d.ts",
+      "default": "./dist/generated/graphql/pothos-types.js"
+    },
+    "./graphql/inputs/*": {
+      "types": "./dist/generated/graphql/pothos-inputs/*.d.ts",
+      "default": "./dist/generated/graphql/pothos-inputs/*.js"
+    },
+    "./graphql/crud": {
+      "types": "./dist/generated/graphql/pothos-inputs/autocrud.d.ts",
+      "default": "./dist/generated/graphql/pothos-inputs/autocrud.js"
+    }
   }
 }

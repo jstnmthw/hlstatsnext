@@ -38,7 +38,7 @@ yarn-error.log*
 *.pem
 
 # Generated Prisma files
-packages/database/generated
+generated/
 ref/
 
 # Servers

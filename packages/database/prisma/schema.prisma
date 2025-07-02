@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated"
+  output   = "../src/generated"
 }
 
 datasource db {
@@ -13,8 +13,8 @@ datasource db {
 
 generator pothos {
   provider  = "prisma-pothos-types"
-  clientOut = "../generated"
-  output    = "../generated/graphql/pothos-types.ts"
+  clientOut = "../src/generated"
+  output    = "../src/generated/graphql/pothos-types.ts"
 }
 
 generator pothosCodegen {

@@ -1,4 +1,4 @@
-import { builder } from "@repo/builder"
+import { builder } from "@repo/database/builder"
 import "@repo/database/graphql/crud"
 
 // Define HealthStatus type

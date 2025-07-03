@@ -3,10 +3,6 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "baseUrl": "src",
-    "paths": {
-      "@/*": ["./*"]
-    },
     "noUnusedLocals": false,
     "noUnusedParameters": false
   },

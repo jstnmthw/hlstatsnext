@@ -12,9 +12,9 @@ datasource db {
 }
 
 generator pothos {
-  provider  = "prisma-pothos-types"
-  clientOut = "../src/generated"
-  output    = "../src/generated/graphql/pothos-types.ts"
+  provider     = "prisma-pothos-types"
+  clientImport = "../generated"
+  output       = "../src/generated/graphql/pothos-types.ts"
 }
 
 generator pothosCodegen {

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc && tsc-alias",
+    "build": "tsc",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf node_modules dist .turbo",
     "db:generate": "rm -rf src/generated && prisma generate --no-hints",

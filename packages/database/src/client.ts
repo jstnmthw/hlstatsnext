@@ -1,4 +1,4 @@
-import { PrismaClient } from "../src/generated"
+import { PrismaClient } from "./generated"
 
 declare global {
   var cachedPrisma: PrismaClient
@@ -15,5 +15,6 @@ if (process.env.NODE_ENV === "production") {
 }
 
 export const db = prisma
-export { PrismaClient } from "../src/generated"
-export type * from "../src/generated"
+export { PrismaClient } from "./generated"
+export { Prisma } from "./generated"
+export type * from "./generated"

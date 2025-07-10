@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,8 @@
     "start": "node dist/index.js",
     "check-types": "tsc --noEmit",
     "lint": "eslint src/ --max-warnings 0",
-    "clean": "rm -rf node_modules dist .turbo"
+    "clean": "rm -rf node_modules dist .turbo src/generated",
+    "db:generate": "mkdir -p src/generated/graphql && cp -r ../../packages/database/src/generated/graphql/* src/generated/graphql/"
   },
   "dependencies": {
     "@graphql-tools/schema": "^10.0.23",

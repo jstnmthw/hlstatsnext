@@ -850,7 +850,7 @@ import { PlayerService } from "@/services/player" // Should be in shared package
   "name": "@repo/database",
   "dependencies": {
     "@prisma/client": "^5.0.0",
-    "prisma": "^5.0.0"
+    "prisma": "^6.11.0"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*"

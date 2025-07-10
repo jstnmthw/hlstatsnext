@@ -3,12 +3,12 @@ import PrismaPlugin from "@pothos/plugin-prisma"
 import type PrismaTypes from "@/generated/graphql/pothos-types"
 import { db } from "@repo/database/client"
 
+// Query builder
 export const builder = new SchemaBuilder<{
   PrismaTypes: PrismaTypes
 }>({
   plugins: [PrismaPlugin],
   prisma: {
-    // The prisma client to use
     client: db,
   },
 })
@@ -19,7 +19,6 @@ builder.queryType({})
 // Add mutation type with a placeholder field
 builder.mutationType({
   fields: (t) => ({
-    // Placeholder mutation - will be replaced with actual mutations later
     _placeholder: t.string({
       resolve: () => "Mutations will be implemented in future phases",
     }),
@@ -29,7 +28,6 @@ builder.mutationType({
 // Add subscription type with a placeholder field
 builder.subscriptionType({
   fields: (t) => ({
-    // Placeholder subscription - will be replaced with actual subscriptions later
     _placeholder: t.string({
       subscribe: () => {
         // Simple async generator that yields once

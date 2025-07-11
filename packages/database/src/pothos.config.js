@@ -12,12 +12,12 @@ export const crud = {
   deleteOutputDirBeforeGenerate: true,
   exportEverythingInObjectsDotTs: false,
   prismaImporter: `import { Prisma } from '@prisma/client';`,
-  resolverImports: `\nimport { db } from "@repo/database/client";`,
+  resolverImports: `\nimport { db } from "@repo/database";`,
 }
 
 export const inputs = {
   outputFilePath: `./src/generated/graphql/pothos-inputs.ts`,
-  prismaImporter: `import { Prisma } from "@repo/database/client";`,
+  prismaImporter: `import { Prisma } from "@repo/database";`,
   prismaCaller: "Prisma",
 }
 

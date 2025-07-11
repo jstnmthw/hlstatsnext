@@ -1,5 +1,5 @@
 import type { GameEvent } from "@/types/common/events"
-import type { Player } from "@repo/database/client"
+import type { Player } from "@repo/database"
 
 export interface IEventProcessor {
   enqueue(event: unknown): Promise<void>

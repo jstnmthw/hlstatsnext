@@ -2,18 +2,23 @@
 import { readFileSync, writeFileSync } from "fs"
 import { glob } from "glob"
 
+export const crud = {
+  outputDir: `./src/generated/graphql/pothos-crud`,
+  simple: true,
+  excludeResolversContain: [],
+  prismaCaller: "db",
+  disabled: false,
+  inputsImporter: `import * as Inputs from "@/generated/graphql/pothos-inputs"`,
+  deleteOutputDirBeforeGenerate: true,
+  exportEverythingInObjectsDotTs: false,
+  prismaImporter: `import { Prisma } from '@prisma/client';`,
+  resolverImports: `\nimport { db } from "@repo/database/client";`,
+}
+
 export const inputs = {
   outputFilePath: `./src/generated/graphql/pothos-inputs.ts`,
   prismaImporter: `import { Prisma } from "@repo/database/client";`,
   prismaCaller: "Prisma",
-}
-export const crud = {
-  outputDir: `./src/generated/graphql/pothos-crud`,
-  inputsImporter: `import * as Inputs from "@/generated/graphql/pothos-inputs"`,
-  resolverImports: `\nimport { db } from "@repo/database/client";`,
-  builderImporter: `import { builder } from "@/modules/pothos/builder.service";`,
-  prismaImporter: `import { db } from "@repo/database/client";`,
-  prismaCaller: "db",
 }
 
 export const global = {
@@ -36,7 +41,7 @@ export const global = {
     // Define the regular expression to find and replace the incorrect builder import
     const wrongBuilderImportRegex =
       /import { builder } from ['"]([./]+builder|[./]*@\/builder)['"];/g
-    const correctBuilderImport = `import { builder } from "@/modules/pothos/builder.service";`
+    const correctBuilderImport = `import { builder } from "@/builder";`
 
     // Define regex to fix the inputs import issue
     // const wrongInputsImportRegex = /import \* as Inputs from ["']([./]+)pothos-inputs["'];/g

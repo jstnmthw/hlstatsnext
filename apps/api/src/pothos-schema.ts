@@ -1,8 +1,8 @@
-import { builder } from "@/modules/pothos/builder.service"
-import { generateAllCrud } from "@/generated/graphql/pothos-crud"
+import { builder } from "./builder"
+import { GraphQL } from "@repo/database"
 
 // Generate all CRUD operations
-generateAllCrud()
+GraphQL.generateAllCrud()
 
 // Define HealthStatus type
 const HealthStatus = builder.objectRef<{
@@ -28,13 +28,6 @@ builder.queryField("health", (t) =>
       timestamp: new Date().toISOString(),
       version: "1.0.0",
     }),
-  }),
-)
-
-// Hello world query
-builder.queryField("hello", (t) =>
-  t.string({
-    resolve: () => "Hello from HLStatsNext API!",
   }),
 )
 

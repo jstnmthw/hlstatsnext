@@ -5,18 +5,16 @@ import { schema } from "./pothos-schema"
 
 // Create GraphQL Yoga server
 const yoga = createYoga({
-  landingPage: false,
   schema,
+  landingPage: false,
+  graphqlEndpoint: "/graphql",
+  graphiql: process.env.NODE_ENV !== "production",
   // context: createContext,
   cors: {
     origin:
       process.env.NODE_ENV === "production" ? process.env.FRONTEND_URL : "http://localhost:3000",
     credentials: true,
   },
-  // GraphQL endpoint
-  graphqlEndpoint: "/graphql",
-  // Enable GraphiQL in development
-  graphiql: process.env.NODE_ENV !== "production",
 })
 
 // Create HTTP server

@@ -16,7 +16,7 @@ import type { PlayerService } from "../../src/services/player/player.service"
 import type { EventService } from "../../src/services/event/event.service"
 import type { WeaponService } from "../../src/services/weapon/weapon.service"
 import type { ILogger } from "../../src/utils/logger.types"
-import type { Player } from "@repo/database/client"
+import type { Player } from "@repo/database"
 
 /**
  * Mock UdpServer for testing

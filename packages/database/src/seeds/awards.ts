@@ -1,4 +1,4 @@
-import { db } from "../client"
+import { db, Prisma } from "../client"
 import { getSeedConfig } from "./config"
 import { log } from "./logger"
 import { faker } from "@faker-js/faker"
@@ -10,10 +10,10 @@ export async function seedAwards() {
     throw new Error("No games found to associate awards with.")
   }
 
-  const awards = []
+  const awards: Prisma.AwardCreateManyInput[] = []
   for (const game of games) {
     for (let i = 0; i < config.awards.count; i++) {
-      const award = {
+      const award: Prisma.AwardCreateManyInput = {
         game: game.code,
         code: faker.lorem.slug(3),
         name: faker.lorem.words(3),

@@ -1,4 +1,4 @@
-import { db } from "../client"
+import { db, Prisma } from "../client"
 import { getSeedConfig } from "./config"
 import { log } from "./logger"
 import { faker } from "@faker-js/faker"
@@ -11,10 +11,10 @@ export async function seedWeapons() {
     throw new Error("No games found to associate weapons with.")
   }
 
-  const weapons = []
+  const weapons: Prisma.WeaponCreateManyInput[] = []
   for (const game of games) {
     for (let i = 0; i < config.weapons.count; i++) {
-      const weapon = {
+      const weapon: Prisma.WeaponCreateManyInput = {
         name: faker.lorem.words(1),
         code: faker.lorem.slug(1),
         game: game.code,

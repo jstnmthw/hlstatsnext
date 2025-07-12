@@ -1,4 +1,4 @@
-import { db } from "../client"
+import { db, Prisma } from "../client"
 import { getSeedConfig } from "./config"
 import { log } from "./logger"
 import { faker } from "@faker-js/faker"
@@ -10,12 +10,12 @@ export async function seedRanks() {
     throw new Error("No games found to associate ranks with.")
   }
 
-  const ranks = []
+  const ranks: Prisma.RankCreateManyInput[] = []
   for (const game of games) {
     let minKills = 0
     for (let i = 0; i < config.ranks.count; i++) {
       const maxKills = minKills + faker.number.int({ min: 50, max: 200 })
-      const rank = {
+      const rank: Prisma.RankCreateManyInput = {
         game: game.code,
         image: `rank_${i}`,
         minKills: minKills,

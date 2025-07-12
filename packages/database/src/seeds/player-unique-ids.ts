@@ -1,4 +1,4 @@
-import { db } from "../client"
+import { db, Prisma } from "../client"
 import { getSeedConfig } from "./config"
 import { generateSteamId } from "./utils"
 import { log } from "./logger"
@@ -13,7 +13,7 @@ export async function seedPlayerUniqueIds() {
     throw new Error("Players and Games must be seeded first.")
   }
 
-  const uniqueIds = []
+  const uniqueIds: Prisma.PlayerUniqueIdCreateManyInput[] = []
   const multiGamePlayerCount = Math.floor(
     players.length * config.playerUniqueIds.multiGamePlayersPercentage,
   )

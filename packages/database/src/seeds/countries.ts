@@ -1,7 +1,7 @@
-import { db } from "../client"
+import { db, Prisma } from "../client"
 import { log, logWarning } from "./logger"
 
-const countries = [
+const countries: Prisma.CountryCreateManyInput[] = [
   { flag: "US", name: "United States" },
   { flag: "CA", name: "Canada" },
   { flag: "GB", name: "United Kingdom" },

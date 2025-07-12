@@ -148,28 +148,15 @@ async function fixGeneratedImports() {
 }
 
 export const crud = {
-  outputDir: `./src/generated/graphql/pothos-crud`,
-  simple: true,
-  excludeResolversContain: [],
-  prismaCaller: "db",
-  disabled: false,
-  inputsImporter: `import { GraphQLInputs as Inputs } from "@repo/database"`,
-  deleteOutputDirBeforeGenerate: true,
+  outputDir: `./src/generated/graphql/`,
   exportEverythingInObjectsDotTs: false,
-  prismaImporter: `import { Prisma } from "@repo/database";`,
-  resolverImports: `\nimport { db } from "@repo/database";`,
 }
 
 export const inputs = {
-  outputFilePath: `./src/generated/graphql/pothos-inputs.ts`,
-  prismaImporter: `import { Prisma } from "@repo/database";`,
-  prismaCaller: "db",
+  outputFilePath: `./src/generated/graphql/inputs.ts`,
+  simple: true,
 }
 
 export const global = {
-  afterGenerate: fixGeneratedImports,
-  // Add type assertion at builder level
-  typeAssertions: {
-    prismaModelName: "string",
-  },
+  builderLocation: "./src/builder",
 }

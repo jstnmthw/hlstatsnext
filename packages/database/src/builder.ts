@@ -11,6 +11,9 @@ export const builder = new SchemaBuilder<{
     DateTime: { Input: Date; Output: Date }
     Json: { Input: Prisma.InputJsonValue; Output: Prisma.JsonValue }
   }
+  Context: {
+    prisma: typeof db
+  }
 }>({
   plugins: [PrismaPlugin],
   prisma: {

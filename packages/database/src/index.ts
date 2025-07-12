@@ -7,9 +7,9 @@ export * from "./client"
 export * from "./builder"
 
 // Export GraphQL-related types
-export * as GraphQL from "./generated/graphql/pothos-crud"
-export * as GraphQLInputs from "./generated/graphql/pothos-inputs"
+export * as GraphQL from "./generated/graphql/autocrud"
+export * as GraphQLInputs from "./generated/graphql/inputs"
 export * as GraphQLTypes from "./generated/graphql/pothos-types"
 
 // Export CRUD generation function directly
-export { generateAllCrud } from "./generated/graphql/pothos-crud"
+export { generateAllCrud } from "./generated/graphql/autocrud"

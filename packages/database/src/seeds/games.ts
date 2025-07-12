@@ -1,7 +1,7 @@
-import { db } from "../client"
+import { db, Prisma } from "../client"
 import { log, logWarning } from "./logger"
 
-const games = [
+const games: Prisma.GameCreateManyInput[] = [
   {
     code: "tf",
     name: "Team Fortress 2",

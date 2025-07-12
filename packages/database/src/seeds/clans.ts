@@ -1,4 +1,4 @@
-import { db } from "../client"
+import { db, Prisma } from "../client"
 import { getSeedConfig } from "./config"
 import { generateClanData } from "./utils"
 import { log } from "./logger"
@@ -11,11 +11,11 @@ export async function seedClans() {
     throw new Error("No games found to associate clans with.")
   }
 
-  const clans = []
+  const clans: Prisma.ClanCreateManyInput[] = []
   for (const game of games) {
     for (let i = 0; i < config.clans.count; i++) {
       const clanData = generateClanData()
-      const clan = {
+      const clan: Prisma.ClanCreateManyInput = {
         ...clanData,
         game: game.code,
       }

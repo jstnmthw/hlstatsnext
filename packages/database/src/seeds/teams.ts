@@ -1,4 +1,4 @@
-import { db } from "../client"
+import { db, Prisma } from "../client"
 import { getSeedConfig } from "./config"
 import { log } from "./logger"
 import { faker } from "@faker-js/faker"
@@ -11,10 +11,10 @@ export async function seedTeams() {
     throw new Error("No games found to associate teams with.")
   }
 
-  const teams = []
+  const teams: Prisma.TeamCreateManyInput[] = []
   for (const game of games) {
     for (let i = 0; i < config.teams.count; i++) {
-      const team = {
+      const team: Prisma.TeamCreateManyInput = {
         name: faker.lorem.words(2),
         game: game.code,
         code: faker.lorem.word(),

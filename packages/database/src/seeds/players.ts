@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import { db } from "../client"
+import { db, Prisma } from "../client"
 import { getSeedConfig } from "./config"
 import { generatePlayerData, generateGameStats } from "./utils"
 import { log } from "./logger"
@@ -17,7 +17,7 @@ export async function seedPlayers() {
     throw new Error("Games and Countries must be seeded first.")
   }
 
-  const players = []
+  const players: Prisma.PlayerCreateManyInput[] = []
   for (let i = 0; i < config.players.count; i++) {
     const game = faker.helpers.arrayElement(games)
     const country = faker.helpers.arrayElement(countries)
@@ -26,7 +26,7 @@ export async function seedPlayers() {
     const gameStats = generateGameStats(game.code)
     const playerData = generatePlayerData()
 
-    const player = {
+    const player: Prisma.PlayerCreateManyInput = {
       ...gameStats,
       ...playerData,
       game: game.code,

@@ -1,4 +1,4 @@
-import { db } from "../client"
+import { db, Prisma } from "../client"
 import { getSeedConfig } from "./config"
 import { log } from "./logger"
 import { faker } from "@faker-js/faker"
@@ -11,10 +11,10 @@ export async function seedActions() {
     throw new Error("No games found to associate actions with.")
   }
 
-  const actions = []
+  const actions: Prisma.ActionCreateManyInput[] = []
   for (const game of games) {
     for (let i = 0; i < config.actions.count; i++) {
-      const action = {
+      const action: Prisma.ActionCreateManyInput = {
         game: game.code,
         code: faker.lorem.slug(2),
         reward_player: faker.number.int({ min: -10, max: 25 }),

@@ -1,7 +1,7 @@
 import { createYoga } from "graphql-yoga"
 import { createServer } from "node:http"
 import { schema } from "./pothos-schema"
-// import { createContext } from "./context"
+import { createContext } from "./context"
 
 // Create GraphQL Yoga server
 const yoga = createYoga({
@@ -9,7 +9,7 @@ const yoga = createYoga({
   landingPage: false,
   graphqlEndpoint: "/graphql",
   graphiql: process.env.NODE_ENV !== "production",
-  // context: createContext,
+  context: createContext,
   cors: {
     origin:
       process.env.NODE_ENV === "production" ? process.env.FRONTEND_URL : "http://localhost:3000",

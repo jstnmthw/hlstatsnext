@@ -44,6 +44,7 @@
     "typescript": "^5.8.3"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./builder": "./src/builder.ts"
   }
 }

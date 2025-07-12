@@ -8,7 +8,7 @@ const IMPORT_REPLACEMENTS = [
   {
     // Find any relative import path to builder (any number of ../)
     pattern: /import\s+\{\s*builder\s*\}\s+from\s+['"](\.\.\/)+builder['"];?/g,
-    replacement: 'import { builder } from "@repo/database";',
+    replacement: 'import { builder } from "@repo/database/builder";',
     description: "Fix builder imports to use absolute path",
   },
   // Fix bigint type issues for GraphQL
@@ -58,7 +58,7 @@ const IMPORT_REPLACEMENTS = [
     replacement: "export const $1Object: any = definePrismaObject('$2' as any,",
     description: "Cast entire variable to any",
   },
-  // Add @ts-nocheck to all generated files
+  // Add @ts-nocheck to all generated files EXCEPT autocrud.ts
   {
     pattern: /^(import.*\n)/,
     replacement: "// @ts-nocheck\n$1",
@@ -96,7 +96,15 @@ async function processFile(filePath) {
   let modifiedContent = content
   let hasChanges = false
 
+  // Skip @ts-nocheck for autocrud.ts since it's the main export file
+  const isAutocrudFile = filePath.includes("autocrud.ts")
+
   for (const replacement of IMPORT_REPLACEMENTS) {
+    // Skip the @ts-nocheck pattern for autocrud.ts
+    if (isAutocrudFile && replacement.description.includes("TypeScript ignore comment")) {
+      continue
+    }
+
     const newContent = modifiedContent.replace(replacement.pattern, replacement.replacement)
     if (newContent !== modifiedContent) {
       hasChanges = true
@@ -150,18 +158,15 @@ export const crud = {
   exportEverythingInObjectsDotTs: false,
   prismaImporter: `import { Prisma } from "@repo/database";`,
   resolverImports: `\nimport { db } from "@repo/database";`,
-  builderImporter: `import { builder } from "@/builder"`,
 }
 
 export const inputs = {
   outputFilePath: `./src/generated/graphql/pothos-inputs.ts`,
   prismaImporter: `import { Prisma } from "@repo/database";`,
   prismaCaller: "db",
-  builderImporter: `import { builder } from "@/builder"`,
 }
 
 export const global = {
-  builderImporter: `import { builder } from "@/builder"`,
   afterGenerate: fixGeneratedImports,
   // Add type assertion at builder level
   typeAssertions: {

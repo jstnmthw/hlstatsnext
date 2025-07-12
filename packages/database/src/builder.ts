@@ -1,8 +1,8 @@
-import { db } from "@repo/database"
-import { Prisma } from "@repo/database"
+import { db } from "./client"
+import { Prisma } from "./client"
 import SchemaBuilder from "@pothos/core"
 import PrismaPlugin from "@pothos/plugin-prisma"
-import PrismaTypes from "@/generated/graphql/pothos-types"
+import PrismaTypes from "./generated/graphql/pothos-types"
 
 export const builder = new SchemaBuilder<{
   PrismaTypes: PrismaTypes

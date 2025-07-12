@@ -1,5 +1,8 @@
-import { builder } from "./builder"
-import { GraphQL } from "@repo/database"
+import { builder, GraphQL } from "@repo/database"
+
+// Define the base Query and Mutation types first
+builder.queryType({})
+builder.mutationType({})
 
 // Generate all CRUD operations
 GraphQL.generateAllCrud()

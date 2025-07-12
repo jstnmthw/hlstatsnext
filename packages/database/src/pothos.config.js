@@ -1,6 +1,90 @@
 /** @type {import('prisma-generator-pothos-codegen').Config} */
-import { readFileSync, writeFileSync } from "fs"
-import { glob } from "glob"
+
+import { readdir, readFile, writeFile, stat } from "fs/promises"
+import { join } from "path"
+
+// Import replacement configuration
+const IMPORT_REPLACEMENTS = [
+  {
+    // Find any relative import path to builder (any number of ../)
+    pattern: /import\s+\{\s*builder\s*\}\s+from\s+['"](\.\.\/)+builder['"];?/g,
+    replacement: 'import { builder } from "@repo/database";',
+    description: "Fix builder imports to use absolute path",
+  },
+  // Add more patterns here as needed:
+  // {
+  //   pattern: /import\s+\{\s*someOtherImport\s*\}\s+from\s+['"](\.\.\/)+someOtherPath['"];?/g,
+  //   replacement: 'import { someOtherImport } from "@/someOtherPath";',
+  //   description: 'Fix someOtherImport imports to use absolute path'
+  // }
+]
+
+// Recursively find all TypeScript files in a directory
+async function findTsFiles(dir, files = []) {
+  const items = await readdir(dir)
+
+  for (const item of items) {
+    const fullPath = join(dir, item)
+    const stats = await stat(fullPath)
+
+    if (stats.isDirectory()) {
+      await findTsFiles(fullPath, files)
+    } else if (item.endsWith(".ts") || item.endsWith(".tsx")) {
+      files.push(fullPath)
+    }
+  }
+
+  return files
+}
+
+// Process a single file with all replacement patterns
+async function processFile(filePath) {
+  const content = await readFile(filePath, "utf8")
+  let modifiedContent = content
+  let hasChanges = false
+
+  for (const replacement of IMPORT_REPLACEMENTS) {
+    const newContent = modifiedContent.replace(replacement.pattern, replacement.replacement)
+    if (newContent !== modifiedContent) {
+      hasChanges = true
+      modifiedContent = newContent
+    }
+  }
+
+  if (hasChanges) {
+    await writeFile(filePath, modifiedContent, "utf8")
+    return true
+  }
+
+  return false
+}
+
+// Create the index.ts file for pothos-crud directory
+async function createPothosCrudIndex() {
+  const pothosCrudDir = "./src/generated/graphql/pothos-crud"
+  const indexFilePath = join(pothosCrudDir, "index.ts")
+
+  const indexContent = `// Re-export everything from autocrud.ts to make it available as a namespace
+export * from './autocrud';
+`
+
+  await writeFile(indexFilePath, indexContent, "utf8")
+  return true
+}
+
+// Main function to process all generated files
+async function fixGeneratedImports() {
+  const generatedDir = "./src/generated"
+
+  // First, create the index.ts file for pothos-crud
+  await createPothosCrudIndex()
+
+  const tsFiles = await findTsFiles(generatedDir)
+
+  for (const file of tsFiles) {
+    await processFile(file)
+  }
+}
 
 export const crud = {
   outputDir: `./src/generated/graphql/pothos-crud`,
@@ -8,116 +92,22 @@ export const crud = {
   excludeResolversContain: [],
   prismaCaller: "db",
   disabled: false,
-  inputsImporter: `import * as Inputs from "@/generated/graphql/pothos-inputs"`,
+  inputsImporter: `import { GraphQLInputs as Inputs } from "@repo/database"`,
   deleteOutputDirBeforeGenerate: true,
   exportEverythingInObjectsDotTs: false,
-  prismaImporter: `import { Prisma } from '@prisma/client';`,
+  prismaImporter: `import { Prisma } from "@repo/database";`,
   resolverImports: `\nimport { db } from "@repo/database";`,
+  builderImporter: `import { builder } from "@/builder"`,
 }
 
 export const inputs = {
   outputFilePath: `./src/generated/graphql/pothos-inputs.ts`,
   prismaImporter: `import { Prisma } from "@repo/database";`,
-  prismaCaller: "Prisma",
+  prismaCaller: "db",
+  builderImporter: `import { builder } from "@/builder"`,
 }
 
 export const global = {
-  afterGenerate: () => {
-    // Get all generated files that might contain the incorrect import
-    const files = glob.sync(`./src/generated/graphql/pothos-crud/**/*.ts`)
-
-    // Also include the pothos-inputs.ts file
-    const inputsFile = `./src/generated/graphql/pothos-inputs.ts`
-    if (glob.sync(inputsFile).length > 0) {
-      files.push(inputsFile)
-    }
-
-    // Also include the pothos-types.ts file
-    const typesFile = `./src/generated/graphql/pothos-types.ts`
-    if (glob.sync(typesFile).length > 0) {
-      files.push(typesFile)
-    }
-
-    // Define the regular expression to find and replace the incorrect builder import
-    const wrongBuilderImportRegex =
-      /import { builder } from ['"]([./]+builder|[./]*@\/builder)['"];/g
-    const correctBuilderImport = `import { builder } from "@/builder";`
-
-    // Define regex to fix the inputs import issue
-    // const wrongInputsImportRegex = /import \* as Inputs from ["']([./]+)pothos-inputs["'];/g
-    // const correctInputsImport = `import * as Inputs from "@/generated/graphql/pothos-inputs";`
-
-    // Define regex to fix client imports
-    // const wrongClientImportRegex = /import { db } from ["']([./]+)client["'];/g
-    // const correctClientImport = `import { db } from "@repo/database/client";`
-
-    // Loop through each file and fix the imports
-    for (const file of files) {
-      let content = readFileSync(file, "utf8")
-      let modified = false
-
-      // Add @ts-nocheck at the top if not already present
-      if (!content.startsWith("// @ts-nocheck")) {
-        content = "// @ts-nocheck\n" + content
-        modified = true
-      }
-
-      if (wrongBuilderImportRegex.test(content)) {
-        content = content.replace(wrongBuilderImportRegex, correctBuilderImport)
-        modified = true
-      }
-
-      // Fix inputs imports
-      // if (wrongInputsImportRegex.test(content)) {
-      //   content = content.replace(wrongInputsImportRegex, correctInputsImport)
-      //   modified = true
-      // }
-
-      // Fix client imports
-      // if (wrongClientImportRegex.test(content)) {
-      //   content = content.replace(wrongClientImportRegex, correctClientImport)
-      //   modified = true
-      // }
-
-      if (modified) {
-        writeFileSync(file, content, "utf8")
-      }
-    }
-
-    // Create index.d.ts for TypeScript declarations
-    const indexDtsContent = `// Type declarations for generated Pothos CRUD code
-// This bypasses TypeScript compilation issues with generated files
-
-export declare function generateAllCrud(opts?: CrudOptions): void
-export declare function generateAllObjects(opts?: CrudOptions): any[]
-export declare function generateAllQueries(opts?: CrudOptions): void
-export declare function generateAllMutations(opts?: CrudOptions): void
-export declare function generateAllResolvers(opts?: CrudOptions): void
-
-export interface CrudOptions {
-  include?: string[]
-  exclude?: string[]
-  handleResolver?: (props: {
-    modelName: string
-    field: any
-    operationName: string
-    resolverName: string
-    t: any
-    isPrismaField: boolean
-    type: "Query" | "Mutation"
-  }) => any
-}
-`
-
-    // Create index.js for runtime re-export
-    const indexJsContent = `// Runtime re-export of the autocrud implementation
-// This allows the code to run while TypeScript uses the .d.ts declarations
-
-export * from './autocrud.js'
-`
-
-    // Write the index files
-    writeFileSync(`./src/generated/graphql/pothos-crud/index.d.ts`, indexDtsContent, "utf8")
-    writeFileSync(`./src/generated/graphql/pothos-crud/index.js`, indexJsContent, "utf8")
-  },
+  builderImporter: `import { builder } from "@/builder"`,
+  afterGenerate: fixGeneratedImports,
 }

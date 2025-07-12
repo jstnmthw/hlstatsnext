@@ -10,7 +10,7 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src/ --max-warnings 0",
     "clean": "rm -rf node_modules dist .turbo src/generated",
-    "db:generate": "echo 'Generating database types...'"
+    "db:generate": "cp -r ../../packages/database/src/generated/graphql ./src/generated"
   },
   "dependencies": {
     "@graphql-tools/schema": "^10.0.23",

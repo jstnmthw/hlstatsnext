@@ -2,77 +2,32 @@ import SchemaBuilder from "@pothos/core"
 import PrismaPlugin from "@pothos/plugin-prisma"
 import RelayPlugin from "@pothos/plugin-relay"
 import WithInputPlugin from "@pothos/plugin-with-input"
-import { db } from "@repo/database/client"
+import { db, Prisma } from "@repo/database/client"
 import type PrismaTypes from "@repo/database/graphql/types"
 import type { Context } from "./context"
 
 export const builder = new SchemaBuilder<{
   Context: Context
   PrismaTypes: PrismaTypes
+  Scalars: {
+    Decimal: { Input: Prisma.Decimal; Output: Prisma.Decimal }
+    DateTime: { Input: Date; Output: Date }
+    Json: { Input: Prisma.InputJsonValue; Output: Prisma.JsonValue }
+  }
 }>({
   plugins: [PrismaPlugin, RelayPlugin, WithInputPlugin],
   prisma: {
     client: db,
-    // defaults to false, uses /// comments from prisma schema as descriptions
-    // for object types, relations and exposed fields.
-    // descriptions can be omitted by setting description to false
     exposeDescriptions: true,
-    // use where clause from prismaRelatedConnection for totalCount (defaults to true)
-    filterConnectionTotalCount: true,
-    // warn when not using a query parameter correctly
     onUnusedQuery: process.env.NODE_ENV === "production" ? null : "warn",
   },
 })
 
-// Add base types
+// Add types
 builder.queryType({})
 
-// Add mutation type with a placeholder field
-builder.mutationType({
-  fields: (t) => ({
-    // Placeholder mutation - will be replaced with actual mutations later
-    _placeholder: t.string({
-      resolve: () => "Mutations will be implemented in future phases",
-    }),
-  }),
-})
+// Add mutations
+builder.mutationType({})
 
-// Add subscription type with a placeholder field
-builder.subscriptionType({
-  fields: (t) => ({
-    // Placeholder subscription - will be replaced with actual subscriptions later
-    _placeholder: t.string({
-      subscribe: () => {
-        // Simple async generator that yields once
-        return (async function* () {
-          yield "Subscriptions will be implemented in future phases"
-        })()
-      },
-      resolve: (value) => value,
-    }),
-  }),
-})
-
-// Newer Options
-// import { db } from "./client"
-// import { Prisma } from "./client"
-// import SchemaBuilder from "@pothos/core"
-// import PrismaPlugin from "@pothos/plugin-prisma"
-// import PrismaTypes from "../generated/graphql/pothos-types"
-
-// export const builder = new SchemaBuilder<{
-//   PrismaTypes: PrismaTypes
-//   Scalars: {
-//     Decimal: { Input: Prisma.Decimal; Output: Prisma.Decimal }
-//     DateTime: { Input: Date; Output: Date }
-//     Json: { Input: Prisma.InputJsonValue; Output: Prisma.JsonValue }
-//   }
-//   Context: {
-//     prisma: typeof db
-//   }
-// }>({
-//   plugins: [PrismaPlugin],
-//   prisma: {
-//     client: db,
-//   },
-// })
+// Add subscriptions
+builder.subscriptionType({})

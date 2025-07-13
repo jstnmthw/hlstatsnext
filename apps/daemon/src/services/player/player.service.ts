@@ -2,7 +2,7 @@ import { DatabaseClient, databaseClient as defaultDb } from "@/database/client"
 import type { SkillRating } from "@/services/processor/handlers/ranking.handler"
 import type { ILogger } from "@/utils/logger.types"
 import { logger as defaultLogger } from "@/utils/logger"
-import type { Player } from "@repo/database"
+import type { Player } from "@repo/database/client"
 import type { IPlayerService } from "./player.types"
 
 /**

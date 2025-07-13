@@ -1,5 +1,5 @@
 import type { SkillRating } from "@/services/processor/handlers/ranking.handler"
-import type { Player } from "@repo/database"
+import type { Player } from "@repo/database/client"
 
 export interface IPlayerService {
   getPlayerRating(playerId: number): Promise<SkillRating>

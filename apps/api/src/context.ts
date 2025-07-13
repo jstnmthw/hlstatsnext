@@ -1,4 +1,4 @@
-import { db } from "@repo/database"
+import { db } from "@repo/database/client"
 
 /**
  * GraphQL context interface with strict typing

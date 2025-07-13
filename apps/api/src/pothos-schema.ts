@@ -1,11 +1,12 @@
-import { builder, GraphQL } from "@repo/database"
+import { builder } from "./builder"
+import { generateAllCrud } from "@repo/database/graphql/crud"
 
 // Define the base Query and Mutation types first
 builder.queryType({})
 builder.mutationType({})
 
 // Generate all CRUD operations
-GraphQL.generateAllCrud()
+generateAllCrud()
 
 // Define HealthStatus type
 const HealthStatus = builder.objectRef<{

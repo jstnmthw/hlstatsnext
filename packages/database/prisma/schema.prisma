@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated"
+  output   = "../generated"
 }
 
 datasource db {
@@ -14,12 +14,12 @@ datasource db {
 generator pothos {
   provider     = "prisma-pothos-types"
   clientImport = "../generated"
-  output       = "../src/generated/graphql/pothos-types.ts"
+  output       = "../generated/graphql/pothos-types.ts"
 }
 
 generator pothosCodegen {
   provider            = "prisma-generator-pothos-codegen"
-  generatorConfigPath = "../src/pothos.config.js"
+  generatorConfigPath = "../src/pothos.config.mjs"
 }
 
 // GeoIP Tables

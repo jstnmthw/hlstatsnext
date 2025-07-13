@@ -27,7 +27,7 @@ export const builder = new SchemaBuilder<{
 builder.queryType({})
 
 // Add mutations
-builder.mutationType({})
+// builder.mutationType({})
 
 // Add subscriptions
-builder.subscriptionType({})
+// builder.subscriptionType({})

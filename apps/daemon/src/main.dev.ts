@@ -22,7 +22,7 @@ import { logger } from "./utils/logger"
   })
 
   await ingress.start()
-  logger.ready("🚀 DEV daemon initialised; log processing active on port 27500")
+  logger.ready("🚀 DEV daemon initialized; log processing active on port 27500")
 
   process.on("SIGINT", async () => {
     await ingress.stop()

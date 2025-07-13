@@ -6,7 +6,7 @@
  *
  */
 
-import { db, type PrismaClient } from "@repo/database"
+import { db, type PrismaClient } from "@repo/database/client"
 
 export type TransactionalPrisma = Omit<
   PrismaClient,

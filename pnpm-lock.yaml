@@ -37,7 +37,7 @@ importers:
         version: 4.6.2(graphql@16.11.0)
       '@pothos/plugin-prisma':
         specifier: ^4.8.2
-        version: 4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.11.0(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3)
+        version: 4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3)
       '@pothos/plugin-relay':
         specifier: ^4.4.2
         version: 4.4.2(@pothos/core@4.6.2(graphql@16.11.0))(graphql@16.11.0)
@@ -210,8 +210,8 @@ importers:
   packages/database:
     dependencies:
       '@prisma/client':
-        specifier: ^6.10.0
-        version: 6.11.0(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3)
+        specifier: ^6.11.1
+        version: 6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3)
       dbgate-query-splitter:
         specifier: ^4.11.5
         version: 4.11.5
@@ -227,7 +227,7 @@ importers:
         version: 4.6.2(graphql@16.11.0)
       '@pothos/plugin-prisma':
         specifier: ^4.8.2
-        version: 4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.11.0(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3)
+        version: 4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3)
       '@pothos/plugin-relay':
         specifier: ^4.4.2
         version: 4.4.2(@pothos/core@4.6.2(graphql@16.11.0))(graphql@16.11.0)
@@ -251,7 +251,7 @@ importers:
         version: 11.0.3
       prisma-generator-pothos-codegen:
         specifier: ^0.7.1
-        version: 0.7.1(@pothos/core@4.6.2(graphql@16.11.0))(@pothos/plugin-prisma@4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.11.0(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3))(@prisma/client@6.11.0(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(prisma@6.11.1(typescript@5.8.3))
+        version: 0.7.1(@pothos/core@4.6.2(graphql@16.11.0))(@pothos/plugin-prisma@4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3))(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(prisma@6.11.1(typescript@5.8.3))
       ts-deepmerge:
         specifier: ^7.0.3
         version: 7.0.3
@@ -1512,8 +1512,8 @@ packages:
       '@pothos/core': '*'
       graphql: '>=16.6.0'
 
-  '@prisma/client@6.11.0':
-    resolution: {integrity: sha512-K9TkKepOYvCOg3qCuKz7ZHf6rf58BFKi08plKjU4qVv9y7/UxO6tLz7PlWcgODUZKURLPmRHjHERffIx/8az4w==}
+  '@prisma/client@6.11.1':
+    resolution: {integrity: sha512-5CLFh8QP6KxRm83pJ84jaVCeSVPQr8k0L2SEtOJHwdkS57/VQDcI/wQpGmdyOZi+D9gdNabdo8tj1Uk+w+upsQ==}
     engines: {node: '>=18.18'}
     peerDependencies:
       prisma: '*'
@@ -5695,10 +5695,10 @@ snapshots:
     dependencies:
       graphql: 16.11.0
 
-  '@pothos/plugin-prisma@4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.11.0(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3)':
+  '@pothos/plugin-prisma@4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3)':
     dependencies:
       '@pothos/core': 4.6.2(graphql@16.11.0)
-      '@prisma/client': 6.11.0(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3)
+      '@prisma/client': 6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3)
       '@prisma/generator-helper': 6.8.2
       graphql: 16.11.0
       typescript: 5.8.3
@@ -5713,7 +5713,7 @@ snapshots:
       '@pothos/core': 4.6.2(graphql@16.11.0)
       graphql: 16.11.0
 
-  '@prisma/client@6.11.0(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3)':
+  '@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3)':
     optionalDependencies:
       prisma: 6.11.1(typescript@5.8.3)
       typescript: 5.8.3
@@ -8113,11 +8113,11 @@ snapshots:
 
   prettier@3.6.0: {}
 
-  prisma-generator-pothos-codegen@0.7.1(@pothos/core@4.6.2(graphql@16.11.0))(@pothos/plugin-prisma@4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.11.0(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3))(@prisma/client@6.11.0(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(prisma@6.11.1(typescript@5.8.3)):
+  prisma-generator-pothos-codegen@0.7.1(@pothos/core@4.6.2(graphql@16.11.0))(@pothos/plugin-prisma@4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3))(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(prisma@6.11.1(typescript@5.8.3)):
     dependencies:
       '@pothos/core': 4.6.2(graphql@16.11.0)
-      '@pothos/plugin-prisma': 4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.11.0(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3)
-      '@prisma/client': 6.11.0(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3)
+      '@pothos/plugin-prisma': 4.8.2(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3)
+      '@prisma/client': 6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3)
       '@prisma/generator-helper': 5.17.0
       prisma: 6.11.1(typescript@5.8.3)
 

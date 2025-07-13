@@ -2,7 +2,6 @@
   "name": "@repo/database",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "check-types": "tsc --noEmit",
@@ -22,7 +21,7 @@
     "lint:fix": "eslint src/**/*.ts --fix"
   },
   "dependencies": {
-    "@prisma/client": "^6.10.0",
+    "@prisma/client": "^6.11.1",
     "dbgate-query-splitter": "^4.11.5",
     "prisma": "^6.11.1"
   },
@@ -44,7 +43,11 @@
     "typescript": "^5.8.3"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./builder": "./src/builder.ts"
+    "./client": "./src/client.ts",
+    "./seed": "./src/seed.ts",
+    "./reset": "./src/reset.ts",
+    "./graphql/types": "./generated/graphql/pothos-types.ts",
+    "./graphql/inputs": "./generated/graphql/pothos-inputs.ts",
+    "./graphql/crud": "./generated/graphql/pothos-inputs/autocrud.ts"
   }
 }

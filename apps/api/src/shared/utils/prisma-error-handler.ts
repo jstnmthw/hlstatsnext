@@ -1,4 +1,4 @@
-import type { Prisma } from "@repo/database"
+import type { Prisma } from "@repo/database/client"
 
 /**
  * Type guard to check if an error is a Prisma known request error

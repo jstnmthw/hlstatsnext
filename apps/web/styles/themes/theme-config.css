@@ -1,0 +1,25 @@
+/* Theme Configuration
+ * 
+ * To switch themes, comment out the current theme import and uncomment the desired theme.
+ * Only ONE theme should be imported at a time.
+ */
+
+/* === SINGLE COLOR SCHEME THEMES === */
+/* These themes use one color scheme regardless of system preference */
+/*@import "./light.css"; /* Light theme */
+@import "./dark.css"; /* Dark theme */
+/* @import "./blue.css"; */ /* Blue theme */
+/* @import "./green.css"; */ /* Green theme */
+
+/* === LIGHT/DARK VARIANT THEMES === */
+/* These themes have separate light and dark versions */
+/* @import "./ocean-light.css"; */ /* Ocean theme - Light variant */
+/* @import "./ocean-dark.css"; */ /* Ocean theme - Dark variant */
+
+/* === ADAPTIVE THEMES === */
+/* These themes automatically switch based on system preference */
+/* @import "./ocean-adaptive.css"; */ /* Ocean theme - Auto light/dark */
+
+/* === CUSTOM THEMES === */
+/* Add your custom themes here */
+/* @import "./custom-theme.css"; */

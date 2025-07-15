@@ -1,5 +1,6 @@
 @import "@repo/tailwind-config";
 @import "@repo/ui/globals.css";
+
 @import "../styles/themes/theme-config.css";
 
 /* Base configuration - applies to all themes */
@@ -51,4 +52,12 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-geist-sans);
+  font-size: var(--font-size-base);
+}
+
+/* Fix border utility to use theme border color by default */
+@layer utilities {
+  .border {
+    border-color: var(--color-border);
+  }
 }

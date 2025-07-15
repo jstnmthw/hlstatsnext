@@ -18,6 +18,10 @@
       "types": "./dist/components/breadcrumb.d.ts",
       "import": "./dist/components/breadcrumb.js"
     },
+    "./icons": {
+      "types": "./dist/icons.d.ts",
+      "import": "./dist/icons.js"
+    },
     "./lib/utils": {
       "types": "./dist/lib/utils.d.ts",
       "import": "./dist/lib/utils.js"

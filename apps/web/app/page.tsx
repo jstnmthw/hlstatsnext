@@ -1,13 +1,15 @@
-import { Header } from "@/components/layout/header"
-import { GameList } from "@/components/game-list"
+import { Header } from "@/features/common/header"
+import { Footer } from "@/features/common/footer"
+import { MainContent } from "@/features/common/main-content"
 
 export default function Page() {
   return (
     <>
       <Header />
-      <main className="flex flex-col items-center justify-between min-h-screen p-24">
-        <GameList />
-      </main>
+      <MainContent>
+        <h1>Hello World</h1>
+      </MainContent>
+      <Footer />
     </>
   )
 }

@@ -4,6 +4,7 @@ import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
 import { activeServers } from "@/lib/mock"
 import { cn } from "@repo/ui/lib/utils"
+import { Button } from "@repo/ui/button"
 
 export const metadata = {
   title: "Welcome to " + process.env.NEXT_PUBLIC_APP_NAME,
@@ -22,20 +23,27 @@ export default function Page() {
             </h2>
             <ul>
               {activeServers.map((server) => (
-                <li key={server.id} className="border-b border-border py-1.5">
+                <li key={server.id} className="border-b border-border py-1.5 hover:bg-muted/25">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div
-                        className={cn(
-                          "w-2 h-2 rounded-full mx-3",
-                          server.status === "online" ? "bg-emerald-500" : "bg-red-500/50",
-                        )}
-                      />
-                      <div className="flex flex-col">
-                        <span className="text-sm">{server.name}</span>
-                        <span className="text-xs text-muted-foreground font-mono">
-                          {server.map} {server.players}
-                        </span>
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center">
+                        <div
+                          className={cn(
+                            "w-2 h-2 rounded-full mx-3",
+                            server.status === "online" ? "bg-emerald-500" : "bg-red-500/50",
+                          )}
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-sm">{server.name}</span>
+                          <span className="text-xs text-muted-foreground font-mono">
+                            {server.map} {server.players}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center px-3">
+                        <Button variant="outline" className="text-xs cursor-pointer" size="sm">
+                          Join
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -43,7 +51,6 @@ export default function Page() {
               ))}
             </ul>
           </div>
-          <div className="col-span-1 border rounded-lg p-2">Sidebar</div>
         </div>
       </MainContent>
       <Footer />

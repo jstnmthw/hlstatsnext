@@ -18,12 +18,10 @@ export default function Page() {
       <MainContent fixedHeader>
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-2 border rounded-lg">
-            <h2 className="uppercase tracking-tight text-xs font-bold p-2 border-b border-border">
-              Game Servers
-            </h2>
+            <h2 className="uppercase tracking-tight text-xs font-bold p-2">Game Servers</h2>
             <ul>
               {activeServers.map((server) => (
-                <li key={server.id} className="border-b border-border py-1.5 hover:bg-muted/25">
+                <li key={server.id} className="border-t border-border py-1.5 hover:bg-muted/25">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center justify-between w-full">
                       <div className="flex items-center">

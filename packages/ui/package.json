@@ -11,8 +11,7 @@
   ],
   "exports": {
     "./globals.css": "./dist/index.css",
-    "./*": "./dist/*.js",
-    "./utils": "./dist/lib/utils.js"
+    "./*": "./dist/*.js"
   },
   "scripts": {
     "build:styles": "tailwindcss -i ./src/globals.css -o ./dist/index.css",

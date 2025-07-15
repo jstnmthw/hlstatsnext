@@ -5,6 +5,7 @@ import { PageWrapper } from "@/features/common/components/page-wrapper"
 import { activeServers } from "@/lib/mock"
 import { cn } from "@repo/ui/lib/utils"
 import { Button } from "@repo/ui/button"
+import { PlayIcon } from "@repo/ui/icons"
 
 export const metadata = {
   title: "Welcome to " + process.env.NEXT_PUBLIC_APP_NAME,
@@ -40,6 +41,7 @@ export default function Page() {
                       </div>
                       <div className="flex items-center px-3">
                         <Button variant="outline" className="text-xs cursor-pointer" size="sm">
+                          <PlayIcon className="size-3" />
                           Join
                         </Button>
                       </div>

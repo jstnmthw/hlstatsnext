@@ -32,52 +32,12 @@ export abstract class BaseParser {
   abstract canParse(logLine: string): boolean
 
   /**
-   * Extract basic event information from a log line
+   * Get current timestamp for real-time event processing
+   * For real-time statistics, we use the current time instead of parsing
+   * game server timestamps to avoid timezone conversion issues.
    */
-  protected extractBasicInfo(logLine: string): {
-    timestamp: Date
-    content: string
-  } {
-    // Match HLStats timestamp format: L MM/DD/YYYY - HH:MM:SS:
-    const timestampMatch = logLine.match(/^L (\d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}):\s*(.*)/)
-
-    if (!timestampMatch || timestampMatch.length < 3) {
-      throw new Error("Invalid log line format - missing timestamp")
-    }
-
-    const timestampStr = timestampMatch[1]!
-    const content = timestampMatch[2]!
-    const timestamp = this.parseTimestamp(timestampStr)
-
-    return { timestamp, content }
-  }
-
-  /**
-   * Parse timestamp from HLStats format
-   */
-  private parseTimestamp(timestampStr: string): Date {
-    // Format: MM/DD/YYYY - HH:MM:SS
-    const match = timestampStr.match(/(\d{2})\/(\d{2})\/(\d{4}) - (\d{2}):(\d{2}):(\d{2})/)
-
-    if (!match || match.length < 7) {
-      throw new Error(`Invalid timestamp format: ${timestampStr}`)
-    }
-
-    const month = match[1]!
-    const day = match[2]!
-    const year = match[3]!
-    const hour = match[4]!
-    const minute = match[5]!
-    const second = match[6]!
-
-    return new Date(
-      parseInt(year, 10),
-      parseInt(month, 10) - 1, // Month is 0-indexed
-      parseInt(day, 10),
-      parseInt(hour, 10),
-      parseInt(minute, 10),
-      parseInt(second, 10),
-    )
+  protected getCurrentTimestamp(): Date {
+    return new Date()
   }
 
   /**

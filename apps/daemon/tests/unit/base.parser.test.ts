@@ -23,8 +23,8 @@ class TestParser extends BaseParser {
   }
 
   // Expose protected methods for testing
-  public extractBasicInfoPublic(logLine: string) {
-    return this.extractBasicInfo(logLine)
+  public getCurrentTimestampPublic(): Date {
+    return this.getCurrentTimestamp()
   }
 
   public parsePlayerInfoPublic(playerStr: string) {
@@ -55,43 +55,15 @@ class TestParser extends BaseParser {
 describe("BaseParser", () => {
   const parser = new TestParser()
 
-  describe("extractBasicInfo", () => {
-    it("should extract timestamp and content from valid log line", () => {
-      const logLine = 'L 06/28/2025 - 08:42:47: World triggered "Round_Start"'
-      const result = parser.extractBasicInfoPublic(logLine)
+  describe("getCurrentTimestamp", () => {
+    it("should return current timestamp", () => {
+      const before = new Date()
+      const timestamp = parser.getCurrentTimestampPublic()
+      const after = new Date()
 
-      expect(result.timestamp).toBeInstanceOf(Date)
-      expect(result.timestamp.getFullYear()).toBe(2025)
-      expect(result.timestamp.getMonth()).toBe(5) // June (0-indexed)
-      expect(result.timestamp.getDate()).toBe(28)
-      expect(result.timestamp.getHours()).toBe(8)
-      expect(result.timestamp.getMinutes()).toBe(42)
-      expect(result.timestamp.getSeconds()).toBe(47)
-      expect(result.content).toBe('World triggered "Round_Start"')
-    })
-
-    it("should throw error for invalid log line format", () => {
-      const invalidLines = [
-        "",
-        "Invalid line without timestamp",
-        "L 06/28/2025",
-        "06/28/2025 - 08:42:47: Missing L prefix",
-      ]
-
-      invalidLines.forEach((line) => {
-        expect(() => parser.extractBasicInfoPublic(line)).toThrow("Invalid log line format")
-      })
-    })
-
-    it("should throw error for malformed timestamp", () => {
-      const malformedLines = [
-        "L invalid-timestamp: content",
-        // Note: JavaScript Date constructor is quite lenient, so most formats don't throw
-      ]
-
-      malformedLines.forEach((line) => {
-        expect(() => parser.extractBasicInfoPublic(line)).toThrow()
-      })
+      expect(timestamp).toBeInstanceOf(Date)
+      expect(timestamp.getTime()).toBeGreaterThanOrEqual(before.getTime())
+      expect(timestamp.getTime()).toBeLessThanOrEqual(after.getTime())
     })
   })
 
@@ -264,7 +236,6 @@ describe("BaseParser", () => {
 
   describe("Edge Cases and Error Handling", () => {
     it("should handle empty strings gracefully", () => {
-      expect(() => parser.extractBasicInfoPublic("")).toThrow()
       expect(parser.parsePositionPublic("")).toBeUndefined()
       expect(parser.isValidWeaponPublic("")).toBe(false)
       expect(parser.sanitizeStringPublic("")).toBe("")
@@ -273,7 +244,6 @@ describe("BaseParser", () => {
 
     it("should handle null and undefined gracefully", () => {
       // These should throw or handle gracefully depending on implementation
-      expect(() => parser.extractBasicInfoPublic(null as unknown as string)).toThrow()
       expect(() => parser.parsePlayerInfoPublic(undefined as unknown as string)).toThrow()
     })
 
@@ -285,18 +255,18 @@ describe("BaseParser", () => {
   })
 
   describe("Performance Tests", () => {
-    it("should handle batch parsing efficiently", () => {
-      const logLines = Array.from(
-        { length: 1000 },
-        (_, i) => `L 06/28/2025 - 08:42:${String(i % 60).padStart(2, "0")}: Event ${i}`,
-      )
-
+    it("should handle timestamp generation efficiently", () => {
       const start = Date.now()
-      logLines.forEach((line) => parser.extractBasicInfoPublic(line))
+
+      // Generate 1000 timestamps
+      for (let i = 0; i < 1000; i++) {
+        parser.getCurrentTimestampPublic()
+      }
+
       const duration = Date.now() - start
 
-      // Should process 1000 lines in under 1 second
-      expect(duration).toBeLessThan(1000)
+      // Should generate 1000 timestamps in under 100ms
+      expect(duration).toBeLessThan(100)
     })
   })
 })

@@ -12,8 +12,8 @@ export const metadata = {
 export default function Page() {
   return (
     <PageWrapper>
-      <Header fixed />
-      <MainContent fixedHeader>
+      <Header />
+      <MainContent>
         <div className="grid grid-cols-3 gap-4">
           <ServerList />
         </div>

@@ -10,18 +10,15 @@ import {
 } from "@/features/common/components/vertical-list"
 
 const GET_SERVERS_QUERY = graphql(`
-  query GetServersList {
-    findManyServer(where: { act_players: { gte: 0 } }, orderBy: { act_players: desc }, take: 10) {
-      serverId
-      name
+  query GetServersWithStatus {
+    serversStatus {
+      id
       address
       port
-      act_players
-      max_players
-      act_map
-      game
-      city
-      country
+      name
+      isOnline
+      lastActivity
+      playerCount
     }
   }
 `)
@@ -31,23 +28,31 @@ export async function ServerList() {
 
   return (
     <VerticalList>
-      <VerticalListHeader>Active Game Servers</VerticalListHeader>
+      <VerticalListHeader>Game Servers</VerticalListHeader>
       <ul>
-        {data.findManyServer.map((server) => (
-          <VerticalListItem key={server.serverId}>
+        {JSON.stringify(data)}
+        {data.serversStatus?.map((server) => (
+          <VerticalListItem key={server.id}>
             <div className="flex items-center justify-between">
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center">
                   <div
                     className={cn(
                       "w-2 h-2 rounded-full mx-3",
-                      server.act_players > 0 ? "bg-emerald-500" : "bg-red-500/50",
+                      server.isOnline ? "bg-emerald-500" : "bg-red-500/50",
                     )}
                   />
                   <div className="flex flex-col">
-                    <span className="text-sm">{server.name}</span>
+                    <span className="text-sm">
+                      {server.name || `${server.address}:${server.port}`}
+                    </span>
                     <span className="text-xs text-muted-foreground font-mono">
-                      {server.act_map || "Unknown"} {server.act_players}/{server.max_players}
+                      {server.playerCount} player{server.playerCount !== 1 ? "s" : ""} online
+                      {server.lastActivity && (
+                        <span className="ml-2">
+                          • Last activity: {new Date(server.lastActivity).toLocaleTimeString()}
+                        </span>
+                      )}
                     </span>
                   </div>
                 </div>

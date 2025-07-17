@@ -27,10 +27,9 @@ export async function ServerList() {
   const { data } = await query({ query: GET_SERVERS_QUERY })
 
   return (
-    <VerticalList>
+    <VerticalList className="mb-10">
       <VerticalListHeader>Game Servers</VerticalListHeader>
       <ul>
-        {JSON.stringify(data)}
         {data.serversStatus?.map((server) => (
           <VerticalListItem key={server.id}>
             <div className="flex items-center justify-between">

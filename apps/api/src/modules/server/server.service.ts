@@ -82,7 +82,9 @@ export class ServerService {
   }
 
   /**
-   * Get all servers with their online status
+   * Get servers with their online status, ordered by most recent activity
+   * A server is considered online if it has any events within the last 5 minutes
+   * Returns up to 10 servers ordered by most recent activity
    */
   async getServersWithStatus(): Promise<Result<ServerWithStatus[], AppError>> {
     try {
@@ -90,6 +92,21 @@ export class ServerService {
         include: {
           _count: {
             select: {
+              // Count all recent events across all event types to determine activity
+              eventsChat: {
+                where: {
+                  eventTime: {
+                    gte: new Date(Date.now() - 5 * 60 * 1000), // Last 5 minutes
+                  },
+                },
+              },
+              eventsFrag: {
+                where: {
+                  eventTime: {
+                    gte: new Date(Date.now() - 5 * 60 * 1000), // Last 5 minutes
+                  },
+                },
+              },
               eventsConnect: {
                 where: {
                   eventTime: {
@@ -104,27 +121,81 @@ export class ServerService {
 
       const serversWithStatus = await Promise.all(
         servers.map(async (server) => {
-          const lastEvent = await this.db.eventConnect.findFirst({
-            where: { serverId: server.serverId },
-            orderBy: { eventTime: "desc" },
-            select: { eventTime: true },
-          })
+          // Check if server has any recent activity across all event types
+          const hasRecentActivity =
+            server._count.eventsChat > 0 ||
+            server._count.eventsFrag > 0 ||
+            server._count.eventsConnect > 0
 
-          const recentPlayerCount = await this.getRecentPlayerCount(server.serverId)
+          // Get the most recent event across all event types for all servers
+          // This is needed for proper sorting by activity
+          const [lastChat, lastFrag, lastConnect] = await Promise.all([
+            this.db.eventChat.findFirst({
+              where: { serverId: server.serverId },
+              orderBy: { eventTime: "desc" },
+              select: { eventTime: true },
+            }),
+            this.db.eventFrag.findFirst({
+              where: { serverId: server.serverId },
+              orderBy: { eventTime: "desc" },
+              select: { eventTime: true },
+            }),
+            this.db.eventConnect.findFirst({
+              where: { serverId: server.serverId },
+              orderBy: { eventTime: "desc" },
+              select: { eventTime: true },
+            }),
+          ])
+
+          // Find the most recent event across all types
+          const allEvents = [lastChat, lastFrag, lastConnect]
+            .filter((event) => event?.eventTime)
+            .map((event) => event!.eventTime!)
+
+          const lastActivity =
+            allEvents.length > 0 ? allEvents.sort((a, b) => b.getTime() - a.getTime())[0]! : null
+
+          // Only get player count for servers with recent activity to optimize performance
+          const recentPlayerCount = hasRecentActivity
+            ? await this.getRecentPlayerCount(server.serverId)
+            : 0
 
           return {
             id: server.serverId.toString(),
             address: server.address,
             port: server.port,
             name: server.name,
-            isOnline: server._count.eventsConnect > 0,
-            lastActivity: lastEvent?.eventTime || null,
+            isOnline: hasRecentActivity,
+            lastActivity,
             playerCount: recentPlayerCount,
           }
         }),
       )
 
-      return success(serversWithStatus)
+      // Sort by most recent activity (online servers first, then by last activity)
+      // Servers with no activity go to the end
+      const sortedServers = serversWithStatus.sort((a, b) => {
+        // Online servers first
+        if (a.isOnline && !b.isOnline) return -1
+        if (!a.isOnline && b.isOnline) return 1
+
+        // Among servers of same online status, sort by last activity
+        if (a.lastActivity && b.lastActivity) {
+          return b.lastActivity.getTime() - a.lastActivity.getTime()
+        }
+
+        // Servers with activity come before servers without
+        if (a.lastActivity && !b.lastActivity) return -1
+        if (!a.lastActivity && b.lastActivity) return 1
+
+        // If both have no activity, sort by server name for consistency
+        return a.name.localeCompare(b.name)
+      })
+
+      // Take only the top 10 most active servers
+      const topServers = sortedServers.slice(0, 10)
+
+      return success(topServers)
     } catch (error) {
       console.error(error)
       return failure({

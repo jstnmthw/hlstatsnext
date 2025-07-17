@@ -82,7 +82,7 @@ export class CsParser extends BaseParser {
     const ipAddress = match[3]!
     const isBot = steamId.toUpperCase() === "BOT"
 
-    const { timestamp } = this.extractBasicInfo(logLine)
+    const timestamp = this.getCurrentTimestamp()
 
     const event: PlayerConnectEvent = {
       eventType: EventType.PLAYER_CONNECT,
@@ -119,7 +119,7 @@ export class CsParser extends BaseParser {
 
     const reason = match[3]
 
-    const { timestamp } = this.extractBasicInfo(logLine)
+    const timestamp = this.getCurrentTimestamp()
 
     const event: PlayerDisconnectEvent = {
       eventType: EventType.PLAYER_DISCONNECT,
@@ -156,7 +156,7 @@ export class CsParser extends BaseParser {
     // Skip if this is a teamkill (same team)
     if (killerTeam === victimTeam) return null
 
-    const { timestamp } = this.extractBasicInfo(logLine)
+    const timestamp = this.getCurrentTimestamp()
 
     const event: PlayerKillEvent = {
       eventType: EventType.PLAYER_KILL,
@@ -206,7 +206,7 @@ export class CsParser extends BaseParser {
     const team = match[3]!
     const weapon = match[4]!
 
-    const { timestamp } = this.extractBasicInfo(logLine)
+    const timestamp = this.getCurrentTimestamp()
 
     const event: PlayerSuicideEvent = {
       eventType: EventType.PLAYER_SUICIDE,
@@ -253,7 +253,7 @@ export class CsParser extends BaseParser {
     // Only process if same team (teamkill)
     if (killerTeam !== victimTeam) return null
 
-    const { timestamp } = this.extractBasicInfo(logLine)
+    const timestamp = this.getCurrentTimestamp()
 
     const event: PlayerTeamkillEvent = {
       eventType: EventType.PLAYER_TEAMKILL,
@@ -303,7 +303,7 @@ export class CsParser extends BaseParser {
 
     const isBot = steamId.toUpperCase() === "BOT"
 
-    const { timestamp } = this.extractBasicInfo(logLine)
+    const timestamp = this.getCurrentTimestamp()
 
     const event: PlayerChatEvent = {
       eventType: EventType.CHAT_MESSAGE,

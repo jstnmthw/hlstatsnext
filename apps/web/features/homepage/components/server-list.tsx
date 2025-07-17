@@ -3,6 +3,7 @@ import { graphql } from "@/lib/gql"
 import { Button } from "@repo/ui/button"
 import { PlayIcon } from "@repo/ui/icons"
 import { cn } from "@repo/ui/lib/utils"
+import { formatLastActivity } from "@/lib/datetime-util"
 import {
   VerticalList,
   VerticalListHeader,
@@ -49,7 +50,7 @@ export async function ServerList() {
                       {server.playerCount} player{server.playerCount !== 1 ? "s" : ""} online
                       {server.lastActivity && (
                         <span className="ml-2">
-                          • Last activity: {new Date(server.lastActivity).toLocaleTimeString()}
+                          • Last activity: {formatLastActivity(server.lastActivity)}
                         </span>
                       )}
                     </span>

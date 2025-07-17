@@ -2,10 +2,7 @@ import { Header } from "@/features/common/components/header"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { activeServers } from "@/lib/mock-data"
-import { cn } from "@repo/ui/lib/utils"
-import { Button } from "@repo/ui/button"
-import { PlayIcon } from "@repo/ui/icons"
+import { ServerList } from "@/features/homepage/components/server-list"
 
 export const metadata = {
   title: "Welcome to " + process.env.NEXT_PUBLIC_APP_NAME,
@@ -18,38 +15,7 @@ export default function Page() {
       <Header fixed />
       <MainContent fixedHeader>
         <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2 border rounded-lg">
-            <h2 className="uppercase tracking-tight text-xs font-bold p-2">Game Servers</h2>
-            <ul>
-              {activeServers.map((server) => (
-                <li key={server.id} className="border-t border-border py-1.5 hover:bg-muted/25">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center">
-                        <div
-                          className={cn(
-                            "w-2 h-2 rounded-full mx-3",
-                            server.status === "online" ? "bg-emerald-500" : "bg-red-500/50",
-                          )}
-                        />
-                        <div className="flex flex-col">
-                          <span className="text-sm">{server.name}</span>
-                          <span className="text-xs text-muted-foreground font-mono">
-                            {server.map} {server.players}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center px-3">
-                        <Button variant="outline" className="text-xs cursor-pointer" size="sm">
-                          <PlayIcon className="size-3" fill="currentColor" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ServerList />
         </div>
       </MainContent>
       <Footer />

@@ -41,8 +41,7 @@ export default function Page() {
                       </div>
                       <div className="flex items-center px-3">
                         <Button variant="outline" className="text-xs cursor-pointer" size="sm">
-                          <PlayIcon className="size-3" />
-                          Join
+                          <PlayIcon className="size-3" fill="currentColor" />
                         </Button>
                       </div>
                     </div>

@@ -3,7 +3,6 @@ import { graphql } from "@/lib/gql"
 import { Button } from "@repo/ui/button"
 import { PlayIcon } from "@repo/ui/icons"
 import { cn } from "@repo/ui/lib/utils"
-import { formatLastActivity } from "@/lib/datetime-util"
 import {
   VerticalList,
   VerticalListHeader,
@@ -47,12 +46,9 @@ export async function ServerList() {
                       {server.name || `${server.address}:${server.port}`}
                     </span>
                     <span className="text-xs text-muted-foreground font-mono">
-                      {server.playerCount} player{server.playerCount !== 1 ? "s" : ""} online
-                      {server.lastActivity && (
-                        <span className="ml-2">
-                          • Last activity: {formatLastActivity(server.lastActivity)}
-                        </span>
-                      )}
+                      {server.isOnline
+                        ? `${server.playerCount} player${server.playerCount !== 1 ? "s" : ""} online`
+                        : "Offline"}
                     </span>
                   </div>
                 </div>

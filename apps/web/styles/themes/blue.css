@@ -1,5 +1,6 @@
 /* Blue Theme Variables */
 :root {
+  --font-size-base: 14px;
   --background: oklch(0.98 0.01 240);
   --foreground: oklch(0.15 0.02 240);
   --card: oklch(1 0 0);

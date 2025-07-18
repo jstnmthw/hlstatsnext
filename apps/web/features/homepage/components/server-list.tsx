@@ -23,11 +23,11 @@ const GET_SERVERS_QUERY = graphql(`
   }
 `)
 
-export async function ServerList() {
+export async function ServerList({ className }: { className?: string }) {
   const { data } = await query({ query: GET_SERVERS_QUERY })
 
   return (
-    <VerticalList className="mb-10">
+    <VerticalList className={cn("mb-10", className)}>
       <VerticalListHeader>Game Servers</VerticalListHeader>
       <ul>
         {data.serversStatus?.map((server) => (

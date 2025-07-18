@@ -11,8 +11,6 @@ export type {
   UnauthorizedError,
 } from "./result.types"
 
-export { isSuccess, isFailure, success, failure } from "./result.types"
-
 // Pagination types
 export type {
   PaginationInput,

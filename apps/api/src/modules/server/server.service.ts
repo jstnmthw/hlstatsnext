@@ -1,18 +1,58 @@
 import type { PrismaClient } from "@repo/database/client"
-import type { Result, AppError } from "@/shared/types"
+import type { Result } from "@/shared/result"
+import type { AppError } from "@/shared/types"
 import type { ServerWithStatus } from "./server.types"
-import { success, failure } from "@/shared/types"
+import { success, failure } from "@/shared/result"
 import { isRecordNotFoundError } from "@/shared/utils/prisma-error-handler"
 
 /**
- * Server service handling business logic for server operations
+ * Service for managing game servers and their status tracking.
+ *
+ * Handles business logic for server queries, online status detection,
+ * and player count calculations based on recent activity.
+ *
+ * @example
+ * ```typescript
+ * const serverService = new ServerService(prismaClient)
+ * const result = await serverService.getServerWithStatus("123")
+ * if (result.success) {
+ *   console.log(`Server ${result.data.name} is ${result.data.isOnline ? 'online' : 'offline'}`)
+ * }
+ * ```
  */
 export class ServerService {
+  /**
+   * Creates a new ServerService instance.
+   *
+   * @param db - The Prisma client instance for database operations
+   */
   constructor(private readonly db: PrismaClient) {}
 
   /**
-   * Get server with online status based on recent activity
-   * A server is considered online if it has logs within the last 5 minutes
+   * Retrieves a server with its current online status and activity information.
+   *
+   * A server is considered online if it has any events (connect, chat, or frag)
+   * within the last 5 minutes. The method also calculates the current player count
+   * based on unique players who connected in the last hour.
+   *
+   * @param serverId - The unique identifier of the server (as a string)
+   * @returns A Result containing either the server status or an error
+   *
+   * @example
+   * ```typescript
+   * const result = await serverService.getServerWithStatus("123")
+   * if (result.success) {
+   *   const server = result.data
+   *   console.log(`Server ${server.name} is ${server.isOnline ? 'online' : 'offline'}`)
+   *   console.log(`Player count: ${server.playerCount}`)
+   *   console.log(`Last activity: ${server.lastActivity}`)
+   * } else {
+   *   console.error(`Error: ${result.error.message}`)
+   * }
+   * ```
+   *
+   * @throws {NotFoundError} When the server with the given ID doesn't exist
+   * @throws {DatabaseError} When database operations fail
    */
   async getServerWithStatus(serverId: string): Promise<Result<ServerWithStatus, AppError>> {
     try {
@@ -82,10 +122,34 @@ export class ServerService {
   }
 
   /**
-   * Get servers with their online status, ordered by most recent activity
-   * A server is considered online if it has any events within the last 5 minutes
-   * Returns up to 10 servers ordered by most recent activity
-   * Optimized to avoid N+1 queries by batching event and player count queries
+   * Retrieves a list of servers with their online status, optimized for performance.
+   *
+   * This method efficiently fetches multiple servers and their status information
+   * using batched queries to avoid N+1 query problems. Servers are considered
+   * online if they have any events (connect, chat, or frag) within the last 5 minutes.
+   *
+   * The results are ordered by:
+   * 1. Online servers first
+   * 2. Most recent activity within each group
+   * 3. Server name for consistency when activity is equal
+   *
+   * Only the top 10 most active servers are returned to limit response size.
+   *
+   * @returns A Result containing either an array of server statuses or an error
+   *
+   * @example
+   * ```typescript
+   * const result = await serverService.getServersWithStatus()
+   * if (result.success) {
+   *   const servers = result.data
+   *   console.log(`Found ${servers.length} servers`)
+   *   servers.forEach(server => {
+   *     console.log(`${server.name}: ${server.isOnline ? 'ONLINE' : 'OFFLINE'} (${server.playerCount} players)`)
+   *   })
+   * }
+   * ```
+   *
+   * @throws {DatabaseError} When database operations fail
    */
   async getServersWithStatus(): Promise<Result<ServerWithStatus[], AppError>> {
     try {
@@ -214,7 +278,21 @@ export class ServerService {
   }
 
   /**
-   * Get recent player count for a server based on unique players in the last hour
+   * Calculates the current player count for a server based on recent activity.
+   *
+   * This method counts unique players who have connected to the server within
+   * the last hour. It filters out null or zero player IDs to ensure accurate counts.
+   *
+   * @param serverId - The numeric ID of the server
+   * @returns The number of unique players who connected in the last hour
+   *
+   * @example
+   * ```typescript
+   * const playerCount = await this.getRecentPlayerCount(123)
+   * console.log(`Server 123 has ${playerCount} recent players`)
+   * ```
+   *
+   * @internal This method is private and used internally by other service methods
    */
   private async getRecentPlayerCount(serverId: number): Promise<number> {
     try {

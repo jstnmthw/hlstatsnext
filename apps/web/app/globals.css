@@ -48,34 +48,49 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /* Font scale based on configurable base */
-  --font-size-xs: calc(var(--font-size-base) * 0.75); /* base * 0.75 */
-  --font-size-sm: var(--font-size-base); /* base size (14px) */
-  --font-size-base: var(--font-size-base);
-  --font-size-lg: calc(var(--font-size-base) * 1.125); /* base * 1.125 */
-  --font-size-xl: calc(var(--font-size-base) * 1.25); /* base * 1.25 */
-  --font-size-2xl: calc(var(--font-size-base) * 1.5); /* base * 1.5 */
-  --font-size-3xl: calc(var(--font-size-base) * 1.875); /* base * 1.875 */
-  --font-size-4xl: calc(var(--font-size-base) * 2.25); /* base * 2.25 */
-  --font-size-5xl: calc(var(--font-size-base) * 3); /* base * 3 */
-  --font-size-6xl: calc(var(--font-size-base) * 3.75); /* base * 3.75 */
-  --font-size-7xl: calc(var(--font-size-base) * 4.5); /* base * 4.5 */
-  --font-size-8xl: calc(var(--font-size-base) * 6); /* base * 6 */
-  --font-size-9xl: calc(var(--font-size-base) * 8); /* base * 8 */
+  --text-size-xs: calc(var(--font-size-base) * 0.75); /* base * 0.75 */
+  --text-size-sm: calc(var(--font-size-base) * 0.875); /* base * 0.875 */
+  --text-size-base: var(--font-size-base);
+  --text-size-lg: calc(var(--font-size-base) * 2.125); /* base * 1.125 */
+  --text-size-xl: calc(var(--font-size-base) * 1.25); /* base * 1.25 */
+  --text-size-2xl: calc(var(--font-size-base) * 1.5); /* base * 1.5 */
+  --text-size-3xl: calc(var(--font-size-base) * 1.875); /* base * 1.875 */
+  --text-size-4xl: calc(var(--font-size-base) * 2.25); /* base * 2.25 */
+  --text-size-5xl: calc(var(--font-size-base) * 3); /* base * 3 */
+  --text-size-6xl: calc(var(--font-size-base) * 3.75); /* base * 3.75 */
+  --text-size-7xl: calc(var(--font-size-base) * 4.5); /* base * 4.5 */
+  --text-size-8xl: calc(var(--font-size-base) * 6); /* base * 6 */
+  --text-size-9xl: calc(var(--font-size-base) * 8); /* base * 8 */
 
-  /* Line heights relative to font sizes */
-  --line-height-xs: calc(var(--font-size-xs) * 1.5);
-  --line-height-sm: calc(var(--font-size-sm) * 1.5);
-  --line-height-base: calc(var(--font-size-base) * 1.5);
-  --line-height-lg: calc(var(--font-size-lg) * 1.5);
-  --line-height-xl: calc(var(--font-size-xl) * 1.4);
-  --line-height-2xl: calc(var(--font-size-2xl) * 1.33);
-  --line-height-3xl: calc(var(--font-size-3xl) * 1.2);
-  --line-height-4xl: calc(var(--font-size-4xl) * 1.1);
-  --line-height-5xl: var(--font-size-5xl);
-  --line-height-6xl: var(--font-size-6xl);
-  --line-height-7xl: var(--font-size-7xl);
-  --line-height-8xl: var(--font-size-8xl);
-  --line-height-9xl: var(--font-size-9xl);
+  /* Line heights relative to text sizes */
+  --line-height-xs: calc(var(--text-size-xs) * 1.5);
+  --line-height-sm: calc(var(--text-size-sm) * 1.5);
+  --line-height-base: calc(var(--text-size-base) * 1.5);
+  --line-height-lg: calc(var(--text-size-lg) * 1.5);
+  --line-height-xl: calc(var(--text-size-xl) * 1.4);
+  --line-height-2xl: calc(var(--text-size-2xl) * 1.33);
+  --line-height-3xl: calc(var(--text-size-3xl) * 1.2);
+  --line-height-4xl: calc(var(--text-size-4xl) * 1.1);
+  --line-height-5xl: var(--text-size-5xl);
+  --line-height-6xl: var(--text-size-6xl);
+  --line-height-7xl: var(--text-size-7xl);
+  --line-height-8xl: var(--text-size-8xl);
+  --line-height-9xl: var(--text-size-9xl);
+
+  /* Map custom text sizes to Tailwind font-size utilities */
+  --font-size-xs: var(--text-size-xs);
+  --font-size-sm: var(--text-size-sm);
+  --font-size-base: var(--text-size-base);
+  --font-size-lg: var(--text-size-lg);
+  --font-size-xl: var(--text-size-xl);
+  --font-size-2xl: var(--text-size-2xl);
+  --font-size-3xl: var(--text-size-3xl);
+  --font-size-4xl: var(--text-size-4xl);
+  --font-size-5xl: var(--text-size-5xl);
+  --font-size-6xl: var(--text-size-6xl);
+  --font-size-7xl: var(--text-size-7xl);
+  --font-size-8xl: var(--text-size-8xl);
+  --font-size-9xl: var(--text-size-9xl);
 }
 
 body {

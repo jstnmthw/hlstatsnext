@@ -33,6 +33,23 @@ export const config = [
     },
   },
   {
+    languageOptions: {
+      globals: {
+        // Node.js globals
+        URL: "readonly",
+        Buffer: "readonly",
+        process: "readonly",
+        global: "readonly",
+        console: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        module: "readonly",
+        require: "readonly",
+        exports: "readonly",
+      },
+    },
+  },
+  {
     plugins: {
       onlyWarn,
     },

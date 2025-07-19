@@ -366,7 +366,7 @@ export class MatchHandler implements IMatchHandler {
         if (!server) return
 
         let totalKills = 0
-        let totalHeadshots = 0
+        const totalHeadshots = 0 // TODO: Track headshots
 
         // Create a player history snapshot for each participant
         for (const [, playerStats] of stats.playerStats) {

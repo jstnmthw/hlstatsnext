@@ -35,6 +35,8 @@ export interface IPlayerService {
       kill_streak?: number
       death_streak?: number
       connection_time?: number
+      last_event?: number
+      lastName?: string
     },
   ): Promise<void>
   getPlayerStats(playerId: number): Promise<Player | null>

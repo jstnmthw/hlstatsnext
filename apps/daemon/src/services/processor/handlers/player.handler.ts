@@ -12,6 +12,10 @@ import type {
   PlayerDisconnectEvent,
   PlayerSuicideEvent,
   PlayerTeamkillEvent,
+  PlayerEntryEvent,
+  PlayerChangeTeamEvent,
+  PlayerChangeRoleEvent,
+  PlayerChangeNameEvent,
 } from "@/types/common/events"
 import type { IPlayerService } from "@/services/player/player.types"
 import { resolveGameId } from "@/config/game-config"
@@ -40,6 +44,18 @@ export class PlayerHandler implements IPlayerHandler {
 
       case "PLAYER_DISCONNECT":
         return this.handlePlayerDisconnect(event)
+
+      case "PLAYER_ENTRY":
+        return this.handlePlayerEntry(event)
+
+      case "PLAYER_CHANGE_TEAM":
+        return this.handlePlayerChangeTeam(event)
+
+      case "PLAYER_CHANGE_ROLE":
+        return this.handlePlayerChangeRole(event)
+
+      case "PLAYER_CHANGE_NAME":
+        return this.handlePlayerChangeName(event)
 
       case "PLAYER_KILL":
         return this.handlePlayerKill(event)
@@ -299,6 +315,164 @@ export class PlayerHandler implements IPlayerHandler {
         error: error instanceof Error ? error.message : "Unknown error",
       }
     }
+  }
+
+  private async handlePlayerEntry(event: PlayerEntryEvent): Promise<HandlerResult> {
+    if (event.eventType !== "PLAYER_ENTRY") return { success: true }
+
+    try {
+      const { playerId } = event.data
+
+      // Update last_event timestamp to mark player as active
+      await this.playerService.updatePlayerStats(playerId, {
+        last_event: Math.floor(Date.now() / 1000),
+      })
+
+      this.logger.event(`Player entered game: ${playerId}`)
+
+      return {
+        success: true,
+        playersAffected: [playerId],
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to handle player entry: ${error instanceof Error ? error.message : "Unknown error"}`,
+      )
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      }
+    }
+  }
+
+  private async handlePlayerChangeTeam(event: PlayerChangeTeamEvent): Promise<HandlerResult> {
+    if (event.eventType !== "PLAYER_CHANGE_TEAM") return { success: true }
+
+    try {
+      const { playerId, team } = event.data
+
+      // TODO: Replace with actual team mapping logic based on game mod
+      // For CS:GO/CS2: "CT" = Counter-Terrorists, "TERRORIST" = Terrorists
+      // For TF2: map to team colors or specific team names
+      const normalizedTeam = this.normalizeTeamName(team)
+
+      // Update player's last event time
+      await this.playerService.updatePlayerStats(playerId, {
+        last_event: Math.floor(Date.now() / 1000),
+      })
+
+      this.logger.event(`Player ${playerId} changed to team: ${normalizedTeam}`)
+
+      return {
+        success: true,
+        playersAffected: [playerId],
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to handle player team change: ${error instanceof Error ? error.message : "Unknown error"}`,
+      )
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      }
+    }
+  }
+
+  private async handlePlayerChangeRole(event: PlayerChangeRoleEvent): Promise<HandlerResult> {
+    if (event.eventType !== "PLAYER_CHANGE_ROLE") return { success: true }
+
+    try {
+      const { playerId, role } = event.data
+
+      // TODO: Replace with actual role mapping logic based on game mod
+      // For CS: role could be "VIP" in cs_assault
+      // For TF2: could be class like "Scout", "Soldier", "Pyro", etc.
+      const normalizedRole = this.normalizeRoleName(role)
+
+      // Update player's last event time
+      await this.playerService.updatePlayerStats(playerId, {
+        last_event: Math.floor(Date.now() / 1000),
+      })
+
+      this.logger.event(`Player ${playerId} changed role to: ${normalizedRole}`)
+
+      return {
+        success: true,
+        playersAffected: [playerId],
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to handle player role change: ${error instanceof Error ? error.message : "Unknown error"}`,
+      )
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      }
+    }
+  }
+
+  private async handlePlayerChangeName(event: PlayerChangeNameEvent): Promise<HandlerResult> {
+    if (event.eventType !== "PLAYER_CHANGE_NAME") return { success: true }
+
+    try {
+      const { playerId, oldName, newName } = event.data
+
+      // Update player's current name and last event time
+      await this.playerService.updatePlayerStats(playerId, {
+        lastName: newName,
+        last_event: Math.floor(Date.now() / 1000),
+      })
+
+      this.logger.event(`Player ${playerId} changed name from "${oldName}" to "${newName}"`)
+
+      return {
+        success: true,
+        playersAffected: [playerId],
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to handle player name change: ${error instanceof Error ? error.message : "Unknown error"}`,
+      )
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      }
+    }
+  }
+
+  /**
+   * Normalize team names for consistent tracking
+   * TODO: Replace with proper game-specific team mapping
+   */
+  private normalizeTeamName(team: string): string {
+    const teamLower = team.toLowerCase()
+    
+    // CS-style team mapping
+    if (teamLower.includes("terror") || teamLower === "t") return "TERRORIST"
+    if (teamLower.includes("ct") || teamLower.includes("counter")) return "CT"
+    if (teamLower.includes("spec")) return "Spectator"
+    
+    // Return original if no mapping found
+    return team
+  }
+
+  /**
+   * Normalize role names for consistent tracking
+   * TODO: Replace with proper game-specific role mapping
+   */
+  private normalizeRoleName(role: string): string {
+    const roleLower = role.toLowerCase()
+    
+    // Common role mappings
+    if (roleLower === "vip") return "VIP"
+    
+    // TF2 class mappings (examples)
+    const tf2Classes = ["scout", "soldier", "pyro", "demoman", "heavy", "engineer", "medic", "sniper", "spy"]
+    const matchedClass = tf2Classes.find(cls => roleLower.includes(cls))
+    if (matchedClass) return matchedClass.charAt(0).toUpperCase() + matchedClass.slice(1)
+    
+    // Return original if no mapping found
+    return role
   }
 
   /**

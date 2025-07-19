@@ -8,12 +8,17 @@
 export enum EventType {
   PLAYER_CONNECT = "PLAYER_CONNECT",
   PLAYER_DISCONNECT = "PLAYER_DISCONNECT",
+  PLAYER_ENTRY = "PLAYER_ENTRY",
   PLAYER_KILL = "PLAYER_KILL",
   PLAYER_DEATH = "PLAYER_DEATH",
   PLAYER_SUICIDE = "PLAYER_SUICIDE",
   PLAYER_TEAMKILL = "PLAYER_TEAMKILL",
+  PLAYER_CHANGE_TEAM = "PLAYER_CHANGE_TEAM",
+  PLAYER_CHANGE_ROLE = "PLAYER_CHANGE_ROLE",
+  PLAYER_CHANGE_NAME = "PLAYER_CHANGE_NAME",
   ROUND_START = "ROUND_START",
   ROUND_END = "ROUND_END",
+  TEAM_WIN = "TEAM_WIN",
   MAP_CHANGE = "MAP_CHANGE",
   SERVER_SHUTDOWN = "SERVER_SHUTDOWN",
   ADMIN_ACTION = "ADMIN_ACTION",
@@ -107,11 +112,23 @@ export interface PlayerChatEvent extends BaseEvent {
 export interface RoundEndEvent extends BaseEvent {
   eventType: EventType.ROUND_END
   data: {
-    winningTeam: string
-    duration: number
-    score: {
+    winningTeam?: string
+    duration?: number
+    score?: {
       team1: number
       team2: number
+    }
+  }
+}
+
+export interface TeamWinEvent extends BaseEvent {
+  eventType: EventType.TEAM_WIN
+  data: {
+    winningTeam: string // e.g., "TERRORIST", "CT"
+    triggerName: string // e.g., "Terrorists_Win", "CTs_Win"
+    score: {
+      ct: number
+      t: number
     }
   }
 }
@@ -197,14 +214,55 @@ export interface AdminActionEvent extends BaseEvent {
   // No meta needed for admin events (admin info should be in data)
 }
 
+export interface PlayerEntryEvent extends BaseEvent {
+  eventType: EventType.PLAYER_ENTRY
+  data: {
+    playerId: number
+  }
+  meta?: PlayerMeta
+}
+
+export interface PlayerChangeTeamEvent extends BaseEvent {
+  eventType: EventType.PLAYER_CHANGE_TEAM
+  data: {
+    playerId: number
+    team: string // e.g. "CT", "TERRORIST", "Spectator"
+  }
+  meta?: PlayerMeta
+}
+
+export interface PlayerChangeRoleEvent extends BaseEvent {
+  eventType: EventType.PLAYER_CHANGE_ROLE
+  data: {
+    playerId: number
+    role: string // e.g. "VIP", "Commander", specific class name
+  }
+  meta?: PlayerMeta
+}
+
+export interface PlayerChangeNameEvent extends BaseEvent {
+  eventType: EventType.PLAYER_CHANGE_NAME
+  data: {
+    playerId: number
+    oldName: string
+    newName: string
+  }
+  meta?: PlayerMeta
+}
+
 // Updated discriminated union of all supported events
 export type GameEvent =
   | PlayerKillEvent
   | PlayerConnectEvent
   | PlayerDisconnectEvent
+  | PlayerEntryEvent
+  | PlayerChangeTeamEvent
+  | PlayerChangeRoleEvent
+  | PlayerChangeNameEvent
   | PlayerChatEvent
   | RoundEndEvent
   | RoundStartEvent
+  | TeamWinEvent
   | MapChangeEvent
   | PlayerDeathEvent
   | PlayerSuicideEvent

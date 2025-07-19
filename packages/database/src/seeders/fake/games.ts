@@ -1,4 +1,4 @@
-import { db, Prisma } from "../client"
+import { db, Prisma } from "../../client"
 import { log, logWarning } from "./logger"
 
 const games: Prisma.GameCreateManyInput[] = [

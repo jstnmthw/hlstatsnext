@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import { db, Prisma } from "../client"
+import { db, Prisma } from "../../client"
 import { getSeedConfig } from "./config"
 import { generatePlayerData, generateGameStats } from "./utils"
 import { log } from "./logger"

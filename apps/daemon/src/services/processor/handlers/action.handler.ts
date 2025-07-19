@@ -70,38 +70,36 @@ export class ActionHandler implements IActionHandler {
         return { success: true }
       }
 
-      await this.db.transaction(async (tx) => {
-        // 1. Record the action event
-        await tx.eventPlayerAction.create({
-          data: {
-            eventTime: context.timestamp,
-            serverId: context.serverId,
-            map: context.map,
-            playerId,
-            actionId: action.id,
-            bonus: bonus ?? action.reward_player,
-            pos_x: position?.x,
-            pos_y: position?.y,
-            pos_z: position?.z,
-          },
-        })
+      const scoreChange = bonus ?? action.reward_player
 
-        // 2. Update player statistics
-        const scoreChange = bonus ?? action.reward_player
-        if (scoreChange !== 0) {
-          await this.playerService.updatePlayerStats(playerId, {
-            skill: scoreChange,
-            last_event: Math.floor(Date.now() / 1000),
-            // Could add action-specific stat tracking here if needed
-          })
-        }
-
-        // 3. Update action count
-        await tx.action.update({
-          where: { id: action.id },
-          data: { count: { increment: 1 } },
-        })
+      // Record event
+      await this.db.prisma.eventPlayerAction.create({
+        data: {
+          eventTime: context.timestamp,
+          serverId: context.serverId,
+          map: context.map,
+          playerId,
+          actionId: action.id,
+          bonus: scoreChange,
+          pos_x: position?.x,
+          pos_y: position?.y,
+          pos_z: position?.z,
+        },
       })
+
+      // Increment action count
+      await this.db.prisma.action.update({
+        where: { id: action.id },
+        data: { count: { increment: 1 } },
+      })
+
+      // Update player statistics outside the transaction to avoid nested tx issues
+      if (scoreChange !== 0) {
+        await this.playerService.updatePlayerStats(playerId, {
+          skill: scoreChange,
+          last_event: Math.floor(Date.now() / 1000),
+        })
+      }
 
       this.logger.event(
         `Player action recorded: ${action.description} by player ${playerId} (+${bonus ?? action.reward_player} points)`,
@@ -145,41 +143,40 @@ export class ActionHandler implements IActionHandler {
         return { success: true }
       }
 
-      await this.db.transaction(async (tx) => {
-        // 1. Record the action event
-        await tx.eventPlayerPlayerAction.create({
-          data: {
-            eventTime: context.timestamp,
-            serverId: context.serverId,
-            map: context.map,
-            playerId,
-            victimId,
-            actionId: action.id,
-            bonus: bonus ?? action.reward_player,
-            pos_x: actorPosition?.x,
-            pos_y: actorPosition?.y,
-            pos_z: actorPosition?.z,
-            pos_victim_x: victimPosition?.x,
-            pos_victim_y: victimPosition?.y,
-            pos_victim_z: victimPosition?.z,
-          },
-        })
+      const scoreChange = bonus ?? action.reward_player
 
-        // 2. Update player statistics for actor
-        const scoreChange = bonus ?? action.reward_player
-        if (scoreChange !== 0) {
-          await this.playerService.updatePlayerStats(playerId, {
-            skill: scoreChange,
-            last_event: Math.floor(Date.now() / 1000),
-          })
-        }
-
-        // 3. Update action count
-        await tx.action.update({
-          where: { id: action.id },
-          data: { count: { increment: 1 } },
-        })
+      // Record event
+      await this.db.prisma.eventPlayerPlayerAction.create({
+        data: {
+          eventTime: context.timestamp,
+          serverId: context.serverId,
+          map: context.map,
+          playerId,
+          victimId,
+          actionId: action.id,
+          bonus: scoreChange,
+          pos_x: actorPosition?.x,
+          pos_y: actorPosition?.y,
+          pos_z: actorPosition?.z,
+          pos_victim_x: victimPosition?.x,
+          pos_victim_y: victimPosition?.y,
+          pos_victim_z: victimPosition?.z,
+        },
       })
+
+      // Increment action count
+      await this.db.prisma.action.update({
+        where: { id: action.id },
+        data: { count: { increment: 1 } },
+      })
+
+      // Update player statistics outside transaction
+      if (scoreChange !== 0) {
+        await this.playerService.updatePlayerStats(playerId, {
+          skill: scoreChange,
+          last_event: Math.floor(Date.now() / 1000),
+        })
+      }
 
       this.logger.event(
         `Player-player action recorded: ${action.description} by player ${playerId} on ${victimId} (+${bonus ?? action.reward_player} points)`,
@@ -225,34 +222,36 @@ export class ActionHandler implements IActionHandler {
       const teamBonus = bonus ?? action.reward_team
       const affectedPlayers = playersAffected || []
 
-      await this.db.transaction(async (tx) => {
-        // Award team bonus to all affected players
-        for (const playerId of affectedPlayers) {
-          await tx.eventTeamBonus.create({
+      if (affectedPlayers.length > 0) {
+        // Batch insert bonus events (avoids N+1)
+        await this.db.prisma.eventTeamBonus.createMany({
+          data: affectedPlayers.map((playerId) => ({
+            eventTime: context.timestamp,
+            serverId: context.serverId,
+            map: context.map,
+            playerId,
+            actionId: action.id,
+            bonus: teamBonus,
+          })),
+          skipDuplicates: true,
+        })
+
+        // Batch skill update – single query for all players
+        if (teamBonus !== 0) {
+          await this.db.prisma.player.updateMany({
+            where: { playerId: { in: affectedPlayers } },
             data: {
-              eventTime: context.timestamp,
-              serverId: context.serverId,
-              map: context.map,
-              playerId,
-              actionId: action.id,
-              bonus: teamBonus,
+              skill: { increment: teamBonus },
+              last_event: Math.floor(Date.now() / 1000),
             },
           })
-
-          // Update player last event time
-          if (teamBonus !== 0) {
-            await this.playerService.updatePlayerStats(playerId, {
-              skill: teamBonus,
-              last_event: Math.floor(Date.now() / 1000),
-            })
-          }
         }
+      }
 
-        // Update action count
-        await tx.action.update({
-          where: { id: action.id },
-          data: { count: { increment: 1 } },
-        })
+      // Increment action count separately (single write)
+      await this.db.prisma.action.update({
+        where: { id: action.id },
+        data: { count: { increment: 1 } },
       })
 
       this.logger.event(
@@ -337,13 +336,13 @@ export class ActionHandler implements IActionHandler {
    * Build processing context from event
    */
   private buildContext(event: GameEvent): ActionProcessingContext {
-    const meta = event.meta as EventMeta
+    const meta = (event.meta as EventMeta | undefined) ?? {}
 
     return {
-      serverId: meta.serverId ?? 0,
+      serverId: event.serverId,
       map: meta.map ?? "",
       timestamp: event.timestamp,
-      game: (event.data as ActionPlayerEvent["data"]).game, // All action events have game field
+      game: (event.data as ActionPlayerEvent["data"]).game,
     }
   }
 }

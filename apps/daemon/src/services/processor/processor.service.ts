@@ -109,6 +109,7 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
         case EventType.ACTION_PLAYER:
         case EventType.ACTION_PLAYER_PLAYER:
         case EventType.ACTION_TEAM:
+        case EventType.ACTION_WORLD:
           await this.actionHandler.handleEvent(event)
           break
 

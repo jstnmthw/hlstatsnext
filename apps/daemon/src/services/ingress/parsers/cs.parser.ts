@@ -7,6 +7,9 @@ import {
   type PlayerSuicideEvent,
   type PlayerTeamkillEvent,
   type PlayerChatEvent,
+  type ActionPlayerEvent,
+  type ActionTeamEvent,
+  type WorldActionEvent,
 } from "@/types/common/events"
 
 /**
@@ -50,6 +53,16 @@ export class CsParser extends BaseParser {
 
     const suicide = await this.parseSuicide(logLine, serverId)
     if (suicide) return { success: true, event: suicide }
+
+    // Action events
+    const teamAction = await this.parseTeamAction(logLine, serverId)
+    if (teamAction) return { success: true, event: teamAction }
+
+    const worldAction = await this.parseWorldAction(logLine, serverId)
+    if (worldAction) return { success: true, event: worldAction }
+
+    const playerAction = await this.parsePlayerAction(logLine, serverId)
+    if (playerAction) return { success: true, event: playerAction }
 
     const connect = await this.parseConnect(logLine, serverId)
     if (connect) return { success: true, event: connect }
@@ -320,6 +333,112 @@ export class CsParser extends BaseParser {
         steamId,
         playerName: this.sanitizeString(playerName),
         isBot,
+      },
+    }
+
+    return event
+  }
+
+  /**
+   * Parse player-triggered action events e.g.
+   * L 07/19/2025 - 15:17:36: "Player<28><STEAM_1:0:111><CT>" [93 303 73] triggered "Defused_The_Bomb"
+   */
+  private async parsePlayerAction(
+    logLine: string,
+    serverId: number,
+  ): Promise<ActionPlayerEvent | null> {
+    const regex =
+      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>"(?: \[([+\-0-9\s]+)\])?\s+triggered\s+"([A-Za-z0-9_]+)"/i
+
+    const match = logLine.match(regex)
+    if (!match) return null
+
+    const playerName = match[1]!
+    const steamId = match[2]!
+    const team = match[3]!
+    const positionStr = match[4]
+    const actionCode = match[5]!
+
+    const position = positionStr ? this.parsePosition(positionStr.trim()) : undefined
+    const isBot = steamId.toUpperCase() === "BOT"
+
+    const timestamp = this.getCurrentTimestamp()
+
+    const event: ActionPlayerEvent = {
+      eventType: EventType.ACTION_PLAYER,
+      timestamp,
+      serverId,
+      data: {
+        playerId: 0,
+        actionCode,
+        game: this.gameType,
+        team,
+        position,
+      },
+      meta: {
+        steamId,
+        playerName: this.sanitizeString(playerName),
+        isBot,
+      },
+    }
+
+    return event
+  }
+
+  /**
+   * Parse team-wide action events e.g.
+   * L 07/19/2025 - 15:17:36: Team "CT" triggered "Bomb_Defused" (CT "6") (T "3")
+   */
+  private async parseTeamAction(
+    logLine: string,
+    serverId: number,
+  ): Promise<ActionTeamEvent | null> {
+    const regex = /^(?:L .+?:\s)?Team "(\w+)" triggered "([A-Za-z0-9_]+)"/i
+    const match = logLine.match(regex)
+    if (!match) return null
+
+    const team = match[1]!
+    const actionCode = match[2]!
+
+    const timestamp = this.getCurrentTimestamp()
+
+    const event: ActionTeamEvent = {
+      eventType: EventType.ACTION_TEAM,
+      timestamp,
+      serverId,
+      data: {
+        team,
+        actionCode,
+        game: this.gameType,
+      },
+    }
+
+    return event
+  }
+
+  /**
+   * Parse world action events e.g.
+   * L 07/19/2025 - 15:17:36: World triggered "Round_End"
+   */
+  private async parseWorldAction(
+    logLine: string,
+    serverId: number,
+  ): Promise<WorldActionEvent | null> {
+    const regex = /^(?:L .+?:\s)?World triggered "([A-Za-z0-9_]+)"/i
+    const match = logLine.match(regex)
+    if (!match) return null
+
+    const actionCode = match[1]!
+
+    const timestamp = this.getCurrentTimestamp()
+
+    const event: WorldActionEvent = {
+      eventType: EventType.ACTION_WORLD,
+      timestamp,
+      serverId,
+      data: {
+        actionCode,
+        game: this.gameType,
       },
     }
 

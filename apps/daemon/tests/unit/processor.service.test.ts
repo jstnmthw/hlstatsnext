@@ -118,6 +118,64 @@ describe("EventProcessorService", () => {
       expect(mockMatchHandler.handleEvent).not.toHaveBeenCalled()
     })
 
+    it("should route ACTION_PLAYER to ActionHandler", async () => {
+      const actionPlayerEvent: import("../../src/types/common/events").ActionPlayerEvent = {
+        eventType: EventType.ACTION_PLAYER,
+        serverId: 1,
+        timestamp: new Date(),
+        data: {
+          playerId: 0,
+          actionCode: "Defused_The_Bomb",
+          game: "csgo",
+          team: "CT",
+        },
+        meta: {
+          steamId: "STEAM_1:0:333",
+          playerName: "Defuser",
+          isBot: false,
+        },
+      }
+
+      await processor.processEvent(actionPlayerEvent)
+      expect(mockActionHandler.handleEvent).toHaveBeenCalledWith(actionPlayerEvent)
+      expect(mockPlayerService.getOrCreatePlayer).toHaveBeenCalledWith(
+        "STEAM_1:0:333",
+        "Defuser",
+        "csgo",
+      )
+    })
+
+    it("should route ACTION_TEAM to ActionHandler", async () => {
+      const actionTeamEvent: import("../../src/types/common/events").ActionTeamEvent = {
+        eventType: EventType.ACTION_TEAM,
+        serverId: 1,
+        timestamp: new Date(),
+        data: {
+          team: "CT",
+          actionCode: "Bomb_Defused",
+          game: "csgo",
+        },
+      }
+
+      await processor.processEvent(actionTeamEvent)
+      expect(mockActionHandler.handleEvent).toHaveBeenCalledWith(actionTeamEvent)
+    })
+
+    it("should route ACTION_WORLD to ActionHandler", async () => {
+      const worldEvent: import("../../src/types/common/events").WorldActionEvent = {
+        eventType: EventType.ACTION_WORLD,
+        serverId: 1,
+        timestamp: new Date(),
+        data: {
+          actionCode: "Round_End",
+          game: "csgo",
+        },
+      }
+
+      await processor.processEvent(worldEvent)
+      expect(mockActionHandler.handleEvent).toHaveBeenCalledWith(worldEvent)
+    })
+
     it("should throw and log if player resolution fails", async () => {
       const dbError = new Error("DB Error")
       vi.mocked(mockPlayerService.getOrCreatePlayer).mockRejectedValue(dbError)

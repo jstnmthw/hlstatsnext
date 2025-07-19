@@ -5,7 +5,7 @@
 COMPOSE_FILE := docker-compose.yml
 DAEMON_CONTAINER := hlstatsnext-daemon
 DB_CONTAINER := hlstatsnext-db
-CS1_CONTAINER := hlstatsnext-cs-1
+CS1_CONTAINER := hlstatsnext-cstrike
 CS2_CONTAINER := hlstatsnext-cs-2
 
 # Colors for output

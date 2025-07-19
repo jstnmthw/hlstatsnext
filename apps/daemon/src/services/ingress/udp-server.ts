@@ -40,8 +40,8 @@ export class UdpServer extends EventEmitter {
       host: "0.0.0.0",
       maxPacketSize: 8192,
       rateLimit: {
-        packetsPerMinute: 1000,
-        burstSize: 50,
+        packetsPerMinute: 2000,
+        burstSize: 200,
       },
       ...options,
     }

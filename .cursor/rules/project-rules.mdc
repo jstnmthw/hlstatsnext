@@ -297,7 +297,7 @@ Mark the following in [MIGRATION.md](mdc:apps/daemon/docs/MIGRATION.md) each tim
 
 1. Environment set-up validated (`pnpm dev` starts all apps)
 2. Database schema migrated & generated types committed
-3. Daemon v2 MVP passes unit & integration tests
+3. Daemon MVP passes unit & integration tests
 4. End-to-end flow (game event → DB → UI) green
 5. Legacy feature parity achieved
 

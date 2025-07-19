@@ -6,7 +6,7 @@ import type { Player } from "@repo/database/client"
 import type { IPlayerService } from "./player.types"
 
 /**
- * Player Service for Daemon v2
+ * Player Service for Daemon
  *
  * Handles all player-related operations including:
  * - Player ratings and skill tracking
@@ -232,7 +232,7 @@ export class PlayerService implements IPlayerService {
         updateData.teamkills = { increment: updates.teamkills }
       }
       if (updates.skill !== undefined) {
-        updateData.skill = updates.skill
+        updateData.skill = { increment: updates.skill }
       }
       if (updates.shots !== undefined) {
         updateData.shots = { increment: updates.shots }
@@ -259,10 +259,27 @@ export class PlayerService implements IPlayerService {
         updateData.lastName = updates.lastName
       }
 
-      await this.db.prisma.player.update({
-        where: { playerId },
-        data: updateData,
-      })
+      try {
+        await this.db.prisma.player.update({
+          where: { playerId },
+          data: updateData,
+        })
+      } catch (err: unknown) {
+        // If skill underflowed on an UNSIGNED column, clamp to zero and retry once.
+        if (
+          updates.skill !== undefined &&
+          typeof err === "object" &&
+          err !== null &&
+          (err as { code?: string; message?: string }).message?.includes("Out of range")
+        ) {
+          await this.db.prisma.player.update({
+            where: { playerId },
+            data: { ...updateData, skill: 0 },
+          })
+        } else {
+          throw err
+        }
+      }
     } catch (error) {
       this.logger.error(`Failed to update player stats for ${playerId}: ${error as string}`)
       throw error

@@ -159,21 +159,29 @@ describe("UdpServer", () => {
       family: "IPv4" as const,
     }
 
+    const BURST_LIMIT = 50
+
     beforeEach(async () => {
+      // Recreate server with explicit rateLimit so test isn't tied to default constants
+      mockedDgram.createSocket.mockReturnValue(mockSocket as unknown as dgram.Socket)
+      server = new UdpServer({
+        port: 12345,
+        rateLimit: { packetsPerMinute: BURST_LIMIT, burstSize: BURST_LIMIT },
+      })
       await server.start()
     })
 
     it("should block requests exceeding the burst limit", () => {
-      // Default burst is 50
+      // Expect blocking after configured BURST_LIMIT
       const logSpy = vi.fn()
       server.on("logReceived", logSpy)
       const message = Buffer.from("message")
 
-      for (let i = 0; i < 60; i++) {
+      for (let i = 0; i < BURST_LIMIT + 10; i++) {
         mockSocket.emit("message", message, remoteInfo)
       }
 
-      expect(logSpy).toHaveBeenCalledTimes(50)
+      expect(logSpy).toHaveBeenCalledTimes(BURST_LIMIT)
     })
   })
 

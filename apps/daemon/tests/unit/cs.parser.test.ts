@@ -247,9 +247,30 @@ describe("Counster Strike Parser", () => {
       const result = await parser.parse(logLine, serverId)
       expect(result.success).toBe(true)
       if (!result.success) return
-      expect(result.event.eventType).toBe(EventType.ACTION_WORLD)
-      const evt = result.event as import("../../src/types/common/events").WorldActionEvent
-      expect(evt.data.actionCode).toBe("Round_End")
+      expect(result.event.eventType).toBe(EventType.ROUND_END)
+    })
+
+    it("should parse a map change line", async () => {
+      const first = await parser.parse(
+        'L 07/19/2025 - 15:37:40: Started map "de_dust" (CRC "-1641307065")',
+        1,
+      )
+      expect(first.success).toBe(true)
+      if (!first.success) return
+      const evt1 = first.event as import("../../src/types/common/events").MapChangeEvent
+      expect(evt1.eventType).toBe(EventType.MAP_CHANGE)
+      expect(evt1.data.previousMap).toBeUndefined()
+      expect(evt1.data.newMap).toBe("de_dust")
+
+      const second = await parser.parse(
+        'L 07/19/2025 - 15:40:00: Started map "de_inferno" (CRC "123")',
+        1,
+      )
+      expect(second.success).toBe(true)
+      if (!second.success) return
+      const evt2 = second.event as import("../../src/types/common/events").MapChangeEvent
+      expect(evt2.data.previousMap).toBe("de_dust")
+      expect(evt2.data.newMap).toBe("de_inferno")
     })
   })
 

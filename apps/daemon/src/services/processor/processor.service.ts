@@ -11,8 +11,10 @@ import { MatchHandler } from "@/services/processor/handlers/match.handler"
 import { EventService } from "@/services/event/event.service"
 import { PlayerHandler } from "@/services/processor/handlers/player.handler"
 import { WeaponHandler } from "@/services/processor/handlers/weapon.handler"
+import { ActionHandler } from "@/services/processor/handlers/action.handler"
 import { WeaponService } from "@/services/weapon/weapon.service"
 import { PlayerService } from "@/services/player/player.service"
+import { ActionService } from "@/services/action/action.service"
 import { RankingHandler } from "@/services/processor/handlers/ranking.handler"
 import { logger as defaultLogger } from "@/utils/logger"
 import { DatabaseClient, databaseClient } from "@/database/client"
@@ -22,6 +24,7 @@ import type { IEventProcessor } from "@/services/processor/processor.types"
 import type { IEventService } from "@/services/event/event.types"
 import type { IPlayerHandler } from "@/services/processor/handlers/player.handler.types"
 import type { IWeaponHandler } from "@/services/processor/handlers/weapon.handler.types"
+import type { IActionHandler } from "@/services/processor/handlers/action.handler.types"
 import type { IMatchHandler } from "@/services/processor/handlers/match.handler.types"
 import type { IRankingHandler } from "@/services/processor/handlers/ranking.handler.types"
 import type { IPlayerService } from "@/services/player/player.types"
@@ -39,6 +42,7 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
     private readonly playerService: IPlayerService,
     private readonly playerHandler: IPlayerHandler,
     private readonly weaponHandler: IWeaponHandler,
+    private readonly actionHandler: IActionHandler,
     private readonly matchHandler: IMatchHandler,
     private readonly rankingHandler: IRankingHandler,
     private readonly logger: ILogger,
@@ -100,6 +104,12 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
         case EventType.TEAM_WIN:
         case EventType.MAP_CHANGE:
           await this.matchHandler.handleEvent(event)
+          break
+
+        case EventType.ACTION_PLAYER:
+        case EventType.ACTION_PLAYER_PLAYER:
+        case EventType.ACTION_TEAM:
+          await this.actionHandler.handleEvent(event)
           break
 
         case EventType.CHAT_MESSAGE: {
@@ -213,6 +223,49 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
         break
       }
 
+      case EventType.ACTION_PLAYER: {
+        if (!event.meta) {
+          throw new Error("ACTION_PLAYER event missing meta")
+        }
+
+        const { steamId, playerName } = event.meta
+        const playerId = await this.playerService.getOrCreatePlayer(
+          steamId,
+          playerName,
+          this.DEFAULT_GAME_ID,
+        )
+        event.data.playerId = playerId
+        break
+      }
+
+      case EventType.ACTION_PLAYER_PLAYER: {
+        if (!event.meta) {
+          throw new Error("ACTION_PLAYER_PLAYER event missing meta")
+        }
+
+        const { killer, victim } = event.meta
+        const actorId = await this.playerService.getOrCreatePlayer(
+          killer.steamId,
+          killer.playerName,
+          this.DEFAULT_GAME_ID,
+        )
+        const victimId = await this.playerService.getOrCreatePlayer(
+          victim.steamId,
+          victim.playerName,
+          this.DEFAULT_GAME_ID,
+        )
+
+        event.data.playerId = actorId
+        event.data.victimId = victimId
+        break
+      }
+
+      case EventType.ACTION_TEAM: {
+        // Team actions don't need individual player ID resolution
+        // Player IDs should be provided in the playersAffected array
+        break
+      }
+
       case EventType.CHAT_MESSAGE: {
         if (!event.meta) {
           throw new Error("CHAT event missing meta")
@@ -234,7 +287,6 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
     }
   }
 
-
   /**
    * Get top players by ranking
    */
@@ -255,11 +307,13 @@ export function createEventProcessorService(
   // Service Layer
   const playerService = new PlayerService(db, logger)
   const weaponService = new WeaponService(db, logger)
+  const actionService = new ActionService(db, logger)
   const eventService = new EventService(db, logger)
 
   // Handler Layer
   const playerHandler = new PlayerHandler(playerService, logger)
   const weaponHandler = new WeaponHandler(weaponService, db, logger)
+  const actionHandler = new ActionHandler(actionService, playerService, db, logger)
   const matchHandler = new MatchHandler(playerService, db, logger)
   const rankingHandler = new RankingHandler(playerService, weaponService, logger)
 
@@ -268,6 +322,7 @@ export function createEventProcessorService(
     playerService,
     playerHandler,
     weaponHandler,
+    actionHandler,
     matchHandler,
     rankingHandler,
     logger,

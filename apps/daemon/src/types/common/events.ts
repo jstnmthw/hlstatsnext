@@ -16,6 +16,10 @@ export enum EventType {
   PLAYER_CHANGE_TEAM = "PLAYER_CHANGE_TEAM",
   PLAYER_CHANGE_ROLE = "PLAYER_CHANGE_ROLE",
   PLAYER_CHANGE_NAME = "PLAYER_CHANGE_NAME",
+  ACTION_PLAYER = "ACTION_PLAYER",
+  ACTION_PLAYER_PLAYER = "ACTION_PLAYER_PLAYER",
+  ACTION_TEAM = "ACTION_TEAM",
+  ACTION_WORLD = "ACTION_WORLD",
   ROUND_START = "ROUND_START",
   ROUND_END = "ROUND_END",
   TEAM_WIN = "TEAM_WIN",
@@ -49,6 +53,7 @@ export interface BaseEvent {
   timestamp: Date
   serverId: number
   raw?: string // Original log line for debugging
+  meta?: unknown
   /**
    * Optional payload for events that do not have a specific data structure.
    * This is primarily to allow ergonomic access in generic code paths (e.g. tests)
@@ -250,6 +255,54 @@ export interface PlayerChangeNameEvent extends BaseEvent {
   meta?: PlayerMeta
 }
 
+export interface ActionPlayerEvent extends BaseEvent {
+  eventType: EventType.ACTION_PLAYER
+  data: {
+    playerId: number
+    actionCode: string // e.g., "Planted_The_Bomb", "headshot", "flagevent_captured"
+    game: string // e.g., "css", "tf", "csgo"
+    team?: string // Optional team context (CT, TERRORIST, etc.)
+    bonus?: number // Additional points/modifier
+    position?: Position3D
+  }
+  meta?: PlayerMeta
+}
+
+export interface ActionPlayerPlayerEvent extends BaseEvent {
+  eventType: EventType.ACTION_PLAYER_PLAYER
+  data: {
+    playerId: number // Actor
+    victimId: number // Target
+    actionCode: string // e.g., "domination", "revenge", "steal_sandvich"
+    game: string
+    team?: string
+    bonus?: number
+    actorPosition?: Position3D
+    victimPosition?: Position3D
+  }
+  meta?: DualPlayerMeta
+}
+
+export interface ActionTeamEvent extends BaseEvent {
+  eventType: EventType.ACTION_TEAM
+  data: {
+    team: string // CT, TERRORIST, RED, BLU, etc.
+    actionCode: string // e.g., "Round_Win", "Target_Bombed", "All_Hostages_Rescued"
+    game: string
+    playersAffected?: number[] // Player IDs that should receive team bonus
+    bonus?: number
+  }
+}
+
+export interface WorldActionEvent extends BaseEvent {
+  eventType: EventType.ACTION_WORLD
+  data: {
+    actionCode: string
+    game: string
+    bonus?: number
+  }
+}
+
 // Updated discriminated union of all supported events
 export type GameEvent =
   | PlayerKillEvent
@@ -259,6 +312,10 @@ export type GameEvent =
   | PlayerChangeTeamEvent
   | PlayerChangeRoleEvent
   | PlayerChangeNameEvent
+  | ActionPlayerEvent
+  | ActionPlayerPlayerEvent
+  | ActionTeamEvent
+  | WorldActionEvent
   | PlayerChatEvent
   | RoundEndEvent
   | RoundStartEvent

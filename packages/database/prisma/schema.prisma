@@ -220,6 +220,7 @@ model Action {
   eventPlayerActions       EventPlayerAction[]
   eventPlayerPlayerActions EventPlayerPlayerAction[]
   eventTeamBonuses         EventTeamBonus[]
+  eventWorldActions        EventWorldAction[]
 
   @@unique([code, game, team], name: "gamecode")
   @@index([code])
@@ -626,6 +627,20 @@ model EventTeamkill {
 
   @@index([killerId])
   @@map("Events_Teamkills")
+}
+
+model EventWorldAction {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime @db.DateTime(0)
+  serverId  Int      @db.UnsignedInt
+  map       String   @default("") @db.VarChar(64)
+  actionId  Int      @db.UnsignedInt
+  action    Action   @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  bonus     Int      @default(0)
+
+  @@index([serverId, eventTime], name: "server_eventTime")
+  @@index([actionId], name: "actionId")
+  @@map("EventWorldAction")
 }
 
 // Game and Server Config Tables

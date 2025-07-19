@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker"
-import type { Prisma } from "../client"
+import type { Prisma } from "../../client"
 
 // Type for game statistics
-type GameStats = Pick<
+export type GameStats = Pick<
   Prisma.PlayerCreateInput,
   "skill" | "kills" | "deaths" | "headshots" | "shots" | "hits" | "connection_time"
 >

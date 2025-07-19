@@ -1,5 +1,5 @@
 import { db } from "./client"
-import { logError, logInfo, logStep, logSuccess } from "./seeders/logger"
+import { logError, logInfo, logStep, logSuccess } from "./seeders/fake/logger"
 import { logDatabaseStats } from "./seeders"
 
 /**
@@ -49,8 +49,9 @@ async function resetDatabase() {
   }
 }
 
-async function main() {
+const main = async (): Promise<void> => {
   try {
+    logStep("Resetting database...")
     await resetDatabase()
   } catch (error) {
     logError("Reset failed with unhandled error:")

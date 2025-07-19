@@ -1,4 +1,4 @@
-import { db } from "../client"
+import { db } from "../../client"
 import { log, logInfo } from "./logger"
 
 /**

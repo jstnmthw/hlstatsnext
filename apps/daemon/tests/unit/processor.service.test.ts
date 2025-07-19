@@ -8,7 +8,8 @@ import type { IMatchHandler } from "../../src/services/processor/handlers/match.
 import type { IPlayerHandler } from "../../src/services/processor/handlers/player.handler.types"
 import type { IRankingHandler } from "../../src/services/processor/handlers/ranking.handler.types"
 import type { IWeaponHandler } from "../../src/services/processor/handlers/weapon.handler.types"
-import type { ILogger } from "@/utils/logger.types"
+import type { IActionHandler } from "../../src/services/processor/handlers/action.handler.types"
+import type { ILogger } from "../../src/utils/logger.types"
 
 // Mock Factories for all dependencies
 const createEventServiceMock = (): IEventService => ({ createGameEvent: vi.fn() })
@@ -32,6 +33,7 @@ const createRankingHandlerMock = (): IRankingHandler => ({
   updatePlayerRating: vi.fn(),
 })
 const createWeaponHandlerMock = (): IWeaponHandler => ({ handleEvent: vi.fn() })
+const createActionHandlerMock = (): IActionHandler => ({ handleEvent: vi.fn() })
 
 describe("EventProcessorService", () => {
   let processor: EventProcessorService
@@ -41,6 +43,7 @@ describe("EventProcessorService", () => {
   let mockPlayerHandler: IPlayerHandler
   let mockRankingHandler: IRankingHandler
   let mockWeaponHandler: IWeaponHandler
+  let mockActionHandler: IActionHandler
   let mockLogger: ILogger
 
   beforeEach(() => {
@@ -51,6 +54,7 @@ describe("EventProcessorService", () => {
     mockPlayerHandler = createPlayerHandlerMock()
     mockRankingHandler = createRankingHandlerMock()
     mockWeaponHandler = createWeaponHandlerMock()
+    mockActionHandler = createActionHandlerMock()
     mockLogger = createMockLogger()
 
     processor = new EventProcessorService(
@@ -58,6 +62,7 @@ describe("EventProcessorService", () => {
       mockPlayerService,
       mockPlayerHandler,
       mockWeaponHandler,
+      mockActionHandler,
       mockMatchHandler,
       mockRankingHandler,
       mockLogger,
@@ -126,6 +131,7 @@ describe("EventProcessorService", () => {
         mockPlayerService,
         mockPlayerHandler,
         mockWeaponHandler,
+        mockActionHandler,
         mockMatchHandler,
         mockRankingHandler,
         mockLogger,

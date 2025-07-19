@@ -52,6 +52,16 @@ export class EventService implements IEventService {
         case "PLAYER_CHANGE_NAME":
           await this.createChangeNameEvent(event)
           break
+        case "ACTION_PLAYER":
+          // Handled by ActionHandler - EventService doesn't need to persist these
+          // as ActionHandler handles both the event recording and database persistence
+          break
+        case "ACTION_PLAYER_PLAYER":
+          // Handled by ActionHandler
+          break
+        case "ACTION_TEAM":
+          // Handled by ActionHandler
+          break
         case "PLAYER_KILL":
           await this.createFragEvent(event)
           break

@@ -216,6 +216,41 @@ describe("Counster Strike Parser", () => {
       const deadEvent = result.event as PlayerChatEvent
       expect(deadEvent.data.isDead).toBe(true)
     })
+
+    it("should parse a player action event", async () => {
+      const logLine =
+        'L 07/19/2025 - 15:17:36: "Defuser<28><STEAM_1:0:111><CT>" triggered "Defused_The_Bomb"'
+      const result = await parser.parse(logLine, serverId)
+      expect(result.success).toBe(true)
+      if (!result.success) return
+
+      expect(result.event.eventType).toBe(EventType.ACTION_PLAYER)
+      const evt = result.event as import("../../src/types/common/events").ActionPlayerEvent
+      expect(evt.data.actionCode).toBe("Defused_The_Bomb")
+      expect(evt.data.team).toBe("CT")
+      expect(evt.meta?.steamId).toBe("STEAM_1:0:111")
+    })
+
+    it("should parse a team action event", async () => {
+      const logLine = 'L 07/19/2025 - 15:17:36: Team "CT" triggered "Bomb_Defused" (CT "6") (T "3")'
+      const result = await parser.parse(logLine, serverId)
+      expect(result.success).toBe(true)
+      if (!result.success) return
+      expect(result.event.eventType).toBe(EventType.ACTION_TEAM)
+      const evt = result.event as import("../../src/types/common/events").ActionTeamEvent
+      expect(evt.data.team).toBe("CT")
+      expect(evt.data.actionCode).toBe("Bomb_Defused")
+    })
+
+    it("should parse a world action event", async () => {
+      const logLine = 'L 07/19/2025 - 15:17:36: World triggered "Round_End"'
+      const result = await parser.parse(logLine, serverId)
+      expect(result.success).toBe(true)
+      if (!result.success) return
+      expect(result.event.eventType).toBe(EventType.ACTION_WORLD)
+      const evt = result.event as import("../../src/types/common/events").WorldActionEvent
+      expect(evt.data.actionCode).toBe("Round_End")
+    })
   })
 
   describe("BOT detection", () => {

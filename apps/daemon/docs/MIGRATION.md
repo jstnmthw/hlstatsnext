@@ -2,7 +2,33 @@
 
 ## Overview
 
-Complete rewrite of the Perl-based HLStats daemon using modern TypeScript/Node.js architecture. This document tracks our progress through each development phase toward a production-ready release candidate.
+This document outlines the comprehensive plan to rewrite the legacy Perl-based HLStats daemon into a modern, scalable, and maintainable microservice using TypeScript and Node.js. It serves as the single source of truth for the migration project, detailing everything from high-level architecture to granular implementation steps.
+
+---
+
+## Project Goal
+
+To replace the old HLstatsX Perl program with a robust, testable, and cloud-native solution for a modern real-time game analytics, seamlessly integrated into the existing monorepo.
+
+---
+
+## Core Technologies
+
+- **Runtime**: Node.js 24+ with TypeScript 5.x
+- **Database**: Prisma ORM with MySQL (utilizing the existing schema)
+- **Message Queue**: Redis + BullMQ for robust event processing
+- **Caching**: Redis for session management and frequently accessed data
+- **Validation**: Zod for compile-time and runtime type safety
+- **Testing**: Vitest for unit/integration tests, Supertest for API testing
+
+### Service Architecture
+
+The daemon is designed as a set of cohesive microservices, each with a distinct responsibility. This modular approach enhances scalability and maintainability.
+
+- **Log Ingress Service**: Listens for UDP log streams from game servers, performs initial parsing, and enqueues events into Redis.
+- **Event Processor Service**: The core of the application. Consumes events from the message queue, applies business logic, and updates the database.
+- **RCON Service**: Provides an interface for remote server administration via the RCON protocol.
+- **Statistics Service**: Aggregates and calculates real-time statistics, serving them via an API.
 
 ---
 
@@ -200,8 +226,6 @@ Extend parser support to all Half-Life engine games and implement advanced event
 - [ ] Server grouping/tagging
 - [ ] Map rotation tracking
 
-### Estimated Duration: 3-4 weeks
-
 ---
 
 ## **Phase 4: RCON & Live Features**
@@ -241,8 +265,6 @@ Implement remote console functionality and real-time features.
 - [ ] Skill change notifications
 - [ ] Achievement announcements
 
-### Estimated Duration: 3-4 weeks
-
 ---
 
 ## **Phase 5: Performance & Production**
@@ -279,22 +301,19 @@ Optimize performance, implement caching, and prepare for production deployment.
 
 #### **Monitoring & Observability**
 
-- [ ] Prometheus metrics
-- [ ] Grafana dashboards
+- [ ] Prometheus metrics (monorepo)
+- [ ] Grafana dashboards (monorepo)
 - [ ] Distributed tracing
 - [ ] Structured logging
-- [ ] Error tracking (Sentry)
-- [ ] Performance monitoring
+- [ ] Error tracking (Sentry - monorepo)
+- [ ] Performance monitoring (monorepo)
 
 #### **Documentation**
 
-- [ ] API documentation
 - [ ] Deployment guide
 - [ ] Configuration reference
 - [ ] Migration guide
 - [ ] Troubleshooting guide
-
-### Estimated Duration: 4-5 weeks
 
 ---
 
@@ -330,8 +349,6 @@ Comprehensive testing, bug fixes, and RC preparation.
 - [ ] Release notes
 - [ ] Migration scripts
 - [ ] Rollback procedures
-
-### Estimated Duration: 2-3 weeks
 
 ---
 

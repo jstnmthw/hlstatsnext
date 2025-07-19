@@ -19,7 +19,7 @@ alwaysApply: true
 | 1   | **ALWAYS** inspect the current code-base & state before writing new code.                                                    | Prevents drift & merge errors          |
 | 2   | **NEVER** skip validation or tests.                                                                                          | Guarantees functional parity           |
 | 3   | **PAUSE** at designated checkpoints and wait for user confirmation.                                                          | Keeps the human in the loop            |
-| 4   | **MAINTAIN** a running log in `apps/daemon/docs/MIGRATION_PROGRESS.md`.                                                      | Traceability                           |
+| 4   | **MAINTAIN** a running log in `apps/daemon/docs/MIGRATION.md`.                                                               | Traceability                           |
 | 5   | **DOCUMENT** every non-trivial decision & any deviation from this prompt (in the same log).                                  | Knowledge sharing                      |
 | 6   | **SYNC DOCS** update `README.md`, architecture docs, and JSDoc comments alongside code changes.                              | Keep all documentation current         |
 | 7   | **ADD TESTS** for _every_ refactor or new feature.                                                                           | Regression safety                      |
@@ -30,9 +30,9 @@ alwaysApply: true
 
 ## 2 Reference Documents (@-style links)
 
-- [MIGRATION_PLAN.md](mdc:docs/MIGRATION_PLAN.md) - phase milestones & checkpoints
-- [DEVELOPMENT_BEST_PRACTICES.md](mdc:apps/daemon/docs/DEVELOPMENT_BEST_PRACTICES.md) - coding conventions & review checklist
-- [MIGRATION_PROGRESS.md](mdc:apps/daemon/docs/MIGRATION_PROGRESS.md) - progress log you must keep updated
+- [MIGRATION.md](mdc:docs/MIGRATION.md) - phase milestones & checkpoints
+- [BEST_PRACTICES.md](mdc:apps/daemon/docs/BEST_PRACTICES.md) - coding conventions & review checklist
+- [MIGRATION.md](mdc:apps/daemon/docs/MIGRATION.md) - progress log you must keep updated
 
 ---
 
@@ -293,7 +293,7 @@ If any command fails, **stop** and fix before continuing.
 
 ## 13 Progress Checkpoints
 
-Mark the following in [MIGRATION_PROGRESS.md](mdc:apps/daemon/docs/MIGRATION_PROGRESS.md) each time they are completed:
+Mark the following in [MIGRATION.md](mdc:apps/daemon/docs/MIGRATION.md) each time they are completed:
 
 1. Environment set-up validated (`pnpm dev` starts all apps)
 2. Database schema migrated & generated types committed
@@ -308,11 +308,11 @@ Mark the following in [MIGRATION_PROGRESS.md](mdc:apps/daemon/docs/MIGRATION_PRO
 A change is **DONE** only when:
 
 1. All acceptance criteria for the current task/phase are satisfied.
-2. Code adheres to this prompt _and_ @DEVELOPMENT_BEST_PRACTICES.md.
+2. Code adheres to this prompt _and_ @BEST_PRACTICES.md.
 3. Tests added/updated with meaningful assertions & coverage.
 4. `pnpm lint && pnpm check-types && pnpm test ` all pass.
 5. **Documentation is synchronised** - `README.md`, relevant markdown specs, architecture docs, and JSDoc comments all reflect the change.
-6. `@MIGRATION_PROGRESS.md` log updated.
+6. `@MIGRATION.md` log updated.
 7. PR description links to relevant docs & tasks.
 
 ---

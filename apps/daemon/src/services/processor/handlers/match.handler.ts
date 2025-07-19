@@ -5,7 +5,26 @@
  * and manages round-based scoring and team performance.
  */
 
-import type { GameEvent, RoundEndEvent, MapChangeEvent, TeamWinEvent } from "@/types/common/events"
+import type { 
+  GameEvent, 
+  RoundEndEvent, 
+  MapChangeEvent, 
+  TeamWinEvent,
+  BombPlantEvent,
+  BombDefuseEvent,
+  BombExplodeEvent,
+  HostageRescueEvent,
+  HostageTouchEvent,
+  FlagCaptureEvent,
+  FlagDefendEvent,
+  FlagPickupEvent,
+  FlagDropEvent,
+  ControlPointCaptureEvent,
+  ControlPointDefendEvent,
+  PlayerKillEvent,
+  PlayerSuicideEvent,
+  PlayerTeamkillEvent
+} from "@/types/common/events"
 import type { ILogger } from "@/utils/logger.types"
 import type { IPlayerService } from "@/services/player/player.types"
 import type { DatabaseClient } from "@/database/client"
@@ -28,6 +47,11 @@ export interface PlayerRoundStats {
   damage: number
   objectiveScore: number // bomb plants, defuses, flag captures, etc.
   clutchWins: number
+  headshots: number
+  shots: number
+  hits: number
+  suicides: number
+  teamkills: number
 }
 
 export interface HandlerResult {
@@ -59,6 +83,28 @@ export class MatchHandler implements IMatchHandler {
 
       case "MAP_CHANGE":
         return this.handleMapChange(event)
+
+      case "BOMB_PLANT":
+      case "BOMB_DEFUSE":
+      case "BOMB_EXPLODE":
+      case "HOSTAGE_RESCUE":
+      case "HOSTAGE_TOUCH":
+      case "FLAG_CAPTURE":
+      case "FLAG_DEFEND":
+      case "FLAG_PICKUP":
+      case "FLAG_DROP":
+      case "CONTROL_POINT_CAPTURE":
+      case "CONTROL_POINT_DEFEND":
+        return this.handleObjectiveEvent(event)
+
+      case "PLAYER_KILL":
+        return this.handlePlayerKillEvent(event)
+
+      case "PLAYER_SUICIDE":
+        return this.handlePlayerSuicideEvent(event)
+
+      case "PLAYER_TEAMKILL":
+        return this.handlePlayerTeamkillEvent(event)
 
       default:
         return { success: true } // Event not handled by this handler
@@ -270,20 +316,34 @@ export class MatchHandler implements IMatchHandler {
     const participants = await this.playerService.getRoundParticipants(serverId, roundDuration)
 
     for (const p of participants) {
-      const existing = matchStats.playerStats.get(p.playerId) ?? {
-        playerId: p.playerId,
-        kills: 0,
-        deaths: 0,
-        assists: 0,
-        damage: 0,
-        objectiveScore: 0,
-        clutchWins: 0,
+      const existing = matchStats.playerStats.get(p.playerId) ?? this.createEmptyPlayerStats(p.playerId)
+
+      // Calculate delta from previous round stats to get round-specific stats
+      const previousTotal = {
+        kills: existing.kills,
+        deaths: existing.deaths,
+        teamkills: existing.teamkills,
       }
 
-      // Update basic kills/deaths from aggregated eventEntry
-      existing.kills += p.player.kills
-      existing.deaths += p.player.deaths
-      existing.objectiveScore += 0 // placeholder – future objective events
+      // Update with current totals from getRoundParticipants (only available fields)
+      // Note: getRoundParticipants only returns skill, teamkills, kills, deaths
+      // Other stats (headshots, suicides, shots, hits) are tracked in real-time via event handlers
+      existing.kills = p.player.kills
+      existing.deaths = p.player.deaths  
+      existing.teamkills = p.player.teamkills
+
+      // Log round delta for debugging
+      const roundDelta = {
+        kills: existing.kills - previousTotal.kills,
+        deaths: existing.deaths - previousTotal.deaths,
+        teamkills: existing.teamkills - previousTotal.teamkills,
+      }
+
+      if (roundDelta.kills > 0 || roundDelta.deaths > 0) {
+        this.logger.debug(
+          `Player ${p.playerId} round stats delta: +${roundDelta.kills} kills, +${roundDelta.deaths} deaths, +${roundDelta.teamkills} teamkills`
+        )
+      }
 
       matchStats.playerStats.set(p.playerId, existing)
     }
@@ -366,13 +426,12 @@ export class MatchHandler implements IMatchHandler {
         if (!server) return
 
         let totalKills = 0
-        const totalHeadshots = 0 // TODO: Track headshots
+        let totalHeadshots = 0
 
         // Create a player history snapshot for each participant
         for (const [, playerStats] of stats.playerStats) {
           totalKills += playerStats.kills
-          // Note: Headshots are not yet tracked on playerStats.
-          // totalHeadshots += playerStats.headshots;
+          totalHeadshots += playerStats.headshots
 
           await tx.playerHistory.create({
             data: {
@@ -380,12 +439,12 @@ export class MatchHandler implements IMatchHandler {
               eventTime: new Date(),
               kills: playerStats.kills,
               deaths: playerStats.deaths,
-              suicides: 0, // Would be tracked separately
+              suicides: playerStats.suicides,
               skill: this.calculatePlayerScore(playerStats),
-              shots: 0, // Would need to be tracked from weapon events
-              hits: 0, // Would need to be tracked from weapon events
-              headshots: 0, // Would need to be tracked from frag events
-              teamkills: 0, // Would be tracked separately
+              shots: playerStats.shots,
+              hits: playerStats.hits,
+              headshots: playerStats.headshots,
+              teamkills: playerStats.teamkills,
             },
           })
         }
@@ -413,6 +472,220 @@ export class MatchHandler implements IMatchHandler {
         `Failed to save match statistics to database for server ${serverId}`,
         error instanceof Error ? error.message : String(error),
       )
+    }
+  }
+
+  private async handleObjectiveEvent(event: 
+    | BombPlantEvent 
+    | BombDefuseEvent 
+    | BombExplodeEvent
+    | HostageRescueEvent 
+    | HostageTouchEvent
+    | FlagCaptureEvent 
+    | FlagDefendEvent
+    | FlagPickupEvent
+    | FlagDropEvent
+    | ControlPointCaptureEvent
+    | ControlPointDefendEvent
+  ): Promise<HandlerResult> {
+    const serverId = event.serverId
+    
+    try {
+      const matchStats = this.currentMatch.get(serverId)
+      if (!matchStats) {
+        this.logger.warn(`No match stats found for server ${serverId} during objective event`)
+        return { success: true }
+      }
+
+      // Some events like BOMB_EXPLODE don't have a player ID
+      const playerId = 'playerId' in event.data ? event.data.playerId : null
+      
+      // Update player objective score (only for player-based events)
+      if (playerId) {
+        const playerStats = matchStats.playerStats.get(playerId) ?? {
+          playerId,
+          kills: 0,
+          deaths: 0,
+          assists: 0,
+          damage: 0,
+          objectiveScore: 0,
+          clutchWins: 0,
+          headshots: 0,
+          shots: 0,
+          hits: 0,
+          suicides: 0,
+          teamkills: 0,
+        }
+
+        // Award objective points based on event type
+        const objectivePoints = this.getObjectivePoints(event.eventType)
+        playerStats.objectiveScore += objectivePoints
+        matchStats.playerStats.set(playerId, playerStats)
+      }
+
+      // Update server statistics for bomb events
+      if (event.eventType === "BOMB_PLANT") {
+        await this.db.prisma.server.update({
+          where: { serverId },
+          data: { bombs_planted: { increment: 1 } },
+        })
+      } else if (event.eventType === "BOMB_DEFUSE") {
+        await this.db.prisma.server.update({
+          where: { serverId },
+          data: { bombs_defused: { increment: 1 } },
+        })
+      }
+
+      this.logger.event(
+        `Objective event on server ${serverId}: ${event.eventType}${playerId ? ` by player ${playerId} (+${this.getObjectivePoints(event.eventType)} points)` : ''}`
+      )
+
+      return {
+        success: true,
+        roundsAffected: 0,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Objective event error",
+      }
+    }
+  }
+
+  private getObjectivePoints(eventType: string): number {
+    const objectivePointsMap: Record<string, number> = {
+      BOMB_PLANT: 3,
+      BOMB_DEFUSE: 3,
+      BOMB_EXPLODE: 0, // No player points for explosion
+      HOSTAGE_RESCUE: 2,
+      HOSTAGE_TOUCH: 1,
+      FLAG_CAPTURE: 5,
+      FLAG_DEFEND: 3,
+      FLAG_PICKUP: 1,
+      FLAG_DROP: 0,
+      CONTROL_POINT_CAPTURE: 4,
+      CONTROL_POINT_DEFEND: 2,
+    }
+    return objectivePointsMap[eventType] || 1
+  }
+
+  private async handlePlayerKillEvent(event: PlayerKillEvent): Promise<HandlerResult> {
+    const serverId = event.serverId
+    
+    try {
+      const matchStats = this.currentMatch.get(serverId)
+      if (!matchStats) {
+        this.logger.warn(`No match stats found for server ${serverId} during kill event`)
+        return { success: true }
+      }
+
+      const { killerId, victimId, headshot } = event.data
+
+      // Update killer stats
+      const killerStats = matchStats.playerStats.get(killerId) ?? this.createEmptyPlayerStats(killerId)
+      killerStats.kills += 1
+      if (headshot) {
+        killerStats.headshots += 1
+      }
+      matchStats.playerStats.set(killerId, killerStats)
+
+      // Update victim stats
+      const victimStats = matchStats.playerStats.get(victimId) ?? this.createEmptyPlayerStats(victimId)
+      victimStats.deaths += 1
+      matchStats.playerStats.set(victimId, victimStats)
+
+      this.logger.debug(
+        `Kill event processed: player ${killerId} killed player ${victimId}${headshot ? ' (headshot)' : ''}`
+      )
+
+      return { success: true }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Kill event error",
+      }
+    }
+  }
+
+  private async handlePlayerSuicideEvent(event: PlayerSuicideEvent): Promise<HandlerResult> {
+    const serverId = event.serverId
+    
+    try {
+      const matchStats = this.currentMatch.get(serverId)
+      if (!matchStats) {
+        this.logger.warn(`No match stats found for server ${serverId} during suicide event`)
+        return { success: true }
+      }
+
+      const { playerId } = event.data
+      const playerStats = matchStats.playerStats.get(playerId) ?? this.createEmptyPlayerStats(playerId)
+      playerStats.suicides += 1
+      playerStats.deaths += 1 // Suicide also counts as a death
+      matchStats.playerStats.set(playerId, playerStats)
+
+      this.logger.debug(`Suicide event processed: player ${playerId}`)
+
+      return { success: true }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Suicide event error",
+      }
+    }
+  }
+
+  private async handlePlayerTeamkillEvent(event: PlayerTeamkillEvent): Promise<HandlerResult> {
+    const serverId = event.serverId
+    
+    try {
+      const matchStats = this.currentMatch.get(serverId)
+      if (!matchStats) {
+        this.logger.warn(`No match stats found for server ${serverId} during teamkill event`)
+        return { success: true }
+      }
+
+      const { killerId, victimId, headshot } = event.data
+
+      // Update killer stats
+      const killerStats = matchStats.playerStats.get(killerId) ?? this.createEmptyPlayerStats(killerId)
+      killerStats.teamkills += 1
+      if (headshot) {
+        killerStats.headshots += 1
+      }
+      matchStats.playerStats.set(killerId, killerStats)
+
+      // Update victim stats  
+      const victimStats = matchStats.playerStats.get(victimId) ?? this.createEmptyPlayerStats(victimId)
+      victimStats.deaths += 1
+      matchStats.playerStats.set(victimId, victimStats)
+
+      this.logger.debug(
+        `Teamkill event processed: player ${killerId} teamkilled player ${victimId}${headshot ? ' (headshot)' : ''}`
+      )
+
+      return { success: true }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Teamkill event error",
+      }
+    }
+  }
+
+  private createEmptyPlayerStats(playerId: number): PlayerRoundStats {
+    return {
+      playerId,
+      kills: 0,
+      deaths: 0,
+      assists: 0,
+      damage: 0,
+      objectiveScore: 0,
+      clutchWins: 0,
+      headshots: 0,
+      shots: 0,
+      hits: 0,
+      suicides: 0,
+      teamkills: 0,
     }
   }
 
@@ -471,5 +744,38 @@ export class MatchHandler implements IMatchHandler {
    */
   public getMatchStats(serverId: number): MatchStats | undefined {
     return this.currentMatch.get(serverId)
+  }
+
+  /**
+   * Add weapon statistics to player match stats
+   * This method can be called by other handlers (like WeaponHandler) to update match stats
+   */
+  public updatePlayerWeaponStats(
+    serverId: number, 
+    playerId: number, 
+    stats: { shots?: number; hits?: number; damage?: number }
+  ): void {
+    const matchStats = this.currentMatch.get(serverId)
+    if (!matchStats) return
+
+    const playerStats = matchStats.playerStats.get(playerId) ?? this.createEmptyPlayerStats(playerId)
+    
+    if (stats.shots) playerStats.shots += stats.shots
+    if (stats.hits) playerStats.hits += stats.hits
+    if (stats.damage) playerStats.damage += stats.damage
+
+    matchStats.playerStats.set(playerId, playerStats)
+    
+    this.logger.debug(
+      `Updated weapon stats for player ${playerId}: +${stats.shots || 0} shots, +${stats.hits || 0} hits, +${stats.damage || 0} damage`
+    )
+  }
+
+  /**
+   * Reset match statistics for a server (useful for new matches)
+   */
+  public resetMatchStats(serverId: number): void {
+    this.currentMatch.delete(serverId)
+    this.logger.info(`Reset match statistics for server ${serverId}`)
   }
 }

@@ -6,6 +6,7 @@
  */
 
 export enum EventType {
+  // Player events
   PLAYER_CONNECT = "PLAYER_CONNECT",
   PLAYER_DISCONNECT = "PLAYER_DISCONNECT",
   PLAYER_ENTRY = "PLAYER_ENTRY",
@@ -27,6 +28,26 @@ export enum EventType {
   SERVER_SHUTDOWN = "SERVER_SHUTDOWN",
   ADMIN_ACTION = "ADMIN_ACTION",
   CHAT_MESSAGE = "CHAT_MESSAGE",
+
+  // Objective-based events
+  BOMB_PLANT = "BOMB_PLANT",
+  BOMB_DEFUSE = "BOMB_DEFUSE",
+  BOMB_EXPLODE = "BOMB_EXPLODE",
+  HOSTAGE_RESCUE = "HOSTAGE_RESCUE",
+  HOSTAGE_TOUCH = "HOSTAGE_TOUCH",
+  FLAG_CAPTURE = "FLAG_CAPTURE",
+  FLAG_DEFEND = "FLAG_DEFEND",
+  FLAG_PICKUP = "FLAG_PICKUP",
+  FLAG_DROP = "FLAG_DROP",
+  CONTROL_POINT_CAPTURE = "CONTROL_POINT_CAPTURE",
+  CONTROL_POINT_DEFEND = "CONTROL_POINT_DEFEND",
+
+  // Weapon events
+  WEAPON_FIRE = "WEAPON_FIRE",
+  WEAPON_HIT = "WEAPON_HIT",
+
+  // Server statistics events
+  SERVER_STATS_UPDATE = "SERVER_STATS_UPDATE",
 }
 
 export interface Position3D {
@@ -303,6 +324,192 @@ export interface WorldActionEvent extends BaseEvent {
   }
 }
 
+// Objective-based event interfaces
+export interface BombPlantEvent extends BaseEvent {
+  eventType: EventType.BOMB_PLANT
+  data: {
+    playerId: number
+    bombsite?: string // "A" or "B"
+    position?: Position3D
+    team: string
+  }
+  meta?: PlayerMeta
+}
+
+export interface BombDefuseEvent extends BaseEvent {
+  eventType: EventType.BOMB_DEFUSE
+  data: {
+    playerId: number
+    bombsite?: string
+    position?: Position3D
+    team: string
+    timeRemaining?: number // Seconds left on timer
+  }
+  meta?: PlayerMeta
+}
+
+export interface BombExplodeEvent extends BaseEvent {
+  eventType: EventType.BOMB_EXPLODE
+  data: {
+    bombsite?: string
+    position?: Position3D
+    planterPlayerId?: number // Who planted the bomb
+  }
+}
+
+export interface HostageRescueEvent extends BaseEvent {
+  eventType: EventType.HOSTAGE_RESCUE
+  data: {
+    playerId: number
+    hostageId?: number
+    position?: Position3D
+    team: string
+  }
+  meta?: PlayerMeta
+}
+
+export interface HostageTouchEvent extends BaseEvent {
+  eventType: EventType.HOSTAGE_TOUCH
+  data: {
+    playerId: number
+    hostageId?: number
+    position?: Position3D
+    team: string
+  }
+  meta?: PlayerMeta
+}
+
+export interface FlagCaptureEvent extends BaseEvent {
+  eventType: EventType.FLAG_CAPTURE
+  data: {
+    playerId: number
+    flagTeam: string // Which team's flag was captured
+    captureTeam: string // Which team made the capture
+    position?: Position3D
+  }
+  meta?: PlayerMeta
+}
+
+export interface FlagDefendEvent extends BaseEvent {
+  eventType: EventType.FLAG_DEFEND
+  data: {
+    playerId: number
+    flagTeam: string
+    position?: Position3D
+    team: string
+  }
+  meta?: PlayerMeta
+}
+
+export interface FlagPickupEvent extends BaseEvent {
+  eventType: EventType.FLAG_PICKUP
+  data: {
+    playerId: number
+    flagTeam: string
+    position?: Position3D
+    team: string
+  }
+  meta?: PlayerMeta
+}
+
+export interface FlagDropEvent extends BaseEvent {
+  eventType: EventType.FLAG_DROP
+  data: {
+    playerId: number
+    flagTeam: string
+    position?: Position3D
+    team: string
+    reason?: string // "killed", "dropped", "returned"
+  }
+  meta?: PlayerMeta
+}
+
+export interface ControlPointCaptureEvent extends BaseEvent {
+  eventType: EventType.CONTROL_POINT_CAPTURE
+  data: {
+    playerId: number
+    pointName: string
+    pointId?: number
+    capturingTeam: string
+    previousOwner?: string
+    position?: Position3D
+    captureTime?: number // Time taken to capture
+  }
+  meta?: PlayerMeta
+}
+
+export interface ControlPointDefendEvent extends BaseEvent {
+  eventType: EventType.CONTROL_POINT_DEFEND
+  data: {
+    playerId: number
+    pointName: string
+    pointId?: number
+    defendingTeam: string
+    position?: Position3D
+    team: string
+  }
+  meta?: PlayerMeta
+}
+
+// Weapon event interfaces
+export interface WeaponFireEvent extends BaseEvent {
+  eventType: EventType.WEAPON_FIRE
+  data: {
+    playerId: number
+    weaponCode: string
+    weaponName?: string
+    team: string
+    position?: Position3D
+  }
+  meta?: PlayerMeta
+}
+
+export interface WeaponHitEvent extends BaseEvent {
+  eventType: EventType.WEAPON_HIT
+  data: {
+    playerId: number
+    victimId?: number
+    weaponCode: string
+    weaponName?: string
+    team: string
+    damage?: number
+    position?: Position3D
+    victimPosition?: Position3D
+  }
+  meta?: PlayerMeta
+}
+
+export interface ServerStatsUpdateEvent extends BaseEvent {
+  eventType: EventType.SERVER_STATS_UPDATE
+  data: {
+    kills?: number
+    players?: number
+    rounds?: number
+    suicides?: number
+    headshots?: number
+    bombsPlanted?: number
+    bombsDefused?: number
+    ctWins?: number
+    tsWins?: number
+    actPlayers?: number
+    maxPlayers?: number
+    actMap?: string
+    mapRounds?: number
+    mapCtWins?: number
+    mapTsWins?: number
+    mapStarted?: number
+    mapChanges?: number
+    ctShots?: number
+    ctHits?: number
+    tsShots?: number
+    tsHits?: number
+    mapCtShots?: number
+    mapCtHits?: number
+    mapTsShots?: number
+    mapTsHits?: number
+  }
+}
+
 // Updated discriminated union of all supported events
 export type GameEvent =
   | PlayerKillEvent
@@ -326,6 +533,20 @@ export type GameEvent =
   | PlayerTeamkillEvent
   | ServerShutdownEvent
   | AdminActionEvent
+  | BombPlantEvent
+  | BombDefuseEvent
+  | BombExplodeEvent
+  | HostageRescueEvent
+  | HostageTouchEvent
+  | FlagCaptureEvent
+  | FlagDefendEvent
+  | FlagPickupEvent
+  | FlagDropEvent
+  | ControlPointCaptureEvent
+  | ControlPointDefendEvent
+  | WeaponFireEvent
+  | WeaponHitEvent
+  | ServerStatsUpdateEvent
 
 export interface ProcessedEvent {
   id: string

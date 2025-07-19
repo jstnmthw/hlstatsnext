@@ -8,6 +8,9 @@ import {
   type PlayerKillEvent,
   type PlayerSuicideEvent,
   type PlayerTeamkillEvent,
+  type ActionPlayerEvent,
+  type ActionTeamEvent,
+  type MapChangeEvent,
 } from "../../src/types/common/events"
 
 describe("Counster Strike Parser", () => {
@@ -225,7 +228,7 @@ describe("Counster Strike Parser", () => {
       if (!result.success) return
 
       expect(result.event.eventType).toBe(EventType.ACTION_PLAYER)
-      const evt = result.event as import("../../src/types/common/events").ActionPlayerEvent
+      const evt = result.event as ActionPlayerEvent
       expect(evt.data.actionCode).toBe("Defused_The_Bomb")
       expect(evt.data.team).toBe("CT")
       expect(evt.meta?.steamId).toBe("STEAM_1:0:111")
@@ -237,7 +240,7 @@ describe("Counster Strike Parser", () => {
       expect(result.success).toBe(true)
       if (!result.success) return
       expect(result.event.eventType).toBe(EventType.ACTION_TEAM)
-      const evt = result.event as import("../../src/types/common/events").ActionTeamEvent
+      const evt = result.event as ActionTeamEvent
       expect(evt.data.team).toBe("CT")
       expect(evt.data.actionCode).toBe("Bomb_Defused")
     })
@@ -257,7 +260,7 @@ describe("Counster Strike Parser", () => {
       )
       expect(first.success).toBe(true)
       if (!first.success) return
-      const evt1 = first.event as import("../../src/types/common/events").MapChangeEvent
+      const evt1 = first.event as MapChangeEvent
       expect(evt1.eventType).toBe(EventType.MAP_CHANGE)
       expect(evt1.data.previousMap).toBeUndefined()
       expect(evt1.data.newMap).toBe("de_dust")
@@ -268,7 +271,7 @@ describe("Counster Strike Parser", () => {
       )
       expect(second.success).toBe(true)
       if (!second.success) return
-      const evt2 = second.event as import("../../src/types/common/events").MapChangeEvent
+      const evt2 = second.event as MapChangeEvent
       expect(evt2.data.previousMap).toBe("de_dust")
       expect(evt2.data.newMap).toBe("de_inferno")
     })

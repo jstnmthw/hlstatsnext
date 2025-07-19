@@ -212,6 +212,8 @@ export class PlayerService implements IPlayerService {
       kill_streak?: number
       death_streak?: number
       connection_time?: number
+      last_event?: number
+      lastName?: string
     },
   ): Promise<void> {
     try {
@@ -249,6 +251,12 @@ export class PlayerService implements IPlayerService {
       }
       if (updates.connection_time !== undefined) {
         updateData.connection_time = { increment: updates.connection_time }
+      }
+      if (updates.last_event !== undefined) {
+        updateData.last_event = updates.last_event
+      }
+      if (updates.lastName !== undefined) {
+        updateData.lastName = updates.lastName
       }
 
       await this.db.prisma.player.update({

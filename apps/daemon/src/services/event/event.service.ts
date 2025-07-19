@@ -14,6 +14,10 @@ import type {
   PlayerChatEvent,
   PlayerSuicideEvent,
   PlayerTeamkillEvent,
+  PlayerEntryEvent,
+  PlayerChangeTeamEvent,
+  PlayerChangeRoleEvent,
+  PlayerChangeNameEvent,
 } from "@/types/common/events"
 import { IEventService } from "./event.types"
 
@@ -35,6 +39,18 @@ export class EventService implements IEventService {
           break
         case "PLAYER_DISCONNECT":
           await this.createDisconnectEvent(event)
+          break
+        case "PLAYER_ENTRY":
+          await this.createEntryEvent(event)
+          break
+        case "PLAYER_CHANGE_TEAM":
+          await this.createChangeTeamEvent(event)
+          break
+        case "PLAYER_CHANGE_ROLE":
+          await this.createChangeRoleEvent(event)
+          break
+        case "PLAYER_CHANGE_NAME":
+          await this.createChangeNameEvent(event)
           break
         case "PLAYER_KILL":
           await this.createFragEvent(event)
@@ -144,6 +160,54 @@ export class EventService implements IEventService {
         map: "", // Placeholder until map tracking implemented
         message_mode: event.data.isDead ? 1 : 0,
         message: event.data.message.substring(0, 128),
+      },
+    })
+  }
+
+  private async createEntryEvent(event: PlayerEntryEvent): Promise<void> {
+    await this.db.prisma.eventEntry.create({
+      data: {
+        eventTime: event.timestamp,
+        playerId: event.data.playerId,
+        serverId: event.serverId,
+        map: "", // TODO: Populate from server context
+      },
+    })
+  }
+
+  private async createChangeTeamEvent(event: PlayerChangeTeamEvent): Promise<void> {
+    await this.db.prisma.eventChangeTeam.create({
+      data: {
+        eventTime: event.timestamp,
+        playerId: event.data.playerId,
+        team: event.data.team,
+        serverId: event.serverId,
+        map: "", // TODO: Populate from server context
+      },
+    })
+  }
+
+  private async createChangeRoleEvent(event: PlayerChangeRoleEvent): Promise<void> {
+    await this.db.prisma.eventChangeRole.create({
+      data: {
+        eventTime: event.timestamp,
+        playerId: event.data.playerId,
+        role: event.data.role,
+        serverId: event.serverId,
+        map: "", // TODO: Populate from server context
+      },
+    })
+  }
+
+  private async createChangeNameEvent(event: PlayerChangeNameEvent): Promise<void> {
+    await this.db.prisma.eventChangeName.create({
+      data: {
+        eventTime: event.timestamp,
+        playerId: event.data.playerId,
+        oldName: event.data.oldName,
+        newName: event.data.newName,
+        serverId: event.serverId,
+        map: "", // TODO: Populate from server context
       },
     })
   }

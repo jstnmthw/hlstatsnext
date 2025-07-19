@@ -155,6 +155,11 @@ export class RankingHandler implements IRankingHandler {
     const { winningTeam, duration } = event.data
     const serverId = event.serverId
 
+    // Skip rating updates if we don't have complete round data
+    if (!winningTeam || !duration) {
+      return { success: true }
+    }
+
     try {
       // Get all players who participated in the round via player service
       const participants = await this.playerService.getRoundParticipants(serverId, duration)

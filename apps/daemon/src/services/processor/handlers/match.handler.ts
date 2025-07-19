@@ -5,7 +5,7 @@
  * and manages round-based scoring and team performance.
  */
 
-import type { GameEvent, RoundEndEvent, MapChangeEvent } from "@/types/common/events"
+import type { GameEvent, RoundEndEvent, MapChangeEvent, TeamWinEvent } from "@/types/common/events"
 import type { ILogger } from "@/utils/logger.types"
 import type { IPlayerService } from "@/services/player/player.types"
 import type { DatabaseClient } from "@/database/client"
@@ -53,6 +53,9 @@ export class MatchHandler implements IMatchHandler {
 
       case "ROUND_END":
         return this.handleRoundEnd(event)
+
+      case "TEAM_WIN":
+        return this.handleTeamWin(event)
 
       case "MAP_CHANGE":
         return this.handleMapChange(event)
@@ -104,15 +107,17 @@ export class MatchHandler implements IMatchHandler {
 
       // Update match statistics
       matchStats.totalRounds++
-      matchStats.duration += duration
-      matchStats.teamScores[winningTeam] = (matchStats.teamScores[winningTeam] || 0) + 1
+      if (duration) matchStats.duration += duration
+      if (winningTeam) {
+        matchStats.teamScores[winningTeam] = (matchStats.teamScores[winningTeam] || 0) + 1
+      }
 
       // Update player round statistics and calculate MVP
       await this.updatePlayerRoundStats(serverId)
       await this.calculateRoundMVP(serverId)
 
       this.logger.event(
-        `Round ended on server ${serverId}: ${winningTeam} won (${score.team1}-${score.team2})`,
+        `Round ended on server ${serverId}${winningTeam ? `: ${winningTeam} won` : ''}${score ? ` (${score.team1}-${score.team2})` : ''}`,
       )
 
       return {
@@ -123,6 +128,54 @@ export class MatchHandler implements IMatchHandler {
       return {
         success: false,
         error: error instanceof Error ? error.message : "Round end error",
+      }
+    }
+  }
+
+  private async handleTeamWin(event: TeamWinEvent): Promise<HandlerResult> {
+    const serverId = event.serverId
+    const { winningTeam, triggerName, score } = event.data
+
+    try {
+      const matchStats = this.currentMatch.get(serverId)
+      if (!matchStats) {
+        // Initialize match stats if not exists
+        this.currentMatch.set(serverId, {
+          duration: 0,
+          totalRounds: 0,
+          teamScores: {},
+          startTime: new Date(),
+          playerStats: new Map(),
+        })
+      }
+
+      const currentMatchStats = this.currentMatch.get(serverId)!
+
+      // Update match statistics
+      currentMatchStats.totalRounds++
+      currentMatchStats.teamScores[winningTeam] = (currentMatchStats.teamScores[winningTeam] || 0) + 1
+
+      // Update player round statistics and calculate MVP
+      await this.updatePlayerRoundStats(serverId)
+      await this.calculateRoundMVP(serverId)
+
+      // Update server statistics for CS-specific team wins
+      if (triggerName === "Terrorists_Win" || triggerName === "CTs_Win") {
+        await this.updateServerTeamStats(serverId, winningTeam)
+      }
+
+      this.logger.event(
+        `Team win on server ${serverId}: ${winningTeam} won via ${triggerName} (CT: ${score.ct}, T: ${score.t})`,
+      )
+
+      return {
+        success: true,
+        roundsAffected: 1,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Team win error",
       }
     }
   }
@@ -296,6 +349,35 @@ export class MatchHandler implements IMatchHandler {
     } catch (error) {
       this.logger.failed(
         `Failed to update player rankings for server ${serverId}`,
+        error instanceof Error ? error.message : String(error),
+      )
+    }
+  }
+
+  /**
+   * Update server-specific team statistics (for CS games)
+   */
+  private async updateServerTeamStats(serverId: number, winningTeam: string): Promise<void> {
+    try {
+      const updateData: Record<string, unknown> = {}
+      
+      if (winningTeam === "TERRORIST") {
+        updateData.ts_wins = { increment: 1 }
+        updateData.map_ts_wins = { increment: 1 }
+      } else if (winningTeam === "CT") {
+        updateData.ct_wins = { increment: 1 }
+        updateData.map_ct_wins = { increment: 1 }
+      }
+
+      await this.db.prisma.server.update({
+        where: { serverId },
+        data: updateData,
+      })
+
+      this.logger.debug(`Updated server team stats for ${winningTeam} win on server ${serverId}`)
+    } catch (error) {
+      this.logger.failed(
+        `Failed to update server team stats for server ${serverId}`,
         error instanceof Error ? error.message : String(error),
       )
     }

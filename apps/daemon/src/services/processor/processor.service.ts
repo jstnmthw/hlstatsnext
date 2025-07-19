@@ -81,6 +81,10 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
       switch (event.eventType) {
         case EventType.PLAYER_CONNECT:
         case EventType.PLAYER_DISCONNECT:
+        case EventType.PLAYER_ENTRY:
+        case EventType.PLAYER_CHANGE_TEAM:
+        case EventType.PLAYER_CHANGE_ROLE:
+        case EventType.PLAYER_CHANGE_NAME:
         case EventType.PLAYER_KILL:
         case EventType.PLAYER_SUICIDE:
         case EventType.PLAYER_TEAMKILL:
@@ -93,6 +97,7 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
 
         case EventType.ROUND_START:
         case EventType.ROUND_END:
+        case EventType.TEAM_WIN:
         case EventType.MAP_CHANGE:
           await this.matchHandler.handleEvent(event)
           break
@@ -178,6 +183,24 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
       case EventType.PLAYER_SUICIDE: {
         if (!event.meta) {
           throw new Error("SUICIDE event missing meta")
+        }
+
+        const { steamId, playerName } = event.meta
+        const playerId = await this.playerService.getOrCreatePlayer(
+          steamId,
+          playerName,
+          this.DEFAULT_GAME_ID,
+        )
+        event.data.playerId = playerId
+        break
+      }
+
+      case EventType.PLAYER_ENTRY:
+      case EventType.PLAYER_CHANGE_TEAM:
+      case EventType.PLAYER_CHANGE_ROLE:
+      case EventType.PLAYER_CHANGE_NAME: {
+        if (!event.meta) {
+          throw new Error(`${event.eventType} event missing meta`)
         }
 
         const { steamId, playerName } = event.meta

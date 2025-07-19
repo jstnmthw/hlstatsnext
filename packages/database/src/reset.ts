@@ -1,6 +1,6 @@
 import { db } from "./client"
-import { logError, logInfo, logStep, logSuccess } from "./seeds/logger"
-import { logDatabaseStats } from "./seeds"
+import { logError, logInfo, logStep, logSuccess } from "./seeders/logger"
+import { logDatabaseStats } from "./seeders"
 
 /**
  * Reset development data from the database.

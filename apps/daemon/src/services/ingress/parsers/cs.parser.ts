@@ -56,7 +56,6 @@ export class CsParser extends BaseParser {
       /^Loading map /i,
       /^Server cvar/i,
       /^Server cvars /i,
-      // Started map now parsed into MAP_CHANGE
     ]
 
     // Strip the leading Source timestamp to test the payload only
@@ -75,7 +74,6 @@ export class CsParser extends BaseParser {
     const suicide = await this.parseSuicide(logLine, serverId)
     if (suicide) return { success: true, event: suicide }
 
-    // Action events
     const teamAction = await this.parseTeamAction(logLine, serverId)
     if (teamAction) return { success: true, event: teamAction }
 

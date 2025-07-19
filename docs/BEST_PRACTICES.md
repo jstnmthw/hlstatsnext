@@ -1730,10 +1730,44 @@ export async function cleanupDatabase() {
 
 ### **5.1 Database Optimization**
 
-**Query Performance**:
+**Query Performance & Avoiding N+1 Problems**:
+
+A common performance pitfall is the "N+1 query problem," where an initial query retrieves a list of items (1 query), and then subsequent queries are made for each item in the list to fetch related data (N queries). This leads to a large number of database round-trips, significantly slowing down your application.
+
+**The Problem (N+1)**:
 
 ```typescript
-// ✅ GOOD: Efficient queries with proper indexes
+// ❌ BAD: N+1 query problem
+// 1. First query to get all players
+const players = await prisma.player.findMany()
+
+// 2. N subsequent queries to get stats for each player
+for (const player of players) {
+  const stats = await prisma.playerStats.findUnique({
+    // This runs for every player
+    where: { playerId: player.id },
+  })
+  // ... do something with player and stats
+}
+```
+
+If you have 100 players, this code executes 101 database queries.
+
+**The Solution (Eager Loading)**:
+
+Prisma provides `include` and `select` to eagerly load related data in a single query.
+
+```typescript
+// ✅ GOOD: Efficient query using `include`
+// Fetches all players and their related stats in one go.
+const playersWithStats = await prisma.player.findMany({
+  include: {
+    stats: true, // Include the full PlayerStats object
+  },
+})
+
+// ✅ GOOD: Efficient query using `select` for specific fields
+// Fetches all players and only specific fields from their stats.
 const topPlayers = await prisma.player.findMany({
   where: {
     lastSeenAt: {
@@ -1754,14 +1788,6 @@ const topPlayers = await prisma.player.findMany({
     },
   },
 })
-
-// ❌ BAD: N+1 queries
-const players = await prisma.player.findMany()
-for (const player of players) {
-  const stats = await prisma.playerStats.findUnique({
-    where: { playerId: player.id },
-  })
-}
 ```
 
 **Connection Pooling**:

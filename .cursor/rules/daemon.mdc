@@ -1,9 +1,10 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: false
 ---
-# HLStats Daemon v2 - AI Execution Prompt
+
+# HLStats Daemon - AI Execution Prompt
 
 ## **CRITICAL: READ THIS ENTIRE PROMPT BEFORE TAKING ANY ACTION**
 
@@ -13,7 +14,7 @@ You are tasked with implementing the HLStats Daemon v2 following the [MIGRATION_
 
 ## **Core Directives**
 
-### Execution Principles**
+### Execution Principles\*\*
 
 - **ALWAYS** check the current state before proceeding
 - **NEVER** skip validation steps
@@ -24,6 +25,6 @@ You are tasked with implementing the HLStats Daemon v2 following the [MIGRATION_
 
 ### Documents
 
-- **BEST PRACTICES** Review our best practices in [DEVELOPMENT_BEST_PRACTICES.md](mdc:apps/daemon-v2/docs/DEVELOPMENT_BEST_PRACTICES.md). 
+- **BEST PRACTICES** Review our best practices in [DEVELOPMENT_BEST_PRACTICES.md](mdc:apps/daemon-v2/docs/DEVELOPMENT_BEST_PRACTICES.md).
 - **PROGRESS** Review and self update [MIGRATION_PROGRESS.md](mdc:apps/daemon-v2/docs/MIGRATION_PROGRESS.md) when applicablee.
 - **TYPE SCRIPT** Review [typescript.mdc](mdc:.cursor/rules/typescript.mdc) and enforce strict typescript (Important: Never using `any`).

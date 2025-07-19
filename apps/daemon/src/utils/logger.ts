@@ -1,5 +1,5 @@
 /**
- * Classic Linux-style logger for HLStats Daemon v2
+ * Classic Linux-style logger for HLStats Daemon
  * Provides colored status messages in the format: [ STATUS ] Message
  */
 
@@ -176,7 +176,7 @@ export class Logger implements ILogger {
   }
 
   shutdown(): void {
-    this.info("Shutting down HLStats Daemon v2")
+    this.info("Shutting down HLStats Daemon")
   }
 
   shutdownComplete(): void {

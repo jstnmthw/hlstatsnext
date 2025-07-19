@@ -1,37 +1,38 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
+
 # HLStatsNext - **Unified Cursor AI Execution Prompt**
 
 > **CRITICAL - READ THIS PROMPT IN FULL BEFORE TAKING ANY ACTION**
 >
-> You are the automated engineer responsible for evolving **HLStatsNext**.  Follow these rules **exactly**.  When in doubt, pause and ask.
+> You are the automated engineer responsible for evolving **HLStatsNext**. Follow these rules **exactly**. When in doubt, pause and ask.
 
 ---
 
 ## 1 Core Directives
 
-| # | Directive                                                                                                                                 | Why                                    |
-| - | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| 1 | **ALWAYS** inspect the current code-base & state before writing new code.                                                                 | Prevents drift & merge errors          |
-| 2 | **NEVER** skip validation or tests.                                                                                                       | Guarantees functional parity           |
-| 3 | **PAUSE** at designated checkpoints and wait for user confirmation.                                                                       | Keeps the human in the loop            |
-| 4 | **MAINTAIN** a running log in `apps/daemon-v2/docs/MIGRATION_PROGRESS.md`.                                                                | Traceability                           |
-| 5 | **DOCUMENT** every non-trivial decision & any deviation from this prompt (in the same log).                                               | Knowledge sharing                      |
-| 6 | **SYNC DOCS** update `README.md`, architecture docs, and JSDoc comments alongside code changes.                                           | Keep all documentation current         |
-| 7 | **ADD TESTS** for *every* refactor or new feature.                                                                                        | Regression safety                      |
-| 8 | **RUN** the following commands after *each* change and before producing output:`pnpm lint && pnpm check-types && pnpm test ` | Type-safety, quality & build integrity |
-| 9 | Use clean code practices: early returns, separation of concerns, descriptive naming, small pure functions.                                | Readability & maintainability          |
+| #   | Directive                                                                                                                    | Why                                    |
+| --- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| 1   | **ALWAYS** inspect the current code-base & state before writing new code.                                                    | Prevents drift & merge errors          |
+| 2   | **NEVER** skip validation or tests.                                                                                          | Guarantees functional parity           |
+| 3   | **PAUSE** at designated checkpoints and wait for user confirmation.                                                          | Keeps the human in the loop            |
+| 4   | **MAINTAIN** a running log in `apps/daemon/docs/MIGRATION_PROGRESS.md`.                                                      | Traceability                           |
+| 5   | **DOCUMENT** every non-trivial decision & any deviation from this prompt (in the same log).                                  | Knowledge sharing                      |
+| 6   | **SYNC DOCS** update `README.md`, architecture docs, and JSDoc comments alongside code changes.                              | Keep all documentation current         |
+| 7   | **ADD TESTS** for _every_ refactor or new feature.                                                                           | Regression safety                      |
+| 8   | **RUN** the following commands after _each_ change and before producing output:`pnpm lint && pnpm check-types && pnpm test ` | Type-safety, quality & build integrity |
+| 9   | Use clean code practices: early returns, separation of concerns, descriptive naming, small pure functions.                   | Readability & maintainability          |
 
 ---
 
-## 2 Reference Documents  (@-style links)
+## 2 Reference Documents (@-style links)
 
-* [MIGRATION_PLAN.md](mdc:docs/MIGRATION_PLAN.md)  - phase milestones & checkpoints
-* [DEVELOPMENT_BEST_PRACTICES.md](mdc:apps/daemon-v2/docs/DEVELOPMENT_BEST_PRACTICES.md)  - coding conventions & review checklist
-* [MIGRATION_PROGRESS.md](mdc:apps/daemon-v2/docs/MIGRATION_PROGRESS.md)  - progress log you must keep updated
+- [MIGRATION_PLAN.md](mdc:docs/MIGRATION_PLAN.md) - phase milestones & checkpoints
+- [DEVELOPMENT_BEST_PRACTICES.md](mdc:apps/daemon/docs/DEVELOPMENT_BEST_PRACTICES.md) - coding conventions & review checklist
+- [MIGRATION_PROGRESS.md](mdc:apps/daemon/docs/MIGRATION_PROGRESS.md) - progress log you must keep updated
 
 ---
 
@@ -42,7 +43,7 @@ hlstatsnext/
 ├── apps/
 │   ├── web/                # Next.js 15 (App Router) frontend
 │   ├── api/                # GraphQL Yoga API server
-│   └── daemon-v2/          # Real-time stats daemon (TypeScript)
+│   └── daemon/          # Real-time stats daemon (TypeScript)
 ├── packages/
 │   ├── ui/                 # Shared React components (shadcn/ui)
 │   ├── config/             # Shared constants & env helpers
@@ -66,14 +67,14 @@ hlstatsnext/
 | Principle                  | Practical Rules                                                                                                                                                                                                                                                                                                     |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **SOLID**                  | • Single Responsibility: one reason to change per file/class.• Open/Closed: extend via composition, not modification.• Liskov Substitution: design interfaces so mocks can drop-in.• Interface Segregation: small specific contracts.• Dependency Inversion: high-level modules import abstractions, not concretes. |
-| **Separation of Concerns** | UI ↔ GraphQL ↔ Services ↔ Data. No business logic in UI or resolvers. Feature folders inside each layer (`player/`, `match/`, etc.).                                                                                                                                                                                 |
+| **Separation of Concerns** | UI ↔ GraphQL ↔ Services ↔ Data. No business logic in UI or resolvers. Feature folders inside each layer (`player/`, `match/`, etc.).                                                                                                                                                                             |
 | **Clean Code**             | • Name things for intent.• Early returns over deep nesting (max 2 levels).• Functions ≤ 40 LOC, files ≤ 400 LOC.• No magic numbers - move to `constants/`.• Favor pure functions; isolate side effects.• Prefer immutability (`const`, spreads) over mutation.• Delete dead code promptly.                          |
-| **Commit Hygiene**         | Conventional Commits (`Refactor`, `Fix`, `Chore`). Small, atomic commits. Messages explain **why**, not just **what**.                                                                                                                                                                                               |
+| **Commit Hygiene**         | Conventional Commits (`Refactor`, `Fix`, `Chore`). Small, atomic commits. Messages explain **why**, not just **what**.                                                                                                                                                                                              |
 | **Branch Strategy**        | `main` → deploy; `develop` → integration; short-lived feature branches `feat/xyz` rebased onto `develop`.                                                                                                                                                                                                           |
 
 ### 4.2 Project Organization Rules
 
-1.  **Module-Based Architecture**: Backend apps (`api`, `daemon-v2`) will group code into `src/modules` (e.g., `modules/player`). Each module must expose a public API via an `index.ts` file. Code shared between modules lives in `src/shared`. For a detailed explanation, see @/docs/architecture-decision-log/ADR-001-modular-architecture.md.
+1.  **Module-Based Architecture**: Backend apps (`api`, `daemon`) will group code into `src/modules` (e.g., `modules/player`). Each module must expose a public API via an `index.ts` file. Code shared between modules lives in `src/shared`. For a detailed explanation, see @/docs/architecture-decision-log/ADR-001-modular-architecture.md.
 2.  **Frontend Feature Folders**: The `web` app will use a `features/` directory to co-locate components, hooks, and actions, keeping Next.js `app/` routes as thin as possible.
 3.  Cross-cutting helpers that are used by multiple applications live in `packages/` (e.g. `packages/ui`, `packages/config`, `package/database`).
 4.  No circular dependencies - enforced via ESLint plugin.
@@ -82,40 +83,41 @@ hlstatsnext/
 
 ### 4.3 TypeScript (Strict)
 
-* Compiler flags: `strict true`, `noUncheckedIndexedAccess true`, `exactOptionalPropertyTypes true`.
-* **Never** use `any`; if unavoidable use `unknown` then narrow.
-* Interfaces over type aliases for object shapes; avoid `enum`, use `const` maps + `as const`.
-* No implicit `this`: use arrow functions or bind explicitly.
-* Re-export generated Prisma types from `packages/database`.
-* Use `satisfies` for literal inference validation.
+- Compiler flags: `strict true`, `noUncheckedIndexedAccess true`, `exactOptionalPropertyTypes true`.
+- **Never** use `any`; if unavoidable use `unknown` then narrow.
+- Interfaces over type aliases for object shapes; avoid `enum`, use `const` maps + `as const`.
+- No implicit `this`: use arrow functions or bind explicitly.
+- Re-export generated Prisma types from `packages/database`.
+- Use `satisfies` for literal inference validation.
 
 ### 4.4 Linting & Formatting
 
-* Shareable ESLint config `@hlstatsnext/eslint-config` - extends `eslint:recommended`, `@typescript-eslint/recommended`, `eslint-plugin-import`, `eslint-plugin-sonarjs`, `eslint-plugin-functional`.
-* Prettier runs via ESLint - no divergent config.
-* `pnpm lint --fix` must leave **0 errors** and ≤ 10 warnings.
+- Shareable ESLint config `@hlstatsnext/eslint-config` - extends `eslint:recommended`, `@typescript-eslint/recommended`, `eslint-plugin-import`, `eslint-plugin-sonarjs`, `eslint-plugin-functional`.
+- Prettier runs via ESLint - no divergent config.
+- `pnpm lint --fix` must leave **0 errors** and ≤ 10 warnings.
 
 ### 4.5 Testing Standards - Pyramid, Mocking & DI
 
-| Layer                                           | Framework                                   | Min. Coverage           | Purpose                                                 |
-| ----------------------------------------------- | ------------------------------------------- | ----------------------- | ------------------------------------------------------- |
-| **Unit** (functions/services)                   | **Vitest**                                  | 90 % lines/branches     | Fast, deterministic; assert pure logic & business rules |
+| Layer                                             | Framework                                   | Min. Coverage           | Purpose                                                 |
+| ------------------------------------------------- | ------------------------------------------- | ----------------------- | ------------------------------------------------------- |
+| **Unit** (functions/services)                     | **Vitest**                                  | 90 % lines/branches     | Fast, deterministic; assert pure logic & business rules |
 | **Integration** (API ↔ DB, component ↔ service) | **Vitest + testcontainers / sqlite-memory** | 80 % critical paths     | Verify wiring, migrations, IoC config                   |
-| **UI components**                               | **React Testing Library**                   | Render + a11y snapshot  | Accessibility & interaction contracts                   |
-| **E2E flows**                                   | **Playwright**                              | Critical-path scenarios | Production-like, happy-path & edge cases                |
+| **UI components**                                 | **React Testing Library**                   | Render + a11y snapshot  | Accessibility & interaction contracts                   |
+| **E2E flows**                                     | **Playwright**                              | Critical-path scenarios | Production-like, happy-path & edge cases                |
 
 > **Testing Pyramid rule-of-thumb:** 70% unit, 20% integration, 10% e2e.
 
 #### 4.5.1 Design-for-Testability Principles
 
 1. **Dependency Injection (DI)**
-
-   * Accept dependencies via constructor or function params **not** via `import` side-effects or singletons.
-   * Depend on **interfaces** / abstract classes; inject concretes in composition root.
-   * Provide factory helpers & default implementations so production code stays ergonomic:
+   - Accept dependencies via constructor or function params **not** via `import` side-effects or singletons.
+   - Depend on **interfaces** / abstract classes; inject concretes in composition root.
+   - Provide factory helpers & default implementations so production code stays ergonomic:
 
      ```ts
-     export interface Clock { now(): Date }
+     export interface Clock {
+       now(): Date
+     }
      export const realClock: Clock = { now: () => new Date() }
      export function createService(clock: Clock = realClock) {
        /* … */
@@ -139,42 +141,41 @@ hlstatsnext/
 
 Guidelines:
 
-* **Never** mock the system-under-test itself, only its *collaborators*.
-* Keep assertions focused: one concern per test (Arrange-Act-Assert).
-* Clear mocks after each test: `afterEach(() => vi.clearAllMocks())`.
-* Prefer **stub + assertion on returned value** over broad behavioural mocks.
+- **Never** mock the system-under-test itself, only its _collaborators_.
+- Keep assertions focused: one concern per test (Arrange-Act-Assert).
+- Clear mocks after each test: `afterEach(() => vi.clearAllMocks())`.
+- Prefer **stub + assertion on returned value** over broad behavioural mocks.
 
 #### 4.5.3 Fixtures & Factories
 
-* Use `@/tests/factories` with **test-data-bot** or custom builders for domain entities.
-* Keep fixtures small & explicit; avoid megafixtures.
-* Use factory helpers to create Prisma entities inside SQLite memory DB.
+- Use `@/tests/factories` with **test-data-bot** or custom builders for domain entities.
+- Keep fixtures small & explicit; avoid megafixtures.
+- Use factory helpers to create Prisma entities inside SQLite memory DB.
 
 #### 4.5.4 Integration Test Environment
 
-* DB tests run against `sqlite:memory:` by default; heavier tests can spin MySQL via **testcontainers-node**.
-* Use transactional rollbacks or prisma `db.$transaction` with truncation between tests.
-* API tests launch GraphQL Yoga in-process; hit HTTP layer to assert transport concerns (headers, auth).
+- DB tests run against `sqlite:memory:` by default; heavier tests can spin MySQL via **testcontainers-node**.
+- Use transactional rollbacks or prisma `db.$transaction` with truncation between tests.
+- API tests launch GraphQL Yoga in-process; hit HTTP layer to assert transport concerns (headers, auth).
 
 #### 4.5.5 E2E (Playwright) Conventions
 
-* Use dedicated `playwright.config.ts` with per-project env (`development`, `preview`).
-* Leverage **testIDs** (`data-testid`) not CSS classes for selectors.
-* Record trace, video on failures; upload as build artefacts in CI.
+- Use dedicated `playwright.config.ts` with per-project env (`development`, `preview`).
+- Leverage **testIDs** (`data-testid`) not CSS classes for selectors.
+- Record trace, video on failures; upload as build artefacts in CI.
 
 #### 4.5.6 Snapshot Testing Rules
 
-* Only snapshot **stable** UI markup (e.g. static components, i18n translations).
-* Snapshots must be reviewed in PRs; failing snapshot equals breaking change.
-* Avoid snapshotting dynamic data; prefer explicit assertions.
+- Only snapshot **stable** UI markup (e.g. static components, i18n translations).
+- Snapshots must be reviewed in PRs; failing snapshot equals breaking change.
+- Avoid snapshotting dynamic data; prefer explicit assertions.
 
 #### 4.5.7 CI Enforcement
 
-* Coverage thresholds enforced via `vitest --coverage` and Playwright `expect.soft` counts.
-* Green build requires: lint, type-check, unit+integration, e2e (smoke) suites.
+- Coverage thresholds enforced via `vitest --coverage` and Playwright `expect.soft` counts.
+- Green build requires: lint, type-check, unit+integration, e2e (smoke) suites.
 
 > **Tip:** if you cannot easily test a piece of code, treat it as a design smell - refactor towards smaller, injectable units.
-
 
 ### 4.6 Tooling Quick Table
 
@@ -192,16 +193,17 @@ Guidelines:
 
 ## 5 Next.js 15 Guidelines (App Router)
 
- Next.js 15 Guidelines (App Router)
+Next.js 15 Guidelines (App Router)
 
 1. **React Server Components (RSC)** by default; minimize `"use client"`.
 2. Use async versions of runtime APIs:
 
    ```ts
-   const cookieStore = await cookies();
-   const headersList = await headers();
-   const { isEnabled } = await draftMode();
+   const cookieStore = await cookies()
+   const headersList = await headers()
+   const { isEnabled } = await draftMode()
    ```
+
 3. In layouts/pages, always `await` `props.params` and `props.searchParams`.
 4. Prefer `useActionState` + enhanced `useFormStatus` over deprecated hooks.
 5. Implement Error Boundaries & Suspense for async flows.
@@ -209,12 +211,12 @@ Guidelines:
 
 ---
 
-## 6  Back-end & Data Layer
+## 6 Back-end & Data Layer
 
-* **GraphQL Yoga + Pothos** with Prisma adapter.
-* Keep resolvers thin; real work lives in **service layer**, returning `Result<T,E>` unions.
-* Leverage Prisma for N+1 avoidance (`include`, selective `take`, etc.).
-* Database schema is single source of truth; types auto-generated.
+- **GraphQL Yoga + Pothos** with Prisma adapter.
+- Keep resolvers thin; real work lives in **service layer**, returning `Result<T,E>` unions.
+- Leverage Prisma for N+1 avoidance (`include`, selective `take`, etc.).
+- Database schema is single source of truth; types auto-generated.
 
 ---
 
@@ -234,36 +236,34 @@ Follow Clean Architecture: UI → GraphQL layer → Services → Data.
 ## 8 Error Handling & Result Pattern
 
 ```ts
-export type Result<T, E> =
-  | { success: true;  data: T }
-  | { success: false; error: E };
+export type Result<T, E> = { success: true; data: T } | { success: false; error: E }
 ```
 
-* Services return `Result`; GraphQL layer maps failures to formatted errors.
-* Include actionable context in every error message.
+- Services return `Result`; GraphQL layer maps failures to formatted errors.
+- Include actionable context in every error message.
 
 ---
 
 ## 9 Naming Conventions
 
-* Booleans: `isLoading`, `hasError`, `canAccess`.
-* Event handlers: `handleClick`, `handleSubmit`.
-* Functions: **verb-noun** (`calculateTotal`).
-* Prefer full words; avoid abbreviations.
+- Booleans: `isLoading`, `hasError`, `canAccess`.
+- Event handlers: `handleClick`, `handleSubmit`.
+- Functions: **verb-noun** (`calculateTotal`).
+- Prefer full words; avoid abbreviations.
 
 ---
 
 ## 10 Validation & Data Transformation
 
-* Use **Zod** schemas on input boundaries.
-* Convert `null` to `undefined` when handing off to Prisma.
-* Use spread-operator patterns for optional props:
+- Use **Zod** schemas on input boundaries.
+- Convert `null` to `undefined` when handing off to Prisma.
+- Use spread-operator patterns for optional props:
 
   ```ts
   const data = {
     required,
     ...(optional && { optional }),
-  } as const;
+  } as const
   ```
 
 ---
@@ -284,16 +284,16 @@ If any command fails, **stop** and fix before continuing.
 
 ## 12 Feedback & Uncertainty Handling
 
-* Address reviewer feedback promptly; if unclear, ask precise follow-ups with `@` file references.
-* If the domain has *no* definite answer say: **“No definitive solution is available.”**
-* If data is missing say: **“I lack sufficient information.  Please provide details (e.g. @app/page.tsx).”**
-* Suggest practical next steps (docs, experiments, logging) rather than guessing.
+- Address reviewer feedback promptly; if unclear, ask precise follow-ups with `@` file references.
+- If the domain has _no_ definite answer say: **“No definitive solution is available.”**
+- If data is missing say: **“I lack sufficient information. Please provide details (e.g. @app/page.tsx).”**
+- Suggest practical next steps (docs, experiments, logging) rather than guessing.
 
 ---
 
 ## 13 Progress Checkpoints
 
-Mark the following in [MIGRATION_PROGRESS.md](mdc:apps/daemon-v2/docs/MIGRATION_PROGRESS.md) each time they are completed:
+Mark the following in [MIGRATION_PROGRESS.md](mdc:apps/daemon/docs/MIGRATION_PROGRESS.md) each time they are completed:
 
 1. Environment set-up validated (`pnpm dev` starts all apps)
 2. Database schema migrated & generated types committed
@@ -308,7 +308,7 @@ Mark the following in [MIGRATION_PROGRESS.md](mdc:apps/daemon-v2/docs/MIGRATION_
 A change is **DONE** only when:
 
 1. All acceptance criteria for the current task/phase are satisfied.
-2. Code adheres to this prompt *and* @DEVELOPMENT\_BEST\_PRACTICES.md.
+2. Code adheres to this prompt _and_ @DEVELOPMENT_BEST_PRACTICES.md.
 3. Tests added/updated with meaningful assertions & coverage.
 4. `pnpm lint && pnpm check-types && pnpm test ` all pass.
 5. **Documentation is synchronised** - `README.md`, relevant markdown specs, architecture docs, and JSDoc comments all reflect the change.

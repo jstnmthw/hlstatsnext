@@ -1,7 +1,7 @@
 import { config } from "dotenv"
 import path from "path"
 
-// Resolve the path to the root of the daemon-v2 package
+// Resolve the path to the root of the daemon package
 const packageRoot = path.resolve(__dirname, "..")
 
 // Load .env.test file from the package root

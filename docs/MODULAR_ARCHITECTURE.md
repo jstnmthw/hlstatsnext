@@ -6,7 +6,7 @@ The HLStatsNext monorepo contains multiple applications (API, web, daemon) that 
 
 We will adopt a **Module-Based Architecture** across the monorepo. The core principle is to group code by system boundary (module) rather than just by technical role (layer).
 
-### Backend Structure (`apps/api`, `apps/daemon-v2`)
+### Backend Structure (`apps/api`, `apps/daemon`)
 
 Backend applications will be organized as follows:
 

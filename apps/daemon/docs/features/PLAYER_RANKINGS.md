@@ -1,8 +1,8 @@
-# Player Rankings System - HLStats Daemon v2
+# Player Rankings System - HLStats Daemon
 
 ## Overview
 
-The HLStats Daemon v2 implements a sophisticated ELO-based rating system for tracking player skill across Half-Life engine games. This system goes beyond simple kill/death ratios to provide dynamic skill assessments that adapt to player performance over time.
+The HLStats Daemon implements a sophisticated ELO-based rating system for tracking player skill across Half-Life engine games. This system goes beyond simple kill/death ratios to provide dynamic skill assessments that adapt to player performance over time.
 
 ## Core Philosophy
 
@@ -321,6 +321,6 @@ WHERE playerId = ?
 
 ## Conclusion
 
-The HLStats Daemon v2 rating system provides a sophisticated, fair, and engaging skill assessment mechanism that encourages competitive play while maintaining long-term stability. By combining traditional ELO mathematics with FPS-specific modifications, it creates meaningful progression for players of all skill levels.
+The HLStats Daemon rating system provides a sophisticated, fair, and engaging skill assessment mechanism that encourages competitive play while maintaining long-term stability. By combining traditional ELO mathematics with FPS-specific modifications, it creates meaningful progression for players of all skill levels.
 
 The system's flexibility allows for future enhancements while maintaining backward compatibility with existing HLStatsX installations. Regular monitoring and adjustment ensure the rating system continues to accurately reflect player skill as the game and community evolve.

@@ -1,5 +1,5 @@
 /**
- * Database Client for HLStats Daemon v2
+ * Database Client for HLStats Daemon
  *
  * Provides a centralized database client with connection management,
  * error handling, and transaction support for the daemon services.

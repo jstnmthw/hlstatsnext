@@ -1,5 +1,5 @@
 /**
- * Server Service for HLStats Daemon v2
+ * Server Service for HLStats Daemon
  *
  * Handles all server-related database operations including:
  * - Server authentication and lookup

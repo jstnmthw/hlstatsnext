@@ -1,5 +1,5 @@
 /**
- * Core Event Types for HLStats Daemon v2
+ * Core Event Types for HLStats Daemon
  *
  * These types define the structure of game events that flow through
  * the processing pipeline from ingress to statistics calculation.

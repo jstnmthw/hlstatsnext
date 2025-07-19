@@ -211,26 +211,6 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
     }
   }
 
-  /**
-   * Test database connectivity
-   */
-  async testDatabaseConnection(): Promise<boolean> {
-    // This is now problematic as we don't have a direct db handle.
-    // This method may need to be moved or re-thought. For now, we'll assume it's a "deep" check
-    // that could be implemented by a service if needed.
-    this.logger.info("Database connection test requested. (Not implemented in refactored service)")
-    return Promise.resolve(true) // Placeholder
-  }
-
-  /**
-   * Close database connection
-   */
-  async disconnect(): Promise<void> {
-    // Similar to above, the processor no longer owns the connection.
-    // This would be handled at the application root.
-    this.logger.info("Disconnect requested. (Not implemented in refactored service)")
-    return Promise.resolve() // Placeholder
-  }
 
   /**
    * Get top players by ranking
@@ -257,7 +237,7 @@ export function createEventProcessorService(
   // Handler Layer
   const playerHandler = new PlayerHandler(playerService, logger)
   const weaponHandler = new WeaponHandler(weaponService, logger)
-  const matchHandler = new MatchHandler(logger)
+  const matchHandler = new MatchHandler(playerService, db, logger)
   const rankingHandler = new RankingHandler(playerService, weaponService, logger)
 
   return new EventProcessorService(

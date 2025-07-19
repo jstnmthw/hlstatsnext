@@ -3,7 +3,6 @@ import type { Mocked } from "vitest"
 
 // Using relative paths to avoid module resolution issues in IDE/linter
 import { DatabaseClient } from "../../src/database/client"
-import { GatewayService } from "../../src/services/gateway/gateway.service"
 import { IngressService } from "../../src/services/ingress/ingress.service"
 import * as processorService from "../../src/services/processor/processor.service"
 import { RconService } from "../../src/services/rcon/rcon.service"
@@ -13,15 +12,12 @@ import { logger } from "../../src/utils/logger"
 import type { IEventProcessor } from "../../src/services/processor/processor.types"
 
 vi.mock("../../src/database/client")
-vi.mock("../../src/services/gateway/gateway.service")
 vi.mock("../../src/services/ingress/ingress.service")
 vi.mock("../../src/services/rcon/rcon.service")
 vi.mock("../../src/services/statistics/statistics.service")
 
 // Mock the entire processor service module
 const mockProcessor: Mocked<IEventProcessor> = {
-  testDatabaseConnection: vi.fn(),
-  disconnect: vi.fn(),
   enqueue: vi.fn(),
   processEvent: vi.fn(),
   getTopPlayers: vi.fn(),
@@ -49,7 +45,6 @@ describe("HLStatsDaemon", () => {
     // The constructor is called in the beforeEach block
     expect(DatabaseClient).toHaveBeenCalledTimes(1)
     expect(createEventProcessorServiceSpy).toHaveBeenCalledTimes(1)
-    expect(GatewayService).toHaveBeenCalledTimes(1)
     expect(IngressService).toHaveBeenCalledTimes(1)
     expect(RconService).toHaveBeenCalledTimes(1)
     expect(StatisticsService).toHaveBeenCalledTimes(1)
@@ -57,10 +52,8 @@ describe("HLStatsDaemon", () => {
 
   describe("start", () => {
     it("should start all services successfully", async () => {
-      mockProcessor.testDatabaseConnection.mockResolvedValue(true)
-
-      const gatewayInstance = vi.mocked(GatewayService).mock.instances[0] as Mocked<GatewayService>
-      gatewayInstance.start.mockResolvedValue(undefined)
+      const dbInstance = vi.mocked(DatabaseClient).mock.instances[0] as Mocked<DatabaseClient>
+      dbInstance.testConnection.mockResolvedValue(true)
 
       const ingressInstance = vi.mocked(IngressService).mock.instances[0] as Mocked<IngressService>
       ingressInstance.start.mockResolvedValue(undefined)
@@ -74,8 +67,7 @@ describe("HLStatsDaemon", () => {
 
       await daemon.start()
 
-      expect(mockProcessor.testDatabaseConnection).toHaveBeenCalled()
-      expect(gatewayInstance.start).toHaveBeenCalled()
+      expect(dbInstance.testConnection).toHaveBeenCalled()
       expect(ingressInstance.start).toHaveBeenCalled()
       expect(rconInstance.start).toHaveBeenCalled()
       expect(statisticsInstance.start).toHaveBeenCalled()
@@ -86,7 +78,8 @@ describe("HLStatsDaemon", () => {
     })
 
     it("should exit if database connection fails", async () => {
-      mockProcessor.testDatabaseConnection.mockResolvedValue(false)
+      const dbInstance = vi.mocked(DatabaseClient).mock.instances[0] as Mocked<DatabaseClient>
+      dbInstance.testConnection.mockResolvedValue(false)
 
       await daemon.start()
 
@@ -98,23 +91,24 @@ describe("HLStatsDaemon", () => {
     })
 
     it("should exit if a service fails to start", async () => {
-      mockProcessor.testDatabaseConnection.mockResolvedValue(true)
+      const dbInstance = vi.mocked(DatabaseClient).mock.instances[0] as Mocked<DatabaseClient>
+      dbInstance.testConnection.mockResolvedValue(true)
 
-      const gatewayInstance = vi.mocked(GatewayService).mock.instances[0] as Mocked<GatewayService>
-      const startError = new Error("Gateway failed")
-      gatewayInstance.start.mockRejectedValue(startError)
+      const ingressInstance = vi.mocked(IngressService).mock.instances[0] as Mocked<IngressService>
+      const startError = new Error("Ingress failed")
+      ingressInstance.start.mockRejectedValue(startError)
 
       await daemon.start()
 
-      expect(mockLoggerFailed).toHaveBeenCalledWith("Failed to start daemon", "Gateway failed")
+      expect(mockLoggerFailed).toHaveBeenCalledWith("Failed to start daemon", "Ingress failed")
       expect(mockExit).toHaveBeenCalledWith(1)
     })
   })
 
   describe("stop", () => {
     it("should stop all services successfully", async () => {
-      const gatewayInstance = vi.mocked(GatewayService).mock.instances[0] as Mocked<GatewayService>
-      gatewayInstance.stop.mockResolvedValue(undefined)
+      const dbInstance = vi.mocked(DatabaseClient).mock.instances[0] as Mocked<DatabaseClient>
+      dbInstance.disconnect.mockResolvedValue(undefined)
       const ingressInstance = vi.mocked(IngressService).mock.instances[0] as Mocked<IngressService>
       ingressInstance.stop.mockResolvedValue(undefined)
       const rconInstance = vi.mocked(RconService).mock.instances[0] as Mocked<RconService>
@@ -122,27 +116,25 @@ describe("HLStatsDaemon", () => {
       const statisticsInstance = vi.mocked(StatisticsService).mock
         .instances[0] as Mocked<StatisticsService>
       statisticsInstance.stop.mockResolvedValue(undefined)
-      mockProcessor.disconnect.mockResolvedValue(undefined)
 
       await daemon.stop()
 
-      expect(gatewayInstance.stop).toHaveBeenCalled()
       expect(ingressInstance.stop).toHaveBeenCalled()
       expect(rconInstance.stop).toHaveBeenCalled()
       expect(statisticsInstance.stop).toHaveBeenCalled()
-      expect(mockProcessor.disconnect).toHaveBeenCalled()
+      expect(dbInstance.disconnect).toHaveBeenCalled()
 
       expect(mockLoggerOk).toHaveBeenCalledWith(expect.stringContaining("Daemon shutdown complete"))
     })
 
     it("should log an error if a service fails to stop", async () => {
-      const gatewayInstance = vi.mocked(GatewayService).mock.instances[0] as Mocked<GatewayService>
-      const stopError = new Error("Gateway stop failed")
-      gatewayInstance.stop.mockRejectedValue(stopError)
+      const ingressInstance = vi.mocked(IngressService).mock.instances[0] as Mocked<IngressService>
+      const stopError = new Error("Ingress stop failed")
+      ingressInstance.stop.mockRejectedValue(stopError)
 
       await daemon.stop()
 
-      expect(mockLoggerFailed).toHaveBeenCalledWith("Error during shutdown", "Gateway stop failed")
+      expect(mockLoggerFailed).toHaveBeenCalledWith("Error during shutdown", "Ingress stop failed")
     })
   })
 })

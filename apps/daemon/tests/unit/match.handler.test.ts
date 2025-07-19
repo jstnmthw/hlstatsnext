@@ -8,14 +8,41 @@ import {
   RoundStartEvent,
   PlayerKillEvent,
 } from "../../src/types/common/events"
-// import type { DatabaseClient } from "../../src/database/client" // TODO: Add back when database operations are implemented
+import type { IPlayerService } from "../../src/services/player/player.types"
+import type { DatabaseClient } from "../../src/database/client"
 
 describe("MatchHandler", () => {
   let handler: MatchHandler
+  let mockPlayerService: IPlayerService
+  let mockDatabase: DatabaseClient
   const loggerMock = createMockLogger()
 
   beforeEach(() => {
-    handler = new MatchHandler(loggerMock)
+    mockPlayerService = {
+      getOrCreatePlayer: vi.fn(),
+      getPlayerStats: vi.fn(),
+      updatePlayerStats: vi.fn(),
+      getPlayerRating: vi.fn(),
+      updatePlayerRatings: vi.fn(),
+      getRoundParticipants: vi.fn(),
+      getTopPlayers: vi.fn(),
+    }
+
+    mockDatabase = {
+      transaction: vi.fn(),
+      testConnection: vi.fn(),
+      disconnect: vi.fn(),
+      prisma: {
+        server: {
+          update: vi.fn(),
+        },
+        playerHistory: {
+          create: vi.fn(),
+        },
+      },
+    } as unknown as DatabaseClient
+
+    handler = new MatchHandler(mockPlayerService, mockDatabase, loggerMock)
   })
 
   describe("handleEvent", () => {

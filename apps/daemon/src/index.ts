@@ -6,7 +6,6 @@
  */
 
 import { DatabaseClient } from "./database/client"
-import { GatewayService } from "./services/gateway/gateway.service"
 import { IngressService } from "./services/ingress/ingress.service"
 import { createEventProcessorService } from "./services/processor/processor.service"
 import { RconService } from "./services/rcon/rcon.service"
@@ -16,7 +15,6 @@ import type { IEventProcessor } from "./services/processor/processor.types"
 
 export class HLStatsDaemon {
   private db: DatabaseClient
-  private gateway: GatewayService
   private ingress: IngressService
   private processor: IEventProcessor
   private rcon: RconService
@@ -27,7 +25,6 @@ export class HLStatsDaemon {
 
     this.db = new DatabaseClient()
     this.processor = createEventProcessorService()
-    this.gateway = new GatewayService()
     this.ingress = new IngressService(27500, this.processor, this.db)
     this.rcon = new RconService()
     this.statistics = new StatisticsService()
@@ -37,7 +34,7 @@ export class HLStatsDaemon {
     try {
       // Test database connectivity first
       logger.connecting("database")
-      const dbConnected = await this.processor.testDatabaseConnection()
+      const dbConnected = await this.testDatabaseConnection()
 
       if (!dbConnected) {
         throw new Error("Failed to connect to database")
@@ -48,7 +45,6 @@ export class HLStatsDaemon {
       // Start all services
       logger.info("Starting services")
       await Promise.all([
-        this.gateway.start(),
         this.ingress.start(),
         this.rcon.start(),
         this.statistics.start(),
@@ -70,16 +66,34 @@ export class HLStatsDaemon {
 
     try {
       await Promise.all([
-        this.gateway.stop(),
         this.ingress.stop(),
         this.rcon.stop(),
         this.statistics.stop(),
-        this.processor.disconnect(),
       ])
+      await this.disconnectDatabase()
 
       logger.shutdownComplete()
     } catch (error) {
       logger.failed("Error during shutdown", error instanceof Error ? error.message : String(error))
+    }
+  }
+
+  private async testDatabaseConnection(): Promise<boolean> {
+    try {
+      // Test database connectivity using the DatabaseClient method
+      return await this.db.testConnection()
+    } catch (error) {
+      logger.failed("Database connection test failed", error instanceof Error ? error.message : String(error))
+      return false
+    }
+  }
+
+  private async disconnectDatabase(): Promise<void> {
+    try {
+      await this.db.disconnect()
+      logger.info("Database connection closed")
+    } catch (error) {
+      logger.failed("Error closing database connection", error instanceof Error ? error.message : String(error))
     }
   }
 }

@@ -207,7 +207,7 @@ async function testPlayerLifecycle() {
     console.error("❌ Test failed:", error)
     process.exit(1)
   } finally {
-    await processor.disconnect()
+    await db.disconnect()
     console.log("\n👋 Cleanup complete")
   }
 }

@@ -50,7 +50,7 @@ Establish core architecture, services skeleton, and development infrastructure.
 
 #### **Core Services** ✅
 
-- ✅ **Gateway Service**: HTTP API skeleton with Fastify
+- ⚠️  **Gateway Service**: Removed - using `apps/api` instead
 - ✅ **Ingress Service**: UDP server for game log reception
   - ✅ High-performance UDP packet handling
   - ✅ Rate limiting per IP address

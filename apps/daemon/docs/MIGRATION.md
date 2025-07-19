@@ -245,10 +245,32 @@ Implement round and match event handling with proper event routing.
   - [ ] Hostage rescue (CS)
   - [ ] Flag capture (TF2)
   - [ ] Control point capture
-- [ ] Weapon pickup/drop events
-- [ ] Money/economy events (CS)
-- [ ] Voice communication events (optional)
-- [ ] Spectator events (optional)
+- [ ] Server-based events
+  - [ ] lills
+  - [ ] players
+  - [ ] rounds
+  - [ ] suicides
+  - [ ] headshots
+  - [ ] bombs_planted
+  - [ ] bombs_defused
+  - [ ] ct_wins
+  - [ ] ts_wins
+  - [ ] act_players
+  - [ ] max_players
+  - [ ] act_map
+  - [ ] map_rounds
+  - [ ] map_ct_wins
+  - [ ] map_ts_wins
+  - [ ] map_started
+  - [ ] map_changes
+  - [ ] ct_shots
+  - [ ] ct_hits
+  - [ ] ts_shots
+  - [ ] ts_hits
+  - [ ] map_ct_shots
+  - [ ] map_ct_hits
+  - [ ] map_ts_shots
+  - [ ] map_ts_hits
 
 #### **Server Management**
 

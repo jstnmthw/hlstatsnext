@@ -1,8 +1,10 @@
 # HLStatsNext
 
-**HLStatsNext** is the next-generation game statistics platform that transforms how players and communities experience Half-Life engine games. Built from the ground up with modern web technologies, HLStatsNext delivers lightning-fast real-time statistics, beautiful analytics dashboards, and powerful server management tools that make running gaming communities effortless.
+**HLStatsNext** is a comprehensive game statistics platform designed for Half-Life engine games. It offers real-time statistics, analytics dashboards, and server management tools, all built with modern web technologies. The platform is a complete modernization of the HLstatsX Community Edition, utilizing a TypeScript stack, Next.js interface, and GraphQL API to provide a scalable and user-friendly experience.
 
-Born from the proven foundation of HLstatsX Community Edition—trusted by thousands of servers worldwide—HLStatsNext completely reimagines the platform with a cutting-edge TypeScript stack, sleek Next.js interface, and robust GraphQL API. Whether you're a player tracking your performance, a server admin managing multiple communities, or a developer extending the platform, HLStatsNext provides the modern, scalable, and user-friendly experience you've been waiting for.
+Key features include a Node.js-based real-time statistics engine, a responsive web interface, and a flexible GraphQL API for efficient data communication. HLStatsNext supports seamless server management with integrated LinuxGSM, ensuring reliable service communication through a custom network architecture. The platform also includes MySQL 8.4 integration for database management, with automated schema handling and persistent storage.
+
+For developers, HLStatsNext offers a hot-reload development environment, type-safe implementation, and a modular package system for shared components and configurations. The platform simplifies the process of adding new game servers, making it an ideal choice for server admins and developers looking to extend its capabilities.
 
 ## Table of Contents
 

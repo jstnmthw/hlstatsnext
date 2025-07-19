@@ -1,8 +1,8 @@
 ---
-description: 
-globs: 
+globs: apps/web/*
 alwaysApply: false
 ---
+
 # Next.js 15 SSR Standards
 
 ## Apply general coding principles and best practices for TypeScript and React development across the project.
@@ -28,7 +28,6 @@ alwaysApply: false
   const headersList = await headers()
   const { isEnabled } = await draftMode()
   ```
-  
 - Handle async params in layouts/pages:
   ```typescript
   const params = await props.params
@@ -56,7 +55,7 @@ alwaysApply: false
 
 ## Feedback
 
-- Adapt suggestions based on user feedback. Address recurring issues with simpler or alternative solutions. Clarify ambiguous feedback via @ references. 
+- Adapt suggestions based on user feedback. Address recurring issues with simpler or alternative solutions. Clarify ambiguous feedback via @ references.
 
 ## Uncertainty
 

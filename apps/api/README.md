@@ -127,5 +127,5 @@ apps/api/
 ## Notes
 
 - All API logic is strictly typed and modular. Cross-module access is only via public APIs.
-- For more on the modular architecture, see [`docs/MODULAR_ARCHITECTURE.md`](../../docs/MODULAR_ARCHITECTURE.md).
-- For shared development standards, see the root [`README.md`](../../README.md) and [`DEVELOPMENT_BEST_PRACTICES.md`](../../apps/daemon/docs/DEVELOPMENT_BEST_PRACTICES.md).
+- For more on the modular architecture, see [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md).
+- For shared development standards, see the root [`README.md`](../../README.md) and [`BEST_PRACTICES.md`](../../apps/daemon/docs/BEST_PRACTICES.md).

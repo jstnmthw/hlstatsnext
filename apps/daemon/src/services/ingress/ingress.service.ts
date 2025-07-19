@@ -169,11 +169,14 @@ export class IngressService implements IIngressService {
       const parseResult = await this.parser.parse(logLine, serverId)
 
       if (!parseResult.success) {
-        // Strip the Source log timestamp ("L 06/28/2025 - 09:00:55: ") for clarity -
-        // we already have our own timestamp from the logger.
         const cleaned = logLine.replace(/^L \d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}:\s*/, "")
         const snippet = cleaned.length > 120 ? `${cleaned.slice(0, 117)}…` : cleaned
-        logger.debug(`Parser error - ${parseResult.error}: ${snippet}`)
+
+        if (parseResult.error === "IGNORED") {
+          logger.info(snippet)
+        } else {
+          logger.debug(`Parser error - ${parseResult.error}: ${snippet}`)
+        }
         return
       }
 

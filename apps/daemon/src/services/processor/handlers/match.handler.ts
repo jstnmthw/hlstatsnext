@@ -113,11 +113,11 @@ export class MatchHandler implements IMatchHandler {
       }
 
       // Update player round statistics and calculate MVP
-      await this.updatePlayerRoundStats(serverId)
+      await this.updatePlayerRoundStats(serverId, duration || 0)
       await this.calculateRoundMVP(serverId)
 
       this.logger.event(
-        `Round ended on server ${serverId}${winningTeam ? `: ${winningTeam} won` : ''}${score ? ` (${score.team1}-${score.team2})` : ''}`,
+        `Round ended on server ${serverId}${winningTeam ? `: ${winningTeam} won` : ""}${score ? ` (${score.team1}-${score.team2})` : ""}`,
       )
 
       return {
@@ -153,10 +153,11 @@ export class MatchHandler implements IMatchHandler {
 
       // Update match statistics
       currentMatchStats.totalRounds++
-      currentMatchStats.teamScores[winningTeam] = (currentMatchStats.teamScores[winningTeam] || 0) + 1
+      currentMatchStats.teamScores[winningTeam] =
+        (currentMatchStats.teamScores[winningTeam] || 0) + 1
 
       // Update player round statistics and calculate MVP
-      await this.updatePlayerRoundStats(serverId)
+      await this.updatePlayerRoundStats(serverId, 0) // Round duration is not available here
       await this.calculateRoundMVP(serverId)
 
       // Update server statistics for CS-specific team wins
@@ -234,24 +235,54 @@ export class MatchHandler implements IMatchHandler {
     }
   }
 
-  private async updatePlayerRoundStats(serverId: number): Promise<void> {
-    // This method would be called from other handlers (PlayerHandler, WeaponHandler)
-    // when kill/death events occur during the round. For now, we'll use placeholder logic.
+  private async updatePlayerRoundStats(serverId: number, roundDuration: number): Promise<void> {
     const matchStats = this.currentMatch.get(serverId)
     if (!matchStats) return
 
-    // In a real implementation, this would be populated by kill/death events
-    // during the round. For MVP calculation, we're creating a basic framework.
-    this.logger.debug(`Updated player round stats for server ${serverId}`)
+    // Pull round participants from PlayerService (DB view of last X seconds)
+    const participants = await this.playerService.getRoundParticipants(serverId, roundDuration)
+
+    for (const p of participants) {
+      const existing = matchStats.playerStats.get(p.playerId) ?? {
+        playerId: p.playerId,
+        kills: 0,
+        deaths: 0,
+        assists: 0,
+        damage: 0,
+        objectiveScore: 0,
+        clutchWins: 0,
+      }
+
+      // Update basic kills/deaths from aggregated eventEntry
+      existing.kills += p.player.kills
+      existing.deaths += p.player.deaths
+      existing.objectiveScore += 0 // placeholder – future objective events
+
+      matchStats.playerStats.set(p.playerId, existing)
+    }
+
+    this.logger.info(`Updated player round stats for server ${serverId}`)
   }
 
   private async calculateRoundMVP(serverId: number): Promise<void> {
     const matchStats = this.currentMatch.get(serverId)
     if (!matchStats) return
 
-    // Round MVP calculation would happen here
-    // For now, we'll defer to the match-level MVP calculation
-    this.logger.debug(`Round MVP calculated for server ${serverId}`)
+    let mvpPlayerId: number | undefined
+    let highestScore = -Infinity
+
+    for (const stats of matchStats.playerStats.values()) {
+      const score = this.calculatePlayerScore(stats)
+      if (score > highestScore) {
+        highestScore = score
+        mvpPlayerId = stats.playerId
+      }
+    }
+
+    if (mvpPlayerId !== undefined) {
+      matchStats.mvpPlayer = mvpPlayerId
+      this.logger.info(`Round MVP calculated for server ${serverId}: player ${mvpPlayerId}`)
+    }
   }
 
   private async calculateMatchMVP(serverId: number): Promise<number | undefined> {
@@ -276,7 +307,7 @@ export class MatchHandler implements IMatchHandler {
   private calculatePlayerScore(stats: PlayerRoundStats): number {
     // MVP scoring algorithm:
     // - Kills: 2 points each
-    // - Deaths: -1 point each  
+    // - Deaths: -1 point each
     // - Assists: 1 point each
     // - Objective score: 3 points each (bomb plants/defuses, etc.)
     // - Clutch wins: 5 points each
@@ -360,7 +391,7 @@ export class MatchHandler implements IMatchHandler {
   private async updateServerTeamStats(serverId: number, winningTeam: string): Promise<void> {
     try {
       const updateData: Record<string, unknown> = {}
-      
+
       if (winningTeam === "TERRORIST") {
         updateData.ts_wins = { increment: 1 }
         updateData.map_ts_wins = { increment: 1 }

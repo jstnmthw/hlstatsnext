@@ -78,6 +78,22 @@ describe("MatchHandler", () => {
         },
       } as RoundStartEvent)
 
+      // Mock PlayerService round participants
+      type Participant = Awaited<ReturnType<IPlayerService["getRoundParticipants"]>>[number]
+
+      const participants: Participant[] = [
+        {
+          playerId: 101,
+          player: { kills: 2, deaths: 1, teamkills: 0, skill: 1000 },
+        },
+        {
+          playerId: 102,
+          player: { kills: 0, deaths: 2, teamkills: 0, skill: 1000 },
+        },
+      ]
+
+      vi.mocked(mockPlayerService.getRoundParticipants).mockResolvedValueOnce(participants)
+
       const roundEndEvent: RoundEndEvent = {
         eventType: EventType.ROUND_END,
         serverId: 1,
@@ -96,6 +112,7 @@ describe("MatchHandler", () => {
       expect(stats?.totalRounds).toBe(1)
       expect(stats?.duration).toBe(120)
       expect(stats?.teamScores["TERRORIST"]).toBe(1)
+      expect(stats?.playerStats.size).toBe(2)
     })
 
     it("should handle MAP_CHANGE and finalize/reset stats", async () => {

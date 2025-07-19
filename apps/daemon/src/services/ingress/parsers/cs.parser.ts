@@ -10,6 +10,7 @@ import {
   type ActionPlayerEvent,
   type ActionTeamEvent,
   type WorldActionEvent,
+  type MapChangeEvent,
 } from "@/types/common/events"
 
 /**
@@ -29,6 +30,9 @@ export class CsParser extends BaseParser {
     super(game)
   }
 
+  /* Track the last known map per server so we can emit previousMap in MAP_CHANGE */
+  private readonly currentMaps: Map<number, string> = new Map()
+
   canParse(rawLogLine: string): boolean {
     const logLine = this.normaliseLogLine(rawLogLine)
 
@@ -44,6 +48,23 @@ export class CsParser extends BaseParser {
   async parse(rawLogLine: string, serverId: number): Promise<ParseResult> {
     const logLine = this.normaliseLogLine(rawLogLine)
 
+    // Quick early-exit for lines we deliberately ignore but still want surfaced as INFO
+    const IGNORED_PATTERNS = [
+      /\[META\]/i,
+      /^Server shutdown$/i,
+      /^Log file (?:closed|started)/i,
+      /^Loading map /i,
+      /^Server cvar/i,
+      /^Server cvars /i,
+      // Started map now parsed into MAP_CHANGE
+    ]
+
+    // Strip the leading Source timestamp to test the payload only
+    const payload = logLine.replace(/^L\s+[^:]+:\s*/, "")
+    if (IGNORED_PATTERNS.some((pat) => pat.test(payload))) {
+      return { success: false, error: "IGNORED" }
+    }
+
     // Order matters - check for teamkill first (most specific), then kill, then suicide
     const teamkill = await this.parseTeamkill(logLine, serverId)
     if (teamkill) return { success: true, event: teamkill }
@@ -58,8 +79,11 @@ export class CsParser extends BaseParser {
     const teamAction = await this.parseTeamAction(logLine, serverId)
     if (teamAction) return { success: true, event: teamAction }
 
-    const worldAction = await this.parseWorldAction(logLine, serverId)
-    if (worldAction) return { success: true, event: worldAction }
+    const mapChange = await this.parseMapChange(logLine, serverId)
+    if (mapChange) return { success: true, event: mapChange }
+
+    const worldOrRound = await this.parseWorldOrRoundAction(logLine, serverId)
+    if (worldOrRound) return { success: true, event: worldOrRound }
 
     const playerAction = await this.parsePlayerAction(logLine, serverId)
     if (playerAction) return { success: true, event: playerAction }
@@ -417,31 +441,89 @@ export class CsParser extends BaseParser {
   }
 
   /**
-   * Parse world action events e.g.
-   * L 07/19/2025 - 15:17:36: World triggered "Round_End"
+   * Parse map change lines e.g.
+   *  L 07/19/2025 - 15:37:41: Started map "de_dust" (CRC "-1641307065")
    */
-  private async parseWorldAction(
+  private async parseMapChange(logLine: string, serverId: number): Promise<MapChangeEvent | null> {
+    const regex = /^(?:L .+?:\s)?Started map "([A-Za-z0-9_]+)" \(CRC "[-0-9]+"\)/i
+    const match = logLine.match(regex)
+    if (!match) return null
+
+    const newMap = match[1]!
+    const previousMap = this.currentMaps.get(serverId)
+
+    // Update cache
+    this.currentMaps.set(serverId, newMap)
+
+    const timestamp = this.getCurrentTimestamp()
+
+    const event: MapChangeEvent = {
+      eventType: EventType.MAP_CHANGE,
+      timestamp,
+      serverId,
+      data: {
+        previousMap,
+        newMap,
+        playerCount: 0, // Could be set later if we parse cvar/scoreboard lines
+      },
+    }
+
+    return event
+  }
+
+  private async parseWorldOrRoundAction(
     logLine: string,
     serverId: number,
-  ): Promise<WorldActionEvent | null> {
+  ): Promise<
+    | WorldActionEvent
+    | import("@/types/common/events").RoundStartEvent
+    | import("@/types/common/events").RoundEndEvent
+    | null
+  > {
     const regex = /^(?:L .+?:\s)?World triggered "([A-Za-z0-9_]+)"/i
     const match = logLine.match(regex)
     if (!match) return null
 
     const actionCode = match[1]!
-
     const timestamp = this.getCurrentTimestamp()
 
-    const event: WorldActionEvent = {
-      eventType: EventType.ACTION_WORLD,
-      timestamp,
-      serverId,
-      data: {
-        actionCode,
-        game: this.gameType,
-      },
+    switch (actionCode) {
+      case "Round_Start":
+      case "Game_Commencing": {
+        return {
+          eventType: EventType.ROUND_START,
+          timestamp,
+          serverId,
+          data: {
+            map: "", // can be filled by map-context parser later
+            roundNumber: 0,
+            maxPlayers: 0,
+          },
+        }
+      }
+      case "Round_End":
+      case "Round_Draw": {
+        return {
+          eventType: EventType.ROUND_END,
+          timestamp,
+          serverId,
+          data: {
+            winningTeam: actionCode === "Round_Draw" ? "DRAW" : undefined,
+          },
+        }
+      }
+      default: {
+        const event: WorldActionEvent = {
+          eventType: EventType.ACTION_WORLD,
+          timestamp,
+          serverId,
+          data: {
+            actionCode,
+            game: this.gameType,
+          },
+        }
+        return event
+      }
     }
-
-    return event
   }
 }

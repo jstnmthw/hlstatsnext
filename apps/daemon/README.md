@@ -7,7 +7,7 @@ The **HLStatsNext Daemon** is a real-time statistics engine for Half-Life engine
 ## Architecture Overview
 
 - **TypeScript-first**: Strict types, modular services, and clear domain boundaries.
-- **Service-Oriented**: Core logic is organized into feature services (player, event, statistics, gateway, ingress, RCON, etc.).
+- **Service-Oriented**: Core logic is organized into feature services (player, event, statistics, ingress, RCON, etc.).
 - **Database Integration**: Uses a dedicated `DatabaseClient` for all persistence, with types shared via the monorepo.
 - **UDP Ingress**: Listens for game server events on a configurable UDP port (default: 27500).
 - **Event Processing Pipeline**: Modular event processor for parsing, validating, and handling all game events.
@@ -40,7 +40,7 @@ pnpm test         # Run all tests (unit + integration)
 ```
 apps/daemon/
 ├── src/
-│   ├── services/      # Feature services (player, event, statistics, gateway, ingress, rcon, etc.)
+│   ├── services/      # Feature services (player, event, statistics, ingress, rcon, etc.)
 │   ├── config/        # Game and weapon configuration
 │   ├── database/      # Database client and helpers
 │   ├── types/         # Domain and shared types

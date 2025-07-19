@@ -11,6 +11,9 @@ import {
   type ActionTeamEvent,
   type WorldActionEvent,
   type MapChangeEvent,
+  type GameEvent,
+  type RoundStartEvent,
+  type RoundEndEvent,
 } from "@/types/common/events"
 
 export const IGNORED_PATTERNS = [
@@ -102,9 +105,7 @@ export class CsParser extends BaseParser {
     }
 
     // Declarative parsing pipeline – the order of functions defines precedence.
-    const pipeline: Array<
-      (line: string, sid: number) => Promise<import("@/types/common/events").GameEvent | null>
-    > = [
+    const pipeline: Array<(line: string, sid: number) => Promise<GameEvent | null>> = [
       this.parseTeamkill,
       this.parseKill,
       this.parseSuicide,
@@ -484,12 +485,7 @@ export class CsParser extends BaseParser {
   private async parseWorldOrRoundAction(
     logLine: string,
     serverId: number,
-  ): Promise<
-    | WorldActionEvent
-    | import("@/types/common/events").RoundStartEvent
-    | import("@/types/common/events").RoundEndEvent
-    | null
-  > {
+  ): Promise<WorldActionEvent | RoundStartEvent | RoundEndEvent | null> {
     const match = logLine.match(RE_ACTION_WORLD)
     if (!match) return null
 

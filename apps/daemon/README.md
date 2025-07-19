@@ -108,7 +108,3 @@ NODE_ENV=development
 - All daemon logic is strictly typed and modular. Cross-service access is only via public APIs.
 - For architecture and development standards, see the root [`README.md`](../../README.md) and [`DEVELOPMENT_BEST_PRACTICES.md`](./docs/DEVELOPMENT_BEST_PRACTICES.md).
 - For migration progress and plans, see [`docs/MIGRATION_PROGRESS.md`](./docs/MIGRATION_PROGRESS.md) and [`docs/MIGRATION_PLAN.md`](./docs/MIGRATION_PLAN.md).
-
----
-
-**Let me know if you want any additional sections (e.g., diagrams, advanced config, or deployment notes) or if you’d like this committed as-is!**

@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## **CRITICAL: READ THIS ENTIRE PROMPT BEFORE TAKING ANY ACTION**
 
-You are tasked with implementing the HLStats Daemon v2 following the [MIGRATION_PLAN.md](mdc:apps/daemon-v2/docs/MIGRATION_PLAN.md). This is a complex, multi-phase project that requires careful execution and constant validation.
+You are tasked with implementing the HLStats Daemon following the [MIGRATION_PLAN.md](mdc:apps/daemon/docs/MIGRATION_PLAN.md). This is a complex, multi-phase project that requires careful execution and constant validation.
 
 ---
 
@@ -19,12 +19,12 @@ You are tasked with implementing the HLStats Daemon v2 following the [MIGRATION_
 - **ALWAYS** check the current state before proceeding
 - **NEVER** skip validation steps
 - **PAUSE** for user input at designated checkpoints
-- **MAINTAIN** a progress log in `apps/daemon-v2/docs/MIGRATION_PROGRESS.md`
+- **MAINTAIN** a progress log in `apps/daemon/docs/MIGRATION_PROGRESS.md`
 - **TEST** each component before moving to the next
 - **DOCUMENT** all decisions and deviations
 
 ### Documents
 
-- **BEST PRACTICES** Review our best practices in [DEVELOPMENT_BEST_PRACTICES.md](mdc:apps/daemon-v2/docs/DEVELOPMENT_BEST_PRACTICES.md).
-- **PROGRESS** Review and self update [MIGRATION_PROGRESS.md](mdc:apps/daemon-v2/docs/MIGRATION_PROGRESS.md) when applicablee.
+- **BEST PRACTICES** Review our best practices in [DEVELOPMENT_BEST_PRACTICES.md](mdc:apps/daemon/docs/DEVELOPMENT_BEST_PRACTICES.md).
+- **PROGRESS** Review and self update [MIGRATION_PROGRESS.md](mdc:apps/daemon/docs/MIGRATION_PROGRESS.md) when applicablee.
 - **TYPE SCRIPT** Review [typescript.mdc](mdc:.cursor/rules/typescript.mdc) and enforce strict typescript (Important: Never using `any`).

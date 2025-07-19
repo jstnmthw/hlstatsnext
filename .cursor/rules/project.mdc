@@ -1,11 +1,12 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: false
 ---
+
 # Core Principles
 
-Review [DEVELOPMENT_BEST_PRACTICES.md](mdc:apps/daemon-v2/docs/DEVELOPMENT_BEST_PRACTICES.md).
+Review [DEVELOPMENT_BEST_PRACTICES.md](mdc:apps/daemon/docs/DEVELOPMENT_BEST_PRACTICES.md).
 
 ## 1. Clean Architecture from Day One
 

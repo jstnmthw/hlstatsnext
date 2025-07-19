@@ -188,7 +188,7 @@ describe("Logger", () => {
 
       testLogger.shutdown()
 
-      expect(spy).toHaveBeenCalledWith("[ INFO ] Shutting down HLStats Daemon v2")
+      expect(spy).toHaveBeenCalledWith("[ INFO ] Shutting down HLStats Daemon")
     })
 
     it("should log shutdown complete", () => {

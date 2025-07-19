@@ -128,7 +128,7 @@ packages/database/src/utils/player-stats.ts
 apps/web/src/components/player-stats-chart.tsx
 
 # ✅ GOOD: App-specific processing logic in daemon
-apps/daemon-v2/src/processors/player-stats-processor.ts
+apps/daemon/src/processors/player-stats-processor.ts
 ```
 
 **TurboRepo Commands & Development**:
@@ -141,7 +141,7 @@ pnpm install
 pnpm build
 
 # Run specific app
-pnpm --filter @repo/daemon-v2 dev
+pnpm --filter @repo/daemon dev
 pnpm --filter @repo/web dev
 
 # Run command in multiple packages
@@ -149,11 +149,11 @@ pnpm --filter "@repo/daemon-*" test
 pnpm --filter "@repo/*" lint
 
 # Add dependency to specific package
-pnpm --filter @repo/daemon-v2 add lodash
+pnpm --filter @repo/daemon add lodash
 pnpm --filter @repo/web add @types/react
 
 # Add shared package dependency
-pnpm --filter @repo/daemon-v2 add @repo/database
+pnpm --filter @repo/daemon add @repo/database
 
 # Generate types (typically in database package)
 pnpm --filter @repo/database db:generate
@@ -191,7 +191,7 @@ export { GameEventProcessor } from './services/game.service';
 **Branch Naming Convention**:
 
 ```bash
-feature/daemon-v2-event-processor
+feature/daemon-event-processor
 fix/player-stats-calculation
 chore/update-dependencies
 docs/api-documentation
@@ -362,7 +362,7 @@ hlstatsnext/
 │               └── constants.types.ts
 │
 ├── apps/
-│   ├── daemon-v2/                  # Daemon application
+│   ├── daemon/                  # Daemon application
 │   │   └── src/
 │   │       ├── types/              # Daemon-specific types only
 │   │       │   ├── events.types.ts
@@ -447,7 +447,7 @@ export type PlayerStatsAggregation = {
 **Cross-Package Type Imports**:
 
 ```typescript
-// In apps/daemon-v2/src/services/player.service.ts
+// In apps/daemon/src/services/player.service.ts
 import type { Player, PlayerStats, PlayerCreateInput, PlayerWithStats } from "@repo/database"
 
 // In apps/web/src/components/player-card.tsx
@@ -767,7 +767,7 @@ export * from "./env"
 export type * from "./types"
 
 // ✅ App-level import organization with monorepo packages
-// apps/daemon-v2/src/services/player.service.ts
+// apps/daemon/src/services/player.service.ts
 import type { Player, PlayerCreateInput, PlayerWhereInput } from "@repo/database"
 import { prisma, createPlayer } from "@repo/database"
 import { GAME_CONSTANTS } from "@repo/config"
@@ -805,7 +805,7 @@ import { PlayerService } from "@/services/player" // Should be in shared package
     { "path": "./packages/database" },
     { "path": "./packages/ui" },
     { "path": "./packages/config" },
-    { "path": "./apps/daemon-v2" },
+    { "path": "./apps/daemon" },
     { "path": "./apps/web" },
     { "path": "./apps/api" }
   ]
@@ -823,7 +823,7 @@ import { PlayerService } from "@/services/player" // Should be in shared package
   "exclude": ["dist", "node_modules"]
 }
 
-// apps/daemon-v2/tsconfig.json
+// apps/daemon/tsconfig.json
 {
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
@@ -857,9 +857,9 @@ import { PlayerService } from "@/services/player" // Should be in shared package
   }
 }
 
-// apps/daemon-v2/package.json
+// apps/daemon/package.json
 {
-  "name": "@repo/daemon-v2",
+  "name": "@repo/daemon",
   "dependencies": {
     "@repo/database": "workspace:*",
     "@repo/config": "workspace:*"
@@ -2216,7 +2216,7 @@ COPY pnpm-workspace.yaml ./
 COPY turbo.json ./
 
 # Copy package files
-COPY apps/daemon-v2/package.json ./apps/daemon-v2/
+COPY apps/daemon/package.json ./apps/daemon/
 COPY packages/*/package.json ./packages/*/
 
 # Install dependencies
@@ -2226,7 +2226,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Build application
-RUN pnpm --filter @hlstatsnext/daemon-v2 build
+RUN pnpm --filter @hlstatsnext/daemon build
 
 # Production stage
 FROM node:20-alpine AS production
@@ -2241,7 +2241,7 @@ RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
 # Copy built application
-COPY --from=builder --chown=nodejs:nodejs /app/apps/daemon-v2/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/apps/daemon/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 
 # Switch to non-root user
@@ -2430,7 +2430,7 @@ We will use Redis with Bull MQ for the event processing queue.
 
 - RabbitMQ: More complex, overkill for our needs
 - AWS SQS: Vendor lock-in, higher latency
-- In-memory queue: No persistence, single point of failure
+- In-memory queue: No persistence, a single point of failure
 ```
 
 ---

@@ -1,5 +1,5 @@
 /**
- * Event Service for HLStats Daemon v2
+ * Event Service for HLStats Daemon
  *
  * Handles all event-related database operations
  */

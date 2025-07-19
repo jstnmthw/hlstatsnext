@@ -1,4 +1,4 @@
-# HLStats Daemon v2 - Migration Progress
+# HLStats Daemon - Migration Progress
 
 ## Overview
 
@@ -204,53 +204,7 @@ Extend parser support to all Half-Life engine games and implement advanced event
 
 ---
 
-## **Phase 4: Gateway API & Admin Tools** 🔄
-
-### Objectives
-
-Build REST/GraphQL API for data access and administrative interfaces.
-
-### Planned Features
-
-#### **Gateway API Development**
-
-- [ ] RESTful endpoints
-  - [ ] Player statistics API
-  - [ ] Server status API
-  - [ ] Match history API
-  - [ ] Leaderboard API
-- [ ] GraphQL schema
-  - [ ] Player queries
-  - [ ] Statistics aggregations
-  - [ ] Real-time subscriptions
-- [ ] Authentication & authorization
-  - [ ] JWT token system
-  - [ ] API key management
-  - [ ] Role-based access control
-
-#### **Admin Interface Backend**
-
-- [ ] Server management endpoints
-- [ ] Player administration
-  - [ ] Ban/unban system
-  - [ ] Skill reset functionality
-  - [ ] Player merging
-- [ ] Configuration management
-- [ ] Log viewer API
-- [ ] System health endpoints
-
-#### **Data Export/Import**
-
-- [ ] Legacy data migration tools
-- [ ] Bulk data export (CSV, JSON)
-- [ ] Backup/restore functionality
-- [ ] Data validation tools
-
-### Estimated Duration: 4-5 weeks
-
----
-
-## **Phase 5: RCON & Live Features** 🔄
+## **Phase 4: RCON & Live Features**
 
 ### Objectives
 
@@ -291,7 +245,7 @@ Implement remote console functionality and real-time features.
 
 ---
 
-## **Phase 6: Performance & Production** 🔄
+## **Phase 5: Performance & Production**
 
 ### Objectives
 
@@ -344,7 +298,7 @@ Optimize performance, implement caching, and prepare for production deployment.
 
 ---
 
-## **Phase 7: Testing & Release Candidate** 🔄
+## **Phase 6: Testing & Release Candidate**
 
 ### Objectives
 
@@ -392,12 +346,11 @@ Comprehensive testing, bug fixes, and RC preparation.
 
 - **Phase 3**: Multi-Game Support & Advanced Parsing (**~20% complete**)
 
-### Upcoming 🔄
+### Upcoming
 
-- **Phase 4**: Gateway API & Admin Tools
-- **Phase 5**: RCON & Live Features
-- **Phase 6**: Performance & Production
-- **Phase 7**: Testing & Release Candidate
+- **Phase 4**: RCON & Live Features
+- **Phase 5**: Performance & Production
+- **Phase 6**: Testing & Release Candidate
 
 ### Total Estimated Timeline
 

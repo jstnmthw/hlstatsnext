@@ -322,7 +322,7 @@ make help               # Show all available commands
 .
 ├── apps/
 │   ├── api/            # Node.js GraphQL Yoga API
-│   ├── daemon/         # Pearl daemon for game server monitoring
+│   ├── daemon/         # Node.js daemon for game server monitoring
 │   └── web/            # Next.js frontend application
 ├── packages/
 │   ├── ui/             # Shared UI components (shadcn/ui + custom components)
@@ -332,7 +332,6 @@ make help               # Show all available commands
 │   ├── cs1/            # Example Counter-Strike server 1 data
 │   └── cs2/            # Example Counter-Strike server 2 data
 ├── docker/             # Docker configuration files
-│   ├── daemon/         # Daemon Dockerfile and configs
 │   └── mysql/          # MySQL configuration files
 ├── docker-compose.yml  # Docker Compose configuration
 └── Makefile            # Docker management commands

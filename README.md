@@ -215,7 +215,7 @@ The daemon service processes game events and updates statistics in real-time.
 The database service stores all game statistics and player data.
 
 - **Container**: `hlstatsnext-db`
-- **Image**: `mysql:5.7`
+- **Image**: `mysql:8.4`
 - **Port**: `3306`
 - **Features**:
   - Persistent data storage via Docker volumes

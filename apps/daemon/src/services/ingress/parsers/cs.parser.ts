@@ -13,17 +13,64 @@ import {
   type MapChangeEvent,
 } from "@/types/common/events"
 
+export const IGNORED_PATTERNS = [
+  /\[META\]/i,
+  /^Server shutdown$/i,
+  /^Log file (?:closed|started)/i,
+  /^Loading map /i,
+  /^Server cvar/i,
+  /^Server cvars /i,
+] as const
+
+const RE_CONNECT =
+  /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><.*?>" connected, address "(.+?)(?::\d+)?"/i
+const RE_DISCONNECT =
+  /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><.*?>" disconnected(?: \(reason\s+"(.+?)"\))?/i
+const RE_KILL =
+  /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?killed "(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?with "(\w+)"( \(headshot\))?/i
+const RE_SUICIDE =
+  /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?committed suicide with "(\w+)"/i
+const RE_CHAT =
+  /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>"\s+say\s+"([^"]+)"(?:\s+\((dead)\))?/i
+const RE_ACTION_PLAYER =
+  /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>"(?: \[([+\-0-9\s]+)\])?\s+triggered\s+"([A-Za-z0-9_]+)"/i
+const RE_ACTION_TEAM = /^(?:L .+?:\s)?Team "(\w+)" triggered "([A-Za-z0-9_]+)"/i
+const RE_MAP_CHANGE = /^(?:L .+?:\s)?Started map "([A-Za-z0-9_]+)" \(CRC "[-0-9]+"\)/i
+const RE_ACTION_WORLD = /^(?:L .+?:\s)?World triggered "([A-Za-z0-9_]+)"/i
+
 /**
- * Minimal Counter-Strike (Source / GO) log parser.
+ * Counter-Strike (Source / GO) log parser with declarative parsing pipeline.
  *
- * ✅ PLAYER_CONNECT
- * ✅ PLAYER_DISCONNECT
- * ✅ PLAYER_KILL
- * ✅ PLAYER_SUICIDE
- * ✅ PLAYER_TEAMKILL
+ * Parses real-time game server logs into structured events for statistics tracking.
+ * Uses a pre-compiled regex approach for performance and a declarative pipeline
+ * for maintainability.
  *
- * This is intentionally lightweight - regexes are crude but good enough for a
- * phase-1 prototype. They can be hardened later.
+ * Supported Events:
+ * - PLAYER_CONNECT: Player joins server
+ * - PLAYER_DISCONNECT: Player leaves server
+ * - PLAYER_KILL: Player kills another player (different teams)
+ * - PLAYER_SUICIDE: Player kills themselves
+ * - PLAYER_TEAMKILL: Player kills teammate (same team)
+ * - CHAT_MESSAGE: Player chat messages
+ * - ACTION_PLAYER: Player-triggered game events (bomb defuse, etc.)
+ * - ACTION_TEAM: Team-wide events (bomb planted, etc.)
+ * - ACTION_WORLD: World/round events (round start/end)
+ * - MAP_CHANGE: Server map changes
+ *
+ * Ignored Patterns:
+ * - Meta-mod logs, server cvars, shutdown messages
+ * - Log file open/close events
+ * - Map loading messages
+ *
+ * @example
+ * ```typescript
+ * const parser = new CsParser("cstrike")
+ * const result = await parser.parse(logLine, serverId)
+ * if (result.success) {
+ *   // Process structured event
+ *   await eventProcessor.process(result.event)
+ * }
+ * ```
  */
 export class CsParser extends BaseParser {
   constructor(game: string) {
@@ -48,52 +95,35 @@ export class CsParser extends BaseParser {
   async parse(rawLogLine: string, serverId: number): Promise<ParseResult> {
     const logLine = this.normaliseLogLine(rawLogLine)
 
-    // Quick early-exit for lines we deliberately ignore but still want surfaced as INFO
-    const IGNORED_PATTERNS = [
-      /\[META\]/i,
-      /^Server shutdown$/i,
-      /^Log file (?:closed|started)/i,
-      /^Loading map /i,
-      /^Server cvar/i,
-      /^Server cvars /i,
-    ]
-
-    // Strip the leading Source timestamp to test the payload only
+    // Fast-fail for intentionally ignored noise (keeps downstream logic clean)
     const payload = logLine.replace(/^L\s+[^:]+:\s*/, "")
     if (IGNORED_PATTERNS.some((pat) => pat.test(payload))) {
       return { success: false, error: "IGNORED" }
     }
 
-    // Order matters - check for teamkill first (most specific), then kill, then suicide
-    const teamkill = await this.parseTeamkill(logLine, serverId)
-    if (teamkill) return { success: true, event: teamkill }
+    // Declarative parsing pipeline – the order of functions defines precedence.
+    const pipeline: Array<
+      (line: string, sid: number) => Promise<import("@/types/common/events").GameEvent | null>
+    > = [
+      this.parseTeamkill,
+      this.parseKill,
+      this.parseSuicide,
+      this.parseTeamAction,
+      this.parseMapChange,
+      this.parseWorldOrRoundAction,
+      this.parsePlayerAction,
+      this.parseConnect,
+      this.parseDisconnect,
+      this.parseChat,
+    ]
 
-    const kill = await this.parseKill(logLine, serverId)
-    if (kill) return { success: true, event: kill }
-
-    const suicide = await this.parseSuicide(logLine, serverId)
-    if (suicide) return { success: true, event: suicide }
-
-    const teamAction = await this.parseTeamAction(logLine, serverId)
-    if (teamAction) return { success: true, event: teamAction }
-
-    const mapChange = await this.parseMapChange(logLine, serverId)
-    if (mapChange) return { success: true, event: mapChange }
-
-    const worldOrRound = await this.parseWorldOrRoundAction(logLine, serverId)
-    if (worldOrRound) return { success: true, event: worldOrRound }
-
-    const playerAction = await this.parsePlayerAction(logLine, serverId)
-    if (playerAction) return { success: true, event: playerAction }
-
-    const connect = await this.parseConnect(logLine, serverId)
-    if (connect) return { success: true, event: connect }
-
-    const disconnect = await this.parseDisconnect(logLine, serverId)
-    if (disconnect) return { success: true, event: disconnect }
-
-    const chat = await this.parseChat(logLine, serverId)
-    if (chat) return { success: true, event: chat }
+    for (const fn of pipeline) {
+      // Bind to preserve `this` context for private methods
+      const event = await fn.call(this, logLine, serverId)
+      if (event) {
+        return { success: true, event }
+      }
+    }
 
     return { success: false, error: "Unsupported log line" }
   }
@@ -107,9 +137,7 @@ export class CsParser extends BaseParser {
       L 07/15/2024 - 22:35:10: "PlayerName<1><STEAM_1:0:12345><CT>" STEAM USERID validated
       L 07/15/2024 - 22:35:10: "PlayerName<1><STEAM_1:0:12345><>" connected, address "192.168.1.100:27005"
     */
-    const regex =
-      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><.*?>" connected, address "(.+?)(?::\d+)?"/i
-    const match = logLine.match(regex)
+    const match = logLine.match(RE_CONNECT)
     if (!match) return null
 
     const playerName = match[1]!
@@ -147,9 +175,7 @@ export class CsParser extends BaseParser {
       Example:
       L 07/15/2024 - 22:35:10: "PlayerName<1><STEAM_1:0:12345><CT>" disconnected (reason "Client left game")
     */
-    const regex =
-      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><.*?>" disconnected(?: \(reason\s+"(.+?)"\))?/i
-    const match = logLine.match(regex)
+    const match = logLine.match(RE_DISCONNECT)
     if (!match) return null
 
     const reason = match[3]
@@ -174,9 +200,7 @@ export class CsParser extends BaseParser {
       Example:
       L 07/15/2024 - 22:35:05: "Killer<2><STEAM_1:0:111><TERRORIST>" [93 303 73] killed "Victim<3><STEAM_1:0:222><CT>" [35 302 73] with "ak47" (headshot)
     */
-    const regex =
-      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?killed "(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?with "(\w+)"( \(headshot\))?/i
-    const match = logLine.match(regex)
+    const match = logLine.match(RE_KILL)
     if (!match) return null
 
     const killerName = match[1]!
@@ -231,9 +255,7 @@ export class CsParser extends BaseParser {
       Example:
       L 07/15/2024 - 22:35:05: "Player<2><STEAM_1:0:111><TERRORIST>" [93 303 73] committed suicide with "world"
     */
-    const regex =
-      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?committed suicide with "(\w+)"/i
-    const match = logLine.match(regex)
+    const match = logLine.match(RE_SUICIDE)
     if (!match) return null
 
     const playerName = match[1]!
@@ -271,9 +293,7 @@ export class CsParser extends BaseParser {
       L 07/15/2024 - 22:35:05: "Killer<2><STEAM_1:0:111><TERRORIST>" [93 303 73] killed "Victim<3><STEAM_1:0:222><TERRORIST>" [35 302 73] with "ak47" (headshot)
       Note: Same team for both players
     */
-    const regex =
-      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?killed "(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>".*?with "(\w+)"( \(headshot\))?/i
-    const match = logLine.match(regex)
+    const match = logLine.match(RE_KILL)
     if (!match) return null
 
     const killerName = match[1]!
@@ -324,10 +344,7 @@ export class CsParser extends BaseParser {
    * L 06/28/2025 - 09:09:32: "goat<5><BOT><CT>" say "Too bad NNBot is discontinued..." (dead)
    */
   private async parseChat(logLine: string, serverId: number): Promise<PlayerChatEvent | null> {
-    const regex =
-      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>"\s+say\s+"([^"]+)"(?:\s+\((dead)\))?/i
-
-    const match = logLine.match(regex)
+    const match = logLine.match(RE_CHAT)
     if (!match) return null
 
     const playerName = match[1]!
@@ -369,10 +386,7 @@ export class CsParser extends BaseParser {
     logLine: string,
     serverId: number,
   ): Promise<ActionPlayerEvent | null> {
-    const regex =
-      /^(?:L .+?:\s)?"(.+?)<\d+><(STEAM_[0-9A-Za-z:_]+|BOT)><(\w+)>"(?: \[([+\-0-9\s]+)\])?\s+triggered\s+"([A-Za-z0-9_]+)"/i
-
-    const match = logLine.match(regex)
+    const match = logLine.match(RE_ACTION_PLAYER)
     if (!match) return null
 
     const playerName = match[1]!
@@ -415,8 +429,7 @@ export class CsParser extends BaseParser {
     logLine: string,
     serverId: number,
   ): Promise<ActionTeamEvent | null> {
-    const regex = /^(?:L .+?:\s)?Team "(\w+)" triggered "([A-Za-z0-9_]+)"/i
-    const match = logLine.match(regex)
+    const match = logLine.match(RE_ACTION_TEAM)
     if (!match) return null
 
     const team = match[1]!
@@ -443,8 +456,7 @@ export class CsParser extends BaseParser {
    *  L 07/19/2025 - 15:37:41: Started map "de_dust" (CRC "-1641307065")
    */
   private async parseMapChange(logLine: string, serverId: number): Promise<MapChangeEvent | null> {
-    const regex = /^(?:L .+?:\s)?Started map "([A-Za-z0-9_]+)" \(CRC "[-0-9]+"\)/i
-    const match = logLine.match(regex)
+    const match = logLine.match(RE_MAP_CHANGE)
     if (!match) return null
 
     const newMap = match[1]!
@@ -478,8 +490,7 @@ export class CsParser extends BaseParser {
     | import("@/types/common/events").RoundEndEvent
     | null
   > {
-    const regex = /^(?:L .+?:\s)?World triggered "([A-Za-z0-9_]+)"/i
-    const match = logLine.match(regex)
+    const match = logLine.match(RE_ACTION_WORLD)
     if (!match) return null
 
     const actionCode = match[1]!

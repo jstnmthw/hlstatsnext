@@ -1,6 +1,5 @@
 ---
-description:
-globs:
+globs: apps/daemon/*
 alwaysApply: false
 ---
 

@@ -74,6 +74,11 @@ export class EventService implements IEventService {
         case "CHAT_MESSAGE":
           await this.createChatEvent(event)
           break
+        case "ROUND_START":
+        case "ROUND_END":
+        case "TEAM_WIN":
+        case "MAP_CHANGE":
+          break
         default:
           this.logger.warn(`Unhandled event type: ${event.eventType}`)
       }

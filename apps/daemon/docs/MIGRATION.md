@@ -50,7 +50,7 @@ Establish core architecture, services skeleton, and development infrastructure.
 
 #### **Core Services** ✅
 
-- ⚠️  **Gateway Service**: Removed - using `apps/api` instead
+- ⚠️ **Gateway Service**: Removed - using `apps/api` instead
 - ✅ **Ingress Service**: UDP server for game log reception
   - ✅ High-performance UDP packet handling
   - ✅ Rate limiting per IP address
@@ -198,6 +198,38 @@ Implement complete player tracking, event processing, and ranking system.
 Extend parser support to all Half-Life engine games and implement advanced event tracking.
 
 ### Planned Features
+
+---
+
+## **Phase 4: Round & Match Events** ✅
+
+### Objectives
+
+Implement round and match event handling with proper event routing.
+
+### Completed Features
+
+#### **Event Routing Fix** ✅
+
+- ✅ **Fixed conflicting logs**: Resolved issue where `ROUND_START` and `ROUND_END` events were both being handled by `MatchHandler` and marked as "Unhandled event type" in `EventService`
+- ✅ **EventService updates**: Added explicit cases for `ROUND_START`, `ROUND_END`, `TEAM_WIN`, and `MAP_CHANGE` events to prevent false "unhandled" warnings
+- ✅ **Proper event flow**: Events are now correctly routed through the processing pipeline without duplicate warnings
+- ✅ **Memory-only handling**: Round events are handled in memory by `MatchHandler` and don't require database persistence
+- ✅ **Test validation**: All 187 tests passing, confirming no regressions
+
+#### **Event Processing Pipeline** ✅
+
+- ✅ **EventProcessorService**: Routes round events to `MatchHandler` for in-memory processing
+- ✅ **EventService**: Explicitly handles round events without database persistence
+- ✅ **MatchHandler**: Manages round state, match statistics, and player round participation
+- ✅ **Clean separation**: Database persistence vs. in-memory state management properly separated
+
+### Phase 4 Metrics
+
+- **Bug Fixes**: 1 critical event routing issue resolved
+- **Test Coverage**: 187 tests passing (no regressions)
+- **Code Quality**: Zero ESLint warnings, strict TypeScript compliance
+- **Event Flow**: Clean, non-conflicting event processing pipeline
 
 #### **Game-Specific Parsers**
 

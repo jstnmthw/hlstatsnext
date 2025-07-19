@@ -1,5 +1,5 @@
 /**
- * HLStats Daemon v2 - Main Entry Point
+ * HLStatsNext Daemon - Main Entry Point
  *
  * Modern TypeScript rewrite of the legacy Perl HLstatsX daemon.
  * Collects and processes statistics from Half-Life dedicated game servers.
@@ -55,7 +55,7 @@ export class HLStatsDaemon {
       ])
 
       logger.ok("All services started successfully")
-      logger.ready("HLStats Daemon v2 is ready to receive game server data")
+      logger.ready("HLStatsNext Daemon is ready to receive game server data")
     } catch (error) {
       logger.failed(
         "Failed to start daemon",

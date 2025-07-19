@@ -1,5 +1,5 @@
 ---
-globs: apps/daemon/*
+globs: apps/daemon/**/*.ts
 alwaysApply: false
 ---
 

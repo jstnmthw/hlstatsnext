@@ -3,11 +3,12 @@ import { WeaponHandler } from "../../src/services/processor/handlers/weapon.hand
 import { EventType, PlayerKillEvent, PlayerConnectEvent } from "../../src/types/common/events"
 import { createMockLogger } from "../types/test-mocks"
 import type { IWeaponService } from "../../src/services/weapon/weapon.types"
+import type { DatabaseClient } from "../../src/database/client"
 
 const createWeaponServiceMock = (): IWeaponService => ({
   getSkillMultiplier: vi.fn().mockResolvedValue(1.0),
   getWeaponModifier: vi.fn(),
-  getDamageMultiplier: vi.fn(),
+  getDamageMultiplier: vi.fn().mockResolvedValue(100),
   clearCache: vi.fn(),
   getCacheSize: vi.fn(),
 })
@@ -15,12 +16,36 @@ const createWeaponServiceMock = (): IWeaponService => ({
 describe("WeaponHandler", () => {
   let handler: WeaponHandler
   let mockWeaponService: IWeaponService
+  let mockDatabase: DatabaseClient
   const loggerMock = createMockLogger()
 
   beforeEach(() => {
     vi.clearAllMocks()
     mockWeaponService = createWeaponServiceMock()
-    handler = new WeaponHandler(mockWeaponService, loggerMock)
+    
+    mockDatabase = {
+      transaction: vi.fn().mockImplementation((callback) => callback({
+        eventFrag: { create: vi.fn() },
+        weapon: { upsert: vi.fn() },
+        player: { update: vi.fn() },
+      })),
+      testConnection: vi.fn(),
+      disconnect: vi.fn(),
+      prisma: {
+        eventFrag: {
+          groupBy: vi.fn(),
+        },
+        player: {
+          findUnique: vi.fn(),
+          update: vi.fn(),
+        },
+        weapon: {
+          findMany: vi.fn(),
+        },
+      },
+    } as unknown as DatabaseClient
+    
+    handler = new WeaponHandler(mockWeaponService, mockDatabase, loggerMock)
   })
 
   describe("handleEvent", () => {

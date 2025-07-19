@@ -236,7 +236,7 @@ export function createEventProcessorService(
 
   // Handler Layer
   const playerHandler = new PlayerHandler(playerService, logger)
-  const weaponHandler = new WeaponHandler(weaponService, logger)
+  const weaponHandler = new WeaponHandler(weaponService, db, logger)
   const matchHandler = new MatchHandler(playerService, db, logger)
   const rankingHandler = new RankingHandler(playerService, weaponService, logger)
 

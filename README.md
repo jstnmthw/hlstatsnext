@@ -40,17 +40,14 @@ Born from the proven foundation of HLstatsX Community Edition—trusted by thous
 
 **Real-time Statistics Engine:**
 
-- **Completely Rewritten Daemon**: Ground-up Pearl implementation replacing legacy Perl daemon for enhanced performance and reliability
-- **Real-time Game Event Processing**: Live statistics tracking with sub-second latency for immediate player feedback
-- **Multi-Game Support**: Extensible architecture supporting various Half-Life engine games
-- **Advanced Player Analytics**: Comprehensive ranking systems, weapon statistics, and performance metrics
+- **Completely Rewritten Daemon**: Ground-up Node.js implementation replacing legacy Perl daemon for enhanced performance and reliability
 
 **Infrastructure & DevOps:**
 
 - **Production-Ready Containerization**: Comprehensive Docker Compose setup with service orchestration
 - **Automated Game Server Management**: Integrated LinuxGSM support for seamless server deployment and management
 - **Custom Network Architecture**: Isolated container networking with static IP allocation for reliable service communication
-- **Database Management**: MySQL 5.7 integration with automated schema management and persistent storage
+- **Database Management**: MySQL 8.4 integration with automated schema management and persistent storage
 - **Health Monitoring**: Built-in health checks and automatic service recovery for maximum uptime
 
 **Developer Experience:**
@@ -63,7 +60,7 @@ Born from the proven foundation of HLstatsX Community Edition—trusted by thous
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 24+
 - pnpm (recommended) or npm
 - Docker & Docker Compose (for containerized development)
 
@@ -109,7 +106,7 @@ pnpm build
 pnpm lint
 
 # Generate GraphQL client for the web app (requires api to be running)
-pnpm --filter=web graphql:codegen
+pnpm codegen
 
 # Run tests across all apps and packages
 pnpm test

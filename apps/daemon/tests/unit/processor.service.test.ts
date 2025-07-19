@@ -9,6 +9,7 @@ import type { IPlayerHandler } from "../../src/services/processor/handlers/playe
 import type { IRankingHandler } from "../../src/services/processor/handlers/ranking.handler.types"
 import type { IWeaponHandler } from "../../src/services/processor/handlers/weapon.handler.types"
 import type { IActionHandler } from "../../src/services/processor/handlers/action.handler.types"
+import type { IServerStatsHandler } from "../../src/services/processor/handlers/server-stats.handler"
 import type { ILogger } from "../../src/utils/logger.types"
 
 // Mock Factories for all dependencies
@@ -34,6 +35,13 @@ const createRankingHandlerMock = (): IRankingHandler => ({
 })
 const createWeaponHandlerMock = (): IWeaponHandler => ({ handleEvent: vi.fn() })
 const createActionHandlerMock = (): IActionHandler => ({ handleEvent: vi.fn() })
+const createServerStatsHandlerMock = (): IServerStatsHandler => ({
+  handleEvent: vi.fn(),
+  getServerStats: vi.fn(),
+  generateStatsUpdateEvent: vi.fn(),
+  onStatsUpdate: vi.fn(),
+  offStatsUpdate: vi.fn(),
+})
 
 describe("EventProcessorService", () => {
   let processor: EventProcessorService
@@ -44,6 +52,7 @@ describe("EventProcessorService", () => {
   let mockRankingHandler: IRankingHandler
   let mockWeaponHandler: IWeaponHandler
   let mockActionHandler: IActionHandler
+  let mockServerStatsHandler: IServerStatsHandler
   let mockLogger: ILogger
 
   beforeEach(() => {
@@ -55,6 +64,7 @@ describe("EventProcessorService", () => {
     mockRankingHandler = createRankingHandlerMock()
     mockWeaponHandler = createWeaponHandlerMock()
     mockActionHandler = createActionHandlerMock()
+    mockServerStatsHandler = createServerStatsHandlerMock()
     mockLogger = createMockLogger()
 
     processor = new EventProcessorService(
@@ -65,6 +75,7 @@ describe("EventProcessorService", () => {
       mockActionHandler,
       mockMatchHandler,
       mockRankingHandler,
+      mockServerStatsHandler,
       mockLogger,
     )
   })
@@ -192,6 +203,7 @@ describe("EventProcessorService", () => {
         mockActionHandler,
         mockMatchHandler,
         mockRankingHandler,
+        mockServerStatsHandler,
         mockLogger,
         { logBots: false },
       )

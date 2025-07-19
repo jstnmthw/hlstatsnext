@@ -95,7 +95,9 @@ export interface MockDatabaseClient extends Omit<DatabaseClient, "prisma"> {
     }
     server: {
       findFirst: ReturnType<typeof vi.fn>
+      findUnique: ReturnType<typeof vi.fn>
       create: ReturnType<typeof vi.fn>
+      update: ReturnType<typeof vi.fn>
     }
     weapon: {
       findFirst: ReturnType<typeof vi.fn>
@@ -156,7 +158,9 @@ export function createMockDatabaseClient(
     },
     server: {
       findFirst: vi.fn(),
+      findUnique: vi.fn(),
       create: vi.fn(),
+      update: vi.fn(),
     },
     weapon: {
       findFirst: vi.fn(),

@@ -16,10 +16,11 @@ import { WeaponService } from "@/services/weapon/weapon.service"
 import { PlayerService } from "@/services/player/player.service"
 import { ActionService } from "@/services/action/action.service"
 import { RankingHandler } from "@/services/processor/handlers/ranking.handler"
+import { ServerStatsHandler } from "@/services/processor/handlers/server-stats.handler"
 import { logger as defaultLogger } from "@/utils/logger"
 import { DatabaseClient, databaseClient } from "@/database/client"
 
-import type { GameEvent } from "@/types/common/events"
+import type { GameEvent, ServerStatsUpdateEvent } from "@/types/common/events"
 import type { IEventProcessor } from "@/services/processor/processor.types"
 import type { IEventService } from "@/services/event/event.types"
 import type { IPlayerHandler } from "@/services/processor/handlers/player.handler.types"
@@ -27,6 +28,7 @@ import type { IWeaponHandler } from "@/services/processor/handlers/weapon.handle
 import type { IActionHandler } from "@/services/processor/handlers/action.handler.types"
 import type { IMatchHandler } from "@/services/processor/handlers/match.handler.types"
 import type { IRankingHandler } from "@/services/processor/handlers/ranking.handler.types"
+import type { IServerStatsHandler } from "@/services/processor/handlers/server-stats.handler"
 import type { IPlayerService } from "@/services/player/player.types"
 import type { ILogger } from "@/utils/logger.types"
 
@@ -45,11 +47,19 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
     private readonly actionHandler: IActionHandler,
     private readonly matchHandler: IMatchHandler,
     private readonly rankingHandler: IRankingHandler,
+    private readonly serverStatsHandler: IServerStatsHandler,
     private readonly logger: ILogger,
     opts: { logBots?: boolean } = {},
   ) {
     super()
     this.opts = { logBots: true, ...opts }
+    
+    // Set up server stats handler to process generated stats events
+    this.serverStatsHandler.onStatsUpdate((statsEvent: ServerStatsUpdateEvent) => {
+      this.eventService.createGameEvent(statsEvent).catch((error) => {
+        this.logger.error(`Failed to process server stats update: ${error}`)
+      })
+    })
   }
 
   /* Existing enqueue placeholder (kept for API compatibility).
@@ -66,6 +76,12 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
    */
   async processEvent(event: GameEvent): Promise<void> {
     try {
+      // Log all events for debugging server stats issues
+      this.logger.info(`[DEBUG] Processing event: ${event.eventType} for server ${event.serverId}`)
+      if (['BOMB_PLANT', 'BOMB_DEFUSE', 'TEAM_WIN', 'PLAYER_CONNECT', 'PLAYER_DISCONNECT'].includes(event.eventType)) {
+        this.logger.info(`[DEBUG] Critical event data:`, event.data)
+      }
+      
       // Skip bot events if logBots is false
       if (!this.opts.logBots) {
         const eventWithMeta = event as GameEvent & { meta?: { isBot?: boolean } }
@@ -80,6 +96,9 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
 
       // Persist the event to the database
       await this.eventService.createGameEvent(event)
+
+      // Update server statistics (this may generate additional SERVER_STATS_UPDATE events)
+      await this.serverStatsHandler.handleEvent(event)
 
       // Route to appropriate handlers
       switch (event.eventType) {
@@ -103,7 +122,22 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
         case EventType.ROUND_END:
         case EventType.TEAM_WIN:
         case EventType.MAP_CHANGE:
+        case EventType.BOMB_PLANT:
+        case EventType.BOMB_DEFUSE:
+        case EventType.BOMB_EXPLODE:
+        case EventType.HOSTAGE_RESCUE:
+        case EventType.HOSTAGE_TOUCH:
+        case EventType.FLAG_CAPTURE:
+        case EventType.FLAG_DEFEND:
+        case EventType.FLAG_PICKUP:
+        case EventType.FLAG_DROP:
+        case EventType.CONTROL_POINT_CAPTURE:
+        case EventType.CONTROL_POINT_DEFEND:
           await this.matchHandler.handleEvent(event)
+          break
+        
+        case EventType.SERVER_STATS_UPDATE:
+          // Server stats events are handled directly by EventService
           break
 
         case EventType.ACTION_PLAYER:
@@ -119,6 +153,11 @@ export class EventProcessorService extends EventEmitter implements IEventProcess
           this.logger.chat(`${event.meta?.playerName}: ${chatData.message}${deadIndicator}`)
           break
         }
+
+        case EventType.WEAPON_FIRE:
+        case EventType.WEAPON_HIT:
+          // Weapon events are handled by ServerStatsHandler (called for all events above)
+          break
 
         default:
           this.logger.warn(`Unhandled event type: ${event.eventType}`)
@@ -317,6 +356,7 @@ export function createEventProcessorService(
   const actionHandler = new ActionHandler(actionService, playerService, db, logger)
   const matchHandler = new MatchHandler(playerService, db, logger)
   const rankingHandler = new RankingHandler(playerService, weaponService, logger)
+  const serverStatsHandler = new ServerStatsHandler(db, logger)
 
   return new EventProcessorService(
     eventService,
@@ -326,6 +366,7 @@ export function createEventProcessorService(
     actionHandler,
     matchHandler,
     rankingHandler,
+    serverStatsHandler,
     logger,
     opts,
   )

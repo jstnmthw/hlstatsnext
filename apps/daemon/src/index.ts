@@ -23,7 +23,7 @@ export class HLStatsDaemon {
   private statistics: StatisticsService
 
   constructor() {
-    logger.info("Initializing HLStats Daemon v2")
+    logger.info("Initializing HLStatsNext Daemon")
 
     this.db = new DatabaseClient()
     this.processor = createEventProcessorService()
@@ -106,8 +106,7 @@ function main() {
     process.exit(1)
   })
 
-  logger.ok("HLStats Daemon v2 - Phase 1 Complete")
-  logger.info("Features implemented")
+  logger.ok("🚀 HLStatsNext Daemon started")
 }
 
 // This allows the file to be imported for testing without executing the startup logic.

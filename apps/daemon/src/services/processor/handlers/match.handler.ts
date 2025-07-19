@@ -112,6 +112,11 @@ export class MatchHandler implements IMatchHandler {
         matchStats.teamScores[winningTeam] = (matchStats.teamScores[winningTeam] || 0) + 1
       }
 
+      await this.db.prisma.server.update({
+        where: { serverId },
+        data: { map_rounds: { increment: 1 } },
+      })
+
       // Update player round statistics and calculate MVP
       await this.updatePlayerRoundStats(serverId, duration || 0)
       await this.calculateRoundMVP(serverId)
@@ -160,6 +165,11 @@ export class MatchHandler implements IMatchHandler {
       await this.updatePlayerRoundStats(serverId, 0) // Round duration is not available here
       await this.calculateRoundMVP(serverId)
 
+      await this.db.prisma.server.update({
+        where: { serverId },
+        data: { map_rounds: { increment: 1 } },
+      })
+
       // Update server statistics for CS-specific team wins
       if (triggerName === "Terrorists_Win" || triggerName === "CTs_Win") {
         await this.updateServerTeamStats(serverId, winningTeam)
@@ -194,6 +204,23 @@ export class MatchHandler implements IMatchHandler {
 
       // Reset match stats for new map
       this.currentMatch.delete(serverId)
+
+      // Update server record for the new map
+      await this.db.prisma.server.update({
+        where: { serverId },
+        data: {
+          act_map: newMap,
+          map_changes: { increment: 1 },
+          map_started: Math.floor(Date.now() / 1000),
+          map_rounds: 0,
+          map_ct_wins: 0,
+          map_ts_wins: 0,
+          map_ct_shots: 0,
+          map_ct_hits: 0,
+          map_ts_shots: 0,
+          map_ts_hits: 0,
+        },
+      })
 
       this.logger.event(
         `Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`,
@@ -331,13 +358,22 @@ export class MatchHandler implements IMatchHandler {
         await tx.server.update({
           where: { serverId },
           data: {
-            act_map: mapName,
             rounds: { increment: stats.totalRounds },
           },
         })
 
+        const server = await tx.server.findUnique({ where: { serverId } })
+        if (!server) return
+
+        let totalKills = 0
+        let totalHeadshots = 0
+
         // Create a player history snapshot for each participant
         for (const [, playerStats] of stats.playerStats) {
+          totalKills += playerStats.kills
+          // Note: Headshots are not yet tracked on playerStats.
+          // totalHeadshots += playerStats.headshots;
+
           await tx.playerHistory.create({
             data: {
               playerId: playerStats.playerId,
@@ -350,6 +386,22 @@ export class MatchHandler implements IMatchHandler {
               hits: 0, // Would need to be tracked from weapon events
               headshots: 0, // Would need to be tracked from frag events
               teamkills: 0, // Would be tracked separately
+            },
+          })
+        }
+
+        if (totalKills > 0 || totalHeadshots > 0) {
+          await tx.mapCount.upsert({
+            where: { game_map: { game: server.game, map: mapName } },
+            create: {
+              game: server.game,
+              map: mapName,
+              kills: totalKills,
+              headshots: totalHeadshots,
+            },
+            update: {
+              kills: { increment: totalKills },
+              headshots: { increment: totalHeadshots },
             },
           })
         }

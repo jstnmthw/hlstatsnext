@@ -7,6 +7,7 @@ import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger"
 import type { IWeaponRepository } from "./weapon.types"
 import type { FindOptions, UpdateOptions } from "@/shared/types/database"
+import type { Prisma } from "@repo/database/client"
 
 export class WeaponRepository
   extends BaseRepository<Record<string, unknown>>
@@ -24,10 +25,14 @@ export class WeaponRepository
     options?: UpdateOptions,
   ): Promise<void> {
     try {
-      await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? tx.weapon : this.table
-        await table.upsert({
-          where: { code: weaponCode },
+      await this.executeWithTransaction(async (client) => {
+        await client.weapon.upsert({
+          where: {
+            gamecode: {
+              game: "cstrike",
+              code: weaponCode,
+            },
+          },
           create: {
             code: weaponCode,
             game: "csgo",
@@ -47,13 +52,18 @@ export class WeaponRepository
 
   async findWeaponByCode(weaponCode: string, options?: FindOptions): Promise<unknown> {
     try {
-      return await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? tx.weapon : this.table
-        return table.findUnique({
-          where: { code: weaponCode },
-          include: options?.include,
-          select: options?.select,
-        })
+      return await this.executeWithTransaction(async (client) => {
+        const query: Prisma.WeaponFindUniqueArgs = {
+          where: {
+            gamecode: {
+              game: "cstrike",
+              code: weaponCode,
+            },
+          },
+          ...(options?.include ? { include: options.include } : {}),
+          ...(options?.select ? { select: options.select } : {}),
+        } as const
+        return client.weapon.findUnique(query)
       }, options)
     } catch (error) {
       this.handleError("findWeaponByCode", error)

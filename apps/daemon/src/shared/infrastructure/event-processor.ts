@@ -6,9 +6,9 @@
  */
 
 import type { AppContext } from "@/context"
-import type { BaseEvent } from "@/shared/types/events"
+import type { BaseEvent, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger"
-import type { PlayerEvent } from "@/modules/player/player.types"
+import type { PlayerEvent, PlayerKillEvent } from "@/modules/player/player.types"
 import type { WeaponEvent } from "@/modules/weapon/weapon.types"
 import type { ActionEvent } from "@/modules/action/action.types"
 import type { MatchEvent, ObjectiveEvent } from "@/modules/match/match.types"
@@ -50,8 +50,7 @@ export class EventProcessor {
         // Kill events - multiple modules involved
         case EventType.PLAYER_KILL:
           await Promise.all([
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            playerService.handleKillEvent(resolvedEvent as any),
+            playerService.handleKillEvent(resolvedEvent as PlayerKillEvent),
             weaponService.handleWeaponEvent(resolvedEvent as WeaponEvent),
             rankingService.handleRatingUpdate(),
             matchService.handleKillInMatch(resolvedEvent),
@@ -158,39 +157,50 @@ export class EventProcessor {
       return event
     }
 
-    const meta = event.meta as any
+    const meta = event.meta
     const resolvedEvent = { ...event }
+
+    if (!meta || typeof meta !== "object") {
+      return event
+    }
 
     try {
       // Handle PLAYER_KILL events
       if (event.eventType === EventType.PLAYER_KILL) {
-        if (meta.killer?.steamId && meta.killer?.playerName) {
+        const dualMeta = meta as DualPlayerMeta
+        if (dualMeta.killer?.steamId && dualMeta.killer?.playerName) {
           const killerId = await this.context.playerService.getOrCreatePlayer(
-            meta.killer.steamId,
-            meta.killer.playerName,
+            dualMeta.killer.steamId,
+            dualMeta.killer.playerName,
             "csgo",
           )
-          resolvedEvent.data = { ...event.data, killerId }
+          resolvedEvent.data = { ...((event.data as Record<string, unknown>) ?? {}), killerId }
         }
 
-        if (meta.victim?.steamId && meta.victim?.playerName) {
+        if (dualMeta.victim?.steamId && dualMeta.victim?.playerName) {
           const victimId = await this.context.playerService.getOrCreatePlayer(
-            meta.victim.steamId,
-            meta.victim.playerName,
+            dualMeta.victim.steamId,
+            dualMeta.victim.playerName,
             "csgo",
           )
-          resolvedEvent.data = { ...resolvedEvent.data, victimId }
+          resolvedEvent.data = {
+            ...((resolvedEvent.data as Record<string, unknown>) ?? {}),
+            victimId,
+          }
         }
       }
 
       // Handle single player events (PLAYER_CONNECT, PLAYER_DISCONNECT, etc.)
-      else if (meta.player?.steamId && meta.player?.playerName) {
-        const playerId = await this.context.playerService.getOrCreatePlayer(
-          meta.player.steamId,
-          meta.player.playerName,
-          "csgo",
-        )
-        resolvedEvent.data = { ...event.data, playerId }
+      else {
+        const playerMeta = meta as PlayerMeta
+        if (playerMeta.steamId && playerMeta.playerName) {
+          const playerId = await this.context.playerService.getOrCreatePlayer(
+            playerMeta.steamId,
+            playerMeta.playerName,
+            "csgo",
+          )
+          resolvedEvent.data = { ...((event.data as Record<string, unknown>) ?? {}), playerId }
+        }
       }
 
       return resolvedEvent

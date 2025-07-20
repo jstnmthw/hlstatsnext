@@ -2,10 +2,9 @@
  * Database-related types shared across modules
  */
 
-export interface DatabaseTransaction {
-  // Transaction interface that matches Prisma's transaction type
-  [key: string]: unknown
-}
+import type { TransactionalPrisma } from "@/database/client"
+
+export type DatabaseTransaction = TransactionalPrisma
 
 export interface RepositoryOptions {
   transaction?: DatabaseTransaction

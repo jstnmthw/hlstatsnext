@@ -6,51 +6,18 @@
 
 import type { MockedFunction } from "vitest"
 import { db } from "@repo/database/client"
+import type { TransactionalPrisma } from "@/database/client"
 import { vi } from "vitest"
 
 export interface MockDatabaseClient {
-  prisma: {
-    player: {
-      findUnique: MockedFunction<typeof db.player.findUnique>
-      findMany: MockedFunction<typeof db.player.findMany>
-      create: MockedFunction<typeof db.player.create>
-      update: MockedFunction<typeof db.player.update>
-      delete: MockedFunction<typeof db.player.delete>
-    }
-    // playerStats: {
-    //   findUnique: MockedFunction<typeof db.playerStats.findUnique>
-    //   create: MockedFunction<typeof db.playerStats.create>
-    //   update: MockedFunction<typeof db.playerStats.update>
-    // }
-    server: {
-      findFirst: MockedFunction<typeof db.server.findFirst>
-      findUnique: MockedFunction<typeof db.server.findUnique>
-      create: MockedFunction<typeof db.server.create>
-      update: MockedFunction<typeof db.server.update>
-    }
-    // gameEvent: {
-    //   create: MockedFunction<typeof db.gameEvent.create>
-    //   findMany: MockedFunction<typeof db.gameEvent.findMany>
-    // }
-    playerUniqueId: {
-      findUnique: MockedFunction<typeof db.playerUniqueId.findUnique>
-      create: MockedFunction<typeof db.playerUniqueId.create>
-    }
-    eventEntry: {
-      findMany: MockedFunction<typeof db.eventEntry.findMany>
-      create: MockedFunction<typeof db.eventEntry.create>
-    }
-    weapon: {
-      findUnique: MockedFunction<typeof db.weapon.findUnique>
-      upsert: MockedFunction<typeof db.weapon.upsert>
-    }
+  prisma: TransactionalPrisma & {
     $transaction: MockedFunction<typeof db.$transaction>
     $disconnect: MockedFunction<typeof db.$disconnect>
   }
   testConnection: MockedFunction<() => Promise<boolean>>
   disconnect: MockedFunction<() => Promise<void>>
   transaction: MockedFunction<
-    (callback: (prisma: MockDatabaseClient["prisma"]) => Promise<void>) => Promise<void>
+    (callback: (prisma: TransactionalPrisma) => Promise<void>) => Promise<void>
   >
 }
 
@@ -63,21 +30,12 @@ export function createMockDatabaseClient(): MockDatabaseClient {
       update: vi.fn(),
       delete: vi.fn(),
     },
-    // playerStats: {
-    //   findUnique: vi.fn(),
-    //   create: vi.fn(),
-    //   update: vi.fn(),
-    // },
     server: {
       findFirst: vi.fn(),
       findUnique: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
     },
-    // gameEvent: {
-    //   create: vi.fn(),
-    //   findMany: vi.fn(),
-    // },
     playerUniqueId: {
       findUnique: vi.fn(),
       create: vi.fn(),
@@ -90,15 +48,28 @@ export function createMockDatabaseClient(): MockDatabaseClient {
       findUnique: vi.fn(),
       upsert: vi.fn(),
     },
+    playerHistory: {
+      create: vi.fn(),
+    },
+    mapCount: {
+      upsert: vi.fn(),
+    },
+    $queryRaw: vi.fn(),
+    $queryRawUnsafe: vi.fn(), 
+    $executeRaw: vi.fn(),
+    $executeRawUnsafe: vi.fn(),
     $transaction: vi.fn((callback) => callback(mockPrisma)),
     $disconnect: vi.fn(),
+  } as TransactionalPrisma & {
+    $transaction: MockedFunction<typeof db.$transaction>
+    $disconnect: MockedFunction<typeof db.$disconnect>
   }
 
   return {
     prisma: mockPrisma,
     testConnection: vi.fn().mockResolvedValue(true),
     disconnect: vi.fn().mockResolvedValue(undefined),
-    transaction: vi.fn((callback: (prisma: typeof mockPrisma) => Promise<void>) =>
+    transaction: vi.fn((callback: (prisma: TransactionalPrisma) => Promise<void>) =>
       callback(mockPrisma),
     ),
   }

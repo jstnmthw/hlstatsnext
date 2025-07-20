@@ -10,6 +10,7 @@ import { createMockDatabaseClient } from "../../test-support/mocks/database"
 import type { WeaponFireEvent, WeaponHitEvent } from "./weapon.types"
 import type { DatabaseClient } from "@/database/client"
 import { EventType } from "@/shared/types/events"
+import type { BaseEvent } from "@/shared/types/events"
 
 describe("WeaponService", () => {
   let weaponService: WeaponService
@@ -121,7 +122,7 @@ describe("WeaponService", () => {
         data: {
           weaponCode: "knife",
         },
-      } as any
+      } as BaseEvent
 
       const result = await weaponService.handleWeaponEvent(unknownEvent)
 

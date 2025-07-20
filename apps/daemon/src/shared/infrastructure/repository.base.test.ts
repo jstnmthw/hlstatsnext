@@ -6,7 +6,9 @@ import { describe, it, expect, beforeEach, vi } from "vitest"
 import { BaseRepository } from "./repository.base"
 import { createMockLogger } from "../../test-support/mocks/logger"
 import { createMockDatabaseClient } from "../../test-support/mocks/database"
-import type { DatabaseClient } from "@/database/client"
+import type { DatabaseClient, TransactionalPrisma } from "@/database/client"
+import type { ILogger } from "@/shared/utils/logger"
+import type { RepositoryOptions } from "@/shared/types/database"
 
 // Concrete implementation for testing
 interface TestRecord extends Record<string, unknown> {
@@ -20,7 +22,7 @@ interface TestRecord extends Record<string, unknown> {
 class TestRepository extends BaseRepository<TestRecord> {
   protected tableName = "test"
 
-  constructor(db: DatabaseClient, logger: any) {
+  constructor(db: DatabaseClient, logger: ILogger) {
     super(db, logger)
   }
 
@@ -38,8 +40,8 @@ class TestRepository extends BaseRepository<TestRecord> {
   }
 
   public async executeWithTransactionPublic<R>(
-    operation: (tx: any) => Promise<R>,
-    options?: any,
+    operation: (client: TransactionalPrisma) => Promise<R>,
+    options?: RepositoryOptions,
   ): Promise<R> {
     return this.executeWithTransaction(operation, options)
   }
@@ -68,12 +70,12 @@ describe("BaseRepository", () => {
     })
 
     it("should store database and logger", () => {
-      expect((repository as any).db).toBe(mockDatabase)
-      expect((repository as any).logger).toBe(mockLogger)
+      expect((repository as unknown as { db: DatabaseClient }).db).toBe(mockDatabase)
+      expect((repository as unknown as { logger: ILogger }).logger).toBe(mockLogger)
     })
 
     it("should have tableName set", () => {
-      expect((repository as any).tableName).toBe("test")
+      expect((repository as unknown as { tableName: string }).tableName).toBe("test")
     })
   })
 
@@ -81,7 +83,7 @@ describe("BaseRepository", () => {
     it("should return table from prisma client", () => {
       const table = repository.tablePublic
 
-      expect(table).toBe((mockDatabase.prisma as any).test)
+      expect(table).toBe((mockDatabase.prisma as unknown as Record<string, unknown>).test)
     })
 
     it("should work with different table names", () => {
@@ -94,7 +96,7 @@ describe("BaseRepository", () => {
       }
 
       const playerRepo = new PlayerRepository(mockDatabase as unknown as DatabaseClient, mockLogger)
-      expect(playerRepo.tablePublic).toBe((mockDatabase.prisma as any).player)
+      expect(playerRepo.tablePublic).toBe((mockDatabase.prisma as unknown as Record<string, unknown>).player)
     })
   })
 
@@ -209,10 +211,10 @@ describe("BaseRepository", () => {
     })
 
     it("should throw for null/undefined IDs", () => {
-      expect(() => repository.validateIdPublic(null as any, "test")).toThrow(
+      expect(() => repository.validateIdPublic(null as unknown as number, "test")).toThrow(
         "Invalid test ID for test: null",
       )
-      expect(() => repository.validateIdPublic(undefined as any, "test")).toThrow(
+      expect(() => repository.validateIdPublic(undefined as unknown as number, "test")).toThrow(
         "Invalid test ID for test: undefined",
       )
     })
@@ -224,11 +226,11 @@ describe("BaseRepository", () => {
     })
 
     it("should handle floating point IDs", () => {
-      expect(() => repository.validateIdPublic(1.5 as any, "test")).not.toThrow() // JavaScript will treat 1.5 as truthy and > 0
+      expect(() => repository.validateIdPublic(1.5 as unknown as number, "test")).not.toThrow() // JavaScript will treat 1.5 as truthy and > 0
 
-      expect(() => repository.validateIdPublic(0.5 as any, "test")).not.toThrow() // 0.5 is > 0
+      expect(() => repository.validateIdPublic(0.5 as unknown as number, "test")).not.toThrow() // 0.5 is > 0
 
-      expect(() => repository.validateIdPublic(0.0 as any, "test")).toThrow(
+      expect(() => repository.validateIdPublic(0.0 as unknown as number, "test")).toThrow(
         "Invalid test ID for test: 0",
       )
     })
@@ -274,7 +276,7 @@ describe("BaseRepository", () => {
     it("should preserve null values", () => {
       const data: Partial<TestRecord> = {
         name: "test",
-        value: null as any,
+        value: null as unknown as number,
       }
 
       const cleaned = repository.cleanUpdateDataPublic(data)
@@ -476,7 +478,7 @@ describe("BaseRepository", () => {
     it("should handle cleaning data with arrays and complex types", () => {
       interface ComplexRecord extends TestRecord {
         tags: string[]
-        settings: Record<string, any>
+        settings: Record<string, unknown>
         timestamps: Date[]
       }
 

@@ -2,12 +2,12 @@
  * RankingService Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { RankingService } from './ranking.service'
-import { createMockLogger } from '../../test-support/mocks/logger'
-import type { SkillRating } from './ranking.types'
+import { describe, it, expect, beforeEach, vi } from "vitest"
+import { RankingService } from "./ranking.service"
+import { createMockLogger } from "../../test-support/mocks/logger"
+import type { SkillRating } from "./ranking.types"
 
-describe('RankingService', () => {
+describe("RankingService", () => {
   let rankingService: RankingService
   let mockLogger: ReturnType<typeof createMockLogger>
 
@@ -16,33 +16,33 @@ describe('RankingService', () => {
     rankingService = new RankingService(mockLogger)
   })
 
-  describe('Service instantiation', () => {
-    it('should create service instance', () => {
+  describe("Service instantiation", () => {
+    it("should create service instance", () => {
       expect(rankingService).toBeDefined()
       expect(rankingService).toBeInstanceOf(RankingService)
     })
 
-    it('should have required methods', () => {
+    it("should have required methods", () => {
       expect(rankingService.handleRatingUpdate).toBeDefined()
       expect(rankingService.calculateRatingAdjustment).toBeDefined()
-      expect(typeof rankingService.handleRatingUpdate).toBe('function')
-      expect(typeof rankingService.calculateRatingAdjustment).toBe('function')
+      expect(typeof rankingService.handleRatingUpdate).toBe("function")
+      expect(typeof rankingService.calculateRatingAdjustment).toBe("function")
     })
   })
 
-  describe('handleRatingUpdate', () => {
-    it('should return success result', async () => {
+  describe("handleRatingUpdate", () => {
+    it("should return success result", async () => {
       const result = await rankingService.handleRatingUpdate()
 
       expect(result.success).toBe(true)
       expect(result.error).toBeUndefined()
     })
 
-    it('should handle errors gracefully', async () => {
+    it("should handle errors gracefully", async () => {
       // Create a service that throws an error internally
       const errorService = new RankingService(mockLogger)
-      vi.spyOn(errorService as any, 'calculateRatingAdjustment').mockImplementation(() => {
-        throw new Error('Rating calculation failed')
+      vi.spyOn(errorService as any, "calculateRatingAdjustment").mockImplementation(() => {
+        throw new Error("Rating calculation failed")
       })
 
       // Since handleRatingUpdate doesn't use calculateRatingAdjustment, just test error handling
@@ -50,15 +50,15 @@ describe('RankingService', () => {
       expect(result.success).toBe(true) // The actual method doesn't throw
     })
 
-    it('should handle non-Error exceptions', async () => {
+    it("should handle non-Error exceptions", async () => {
       // Similar to above - the method doesn't actually throw, so test the mechanism
       const result = await rankingService.handleRatingUpdate()
       expect(result.success).toBe(true) // The actual method doesn't throw
     })
   })
 
-  describe('calculateRatingAdjustment', () => {
-    it('should calculate rating adjustments for evenly matched players', () => {
+  describe("calculateRatingAdjustment", () => {
+    it("should calculate rating adjustments for evenly matched players", () => {
       const winnerRating: SkillRating = {
         playerId: 1,
         rating: 1500,
@@ -82,7 +82,7 @@ describe('RankingService', () => {
       expect(Math.abs(adjustment.winner + adjustment.loser)).toBeLessThanOrEqual(1) // Should be approximately zero-sum
     })
 
-    it('should give smaller adjustment when higher rated player beats lower rated player', () => {
+    it("should give smaller adjustment when higher rated player beats lower rated player", () => {
       const higherRatedWinner: SkillRating = {
         playerId: 1,
         rating: 1800,
@@ -99,14 +99,17 @@ describe('RankingService', () => {
         gamesPlayed: 50,
       }
 
-      const adjustment = rankingService.calculateRatingAdjustment(higherRatedWinner, lowerRatedLoser)
+      const adjustment = rankingService.calculateRatingAdjustment(
+        higherRatedWinner,
+        lowerRatedLoser,
+      )
 
       expect(adjustment.winner).toBeGreaterThan(0)
       expect(adjustment.winner).toBeLessThan(16) // Should be smaller than average (16 for K=32)
       expect(adjustment.loser).toBeLessThan(0)
     })
 
-    it('should give larger adjustment when lower rated player beats higher rated player', () => {
+    it("should give larger adjustment when lower rated player beats higher rated player", () => {
       const lowerRatedWinner: SkillRating = {
         playerId: 1,
         rating: 1200,
@@ -123,13 +126,16 @@ describe('RankingService', () => {
         gamesPlayed: 100,
       }
 
-      const adjustment = rankingService.calculateRatingAdjustment(lowerRatedWinner, higherRatedLoser)
+      const adjustment = rankingService.calculateRatingAdjustment(
+        lowerRatedWinner,
+        higherRatedLoser,
+      )
 
       expect(adjustment.winner).toBeGreaterThan(16) // Should be larger than average (16 for K=32)
       expect(adjustment.loser).toBeLessThan(-16) // Should be a larger penalty
     })
 
-    it('should handle extreme rating differences', () => {
+    it("should handle extreme rating differences", () => {
       const veryHighRated: SkillRating = {
         playerId: 1,
         rating: 2500,
@@ -154,7 +160,7 @@ describe('RankingService', () => {
       expect(Number.isInteger(adjustment.loser)).toBe(true)
     })
 
-    it('should return rounded integer values', () => {
+    it("should return rounded integer values", () => {
       const rating1: SkillRating = {
         playerId: 1,
         rating: 1547,
@@ -177,7 +183,7 @@ describe('RankingService', () => {
       expect(Number.isInteger(adjustment.loser)).toBe(true)
     })
 
-    it('should be consistent with ELO principles', () => {
+    it("should be consistent with ELO principles", () => {
       const rating1: SkillRating = {
         playerId: 1,
         rating: 1600,
@@ -196,7 +202,7 @@ describe('RankingService', () => {
 
       // Higher rated player wins - should get small gain
       const adjustmentHigherWins = rankingService.calculateRatingAdjustment(rating1, rating2)
-      
+
       // Lower rated player wins - should get large gain
       const adjustmentLowerWins = rankingService.calculateRatingAdjustment(rating2, rating1)
 
@@ -205,8 +211,8 @@ describe('RankingService', () => {
     })
   })
 
-  describe('Edge cases', () => {
-    it('should handle identical ratings', () => {
+  describe("Edge cases", () => {
+    it("should handle identical ratings", () => {
       const identicalRating: SkillRating = {
         playerId: 1,
         rating: 1500,
@@ -221,7 +227,7 @@ describe('RankingService', () => {
       expect(adjustment.loser).toBe(-16)
     })
 
-    it('should handle minimum rating values', () => {
+    it("should handle minimum rating values", () => {
       const minRating: SkillRating = {
         playerId: 1,
         rating: 0,
@@ -240,8 +246,8 @@ describe('RankingService', () => {
 
       const adjustment = rankingService.calculateRatingAdjustment(minRating, normalRating)
 
-      expect(typeof adjustment.winner).toBe('number')
-      expect(typeof adjustment.loser).toBe('number')
+      expect(typeof adjustment.winner).toBe("number")
+      expect(typeof adjustment.loser).toBe("number")
       expect(Number.isFinite(adjustment.winner)).toBe(true)
       expect(Number.isFinite(adjustment.loser)).toBe(true)
     })

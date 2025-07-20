@@ -1,6 +1,6 @@
 /**
  * Database Test Fixtures
- * 
+ *
  * Provides test data seeding and cleanup utilities.
  */
 
@@ -8,8 +8,8 @@
 export const testPlayers = [
   {
     playerId: 1,
-    lastName: 'TestPlayer1',
-    game: 'csgo',
+    lastName: "TestPlayer1",
+    game: "csgo",
     skill: 1000,
     kills: 0,
     deaths: 0,
@@ -26,8 +26,8 @@ export const testPlayers = [
   },
   {
     playerId: 2,
-    lastName: 'TestPlayer2',
-    game: 'csgo',
+    lastName: "TestPlayer2",
+    game: "csgo",
     skill: 1200,
     kills: 10,
     deaths: 5,
@@ -47,10 +47,10 @@ export const testPlayers = [
 export const testServers = [
   {
     serverId: 1,
-    name: 'Test Server 1',
-    address: '127.0.0.1',
+    name: "Test Server 1",
+    address: "127.0.0.1",
     port: 27015,
-    game: 'csgo',
+    game: "csgo",
     players: 0,
     max_players: 32,
     status: 1,
@@ -62,13 +62,13 @@ export const testEvents = [
     id: 1,
     serverId: 1,
     playerId: 1,
-    eventType: 'player_connect',
+    eventType: "player_connect",
     eventTime: new Date(),
     data: JSON.stringify({
       playerId: 1,
-      steamId: '12345678901234567',
-      playerName: 'TestPlayer1',
-      ipAddress: '127.0.0.1:27005',
+      steamId: "12345678901234567",
+      playerName: "TestPlayer1",
+      ipAddress: "127.0.0.1:27005",
     }),
   },
 ]
@@ -79,7 +79,7 @@ export const testEvents = [
 export async function seedTestDatabase(): Promise<void> {
   // In a real implementation, this would use the actual database client
   // For now, this is a placeholder that would be implemented with actual Prisma operations
-  console.log('Seeding test database with mock data')
+  console.log("Seeding test database with mock data")
 }
 
 /**
@@ -88,5 +88,5 @@ export async function seedTestDatabase(): Promise<void> {
 export async function cleanupDatabase(): Promise<void> {
   // In a real implementation, this would clean up the actual database
   // For now, this is a placeholder
-  console.log('Cleaning up test database')
+  console.log("Cleaning up test database")
 }

@@ -1,18 +1,18 @@
 /**
  * Objective Handler
- * 
+ *
  * Handles objective-based events (bomb, hostage, flag, control point events).
  */
 
-import type { IObjectiveHandler, ObjectiveEvent } from '../match.types'
-import type { IMatchService } from '../match.types'
-import type { ILogger } from '@/shared/utils/logger'
-import type { HandlerResult } from '@/shared/types/common'
+import type { IObjectiveHandler, ObjectiveEvent } from "../match.types"
+import type { IMatchService } from "../match.types"
+import type { ILogger } from "@/shared/utils/logger"
+import type { HandlerResult } from "@/shared/types/common"
 
 export class ObjectiveHandler implements IObjectiveHandler {
   constructor(
     private readonly matchService: IMatchService,
-    private readonly logger: ILogger
+    private readonly logger: ILogger,
   ) {}
 
   async handleObjectiveEvent(event: ObjectiveEvent): Promise<HandlerResult> {

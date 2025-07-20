@@ -2,10 +2,17 @@
  * Action Service
  */
 
-import type { IActionService, ActionEvent, ActionPlayerEvent, ActionPlayerPlayerEvent, ActionTeamEvent, WorldActionEvent } from './action.types'
-import type { ILogger } from '@/shared/utils/logger'
-import type { HandlerResult } from '@/shared/types/common'
-import { EventType } from '@/shared/types/events'
+import type {
+  IActionService,
+  ActionEvent,
+  ActionPlayerEvent,
+  ActionPlayerPlayerEvent,
+  ActionTeamEvent,
+  WorldActionEvent,
+} from "./action.types"
+import type { ILogger } from "@/shared/utils/logger"
+import type { HandlerResult } from "@/shared/types/common"
+import { EventType } from "@/shared/types/events"
 
 export class ActionService implements IActionService {
   constructor(private readonly logger: ILogger) {}
@@ -38,7 +45,9 @@ export class ActionService implements IActionService {
   }
 
   private async handlePlayerPlayerAction(event: ActionPlayerPlayerEvent): Promise<HandlerResult> {
-    this.logger.debug(`Player-player action: ${event.data.actionCode} by ${event.data.playerId} on ${event.data.victimId}`)
+    this.logger.debug(
+      `Player-player action: ${event.data.actionCode} by ${event.data.playerId} on ${event.data.victimId}`,
+    )
     return { success: true }
   }
 

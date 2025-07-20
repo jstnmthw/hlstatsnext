@@ -2,9 +2,9 @@
  * Ranking Service
  */
 
-import type { IRankingService, SkillRating } from './ranking.types'
-import type { ILogger } from '@/shared/utils/logger'
-import type { HandlerResult } from '@/shared/types/common'
+import type { IRankingService, SkillRating } from "./ranking.types"
+import type { ILogger } from "@/shared/utils/logger"
+import type { HandlerResult } from "@/shared/types/common"
 
 export class RankingService implements IRankingService {
   constructor(private readonly logger: ILogger) {}
@@ -22,15 +22,18 @@ export class RankingService implements IRankingService {
     }
   }
 
-  calculateRatingAdjustment(winnerRating: SkillRating, loserRating: SkillRating): { winner: number; loser: number } {
+  calculateRatingAdjustment(
+    winnerRating: SkillRating,
+    loserRating: SkillRating,
+  ): { winner: number; loser: number } {
     // Simplified ELO-style calculation
     const K = 32 // K-factor
     const expectedWinner = 1 / (1 + Math.pow(10, (loserRating.rating - winnerRating.rating) / 400))
     const expectedLoser = 1 - expectedWinner
-    
+
     const winnerAdjustment = Math.round(K * (1 - expectedWinner))
     const loserAdjustment = Math.round(K * (0 - expectedLoser))
-    
+
     return {
       winner: winnerAdjustment,
       loser: loserAdjustment,

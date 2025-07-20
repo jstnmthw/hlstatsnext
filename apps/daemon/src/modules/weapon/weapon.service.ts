@@ -2,15 +2,15 @@
  * Weapon Service
  */
 
-import type { IWeaponService, IWeaponRepository, WeaponEvent } from './weapon.types'
-import type { ILogger } from '@/shared/utils/logger'
-import type { HandlerResult } from '@/shared/types/common'
-import { EventType } from '@/shared/types/events'
+import type { IWeaponService, IWeaponRepository, WeaponEvent } from "./weapon.types"
+import type { ILogger } from "@/shared/utils/logger"
+import type { HandlerResult } from "@/shared/types/common"
+import { EventType } from "@/shared/types/events"
 
 export class WeaponService implements IWeaponService {
   constructor(
     private readonly repository: IWeaponRepository,
-    private readonly logger: ILogger
+    private readonly logger: ILogger,
   ) {}
 
   async handleWeaponEvent(event: WeaponEvent): Promise<HandlerResult> {
@@ -31,10 +31,13 @@ export class WeaponService implements IWeaponService {
     }
   }
 
-  async updateWeaponStats(weaponCode: string, stats: { shots?: number; hits?: number; damage?: number }): Promise<void> {
+  async updateWeaponStats(
+    weaponCode: string,
+    stats: { shots?: number; hits?: number; damage?: number },
+  ): Promise<void> {
     try {
       const updates: Record<string, unknown> = {}
-      
+
       if (stats.shots !== undefined) {
         updates.shots = { increment: stats.shots }
       }
@@ -44,7 +47,7 @@ export class WeaponService implements IWeaponService {
       if (stats.damage !== undefined) {
         updates.damage = { increment: stats.damage }
       }
-      
+
       await this.repository.updateWeaponStats(weaponCode, updates)
     } catch (error) {
       this.logger.error(`Failed to update weapon stats for ${weaponCode}: ${error}`)

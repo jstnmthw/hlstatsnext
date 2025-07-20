@@ -2,9 +2,9 @@
  * Match Module Types
  */
 
-import type { BaseEvent, EventType, PlayerMeta } from '@/shared/types/events'
-import type { HandlerResult } from '@/shared/types/common'
-import type { FindOptions, UpdateOptions, CreateOptions } from '@/shared/types/database'
+import type { BaseEvent, EventType, PlayerMeta } from "@/shared/types/events"
+import type { HandlerResult } from "@/shared/types/common"
+import type { FindOptions, UpdateOptions, CreateOptions } from "@/shared/types/database"
 
 // Match-specific event types
 export interface RoundStartEvent extends BaseEvent {
@@ -166,13 +166,9 @@ export interface ControlPointDefendEvent extends BaseEvent {
 }
 
 // Union types
-export type MatchEvent = 
-  | RoundStartEvent
-  | RoundEndEvent
-  | TeamWinEvent
-  | MapChangeEvent
+export type MatchEvent = RoundStartEvent | RoundEndEvent | TeamWinEvent | MapChangeEvent
 
-export type ObjectiveEvent = 
+export type ObjectiveEvent =
   | BombPlantEvent
   | BombDefuseEvent
   | BombExplodeEvent
@@ -225,12 +221,16 @@ export interface IMatchService {
   handleMatchEvent(event: MatchEvent): Promise<HandlerResult>
   handleObjectiveEvent(event: ObjectiveEvent): Promise<HandlerResult>
   handleKillInMatch(event: BaseEvent): Promise<HandlerResult>
-  
+
   // Match state
   getMatchStats(serverId: number): MatchStats | undefined
   resetMatchStats(serverId: number): void
-  updatePlayerWeaponStats(serverId: number, playerId: number, stats: { shots?: number; hits?: number; damage?: number }): void
-  
+  updatePlayerWeaponStats(
+    serverId: number,
+    playerId: number,
+    stats: { shots?: number; hits?: number; damage?: number },
+  ): void
+
   // MVP calculations
   calculateMatchMVP(serverId: number): Promise<number | undefined>
   calculatePlayerScore(stats: PlayerRoundStats): number
@@ -260,19 +260,33 @@ export interface PlayerHistoryData {
 
 export interface IMatchRepository {
   // Server operations
-  updateServerStats(serverId: number, updates: Record<string, unknown>, options?: UpdateOptions): Promise<void>
+  updateServerStats(
+    serverId: number,
+    updates: Record<string, unknown>,
+    options?: UpdateOptions,
+  ): Promise<void>
   findServerById(serverId: number, options?: FindOptions): Promise<ServerRecord | null>
-  
+
   // Match history
   createPlayerHistory(data: PlayerHistoryData, options?: CreateOptions): Promise<void>
-  
+
   // Map statistics
-  updateMapCount(game: string, map: string, kills: number, headshots: number, options?: UpdateOptions): Promise<void>
-  
+  updateMapCount(
+    game: string,
+    map: string,
+    kills: number,
+    headshots: number,
+    options?: UpdateOptions,
+  ): Promise<void>
+
   // Additional server operations
   incrementServerRounds(serverId: number, options?: UpdateOptions): Promise<void>
   updateTeamWins(serverId: number, winningTeam: string, options?: UpdateOptions): Promise<void>
-  updateBombStats(serverId: number, eventType: 'plant' | 'defuse', options?: UpdateOptions): Promise<void>
+  updateBombStats(
+    serverId: number,
+    eventType: "plant" | "defuse",
+    options?: UpdateOptions,
+  ): Promise<void>
   resetMapStats(serverId: number, newMap: string, options?: UpdateOptions): Promise<void>
 }
 

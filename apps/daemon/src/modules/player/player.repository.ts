@@ -1,23 +1,18 @@
 /**
  * Player Repository
- * 
+ *
  * Data access layer for player operations.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { BaseRepository } from '@/shared/infrastructure/repository.base'
-import type { DatabaseClient } from '@/database/client'
-import type { ILogger } from '@/shared/utils/logger'
-import type { 
-  IPlayerRepository, 
-  PlayerCreateData
-} from './player.types'
-import type { FindOptions, CreateOptions, UpdateOptions } from '@/shared/types/database'
-import type { Player } from '@repo/database/client'
+import { BaseRepository } from "@/shared/infrastructure/repository.base"
+import type { DatabaseClient } from "@/database/client"
+import type { ILogger } from "@/shared/utils/logger"
+import type { IPlayerRepository, PlayerCreateData } from "./player.types"
+import type { FindOptions, CreateOptions, UpdateOptions } from "@/shared/types/database"
+import type { Player } from "@repo/database/client"
 
 export class PlayerRepository extends BaseRepository<Player> implements IPlayerRepository {
-  protected tableName = 'player'
+  protected tableName = "player"
 
   constructor(db: DatabaseClient, logger: ILogger) {
     super(db, logger)
@@ -25,8 +20,8 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
 
   async findById(playerId: number, options?: FindOptions): Promise<Player | null> {
     try {
-      this.validateId(playerId, 'findById')
-      
+      this.validateId(playerId, "findById")
+
       return await this.executeWithTransaction(async (tx) => {
         const table = options?.transaction ? (tx as any).player : this.table
         return table.findUnique({
@@ -36,18 +31,24 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
         })
       }, options)
     } catch (error) {
-      this.handleError('findById', error)
+      this.handleError("findById", error)
     }
   }
 
-  async findByUniqueId(uniqueId: string, game: string, options?: FindOptions): Promise<Player | null> {
+  async findByUniqueId(
+    uniqueId: string,
+    game: string,
+    options?: FindOptions,
+  ): Promise<Player | null> {
     try {
       if (!uniqueId || !game) {
-        throw new Error('uniqueId and game are required')
+        throw new Error("uniqueId and game are required")
       }
-      
+
       return await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? (tx as any).playerUniqueId : this.db.prisma.playerUniqueId
+        const table = options?.transaction
+          ? (tx as any).playerUniqueId
+          : this.db.prisma.playerUniqueId
         const uniqueIdEntry = await table.findUnique({
           where: {
             uniqueId_game: {
@@ -59,23 +60,23 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
             player: true,
           },
         })
-        
+
         return uniqueIdEntry?.player || null
       }, options)
     } catch (error) {
-      this.handleError('findByUniqueId', error)
+      this.handleError("findByUniqueId", error)
     }
   }
 
   async create(data: PlayerCreateData, options?: CreateOptions): Promise<Player> {
     try {
       if (!data.lastName || !data.game || !data.steamId) {
-        throw new Error('lastName, game, and steamId are required')
+        throw new Error("lastName, game, and steamId are required")
       }
-      
+
       return await this.executeWithTransaction(async (tx) => {
         const table = options?.transaction ? (tx as any).player : this.table
-        
+
         const player = await table.create({
           data: {
             lastName: data.lastName,
@@ -89,92 +90,145 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
             },
           },
         })
-        
+
         this.logger.debug(`Created player ${player.playerId} for ${data.steamId}`)
         return player
       }, options)
     } catch (error) {
-      this.handleError('create', error)
+      this.handleError("create", error)
     }
   }
 
   async update(playerId: number, data: Partial<Player>, options?: UpdateOptions): Promise<Player> {
     try {
-      this.validateId(playerId, 'update')
+      this.validateId(playerId, "update")
       const cleanData = this.cleanUpdateData(data)
-      
+
       if (Object.keys(cleanData).length === 0) {
-        throw new Error('No valid fields to update')
+        throw new Error("No valid fields to update")
       }
-      
+
       return await this.executeWithTransaction(async (tx) => {
         const table = options?.transaction ? (tx as any).player : this.table
-        
-        // Handle skill underflow protection
-        if (cleanData.skill !== undefined && typeof cleanData.skill === 'object' && 'increment' in cleanData.skill) {
-          try {
-            return await table.update({
-              where: { playerId },
-              data: cleanData,
-            })
-          } catch (err: unknown) {
-            // If skill underflowed on an UNSIGNED column, clamp to zero and retry
-            if (
-              typeof err === 'object' &&
-              err !== null &&
-              (err as { code?: string; message?: string }).message?.includes('Out of range')
-            ) {
+
+        // Try to update first, catch any errors and handle them appropriately
+        try {
+          // Handle skill underflow protection
+          if (
+            cleanData.skill !== undefined &&
+            typeof cleanData.skill === "object" &&
+            "increment" in cleanData.skill
+          ) {
+            try {
               return await table.update({
                 where: { playerId },
-                data: { ...cleanData, skill: 0 },
+                data: cleanData,
               })
+            } catch (err: unknown) {
+              // If skill underflowed on an UNSIGNED column, clamp to zero and retry
+              if (
+                typeof err === "object" &&
+                err !== null &&
+                (err as { code?: string; message?: string }).message?.includes("Out of range")
+              ) {
+                return await table.update({
+                  where: { playerId },
+                  data: { ...cleanData, skill: 0 },
+                })
+              }
+              // If record not found, fall through to create logic
+              if (
+                typeof err === "object" &&
+                err !== null &&
+                (err as { message?: string }).message?.includes(
+                  "record that were required but not found",
+                )
+              ) {
+                throw err // Let the outer catch handle this
+              }
+              throw err
             }
-            throw err
           }
+
+          return await table.update({
+            where: { playerId },
+            data: cleanData,
+          })
+        } catch (err: unknown) {
+          // If record not found, convert increments to direct values and create the player
+          if (
+            typeof err === "object" &&
+            err !== null &&
+            (err as { message?: string }).message?.includes(
+              "record that were required but not found",
+            )
+          ) {
+            this.logger.warn(`Player ${playerId} not found, attempting to create with stats`)
+
+            // Convert increment operations to direct values for creation
+            const createData: any = { playerId }
+
+            for (const [key, value] of Object.entries(cleanData)) {
+              if (typeof value === "object" && value !== null && "increment" in value) {
+                createData[key] = Math.max(0, (value as any).increment)
+              } else {
+                createData[key] = value
+              }
+            }
+
+            // Set default values for required fields if not provided
+            if (!createData.lastName) createData.lastName = `Player${playerId}`
+            if (!createData.game) createData.game = "cstrike"
+            if (createData.skill === undefined) createData.skill = 1000
+
+            return await table.create({
+              data: createData,
+            })
+          }
+          throw err
         }
-        
-        return await table.update({
-          where: { playerId },
-          data: cleanData,
-        })
       }, options)
     } catch (error) {
-      this.handleError('update', error)
+      this.handleError("update", error)
     }
   }
 
   async findTopPlayers(
-    limit: number, 
-    game: string, 
-    includeHidden: boolean, 
-    options?: FindOptions
+    limit: number,
+    game: string,
+    includeHidden: boolean,
+    options?: FindOptions,
   ): Promise<Player[]> {
     try {
       const whereClause: Record<string, unknown> = { game }
-      
+
       if (!includeHidden) {
         whereClause.hideranking = 0
       }
-      
+
       return await this.executeWithTransaction(async (tx) => {
         const table = options?.transaction ? (tx as any).player : this.table
         return table.findMany({
           where: whereClause,
-          orderBy: { skill: 'desc' },
+          orderBy: { skill: "desc" },
           take: Math.min(limit, 100),
           include: options?.include,
           select: options?.select,
         })
       }, options)
     } catch (error) {
-      this.handleError('findTopPlayers', error)
+      this.handleError("findTopPlayers", error)
     }
   }
 
-  async findRoundParticipants(serverId: number, startTime: Date, options?: FindOptions): Promise<unknown[]> {
+  async findRoundParticipants(
+    serverId: number,
+    startTime: Date,
+    options?: FindOptions,
+  ): Promise<unknown[]> {
     try {
-      this.validateId(serverId, 'findRoundParticipants')
-      
+      this.validateId(serverId, "findRoundParticipants")
+
       return await this.executeWithTransaction(async (tx) => {
         const table = options?.transaction ? (tx as any).eventEntry : this.db.prisma.eventEntry
         return table.findMany({
@@ -198,16 +252,23 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
         })
       }, options)
     } catch (error) {
-      this.handleError('findRoundParticipants', error)
+      this.handleError("findRoundParticipants", error)
     }
   }
 
-  async createUniqueId(playerId: number, uniqueId: string, game: string, options?: CreateOptions): Promise<void> {
+  async createUniqueId(
+    playerId: number,
+    uniqueId: string,
+    game: string,
+    options?: CreateOptions,
+  ): Promise<void> {
     try {
-      this.validateId(playerId, 'createUniqueId')
-      
+      this.validateId(playerId, "createUniqueId")
+
       await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? (tx as any).playerUniqueId : this.db.prisma.playerUniqueId
+        const table = options?.transaction
+          ? (tx as any).playerUniqueId
+          : this.db.prisma.playerUniqueId
         await table.create({
           data: {
             playerId,
@@ -217,14 +278,16 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
         })
       }, options)
     } catch (error) {
-      this.handleError('createUniqueId', error)
+      this.handleError("createUniqueId", error)
     }
   }
 
   async findUniqueIdEntry(uniqueId: string, game: string, options?: FindOptions): Promise<unknown> {
     try {
       return await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? (tx as any).playerUniqueId : this.db.prisma.playerUniqueId
+        const table = options?.transaction
+          ? (tx as any).playerUniqueId
+          : this.db.prisma.playerUniqueId
         return table.findUnique({
           where: {
             uniqueId_game: {
@@ -238,7 +301,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
         })
       }, options)
     } catch (error) {
-      this.handleError('findUniqueIdEntry', error)
+      this.handleError("findUniqueIdEntry", error)
     }
   }
 }

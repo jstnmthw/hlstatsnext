@@ -1,10 +1,10 @@
 /**
  * Base Parser
- * 
+ *
  * Abstract base class for game log parsers.
  */
 
-import type { BaseEvent } from '@/shared/types/events'
+import type { BaseEvent } from "@/shared/types/events"
 
 export interface ParseResult {
   event: BaseEvent | null
@@ -32,18 +32,18 @@ export abstract class BaseParser {
 
   protected extractQuotedValue(text: string, key: string): string | null {
     // Escape special regex characters in the key
-    const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    const regex = new RegExp(`${escapedKey}"((?:[^"\\\\]|\\\\.)*)"`,'g')
+    const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    const regex = new RegExp(`${escapedKey}"((?:[^"\\\\]|\\\\.)*)"`, "g")
     const match = regex.exec(text)
-    return match ? (match[1] || null) : null
+    return match ? match[1] || null : null
   }
 
   protected extractNumericValue(text: string, key: string): number | null {
     // Escape special regex characters in the key
-    const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
     const regex = new RegExp(`${escapedKey}"([^"]*)"`)
     const match = text.match(regex)
-    if (match && match[1] !== '' && !isNaN(Number(match[1]))) {
+    if (match && match[1] !== "" && !isNaN(Number(match[1]))) {
       return Number(match[1])
     }
     return null

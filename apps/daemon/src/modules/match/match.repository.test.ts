@@ -2,25 +2,25 @@
  * MatchRepository Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { MatchRepository } from './match.repository'
-import { createMockLogger } from '../../test-support/mocks/logger'
-import { createMockDatabaseClient } from '../../test-support/mocks/database'
-import type { DatabaseClient } from '@/database/client'
-import type { ServerRecord } from './match.types'
+import { describe, it, expect, beforeEach, vi } from "vitest"
+import { MatchRepository } from "./match.repository"
+import { createMockLogger } from "../../test-support/mocks/logger"
+import { createMockDatabaseClient } from "../../test-support/mocks/database"
+import type { DatabaseClient } from "@/database/client"
+import type { ServerRecord } from "./match.types"
 
 // Helper to create a complete server record for mocking
 function createMockServerRecord(overrides: Partial<any> = {}): any {
   return {
     serverId: 1,
-    address: '',
+    address: "",
     port: 0,
-    name: 'Test Server',
+    name: "Test Server",
     sortorder: 0,
-    game: 'csgo',
-    publicaddress: '',
+    game: "csgo",
+    publicaddress: "",
     statusurl: null,
-    rcon_password: '',
+    rcon_password: "",
     kills: 0,
     players: 0,
     rounds: 0,
@@ -32,7 +32,7 @@ function createMockServerRecord(overrides: Partial<any> = {}): any {
     ts_wins: 0,
     act_players: 0,
     max_players: 0,
-    act_map: '',
+    act_map: "",
     map_rounds: 0,
     map_ct_wins: 0,
     map_ts_wins: 0,
@@ -48,14 +48,14 @@ function createMockServerRecord(overrides: Partial<any> = {}): any {
     map_ts_hits: 0,
     lat: null,
     lng: null,
-    city: '',
-    country: '',
+    city: "",
+    country: "",
     last_event: 0,
     ...overrides,
   }
 }
 
-describe('MatchRepository', () => {
+describe("MatchRepository", () => {
   let matchRepository: MatchRepository
   let mockLogger: ReturnType<typeof createMockLogger>
   let mockDatabase: ReturnType<typeof createMockDatabaseClient>
@@ -66,27 +66,27 @@ describe('MatchRepository', () => {
     matchRepository = new MatchRepository(mockDatabase as unknown as DatabaseClient, mockLogger)
   })
 
-  describe('Repository instantiation', () => {
-    it('should create repository instance', () => {
+  describe("Repository instantiation", () => {
+    it("should create repository instance", () => {
       expect(matchRepository).toBeDefined()
       expect(matchRepository).toBeInstanceOf(MatchRepository)
     })
 
-    it('should have required methods', () => {
+    it("should have required methods", () => {
       expect(matchRepository.updateServerStats).toBeDefined()
       expect(matchRepository.findServerById).toBeDefined()
-      expect(typeof matchRepository.updateServerStats).toBe('function')
-      expect(typeof matchRepository.findServerById).toBe('function')
+      expect(typeof matchRepository.updateServerStats).toBe("function")
+      expect(typeof matchRepository.findServerById).toBe("function")
     })
   })
 
-  describe('updateServerStats', () => {
-    it('should update server statistics', async () => {
+  describe("updateServerStats", () => {
+    it("should update server statistics", async () => {
       const serverId = 1
       const updates = {
         rounds: { increment: 1 },
         players: 10,
-        act_map: 'de_dust2',
+        act_map: "de_dust2",
       }
 
       mockDatabase.prisma.server.update.mockResolvedValue(
@@ -94,8 +94,8 @@ describe('MatchRepository', () => {
           serverId,
           rounds: 100,
           players: 10,
-          act_map: 'de_dust2',
-        })
+          act_map: "de_dust2",
+        }),
       )
 
       await matchRepository.updateServerStats(serverId, updates)
@@ -106,7 +106,7 @@ describe('MatchRepository', () => {
       })
     })
 
-    it('should handle partial updates', async () => {
+    it("should handle partial updates", async () => {
       const serverId = 2
       const updates = { players: 5 }
 
@@ -114,7 +114,7 @@ describe('MatchRepository', () => {
         createMockServerRecord({
           serverId,
           players: 5,
-        })
+        }),
       )
 
       await matchRepository.updateServerStats(serverId, updates)
@@ -125,15 +125,14 @@ describe('MatchRepository', () => {
       })
     })
 
-    it('should validate server ID', async () => {
+    it("should validate server ID", async () => {
       const invalidServerId = 0
       const updates = { players: 1 }
 
-      await expect(matchRepository.updateServerStats(invalidServerId, updates))
-        .rejects.toThrow()
+      await expect(matchRepository.updateServerStats(invalidServerId, updates)).rejects.toThrow()
     })
 
-    it('should handle transaction options', async () => {
+    it("should handle transaction options", async () => {
       const serverId = 1
       const updates = { rounds: { increment: 1 } }
       const options = { transaction: mockDatabase.prisma }
@@ -144,13 +143,11 @@ describe('MatchRepository', () => {
       expect(mockDatabase.prisma.server.update).toHaveBeenCalled()
     })
 
-    it('should handle empty updates', async () => {
+    it("should handle empty updates", async () => {
       const serverId = 1
       const updates = {}
 
-      mockDatabase.prisma.server.update.mockResolvedValue(
-        createMockServerRecord({ serverId })
-      )
+      mockDatabase.prisma.server.update.mockResolvedValue(createMockServerRecord({ serverId }))
 
       await matchRepository.updateServerStats(serverId, updates)
 
@@ -161,13 +158,13 @@ describe('MatchRepository', () => {
     })
   })
 
-  describe('findServerById', () => {
-    it('should find server by ID', async () => {
+  describe("findServerById", () => {
+    it("should find server by ID", async () => {
       const serverId = 1
       const mockServer = createMockServerRecord({
         serverId: 1,
-        game: 'csgo',
-        act_map: 'de_dust2',
+        game: "csgo",
+        act_map: "de_dust2",
       })
 
       mockDatabase.prisma.server.findUnique.mockResolvedValue(mockServer)
@@ -182,7 +179,7 @@ describe('MatchRepository', () => {
       })
     })
 
-    it('should return null for non-existent server', async () => {
+    it("should return null for non-existent server", async () => {
       const serverId = 999
 
       mockDatabase.prisma.server.findUnique.mockResolvedValue(null)
@@ -197,7 +194,7 @@ describe('MatchRepository', () => {
       })
     })
 
-    it('should handle find options', async () => {
+    it("should handle find options", async () => {
       const serverId = 1
       const options = {
         include: { players: true },
@@ -207,8 +204,8 @@ describe('MatchRepository', () => {
       mockDatabase.prisma.server.findUnique.mockResolvedValue(
         createMockServerRecord({
           serverId: 1,
-          game: 'csgo',
-        })
+          game: "csgo",
+        }),
       )
 
       await matchRepository.findServerById(serverId, options)
@@ -220,20 +217,17 @@ describe('MatchRepository', () => {
       })
     })
 
-    it('should validate server ID', async () => {
+    it("should validate server ID", async () => {
       const invalidServerId = -1
 
-      await expect(matchRepository.findServerById(invalidServerId))
-        .rejects.toThrow()
+      await expect(matchRepository.findServerById(invalidServerId)).rejects.toThrow()
     })
 
-    it('should handle transaction options', async () => {
+    it("should handle transaction options", async () => {
       const serverId = 1
       const options = { transaction: mockDatabase.prisma }
 
-      mockDatabase.prisma.server.findUnique.mockResolvedValue(
-        createMockServerRecord({ serverId })
-      )
+      mockDatabase.prisma.server.findUnique.mockResolvedValue(createMockServerRecord({ serverId }))
 
       await matchRepository.findServerById(serverId, options)
 
@@ -242,17 +236,17 @@ describe('MatchRepository', () => {
     })
   })
 
-  describe('incrementServerRounds', () => {
-    it('should increment server round count', async () => {
+  describe("incrementServerRounds", () => {
+    it("should increment server round count", async () => {
       const serverId = 1
 
       // Test that updateServerStats can be used for round increments
       mockDatabase.prisma.server.update.mockResolvedValue(
-        createMockServerRecord({ serverId, rounds: 1 })
+        createMockServerRecord({ serverId, rounds: 1 }),
       )
-      
+
       await matchRepository.updateServerStats(serverId, { rounds: { increment: 1 } })
-        
+
       expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
         where: { serverId },
         data: { rounds: { increment: 1 } },
@@ -260,14 +254,15 @@ describe('MatchRepository', () => {
     })
   })
 
-  describe('updateTeamWins', () => {
-    it('should update team win statistics', async () => {
+  describe("updateTeamWins", () => {
+    it("should update team win statistics", async () => {
       const serverId = 1
-      const team = 'ct'
+      const team = "ct"
 
       // Test using updateServerStats for team wins
-      const teamWinUpdate = team === 'ct' ? { ct_wins: { increment: 1 } } : { t_wins: { increment: 1 } }
-      
+      const teamWinUpdate =
+        team === "ct" ? { ct_wins: { increment: 1 } } : { t_wins: { increment: 1 } }
+
       await matchRepository.updateServerStats(serverId, teamWinUpdate)
 
       expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
@@ -277,16 +272,16 @@ describe('MatchRepository', () => {
     })
   })
 
-  describe('updateBombStats', () => {
-    it('should update bomb statistics', async () => {
+  describe("updateBombStats", () => {
+    it("should update bomb statistics", async () => {
       const serverId = 1
       const bombDefused = true
 
       // Test using updateServerStats for bomb stats
-      const bombUpdate = bombDefused ? 
-        { bomb_defused: { increment: 1 } } : 
-        { bomb_exploded: { increment: 1 } }
-      
+      const bombUpdate = bombDefused
+        ? { bomb_defused: { increment: 1 } }
+        : { bomb_exploded: { increment: 1 } }
+
       await matchRepository.updateServerStats(serverId, bombUpdate)
 
       expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
@@ -296,8 +291,8 @@ describe('MatchRepository', () => {
     })
   })
 
-  describe('resetMapStats', () => {
-    it('should reset map-specific statistics', async () => {
+  describe("resetMapStats", () => {
+    it("should reset map-specific statistics", async () => {
       const serverId = 1
 
       // Test using updateServerStats for map reset
@@ -309,7 +304,7 @@ describe('MatchRepository', () => {
         bomb_defused: 0,
         bomb_exploded: 0,
       }
-      
+
       await matchRepository.updateServerStats(serverId, resetUpdate)
 
       expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
@@ -319,44 +314,41 @@ describe('MatchRepository', () => {
     })
   })
 
-  describe('Error handling', () => {
-    it('should handle database errors in updateServerStats', async () => {
+  describe("Error handling", () => {
+    it("should handle database errors in updateServerStats", async () => {
       const serverId = 1
       const updates = { players: 10 }
 
-      mockDatabase.prisma.server.update.mockRejectedValue(new Error('Database error'))
+      mockDatabase.prisma.server.update.mockRejectedValue(new Error("Database error"))
 
-      await expect(matchRepository.updateServerStats(serverId, updates))
-        .rejects.toThrow()
+      await expect(matchRepository.updateServerStats(serverId, updates)).rejects.toThrow()
     })
 
-    it('should handle database errors in findServerById', async () => {
+    it("should handle database errors in findServerById", async () => {
       const serverId = 1
 
-      mockDatabase.prisma.server.findUnique.mockRejectedValue(new Error('Database error'))
+      mockDatabase.prisma.server.findUnique.mockRejectedValue(new Error("Database error"))
 
-      await expect(matchRepository.findServerById(serverId))
-        .rejects.toThrow()
+      await expect(matchRepository.findServerById(serverId)).rejects.toThrow()
     })
 
-    it('should handle constraint violations', async () => {
+    it("should handle constraint violations", async () => {
       const serverId = 1
       const updates = { players: -1 } // Potentially invalid value
 
-      mockDatabase.prisma.server.update.mockRejectedValue(new Error('Constraint violation'))
+      mockDatabase.prisma.server.update.mockRejectedValue(new Error("Constraint violation"))
 
-      await expect(matchRepository.updateServerStats(serverId, updates))
-        .rejects.toThrow()
+      await expect(matchRepository.updateServerStats(serverId, updates)).rejects.toThrow()
     })
   })
 
-  describe('Edge cases', () => {
-    it('should handle very large server IDs', async () => {
+  describe("Edge cases", () => {
+    it("should handle very large server IDs", async () => {
       const largeServerId = 999999999
       const updates = { players: 1 }
 
       mockDatabase.prisma.server.update.mockResolvedValue(
-        createMockServerRecord({ serverId: largeServerId })
+        createMockServerRecord({ serverId: largeServerId }),
       )
 
       await matchRepository.updateServerStats(largeServerId, updates)
@@ -367,19 +359,17 @@ describe('MatchRepository', () => {
       })
     })
 
-    it('should handle complex nested updates', async () => {
+    it("should handle complex nested updates", async () => {
       const serverId = 1
       const complexUpdates = {
         rounds: { increment: 1 },
-        act_map: 'de_inferno',
+        act_map: "de_inferno",
         players: 20,
-        status: 'active',
+        status: "active",
         lastUpdate: new Date(),
       }
 
-      mockDatabase.prisma.server.update.mockResolvedValue(
-        createMockServerRecord({ serverId })
-      )
+      mockDatabase.prisma.server.update.mockResolvedValue(createMockServerRecord({ serverId }))
 
       await matchRepository.updateServerStats(serverId, complexUpdates)
 
@@ -389,7 +379,7 @@ describe('MatchRepository', () => {
       })
     })
 
-    it('should handle null and undefined values in updates', async () => {
+    it("should handle null and undefined values in updates", async () => {
       const serverId = 1
       const updatesWithNulls = {
         act_map: null,
@@ -397,9 +387,7 @@ describe('MatchRepository', () => {
         players: 0,
       }
 
-      mockDatabase.prisma.server.update.mockResolvedValue(
-        createMockServerRecord({ serverId })
-      )
+      mockDatabase.prisma.server.update.mockResolvedValue(createMockServerRecord({ serverId }))
 
       await matchRepository.updateServerStats(serverId, updatesWithNulls)
 

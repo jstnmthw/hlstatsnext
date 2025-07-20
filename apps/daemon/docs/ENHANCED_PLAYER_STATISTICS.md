@@ -53,16 +53,19 @@ export interface PlayerRoundStats {
 Added comprehensive event handlers in MatchHandler for real-time statistics tracking:
 
 #### Kill Event Handler
+
 - Tracks killer kills and victim deaths
 - Increments headshot count when applicable
 - Updates match statistics in real-time
 
 #### Suicide Event Handler
+
 - Tracks player suicides
 - Increments both suicide count and death count
 - Maintains consistency with legacy statistics
 
 #### Teamkill Event Handler
+
 - Tracks teamkills by the killer
 - Tracks deaths for the victim
 - Handles headshot tracking for teamkills
@@ -100,6 +103,7 @@ The MatchHandler now processes events in real-time to maintain accurate player s
 ### 5. Integration with ServerStatsHandler
 
 The enhanced system works seamlessly with the ServerStatsHandler to provide:
+
 - Individual player statistics (MatchHandler)
 - Server-level aggregate statistics (ServerStatsHandler)
 - Proper event-driven updates for both systems
@@ -107,21 +111,25 @@ The enhanced system works seamlessly with the ServerStatsHandler to provide:
 ## Key Features
 
 ### ✅ Complete Statistics Tracking
+
 - All player statistics are now properly tracked and persisted
 - Real-time updates during match progression
 - Accurate historical data in PlayerHistory table
 
 ### ✅ Event-Driven Architecture
+
 - Statistics are updated as events are processed
 - No missing or delayed statistics
 - Consistent with existing event processing pipeline
 
 ### ✅ Backward Compatibility
+
 - All existing functionality preserved
 - Enhanced statistics are additive
 - No breaking changes to existing APIs
 
 ### ✅ Performance Optimized
+
 - In-memory match statistics during gameplay
 - Batch persistence at match end
 - Efficient event processing
@@ -144,7 +152,7 @@ Game Events → EventProcessor → MatchHandler → Match Statistics (Memory)
 // Update weapon statistics from other handlers
 updatePlayerWeaponStats(serverId: number, playerId: number, stats: {
   shots?: number
-  hits?: number 
+  hits?: number
   damage?: number
 }): void
 
@@ -168,27 +176,31 @@ console.log(`Player Stats:`, {
   hits: playerStats.hits,
   suicides: playerStats.suicides,
   teamkills: playerStats.teamkills,
-  objectiveScore: playerStats.objectiveScore
+  objectiveScore: playerStats.objectiveScore,
 })
 ```
 
 ## Benefits
 
 ### 🎯 **Accurate MVP Calculations**
+
 - All relevant statistics are included in MVP scoring
 - Objective events, kills, deaths, and other factors properly weighted
 
 ### 📊 **Comprehensive Analytics**
+
 - Complete player performance tracking
 - Detailed match history with all statistics
 - Support for advanced analytics and reporting
 
 ### 🔄 **Real-time Updates**
+
 - Live match statistics during gameplay
 - Immediate feedback for player performance
 - Up-to-date leaderboards and rankings
 
 ### 🏗️ **Future-Ready Architecture**
+
 - Easy extension for new statistics
 - Weapon-specific tracking ready for implementation
 - Scalable for additional game modes and events
@@ -196,16 +208,19 @@ console.log(`Player Stats:`, {
 ## Integration Points
 
 ### With ServerStatsHandler
+
 - Server-level aggregation of player statistics
 - Automatic generation of SERVER_STATS_UPDATE events
 - Consistent tracking across individual and server levels
 
 ### With WeaponHandler
+
 - Ready for weapon-specific shot/hit tracking
 - Damage calculation integration
 - Weapon accuracy statistics
 
 ### With RankingHandler
+
 - Enhanced skill calculations with all statistics
 - More accurate ELO updates based on complete performance data
 - Objective-based ranking adjustments
@@ -213,6 +228,7 @@ console.log(`Player Stats:`, {
 ## Testing
 
 The enhanced system includes comprehensive test coverage:
+
 - Unit tests for all new event handlers
 - Integration tests for complete event processing
 - Validation of statistics accuracy and persistence
@@ -221,16 +237,19 @@ The enhanced system includes comprehensive test coverage:
 ## Future Enhancements
 
 ### Weapon Shot/Hit Events
+
 - Add `WEAPON_FIRE` and `WEAPON_HIT` event types
 - Individual shot tracking with weapon accuracy
 - Real-time weapon performance statistics
 
 ### Advanced Analytics
+
 - Heat map data collection with position tracking
 - Clutch situation detection and scoring
 - Team coordination metrics
 
 ### Performance Metrics
+
 - Round timing and positioning data
 - Movement and positioning analytics
 - Advanced player behavior tracking

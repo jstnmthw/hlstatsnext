@@ -49,7 +49,9 @@ export interface MockDatabaseClient {
   }
   testConnection: MockedFunction<() => Promise<boolean>>
   disconnect: MockedFunction<() => Promise<void>>
-  transaction: MockedFunction<(callback: (prisma: MockDatabaseClient['prisma']) => Promise<void>) => Promise<void>>
+  transaction: MockedFunction<
+    (callback: (prisma: MockDatabaseClient["prisma"]) => Promise<void>) => Promise<void>
+  >
 }
 
 export function createMockDatabaseClient(): MockDatabaseClient {

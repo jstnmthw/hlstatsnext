@@ -3,7 +3,7 @@
  */
 
 export const GAME_CONFIG = {
-  defaultGame: 'csgo',
+  defaultGame: "csgo",
   defaultRating: 1000,
   defaultConfidence: 350,
   defaultVolatility: 0.06,

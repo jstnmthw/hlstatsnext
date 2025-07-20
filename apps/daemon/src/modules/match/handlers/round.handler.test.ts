@@ -2,13 +2,13 @@
  * RoundHandler Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { RoundHandler } from './round.handler'
-import { createMockLogger } from '../../../test-support/mocks/logger'
-import type { RoundStartEvent, RoundEndEvent, TeamWinEvent, MapChangeEvent } from '../match.types'
-import { EventType } from '@/shared/types/events'
+import { describe, it, expect, beforeEach, vi } from "vitest"
+import { RoundHandler } from "./round.handler"
+import { createMockLogger } from "../../../test-support/mocks/logger"
+import type { RoundStartEvent, RoundEndEvent, TeamWinEvent, MapChangeEvent } from "../match.types"
+import { EventType } from "@/shared/types/events"
 
-describe('RoundHandler', () => {
+describe("RoundHandler", () => {
   let roundHandler: RoundHandler
   let mockMatchService: any
   let mockLogger: ReturnType<typeof createMockLogger>
@@ -23,36 +23,36 @@ describe('RoundHandler', () => {
       processMapChange: vi.fn(),
       incrementRounds: vi.fn(),
     }
-    
+
     roundHandler = new RoundHandler(mockMatchService, mockLogger)
   })
 
-  describe('Handler instantiation', () => {
-    it('should create handler instance', () => {
+  describe("Handler instantiation", () => {
+    it("should create handler instance", () => {
       expect(roundHandler).toBeDefined()
       expect(roundHandler).toBeInstanceOf(RoundHandler)
     })
 
-    it('should have required methods', () => {
+    it("should have required methods", () => {
       expect(roundHandler.handleRoundStart).toBeDefined()
       expect(roundHandler.handleRoundEnd).toBeDefined()
       expect(roundHandler.handleTeamWin).toBeDefined()
       expect(roundHandler.handleMapChange).toBeDefined()
-      expect(typeof roundHandler.handleRoundStart).toBe('function')
-      expect(typeof roundHandler.handleRoundEnd).toBe('function')
-      expect(typeof roundHandler.handleTeamWin).toBe('function')
-      expect(typeof roundHandler.handleMapChange).toBe('function')
+      expect(typeof roundHandler.handleRoundStart).toBe("function")
+      expect(typeof roundHandler.handleRoundEnd).toBe("function")
+      expect(typeof roundHandler.handleTeamWin).toBe("function")
+      expect(typeof roundHandler.handleMapChange).toBe("function")
     })
   })
 
-  describe('handleRoundStart', () => {
-    it('should handle round start events successfully', async () => {
+  describe("handleRoundStart", () => {
+    it("should handle round start events successfully", async () => {
       const roundStartEvent: RoundStartEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.ROUND_START,
         data: {
-          map: 'de_dust2',
+          map: "de_dust2",
           roundNumber: 1,
           maxPlayers: 10,
         },
@@ -67,13 +67,13 @@ describe('RoundHandler', () => {
       expect(mockMatchService.handleMatchEvent).toHaveBeenCalledWith(roundStartEvent)
     })
 
-    it('should handle pistol round events', async () => {
+    it("should handle pistol round events", async () => {
       const pistolRoundEvent: RoundStartEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.ROUND_START,
         data: {
-          map: 'de_dust2',
+          map: "de_dust2",
           roundNumber: 1,
           maxPlayers: 10,
         },
@@ -88,37 +88,39 @@ describe('RoundHandler', () => {
       expect(mockMatchService.handleMatchEvent).toHaveBeenCalledWith(pistolRoundEvent)
     })
 
-    it('should handle service errors in round start', async () => {
+    it("should handle service errors in round start", async () => {
       const roundStartEvent: RoundStartEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.ROUND_START,
         data: {
-          map: 'de_dust2',
+          map: "de_dust2",
           roundNumber: 1,
           maxPlayers: 10,
         },
       }
 
-      const serviceError = new Error('Round start processing failed')
+      const serviceError = new Error("Round start processing failed")
       mockMatchService.handleMatchEvent.mockRejectedValue(serviceError)
 
       const result = await roundHandler.handleRoundStart(roundStartEvent)
 
       expect(result.success).toBe(false)
-      expect(result.error).toBe('Round start processing failed')
-      expect(mockLogger.error).toHaveBeenCalledWith('Round start handler failed: Error: Round start processing failed')
+      expect(result.error).toBe("Round start processing failed")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        "Round start handler failed: Error: Round start processing failed",
+      )
     })
   })
 
-  describe('handleRoundEnd', () => {
-    it('should handle round end events successfully', async () => {
+  describe("handleRoundEnd", () => {
+    it("should handle round end events successfully", async () => {
       const roundEndEvent: RoundEndEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.ROUND_END,
         data: {
-          winningTeam: 'ct',
+          winningTeam: "ct",
           duration: 89.5,
           score: {
             team1: 1,
@@ -136,13 +138,13 @@ describe('RoundHandler', () => {
       expect(mockMatchService.handleMatchEvent).toHaveBeenCalledWith(roundEndEvent)
     })
 
-    it('should handle bomb defuse round end', async () => {
+    it("should handle bomb defuse round end", async () => {
       const bombDefuseEndEvent: RoundEndEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.ROUND_END,
         data: {
-          winningTeam: 'ct',
+          winningTeam: "ct",
           duration: 75.2,
           score: {
             team1: 2,
@@ -160,13 +162,13 @@ describe('RoundHandler', () => {
       expect(mockMatchService.handleMatchEvent).toHaveBeenCalledWith(bombDefuseEndEvent)
     })
 
-    it('should handle service errors in round end', async () => {
+    it("should handle service errors in round end", async () => {
       const roundEndEvent: RoundEndEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.ROUND_END,
         data: {
-          winningTeam: 'ct',
+          winningTeam: "ct",
           duration: 60,
           score: {
             team1: 1,
@@ -175,26 +177,28 @@ describe('RoundHandler', () => {
         },
       }
 
-      const serviceError = new Error('Round end processing failed')
+      const serviceError = new Error("Round end processing failed")
       mockMatchService.handleMatchEvent.mockRejectedValue(serviceError)
 
       const result = await roundHandler.handleRoundEnd(roundEndEvent)
 
       expect(result.success).toBe(false)
-      expect(result.error).toBe('Round end processing failed')
-      expect(mockLogger.error).toHaveBeenCalledWith('Round end handler failed: Error: Round end processing failed')
+      expect(result.error).toBe("Round end processing failed")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        "Round end handler failed: Error: Round end processing failed",
+      )
     })
   })
 
-  describe('handleTeamWin', () => {
-    it('should handle team win events successfully', async () => {
+  describe("handleTeamWin", () => {
+    it("should handle team win events successfully", async () => {
       const teamWinEvent: TeamWinEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.TEAM_WIN,
         data: {
-          winningTeam: 'ct',
-          triggerName: 'round_end',
+          winningTeam: "ct",
+          triggerName: "round_end",
           score: {
             ct: 16,
             t: 14,
@@ -211,14 +215,14 @@ describe('RoundHandler', () => {
       expect(mockMatchService.handleMatchEvent).toHaveBeenCalledWith(teamWinEvent)
     })
 
-    it('should handle overtime team win', async () => {
+    it("should handle overtime team win", async () => {
       const overtimeWinEvent: TeamWinEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.TEAM_WIN,
         data: {
-          winningTeam: 'terrorist',
-          triggerName: 'round_end',
+          winningTeam: "terrorist",
+          triggerName: "round_end",
           score: {
             ct: 18,
             t: 19,
@@ -235,14 +239,14 @@ describe('RoundHandler', () => {
       expect(mockMatchService.handleMatchEvent).toHaveBeenCalledWith(overtimeWinEvent)
     })
 
-    it('should handle service errors in team win', async () => {
+    it("should handle service errors in team win", async () => {
       const teamWinEvent: TeamWinEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.TEAM_WIN,
         data: {
-          winningTeam: 'ct',
-          triggerName: 'round_end',
+          winningTeam: "ct",
+          triggerName: "round_end",
           score: {
             ct: 16,
             t: 10,
@@ -250,26 +254,28 @@ describe('RoundHandler', () => {
         },
       }
 
-      const serviceError = new Error('Team win processing failed')
+      const serviceError = new Error("Team win processing failed")
       mockMatchService.handleMatchEvent.mockRejectedValue(serviceError)
 
       const result = await roundHandler.handleTeamWin(teamWinEvent)
 
       expect(result.success).toBe(false)
-      expect(result.error).toBe('Team win processing failed')
-      expect(mockLogger.error).toHaveBeenCalledWith('Team win handler failed: Error: Team win processing failed')
+      expect(result.error).toBe("Team win processing failed")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        "Team win handler failed: Error: Team win processing failed",
+      )
     })
   })
 
-  describe('handleMapChange', () => {
-    it('should handle map change events successfully', async () => {
+  describe("handleMapChange", () => {
+    it("should handle map change events successfully", async () => {
       const mapChangeEvent: MapChangeEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.MAP_CHANGE,
         data: {
-          previousMap: 'de_dust2',
-          newMap: 'de_inferno',
+          previousMap: "de_dust2",
+          newMap: "de_inferno",
           playerCount: 10,
         },
       }
@@ -283,14 +289,14 @@ describe('RoundHandler', () => {
       expect(mockMatchService.handleMatchEvent).toHaveBeenCalledWith(mapChangeEvent)
     })
 
-    it('should handle initial map load', async () => {
+    it("should handle initial map load", async () => {
       const initialMapEvent: MapChangeEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.MAP_CHANGE,
         data: {
           previousMap: undefined,
-          newMap: 'de_mirage',
+          newMap: "de_mirage",
           playerCount: 0,
         },
       }
@@ -304,79 +310,113 @@ describe('RoundHandler', () => {
       expect(mockMatchService.handleMatchEvent).toHaveBeenCalledWith(initialMapEvent)
     })
 
-    it('should handle service errors in map change', async () => {
+    it("should handle service errors in map change", async () => {
       const mapChangeEvent: MapChangeEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.MAP_CHANGE,
         data: {
-          previousMap: 'de_cache',
-          newMap: 'de_nuke',
+          previousMap: "de_cache",
+          newMap: "de_nuke",
           playerCount: 10,
         },
       }
 
-      const serviceError = new Error('Map change processing failed')
+      const serviceError = new Error("Map change processing failed")
       mockMatchService.handleMatchEvent.mockRejectedValue(serviceError)
 
       const result = await roundHandler.handleMapChange(mapChangeEvent)
 
       expect(result.success).toBe(false)
-      expect(result.error).toBe('Map change processing failed')
-      expect(mockLogger.error).toHaveBeenCalledWith('Map change handler failed: Error: Map change processing failed')
+      expect(result.error).toBe("Map change processing failed")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        "Map change handler failed: Error: Map change processing failed",
+      )
     })
   })
 
-  describe('Error handling', () => {
-    it('should handle non-Error exceptions across all methods', async () => {
+  describe("Error handling", () => {
+    it("should handle non-Error exceptions across all methods", async () => {
       const events = [
-        { method: 'handleRoundStart', event: { timestamp: new Date(), serverId: 1, eventType: EventType.ROUND_START, data: { map: 'de_dust2', roundNumber: 1, maxPlayers: 10 } } },
-        { method: 'handleRoundEnd', event: { timestamp: new Date(), serverId: 1, eventType: EventType.ROUND_END, data: { winningTeam: 'ct' } } },
-        { method: 'handleTeamWin', event: { timestamp: new Date(), serverId: 1, eventType: EventType.TEAM_WIN, data: { winningTeam: 'ct', triggerName: 'round_end', score: { ct: 16, t: 14 } } } },
-        { method: 'handleMapChange', event: { timestamp: new Date(), serverId: 1, eventType: EventType.MAP_CHANGE, data: { newMap: 'de_test', playerCount: 10 } } },
+        {
+          method: "handleRoundStart",
+          event: {
+            timestamp: new Date(),
+            serverId: 1,
+            eventType: EventType.ROUND_START,
+            data: { map: "de_dust2", roundNumber: 1, maxPlayers: 10 },
+          },
+        },
+        {
+          method: "handleRoundEnd",
+          event: {
+            timestamp: new Date(),
+            serverId: 1,
+            eventType: EventType.ROUND_END,
+            data: { winningTeam: "ct" },
+          },
+        },
+        {
+          method: "handleTeamWin",
+          event: {
+            timestamp: new Date(),
+            serverId: 1,
+            eventType: EventType.TEAM_WIN,
+            data: { winningTeam: "ct", triggerName: "round_end", score: { ct: 16, t: 14 } },
+          },
+        },
+        {
+          method: "handleMapChange",
+          event: {
+            timestamp: new Date(),
+            serverId: 1,
+            eventType: EventType.MAP_CHANGE,
+            data: { newMap: "de_test", playerCount: 10 },
+          },
+        },
       ]
 
       for (const { method, event } of events) {
-        mockMatchService.handleMatchEvent.mockRejectedValue('String error')
+        mockMatchService.handleMatchEvent.mockRejectedValue("String error")
 
         const result = await (roundHandler as any)[method](event)
 
         expect(result.success).toBe(false)
-        expect(result.error).toBe('String error')
+        expect(result.error).toBe("String error")
       }
     })
 
-    it('should handle timeout errors', async () => {
+    it("should handle timeout errors", async () => {
       const roundStartEvent: RoundStartEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.ROUND_START,
         data: {
-          map: 'de_dust2',
+          map: "de_dust2",
           roundNumber: 1,
           maxPlayers: 10,
         },
       }
 
-      const timeoutError = new Error('Request timeout')
-      timeoutError.name = 'TimeoutError'
+      const timeoutError = new Error("Request timeout")
+      timeoutError.name = "TimeoutError"
       mockMatchService.handleMatchEvent.mockRejectedValue(timeoutError)
 
       const result = await roundHandler.handleRoundStart(roundStartEvent)
 
       expect(result.success).toBe(false)
-      expect(result.error).toBe('Request timeout')
+      expect(result.error).toBe("Request timeout")
     })
   })
 
-  describe('Edge cases', () => {
-    it('should handle events with minimal data', async () => {
+  describe("Edge cases", () => {
+    it("should handle events with minimal data", async () => {
       const minimalRoundEnd: RoundEndEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.ROUND_END,
         data: {
-          winningTeam: 'ct',
+          winningTeam: "ct",
         },
       }
 
@@ -389,14 +429,14 @@ describe('RoundHandler', () => {
       expect(mockMatchService.handleMatchEvent).toHaveBeenCalledWith(minimalRoundEnd)
     })
 
-    it('should preserve service result structure', async () => {
+    it("should preserve service result structure", async () => {
       const teamWinEvent: TeamWinEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.TEAM_WIN,
         data: {
-          winningTeam: 'terrorist',
-          triggerName: 'round_end',
+          winningTeam: "terrorist",
+          triggerName: "round_end",
           score: {
             ct: 14,
             t: 16,
@@ -407,10 +447,10 @@ describe('RoundHandler', () => {
       const serviceResult = {
         success: true,
         affected: 2,
-        metadata: { 
-          matchType: 'competitive',
+        metadata: {
+          matchType: "competitive",
           duration: 2400,
-          mvp: { playerId: 5, rating: 1.45 }
+          mvp: { playerId: 5, rating: 1.45 },
         },
       }
       mockMatchService.handleMatchEvent.mockResolvedValue(serviceResult)
@@ -421,21 +461,21 @@ describe('RoundHandler', () => {
       expect(result.affected).toBe(2)
     })
 
-    it('should handle service returning failure result', async () => {
+    it("should handle service returning failure result", async () => {
       const mapChangeEvent: MapChangeEvent = {
         timestamp: new Date(),
         serverId: 1,
         eventType: EventType.MAP_CHANGE,
         data: {
-          previousMap: 'de_ancient',
-          newMap: 'invalid_map',
+          previousMap: "de_ancient",
+          newMap: "invalid_map",
           playerCount: 0,
         },
       }
 
       const serviceResult = {
         success: false,
-        error: 'Invalid map name',
+        error: "Invalid map name",
       }
       mockMatchService.handleMatchEvent.mockResolvedValue(serviceResult)
 
@@ -443,7 +483,7 @@ describe('RoundHandler', () => {
 
       expect(result).toEqual(serviceResult)
       expect(result.success).toBe(false)
-      expect(result.error).toBe('Invalid map name')
+      expect(result.error).toBe("Invalid map name")
     })
   })
 })

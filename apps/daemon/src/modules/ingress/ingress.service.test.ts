@@ -2,15 +2,15 @@
  * IngressService Unit Tests
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { IngressService } from './ingress.service'
-import { createMockLogger } from '../../test-support/mocks/logger'
-import { createMockDatabaseClient } from '../../test-support/mocks/database'
-import type { AppContext } from '../../context'
-import type { DatabaseClient } from '@/database/client'
-import type { IIngressService } from './ingress.types'
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
+import { IngressService } from "./ingress.service"
+import { createMockLogger } from "../../test-support/mocks/logger"
+import { createMockDatabaseClient } from "../../test-support/mocks/database"
+import type { AppContext } from "../../context"
+import type { DatabaseClient } from "@/database/client"
+import type { IIngressService } from "./ingress.types"
 
-describe('IngressService', () => {
+describe("IngressService", () => {
   let ingressService: IngressService
   let mockLogger: ReturnType<typeof createMockLogger>
   let mockDatabase: ReturnType<typeof createMockDatabaseClient>
@@ -19,7 +19,7 @@ describe('IngressService', () => {
   beforeEach(() => {
     mockLogger = createMockLogger()
     mockDatabase = createMockDatabaseClient()
-    
+
     // Create simplified mock context
     mockContext = {
       database: mockDatabase as unknown as DatabaseClient,
@@ -59,11 +59,16 @@ describe('IngressService', () => {
       ingressService: {} as IIngressService,
     }
 
-    ingressService = new IngressService(mockLogger, mockDatabase as unknown as DatabaseClient, mockContext, {
-      port: 27501,
-      skipAuth: true,
-      logBots: false,
-    })
+    ingressService = new IngressService(
+      mockLogger,
+      mockDatabase as unknown as DatabaseClient,
+      mockContext,
+      {
+        port: 27501,
+        skipAuth: true,
+        logBots: false,
+      },
+    )
   })
 
   afterEach(() => {
@@ -72,13 +77,13 @@ describe('IngressService', () => {
     }
   })
 
-  describe('Service instantiation', () => {
-    it('should create service instance', () => {
+  describe("Service instantiation", () => {
+    it("should create service instance", () => {
       expect(ingressService).toBeDefined()
       expect(ingressService).toBeInstanceOf(IngressService)
     })
 
-    it('should have required methods', () => {
+    it("should have required methods", () => {
       expect(ingressService.start).toBeDefined()
       expect(ingressService.stop).toBeDefined()
       expect(ingressService.isRunning).toBeDefined()
@@ -87,30 +92,30 @@ describe('IngressService', () => {
     })
   })
 
-  describe('Server state management', () => {
-    it('should start in stopped state', () => {
+  describe("Server state management", () => {
+    it("should start in stopped state", () => {
       expect(ingressService.isRunning()).toBe(false)
     })
 
-    it('should track statistics', () => {
+    it("should track statistics", () => {
       const stats = ingressService.getStats()
-      expect(stats).toHaveProperty('totalLogsProcessed')
-      expect(stats).toHaveProperty('totalErrors')
-      expect(typeof stats.totalLogsProcessed).toBe('number')
-      expect(typeof stats.totalErrors).toBe('number')
+      expect(stats).toHaveProperty("totalLogsProcessed")
+      expect(stats).toHaveProperty("totalErrors")
+      expect(typeof stats.totalLogsProcessed).toBe("number")
+      expect(typeof stats.totalErrors).toBe("number")
     })
   })
 
-  describe('Log processing', () => {
-    it('should process log lines without throwing', async () => {
+  describe("Log processing", () => {
+    it("should process log lines without throwing", async () => {
       const logLine = 'L 01/01/2024 - 12:00:00: World triggered "Round_Start"'
-      
+
       await expect(ingressService.processLogLine(logLine)).resolves.not.toThrow()
     })
 
-    it('should handle malformed log lines gracefully', async () => {
-      const logLine = 'Invalid log line format'
-      
+    it("should handle malformed log lines gracefully", async () => {
+      const logLine = "Invalid log line format"
+
       await expect(ingressService.processLogLine(logLine)).resolves.not.toThrow()
     })
   })

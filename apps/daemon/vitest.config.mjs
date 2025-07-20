@@ -1,20 +1,46 @@
+/**
+ * Vitest Configuration
+ */
+
 import { defineConfig } from "vitest/config"
+import path from "path"
 
 export default defineConfig({
   test: {
-    setupFiles: ["./tests/setup-test-env.ts"],
-    environment: "node",
     globals: true,
+    environment: "node",
+    setupFiles: ["./src/test-support/setup.ts"],
+    include: ["src/**/*.test.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
-      include: ["src/**/*.ts"],
-      exclude: ["src/database/client.ts", "src/types/**/*.ts"],
+      exclude: [
+        "node_modules/",
+        "src/test-support/",
+        "dist/",
+        "**/*.d.ts",
+        "**/*.config.*",
+        "**/generated/**",
+      ],
+      thresholds: {
+        global: {
+          branches: 80,
+          functions: 80,
+          lines: 80,
+          statements: 80,
+        },
+      },
+    },
+    pool: "forks",
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
     },
   },
   resolve: {
     alias: {
-      "@": new URL("./src", import.meta.url).pathname,
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 })

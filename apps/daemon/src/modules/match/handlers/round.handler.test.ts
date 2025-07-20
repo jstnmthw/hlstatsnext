@@ -5,12 +5,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { RoundHandler } from "./round.handler"
 import { createMockLogger } from "../../../test-support/mocks/logger"
-import type { RoundStartEvent, RoundEndEvent, TeamWinEvent, MapChangeEvent } from "../match.types"
+import type { RoundStartEvent, RoundEndEvent, TeamWinEvent, MapChangeEvent, IMatchService } from "../match.types"
 import { EventType } from "@/shared/types/events"
 
 describe("RoundHandler", () => {
   let roundHandler: RoundHandler
-  let mockMatchService: any
+  let mockMatchService: IMatchService
   let mockLogger: ReturnType<typeof createMockLogger>
 
   beforeEach(() => {
@@ -379,7 +379,7 @@ describe("RoundHandler", () => {
       for (const { method, event } of events) {
         mockMatchService.handleMatchEvent.mockRejectedValue("String error")
 
-        const result = await (roundHandler as any)[method](event)
+        const result = await (roundHandler as unknown as Record<string, (event: unknown) => Promise<unknown>>)[method](event)
 
         expect(result.success).toBe(false)
         expect(result.error).toBe("String error")

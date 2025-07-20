@@ -5,12 +5,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { PlayerEventHandler } from "./player-event.handler"
 import { createMockLogger } from "../../../test-support/mocks/logger"
-import type { PlayerEvent } from "../player.types"
+import type { PlayerEvent, IPlayerService } from "../player.types"
 import { EventType } from "@/shared/types/events"
 
 describe("PlayerEventHandler", () => {
   let playerEventHandler: PlayerEventHandler
-  let mockPlayerService: any
+  let mockPlayerService: IPlayerService
   let mockLogger: ReturnType<typeof createMockLogger>
 
   beforeEach(() => {

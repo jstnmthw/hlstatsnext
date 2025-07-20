@@ -6,11 +6,12 @@ import { describe, it, expect, beforeEach, vi } from "vitest"
 import { EventProcessor } from "./event-processor"
 import { createMockLogger } from "../../test-support/mocks/logger"
 import type { BaseEvent } from "@/shared/types/events"
+import type { AppContext } from "@/context"
 import { EventType } from "@/shared/types/events"
 
 describe("EventProcessor", () => {
   let eventProcessor: EventProcessor
-  let mockContext: any
+  let mockContext: AppContext
   let mockLogger: ReturnType<typeof createMockLogger>
 
   beforeEach(() => {
@@ -47,7 +48,7 @@ describe("EventProcessor", () => {
     })
 
     it("should store logger from context", () => {
-      expect((eventProcessor as any).logger).toBe(mockLogger)
+      expect((eventProcessor as unknown as { logger: typeof mockLogger }).logger).toBe(mockLogger)
     })
   })
 

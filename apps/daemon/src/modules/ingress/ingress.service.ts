@@ -69,13 +69,13 @@ export class IngressService implements IIngressService {
     this.running = true
     this.stats.startTime = new Date()
 
-    this.logger.starting("UDP Log Ingress Server")
-    this.logger.started(`UDP Log Ingress Server on ${this.options.host}:${this.options.port}`)
+    this.logger.starting("Ingress Server")
+    this.logger.started(`Ingress Server on ${this.options.host}:${this.options.port}`)
   }
 
   stop(): void {
     if (this.running) {
-      this.logger.stopping("UDP Log Ingress Server")
+      this.logger.stopping("Ingress Server")
       this.udpServer.stop()
       this.authenticatedServers.clear()
       this.running = false

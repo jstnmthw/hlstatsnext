@@ -5,12 +5,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { ObjectiveHandler } from "./objective.handler"
 import { createMockLogger } from "../../../test-support/mocks/logger"
-import type { ObjectiveEvent } from "../match.types"
+import type { ObjectiveEvent, IMatchService } from "../match.types"
 import { EventType } from "@/shared/types/events"
 
 describe("ObjectiveHandler", () => {
   let objectiveHandler: ObjectiveHandler
-  let mockMatchService: any
+  let mockMatchService: IMatchService
   let mockLogger: ReturnType<typeof createMockLogger>
 
   beforeEach(() => {

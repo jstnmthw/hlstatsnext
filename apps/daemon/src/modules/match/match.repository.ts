@@ -9,6 +9,7 @@ import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger"
 import type { IMatchRepository, ServerRecord, PlayerHistoryData } from "./match.types"
 import type { UpdateOptions, CreateOptions, FindOptions } from "@/shared/types/database"
+import type { Prisma } from "@repo/database/client"
 
 export class MatchRepository extends BaseRepository<ServerRecord> implements IMatchRepository {
   protected tableName = "server"
@@ -25,9 +26,8 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
     try {
       this.validateId(serverId, "updateServerStats")
 
-      await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? (tx as any).server : this.db.prisma.server
-        await table.update({
+      await this.executeWithTransaction(async (client) => {
+        await client.server.update({
           where: { serverId },
           data: updates,
         })
@@ -41,13 +41,15 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
     try {
       this.validateId(serverId, "findServerById")
 
-      return await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? (tx as any).server : this.db.prisma.server
-        return table.findUnique({
-          where: { serverId },
-          include: options?.include,
-          select: options?.select,
-        })
+      return await this.executeWithTransaction(async (client) => {
+        const query: Prisma.ServerFindUniqueArgs = { where: { serverId } }
+        if (options?.include) {
+          query.include = options.include as Prisma.ServerInclude
+        }
+        if (options?.select) {
+          query.select = options.select as Prisma.ServerSelect
+        }
+        return client.server.findUnique(query)
       }, options)
     } catch (error) {
       this.handleError("findServerById", error)
@@ -60,11 +62,8 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
         throw new Error("playerId and eventTime are required for player history")
       }
 
-      await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction
-          ? (tx as any).playerHistory
-          : this.db.prisma.playerHistory
-        await table.create({
+      await this.executeWithTransaction(async (client) => {
+        await client.playerHistory.create({
           data: {
             playerId: data.playerId,
             eventTime: data.eventTime,
@@ -96,9 +95,8 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
         throw new Error("game and map are required for map count update")
       }
 
-      await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? (tx as any).mapCount : this.db.prisma.mapCount
-        await table.upsert({
+      await this.executeWithTransaction(async (client) => {
+        await client.mapCount.upsert({
           where: {
             game_map: { game, map },
           },

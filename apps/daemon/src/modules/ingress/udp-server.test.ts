@@ -7,6 +7,7 @@ import { EventEmitter } from "events"
 import { UdpServer } from "./udp-server"
 import { createMockLogger } from "../../test-support/mocks/logger"
 import type { UdpServerOptions, ISocketFactory } from "./udp-server"
+import type { Socket } from "dgram"
 
 // Create a mock socket
 const mockSocket = {
@@ -16,11 +17,11 @@ const mockSocket = {
   removeAllListeners: vi.fn(),
   address: vi.fn(() => ({ address: "0.0.0.0", family: "IPv4", port: 30000 })),
   listening: false,
-}
+} as unknown as Socket
 
 // Create a mock socket factory
 const mockSocketFactory: ISocketFactory = {
-  createSocket: vi.fn(() => mockSocket as any),
+  createSocket: vi.fn(() => mockSocket),
 }
 
 describe("UdpServer", () => {
@@ -39,7 +40,7 @@ describe("UdpServer", () => {
     vi.clearAllMocks()
 
     // Restore the socket factory mock
-    mockSocketFactory.createSocket = vi.fn(() => mockSocket as any)
+    mockSocketFactory.createSocket = vi.fn(() => mockSocket)
 
     // Set up default mock behaviors
     mockSocket.bind.mockImplementation((port, host, callback) => {
@@ -82,8 +83,8 @@ describe("UdpServer", () => {
       }
       const customServer = new UdpServer(customOptions, mockLogger, mockSocketFactory)
 
-      expect((customServer as any).options.port).toBe(8080)
-      expect((customServer as any).options.host).toBe("127.0.0.1")
+      expect((customServer as unknown as { options: UdpServerOptions }).options.port).toBe(8080)
+      expect((customServer as unknown as { options: UdpServerOptions }).options.host).toBe("127.0.0.1")
     })
   })
 

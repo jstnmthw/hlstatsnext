@@ -51,7 +51,12 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { code: weaponCode },
+        where: { 
+          gamecode: {
+            game: "cstrike",
+            code: weaponCode
+          }
+        },
         create: {
           code: weaponCode,
           game: "csgo",
@@ -83,7 +88,12 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { code: weaponCode },
+        where: { 
+          gamecode: {
+            game: "cstrike",
+            code: weaponCode
+          }
+        },
         create: {
           code: weaponCode,
           game: "csgo",
@@ -118,7 +128,12 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { code: weaponCode },
+        where: { 
+          gamecode: {
+            game: "cstrike",
+            code: weaponCode
+          }
+        },
         create: {
           code: weaponCode,
           game: "csgo",
@@ -166,7 +181,12 @@ describe("WeaponRepository", () => {
 
       expect(result).toEqual(mockWeapon)
       expect(mockDatabase.prisma.weapon.findUnique).toHaveBeenCalledWith({
-        where: { code: weaponCode },
+        where: { 
+          gamecode: {
+            game: "cstrike",
+            code: weaponCode
+          }
+        },
         include: undefined,
         select: undefined,
       })
@@ -181,7 +201,12 @@ describe("WeaponRepository", () => {
 
       expect(result).toBeNull()
       expect(mockDatabase.prisma.weapon.findUnique).toHaveBeenCalledWith({
-        where: { code: weaponCode },
+        where: { 
+          gamecode: {
+            game: "cstrike",
+            code: weaponCode
+          }
+        },
         include: undefined,
         select: undefined,
       })
@@ -207,7 +232,12 @@ describe("WeaponRepository", () => {
       await weaponRepository.findWeaponByCode(weaponCode, options)
 
       expect(mockDatabase.prisma.weapon.findUnique).toHaveBeenCalledWith({
-        where: { code: weaponCode },
+        where: { 
+          gamecode: {
+            game: "cstrike",
+            code: weaponCode
+          }
+        },
         include: options.include,
         select: options.select,
       })
@@ -262,7 +292,12 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { code: "" },
+        where: { 
+          gamecode: {
+            game: "cstrike",
+            code: ""
+          }
+        },
         create: {
           code: "",
           game: "csgo",
@@ -293,7 +328,12 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { code: weaponCode },
+        where: { 
+          gamecode: {
+            game: "cstrike",
+            code: weaponCode
+          }
+        },
         create: expect.objectContaining({
           code: weaponCode,
         }),
@@ -318,7 +358,12 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { code: weaponCode },
+        where: { 
+          gamecode: {
+            game: "cstrike",
+            code: weaponCode
+          }
+        },
         create: expect.objectContaining({
           code: weaponCode,
         }),
@@ -343,7 +388,12 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { code: weaponCode },
+        where: { 
+          gamecode: {
+            game: "cstrike",
+            code: weaponCode
+          }
+        },
         create: {
           code: weaponCode,
           game: "csgo",

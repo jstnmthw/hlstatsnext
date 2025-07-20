@@ -9,7 +9,7 @@ import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger"
 import type { IPlayerRepository, PlayerCreateData } from "./player.types"
 import type { FindOptions, CreateOptions, UpdateOptions } from "@/shared/types/database"
-import type { Player } from "@repo/database/client"
+import type { Player, Prisma } from "@repo/database/client"
 
 export class PlayerRepository extends BaseRepository<Player> implements IPlayerRepository {
   protected tableName = "player"
@@ -22,13 +22,15 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
     try {
       this.validateId(playerId, "findById")
 
-      return await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? (tx as any).player : this.table
-        return table.findUnique({
-          where: { playerId },
-          include: options?.include,
-          select: options?.select,
-        })
+      return await this.executeWithTransaction(async (client) => {
+        const query: Prisma.PlayerFindUniqueArgs = { where: { playerId } }
+        if (options?.include) {
+          query.include = options.include as Prisma.PlayerInclude
+        }
+        if (options?.select) {
+          query.select = options.select as Prisma.PlayerSelect
+        }
+        return client.player.findUnique(query)
       }, options)
     } catch (error) {
       this.handleError("findById", error)
@@ -45,11 +47,8 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
         throw new Error("uniqueId and game are required")
       }
 
-      return await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction
-          ? (tx as any).playerUniqueId
-          : this.db.prisma.playerUniqueId
-        const uniqueIdEntry = await table.findUnique({
+      return await this.executeWithTransaction(async (client) => {
+        const uniqueIdEntry = await client.playerUniqueId.findUnique({
           where: {
             uniqueId_game: {
               uniqueId,
@@ -74,10 +73,8 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
         throw new Error("lastName, game, and steamId are required")
       }
 
-      return await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? (tx as any).player : this.table
-
-        const player = await table.create({
+      return await this.executeWithTransaction(async (client) => {
+        const player = await client.player.create({
           data: {
             lastName: data.lastName,
             game: data.game,
@@ -108,9 +105,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
         throw new Error("No valid fields to update")
       }
 
-      return await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? (tx as any).player : this.table
-
+      return await this.executeWithTransaction(async (client) => {
         // Try to update first, catch any errors and handle them appropriately
         try {
           // Handle skill underflow protection
@@ -120,7 +115,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
             "increment" in cleanData.skill
           ) {
             try {
-              return await table.update({
+              return await client.player.update({
                 where: { playerId },
                 data: cleanData,
               })
@@ -131,7 +126,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
                 err !== null &&
                 (err as { code?: string; message?: string }).message?.includes("Out of range")
               ) {
-                return await table.update({
+                return await client.player.update({
                   where: { playerId },
                   data: { ...cleanData, skill: 0 },
                 })
@@ -150,7 +145,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
             }
           }
 
-          return await table.update({
+          return await client.player.update({
             where: { playerId },
             data: cleanData,
           })
@@ -166,22 +161,23 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
             this.logger.warn(`Player ${playerId} not found, attempting to create with stats`)
 
             // Convert increment operations to direct values for creation
-            const createData: any = { playerId }
+            const createData: Prisma.PlayerUncheckedCreateInput = {
+              playerId,
+              lastName: `Player${playerId}`,
+              game: "cstrike",
+              skill: 1000,
+            }
 
             for (const [key, value] of Object.entries(cleanData)) {
               if (typeof value === "object" && value !== null && "increment" in value) {
-                createData[key] = Math.max(0, (value as any).increment)
+                const incrementValue = (value as { increment: number }).increment
+                ;(createData as Record<string, unknown>)[key] = Math.max(0, incrementValue)
               } else {
-                createData[key] = value
+                ;(createData as Record<string, unknown>)[key] = value
               }
             }
 
-            // Set default values for required fields if not provided
-            if (!createData.lastName) createData.lastName = `Player${playerId}`
-            if (!createData.game) createData.game = "cstrike"
-            if (createData.skill === undefined) createData.skill = 1000
-
-            return await table.create({
+            return await client.player.create({
               data: createData,
             })
           }
@@ -206,15 +202,19 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
         whereClause.hideranking = 0
       }
 
-      return await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? (tx as any).player : this.table
-        return table.findMany({
-          where: whereClause,
+      return await this.executeWithTransaction(async (client) => {
+        const query: Prisma.PlayerFindManyArgs = {
+          where: whereClause as Prisma.PlayerWhereInput,
           orderBy: { skill: "desc" },
           take: Math.min(limit, 100),
-          include: options?.include,
-          select: options?.select,
-        })
+        }
+        if (options?.include) {
+          query.include = options.include as Prisma.PlayerInclude
+        }
+        if (options?.select) {
+          query.select = options.select as Prisma.PlayerSelect
+        }
+        return client.player.findMany(query)
       }, options)
     } catch (error) {
       this.handleError("findTopPlayers", error)
@@ -229,9 +229,8 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
     try {
       this.validateId(serverId, "findRoundParticipants")
 
-      return await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction ? (tx as any).eventEntry : this.db.prisma.eventEntry
-        return table.findMany({
+      return await this.executeWithTransaction(async (client) => {
+        return client.eventEntry.findMany({
           where: {
             serverId,
             eventTime: {
@@ -265,11 +264,8 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
     try {
       this.validateId(playerId, "createUniqueId")
 
-      await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction
-          ? (tx as any).playerUniqueId
-          : this.db.prisma.playerUniqueId
-        await table.create({
+      await this.executeWithTransaction(async (client) => {
+        await client.playerUniqueId.create({
           data: {
             playerId,
             uniqueId,
@@ -284,11 +280,8 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
 
   async findUniqueIdEntry(uniqueId: string, game: string, options?: FindOptions): Promise<unknown> {
     try {
-      return await this.executeWithTransaction(async (tx) => {
-        const table = options?.transaction
-          ? (tx as any).playerUniqueId
-          : this.db.prisma.playerUniqueId
-        return table.findUnique({
+      return await this.executeWithTransaction(async (client) => {
+        return client.playerUniqueId.findUnique({
           where: {
             uniqueId_game: {
               uniqueId,

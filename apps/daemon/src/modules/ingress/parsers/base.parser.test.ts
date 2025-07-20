@@ -65,7 +65,7 @@ describe("BaseParser", () => {
   describe("createTimestamp", () => {
     it("should create current timestamp when no date string provided", () => {
       const before = new Date()
-      const timestamp = (parser as any).createTimestamp()
+      const timestamp = (parser as unknown as ParserWithMethods).createTimestamp()
       const after = new Date()
 
       expect(timestamp).toBeInstanceOf(Date)
@@ -75,7 +75,7 @@ describe("BaseParser", () => {
 
     it("should create current timestamp when undefined provided", () => {
       const before = new Date()
-      const timestamp = (parser as any).createTimestamp(undefined)
+      const timestamp = (parser as unknown as ParserWithMethods).createTimestamp(undefined)
       const after = new Date()
 
       expect(timestamp).toBeInstanceOf(Date)
@@ -85,7 +85,7 @@ describe("BaseParser", () => {
 
     it("should parse valid date strings", () => {
       const dateStr = "2023-01-15T10:30:45.123Z"
-      const timestamp = (parser as any).createTimestamp(dateStr)
+      const timestamp = (parser as unknown as ParserWithMethods).createTimestamp(dateStr)
 
       expect(timestamp).toBeInstanceOf(Date)
       expect(timestamp.toISOString()).toBe(dateStr)
@@ -93,7 +93,7 @@ describe("BaseParser", () => {
 
     it("should parse partial date strings", () => {
       const dateStr = "2023-01-15"
-      const timestamp = (parser as any).createTimestamp(dateStr)
+      const timestamp = (parser as unknown as ParserWithMethods).createTimestamp(dateStr)
 
       expect(timestamp).toBeInstanceOf(Date)
       expect(timestamp.getFullYear()).toBe(2023)
@@ -112,7 +112,7 @@ describe("BaseParser", () => {
 
       for (const dateStr of invalidDates) {
         const before = new Date()
-        const timestamp = (parser as any).createTimestamp(dateStr)
+        const timestamp = (parser as unknown as ParserWithMethods).createTimestamp(dateStr)
         const after = new Date()
 
         expect(timestamp).toBeInstanceOf(Date)
@@ -129,7 +129,7 @@ describe("BaseParser", () => {
       ]
 
       for (const dateStr of edgeCases) {
-        const timestamp = (parser as any).createTimestamp(dateStr)
+        const timestamp = (parser as unknown as ParserWithMethods).createTimestamp(dateStr)
         expect(timestamp).toBeInstanceOf(Date)
         expect(timestamp.toISOString()).toBe(dateStr)
       }
@@ -139,35 +139,35 @@ describe("BaseParser", () => {
   describe("extractQuotedValue", () => {
     it("should extract simple quoted values", () => {
       const text = 'player_name"TestPlayer"'
-      const result = (parser as any).extractQuotedValue(text, "player_name")
+      const result = (parser as unknown as ParserWithMethods).extractQuotedValue(text, "player_name")
 
       expect(result).toBe("TestPlayer")
     })
 
     it("should extract quoted values with spaces", () => {
       const text = 'player_name"Test Player With Spaces"'
-      const result = (parser as any).extractQuotedValue(text, "player_name")
+      const result = (parser as unknown as ParserWithMethods).extractQuotedValue(text, "player_name")
 
       expect(result).toBe("Test Player With Spaces")
     })
 
     it("should extract quoted values with special characters", () => {
       const text = 'weapon"ak47|special_variant"'
-      const result = (parser as any).extractQuotedValue(text, "weapon")
+      const result = (parser as unknown as ParserWithMethods).extractQuotedValue(text, "weapon")
 
       expect(result).toBe("ak47|special_variant")
     })
 
     it("should return null for missing keys", () => {
       const text = 'player_name"TestPlayer"'
-      const result = (parser as any).extractQuotedValue(text, "missing_key")
+      const result = (parser as unknown as ParserWithMethods).extractQuotedValue(text, "missing_key")
 
       expect(result).toBeNull()
     })
 
     it("should return null for empty quoted values", () => {
       const text = 'player_name""'
-      const result = (parser as any).extractQuotedValue(text, "player_name")
+      const result = (parser as unknown as ParserWithMethods).extractQuotedValue(text, "player_name")
 
       expect(result).toBeNull()
     })
@@ -175,21 +175,21 @@ describe("BaseParser", () => {
     it("should handle multiple quoted values and extract the correct one", () => {
       const text = 'player_name"Player1" target_name"Player2" weapon"ak47"'
 
-      expect((parser as any).extractQuotedValue(text, "player_name")).toBe("Player1")
-      expect((parser as any).extractQuotedValue(text, "target_name")).toBe("Player2")
-      expect((parser as any).extractQuotedValue(text, "weapon")).toBe("ak47")
+      expect((parser as unknown as ParserWithMethods).extractQuotedValue(text, "player_name")).toBe("Player1")
+      expect((parser as unknown as ParserWithMethods).extractQuotedValue(text, "target_name")).toBe("Player2")
+      expect((parser as unknown as ParserWithMethods).extractQuotedValue(text, "weapon")).toBe("ak47")
     })
 
     it("should handle nested quotes within values", () => {
       const text = 'message"Player said: \\"Hello World\\""'
-      const result = (parser as any).extractQuotedValue(text, "message")
+      const result = (parser as unknown as ParserWithMethods).extractQuotedValue(text, "message")
 
       expect(result).toBe('Player said: \\"Hello World\\"')
     })
 
     it("should handle Unicode characters", () => {
       const text = 'player_name"Tëst_Plâyér_🎮"'
-      const result = (parser as any).extractQuotedValue(text, "player_name")
+      const result = (parser as unknown as ParserWithMethods).extractQuotedValue(text, "player_name")
 
       expect(result).toBe("Tëst_Plâyér_🎮")
     })
@@ -197,65 +197,65 @@ describe("BaseParser", () => {
     it("should be case sensitive for keys", () => {
       const text = 'Player_Name"TestPlayer"'
 
-      expect((parser as any).extractQuotedValue(text, "Player_Name")).toBe("TestPlayer")
-      expect((parser as any).extractQuotedValue(text, "player_name")).toBeNull()
-      expect((parser as any).extractQuotedValue(text, "PLAYER_NAME")).toBeNull()
+      expect((parser as unknown as ParserWithMethods).extractQuotedValue(text, "Player_Name")).toBe("TestPlayer")
+      expect((parser as unknown as ParserWithMethods).extractQuotedValue(text, "player_name")).toBeNull()
+      expect((parser as unknown as ParserWithMethods).extractQuotedValue(text, "PLAYER_NAME")).toBeNull()
     })
   })
 
   describe("extractNumericValue", () => {
     it("should extract integer values", () => {
       const text = 'damage"100"'
-      const result = (parser as any).extractNumericValue(text, "damage")
+      const result = (parser as unknown as ParserWithMethods).extractNumericValue(text, "damage")
 
       expect(result).toBe(100)
     })
 
     it("should extract floating point values", () => {
       const text = 'health"75.5"'
-      const result = (parser as any).extractNumericValue(text, "health")
+      const result = (parser as unknown as ParserWithMethods).extractNumericValue(text, "health")
 
       expect(result).toBe(75.5)
     })
 
     it("should extract negative values", () => {
       const text = 'temperature"-15.2"'
-      const result = (parser as any).extractNumericValue(text, "temperature")
+      const result = (parser as unknown as ParserWithMethods).extractNumericValue(text, "temperature")
 
       expect(result).toBe(-15.2)
     })
 
     it("should extract zero values", () => {
       const text = 'kills"0"'
-      const result = (parser as any).extractNumericValue(text, "kills")
+      const result = (parser as unknown as ParserWithMethods).extractNumericValue(text, "kills")
 
       expect(result).toBe(0)
     })
 
     it("should return null for non-numeric values", () => {
       const text = 'player_name"TestPlayer"'
-      const result = (parser as any).extractNumericValue(text, "player_name")
+      const result = (parser as unknown as ParserWithMethods).extractNumericValue(text, "player_name")
 
       expect(result).toBeNull()
     })
 
     it("should return null for missing keys", () => {
       const text = 'damage"100"'
-      const result = (parser as any).extractNumericValue(text, "missing_key")
+      const result = (parser as unknown as ParserWithMethods).extractNumericValue(text, "missing_key")
 
       expect(result).toBeNull()
     })
 
     it("should return null for empty quoted values", () => {
       const text = 'damage""'
-      const result = (parser as any).extractNumericValue(text, "damage")
+      const result = (parser as unknown as ParserWithMethods).extractNumericValue(text, "damage")
 
       expect(result).toBeNull()
     })
 
     it("should handle scientific notation", () => {
       const text = 'large_number"1.5e3"'
-      const result = (parser as any).extractNumericValue(text, "large_number")
+      const result = (parser as unknown as ParserWithMethods).extractNumericValue(text, "large_number")
 
       expect(result).toBe(1500)
     })
@@ -263,21 +263,21 @@ describe("BaseParser", () => {
     it("should handle multiple numeric values", () => {
       const text = 'x"100.5" y"200.75" z"-50.25"'
 
-      expect((parser as any).extractNumericValue(text, "x")).toBe(100.5)
-      expect((parser as any).extractNumericValue(text, "y")).toBe(200.75)
-      expect((parser as any).extractNumericValue(text, "z")).toBe(-50.25)
+      expect((parser as unknown as ParserWithMethods).extractNumericValue(text, "x")).toBe(100.5)
+      expect((parser as unknown as ParserWithMethods).extractNumericValue(text, "y")).toBe(200.75)
+      expect((parser as unknown as ParserWithMethods).extractNumericValue(text, "z")).toBe(-50.25)
     })
 
     it("should handle very large numbers", () => {
       const text = 'big_number"999999999999"'
-      const result = (parser as any).extractNumericValue(text, "big_number")
+      const result = (parser as unknown as ParserWithMethods).extractNumericValue(text, "big_number")
 
       expect(result).toBe(999999999999)
     })
 
     it("should handle very small decimal numbers", () => {
       const text = 'small_number"0.000001"'
-      const result = (parser as any).extractNumericValue(text, "small_number")
+      const result = (parser as unknown as ParserWithMethods).extractNumericValue(text, "small_number")
 
       expect(result).toBe(0.000001)
     })
@@ -329,8 +329,8 @@ describe("BaseParser", () => {
       ]
 
       for (const input of malformedInputs) {
-        expect(() => (parser as any).extractQuotedValue(input, "test")).not.toThrow()
-        expect(() => (parser as any).extractNumericValue(input, "test")).not.toThrow()
+        expect(() => (parser as unknown as ParserWithMethods).extractQuotedValue(input, "test")).not.toThrow()
+        expect(() => (parser as unknown as ParserWithMethods).extractNumericValue(input, "test")).not.toThrow()
       }
     })
 
@@ -338,13 +338,13 @@ describe("BaseParser", () => {
       const longValue = "x".repeat(10000)
       const text = `player_name"${longValue}"`
 
-      const result = (parser as any).extractQuotedValue(text, "player_name")
+      const result = (parser as unknown as ParserWithMethods).extractQuotedValue(text, "player_name")
       expect(result).toBe(longValue)
     })
 
     it("should handle regex special characters in keys", () => {
       const text = 'key.with[special]chars"value"'
-      const result = (parser as any).extractQuotedValue(text, "key.with[special]chars")
+      const result = (parser as unknown as ParserWithMethods).extractQuotedValue(text, "key.with[special]chars")
 
       expect(result).toBe("value")
     })

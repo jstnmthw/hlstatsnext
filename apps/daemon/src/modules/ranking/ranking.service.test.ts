@@ -41,7 +41,7 @@ describe("RankingService", () => {
     it("should handle errors gracefully", async () => {
       // Create a service that throws an error internally
       const errorService = new RankingService(mockLogger)
-      vi.spyOn(errorService as any, "calculateRatingAdjustment").mockImplementation(() => {
+      vi.spyOn(errorService as unknown as { calculateRatingAdjustment: () => SkillRating }, "calculateRatingAdjustment").mockImplementation(() => {
         throw new Error("Rating calculation failed")
       })
 

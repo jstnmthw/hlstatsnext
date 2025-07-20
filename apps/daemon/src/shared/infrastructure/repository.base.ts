@@ -7,7 +7,6 @@
 import type { DatabaseClient, TransactionalPrisma } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger"
 import type { RepositoryOptions } from "@/shared/types/database"
-import type { Prisma } from "@repo/database/client"
 
 export abstract class BaseRepository<T extends Record<string, unknown>> {
   protected abstract tableName: string
@@ -17,7 +16,7 @@ export abstract class BaseRepository<T extends Record<string, unknown>> {
     protected readonly logger: ILogger,
   ) {}
 
-  protected get table() {
+  protected get table(): unknown {
     return this.db.prisma[this.tableName as keyof TransactionalPrisma]
   }
 
@@ -25,7 +24,7 @@ export abstract class BaseRepository<T extends Record<string, unknown>> {
     return options?.transaction || this.db.prisma
   }
 
-  protected getTable(client: TransactionalPrisma) {
+  protected getTable(client: TransactionalPrisma): unknown {
     return client[this.tableName as keyof TransactionalPrisma]
   }
 

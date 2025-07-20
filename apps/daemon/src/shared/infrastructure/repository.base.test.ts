@@ -96,7 +96,9 @@ describe("BaseRepository", () => {
       }
 
       const playerRepo = new PlayerRepository(mockDatabase as unknown as DatabaseClient, mockLogger)
-      expect(playerRepo.tablePublic).toBe((mockDatabase.prisma as unknown as Record<string, unknown>).player)
+      expect(playerRepo.tablePublic).toBe(
+        (mockDatabase.prisma as unknown as Record<string, unknown>).player,
+      )
     })
   })
 

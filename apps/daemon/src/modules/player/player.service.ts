@@ -18,6 +18,7 @@ import type { HandlerResult } from "@/shared/types/common"
 import type { Player } from "@repo/database/client"
 import { validateSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
 import { EventType } from "@/shared/types/events"
+import type { PlayerChatEvent } from "./player.types"
 
 export class PlayerService implements IPlayerService {
   // Rating system constants
@@ -252,7 +253,7 @@ export class PlayerService implements IPlayerService {
         case EventType.PLAYER_TEAMKILL:
           return await this.handlePlayerTeamkill(event)
         case EventType.CHAT_MESSAGE:
-          return await this.handleChatMessage()
+          return await this.handleChatMessage(event)
         default:
           return { success: true } // Event not handled by this service
       }
@@ -305,8 +306,7 @@ export class PlayerService implements IPlayerService {
   private async handlePlayerConnect(event: PlayerEvent): Promise<HandlerResult> {
     try {
       // Player ID should already be resolved by event processor
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { playerId } = (event as any).data
+      const { playerId } = event.data
 
       await this.updatePlayerStats(playerId, {
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
@@ -434,8 +434,31 @@ export class PlayerService implements IPlayerService {
     }
   }
 
-  private async handleChatMessage(): Promise<HandlerResult> {
-    // Chat messages don't affect player stats
-    return { success: true }
+  private async handleChatMessage(event: PlayerEvent): Promise<HandlerResult> {
+    try {
+      // Extract data from chat event - using any cast to handle union type
+      const { playerId, message, messageMode } = (event as any).data
+
+      // Get current map from the server context (use empty string as fallback)
+      const map = "" // TODO: Get actual map from server context or event data
+
+      // Store chat message in database
+      await this.repository.createChatEvent(
+        playerId,
+        event.serverId,
+        map,
+        message,
+        messageMode || 0,
+      )
+
+      this.logger.debug(`Stored chat message from player ${playerId}: "${message}"`)
+
+      return { success: true, affected: 1 }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      }
+    }
   }
 }

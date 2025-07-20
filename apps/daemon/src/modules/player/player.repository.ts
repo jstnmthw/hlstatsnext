@@ -273,6 +273,8 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
           },
         })
       }, options)
+
+      this.logger.debug(`Created unique ID entry for ${uniqueId} in game ${game}`)
     } catch (error) {
       this.handleError("createUniqueId", error)
     }
@@ -288,13 +290,41 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
               game,
             },
           },
-          include: {
-            player: true,
-          },
         })
       }, options)
     } catch (error) {
       this.handleError("findUniqueIdEntry", error)
+    }
+  }
+
+  async createChatEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    message: string,
+    messageMode: number = 0,
+    options?: CreateOptions,
+  ): Promise<void> {
+    try {
+      this.validateId(playerId, "createChatEvent")
+      this.validateId(serverId, "createChatEvent")
+
+      await this.executeWithTransaction(async (client) => {
+        await client.eventChat.create({
+          data: {
+            playerId,
+            serverId,
+            map,
+            message,
+            message_mode: messageMode,
+            eventTime: new Date(),
+          },
+        })
+      }, options)
+
+      this.logger.debug(`Created chat event for player ${playerId} on server ${serverId}`)
+    } catch (error) {
+      this.handleError("createChatEvent", error)
     }
   }
 }

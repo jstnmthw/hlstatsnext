@@ -7,13 +7,11 @@
 import type { MockedFunction } from "vitest"
 import { db } from "@repo/database/client"
 import type { TransactionalPrisma } from "@/database/client"
+import { prismaPartialMock } from "./prismaPartialMock"
 import { vi } from "vitest"
 
 export interface MockDatabaseClient {
-  prisma: TransactionalPrisma & {
-    $transaction: MockedFunction<typeof db.$transaction>
-    $disconnect: MockedFunction<typeof db.$disconnect>
-  }
+  prisma: TransactionalPrisma
   testConnection: MockedFunction<() => Promise<boolean>>
   disconnect: MockedFunction<() => Promise<void>>
   transaction: MockedFunction<
@@ -22,58 +20,19 @@ export interface MockDatabaseClient {
 }
 
 export function createMockDatabaseClient(): MockDatabaseClient {
-  const mockPrisma = {
-    player: {
-      findUnique: vi.fn(),
-      findMany: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-    },
-    server: {
-      findFirst: vi.fn(),
-      findUnique: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-    },
-    playerUniqueId: {
-      findUnique: vi.fn(),
-      create: vi.fn(),
-    },
-    eventEntry: {
-      findMany: vi.fn(),
-      create: vi.fn(),
-    },
-    weapon: {
-      findUnique: vi.fn(),
-      upsert: vi.fn(),
-    },
-    playerHistory: {
-      create: vi.fn(),
-    },
-    mapCount: {
-      upsert: vi.fn(),
-    },
-    $queryRaw: vi.fn(),
-    $queryRawUnsafe: vi.fn(),
-    $executeRaw: vi.fn(),
-    $executeRawUnsafe: vi.fn(),
-    $transaction: vi.fn((callback: (prisma: TransactionalPrisma) => Promise<unknown>) =>
-      callback(mockPrisma),
-    ),
+  const prisma = prismaPartialMock({
+    player: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn(), findMany: vi.fn() } as any,
+    playerUniqueId: { findUnique: vi.fn(), create: vi.fn(), update: vi.fn() } as any,
+    server: { findUnique: vi.fn(), update: vi.fn() } as any,
+    weapon: { findUnique: vi.fn(), upsert: vi.fn() } as any,
+    $transaction: vi.fn((cb) => cb(prisma)),
     $disconnect: vi.fn(),
-  } as unknown as (TransactionalPrisma & {
-    $transaction: MockedFunction<typeof db.$transaction>
-    $disconnect: MockedFunction<typeof db.$disconnect>
-  }) &
-    Record<string, unknown>
+  })
 
   return {
-    prisma: mockPrisma,
+    prisma,
     testConnection: vi.fn().mockResolvedValue(true),
     disconnect: vi.fn().mockResolvedValue(undefined),
-    transaction: vi.fn((callback: (prisma: TransactionalPrisma) => Promise<void>) =>
-      callback(mockPrisma),
-    ),
+    transaction: prisma.$transaction,
   }
 }

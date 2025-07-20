@@ -2,13 +2,13 @@
  * WeaponRepository Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { WeaponRepository } from './weapon.repository'
-import { createMockLogger } from '../../test-support/mocks/logger'
-import { createMockDatabaseClient } from '../../test-support/mocks/database'
-import type { DatabaseClient } from '@/database/client'
+import { describe, it, expect, beforeEach, vi } from "vitest"
+import { WeaponRepository } from "./weapon.repository"
+import { createMockLogger } from "../../test-support/mocks/logger"
+import { createMockDatabaseClient } from "../../test-support/mocks/database"
+import type { DatabaseClient } from "@/database/client"
 
-describe('WeaponRepository', () => {
+describe("WeaponRepository", () => {
   let weaponRepository: WeaponRepository
   let mockLogger: ReturnType<typeof createMockLogger>
   let mockDatabase: ReturnType<typeof createMockDatabaseClient>
@@ -19,28 +19,28 @@ describe('WeaponRepository', () => {
     weaponRepository = new WeaponRepository(mockDatabase as unknown as DatabaseClient, mockLogger)
   })
 
-  describe('Repository instantiation', () => {
-    it('should create repository instance', () => {
+  describe("Repository instantiation", () => {
+    it("should create repository instance", () => {
       expect(weaponRepository).toBeDefined()
       expect(weaponRepository).toBeInstanceOf(WeaponRepository)
     })
 
-    it('should have required methods', () => {
+    it("should have required methods", () => {
       expect(weaponRepository.updateWeaponStats).toBeDefined()
       expect(weaponRepository.findWeaponByCode).toBeDefined()
-      expect(typeof weaponRepository.updateWeaponStats).toBe('function')
-      expect(typeof weaponRepository.findWeaponByCode).toBe('function')
+      expect(typeof weaponRepository.updateWeaponStats).toBe("function")
+      expect(typeof weaponRepository.findWeaponByCode).toBe("function")
     })
   })
 
-  describe('updateWeaponStats', () => {
-    it('should upsert weapon statistics', async () => {
-      const weaponCode = 'ak47'
+  describe("updateWeaponStats", () => {
+    it("should upsert weapon statistics", async () => {
+      const weaponCode = "ak47"
       const updates = { shots: { increment: 5 }, hits: { increment: 3 } }
 
       mockDatabase.prisma.weapon.upsert.mockResolvedValue({
         weaponId: 1,
-        game: 'csgo',
+        game: "csgo",
         code: weaponCode,
         name: weaponCode,
         modifier: 1,
@@ -54,7 +54,7 @@ describe('WeaponRepository', () => {
         where: { code: weaponCode },
         create: {
           code: weaponCode,
-          game: 'csgo',
+          game: "csgo",
           name: weaponCode,
           modifier: 1,
           kills: 0,
@@ -66,13 +66,13 @@ describe('WeaponRepository', () => {
       })
     })
 
-    it('should handle new weapon creation', async () => {
-      const weaponCode = 'new_weapon'
+    it("should handle new weapon creation", async () => {
+      const weaponCode = "new_weapon"
       const updates = { shots: { increment: 1 } }
 
       mockDatabase.prisma.weapon.upsert.mockResolvedValue({
         weaponId: 2,
-        game: 'csgo',
+        game: "csgo",
         code: weaponCode,
         name: weaponCode,
         modifier: 1,
@@ -86,7 +86,7 @@ describe('WeaponRepository', () => {
         where: { code: weaponCode },
         create: {
           code: weaponCode,
-          game: 'csgo',
+          game: "csgo",
           name: weaponCode,
           modifier: 1,
           kills: 0,
@@ -97,15 +97,23 @@ describe('WeaponRepository', () => {
       })
     })
 
-    it('should handle multiple stat updates', async () => {
-      const weaponCode = 'm4a1'
+    it("should handle multiple stat updates", async () => {
+      const weaponCode = "m4a1"
       const updates = {
         shots: { increment: 10 },
         hits: { increment: 7 },
         damage: { increment: 350 },
       }
 
-      mockDatabase.prisma.weapon.upsert.mockResolvedValue({ weaponId: 1, code: weaponCode, kills: 0, headshots: 0, name: weaponCode, game: 'csgo', modifier: 1 })
+      mockDatabase.prisma.weapon.upsert.mockResolvedValue({
+        weaponId: 1,
+        code: weaponCode,
+        kills: 0,
+        headshots: 0,
+        name: weaponCode,
+        game: "csgo",
+        modifier: 1,
+      })
 
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
@@ -113,7 +121,7 @@ describe('WeaponRepository', () => {
         where: { code: weaponCode },
         create: {
           code: weaponCode,
-          game: 'csgo',
+          game: "csgo",
           name: weaponCode,
           modifier: 1,
           kills: 0,
@@ -126,8 +134,8 @@ describe('WeaponRepository', () => {
       })
     })
 
-    it('should handle transaction option', async () => {
-      const weaponCode = 'awp'
+    it("should handle transaction option", async () => {
+      const weaponCode = "awp"
       const updates = { damage: { increment: 100 } }
       const options = { transaction: mockDatabase.prisma }
 
@@ -139,12 +147,12 @@ describe('WeaponRepository', () => {
     })
   })
 
-  describe('findWeaponByCode', () => {
-    it('should find weapon by code', async () => {
-      const weaponCode = 'ak47'
+  describe("findWeaponByCode", () => {
+    it("should find weapon by code", async () => {
+      const weaponCode = "ak47"
       const mockWeapon = {
         weaponId: 3,
-        game: 'csgo',
+        game: "csgo",
         code: weaponCode,
         name: weaponCode,
         modifier: 1,
@@ -164,8 +172,8 @@ describe('WeaponRepository', () => {
       })
     })
 
-    it('should return null for non-existent weapon', async () => {
-      const weaponCode = 'non_existent'
+    it("should return null for non-existent weapon", async () => {
+      const weaponCode = "non_existent"
 
       mockDatabase.prisma.weapon.findUnique.mockResolvedValue(null)
 
@@ -179,8 +187,8 @@ describe('WeaponRepository', () => {
       })
     })
 
-    it('should handle find options', async () => {
-      const weaponCode = 'glock'
+    it("should handle find options", async () => {
+      const weaponCode = "glock"
       const options = {
         include: { kills: true },
         select: { weapon: true, shots: true },
@@ -188,7 +196,7 @@ describe('WeaponRepository', () => {
 
       mockDatabase.prisma.weapon.findUnique.mockResolvedValue({
         weaponId: 4,
-        game: 'csgo',
+        game: "csgo",
         code: weaponCode,
         name: weaponCode,
         modifier: 1,
@@ -205,8 +213,8 @@ describe('WeaponRepository', () => {
       })
     })
 
-    it('should handle transaction option in find', async () => {
-      const weaponCode = 'deagle'
+    it("should handle transaction option in find", async () => {
+      const weaponCode = "deagle"
       const options = { transaction: mockDatabase.prisma }
 
       await weaponRepository.findWeaponByCode(weaponCode, options)
@@ -216,43 +224,49 @@ describe('WeaponRepository', () => {
     })
   })
 
-  describe('Error handling', () => {
-    it('should handle database errors in updateWeaponStats', async () => {
-      const weaponCode = 'error_weapon'
+  describe("Error handling", () => {
+    it("should handle database errors in updateWeaponStats", async () => {
+      const weaponCode = "error_weapon"
       const updates = { shots: { increment: 1 } }
 
-      mockDatabase.prisma.weapon.upsert.mockRejectedValue(new Error('Database error'))
+      mockDatabase.prisma.weapon.upsert.mockRejectedValue(new Error("Database error"))
 
       // The base repository should handle errors, but let's test graceful handling
-      await expect(weaponRepository.updateWeaponStats(weaponCode, updates))
-        .rejects.toThrow()
+      await expect(weaponRepository.updateWeaponStats(weaponCode, updates)).rejects.toThrow()
     })
 
-    it('should handle database errors in findWeaponByCode', async () => {
-      const weaponCode = 'error_weapon'
+    it("should handle database errors in findWeaponByCode", async () => {
+      const weaponCode = "error_weapon"
 
-      mockDatabase.prisma.weapon.findUnique.mockRejectedValue(new Error('Database error'))
+      mockDatabase.prisma.weapon.findUnique.mockRejectedValue(new Error("Database error"))
 
-      await expect(weaponRepository.findWeaponByCode(weaponCode))
-        .rejects.toThrow()
+      await expect(weaponRepository.findWeaponByCode(weaponCode)).rejects.toThrow()
     })
   })
 
-  describe('Edge cases', () => {
-    it('should handle empty weapon code', async () => {
-      const weaponCode = ''
+  describe("Edge cases", () => {
+    it("should handle empty weapon code", async () => {
+      const weaponCode = ""
       const updates = { shots: { increment: 1 } }
 
-      mockDatabase.prisma.weapon.upsert.mockResolvedValue({ weaponId: 1, code: weaponCode, kills: 0, headshots: 0, name: weaponCode, game: 'csgo', modifier: 1 })
+      mockDatabase.prisma.weapon.upsert.mockResolvedValue({
+        weaponId: 1,
+        code: weaponCode,
+        kills: 0,
+        headshots: 0,
+        name: weaponCode,
+        game: "csgo",
+        modifier: 1,
+      })
 
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { code: '' },
+        where: { code: "" },
         create: {
-          code: '',
-          game: 'csgo',
-          name: '',
+          code: "",
+          game: "csgo",
+          name: "",
           modifier: 1,
           kills: 0,
           headshots: 0,
@@ -262,11 +276,19 @@ describe('WeaponRepository', () => {
       })
     })
 
-    it('should handle very long weapon codes', async () => {
-      const weaponCode = 'a'.repeat(100)
+    it("should handle very long weapon codes", async () => {
+      const weaponCode = "a".repeat(100)
       const updates = { shots: { increment: 1 } }
 
-      mockDatabase.prisma.weapon.upsert.mockResolvedValue({ weaponId: 1, code: weaponCode, kills: 0, headshots: 0, name: weaponCode, game: 'csgo', modifier: 1 })
+      mockDatabase.prisma.weapon.upsert.mockResolvedValue({
+        weaponId: 1,
+        code: weaponCode,
+        kills: 0,
+        headshots: 0,
+        name: weaponCode,
+        game: "csgo",
+        modifier: 1,
+      })
 
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
@@ -279,11 +301,19 @@ describe('WeaponRepository', () => {
       })
     })
 
-    it('should handle special characters in weapon codes', async () => {
-      const weaponCode = 'weapon-with_special.chars!'
+    it("should handle special characters in weapon codes", async () => {
+      const weaponCode = "weapon-with_special.chars!"
       const updates = { hits: { increment: 1 } }
 
-      mockDatabase.prisma.weapon.upsert.mockResolvedValue({ weaponId: 1, code: weaponCode, kills: 0, headshots: 0, name: weaponCode, game: 'csgo', modifier: 1 })
+      mockDatabase.prisma.weapon.upsert.mockResolvedValue({
+        weaponId: 1,
+        code: weaponCode,
+        kills: 0,
+        headshots: 0,
+        name: weaponCode,
+        game: "csgo",
+        modifier: 1,
+      })
 
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
@@ -296,11 +326,19 @@ describe('WeaponRepository', () => {
       })
     })
 
-    it('should handle empty updates object', async () => {
-      const weaponCode = 'ak47'
+    it("should handle empty updates object", async () => {
+      const weaponCode = "ak47"
       const updates = {}
 
-      mockDatabase.prisma.weapon.upsert.mockResolvedValue({ weaponId: 1, code: weaponCode, kills: 0, headshots: 0, name: weaponCode, game: 'csgo', modifier: 1 })
+      mockDatabase.prisma.weapon.upsert.mockResolvedValue({
+        weaponId: 1,
+        code: weaponCode,
+        kills: 0,
+        headshots: 0,
+        name: weaponCode,
+        game: "csgo",
+        modifier: 1,
+      })
 
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
@@ -308,7 +346,7 @@ describe('WeaponRepository', () => {
         where: { code: weaponCode },
         create: {
           code: weaponCode,
-          game: 'csgo',
+          game: "csgo",
           name: weaponCode,
           modifier: 1,
           kills: 0,

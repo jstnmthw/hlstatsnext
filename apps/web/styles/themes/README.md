@@ -5,19 +5,25 @@ This directory contains the theme system for the Next.js application. The system
 ## Theme Types
 
 ### 1. Single Color Scheme Themes
+
 These themes use one color scheme regardless of system preference:
+
 - `light.css` - Light colors
 - `dark.css` - Dark colors
 - `blue.css` - Blue-tinted theme
 - `green.css` - Green-tinted theme
 
 ### 2. Light/Dark Variant Themes
+
 These themes have separate files for light and dark versions:
+
 - `ocean-light.css` - Ocean theme light variant
 - `ocean-dark.css` - Ocean theme dark variant
 
 ### 3. Adaptive Themes
+
 These themes automatically switch between light and dark based on system preference:
+
 - `ocean-adaptive.css` - Ocean theme that adapts to system preference
 
 ## How to Switch Themes
@@ -25,22 +31,25 @@ These themes automatically switch between light and dark based on system prefere
 Edit the `theme-config.css` file and uncomment the desired theme import while commenting out the others:
 
 ### For Single Color Schemes:
+
 ```css
-/* @import "./light.css"; */     /* Light theme */
-@import "./dark.css";            /* Dark theme - ACTIVE */
-/* @import "./blue.css"; */      /* Blue theme */
+/* @import "./light.css"; */ /* Light theme */
+@import "./dark.css"; /* Dark theme - ACTIVE */
+/* @import "./blue.css"; */ /* Blue theme */
 ```
 
 ### For Light/Dark Variants:
+
 ```css
 /* Choose either light OR dark variant */
-@import "./ocean-light.css";     /* Ocean light - ACTIVE */
+@import "./ocean-light.css"; /* Ocean light - ACTIVE */
 /* @import "./ocean-dark.css"; */ /* Ocean dark */
 ```
 
 ### For Adaptive Themes:
+
 ```css
-@import "./ocean-adaptive.css";  /* Ocean adaptive - ACTIVE */
+@import "./ocean-adaptive.css"; /* Ocean adaptive - ACTIVE */
 ```
 
 **Important**: Only one theme should be imported at a time.
@@ -99,37 +108,21 @@ Each theme must define these CSS custom properties:
 
 ```css
 :root {
-  --background: /* Main background color */
-  --foreground: /* Main text color */
-  --card: /* Card background */
-  --card-foreground: /* Card text */
-  --popover: /* Popover background */
-  --popover-foreground: /* Popover text */
-  --primary: /* Primary brand color */
-  --primary-foreground: /* Primary text */
-  --secondary: /* Secondary color */
-  --secondary-foreground: /* Secondary text */
-  --muted: /* Muted background */
-  --muted-foreground: /* Muted text */
-  --accent: /* Accent color */
-  --accent-foreground: /* Accent text */
-  --destructive: /* Error/danger color */
-  --border: /* Border color */
-  --input: /* Input background */
-  --ring: /* Focus ring color */
-  --chart-1: /* Chart color 1 */
-  --chart-2: /* Chart color 2 */
-  --chart-3: /* Chart color 3 */
-  --chart-4: /* Chart color 4 */
-  --chart-5: /* Chart color 5 */
-  --sidebar: /* Sidebar background */
-  --sidebar-foreground: /* Sidebar text */
-  --sidebar-primary: /* Sidebar primary */
-  --sidebar-primary-foreground: /* Sidebar primary text */
-  --sidebar-accent: /* Sidebar accent */
-  --sidebar-accent-foreground: /* Sidebar accent text */
-  --sidebar-border: /* Sidebar border */
-  --sidebar-ring: /* Sidebar focus ring */
+  --background: /* Main background color */ --foreground: /* Main text color */
+    --card: /* Card background */ --card-foreground: /* Card text */
+    --popover: /* Popover background */ --popover-foreground: /* Popover text */
+    --primary: /* Primary brand color */ --primary-foreground: /* Primary text */
+    --secondary: /* Secondary color */ --secondary-foreground: /* Secondary text */
+    --muted: /* Muted background */ --muted-foreground: /* Muted text */
+    --accent: /* Accent color */ --accent-foreground: /* Accent text */
+    --destructive: /* Error/danger color */ --border: /* Border color */
+    --input: /* Input background */ --ring: /* Focus ring color */ --chart-1: /* Chart color 1 */
+    --chart-2: /* Chart color 2 */ --chart-3: /* Chart color 3 */ --chart-4: /* Chart color 4 */
+    --chart-5: /* Chart color 5 */ --sidebar: /* Sidebar background */
+    --sidebar-foreground: /* Sidebar text */ --sidebar-primary: /* Sidebar primary */
+    --sidebar-primary-foreground: /* Sidebar primary text */ --sidebar-accent: /* Sidebar accent */
+    --sidebar-accent-foreground: /* Sidebar accent text */ --sidebar-border: /* Sidebar border */
+    --sidebar-ring: /* Sidebar focus ring */;
 }
 ```
 
@@ -168,19 +161,22 @@ styles/themes/
 ## Examples
 
 ### Switching to Blue Theme (Single Scheme):
+
 ```css
 /* @import "./light.css"; */
-@import "./blue.css";  /* Blue theme - ACTIVE */
+@import "./blue.css"; /* Blue theme - ACTIVE */
 ```
 
 ### Switching to Ocean Dark:
+
 ```css
 /* @import "./light.css"; */
-@import "./ocean-dark.css";  /* Ocean dark - ACTIVE */
+@import "./ocean-dark.css"; /* Ocean dark - ACTIVE */
 ```
 
 ### Using Adaptive Ocean (Auto Light/Dark):
+
 ```css
 /* @import "./light.css"; */
-@import "./ocean-adaptive.css";  /* Ocean adaptive - ACTIVE */
-``` 
+@import "./ocean-adaptive.css"; /* Ocean adaptive - ACTIVE */
+```

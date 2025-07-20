@@ -1,6 +1,6 @@
 /**
  * Base Event Types for HLStats Daemon
- * 
+ *
  * Core event interfaces that are shared across all modules.
  * Domain-specific event types are defined in their respective modules.
  */
@@ -17,19 +17,19 @@ export enum EventType {
   PLAYER_CHANGE_TEAM = "PLAYER_CHANGE_TEAM",
   PLAYER_CHANGE_ROLE = "PLAYER_CHANGE_ROLE",
   PLAYER_CHANGE_NAME = "PLAYER_CHANGE_NAME",
-  
+
   // Action events
   ACTION_PLAYER = "ACTION_PLAYER",
   ACTION_PLAYER_PLAYER = "ACTION_PLAYER_PLAYER",
   ACTION_TEAM = "ACTION_TEAM",
   ACTION_WORLD = "ACTION_WORLD",
-  
+
   // Match events
   ROUND_START = "ROUND_START",
   ROUND_END = "ROUND_END",
   TEAM_WIN = "TEAM_WIN",
   MAP_CHANGE = "MAP_CHANGE",
-  
+
   // Objective events
   BOMB_PLANT = "BOMB_PLANT",
   BOMB_DEFUSE = "BOMB_DEFUSE",
@@ -42,11 +42,11 @@ export enum EventType {
   FLAG_DROP = "FLAG_DROP",
   CONTROL_POINT_CAPTURE = "CONTROL_POINT_CAPTURE",
   CONTROL_POINT_DEFEND = "CONTROL_POINT_DEFEND",
-  
+
   // Weapon events
   WEAPON_FIRE = "WEAPON_FIRE",
   WEAPON_HIT = "WEAPON_HIT",
-  
+
   // System events
   SERVER_SHUTDOWN = "SERVER_SHUTDOWN",
   SERVER_STATS_UPDATE = "SERVER_STATS_UPDATE",

@@ -2,7 +2,7 @@
  * Ingress Module Types
  */
 
-import type { BaseEvent } from '@/shared/types/events'
+import type { BaseEvent } from "@/shared/types/events"
 
 export interface IngressOptions {
   port?: number
@@ -24,7 +24,11 @@ export interface IIngressService {
   isRunning(): boolean
   processLogLine(logLine: string): Promise<void>
   getStats(): IngressStats
-  processRawEvent(rawData: string, serverAddress: string, serverPort: number): Promise<BaseEvent | null>
+  processRawEvent(
+    rawData: string,
+    serverAddress: string,
+    serverPort: number,
+  ): Promise<BaseEvent | null>
   authenticateServer(address: string, port: number): Promise<number | null>
 }
 

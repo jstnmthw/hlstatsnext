@@ -2,20 +2,27 @@
  * Weapon Repository
  */
 
-import { BaseRepository } from '@/shared/infrastructure/repository.base'
-import type { DatabaseClient } from '@/database/client'
-import type { ILogger } from '@/shared/utils/logger'
-import type { IWeaponRepository } from './weapon.types'
-import type { FindOptions, UpdateOptions } from '@/shared/types/database'
+import { BaseRepository } from "@/shared/infrastructure/repository.base"
+import type { DatabaseClient } from "@/database/client"
+import type { ILogger } from "@/shared/utils/logger"
+import type { IWeaponRepository } from "./weapon.types"
+import type { FindOptions, UpdateOptions } from "@/shared/types/database"
 
-export class WeaponRepository extends BaseRepository<Record<string, unknown>> implements IWeaponRepository {
-  protected tableName = 'weapon'
+export class WeaponRepository
+  extends BaseRepository<Record<string, unknown>>
+  implements IWeaponRepository
+{
+  protected tableName = "weapon"
 
   constructor(db: DatabaseClient, logger: ILogger) {
     super(db, logger)
   }
 
-  async updateWeaponStats(weaponCode: string, updates: Record<string, unknown>, options?: UpdateOptions): Promise<void> {
+  async updateWeaponStats(
+    weaponCode: string,
+    updates: Record<string, unknown>,
+    options?: UpdateOptions,
+  ): Promise<void> {
     try {
       await this.executeWithTransaction(async (tx) => {
         const table = options?.transaction ? tx.weapon : this.table
@@ -23,7 +30,7 @@ export class WeaponRepository extends BaseRepository<Record<string, unknown>> im
           where: { code: weaponCode },
           create: {
             code: weaponCode,
-            game: 'csgo',
+            game: "csgo",
             name: weaponCode,
             modifier: 1,
             kills: 0,
@@ -34,7 +41,7 @@ export class WeaponRepository extends BaseRepository<Record<string, unknown>> im
         })
       }, options)
     } catch (error) {
-      this.handleError('updateWeaponStats', error)
+      this.handleError("updateWeaponStats", error)
     }
   }
 
@@ -49,7 +56,7 @@ export class WeaponRepository extends BaseRepository<Record<string, unknown>> im
         })
       }, options)
     } catch (error) {
-      this.handleError('findWeaponByCode', error)
+      this.handleError("findWeaponByCode", error)
     }
   }
 }

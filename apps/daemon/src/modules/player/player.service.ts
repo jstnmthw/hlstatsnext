@@ -1,15 +1,23 @@
 /**
  * Player Service
- * 
+ *
  * Business logic for player management, statistics, and ratings.
  */
 
-import type { IPlayerService, IPlayerRepository, PlayerStatsUpdate, SkillRating, RatingUpdate, PlayerEvent, PlayerKillEvent } from './player.types'
-import type { ILogger } from '@/shared/utils/logger'
-import type { HandlerResult } from '@/shared/types/common'
-import type { Player } from '@repo/database/client'
-import { validateSteamId, validatePlayerName, sanitizePlayerName } from '@/shared/utils/validation'
-import { EventType } from '@/shared/types/events'
+import type {
+  IPlayerService,
+  IPlayerRepository,
+  PlayerStatsUpdate,
+  SkillRating,
+  RatingUpdate,
+  PlayerEvent,
+  PlayerKillEvent,
+} from "./player.types"
+import type { ILogger } from "@/shared/utils/logger"
+import type { HandlerResult } from "@/shared/types/common"
+import type { Player } from "@repo/database/client"
+import { validateSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
+import { EventType } from "@/shared/types/events"
 
 export class PlayerService implements IPlayerService {
   // Rating system constants
@@ -21,26 +29,26 @@ export class PlayerService implements IPlayerService {
 
   constructor(
     private readonly repository: IPlayerRepository,
-    private readonly logger: ILogger
+    private readonly logger: ILogger,
   ) {}
 
   async getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number> {
     if (!validateSteamId(steamId)) {
       throw new Error(`Invalid Steam ID: ${steamId}`)
     }
-    
+
     if (!validatePlayerName(playerName)) {
       throw new Error(`Invalid player name: ${playerName}`)
     }
 
-    const isBot = steamId.toUpperCase() === 'BOT'
+    const isBot = steamId.toUpperCase() === "BOT"
     const normalizedName = sanitizePlayerName(playerName)
     const effectiveId = isBot ? `BOT_${normalizedName}` : steamId
 
     try {
       // First, try to find existing player by Steam ID
       const existingPlayer = await this.repository.findByUniqueId(effectiveId, game)
-      
+
       if (existingPlayer) {
         return existingPlayer.playerId
       }
@@ -53,7 +61,9 @@ export class PlayerService implements IPlayerService {
         steamId: effectiveId,
       })
 
-      this.logger.info(`Created new player: ${playerName} (${effectiveId}) with ID ${player.playerId}`)
+      this.logger.info(
+        `Created new player: ${playerName} (${effectiveId}) with ID ${player.playerId}`,
+      )
       return player.playerId
     } catch (error) {
       this.logger.error(`Failed to get or create player ${playerName}: ${error}`)
@@ -153,7 +163,7 @@ export class PlayerService implements IPlayerService {
       const confidenceReduction = Math.min(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (player as any)._count.fragsAsKiller,
-        this.MAX_CONFIDENCE_REDUCTION
+        this.MAX_CONFIDENCE_REDUCTION,
       )
       const adjustedConfidence = this.DEFAULT_CONFIDENCE - confidenceReduction
 
@@ -186,10 +196,10 @@ export class PlayerService implements IPlayerService {
           this.repository.update(update.playerId, {
             skill: update.newRating,
             last_skill_change: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
-          })
-        )
+          }),
+        ),
       )
-      
+
       this.logger.debug(`Updated ratings for ${updates.length} players`)
     } catch (error) {
       this.logger.error(`Failed to update player ratings: ${error}`)
@@ -199,8 +209,8 @@ export class PlayerService implements IPlayerService {
 
   async getTopPlayers(
     limit: number = 50,
-    game: string = 'cstrike',
-    includeHidden: boolean = false
+    game: string = "cstrike",
+    includeHidden: boolean = false,
   ): Promise<Player[]> {
     try {
       return await this.repository.findTopPlayers(limit, game, includeHidden)
@@ -214,7 +224,7 @@ export class PlayerService implements IPlayerService {
     try {
       const durationMs = duration * this.UNIX_TIMESTAMP_DIVISOR
       const roundStartTime = new Date(Date.now() - durationMs)
-      
+
       return await this.repository.findRoundParticipants(serverId, roundStartTime)
     } catch (error) {
       this.logger.error(`Failed to get round participants: ${error}`)
@@ -257,30 +267,32 @@ export class PlayerService implements IPlayerService {
   async handleKillEvent(event: PlayerKillEvent): Promise<HandlerResult> {
     try {
       const { killerId, victimId, headshot } = event.data
-      
+
       // Update killer stats
       const killerUpdates: PlayerStatsUpdate = {
         kills: 1,
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
       }
-      
+
       if (headshot) {
         killerUpdates.headshots = 1
       }
-      
+
       // Update victim stats
       const victimUpdates: PlayerStatsUpdate = {
         deaths: 1,
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
       }
-      
+
       await Promise.all([
         this.updatePlayerStats(killerId, killerUpdates),
         this.updatePlayerStats(victimId, victimUpdates),
       ])
-      
-      this.logger.debug(`Processed kill event: ${killerId} -> ${victimId}${headshot ? ' (headshot)' : ''}`)
-      
+
+      this.logger.debug(
+        `Processed kill event: ${killerId} -> ${victimId}${headshot ? " (headshot)" : ""}`,
+      )
+
       return { success: true, affected: 2 }
     } catch (error) {
       return {
@@ -295,11 +307,11 @@ export class PlayerService implements IPlayerService {
       // Player ID should already be resolved by event processor
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { playerId } = (event as any).data
-      
+
       await this.updatePlayerStats(playerId, {
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
       })
-      
+
       return { success: true, affected: 1 }
     } catch (error) {
       return {
@@ -313,17 +325,17 @@ export class PlayerService implements IPlayerService {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { playerId, sessionDuration } = (event as any).data
-      
+
       const updates: PlayerStatsUpdate = {
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
       }
-      
+
       if (sessionDuration) {
         updates.connection_time = sessionDuration
       }
-      
+
       await this.updatePlayerStats(playerId, updates)
-      
+
       return { success: true, affected: 1 }
     } catch (error) {
       return {
@@ -352,12 +364,12 @@ export class PlayerService implements IPlayerService {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { playerId, newName } = (event as any).data
-      
+
       await this.updatePlayerStats(playerId, {
         lastName: newName,
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
       })
-      
+
       return { success: true, affected: 1 }
     } catch (error) {
       return {
@@ -371,13 +383,13 @@ export class PlayerService implements IPlayerService {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { playerId } = (event as any).data
-      
+
       await this.updatePlayerStats(playerId, {
         suicides: 1,
         deaths: 1, // Suicide also counts as death
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
       })
-      
+
       return { success: true, affected: 1 }
     } catch (error) {
       return {
@@ -391,28 +403,28 @@ export class PlayerService implements IPlayerService {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { killerId, victimId, headshot } = (event as any).data
-      
+
       // Update killer stats (teamkill)
       const killerUpdates: PlayerStatsUpdate = {
         teamkills: 1,
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
       }
-      
+
       if (headshot) {
         killerUpdates.headshots = 1
       }
-      
+
       // Update victim stats (death)
       const victimUpdates: PlayerStatsUpdate = {
         deaths: 1,
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
       }
-      
+
       await Promise.all([
         this.updatePlayerStats(killerId, killerUpdates),
         this.updatePlayerStats(victimId, victimUpdates),
       ])
-      
+
       return { success: true, affected: 2 }
     } catch (error) {
       return {

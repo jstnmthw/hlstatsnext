@@ -29,8 +29,11 @@ export class EventProcessor {
       // Log event for debugging
       this.logger.info(`Processing event: ${event.eventType} for server ${event.serverId}`)
 
+      // Resolve player IDs from Steam IDs for events that need it
+      const resolvedEvent = await this.resolvePlayerIds(event)
+
       // Route to appropriate modules based on event type
-      switch (event.eventType) {
+      switch (resolvedEvent.eventType) {
         // Player events
         case EventType.PLAYER_CONNECT:
         case EventType.PLAYER_DISCONNECT:
@@ -41,17 +44,17 @@ export class EventProcessor {
         case EventType.PLAYER_SUICIDE:
         case EventType.PLAYER_TEAMKILL:
         case EventType.CHAT_MESSAGE:
-          await playerService.handlePlayerEvent(event as PlayerEvent)
+          await playerService.handlePlayerEvent(resolvedEvent as PlayerEvent)
           break
 
         // Kill events - multiple modules involved
         case EventType.PLAYER_KILL:
           await Promise.all([
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            playerService.handleKillEvent(event as any),
-            weaponService.handleWeaponEvent(event as WeaponEvent),
+            playerService.handleKillEvent(resolvedEvent as any),
+            weaponService.handleWeaponEvent(resolvedEvent as WeaponEvent),
             rankingService.handleRatingUpdate(),
-            matchService.handleKillInMatch(event),
+            matchService.handleKillInMatch(resolvedEvent),
           ])
           break
 
@@ -60,7 +63,7 @@ export class EventProcessor {
         case EventType.ROUND_END:
         case EventType.TEAM_WIN:
         case EventType.MAP_CHANGE:
-          await matchService.handleMatchEvent(event as MatchEvent)
+          await matchService.handleMatchEvent(resolvedEvent as MatchEvent)
           break
 
         // Objective events
@@ -75,13 +78,13 @@ export class EventProcessor {
         case EventType.FLAG_DROP:
         case EventType.CONTROL_POINT_CAPTURE:
         case EventType.CONTROL_POINT_DEFEND:
-          await matchService.handleObjectiveEvent(event as ObjectiveEvent)
+          await matchService.handleObjectiveEvent(resolvedEvent as ObjectiveEvent)
           break
 
         // Weapon events
         case EventType.WEAPON_FIRE:
         case EventType.WEAPON_HIT:
-          await weaponService.handleWeaponEvent(event as WeaponEvent)
+          await weaponService.handleWeaponEvent(resolvedEvent as WeaponEvent)
           break
 
         // Action events
@@ -89,13 +92,13 @@ export class EventProcessor {
         case EventType.ACTION_PLAYER_PLAYER:
         case EventType.ACTION_TEAM:
         case EventType.ACTION_WORLD:
-          await actionService.handleActionEvent(event as ActionEvent)
+          await actionService.handleActionEvent(resolvedEvent as ActionEvent)
           break
 
         // Server events
         case EventType.SERVER_STATS_UPDATE:
           // Server stats events are typically handled by ingress or dedicated handlers
-          this.logger.debug(`Server stats update event for server ${event.serverId}`)
+          this.logger.debug(`Server stats update event for server ${resolvedEvent.serverId}`)
           break
 
         case EventType.SERVER_SHUTDOWN:
@@ -143,6 +146,57 @@ export class EventProcessor {
     // Process remaining events
     if (promises.length > 0) {
       await Promise.all(promises)
+    }
+  }
+
+  /**
+   * Resolve Steam IDs to database player IDs for events that contain player references
+   */
+  private async resolvePlayerIds(event: BaseEvent): Promise<BaseEvent> {
+    // Only resolve for events that have player data
+    if (!event.meta || typeof event.meta !== "object") {
+      return event
+    }
+
+    const meta = event.meta as any
+    const resolvedEvent = { ...event }
+
+    try {
+      // Handle PLAYER_KILL events
+      if (event.eventType === EventType.PLAYER_KILL) {
+        if (meta.killer?.steamId && meta.killer?.playerName) {
+          const killerId = await this.context.playerService.getOrCreatePlayer(
+            meta.killer.steamId,
+            meta.killer.playerName,
+            "csgo",
+          )
+          resolvedEvent.data = { ...event.data, killerId }
+        }
+
+        if (meta.victim?.steamId && meta.victim?.playerName) {
+          const victimId = await this.context.playerService.getOrCreatePlayer(
+            meta.victim.steamId,
+            meta.victim.playerName,
+            "csgo",
+          )
+          resolvedEvent.data = { ...resolvedEvent.data, victimId }
+        }
+      }
+
+      // Handle single player events (PLAYER_CONNECT, PLAYER_DISCONNECT, etc.)
+      else if (meta.player?.steamId && meta.player?.playerName) {
+        const playerId = await this.context.playerService.getOrCreatePlayer(
+          meta.player.steamId,
+          meta.player.playerName,
+          "csgo",
+        )
+        resolvedEvent.data = { ...event.data, playerId }
+      }
+
+      return resolvedEvent
+    } catch (error) {
+      this.logger.error(`Failed to resolve player IDs for event ${event.eventType}: ${error}`)
+      return event // Return original event if resolution fails
     }
   }
 }

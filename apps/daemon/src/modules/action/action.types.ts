@@ -2,8 +2,8 @@
  * Action Module Types
  */
 
-import type { BaseEvent, EventType, PlayerMeta, DualPlayerMeta } from '@/shared/types/events'
-import type { HandlerResult } from '@/shared/types/common'
+import type { BaseEvent, EventType, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
+import type { HandlerResult } from "@/shared/types/common"
 
 export interface ActionPlayerEvent extends BaseEvent {
   eventType: EventType.ACTION_PLAYER
@@ -50,7 +50,11 @@ export interface WorldActionEvent extends BaseEvent {
   }
 }
 
-export type ActionEvent = ActionPlayerEvent | ActionPlayerPlayerEvent | ActionTeamEvent | WorldActionEvent
+export type ActionEvent =
+  | ActionPlayerEvent
+  | ActionPlayerPlayerEvent
+  | ActionTeamEvent
+  | WorldActionEvent
 
 export interface IActionService {
   handleActionEvent(event: ActionEvent): Promise<HandlerResult>

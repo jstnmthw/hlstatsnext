@@ -2,7 +2,7 @@
  * Ranking Module Types
  */
 
-import type { HandlerResult } from '@/shared/types/common'
+import type { HandlerResult } from "@/shared/types/common"
 
 export interface SkillRating {
   playerId: number
@@ -14,5 +14,8 @@ export interface SkillRating {
 
 export interface IRankingService {
   handleRatingUpdate(): Promise<HandlerResult>
-  calculateRatingAdjustment(winnerRating: SkillRating, loserRating: SkillRating): { winner: number; loser: number }
+  calculateRatingAdjustment(
+    winnerRating: SkillRating,
+    loserRating: SkillRating,
+  ): { winner: number; loser: number }
 }

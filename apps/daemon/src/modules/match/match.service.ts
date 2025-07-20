@@ -1,32 +1,32 @@
 /**
  * Match Service
- * 
+ *
  * Business logic for match management, rounds, and MVP calculations.
  */
 
-import type { 
-  IMatchService, 
-  IMatchRepository, 
-  MatchEvent, 
-  ObjectiveEvent, 
-  MatchStats, 
+import type {
+  IMatchService,
+  IMatchRepository,
+  MatchEvent,
+  ObjectiveEvent,
+  MatchStats,
   PlayerRoundStats,
   RoundStartEvent,
   RoundEndEvent,
   TeamWinEvent,
-  MapChangeEvent
-} from './match.types'
-import type { ILogger } from '@/shared/utils/logger'
-import type { HandlerResult } from '@/shared/types/common'
-import type { BaseEvent } from '@/shared/types/events'
-import { EventType } from '@/shared/types/events'
+  MapChangeEvent,
+} from "./match.types"
+import type { ILogger } from "@/shared/utils/logger"
+import type { HandlerResult } from "@/shared/types/common"
+import type { BaseEvent } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
 
 export class MatchService implements IMatchService {
   private currentMatches: Map<number, MatchStats> = new Map() // serverId -> MatchStats
 
   constructor(
     private readonly repository: IMatchRepository,
-    private readonly logger: ILogger
+    private readonly logger: ILogger,
   ) {}
 
   async handleMatchEvent(event: MatchEvent): Promise<HandlerResult> {
@@ -55,19 +55,27 @@ export class MatchService implements IMatchService {
     const serverId = event.serverId
 
     try {
-      const matchStats = this.currentMatches.get(serverId)
+      let matchStats = this.currentMatches.get(serverId)
       if (!matchStats) {
-        this.logger.warn(`No match stats found for server ${serverId} during objective event`)
-        return { success: true }
+        this.logger.info(`Auto-initializing match context for server ${serverId}`)
+        matchStats = {
+          duration: 0,
+          totalRounds: 0,
+          teamScores: {},
+          startTime: new Date(),
+          playerStats: new Map(),
+        }
+        this.currentMatches.set(serverId, matchStats)
       }
 
       // Some events like BOMB_EXPLODE don't have a player ID
-      const playerId = 'playerId' in event.data ? event.data.playerId : null
+      const playerId = "playerId" in event.data ? event.data.playerId : null
 
       // Update player objective score (only for player-based events)
       if (playerId) {
-        const playerStats = matchStats.playerStats.get(playerId) ?? this.createEmptyPlayerStats(playerId)
-        
+        const playerStats =
+          matchStats.playerStats.get(playerId) ?? this.createEmptyPlayerStats(playerId)
+
         // Award objective points based on event type
         const objectivePoints = this.getObjectivePoints(event.eventType)
         playerStats.objectiveScore += objectivePoints
@@ -76,15 +84,17 @@ export class MatchService implements IMatchService {
 
       // Update server statistics for specific events
       if (event.eventType === EventType.BOMB_PLANT) {
-        await this.repository.updateBombStats(serverId, 'plant')
+        await this.repository.updateBombStats(serverId, "plant")
       } else if (event.eventType === EventType.BOMB_DEFUSE) {
-        await this.repository.updateBombStats(serverId, 'defuse')
+        await this.repository.updateBombStats(serverId, "defuse")
       }
 
       this.logger.event(
         `Objective event on server ${serverId}: ${event.eventType}${
-          playerId ? ` by player ${playerId} (+${this.getObjectivePoints(event.eventType)} points)` : ''
-        }`
+          playerId
+            ? ` by player ${playerId} (+${this.getObjectivePoints(event.eventType)} points)`
+            : ""
+        }`,
       )
 
       return { success: true }
@@ -100,16 +110,28 @@ export class MatchService implements IMatchService {
     const serverId = event.serverId
 
     try {
-      const matchStats = this.currentMatches.get(serverId)
+      let matchStats = this.currentMatches.get(serverId)
       if (!matchStats) {
-        this.logger.warn(`No match stats found for server ${serverId} during kill event`)
-        return { success: true }
+        this.logger.info(`Auto-initializing match context for server ${serverId}`)
+        matchStats = {
+          duration: 0,
+          totalRounds: 0,
+          teamScores: {},
+          startTime: new Date(),
+          playerStats: new Map(),
+        }
+        this.currentMatches.set(serverId, matchStats)
       }
 
-      const { killerId, victimId, headshot } = event.data as { killerId: number; victimId: number; headshot: boolean }
+      const { killerId, victimId, headshot } = event.data as {
+        killerId: number
+        victimId: number
+        headshot: boolean
+      }
 
       // Update killer stats
-      const killerStats = matchStats.playerStats.get(killerId) ?? this.createEmptyPlayerStats(killerId)
+      const killerStats =
+        matchStats.playerStats.get(killerId) ?? this.createEmptyPlayerStats(killerId)
       killerStats.kills += 1
       if (headshot) {
         killerStats.headshots += 1
@@ -117,12 +139,13 @@ export class MatchService implements IMatchService {
       matchStats.playerStats.set(killerId, killerStats)
 
       // Update victim stats
-      const victimStats = matchStats.playerStats.get(victimId) ?? this.createEmptyPlayerStats(victimId)
+      const victimStats =
+        matchStats.playerStats.get(victimId) ?? this.createEmptyPlayerStats(victimId)
       victimStats.deaths += 1
       matchStats.playerStats.set(victimId, victimStats)
 
       this.logger.debug(
-        `Kill event processed in match: player ${killerId} killed player ${victimId}${headshot ? ' (headshot)' : ''}`
+        `Kill event processed in match: player ${killerId} killed player ${victimId}${headshot ? " (headshot)" : ""}`,
       )
 
       return { success: true }
@@ -144,23 +167,24 @@ export class MatchService implements IMatchService {
   }
 
   updatePlayerWeaponStats(
-    serverId: number, 
-    playerId: number, 
-    stats: { shots?: number; hits?: number; damage?: number }
+    serverId: number,
+    playerId: number,
+    stats: { shots?: number; hits?: number; damage?: number },
   ): void {
     const matchStats = this.currentMatches.get(serverId)
     if (!matchStats) return
 
-    const playerStats = matchStats.playerStats.get(playerId) ?? this.createEmptyPlayerStats(playerId)
-    
+    const playerStats =
+      matchStats.playerStats.get(playerId) ?? this.createEmptyPlayerStats(playerId)
+
     if (stats.shots) playerStats.shots += stats.shots
     if (stats.hits) playerStats.hits += stats.hits
     if (stats.damage) playerStats.damage += stats.damage
 
     matchStats.playerStats.set(playerId, playerStats)
-    
+
     this.logger.debug(
-      `Updated weapon stats for player ${playerId}: +${stats.shots || 0} shots, +${stats.hits || 0} hits, +${stats.damage || 0} damage`
+      `Updated weapon stats for player ${playerId}: +${stats.shots || 0} shots, +${stats.hits || 0} hits, +${stats.damage || 0} damage`,
     )
   }
 
@@ -264,10 +288,17 @@ export class MatchService implements IMatchService {
     const { winningTeam, duration, score } = event.data
 
     try {
-      const matchStats = this.currentMatches.get(serverId)
+      let matchStats = this.currentMatches.get(serverId)
       if (!matchStats) {
-        this.logger.warn(`No match stats found for server ${serverId}`)
-        return { success: true }
+        this.logger.info(`Auto-initializing match context for server ${serverId}`)
+        matchStats = {
+          duration: 0,
+          totalRounds: 0,
+          teamScores: {},
+          startTime: new Date(),
+          playerStats: new Map(),
+        }
+        this.currentMatches.set(serverId, matchStats)
       }
 
       // Update match statistics
@@ -280,9 +311,9 @@ export class MatchService implements IMatchService {
       await this.repository.incrementServerRounds(serverId)
 
       this.logger.event(
-        `Round ended on server ${serverId}${winningTeam ? `: ${winningTeam} won` : ''}${
-          score ? ` (${score.team1}-${score.team2})` : ''
-        }`
+        `Round ended on server ${serverId}${winningTeam ? `: ${winningTeam} won` : ""}${
+          score ? ` (${score.team1}-${score.team2})` : ""
+        }`,
       )
 
       return { success: true, affected: 1 }
@@ -315,17 +346,18 @@ export class MatchService implements IMatchService {
 
       // Update match statistics
       currentMatchStats.totalRounds++
-      currentMatchStats.teamScores[winningTeam] = (currentMatchStats.teamScores[winningTeam] || 0) + 1
+      currentMatchStats.teamScores[winningTeam] =
+        (currentMatchStats.teamScores[winningTeam] || 0) + 1
 
       await this.repository.incrementServerRounds(serverId)
 
       // Update server statistics for CS-specific team wins
-      if (triggerName === 'Terrorists_Win' || triggerName === 'CTs_Win') {
+      if (triggerName === "Terrorists_Win" || triggerName === "CTs_Win") {
         await this.repository.updateTeamWins(serverId, winningTeam)
       }
 
       this.logger.event(
-        `Team win on server ${serverId}: ${winningTeam} won via ${triggerName} (CT: ${score.ct}, T: ${score.t})`
+        `Team win on server ${serverId}: ${winningTeam} won via ${triggerName} (CT: ${score.ct}, T: ${score.t})`,
       )
 
       return { success: true, affected: 1 }
@@ -355,7 +387,7 @@ export class MatchService implements IMatchService {
       await this.repository.resetMapStats(serverId, newMap)
 
       this.logger.event(
-        `Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`
+        `Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`,
       )
 
       return { success: true }
@@ -378,18 +410,22 @@ export class MatchService implements IMatchService {
 
       this.logger.event(
         `Match finalized on server ${serverId} for map ${mapName}: ${stats.totalRounds} rounds, ${stats.duration}s, MVP: ${mvpPlayerId}, scores: ${JSON.stringify(
-          stats.teamScores
-        )}`
+          stats.teamScores,
+        )}`,
       )
     } catch (error) {
       this.logger.failed(
         `Failed to finalize match on server ${serverId}`,
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? error.message : String(error),
       )
     }
   }
 
-  private async saveMatchToDatabase(serverId: number, mapName: string, stats: MatchStats): Promise<void> {
+  private async saveMatchToDatabase(
+    serverId: number,
+    mapName: string,
+    stats: MatchStats,
+  ): Promise<void> {
     try {
       const server = await this.repository.findServerById(serverId)
       if (!server) return
@@ -424,7 +460,7 @@ export class MatchService implements IMatchService {
     } catch (error) {
       this.logger.failed(
         `Failed to save match statistics to database for server ${serverId}`,
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? error.message : String(error),
       )
     }
   }

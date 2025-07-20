@@ -72,16 +72,16 @@ apps/web/
 
 ```typescript
 // ✅ GOOD: Direct imports with TypeScript path mapping
-import { PlayerService } from '@/modules/player/player.service'
-import { MatchService } from '@/modules/match/match.service'
-import type { PlayerStats } from '@/modules/player/player.types'
-import { logger } from '@/shared/utils/logger'
+import { PlayerService } from "@/modules/player/player.service"
+import { MatchService } from "@/modules/match/match.service"
+import type { PlayerStats } from "@/modules/player/player.types"
+import { logger } from "@/shared/utils/logger"
 
 // ❌ BAD: Importing private files (ESLint will catch this)
-import { internalHelper } from '@/modules/player/_player.internal'
+import { internalHelper } from "@/modules/player/_player.internal"
 
 // ❌ BAD: Index.ts re-exports (slower compilation)
-import { PlayerService } from '@/modules/player'
+import { PlayerService } from "@/modules/player"
 ```
 
 ### TypeScript Configuration

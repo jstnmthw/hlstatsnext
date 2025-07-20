@@ -2,14 +2,14 @@
  * PlayerRepository Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { PlayerRepository } from './player.repository'
-import { createMockLogger } from '../../test-support/mocks/logger'
-import { createMockDatabaseClient } from '../../test-support/mocks/database'
-import type { DatabaseClient } from '@/database/client'
-import type { Player } from '@repo/database/client'
+import { describe, it, expect, beforeEach, vi } from "vitest"
+import { PlayerRepository } from "./player.repository"
+import { createMockLogger } from "../../test-support/mocks/logger"
+import { createMockDatabaseClient } from "../../test-support/mocks/database"
+import type { DatabaseClient } from "@/database/client"
+import type { Player } from "@repo/database/client"
 
-describe('PlayerRepository', () => {
+describe("PlayerRepository", () => {
   let playerRepository: PlayerRepository
   let mockLogger: ReturnType<typeof createMockLogger>
   let mockDatabase: ReturnType<typeof createMockDatabaseClient>
@@ -20,29 +20,29 @@ describe('PlayerRepository', () => {
     playerRepository = new PlayerRepository(mockDatabase as unknown as DatabaseClient, mockLogger)
   })
 
-  describe('Repository instantiation', () => {
-    it('should create repository instance', () => {
+  describe("Repository instantiation", () => {
+    it("should create repository instance", () => {
       expect(playerRepository).toBeDefined()
       expect(playerRepository).toBeInstanceOf(PlayerRepository)
     })
 
-    it('should have required methods', () => {
+    it("should have required methods", () => {
       expect(playerRepository.findById).toBeDefined()
       expect(playerRepository.findByUniqueId).toBeDefined()
       expect(playerRepository.create).toBeDefined()
       expect(playerRepository.update).toBeDefined()
-      expect(typeof playerRepository.findById).toBe('function')
-      expect(typeof playerRepository.findByUniqueId).toBe('function')
+      expect(typeof playerRepository.findById).toBe("function")
+      expect(typeof playerRepository.findByUniqueId).toBe("function")
     })
   })
 
-  describe('findById', () => {
-    it('should find player by ID', async () => {
+  describe("findById", () => {
+    it("should find player by ID", async () => {
       const playerId = 1
       const mockPlayer: Partial<Player> = {
         playerId: 1,
-        lastName: 'TestPlayer',
-        game: 'csgo',
+        lastName: "TestPlayer",
+        game: "csgo",
         skill: 1000,
       }
 
@@ -58,7 +58,7 @@ describe('PlayerRepository', () => {
       })
     })
 
-    it('should return null for non-existent player', async () => {
+    it("should return null for non-existent player", async () => {
       const playerId = 999
 
       mockDatabase.prisma.player.findUnique.mockResolvedValue(null)
@@ -73,7 +73,7 @@ describe('PlayerRepository', () => {
       })
     })
 
-    it('should handle find options', async () => {
+    it("should handle find options", async () => {
       const playerId = 1
       const options = {
         include: { stats: true },
@@ -82,7 +82,7 @@ describe('PlayerRepository', () => {
 
       mockDatabase.prisma.player.findUnique.mockResolvedValue({
         playerId: 1,
-        lastName: 'TestPlayer',
+        lastName: "TestPlayer",
       } as Player)
 
       await playerRepository.findById(playerId, options)
@@ -94,24 +94,23 @@ describe('PlayerRepository', () => {
       })
     })
 
-    it('should validate player ID', async () => {
+    it("should validate player ID", async () => {
       const invalidPlayerId = 0
 
-      await expect(playerRepository.findById(invalidPlayerId))
-        .rejects.toThrow()
+      await expect(playerRepository.findById(invalidPlayerId)).rejects.toThrow()
     })
   })
 
-  describe('findByUniqueId', () => {
-    it('should find player by unique ID', async () => {
-      const uniqueId = '76561198000000000'
-      const game = 'csgo'
+  describe("findByUniqueId", () => {
+    it("should find player by unique ID", async () => {
+      const uniqueId = "76561198000000000"
+      const game = "csgo"
       const mockPlayer: Partial<Player> = {
         playerId: 1,
-        lastName: 'TestPlayer',
-        game: 'csgo',
+        lastName: "TestPlayer",
+        game: "csgo",
       }
-      
+
       const mockUniqueIdEntry = {
         uniqueId,
         playerId: 1,
@@ -139,9 +138,9 @@ describe('PlayerRepository', () => {
       })
     })
 
-    it('should return null when unique ID not found', async () => {
-      const uniqueId = '76561198000000000'
-      const game = 'csgo'
+    it("should return null when unique ID not found", async () => {
+      const uniqueId = "76561198000000000"
+      const game = "csgo"
 
       mockDatabase.prisma.playerUniqueId.findUnique.mockResolvedValue(null)
 
@@ -150,21 +149,23 @@ describe('PlayerRepository', () => {
       expect(result).toBeNull()
     })
 
-    it('should validate required parameters', async () => {
-      await expect(playerRepository.findByUniqueId('', 'csgo'))
-        .rejects.toThrow('uniqueId and game are required')
+    it("should validate required parameters", async () => {
+      await expect(playerRepository.findByUniqueId("", "csgo")).rejects.toThrow(
+        "uniqueId and game are required",
+      )
 
-      await expect(playerRepository.findByUniqueId('12345', ''))
-        .rejects.toThrow('uniqueId and game are required')
+      await expect(playerRepository.findByUniqueId("12345", "")).rejects.toThrow(
+        "uniqueId and game are required",
+      )
     })
   })
 
-  describe('create', () => {
-    it('should create new player', async () => {
+  describe("create", () => {
+    it("should create new player", async () => {
       const playerData = {
-        lastName: 'NewPlayer',
-        game: 'csgo',
-        steamId: '76561198000000001',
+        lastName: "NewPlayer",
+        game: "csgo",
+        steamId: "76561198000000001",
         skill: 1000,
       }
 
@@ -194,11 +195,11 @@ describe('PlayerRepository', () => {
       })
     })
 
-    it('should handle create options', async () => {
+    it("should handle create options", async () => {
       const playerData = {
-        lastName: 'NewPlayer',
-        game: 'csgo',
-        steamId: '76561198000000002',
+        lastName: "NewPlayer",
+        game: "csgo",
+        steamId: "76561198000000002",
       }
       const options = { transaction: mockDatabase.prisma }
 
@@ -211,11 +212,11 @@ describe('PlayerRepository', () => {
     })
   })
 
-  describe('update', () => {
-    it('should update player data', async () => {
+  describe("update", () => {
+    it("should update player data", async () => {
       const playerId = 1
       const updateData = {
-        lastName: 'UpdatedPlayer',
+        lastName: "UpdatedPlayer",
         skill: 1200,
         kills: 10,
       }
@@ -236,7 +237,7 @@ describe('PlayerRepository', () => {
       })
     })
 
-    it('should handle partial updates', async () => {
+    it("should handle partial updates", async () => {
       const playerId = 1
       const updateData = { skill: 1500 }
 
@@ -253,7 +254,7 @@ describe('PlayerRepository', () => {
       })
     })
 
-    it('should handle update options', async () => {
+    it("should handle update options", async () => {
       const playerId = 1
       const updateData = { skill: 1300 }
       const options = { transaction: mockDatabase.prisma }
@@ -267,16 +268,16 @@ describe('PlayerRepository', () => {
     })
   })
 
-  describe('findTopPlayers', () => {
-    it('should find top players by skill', async () => {
+  describe("findTopPlayers", () => {
+    it("should find top players by skill", async () => {
       const limit = 10
-      const game = 'csgo'
+      const game = "csgo"
       const includeHidden = false
 
       const mockTopPlayers: Partial<Player>[] = [
-        { playerId: 1, lastName: 'Player1', skill: 2000 },
-        { playerId: 2, lastName: 'Player2', skill: 1800 },
-        { playerId: 3, lastName: 'Player3', skill: 1600 },
+        { playerId: 1, lastName: "Player1", skill: 2000 },
+        { playerId: 2, lastName: "Player2", skill: 1800 },
+        { playerId: 3, lastName: "Player3", skill: 1600 },
       ]
 
       mockDatabase.prisma.player.findMany.mockResolvedValue(mockTopPlayers as Player[])
@@ -289,14 +290,14 @@ describe('PlayerRepository', () => {
           game,
           hideranking: includeHidden ? undefined : 0,
         },
-        orderBy: { skill: 'desc' },
+        orderBy: { skill: "desc" },
         take: limit,
       })
     })
 
-    it('should include hidden players when specified', async () => {
+    it("should include hidden players when specified", async () => {
       const limit = 5
-      const game = 'csgo'
+      const game = "csgo"
       const includeHidden = true
 
       mockDatabase.prisma.player.findMany.mockResolvedValue([])
@@ -308,32 +309,32 @@ describe('PlayerRepository', () => {
           game,
           hideranking: undefined,
         },
-        orderBy: { skill: 'desc' },
+        orderBy: { skill: "desc" },
         take: limit,
       })
     })
   })
 
-  describe('Error handling', () => {
-    it('should handle database errors gracefully', async () => {
+  describe("Error handling", () => {
+    it("should handle database errors gracefully", async () => {
       const playerId = 1
 
-      mockDatabase.prisma.player.findUnique.mockRejectedValue(new Error('Database connection failed'))
+      mockDatabase.prisma.player.findUnique.mockRejectedValue(
+        new Error("Database connection failed"),
+      )
 
-      await expect(playerRepository.findById(playerId))
-        .rejects.toThrow()
+      await expect(playerRepository.findById(playerId)).rejects.toThrow()
     })
 
-    it('should handle invalid player ID', async () => {
+    it("should handle invalid player ID", async () => {
       const invalidPlayerId = -1
 
-      await expect(playerRepository.findById(invalidPlayerId))
-        .rejects.toThrow()
+      await expect(playerRepository.findById(invalidPlayerId)).rejects.toThrow()
     })
   })
 
-  describe('Edge cases', () => {
-    it('should handle very large player IDs', async () => {
+  describe("Edge cases", () => {
+    it("should handle very large player IDs", async () => {
       const largePlayerId = 999999999
 
       mockDatabase.prisma.player.findUnique.mockResolvedValue(null)
@@ -348,9 +349,9 @@ describe('PlayerRepository', () => {
       })
     })
 
-    it('should handle special characters in unique IDs', async () => {
-      const specialUniqueId = 'STEAM_1:0:12345'
-      const game = 'csgo'
+    it("should handle special characters in unique IDs", async () => {
+      const specialUniqueId = "STEAM_1:0:12345"
+      const game = "csgo"
 
       mockDatabase.prisma.playerUniqueId.findUnique.mockResolvedValue(null)
 
@@ -370,12 +371,13 @@ describe('PlayerRepository', () => {
       })
     })
 
-    it('should handle empty update data', async () => {
+    it("should handle empty update data", async () => {
       const playerId = 1
       const emptyUpdate = {}
 
-      await expect(playerRepository.update(playerId, emptyUpdate))
-        .rejects.toThrow('No valid fields to update')
+      await expect(playerRepository.update(playerId, emptyUpdate)).rejects.toThrow(
+        "No valid fields to update",
+      )
     })
   })
 })

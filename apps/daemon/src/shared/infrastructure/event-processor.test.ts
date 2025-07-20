@@ -2,13 +2,13 @@
  * EventProcessor Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { EventProcessor } from './event-processor'
-import { createMockLogger } from '../../test-support/mocks/logger'
-import type { BaseEvent } from '@/shared/types/events'
-import { EventType } from '@/shared/types/events'
+import { describe, it, expect, beforeEach, vi } from "vitest"
+import { EventProcessor } from "./event-processor"
+import { createMockLogger } from "../../test-support/mocks/logger"
+import type { BaseEvent } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
 
-describe('EventProcessor', () => {
+describe("EventProcessor", () => {
   let eventProcessor: EventProcessor
   let mockContext: any
   let mockLogger: ReturnType<typeof createMockLogger>
@@ -36,68 +36,72 @@ describe('EventProcessor', () => {
         handleActionEvent: vi.fn().mockResolvedValue({ success: true }),
       },
     }
-    
+
     eventProcessor = new EventProcessor(mockContext)
   })
 
-  describe('EventProcessor instantiation', () => {
-    it('should create processor instance', () => {
+  describe("EventProcessor instantiation", () => {
+    it("should create processor instance", () => {
       expect(eventProcessor).toBeDefined()
       expect(eventProcessor).toBeInstanceOf(EventProcessor)
     })
 
-    it('should store logger from context', () => {
+    it("should store logger from context", () => {
       expect((eventProcessor as any).logger).toBe(mockLogger)
     })
   })
 
-  describe('processEvent - Player Events', () => {
-    it('should handle PLAYER_CONNECT events', async () => {
+  describe("processEvent - Player Events", () => {
+    it("should handle PLAYER_CONNECT events", async () => {
       const playerConnectEvent: BaseEvent = {
         eventType: EventType.PLAYER_CONNECT,
         timestamp: new Date(),
         serverId: 1,
         data: {
           playerId: 1,
-          steamId: '76561198000000000',
-          playerName: 'TestPlayer',
-          ipAddress: '192.168.1.100',
+          steamId: "76561198000000000",
+          playerName: "TestPlayer",
+          ipAddress: "192.168.1.100",
         },
       }
 
       await eventProcessor.processEvent(playerConnectEvent)
 
       expect(mockContext.playerService.handlePlayerEvent).toHaveBeenCalledWith(playerConnectEvent)
-      expect(mockLogger.info).toHaveBeenCalledWith('Processing event: PLAYER_CONNECT for server 1')
-      expect(mockLogger.debug).toHaveBeenCalledWith('Event processed successfully: PLAYER_CONNECT')
+      expect(mockLogger.info).toHaveBeenCalledWith("Processing event: PLAYER_CONNECT for server 1")
+      expect(mockLogger.debug).toHaveBeenCalledWith("Event processed successfully: PLAYER_CONNECT")
     })
 
-    it('should handle PLAYER_DISCONNECT events', async () => {
+    it("should handle PLAYER_DISCONNECT events", async () => {
       const playerDisconnectEvent: BaseEvent = {
         eventType: EventType.PLAYER_DISCONNECT,
         timestamp: new Date(),
         serverId: 1,
         data: {
           playerId: 1,
-          reason: 'timeout',
+          reason: "timeout",
         },
       }
 
       await eventProcessor.processEvent(playerDisconnectEvent)
 
-      expect(mockContext.playerService.handlePlayerEvent).toHaveBeenCalledWith(playerDisconnectEvent)
-      expect(mockLogger.info).toHaveBeenCalledWith('Processing event: PLAYER_DISCONNECT for server 1')
+      expect(mockContext.playerService.handlePlayerEvent).toHaveBeenCalledWith(
+        playerDisconnectEvent,
+      )
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        "Processing event: PLAYER_DISCONNECT for server 1",
+      )
     })
 
-    it('should handle CHAT_MESSAGE events', async () => {
+    it("should handle CHAT_MESSAGE events", async () => {
       const chatEvent: BaseEvent = {
         eventType: EventType.CHAT_MESSAGE,
         timestamp: new Date(),
         serverId: 1,
         data: {
           playerId: 1,
-          message: 'Hello World',
-          channel: 'all',
+          message: "Hello World",
+          channel: "all",
         },
       }
 
@@ -107,8 +111,8 @@ describe('EventProcessor', () => {
     })
   })
 
-  describe('processEvent - Kill Events', () => {
-    it('should handle PLAYER_KILL events with multiple service calls', async () => {
+  describe("processEvent - Kill Events", () => {
+    it("should handle PLAYER_KILL events with multiple service calls", async () => {
       const killEvent: BaseEvent = {
         eventType: EventType.PLAYER_KILL,
         timestamp: new Date(),
@@ -116,7 +120,7 @@ describe('EventProcessor', () => {
         data: {
           killerId: 1,
           victimId: 2,
-          weapon: 'ak47',
+          weapon: "ak47",
           headshot: true,
           damage: 100,
         },
@@ -130,7 +134,7 @@ describe('EventProcessor', () => {
       expect(mockContext.matchService.handleKillInMatch).toHaveBeenCalledWith(killEvent)
     })
 
-    it('should handle kill event failures gracefully', async () => {
+    it("should handle kill event failures gracefully", async () => {
       const killEvent: BaseEvent = {
         eventType: EventType.PLAYER_KILL,
         timestamp: new Date(),
@@ -138,16 +142,18 @@ describe('EventProcessor', () => {
         data: { killerId: 1, victimId: 2 },
       }
 
-      const error = new Error('Player service failed')
+      const error = new Error("Player service failed")
       mockContext.playerService.handleKillEvent.mockRejectedValue(error)
 
-      await expect(eventProcessor.processEvent(killEvent)).rejects.toThrow('Player service failed')
-      expect(mockLogger.error).toHaveBeenCalledWith('Failed to process event PLAYER_KILL: Error: Player service failed')
+      await expect(eventProcessor.processEvent(killEvent)).rejects.toThrow("Player service failed")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        "Failed to process event PLAYER_KILL: Error: Player service failed",
+      )
     })
   })
 
-  describe('processEvent - Match Events', () => {
-    it('should handle ROUND_START events', async () => {
+  describe("processEvent - Match Events", () => {
+    it("should handle ROUND_START events", async () => {
       const roundStartEvent: BaseEvent = {
         eventType: EventType.ROUND_START,
         timestamp: new Date(),
@@ -163,14 +169,14 @@ describe('EventProcessor', () => {
       expect(mockContext.matchService.handleMatchEvent).toHaveBeenCalledWith(roundStartEvent)
     })
 
-    it('should handle ROUND_END events', async () => {
+    it("should handle ROUND_END events", async () => {
       const roundEndEvent: BaseEvent = {
         eventType: EventType.ROUND_END,
         timestamp: new Date(),
         serverId: 1,
         data: {
           roundNumber: 1,
-          winner: 'ct',
+          winner: "ct",
           duration: 89.5,
         },
       }
@@ -180,13 +186,13 @@ describe('EventProcessor', () => {
       expect(mockContext.matchService.handleMatchEvent).toHaveBeenCalledWith(roundEndEvent)
     })
 
-    it('should handle TEAM_WIN events', async () => {
+    it("should handle TEAM_WIN events", async () => {
       const teamWinEvent: BaseEvent = {
         eventType: EventType.TEAM_WIN,
         timestamp: new Date(),
         serverId: 1,
         data: {
-          winningTeam: 'ct',
+          winningTeam: "ct",
           finalScore: { ct: 16, terrorist: 14 },
         },
       }
@@ -196,14 +202,14 @@ describe('EventProcessor', () => {
       expect(mockContext.matchService.handleMatchEvent).toHaveBeenCalledWith(teamWinEvent)
     })
 
-    it('should handle MAP_CHANGE events', async () => {
+    it("should handle MAP_CHANGE events", async () => {
       const mapChangeEvent: BaseEvent = {
         eventType: EventType.MAP_CHANGE,
         timestamp: new Date(),
         serverId: 1,
         data: {
-          previousMap: 'de_dust2',
-          newMap: 'de_inferno',
+          previousMap: "de_dust2",
+          newMap: "de_inferno",
         },
       }
 
@@ -213,15 +219,15 @@ describe('EventProcessor', () => {
     })
   })
 
-  describe('processEvent - Objective Events', () => {
-    it('should handle BOMB_PLANT events', async () => {
+  describe("processEvent - Objective Events", () => {
+    it("should handle BOMB_PLANT events", async () => {
       const bombPlantEvent: BaseEvent = {
         eventType: EventType.BOMB_PLANT,
         timestamp: new Date(),
         serverId: 1,
         data: {
           playerId: 1,
-          site: 'A',
+          site: "A",
         },
       }
 
@@ -230,14 +236,14 @@ describe('EventProcessor', () => {
       expect(mockContext.matchService.handleObjectiveEvent).toHaveBeenCalledWith(bombPlantEvent)
     })
 
-    it('should handle BOMB_DEFUSE events', async () => {
+    it("should handle BOMB_DEFUSE events", async () => {
       const bombDefuseEvent: BaseEvent = {
         eventType: EventType.BOMB_DEFUSE,
         timestamp: new Date(),
         serverId: 1,
         data: {
           playerId: 2,
-          site: 'A',
+          site: "A",
           timeRemaining: 5.2,
         },
       }
@@ -247,7 +253,7 @@ describe('EventProcessor', () => {
       expect(mockContext.matchService.handleObjectiveEvent).toHaveBeenCalledWith(bombDefuseEvent)
     })
 
-    it('should handle all flag events', async () => {
+    it("should handle all flag events", async () => {
       const flagEvents = [
         EventType.FLAG_CAPTURE,
         EventType.FLAG_DEFEND,
@@ -269,11 +275,8 @@ describe('EventProcessor', () => {
       }
     })
 
-    it('should handle control point events', async () => {
-      const controlPointEvents = [
-        EventType.CONTROL_POINT_CAPTURE,
-        EventType.CONTROL_POINT_DEFEND,
-      ]
+    it("should handle control point events", async () => {
+      const controlPointEvents = [EventType.CONTROL_POINT_CAPTURE, EventType.CONTROL_POINT_DEFEND]
 
       for (const eventType of controlPointEvents) {
         const controlEvent: BaseEvent = {
@@ -290,15 +293,15 @@ describe('EventProcessor', () => {
     })
   })
 
-  describe('processEvent - Weapon Events', () => {
-    it('should handle WEAPON_FIRE events', async () => {
+  describe("processEvent - Weapon Events", () => {
+    it("should handle WEAPON_FIRE events", async () => {
       const weaponFireEvent: BaseEvent = {
         eventType: EventType.WEAPON_FIRE,
         timestamp: new Date(),
         serverId: 1,
         data: {
           playerId: 1,
-          weapon: 'ak47',
+          weapon: "ak47",
           ammo: 29,
         },
       }
@@ -308,7 +311,7 @@ describe('EventProcessor', () => {
       expect(mockContext.weaponService.handleWeaponEvent).toHaveBeenCalledWith(weaponFireEvent)
     })
 
-    it('should handle WEAPON_HIT events', async () => {
+    it("should handle WEAPON_HIT events", async () => {
       const weaponHitEvent: BaseEvent = {
         eventType: EventType.WEAPON_HIT,
         timestamp: new Date(),
@@ -316,9 +319,9 @@ describe('EventProcessor', () => {
         data: {
           attackerId: 1,
           victimId: 2,
-          weapon: 'm4a1',
+          weapon: "m4a1",
           damage: 27,
-          bodypart: 'chest',
+          bodypart: "chest",
         },
       }
 
@@ -328,8 +331,8 @@ describe('EventProcessor', () => {
     })
   })
 
-  describe('processEvent - Action Events', () => {
-    it('should handle all action event types', async () => {
+  describe("processEvent - Action Events", () => {
+    it("should handle all action event types", async () => {
       const actionEvents = [
         EventType.ACTION_PLAYER,
         EventType.ACTION_PLAYER_PLAYER,
@@ -342,7 +345,7 @@ describe('EventProcessor', () => {
           eventType,
           timestamp: new Date(),
           serverId: 1,
-          data: { playerId: 1, actionCode: 'test' },
+          data: { playerId: 1, actionCode: "test" },
         }
 
         await eventProcessor.processEvent(actionEvent)
@@ -352,8 +355,8 @@ describe('EventProcessor', () => {
     })
   })
 
-  describe('processEvent - System Events', () => {
-    it('should handle SERVER_STATS_UPDATE events', async () => {
+  describe("processEvent - System Events", () => {
+    it("should handle SERVER_STATS_UPDATE events", async () => {
       const serverStatsEvent: BaseEvent = {
         eventType: EventType.SERVER_STATS_UPDATE,
         timestamp: new Date(),
@@ -363,38 +366,38 @@ describe('EventProcessor', () => {
 
       await eventProcessor.processEvent(serverStatsEvent)
 
-      expect(mockLogger.debug).toHaveBeenCalledWith('Server stats update event for server 1')
+      expect(mockLogger.debug).toHaveBeenCalledWith("Server stats update event for server 1")
     })
 
-    it('should handle SERVER_SHUTDOWN events', async () => {
+    it("should handle SERVER_SHUTDOWN events", async () => {
       const shutdownEvent: BaseEvent = {
         eventType: EventType.SERVER_SHUTDOWN,
         timestamp: new Date(),
         serverId: 1,
-        data: { reason: 'restart' },
+        data: { reason: "restart" },
       }
 
       await eventProcessor.processEvent(shutdownEvent)
 
-      expect(mockLogger.info).toHaveBeenCalledWith('System event: SERVER_SHUTDOWN')
+      expect(mockLogger.info).toHaveBeenCalledWith("System event: SERVER_SHUTDOWN")
     })
 
-    it('should handle ADMIN_ACTION events', async () => {
+    it("should handle ADMIN_ACTION events", async () => {
       const adminActionEvent: BaseEvent = {
         eventType: EventType.ADMIN_ACTION,
         timestamp: new Date(),
         serverId: 1,
-        data: { adminId: 1, action: 'kick_player' },
+        data: { adminId: 1, action: "kick_player" },
       }
 
       await eventProcessor.processEvent(adminActionEvent)
 
-      expect(mockLogger.info).toHaveBeenCalledWith('System event: ADMIN_ACTION')
+      expect(mockLogger.info).toHaveBeenCalledWith("System event: ADMIN_ACTION")
     })
 
-    it('should handle unknown event types', async () => {
+    it("should handle unknown event types", async () => {
       const unknownEvent: BaseEvent = {
-        eventType: 'UNKNOWN_EVENT' as EventType,
+        eventType: "UNKNOWN_EVENT" as EventType,
         timestamp: new Date(),
         serverId: 1,
         data: {},
@@ -402,12 +405,12 @@ describe('EventProcessor', () => {
 
       await eventProcessor.processEvent(unknownEvent)
 
-      expect(mockLogger.warn).toHaveBeenCalledWith('Unhandled event type: UNKNOWN_EVENT')
+      expect(mockLogger.warn).toHaveBeenCalledWith("Unhandled event type: UNKNOWN_EVENT")
     })
   })
 
-  describe('processEvents - Sequential Processing', () => {
-    it('should process multiple events in sequence', async () => {
+  describe("processEvents - Sequential Processing", () => {
+    it("should process multiple events in sequence", async () => {
       const events: BaseEvent[] = [
         {
           eventType: EventType.PLAYER_CONNECT,
@@ -419,7 +422,7 @@ describe('EventProcessor', () => {
           eventType: EventType.WEAPON_FIRE,
           timestamp: new Date(),
           serverId: 1,
-          data: { playerId: 1, weapon: 'ak47' },
+          data: { playerId: 1, weapon: "ak47" },
         },
         {
           eventType: EventType.ROUND_START,
@@ -436,7 +439,7 @@ describe('EventProcessor', () => {
       expect(mockContext.matchService.handleMatchEvent).toHaveBeenCalledTimes(1)
     })
 
-    it('should stop processing on error and propagate it', async () => {
+    it("should stop processing on error and propagate it", async () => {
       const events: BaseEvent[] = [
         {
           eventType: EventType.PLAYER_CONNECT,
@@ -448,28 +451,28 @@ describe('EventProcessor', () => {
           eventType: EventType.WEAPON_FIRE,
           timestamp: new Date(),
           serverId: 1,
-          data: { playerId: 1, weapon: 'ak47' },
+          data: { playerId: 1, weapon: "ak47" },
         },
       ]
 
-      const error = new Error('Processing failed')
+      const error = new Error("Processing failed")
       mockContext.playerService.handlePlayerEvent.mockRejectedValue(error)
 
-      await expect(eventProcessor.processEvents(events)).rejects.toThrow('Processing failed')
-      
+      await expect(eventProcessor.processEvents(events)).rejects.toThrow("Processing failed")
+
       // Second event should not be processed due to error
       expect(mockContext.weaponService.handleWeaponEvent).not.toHaveBeenCalled()
     })
 
-    it('should handle empty event array', async () => {
+    it("should handle empty event array", async () => {
       await eventProcessor.processEvents([])
 
       expect(mockLogger.info).not.toHaveBeenCalled()
     })
   })
 
-  describe('processEventsConcurrent - Concurrent Processing', () => {
-    it('should process events with default concurrency', async () => {
+  describe("processEventsConcurrent - Concurrent Processing", () => {
+    it("should process events with default concurrency", async () => {
       const events: BaseEvent[] = Array.from({ length: 5 }, (_, i) => ({
         eventType: EventType.PLAYER_CONNECT,
         timestamp: new Date(),
@@ -482,12 +485,12 @@ describe('EventProcessor', () => {
       expect(mockContext.playerService.handlePlayerEvent).toHaveBeenCalledTimes(5)
     })
 
-    it('should process events with custom concurrency limit', async () => {
+    it("should process events with custom concurrency limit", async () => {
       const events: BaseEvent[] = Array.from({ length: 15 }, (_, i) => ({
         eventType: EventType.WEAPON_FIRE,
         timestamp: new Date(),
         serverId: 1,
-        data: { playerId: i + 1, weapon: 'ak47' },
+        data: { playerId: i + 1, weapon: "ak47" },
       }))
 
       await eventProcessor.processEventsConcurrent(events, 3)
@@ -495,7 +498,7 @@ describe('EventProcessor', () => {
       expect(mockContext.weaponService.handleWeaponEvent).toHaveBeenCalledTimes(15)
     })
 
-    it('should handle concurrent processing errors', async () => {
+    it("should handle concurrent processing errors", async () => {
       const events: BaseEvent[] = Array.from({ length: 3 }, (_, i) => ({
         eventType: EventType.PLAYER_CONNECT,
         timestamp: new Date(),
@@ -503,18 +506,20 @@ describe('EventProcessor', () => {
         data: { playerId: i + 1 },
       }))
 
-      const error = new Error('Concurrent processing failed')
+      const error = new Error("Concurrent processing failed")
       mockContext.playerService.handlePlayerEvent.mockRejectedValue(error)
 
-      await expect(eventProcessor.processEventsConcurrent(events, 2)).rejects.toThrow('Concurrent processing failed')
+      await expect(eventProcessor.processEventsConcurrent(events, 2)).rejects.toThrow(
+        "Concurrent processing failed",
+      )
     })
 
-    it('should process remaining events after batch completion', async () => {
+    it("should process remaining events after batch completion", async () => {
       const events: BaseEvent[] = Array.from({ length: 7 }, (_, i) => ({
         eventType: EventType.ACTION_PLAYER,
         timestamp: new Date(),
         serverId: 1,
-        data: { playerId: i + 1, actionCode: 'test' },
+        data: { playerId: i + 1, actionCode: "test" },
       }))
 
       await eventProcessor.processEventsConcurrent(events, 3)
@@ -522,15 +527,15 @@ describe('EventProcessor', () => {
       expect(mockContext.actionService.handleActionEvent).toHaveBeenCalledTimes(7)
     })
 
-    it('should handle empty concurrent event array', async () => {
+    it("should handle empty concurrent event array", async () => {
       await eventProcessor.processEventsConcurrent([])
 
       expect(mockLogger.info).not.toHaveBeenCalled()
     })
   })
 
-  describe('Error handling and edge cases', () => {
-    it('should handle service method not found gracefully', async () => {
+  describe("Error handling and edge cases", () => {
+    it("should handle service method not found gracefully", async () => {
       // Remove a service method
       delete mockContext.playerService.handlePlayerEvent
 
@@ -543,11 +548,11 @@ describe('EventProcessor', () => {
 
       await expect(eventProcessor.processEvent(playerEvent)).rejects.toThrow()
       expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to process event PLAYER_CONNECT')
+        expect.stringContaining("Failed to process event PLAYER_CONNECT"),
       )
     })
 
-    it('should handle events with missing data', async () => {
+    it("should handle events with missing data", async () => {
       const incompleteEvent: BaseEvent = {
         eventType: EventType.PLAYER_KILL,
         timestamp: new Date(),
@@ -560,7 +565,7 @@ describe('EventProcessor', () => {
       expect(mockContext.playerService.handleKillEvent).toHaveBeenCalledWith(incompleteEvent)
     })
 
-    it('should handle events with null/undefined values', async () => {
+    it("should handle events with null/undefined values", async () => {
       const eventWithNulls: BaseEvent = {
         eventType: EventType.WEAPON_FIRE,
         timestamp: new Date(),
@@ -577,7 +582,7 @@ describe('EventProcessor', () => {
       expect(mockContext.weaponService.handleWeaponEvent).toHaveBeenCalledWith(eventWithNulls)
     })
 
-    it('should handle very large event batches', async () => {
+    it("should handle very large event batches", async () => {
       const largeEventBatch: BaseEvent[] = Array.from({ length: 1000 }, (_, i) => ({
         eventType: EventType.PLAYER_CONNECT,
         timestamp: new Date(),

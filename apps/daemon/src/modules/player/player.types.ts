@@ -2,9 +2,9 @@
  * Player Module Types
  */
 
-import type { BaseEvent, EventType, PlayerMeta, DualPlayerMeta } from '@/shared/types/events'
-import type { HandlerResult } from '@/shared/types/common'
-import type { FindOptions, UpdateOptions, CreateOptions } from '@/shared/types/database'
+import type { BaseEvent, EventType, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
+import type { HandlerResult } from "@/shared/types/common"
+import type { FindOptions, UpdateOptions, CreateOptions } from "@/shared/types/database"
 
 // Player-specific event types
 export interface PlayerKillEvent extends BaseEvent {
@@ -116,7 +116,7 @@ export interface PlayerChatEvent extends BaseEvent {
 }
 
 // Union type of all player events
-export type PlayerEvent = 
+export type PlayerEvent =
   | PlayerKillEvent
   | PlayerConnectEvent
   | PlayerDisconnectEvent
@@ -185,17 +185,21 @@ export interface RatingUpdate {
 export interface IPlayerService {
   // Player management
   getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number>
-  getPlayerStats(playerId: number): Promise<import('@repo/database/client').Player | null>
+  getPlayerStats(playerId: number): Promise<import("@repo/database/client").Player | null>
   updatePlayerStats(playerId: number, updates: PlayerStatsUpdate): Promise<void>
-  
+
   // Rating system
   getPlayerRating(playerId: number): Promise<SkillRating>
   updatePlayerRatings(updates: RatingUpdate[]): Promise<void>
-  
+
   // Queries
-  getTopPlayers(limit?: number, game?: string, includeHidden?: boolean): Promise<import('@repo/database/client').Player[]>
+  getTopPlayers(
+    limit?: number,
+    game?: string,
+    includeHidden?: boolean,
+  ): Promise<import("@repo/database/client").Player[]>
   getRoundParticipants(serverId: number, duration: number): Promise<unknown[]>
-  
+
   // Event handling
   handlePlayerEvent(event: PlayerEvent): Promise<HandlerResult>
   handleKillEvent(event: PlayerKillEvent): Promise<HandlerResult>
@@ -203,17 +207,45 @@ export interface IPlayerService {
 
 export interface IPlayerRepository {
   // CRUD operations
-  findById(playerId: number, options?: FindOptions): Promise<import('@repo/database/client').Player | null>
-  findByUniqueId(uniqueId: string, game: string, options?: FindOptions): Promise<import('@repo/database/client').Player | null>
-  create(data: PlayerCreateData, options?: CreateOptions): Promise<import('@repo/database/client').Player>
-  update(playerId: number, data: Partial<import('@repo/database/client').Player>, options?: UpdateOptions): Promise<import('@repo/database/client').Player>
-  
+  findById(
+    playerId: number,
+    options?: FindOptions,
+  ): Promise<import("@repo/database/client").Player | null>
+  findByUniqueId(
+    uniqueId: string,
+    game: string,
+    options?: FindOptions,
+  ): Promise<import("@repo/database/client").Player | null>
+  create(
+    data: PlayerCreateData,
+    options?: CreateOptions,
+  ): Promise<import("@repo/database/client").Player>
+  update(
+    playerId: number,
+    data: Partial<import("@repo/database/client").Player>,
+    options?: UpdateOptions,
+  ): Promise<import("@repo/database/client").Player>
+
   // Specialized queries
-  findTopPlayers(limit: number, game: string, includeHidden: boolean, options?: FindOptions): Promise<import('@repo/database/client').Player[]>
-  findRoundParticipants(serverId: number, startTime: Date, options?: FindOptions): Promise<unknown[]>
-  
+  findTopPlayers(
+    limit: number,
+    game: string,
+    includeHidden: boolean,
+    options?: FindOptions,
+  ): Promise<import("@repo/database/client").Player[]>
+  findRoundParticipants(
+    serverId: number,
+    startTime: Date,
+    options?: FindOptions,
+  ): Promise<unknown[]>
+
   // Unique ID management
-  createUniqueId(playerId: number, uniqueId: string, game: string, options?: CreateOptions): Promise<void>
+  createUniqueId(
+    playerId: number,
+    uniqueId: string,
+    game: string,
+    options?: CreateOptions,
+  ): Promise<void>
   findUniqueIdEntry(uniqueId: string, game: string, options?: FindOptions): Promise<unknown>
 }
 

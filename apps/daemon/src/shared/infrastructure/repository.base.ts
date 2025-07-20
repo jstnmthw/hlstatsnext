@@ -1,24 +1,19 @@
 /**
  * Base Repository Class
- * 
+ *
  * Provides common database operations and patterns for all module repositories.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import type { DatabaseClient } from '@/database/client'
-import type { ILogger } from '@/shared/utils/logger'
-import type { 
-  DatabaseTransaction, 
-  RepositoryOptions
-} from '@/shared/types/database'
+import type { DatabaseClient } from "@/database/client"
+import type { ILogger } from "@/shared/utils/logger"
+import type { DatabaseTransaction, RepositoryOptions } from "@/shared/types/database"
 
 export abstract class BaseRepository<T extends Record<string, unknown>> {
   protected abstract tableName: string
 
   constructor(
     protected readonly db: DatabaseClient,
-    protected readonly logger: ILogger
+    protected readonly logger: ILogger,
   ) {}
 
   protected get table() {
@@ -27,7 +22,7 @@ export abstract class BaseRepository<T extends Record<string, unknown>> {
 
   protected async executeWithTransaction<R>(
     operation: (tx: DatabaseTransaction) => Promise<R>,
-    options?: RepositoryOptions
+    options?: RepositoryOptions,
   ): Promise<R> {
     if (options?.transaction) {
       return operation(options.transaction)
@@ -54,14 +49,14 @@ export abstract class BaseRepository<T extends Record<string, unknown>> {
     delete cleaned.id
     delete cleaned.createdAt
     delete cleaned.updatedAt
-    
+
     // Remove undefined values
-    Object.keys(cleaned).forEach(key => {
+    Object.keys(cleaned).forEach((key) => {
       if (cleaned[key] === undefined) {
         delete cleaned[key]
       }
     })
-    
+
     return cleaned as Partial<T>
   }
 }

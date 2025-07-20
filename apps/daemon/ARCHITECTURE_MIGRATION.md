@@ -7,6 +7,7 @@ This document outlines the migration from the legacy layered architecture to the
 The daemon has been completely refactored from a layered architecture to a modular, domain-driven architecture that follows the established best practices.
 
 ### Before (Legacy Architecture)
+
 ```
 src/
 ├── services/           # Services grouped by technical layer
@@ -19,6 +20,7 @@ src/
 ```
 
 ### After (Modular Architecture)
+
 ```
 src/
 ├── modules/            # Self-contained business domains
@@ -44,22 +46,27 @@ src/
 ## Key Improvements
 
 ### 1. **Separation of Concerns**
+
 - **Before**: EventProcessorService handled both orchestration AND business logic
 - **After**: EventProcessor only orchestrates, modules handle their own business logic
 
 ### 2. **Dependency Injection**
+
 - **Before**: Manual service wiring with factory functions
 - **After**: Clean DI container with interface-based dependencies
 
 ### 3. **Module Boundaries**
+
 - **Before**: No clear boundaries, services could import anything
 - **After**: ESLint-enforced module boundaries with private file conventions
 
 ### 4. **Type Organization**
+
 - **Before**: 567-line events.ts file with all types
 - **After**: Domain-specific types in their respective modules
 
 ### 5. **TurboRepo Optimization**
+
 - **Before**: No consideration for JIT compilation
 - **After**: Direct imports optimized for TurboRepo's JIT compilation
 
@@ -70,7 +77,7 @@ Each module follows this pattern:
 ```
 modules/[domain]/
 ├── [domain].service.ts     # Business logic
-├── [domain].repository.ts  # Data access layer  
+├── [domain].repository.ts  # Data access layer
 ├── [domain].types.ts       # Domain-specific types
 ├── _[domain].internal.ts   # Private implementation (underscore prefix)
 └── handlers/               # Event handlers
@@ -80,17 +87,19 @@ modules/[domain]/
 ## Usage Examples
 
 ### Direct Module Imports
+
 ```typescript
 // ✅ GOOD: Direct imports optimized for TurboRepo
-import { PlayerService } from '@/modules/player/player.service'
-import { MatchService } from '@/modules/match/match.service'
-import type { PlayerStats } from '@/modules/player/player.types'
+import { PlayerService } from "@/modules/player/player.service"
+import { MatchService } from "@/modules/match/match.service"
+import type { PlayerStats } from "@/modules/player/player.types"
 
 // ❌ BAD: Importing private files
-import { internalHelper } from '@/modules/player/_player.internal'
+import { internalHelper } from "@/modules/player/_player.internal"
 ```
 
 ### Dependency Injection
+
 ```typescript
 // Get application context
 const context = getAppContext()
@@ -101,6 +110,7 @@ await context.matchService.handleMatchEvent(event)
 ```
 
 ### Event Processing
+
 ```typescript
 // Clean event orchestration
 const processor = new EventProcessor(context)
@@ -129,6 +139,6 @@ The public API remains the same through the `HLStatsDaemon` class. The main entr
 ## Next Steps
 
 1. Migrate remaining legacy services as needed
-2. Add more comprehensive event parsing to the ingress module  
+2. Add more comprehensive event parsing to the ingress module
 3. Implement proper ranking/ELO calculations in the ranking module
 4. Add performance monitoring and metrics collection

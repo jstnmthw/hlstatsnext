@@ -1,18 +1,24 @@
 /**
  * Round Handler
- * 
+ *
  * Handles round-specific events (start, end, team wins, map changes).
  */
 
-import type { IRoundHandler, RoundStartEvent, RoundEndEvent, TeamWinEvent, MapChangeEvent } from '../match.types'
-import type { IMatchService } from '../match.types'
-import type { ILogger } from '@/shared/utils/logger'
-import type { HandlerResult } from '@/shared/types/common'
+import type {
+  IRoundHandler,
+  RoundStartEvent,
+  RoundEndEvent,
+  TeamWinEvent,
+  MapChangeEvent,
+} from "../match.types"
+import type { IMatchService } from "../match.types"
+import type { ILogger } from "@/shared/utils/logger"
+import type { HandlerResult } from "@/shared/types/common"
 
 export class RoundHandler implements IRoundHandler {
   constructor(
     private readonly matchService: IMatchService,
-    private readonly logger: ILogger
+    private readonly logger: ILogger,
   ) {}
 
   async handleRoundStart(event: RoundStartEvent): Promise<HandlerResult> {

@@ -4,10 +4,12 @@
     "outDir": "dist",
     "rootDir": ".",
     "types": ["node"],
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/types/*": ["./src/types/*"]
+      "@/*": ["*"],
+      "@/modules/*": ["modules/*"],
+      "@/shared/*": ["shared/*"],
+      "@/config/*": ["config/*"]
     }
   },
   "include": ["src/**/*", "tests/**/*", "scripts/**/*"],

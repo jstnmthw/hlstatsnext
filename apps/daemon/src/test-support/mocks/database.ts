@@ -55,15 +55,18 @@ export function createMockDatabaseClient(): MockDatabaseClient {
       upsert: vi.fn(),
     },
     $queryRaw: vi.fn(),
-    $queryRawUnsafe: vi.fn(), 
+    $queryRawUnsafe: vi.fn(),
     $executeRaw: vi.fn(),
     $executeRawUnsafe: vi.fn(),
-    $transaction: vi.fn((callback) => callback(mockPrisma)),
+    $transaction: vi.fn((callback: (prisma: TransactionalPrisma) => Promise<unknown>) =>
+      callback(mockPrisma),
+    ),
     $disconnect: vi.fn(),
-  } as TransactionalPrisma & {
+  } as unknown as (TransactionalPrisma & {
     $transaction: MockedFunction<typeof db.$transaction>
     $disconnect: MockedFunction<typeof db.$disconnect>
-  }
+  }) &
+    Record<string, unknown>
 
   return {
     prisma: mockPrisma,

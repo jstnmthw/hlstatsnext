@@ -18,10 +18,12 @@ describe("ObjectiveHandler", () => {
     mockMatchService = {
       handleObjectiveEvent: vi.fn(),
       handleMatchEvent: vi.fn(),
-      updateServerStats: vi.fn(),
-      processRoundEnd: vi.fn(),
-      processTeamWin: vi.fn(),
-      processMapChange: vi.fn(),
+      handleKillInMatch: vi.fn(),
+      getMatchStats: vi.fn(),
+      resetMatchStats: vi.fn(),
+      updatePlayerWeaponStats: vi.fn(),
+      calculateMatchMVP: vi.fn(),
+      calculatePlayerScore: vi.fn(),
     }
 
     objectiveHandler = new ObjectiveHandler(mockMatchService, mockLogger)

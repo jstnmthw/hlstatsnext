@@ -118,6 +118,7 @@ describe("WeaponService", () => {
       const unknownEvent = {
         timestamp: new Date(),
         serverId: 1,
+        // @ts-expect-error - Testing unknown event type
         eventType: "UNKNOWN_WEAPON_EVENT" as EventType,
         data: {
           weaponCode: "knife",

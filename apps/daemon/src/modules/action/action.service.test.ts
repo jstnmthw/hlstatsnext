@@ -10,7 +10,6 @@ import type {
   ActionPlayerPlayerEvent,
   ActionTeamEvent,
   WorldActionEvent,
-  ActionEvent,
 } from "./action.types"
 import { EventType } from "@/shared/types/events"
 

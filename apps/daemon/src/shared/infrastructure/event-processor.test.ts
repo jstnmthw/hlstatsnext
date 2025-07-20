@@ -8,6 +8,11 @@ import { createMockLogger } from "../../test-support/mocks/logger"
 import type { BaseEvent } from "@/shared/types/events"
 import type { AppContext } from "@/context"
 import { EventType } from "@/shared/types/events"
+import type { IPlayerService } from "@/modules/player/player.types"
+import type { IMatchService } from "@/modules/match/match.types"
+import type { IWeaponService } from "@/modules/weapon/weapon.types"
+import type { IRankingService } from "@/modules/ranking/ranking.types"
+import type { IActionService } from "@/modules/action/action.types"
 
 describe("EventProcessor", () => {
   let eventProcessor: EventProcessor
@@ -16,26 +21,50 @@ describe("EventProcessor", () => {
 
   beforeEach(() => {
     mockLogger = createMockLogger()
+    const playerServiceMock: IPlayerService = {
+      handlePlayerEvent: vi.fn().mockResolvedValue({ success: true }),
+      handleKillEvent: vi.fn().mockResolvedValue({ success: true }),
+      getOrCreatePlayer: vi.fn(),
+      getPlayerStats: vi.fn(),
+      updatePlayerStats: vi.fn(),
+      getPlayerRating: vi.fn(),
+      updatePlayerRatings: vi.fn(),
+      getTopPlayers: vi.fn(),
+      getRoundParticipants: vi.fn(),
+    }
+
+    const matchServiceMock: IMatchService = {
+      handleMatchEvent: vi.fn().mockResolvedValue({ success: true }),
+      handleObjectiveEvent: vi.fn().mockResolvedValue({ success: true }),
+      handleKillInMatch: vi.fn().mockResolvedValue({ success: true }),
+      getMatchStats: vi.fn(),
+      resetMatchStats: vi.fn(),
+      updatePlayerWeaponStats: vi.fn(),
+      calculateMatchMVP: vi.fn(),
+      calculatePlayerScore: vi.fn(),
+    }
+
+    const weaponServiceMock: IWeaponService = {
+      handleWeaponEvent: vi.fn().mockResolvedValue({ success: true }),
+      updateWeaponStats: vi.fn(),
+    }
+
+    const rankingServiceMock: IRankingService = {
+      handleRatingUpdate: vi.fn().mockResolvedValue({ success: true }),
+      calculateRatingAdjustment: vi.fn(),
+    }
+
+    const actionServiceMock: IActionService = {
+      handleActionEvent: vi.fn().mockResolvedValue({ success: true }),
+    }
+
     mockContext = {
       logger: mockLogger,
-      playerService: {
-        handlePlayerEvent: vi.fn().mockResolvedValue({ success: true }),
-        handleKillEvent: vi.fn().mockResolvedValue({ success: true }),
-      },
-      matchService: {
-        handleMatchEvent: vi.fn().mockResolvedValue({ success: true }),
-        handleObjectiveEvent: vi.fn().mockResolvedValue({ success: true }),
-        handleKillInMatch: vi.fn().mockResolvedValue({ success: true }),
-      },
-      weaponService: {
-        handleWeaponEvent: vi.fn().mockResolvedValue({ success: true }),
-      },
-      rankingService: {
-        handleRatingUpdate: vi.fn().mockResolvedValue({ success: true }),
-      },
-      actionService: {
-        handleActionEvent: vi.fn().mockResolvedValue({ success: true }),
-      },
+      playerService: playerServiceMock,
+      matchService: matchServiceMock,
+      weaponService: weaponServiceMock,
+      rankingService: rankingServiceMock,
+      actionService: actionServiceMock,
     }
 
     eventProcessor = new EventProcessor(mockContext)

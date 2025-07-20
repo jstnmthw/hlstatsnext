@@ -247,6 +247,16 @@ export interface IPlayerRepository {
     options?: CreateOptions,
   ): Promise<void>
   findUniqueIdEntry(uniqueId: string, game: string, options?: FindOptions): Promise<unknown>
+
+  // Event creation
+  createChatEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    message: string,
+    messageMode?: number,
+    options?: CreateOptions,
+  ): Promise<void>
 }
 
 export interface IPlayerEventHandler {

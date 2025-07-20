@@ -1,10 +1,10 @@
 # Modular Architecture
 
-The HLStatsNext monorepo contains multiple applications (API, web, daemon) that need a consistent and scalable project structure. A clear, unified pattern is needed that aligns with modern best practices, feels familiar to developers with experience in frameworks like Nest.js, and can be adapted for both backend services and the Next.js frontend.
+The HLStatsNext monorepo contains multiple applications (API, web, daemon) that need a consistent and scalable project structure. A clear, unified pattern is needed that aligns with modern best practices, TurboRepo's just-in-time compilation, and can be adapted for both backend services and the Next.js frontend.
 
 ## Decision
 
-We will adopt a **Module-Based Architecture** across the monorepo. The core principle is to group code by system boundary (module) rather than just by technical role (layer).
+We will adopt a **Module-Based Architecture** across the monorepo. The core principle is to group code by system boundary (module) rather than just by technical role (layer), using direct imports optimized for TurboRepo's JIT compilation.
 
 ### Backend Structure (`apps/api`, `apps/daemon`)
 
@@ -14,28 +14,39 @@ Backend applications will be organized as follows:
 src/
 ├── modules/      # Contains all self-contained business domains
 │   ├── player/
-│   │   ├── index.ts          # Defines the module's public API
-│   │   ├── player.service.ts # Business logic
-│   │   ├── player.schema.ts  # GraphQL schema and resolvers (for API)
-│   │   ├── player.types.ts   # Data structures (domain types, DTOs)
-│   │   └── player.test.ts    # Co-located tests
+│   │   ├── player.service.ts     # Business logic (public)
+│   │   ├── player.repository.ts  # Data access layer (public)
+│   │   ├── player.schema.ts      # GraphQL schema and resolvers (for API)
+│   │   ├── player.types.ts       # Data structures (domain types, DTOs)
+│   │   ├── _player.utils.ts      # Private utilities (underscore prefix)
+│   │   ├── _player.internal.ts   # Private implementation details
+│   │   └── handlers/
+│   │       └── player-event.handler.ts
 │   └── ...
 ├── shared/       # Code shared by MULTIPLE modules
 │   ├── types/
-│   │   └── common.ts
-│   └── utils/
+│   │   ├── events.ts         # Base event interfaces
+│   │   ├── common.ts         # Shared types
+│   │   └── database.ts       # Database result types
+│   ├── utils/
+│   │   ├── logger.ts
+│   │   └── validation.ts
+│   └── infrastructure/
+│       ├── event-processor.ts    # Event orchestration
+│       └── repository.base.ts
 ├── config/       # Application configuration
+├── context.ts    # Dependency injection container
 ├── builder.ts    # Global app infrastructure (e.g., Pothos builder)
-├── context.ts    # Global app infrastructure (e.g., DI context)
 └── index.ts      # Application entry point
 ```
 
 **Key Principles:**
 
-1.  **Public API via `index.ts`**: Each module **must** have an `index.ts` that explicitly exports what is available to the rest of the application (e.g., services, types). Files and functions not exported from `index.ts` are considered private to the module.
-2.  **Strict Boundaries**: Modules must not import directly from other modules' internal files. All cross-module communication should happen via the services injected in `context.ts`.
-3.  **`modules/` over `features/`**: We use the name `modules` to emphasize technical encapsulation and the concept of a public API, which aligns with patterns in Nest.js and other modern frameworks.
-4.  **`shared/` Directory**: Code that is used by two or more modules (e.g., the `Result` type) must be placed in the `src/shared/` directory.
+1.  **Direct Imports (TurboRepo Optimized)**: Import files directly using path mapping. No `index.ts` re-exports to maintain fast JIT compilation and hot reload performance.
+2.  **Private Files Convention**: Files prefixed with underscore (`_`) are considered private to the module and should not be imported by other modules.
+3.  **Strict Boundaries via Tooling**: ESLint rules enforce that modules cannot import private files from other modules. Cross-module communication happens via public service files and dependency injection.
+4.  **`modules/` over `features/`**: We use the name `modules` to emphasize technical encapsulation and clear domain boundaries.
+5.  **`shared/` Directory**: Code that is used by two or more modules (e.g., base types, utilities) must be placed in the `src/shared/` directory.
 
 ### Frontend Structure (`apps/web`)
 
@@ -57,9 +68,64 @@ apps/web/
 └── components/ui # Global, stateless UI components
 ```
 
+### Import Patterns
+
+```typescript
+// ✅ GOOD: Direct imports with TypeScript path mapping
+import { PlayerService } from '@/modules/player/player.service'
+import { MatchService } from '@/modules/match/match.service'
+import type { PlayerStats } from '@/modules/player/player.types'
+import { logger } from '@/shared/utils/logger'
+
+// ❌ BAD: Importing private files (ESLint will catch this)
+import { internalHelper } from '@/modules/player/_player.internal'
+
+// ❌ BAD: Index.ts re-exports (slower compilation)
+import { PlayerService } from '@/modules/player'
+```
+
+### TypeScript Configuration
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@/modules/*": ["modules/*"],
+      "@/shared/*": ["shared/*"],
+      "@/config/*": ["config/*"]
+    }
+  }
+}
+```
+
+### ESLint Boundary Enforcement
+
+```javascript
+// eslint.config.js
+{
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [
+          {
+            group: ['**/modules/**/_*'],
+            message: 'Private module files (prefixed with _) cannot be imported across module boundaries'
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
 ## Consequences
 
+- **TurboRepo Optimized**: Direct imports work seamlessly with JIT compilation and hot reload for maximum development speed.
 - **Improved Clarity**: A clear separation between business logic (`modules/`), application plumbing (root `src/` files), and shared code (`shared/`).
-- **Enhanced Maintainability**: Code is easier to find, refactor, and test. Encapsulation reduces the risk of unintended side-effects from changes.
-- **Developer Experience**: The pattern is familiar and intuitive, especially for developers with a background in Nest.js or similar frameworks.
+- **Enhanced Maintainability**: Code is easier to find, refactor, and test. Private file conventions reduce unintended coupling.
+- **Build Performance**: No re-export overhead improves TypeScript compilation speed and tree-shaking efficiency.
+- **Developer Experience**: Clear import patterns with tooling enforcement prevent architectural violations.
 - **Scalability**: Provides a robust foundation for adding new features without cluttering the codebase.

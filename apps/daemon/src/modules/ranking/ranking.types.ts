@@ -3,6 +3,7 @@
  */
 
 import type { HandlerResult } from "@/shared/types/common"
+import type { KillContext } from "./ranking.service"
 
 export interface SkillRating {
   playerId: number
@@ -18,4 +19,10 @@ export interface IRankingService {
     winnerRating: SkillRating,
     loserRating: SkillRating,
   ): { winner: number; loser: number }
+  calculateSkillAdjustment(
+    killerRating: SkillRating,
+    victimRating: SkillRating,
+    context: KillContext,
+  ): { killerChange: number; victimChange: number }
+  calculateSuicidePenalty(): number
 }

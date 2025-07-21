@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { ActionService } from "./action.service"
 import { createMockLogger } from "../../test-support/mocks/logger"
+import type { IActionRepository, ActionDefinition } from "./action.repository"
 import type {
   ActionPlayerEvent,
   ActionPlayerPlayerEvent,
@@ -13,13 +14,24 @@ import type {
 } from "./action.types"
 import { EventType } from "@/shared/types/events"
 
+// Create mock repository
+const createMockActionRepository = (): IActionRepository => ({
+  findActionByCode: vi.fn(),
+  logPlayerAction: vi.fn(),
+  logPlayerPlayerAction: vi.fn(),
+  logTeamAction: vi.fn(),
+  logWorldAction: vi.fn(),
+})
+
 describe("ActionService", () => {
   let actionService: ActionService
   let mockLogger: ReturnType<typeof createMockLogger>
+  let mockRepository: IActionRepository
 
   beforeEach(() => {
     mockLogger = createMockLogger()
-    actionService = new ActionService(mockLogger)
+    mockRepository = createMockActionRepository()
+    actionService = new ActionService(mockRepository, mockLogger)
   })
 
   describe("Service instantiation", () => {
@@ -36,6 +48,24 @@ describe("ActionService", () => {
 
   describe("handleActionEvent", () => {
     it("should handle ACTION_PLAYER events", async () => {
+      // Mock action definition
+      const mockActionDef: ActionDefinition = {
+        id: 1,
+        game: "csgo",
+        code: "score",
+        rewardPlayer: 5,
+        rewardTeam: 0,
+        team: "ct",
+        description: "Score action",
+        forPlayerActions: true,
+        forPlayerPlayerActions: false,
+        forTeamActions: false,
+        forWorldActions: false,
+      }
+      
+      vi.mocked(mockRepository.findActionByCode).mockResolvedValue(mockActionDef)
+      vi.mocked(mockRepository.logPlayerAction).mockResolvedValue()
+
       const playerActionEvent: ActionPlayerEvent = {
         timestamp: new Date(),
         serverId: 1,
@@ -52,7 +82,10 @@ describe("ActionService", () => {
       const result = await actionService.handleActionEvent(playerActionEvent)
 
       expect(result.success).toBe(true)
-      expect(mockLogger.debug).toHaveBeenCalledWith("Player action: score by player 1")
+      expect(result.affected).toBe(1)
+      expect(mockRepository.findActionByCode).toHaveBeenCalledWith("csgo", "score", "ct")
+      expect(mockRepository.logPlayerAction).toHaveBeenCalledWith(1, 1, 1, "", 10)
+      expect(mockLogger.event).toHaveBeenCalledWith("Player action: score by player 1 (+15 points)")
     })
 
     it("should handle ACTION_PLAYER_PLAYER events", async () => {

@@ -52,25 +52,26 @@ describe("IngressService", () => {
       rankingService: {
         handleRatingUpdate: vi.fn(),
         calculateRatingAdjustment: vi.fn(),
+        calculateSkillAdjustment: vi.fn(),
+        calculateSuicidePenalty: vi.fn(),
       },
       actionService: {
         handleActionEvent: vi.fn(),
       },
       gameDetectionService: {
         detectGame: vi.fn().mockResolvedValue({
-          gameCode: 'csgo',
+          gameCode: "csgo",
           confidence: 0.8,
-          detection_method: 'mock'
+          detection_method: "mock",
         }),
         detectGameFromLogContent: vi.fn(),
         detectGameFromServerQuery: vi.fn(),
         normalizeGameCode: vi.fn(),
-        logger: mockLogger,
       },
       serverService: {
         getServer: vi.fn(),
         getServerByAddress: vi.fn(),
-        getServerGame: vi.fn().mockResolvedValue('csgo'),
+        getServerGame: vi.fn().mockResolvedValue("csgo"),
       },
       ingressService: {} as IIngressService,
     }

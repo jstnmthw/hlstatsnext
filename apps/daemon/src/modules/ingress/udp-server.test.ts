@@ -43,7 +43,7 @@ describe("UdpServer", () => {
     mockSocketFactory.createSocket = vi.fn(() => mockSocket)
 
     // Set up default mock behaviors
-    mockSocket.bind.mockImplementation((port, host, callback) => {
+    mockSocket.bind.mockImplementation((port: number, host: string, callback: () => void) => {
       mockSocket.listening = true
       if (callback) setImmediate(callback)
     })
@@ -84,7 +84,9 @@ describe("UdpServer", () => {
       const customServer = new UdpServer(customOptions, mockLogger, mockSocketFactory)
 
       expect((customServer as unknown as { options: UdpServerOptions }).options.port).toBe(8080)
-      expect((customServer as unknown as { options: UdpServerOptions }).options.host).toBe("127.0.0.1")
+      expect((customServer as unknown as { options: UdpServerOptions }).options.host).toBe(
+        "127.0.0.1",
+      )
     })
   })
 

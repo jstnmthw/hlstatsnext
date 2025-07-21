@@ -24,6 +24,7 @@ import type { IWeaponService } from "@/modules/weapon/weapon.types"
 import { RankingService } from "@/modules/ranking/ranking.service"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 
+import { ActionRepository } from "@/modules/action/action.repository"
 import { ActionService } from "@/modules/action/action.service"
 import type { IActionService } from "@/modules/action/action.types"
 
@@ -35,6 +36,7 @@ import { GameDetectionService } from "@/modules/game/game-detection.service"
 import { ServerRepository } from "@/modules/server/server.repository"
 import { ServerService } from "@/modules/server/server.service"
 import type { IServerService } from "@/modules/server/server.service"
+import { IGameDetectionService } from "./modules/game/game-detection.types"
 
 export interface AppContext {
   // Infrastructure
@@ -48,7 +50,7 @@ export interface AppContext {
   rankingService: IRankingService
   actionService: IActionService
   ingressService: IIngressService
-  gameDetectionService: GameDetectionService
+  gameDetectionService: IGameDetectionService
   serverService: IServerService
 }
 
@@ -61,6 +63,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const playerRepository = new PlayerRepository(database, logger)
   const matchRepository = new MatchRepository(database, logger)
   const weaponRepository = new WeaponRepository(database, logger)
+  const actionRepository = new ActionRepository(database)
   const serverRepository = new ServerRepository(database, logger)
 
   // Services (order matters for dependencies)
@@ -68,7 +71,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const playerService = new PlayerService(playerRepository, logger, rankingService)
   const matchService = new MatchService(matchRepository, logger)
   const weaponService = new WeaponService(weaponRepository, logger)
-  const actionService = new ActionService(logger)
+  const actionService = new ActionService(actionRepository, logger, playerService)
   const gameDetectionService = new GameDetectionService(logger)
   const serverService = new ServerService(serverRepository, logger)
 

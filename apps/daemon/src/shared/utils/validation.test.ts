@@ -161,16 +161,16 @@ describe("Validation Utilities", () => {
     })
 
     it("should handle null and undefined inputs", () => {
-      expect(validateServerId(null as unknown)).toBe(false)
-      expect(validateServerId(undefined as unknown)).toBe(false)
+      expect(validateServerId(null)).toBe(false)
+      expect(validateServerId(undefined)).toBe(false)
     })
 
     it("should handle non-number inputs", () => {
-      expect(validateServerId("1" as unknown)).toBe(false)
-      expect(validateServerId("123" as unknown)).toBe(false)
-      expect(validateServerId({} as unknown)).toBe(false)
-      expect(validateServerId([] as unknown)).toBe(false)
-      expect(validateServerId(true as unknown)).toBe(false)
+      expect(validateServerId("1")).toBe(false)
+      expect(validateServerId("123")).toBe(false)
+      expect(validateServerId({})).toBe(false)
+      expect(validateServerId([])).toBe(false)
+      expect(validateServerId(true)).toBe(false)
     })
 
     it("should handle floating point numbers", () => {
@@ -346,13 +346,13 @@ describe("Validation Utilities", () => {
 
   describe("Integration and edge cases", () => {
     it("should handle all validation functions with null inputs", () => {
-      expect(validateSteamId(null as unknown)).toBe(false)
-      expect(validatePlayerName(null as unknown)).toBe(false)
-      expect(validateServerId(null as unknown)).toBe(false)
-      expect(validateEventType(null as unknown)).toBe(false)
+      expect(validateSteamId(null)).toBe(false)
+      expect(validatePlayerName(null)).toBe(false)
+      expect(validateServerId(null)).toBe(false)
+      expect(validateEventType(null)).toBe(false)
 
       // sanitizePlayerName should handle null gracefully
-      expect(sanitizePlayerName(null as unknown)).toBe("")
+      expect(sanitizePlayerName(null)).toBe("")
     })
 
     it("should handle all validation functions with undefined inputs", () => {

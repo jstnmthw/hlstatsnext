@@ -10,6 +10,7 @@ build/
 # Generated files
 apps/web/lib/gql/
 generated/
+legacy/
 
 # Lock files
 pnpm-lock.yaml

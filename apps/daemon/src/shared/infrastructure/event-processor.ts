@@ -165,6 +165,8 @@ export class EventProcessor {
     }
 
     try {
+      // Get the server's game type for player creation
+      const serverGame = await this.context.serverService.getServerGame(event.serverId)
       // Handle PLAYER_KILL events
       if (event.eventType === EventType.PLAYER_KILL) {
         const dualMeta = meta as DualPlayerMeta
@@ -172,7 +174,7 @@ export class EventProcessor {
           const killerId = await this.context.playerService.getOrCreatePlayer(
             dualMeta.killer.steamId,
             dualMeta.killer.playerName,
-            "csgo",
+            serverGame,
           )
           resolvedEvent.data = { ...((event.data as Record<string, unknown>) ?? {}), killerId }
         }
@@ -181,7 +183,7 @@ export class EventProcessor {
           const victimId = await this.context.playerService.getOrCreatePlayer(
             dualMeta.victim.steamId,
             dualMeta.victim.playerName,
-            "csgo",
+            serverGame,
           )
           resolvedEvent.data = {
             ...((resolvedEvent.data as Record<string, unknown>) ?? {}),
@@ -197,7 +199,7 @@ export class EventProcessor {
           const playerId = await this.context.playerService.getOrCreatePlayer(
             playerMeta.steamId,
             playerMeta.playerName,
-            "csgo",
+            serverGame,
           )
           resolvedEvent.data = { ...((event.data as Record<string, unknown>) ?? {}), playerId }
         }

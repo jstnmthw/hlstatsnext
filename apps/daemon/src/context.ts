@@ -30,6 +30,12 @@ import type { IActionService } from "@/modules/action/action.types"
 import { IngressService } from "@/modules/ingress/ingress.service"
 import type { IIngressService, IngressOptions } from "@/modules/ingress/ingress.types"
 
+import { GameDetectionService } from "@/modules/game/game-detection.service"
+
+import { ServerRepository } from "@/modules/server/server.repository"
+import { ServerService } from "@/modules/server/server.service"
+import type { IServerService } from "@/modules/server/server.service"
+
 export interface AppContext {
   // Infrastructure
   database: DatabaseClient
@@ -42,6 +48,8 @@ export interface AppContext {
   rankingService: IRankingService
   actionService: IActionService
   ingressService: IIngressService
+  gameDetectionService: GameDetectionService
+  serverService: IServerService
 }
 
 export function createAppContext(ingressOptions?: IngressOptions): AppContext {
@@ -53,13 +61,16 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const playerRepository = new PlayerRepository(database, logger)
   const matchRepository = new MatchRepository(database, logger)
   const weaponRepository = new WeaponRepository(database, logger)
+  const serverRepository = new ServerRepository(database, logger)
 
-  // Services
-  const playerService = new PlayerService(playerRepository, logger)
+  // Services (order matters for dependencies)
+  const rankingService = new RankingService(logger)
+  const playerService = new PlayerService(playerRepository, logger, rankingService)
   const matchService = new MatchService(matchRepository, logger)
   const weaponService = new WeaponService(weaponRepository, logger)
-  const rankingService = new RankingService(logger)
   const actionService = new ActionService(logger)
+  const gameDetectionService = new GameDetectionService(logger)
+  const serverService = new ServerService(serverRepository, logger)
 
   // Create context object for circular dependency resolution
   const context = {
@@ -70,6 +81,8 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     weaponService,
     rankingService,
     actionService,
+    gameDetectionService,
+    serverService,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ingressService: null as any, // Will be set below
   } as AppContext

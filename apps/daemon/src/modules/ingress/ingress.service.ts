@@ -117,10 +117,14 @@ export class IngressService implements IIngressService {
     return logLine.includes("<BOT>")
   }
 
-  private async parseAndProcessLogLine(logLine: string): Promise<void> {
+  private async parseAndProcessLogLine(logLine: string, serverAddress?: string, serverPort?: number): Promise<void> {
     // Extract basic info and process different event types
     if (logLine.includes("connected, address")) {
-      await this.handlePlayerConnect(logLine)
+      if (serverAddress && serverPort) {
+        await this.handlePlayerConnect(logLine, serverAddress, serverPort)
+      } else {
+        this.logger.warn(`Cannot process player connect without server info: ${logLine}`)
+      }
     } else if (logLine.includes("disconnected")) {
       await this.handlePlayerDisconnect(logLine)
     } else if (logLine.includes("killed")) {
@@ -134,7 +138,7 @@ export class IngressService implements IIngressService {
     }
   }
 
-  private async handlePlayerConnect(logLine: string): Promise<void> {
+  private async handlePlayerConnect(logLine: string, serverAddress: string, serverPort: number): Promise<void> {
     const playerMatch = logLine.match(/"([^"]+)<\d+><([^>]+)><[^>]*>"/)
     if (!playerMatch) return
 
@@ -143,8 +147,26 @@ export class IngressService implements IIngressService {
 
     this.logger.event(`Player connect: ${playerName} (${steamId})`)
 
-    // Create or get player using the available service method
-    await this.context.playerService.getOrCreatePlayer(steamId, playerName, "csgo")
+    // Get server info to determine game type
+    const serverId = await this.authenticateServer(serverAddress, serverPort)
+    if (!serverId) {
+      this.logger.warn(`Cannot process player connect - server not authenticated: ${serverAddress}:${serverPort}`)
+      return
+    }
+
+    // Look up server to get game type
+    const server = await this.database.prisma.server.findUnique({
+      where: { serverId },
+      select: { game: true },
+    })
+
+    if (!server) {
+      this.logger.error(`Server ${serverId} not found in database`)
+      return
+    }
+
+    // Create or get player using the server's game type
+    await this.context.playerService.getOrCreatePlayer(steamId, playerName, server.game)
   }
 
   private async handlePlayerDisconnect(logLine: string): Promise<void> {
@@ -246,12 +268,57 @@ export class IngressService implements IIngressService {
       return this.authenticatedServers.get(serverKey)!
     }
 
-    // Skip authentication in development mode
+    // Handle authentication based on mode
     if (this.options.skipAuth) {
-      const devServerId = 1 // Default development server ID
-      this.authenticatedServers.set(serverKey, devServerId)
-      this.logger.debug(`Auto-authenticated development server ${serverKey} as ID ${devServerId}`)
-      return devServerId
+      // In development mode, try to find or create the server
+      try {
+        let server = await this.database.prisma.server.findFirst({
+          where: {
+            address,
+            port,
+          },
+          select: {
+            serverId: true,
+          },
+        })
+
+        if (!server) {
+          // Auto-detect game type for new servers in development mode
+          const gameDetection = await this.context.gameDetectionService.detectGame(
+            address,
+            port,
+            []
+          )
+          
+          this.logger.info(`Detected game ${gameDetection.gameCode} for ${serverKey} (confidence: ${gameDetection.confidence}, method: ${gameDetection.detection_method})`)
+          
+          // Auto-create server in development mode
+          server = await this.database.prisma.server.create({
+            data: {
+              game: gameDetection.gameCode,
+              address,
+              port,
+              publicaddress: `${address}:${port}`,
+              name: `Dev Server ${address}:${port}`,
+              rcon_password: '',
+              sortorder: 0,
+              act_players: 0,
+              max_players: 0,
+            },
+            select: {
+              serverId: true,
+            },
+          })
+          this.logger.info(`Auto-created development server ${serverKey} with ID ${server.serverId} (game: ${gameDetection.gameCode})`)
+        }
+
+        this.authenticatedServers.set(serverKey, server.serverId)
+        this.logger.debug(`Development server ${serverKey} mapped to ID ${server.serverId}`)
+        return server.serverId
+      } catch (error) {
+        this.logger.error(`Failed to handle development server ${serverKey}: ${error}`)
+        return null
+      }
     }
 
     // Look up server in database

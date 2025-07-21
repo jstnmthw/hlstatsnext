@@ -19,6 +19,8 @@ import type { Player } from "@repo/database/client"
 import { validateSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
 import { EventType } from "@/shared/types/events"
 import type { PlayerChatEvent } from "./player.types"
+import type { IRankingService } from "@/modules/ranking/ranking.types"
+import type { KillContext } from "@/modules/ranking/ranking.service"
 
 export class PlayerService implements IPlayerService {
   // Rating system constants
@@ -31,6 +33,7 @@ export class PlayerService implements IPlayerService {
   constructor(
     private readonly repository: IPlayerRepository,
     private readonly logger: ILogger,
+    private readonly rankingService: IRankingService,
   ) {}
 
   async getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number> {
@@ -267,31 +270,115 @@ export class PlayerService implements IPlayerService {
 
   async handleKillEvent(event: PlayerKillEvent): Promise<HandlerResult> {
     try {
-      const { killerId, victimId, headshot } = event.data
+      const { killerId, victimId, headshot, weapon, killerTeam, victimTeam } = event.data
+      const timestamp = Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR)
+
+      // Get current player stats for streak tracking
+      const [killerStats, victimStats] = await Promise.all([
+        this.repository.getPlayerStats(killerId),
+        this.repository.getPlayerStats(victimId),
+      ])
+
+      if (!killerStats || !victimStats) {
+        return {
+          success: false,
+          error: 'Unable to retrieve player stats for skill calculation',
+        }
+      }
+
+      // Calculate skill changes using the enhanced ranking system
+      const killContext: KillContext = {
+        weapon: weapon || 'unknown',
+        headshot: headshot || false,
+        killerTeam: killerTeam || 'UNKNOWN',
+        victimTeam: victimTeam || 'UNKNOWN',
+      }
+
+      const killerRating: SkillRating = {
+        playerId: killerId,
+        rating: killerStats.skill || this.DEFAULT_RATING,
+        confidence: 1.0, // TODO: Implement confidence tracking
+        volatility: this.DEFAULT_VOLATILITY,
+        gamesPlayed: killerStats.kills + killerStats.deaths,
+      }
+
+      const victimRating: SkillRating = {
+        playerId: victimId,
+        rating: victimStats.skill || this.DEFAULT_RATING,
+        confidence: 1.0,
+        volatility: this.DEFAULT_VOLATILITY,
+        gamesPlayed: victimStats.kills + victimStats.deaths,
+      }
+
+      const skillAdjustment = this.rankingService.calculateSkillAdjustment(
+        killerRating,
+        victimRating,
+        killContext,
+      )
+
+      // Calculate streaks
+      const newKillerKillStreak = (killerStats.kill_streak || 0) + 1
+      const newVictimDeathStreak = (victimStats.death_streak || 0) + 1
 
       // Update killer stats
       const killerUpdates: PlayerStatsUpdate = {
         kills: 1,
-        last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
+        skill: skillAdjustment.killerChange,
+        kill_streak: newKillerKillStreak,
+        death_streak: 0, // Reset death streak on kill
+        last_event: timestamp,
       }
 
       if (headshot) {
         killerUpdates.headshots = 1
       }
 
+      // Handle team kills
+      if (killerTeam === victimTeam) {
+        killerUpdates.teamkills = 1
+        this.logger.warn(`Team kill: ${killerId} -> ${victimId}`)
+      }
+
       // Update victim stats
       const victimUpdates: PlayerStatsUpdate = {
         deaths: 1,
-        last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
+        skill: skillAdjustment.victimChange,
+        death_streak: newVictimDeathStreak,
+        kill_streak: 0, // Reset kill streak on death
+        last_event: timestamp,
       }
 
+      // Apply stat updates and log EventFrag
       await Promise.all([
         this.updatePlayerStats(killerId, killerUpdates),
         this.updatePlayerStats(victimId, victimUpdates),
+        // Log EventFrag for historical tracking
+        this.repository.logEventFrag(
+          killerId,
+          victimId,
+          event.serverId,
+          '', // TODO: Get current map from MatchService
+          weapon || 'unknown',
+          headshot || false,
+          undefined, // killerRole - TODO: Get from player roles
+          undefined, // victimRole - TODO: Get from player roles
+          // Position data from event if available
+          undefined, // killerX - TODO: Extract from event.data positions
+          undefined, // killerY
+          undefined, // killerZ
+          undefined, // victimX
+          undefined, // victimY
+          undefined, // victimZ
+        ),
       ])
 
       this.logger.debug(
-        `Processed kill event: ${killerId} -> ${victimId}${headshot ? " (headshot)" : ""}`,
+        `Kill processed: ${killerId} -> ${victimId} ` +
+        `(${weapon}${headshot ? ', headshot' : ''}) ` +
+        `skill: ${killerRating.rating}→${killerRating.rating + skillAdjustment.killerChange} ` +
+        `(${skillAdjustment.killerChange > 0 ? '+' : ''}${skillAdjustment.killerChange}), ` +
+        `victim: ${victimRating.rating}→${victimRating.rating + skillAdjustment.victimChange} ` +
+        `(${skillAdjustment.victimChange})`
       )
 
       return { success: true, affected: 2 }
@@ -306,6 +393,9 @@ export class PlayerService implements IPlayerService {
   private async handlePlayerConnect(event: PlayerEvent): Promise<HandlerResult> {
     try {
       // Player ID should already be resolved by event processor
+      if (event.eventType !== EventType.PLAYER_CONNECT) {
+        return { success: false, error: 'Invalid event type for handlePlayerConnect' }
+      }
       const { playerId } = event.data
 
       await this.updatePlayerStats(playerId, {
@@ -381,14 +471,44 @@ export class PlayerService implements IPlayerService {
 
   private async handlePlayerSuicide(event: PlayerEvent): Promise<HandlerResult> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { playerId } = (event as any).data
+      if (event.eventType !== EventType.PLAYER_SUICIDE) {
+        return { success: false, error: 'Invalid event type for handlePlayerSuicide' }
+      }
+      
+      const { playerId } = event.data
+      const timestamp = Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR)
 
-      await this.updatePlayerStats(playerId, {
+      // Get current player stats for streak tracking
+      const playerStats = await this.repository.getPlayerStats(playerId)
+      
+      if (!playerStats) {
+        return {
+          success: false,
+          error: 'Unable to retrieve player stats for suicide processing',
+        }
+      }
+
+      // Calculate skill penalty for suicide
+      const skillPenalty = this.rankingService.calculateSuicidePenalty()
+      
+      // Update death streak, reset kill streak
+      const newDeathStreak = (playerStats.death_streak || 0) + 1
+
+      const updates: PlayerStatsUpdate = {
         suicides: 1,
         deaths: 1, // Suicide also counts as death
-        last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
-      })
+        skill: skillPenalty,
+        death_streak: newDeathStreak,
+        kill_streak: 0, // Reset kill streak on death
+        last_event: timestamp,
+      }
+
+      await this.updatePlayerStats(playerId, updates)
+      
+      this.logger.debug(
+        `Suicide processed: player ${playerId}, ` +
+        `skill penalty: ${skillPenalty}, death streak: ${newDeathStreak}`
+      )
 
       return { success: true, affected: 1 }
     } catch (error) {

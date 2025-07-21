@@ -257,6 +257,31 @@ export interface IPlayerRepository {
     messageMode?: number,
     options?: CreateOptions,
   ): Promise<void>
+  
+  // Player stats retrieval for skill calculations
+  getPlayerStats(
+    playerId: number,
+    options?: FindOptions,
+  ): Promise<import("@repo/database/client").Player | null>
+  
+  // EventFrag logging for kill events
+  logEventFrag(
+    killerId: number,
+    victimId: number,
+    serverId: number,
+    map: string,
+    weapon: string,
+    headshot: boolean,
+    killerRole?: string,
+    victimRole?: string,
+    killerX?: number,
+    killerY?: number,
+    killerZ?: number,
+    victimX?: number,
+    victimY?: number,
+    victimZ?: number,
+    options?: CreateOptions,
+  ): Promise<void>
 }
 
 export interface IPlayerEventHandler {

@@ -327,4 +327,80 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
       this.handleError("createChatEvent", error)
     }
   }
+
+  async getPlayerStats(playerId: number, options?: FindOptions): Promise<Player | null> {
+    try {
+      this.validateId(playerId, "getPlayerStats")
+      
+      return await this.executeWithTransaction(async (client) => {
+        return client.player.findUnique({
+          where: { playerId },
+          select: {
+            playerId: true,
+            skill: true,
+            kills: true,
+            deaths: true,
+            suicides: true,
+            teamkills: true,
+            headshots: true,
+            kill_streak: true,
+            death_streak: true,
+          },
+        }) as Promise<Player | null>
+      }, options)
+    } catch (error) {
+      this.handleError("getPlayerStats", error)
+      return null
+    }
+  }
+
+  async logEventFrag(
+    killerId: number,
+    victimId: number,
+    serverId: number,
+    map: string,
+    weapon: string,
+    headshot: boolean,
+    killerRole?: string,
+    victimRole?: string,
+    killerX?: number,
+    killerY?: number,
+    killerZ?: number,
+    victimX?: number,
+    victimY?: number,
+    victimZ?: number,
+    options?: CreateOptions,
+  ): Promise<void> {
+    try {
+      this.validateId(killerId, "logEventFrag killer")
+      this.validateId(victimId, "logEventFrag victim")
+      this.validateId(serverId, "logEventFrag server")
+
+      await this.executeWithTransaction(async (client) => {
+        await client.eventFrag.create({
+          data: {
+            eventTime: new Date(),
+            serverId,
+            map: map || '',
+            killerId,
+            victimId,
+            weapon: weapon || '',
+            headshot: headshot ? 1 : 0,
+            killerRole: killerRole || '',
+            victimRole: victimRole || '',
+            pos_x: killerX || null,
+            pos_y: killerY || null,
+            pos_z: killerZ || null,
+            pos_victim_x: victimX || null,
+            pos_victim_y: victimY || null,
+            pos_victim_z: victimZ || null,
+          },
+        })
+      }, options)
+
+      this.logger.debug(`Logged EventFrag: ${killerId} -> ${victimId} (${weapon}) on ${map}`)
+    } catch (error) {
+      this.handleError("logEventFrag", error)
+    }
+  }
 }

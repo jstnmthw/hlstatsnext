@@ -10,6 +10,9 @@ import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 
 export class CsParser extends BaseParser {
+  // Track the last winning team for Round_End events
+  private lastWinningTeam: string | undefined
+
   constructor(game: string = "csgo") {
     super(game)
   }
@@ -38,9 +41,23 @@ export class CsParser extends BaseParser {
         return this.parseChatEvent(cleanLine, serverId)
       }
 
+      // Player action triggers
+      if (cleanLine.includes('triggered "')) {
+        const actionResult = this.parseActionEvent(cleanLine, serverId)
+        if (actionResult.success && actionResult.event) {
+          return actionResult
+        }
+        // Fall through to other event parsing if not an action
+      }
+
       // Round events
       if (cleanLine.includes('World triggered "Round_Start"')) {
         return this.parseRoundStartEvent(cleanLine, serverId)
+      }
+
+      // Parse team win events first (these happen before Round_End)
+      if (cleanLine.includes('triggered "Terrorists_Win"') || cleanLine.includes('triggered "CTs_Win"')) {
+        return this.parseTeamWinEvent(cleanLine, serverId)
       }
 
       if (cleanLine.includes('World triggered "Round_End"')) {
@@ -270,6 +287,45 @@ export class CsParser extends BaseParser {
     return { event, success: true }
   }
 
+  private parseTeamWinEvent(logLine: string, serverId: number): ParseResult {
+    // Parse: Team "TERRORIST" triggered "Terrorists_Win" (CT "4") (T "4")
+    const teamWinMatch = logLine.match(/Team "([^"]+)" triggered "([^"]+)"/i)
+    
+    if (teamWinMatch) {
+      const [, team, triggerName] = teamWinMatch
+      
+      // Store the winning team for the subsequent Round_End event
+      this.lastWinningTeam = team
+      
+      // Extract scores if available: (CT "4") (T "4")
+      const scoreMatch = logLine.match(/\(CT "(\d+)"\) \(T "(\d+)"\)/)
+      let score
+      if (scoreMatch && scoreMatch[1] && scoreMatch[2]) {
+        const [, ctScore, tScore] = scoreMatch
+        score = {
+          ct: parseInt(ctScore, 10),
+          t: parseInt(tScore, 10),
+        }
+      }
+
+      const event: BaseEvent = {
+        eventType: EventType.TEAM_WIN,
+        timestamp: this.createTimestamp(),
+        serverId,
+        raw: logLine,
+        data: {
+          winningTeam: team,
+          triggerName,
+          score: score || { ct: 0, t: 0 },
+        },
+      }
+
+      return { event, success: true }
+    }
+
+    return { event: null, success: false }
+  }
+
   private parseRoundEndEvent(logLine: string, serverId: number): ParseResult {
     const event: BaseEvent = {
       eventType: EventType.ROUND_END,
@@ -277,11 +333,61 @@ export class CsParser extends BaseParser {
       serverId,
       raw: logLine,
       data: {
-        winningTeam: "unknown", // Would need additional parsing
-        duration: 0,
+        winningTeam: this.lastWinningTeam || undefined,
+        duration: 0, // Could be extracted from match time if available
       },
     }
 
+    // Clear the winning team after using it
+    this.lastWinningTeam = undefined
+
     return { event, success: true }
+  }
+
+  private parseActionEvent(logLine: string, serverId: number): ParseResult {
+    // Parse player action events like:
+    // "Player<2><STEAM_ID><TERRORIST>" triggered "Spawned_With_The_Bomb"
+    const playerActionRegex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" triggered "([^"]+)"/
+    const playerMatch = logLine.match(playerActionRegex)
+
+    if (playerMatch) {
+      const [, playerName, playerIdStr, steamId, team, actionCode] = playerMatch
+
+      if (!playerName || !playerIdStr || !steamId || !actionCode) {
+        return { event: null, success: false, error: "Missing required fields in player action event" }
+      }
+
+      const playerId = parseInt(playerIdStr)
+      if (isNaN(playerId)) {
+        return { event: null, success: false, error: "Invalid player ID in action event" }
+      }
+
+      const event: BaseEvent = {
+        eventType: EventType.ACTION_PLAYER,
+        timestamp: this.createTimestamp(),
+        serverId,
+        raw: logLine,
+        data: {
+          playerId,
+          actionCode,
+          game: this.game,
+          team: team || undefined,
+        },
+        meta: {
+          steamId,
+          playerName,
+          isBot: steamId === "BOT",
+        },
+      }
+
+      return { event, success: true }
+    }
+
+    // Parse team action events like:
+    // Team "TERRORIST" triggered "Terrorists_Win"
+    // (Already handled by parseTeamWinEvent, but could add other team actions here)
+
+    // Not an action event we handle
+    return { event: null, success: false }
   }
 }

@@ -27,7 +27,7 @@ export class EventProcessor {
 
     try {
       // Log event for debugging
-      this.logger.info(`Processing event: ${event.eventType} for server ${event.serverId}`)
+      this.logger.debug(`Processing event: ${event.eventType} for server ${event.serverId}`)
 
       // Resolve player IDs from Steam IDs for events that need it
       const resolvedEvent = await this.resolvePlayerIds(event)

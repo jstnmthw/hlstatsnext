@@ -10,24 +10,30 @@ import type {
   ActionTeamEvent,
   WorldActionEvent,
 } from "./action.types"
+import type { IActionRepository } from "./action.repository"
+import type { IPlayerService } from "@/modules/player/player.types"
 import type { ILogger } from "@/shared/utils/logger"
 import type { HandlerResult } from "@/shared/types/common"
 import { EventType } from "@/shared/types/events"
 
 export class ActionService implements IActionService {
-  constructor(private readonly logger: ILogger) {}
+  constructor(
+    private readonly repository: IActionRepository,
+    private readonly logger: ILogger,
+    private readonly playerService?: IPlayerService, // Optional to avoid circular dependency
+  ) {}
 
   async handleActionEvent(event: ActionEvent): Promise<HandlerResult> {
     try {
       switch (event.eventType) {
         case EventType.ACTION_PLAYER:
-          return await this.handlePlayerAction(event)
+          return await this.handlePlayerAction(event as ActionPlayerEvent)
         case EventType.ACTION_PLAYER_PLAYER:
-          return await this.handlePlayerPlayerAction(event)
+          return await this.handlePlayerPlayerAction(event as ActionPlayerPlayerEvent)
         case EventType.ACTION_TEAM:
-          return await this.handleTeamAction(event)
+          return await this.handleTeamAction(event as ActionTeamEvent)
         case EventType.ACTION_WORLD:
-          return await this.handleWorldAction(event)
+          return await this.handleWorldAction(event as WorldActionEvent)
         default:
           return { success: true }
       }
@@ -40,24 +46,197 @@ export class ActionService implements IActionService {
   }
 
   private async handlePlayerAction(event: ActionPlayerEvent): Promise<HandlerResult> {
-    this.logger.debug(`Player action: ${event.data.actionCode} by player ${event.data.playerId}`)
-    return { success: true }
+    try {
+      const { playerId, actionCode, game, team, bonus } = event.data
+      
+      // Look up action definition from database
+      this.logger.debug(`Looking up action: ${actionCode} for game ${game}, team ${team}`)
+      const actionDef = await this.repository.findActionByCode(game, actionCode, team)
+      
+      if (!actionDef) {
+        this.logger.warn(`Unknown action code: ${actionCode} for game ${game}`)
+        return { success: true } // Don't fail on unknown actions
+      }
+      
+      this.logger.debug(`Found action definition: ID ${actionDef.id}, reward ${actionDef.rewardPlayer}`)
+      
+      if (!actionDef.forPlayerActions) {
+        this.logger.debug(`Action ${actionCode} not enabled for player actions`)
+        return { success: true }
+      }
+      
+      // Calculate total points (base reward + bonus)
+      const totalPoints = actionDef.rewardPlayer + (bonus || 0)
+      
+      // Log the action event to database
+      this.logger.debug(`Logging player action to database: player ${playerId}, action ${actionDef.id}, server ${event.serverId}`)
+      await this.repository.logPlayerAction(
+        playerId,
+        actionDef.id,
+        event.serverId,
+        '', // TODO: Get current map from event context
+        bonus || 0,
+      )
+      this.logger.debug(`Player action successfully logged to database`)
+      
+      // Update player skill points if player service is available
+      if (this.playerService && totalPoints !== 0) {
+        this.logger.debug(`Updating player skill: ${totalPoints} points for player ${playerId}`)
+        await this.playerService.updatePlayerStats(playerId, {
+          skill: totalPoints,
+        })
+        this.logger.debug(`Player skill updated successfully`)
+      }
+      
+      // Log the event with point information
+      this.logger.event(
+        `Player action: ${actionCode} by player ${playerId} ` +
+        `(${totalPoints > 0 ? '+' : ''}${totalPoints} points)`
+      )
+      
+      return { success: true, affected: 1 }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      }
+    }
   }
 
   private async handlePlayerPlayerAction(event: ActionPlayerPlayerEvent): Promise<HandlerResult> {
-    this.logger.debug(
-      `Player-player action: ${event.data.actionCode} by ${event.data.playerId} on ${event.data.victimId}`,
-    )
-    return { success: true }
+    try {
+      const { playerId, victimId, actionCode, game, team, bonus } = event.data
+      
+      // Look up action definition from database
+      const actionDef = await this.repository.findActionByCode(game, actionCode, team)
+      
+      if (!actionDef) {
+        this.logger.warn(`Unknown action code: ${actionCode} for game ${game}`)
+        return { success: true } // Don't fail on unknown actions
+      }
+      
+      if (!actionDef.forPlayerPlayerActions) {
+        this.logger.debug(`Action ${actionCode} not enabled for player-player actions`)
+        return { success: true }
+      }
+      
+      // Calculate total points (base reward + bonus)
+      const totalPoints = actionDef.rewardPlayer + (bonus || 0)
+      
+      // Log the action event to database
+      await this.repository.logPlayerPlayerAction(
+        playerId,
+        victimId,
+        actionDef.id,
+        event.serverId,
+        '', // TODO: Get current map from event context
+        bonus || 0,
+      )
+      
+      // Update player skill points if player service is available
+      if (this.playerService && totalPoints !== 0) {
+        await this.playerService.updatePlayerStats(playerId, {
+          skill: totalPoints,
+        })
+      }
+      
+      // Log the event with point information
+      this.logger.event(
+        `Player action: ${actionCode} by player ${playerId} on ${victimId} ` +
+        `(${totalPoints > 0 ? '+' : ''}${totalPoints} points)`
+      )
+      
+      return { success: true, affected: 1 }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      }
+    }
   }
 
   private async handleTeamAction(event: ActionTeamEvent): Promise<HandlerResult> {
-    this.logger.debug(`Team action: ${event.data.actionCode} by team ${event.data.team}`)
-    return { success: true }
+    try {
+      const { team, actionCode, game, bonus } = event.data
+      
+      // Look up action definition from database
+      const actionDef = await this.repository.findActionByCode(game, actionCode, team)
+      
+      if (!actionDef) {
+        this.logger.warn(`Unknown action code: ${actionCode} for game ${game}`)
+        return { success: true } // Don't fail on unknown actions
+      }
+      
+      if (!actionDef.forTeamActions) {
+        this.logger.debug(`Action ${actionCode} not enabled for team actions`)
+        return { success: true }
+      }
+      
+      // Calculate total points (base reward + bonus)
+      const totalPoints = actionDef.rewardTeam + (bonus || 0)
+      
+      // Log the action event to database
+      await this.repository.logTeamAction(
+        event.serverId,
+        actionDef.id,
+        '', // TODO: Get current map from event context
+        bonus || 0,
+      )
+      
+      // Log the event with point information
+      this.logger.event(
+        `Team action: ${actionCode} by team ${team} ` +
+        `(${totalPoints > 0 ? '+' : ''}${totalPoints} points)`
+      )
+      
+      return { success: true, affected: 1 }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      }
+    }
   }
 
   private async handleWorldAction(event: WorldActionEvent): Promise<HandlerResult> {
-    this.logger.debug(`World action: ${event.data.actionCode}`)
-    return { success: true }
+    try {
+      const { actionCode, game, bonus } = event.data
+      
+      // Look up action definition from database
+      const actionDef = await this.repository.findActionByCode(game, actionCode)
+      
+      if (!actionDef) {
+        this.logger.warn(`Unknown action code: ${actionCode} for game ${game}`)
+        return { success: true } // Don't fail on unknown actions
+      }
+      
+      if (!actionDef.forWorldActions) {
+        this.logger.debug(`Action ${actionCode} not enabled for world actions`)
+        return { success: true }
+      }
+      
+      // World actions typically don't have player rewards, but may have server-wide effects
+      const totalPoints = bonus || 0
+      
+      // Log the action event to database
+      await this.repository.logWorldAction(
+        event.serverId,
+        actionDef.id,
+        '', // TODO: Get current map from event context
+        bonus || 0,
+      )
+      
+      // Log the event
+      this.logger.event(
+        `World action: ${actionCode}${totalPoints !== 0 ? ` (${totalPoints > 0 ? '+' : ''}${totalPoints} points)` : ''}`
+      )
+      
+      return { success: true, affected: 1 }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      }
+    }
   }
 }

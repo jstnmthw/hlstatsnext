@@ -1,12 +1,7 @@
 import type { ILogger } from "@/shared/utils/logger"
+import type { GameDetectionResult, IGameDetectionService } from "./game-detection.types"
 
-export interface GameDetectionResult {
-  gameCode: string
-  confidence: number
-  detection_method: string
-}
-
-export class GameDetectionService {
+export class GameDetectionService implements IGameDetectionService {
   constructor(private readonly logger: ILogger) {}
 
   /**

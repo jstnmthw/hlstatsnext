@@ -372,12 +372,14 @@ export class PlayerService implements IPlayerService {
         ),
       ])
 
-      this.logger.debug(
-        `Kill processed: ${killerId} -> ${victimId} ` +
-        `(${weapon}${headshot ? ', headshot' : ''}) ` +
-        `skill: ${killerRating.rating}→${killerRating.rating + skillAdjustment.killerChange} ` +
+      // Log kill event
+      this.logger.event(`Kill: ${killerId} -> ${victimId} (${weapon}${headshot ? ', headshot' : ''})`)
+      
+      // Log skill calculation details
+      this.logger.event(
+        `Skill calculation: killer ${killerRating.rating}→${killerRating.rating + skillAdjustment.killerChange} ` +
         `(${skillAdjustment.killerChange > 0 ? '+' : ''}${skillAdjustment.killerChange}), ` +
-        `victim: ${victimRating.rating}→${victimRating.rating + skillAdjustment.victimChange} ` +
+        `victim ${victimRating.rating}→${victimRating.rating + skillAdjustment.victimChange} ` +
         `(${skillAdjustment.victimChange})`
       )
 
@@ -402,6 +404,8 @@ export class PlayerService implements IPlayerService {
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
       })
 
+      this.logger.event(`Player connected: ${playerId}`)
+      
       return { success: true, affected: 1 }
     } catch (error) {
       return {
@@ -426,6 +430,8 @@ export class PlayerService implements IPlayerService {
 
       await this.updatePlayerStats(playerId, updates)
 
+      this.logger.event(`Player disconnected: ${playerId}`)
+      
       return { success: true, affected: 1 }
     } catch (error) {
       return {
@@ -505,10 +511,7 @@ export class PlayerService implements IPlayerService {
 
       await this.updatePlayerStats(playerId, updates)
       
-      this.logger.debug(
-        `Suicide processed: player ${playerId}, ` +
-        `skill penalty: ${skillPenalty}, death streak: ${newDeathStreak}`
-      )
+      this.logger.event(`Player suicide: ${playerId} (penalty: ${skillPenalty})`)
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -571,7 +574,7 @@ export class PlayerService implements IPlayerService {
         messageMode || 0,
       )
 
-      this.logger.debug(`Stored chat message from player ${playerId}: "${message}"`)
+      this.logger.event(`Chat message: ${playerId}: "${message}"`)
 
       return { success: true, affected: 1 }
     } catch (error) {

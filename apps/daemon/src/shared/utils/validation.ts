@@ -2,7 +2,7 @@
  * Shared Validation Utilities
  */
 
-export function validateSteamId(steamId: string): boolean {
+export function validateSteamId(steamId: unknown): boolean {
   if (!steamId || typeof steamId !== "string") {
     return false
   }
@@ -16,7 +16,7 @@ export function validateSteamId(steamId: string): boolean {
   return /^\d{17}$/.test(steamId)
 }
 
-export function validatePlayerName(name: string): boolean {
+export function validatePlayerName(name: unknown): boolean {
   if (!name || typeof name !== "string") {
     return false
   }
@@ -25,15 +25,15 @@ export function validatePlayerName(name: string): boolean {
   return name.trim().length >= 1 && name.trim().length <= 64
 }
 
-export function validateServerId(serverId: number): boolean {
+export function validateServerId(serverId: unknown): boolean {
   return typeof serverId === "number" && serverId > 0
 }
 
-export function validateEventType(eventType: string): boolean {
-  return typeof eventType === "string" && eventType.length > 0
+export function validateEventType(eventType: unknown): boolean {
+  return typeof eventType === "string" && eventType.length > 0 && eventType.length <= 64
 }
 
-export function sanitizePlayerName(name: string): string {
+export function sanitizePlayerName(name: unknown): string {
   if (!name || typeof name !== "string") {
     return ""
   }

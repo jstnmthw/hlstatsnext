@@ -6,6 +6,8 @@
 import type { IRankingService, SkillRating } from "./ranking.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
+import type { IWeaponRepository } from "../weapon/weapon.types"
+import type { Weapon } from "@repo/database/client"
 
 export interface KillContext {
   weapon: string
@@ -13,6 +15,7 @@ export interface KillContext {
   killerTeam: string
   victimTeam: string
   distance?: number
+  game?: string
 }
 
 export class RankingService implements IRankingService {
@@ -24,70 +27,17 @@ export class RankingService implements IRankingService {
   private readonly BASE_K_FACTOR = 32
   private readonly VOLATILITY_DIVISOR = 400
   private readonly VICTIM_LOSS_RATIO = 0.8 // Victim loses 80% of killer's gain
+  private readonly DEFAULT_WEAPON_MODIFIER = 1.0
 
-  // Weapon multipliers (from PLAYER_RANKINGS.md spec)
-  private readonly WEAPON_MULTIPLIERS: Record<string, number> = {
-    // Precision rifles
-    awp: 1.4,
-    scout: 1.4,
-    g3sg1: 1.4,
-    sg550: 1.4,
+  // Cache for weapon modifiers to avoid repeated DB lookups
+  private weaponModifierCache: Map<string, number> = new Map()
+  private cacheLastUpdated: number = 0
+  private readonly CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
-    // Assault rifles (baseline)
-    ak47: 1.0,
-    m4a1: 1.0,
-    m4a1_silencer: 1.0,
-    aug: 1.0,
-    sg552: 1.0,
-    sg553: 1.0,
-    galil: 1.0,
-    famas: 1.0,
-
-    // SMGs
-    mp5navy: 0.9,
-    ump45: 0.9,
-    p90: 0.9,
-    mp7: 0.9,
-    mp9: 0.9,
-    bizon: 0.9,
-    tmp: 0.9,
-    mac10: 0.9,
-
-    // Shotguns
-    m3: 0.9,
-    xm1014: 0.9,
-    nova: 0.9,
-    sawedoff: 0.9,
-    mag7: 0.9,
-
-    // Pistols
-    deagle: 0.8,
-    usp: 0.8,
-    glock: 0.8,
-    p228: 0.8,
-    elite: 0.8,
-    fiveseven: 0.8,
-    tec9: 0.8,
-    p250: 0.8,
-    hkp2000: 0.8,
-
-    // Melee/Special
-    knife: 2.0,
-    hegrenade: 1.5,
-    flashbang: 1.8, // Rare flash kills
-    smokegrenade: 1.8,
-    inferno: 1.2, // Molotov/incendiary
-    decoy: 2.0, // Extremely rare
-
-    // Machine guns
-    m249: 0.8,
-    negev: 0.8,
-
-    // Default for unknown weapons
-    unknown: 1.0,
-  }
-
-  constructor(private readonly logger: ILogger) {}
+  constructor(
+    private readonly logger: ILogger,
+    private readonly weaponRepository: IWeaponRepository,
+  ) {}
 
   async handleRatingUpdate(): Promise<HandlerResult> {
     try {
@@ -106,11 +56,11 @@ export class RankingService implements IRankingService {
    * Calculate skill rating adjustment for a kill event
    * Based on modified ELO rating system from PLAYER_RANKINGS.md
    */
-  calculateSkillAdjustment(
+  async calculateSkillAdjustment(
     killerRating: SkillRating,
     victimRating: SkillRating,
     context: KillContext,
-  ): { killerChange: number; victimChange: number } {
+  ): Promise<{ killerChange: number; victimChange: number }> {
     // Handle team kills with penalties
     if (context.killerTeam === context.victimTeam) {
       return this.calculateTeamKillPenalty()
@@ -126,7 +76,7 @@ export class RankingService implements IRankingService {
     let baseChange = kFactor * (1 - expectedScore)
 
     // Apply weapon multiplier
-    const weaponMultiplier = this.getWeaponMultiplier(context.weapon)
+    const weaponMultiplier = await this.getWeaponMultiplier(context.weapon, context.game)
     baseChange *= weaponMultiplier
 
     // Apply headshot bonus
@@ -151,6 +101,7 @@ export class RankingService implements IRankingService {
       `Skill calculation: ${context.weapon} kill, ` +
         `${context.headshot ? "headshot, " : ""}` +
         `expected: ${expectedScore.toFixed(3)}, k-factor: ${kFactor}, ` +
+        `weapon multiplier: ${weaponMultiplier}, ` +
         `killer: ${killerRating.rating} → ${killerRating.rating + finalKillerChange} (${finalKillerChange > 0 ? "+" : ""}${finalKillerChange}), ` +
         `victim: ${victimRating.rating} → ${victimRating.rating + finalVictimChange} (${finalVictimChange})`,
     )
@@ -191,14 +142,46 @@ export class RankingService implements IRankingService {
   /**
    * Get weapon multiplier for skill calculations
    */
-  private getWeaponMultiplier(weapon: string): number {
+  private async getWeaponMultiplier(weapon: string, game: string = "cstrike"): Promise<number> {
     // Normalize weapon name (remove prefixes, convert to lowercase)
     const normalizedWeapon = weapon
       .toLowerCase()
       .replace(/^weapon_/, "")
       .replace(/^item_/, "")
 
-    return this.WEAPON_MULTIPLIERS[normalizedWeapon] ?? this.WEAPON_MULTIPLIERS.unknown ?? 1.0
+    // Check cache first
+    const cacheKey = `${game}:${normalizedWeapon}`
+    const now = Date.now()
+
+    // Refresh cache if expired
+    if (now - this.cacheLastUpdated > this.CACHE_TTL_MS) {
+      this.weaponModifierCache.clear()
+      this.cacheLastUpdated = now
+    }
+
+    // Return cached value if available
+    if (this.weaponModifierCache.has(cacheKey)) {
+      return this.weaponModifierCache.get(cacheKey)!
+    }
+
+    try {
+      // Fetch from database
+      const weaponData = (await this.weaponRepository.findWeaponByCode(normalizedWeapon)) as Weapon | null
+
+      if (weaponData && weaponData.modifier) {
+        const modifier = Number(weaponData.modifier)
+        this.weaponModifierCache.set(cacheKey, modifier)
+        return modifier
+      }
+
+      // Return default modifier if weapon not found
+      this.logger.debug(`Weapon modifier not found for ${normalizedWeapon}, using default`)
+      this.weaponModifierCache.set(cacheKey, this.DEFAULT_WEAPON_MODIFIER)
+      return this.DEFAULT_WEAPON_MODIFIER
+    } catch (error) {
+      this.logger.error(`Error fetching weapon modifier for ${normalizedWeapon}: ${error}`)
+      return this.DEFAULT_WEAPON_MODIFIER
+    }
   }
 
   /**
@@ -240,10 +223,10 @@ export class RankingService implements IRankingService {
    * Calculate rating adjustment using standard ELO formula
    * This is a simplified version without weapon/headshot modifiers
    */
-  calculateRatingAdjustment(
+  async calculateRatingAdjustment(
     winnerRating: SkillRating,
     loserRating: SkillRating,
-  ): { winner: number; loser: number } {
+  ): Promise<{ winner: number; loser: number }> {
     // Calculate expected score for winner
     const expectedScore = this.calculateExpectedScore(winnerRating.rating, loserRating.rating)
 
@@ -262,5 +245,14 @@ export class RankingService implements IRankingService {
       winner: boundedWinnerGain,
       loser: boundedLoserLoss,
     }
+  }
+
+  /**
+   * Clear the weapon modifier cache
+   * Useful for testing or when weapon data is updated
+   */
+  clearWeaponCache(): void {
+    this.weaponModifierCache.clear()
+    this.cacheLastUpdated = 0
   }
 }

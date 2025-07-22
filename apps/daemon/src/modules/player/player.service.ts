@@ -309,7 +309,7 @@ export class PlayerService implements IPlayerService {
         gamesPlayed: victimStats.kills + victimStats.deaths,
       }
 
-      const skillAdjustment = this.rankingService.calculateSkillAdjustment(
+      const skillAdjustment = await this.rankingService.calculateSkillAdjustment(
         killerRating,
         victimRating,
         killContext,

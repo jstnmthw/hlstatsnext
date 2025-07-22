@@ -6,7 +6,7 @@
 
 import type { IObjectiveHandler, ObjectiveEvent } from "../match.types"
 import type { IMatchService } from "../match.types"
-import type { ILogger } from "@/shared/utils/logger"
+import type { ILogger } from "@/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 
 export class ObjectiveHandler implements IObjectiveHandler {

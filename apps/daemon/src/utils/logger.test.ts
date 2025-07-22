@@ -5,11 +5,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { Logger, logger, type LogStatus } from "./logger"
 import type { ILogger } from "./logger.types"
-import type { MockedFunction } from "vitest"
+import type { MockInstance } from "vitest"
 
 describe("Logger", () => {
   let testLogger: Logger
-  let consoleSpy: MockedFunction<typeof console.log>
+  let consoleSpy: MockInstance
 
   beforeEach(() => {
     // Mock console.log to capture output

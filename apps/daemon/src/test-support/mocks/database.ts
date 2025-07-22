@@ -5,9 +5,7 @@
  */
 
 import type { MockedFunction } from "vitest"
-import { db } from "@repo/database/client"
 import type { TransactionalPrisma } from "@/database/client"
-import { prismaPartialMock } from "./prismaPartialMock"
 import { vi } from "vitest"
 
 export interface MockDatabaseClient {
@@ -19,20 +17,40 @@ export interface MockDatabaseClient {
   >
 }
 
+// Utility to deeply mock any object
+function deepMock<T extends object>(overrides?: Partial<T>): T {
+  const proxy = new Proxy(
+    {},
+    {
+      get: () => vi.fn(),
+    },
+  ) as unknown as T
+  return { ...proxy, ...overrides } as T
+}
+
 export function createMockDatabaseClient(): MockDatabaseClient {
-  const prisma = prismaPartialMock({
-    player: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn(), findMany: vi.fn() } as any,
-    playerUniqueId: { findUnique: vi.fn(), create: vi.fn(), update: vi.fn() } as any,
-    server: { findUnique: vi.fn(), update: vi.fn() } as any,
-    weapon: { findUnique: vi.fn(), upsert: vi.fn() } as any,
-    $transaction: vi.fn((cb) => cb(prisma)),
-    $disconnect: vi.fn(),
-  })
+  const prisma = deepMock<TransactionalPrisma>()
+
+  // Optionally override only the methods you care about:
+  prisma.player.findUnique = vi.fn()
+  prisma.player.update = vi.fn()
+  prisma.player.create = vi.fn()
+  prisma.player.findMany = vi.fn()
+
+  prisma.playerUniqueId.findUnique = vi.fn()
+  prisma.playerUniqueId.create = vi.fn()
+  prisma.playerUniqueId.update = vi.fn()
+
+  prisma.server.findUnique = vi.fn()
+  prisma.server.update = vi.fn()
+
+  prisma.weapon.findUnique = vi.fn()
+  prisma.weapon.upsert = vi.fn()
 
   return {
     prisma,
     testConnection: vi.fn().mockResolvedValue(true),
     disconnect: vi.fn().mockResolvedValue(undefined),
-    transaction: prisma.$transaction,
+    transaction: vi.fn((cb: (prisma: TransactionalPrisma) => Promise<void>) => cb(prisma)),
   }
 }

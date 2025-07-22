@@ -4,7 +4,7 @@
  * Mock logger implementation for testing.
  */
 
-import type { ILogger } from "../../shared/utils/logger"
+import type { ILogger } from "@/utils/logger.types"
 import { vi } from "vitest"
 
 export function createMockLogger(): ILogger {

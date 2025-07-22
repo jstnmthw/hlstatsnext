@@ -137,7 +137,11 @@ describe("BaseRepository", () => {
 
     it("should propagate transaction errors", async () => {
       const operation = vi.fn().mockRejectedValue(new Error("Transaction failed"))
-      const mockTransaction = { test: { findMany: vi.fn() } }
+      const mockTransaction = {
+        test: {
+          findMany: vi.fn(),
+        },
+      }
       const options = { transaction: mockTransaction }
 
       await expect(repository.executeWithTransactionPublic(operation, options)).rejects.toThrow(

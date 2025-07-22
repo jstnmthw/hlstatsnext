@@ -52,6 +52,8 @@ describe("EventProcessor", () => {
     const rankingServiceMock: IRankingService = {
       handleRatingUpdate: vi.fn().mockResolvedValue({ success: true }),
       calculateRatingAdjustment: vi.fn(),
+      calculateSkillAdjustment: vi.fn(),
+      calculateSuicidePenalty: vi.fn(),
     }
 
     const actionServiceMock: IActionService = {

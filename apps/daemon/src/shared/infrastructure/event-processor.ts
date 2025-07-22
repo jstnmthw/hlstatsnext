@@ -7,7 +7,7 @@
 
 import type { AppContext } from "@/context"
 import type { BaseEvent, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
-import type { ILogger } from "@/shared/utils/logger"
+import type { ILogger } from "@/utils/logger.types"
 import type { PlayerEvent, PlayerKillEvent } from "@/modules/player/player.types"
 import type { WeaponEvent } from "@/modules/weapon/weapon.types"
 import type { ActionEvent } from "@/modules/action/action.types"

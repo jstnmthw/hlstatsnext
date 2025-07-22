@@ -2,10 +2,10 @@
  * ObjectiveHandler Unit Tests
  */
 
+import type { ObjectiveEvent, IMatchService } from "../match.types"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { ObjectiveHandler } from "./objective.handler"
 import { createMockLogger } from "../../../test-support/mocks/logger"
-import type { ObjectiveEvent, IMatchService } from "../match.types"
 import { EventType } from "@/shared/types/events"
 
 describe("ObjectiveHandler", () => {

@@ -67,7 +67,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const serverRepository = new ServerRepository(database, logger)
 
   // Services (order matters for dependencies)
-  const rankingService = new RankingService(logger)
+  const rankingService = new RankingService(logger, weaponRepository)
   const playerService = new PlayerService(playerRepository, logger, rankingService)
   const matchService = new MatchService(matchRepository, logger)
   const weaponService = new WeaponService(weaponRepository, logger)

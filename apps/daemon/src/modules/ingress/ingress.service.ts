@@ -199,7 +199,7 @@ export class IngressService implements IIngressService {
     const isHeadshot = !!headshot
 
     this.logger.event(
-      `Kill: ${killerName || "Unknown"} -> ${victimName || "Unknown"} (${weapon}${isHeadshot ? ", headshot" : ""})`,
+      `Kill: ${killerName || "Unknown"} → ${victimName || "Unknown"} (${weapon}${isHeadshot ? ", headshot" : ""})`,
     )
 
     // Get or create players using the available service method

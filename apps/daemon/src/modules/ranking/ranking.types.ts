@@ -18,11 +18,11 @@ export interface IRankingService {
   calculateRatingAdjustment(
     winnerRating: SkillRating,
     loserRating: SkillRating,
-  ): { winner: number; loser: number }
+  ): Promise<{ winner: number; loser: number }>
   calculateSkillAdjustment(
     killerRating: SkillRating,
     victimRating: SkillRating,
     context: KillContext,
-  ): { killerChange: number; victimChange: number }
+  ): Promise<{ killerChange: number; victimChange: number }>
   calculateSuicidePenalty(): number
 }

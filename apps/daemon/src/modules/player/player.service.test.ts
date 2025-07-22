@@ -9,18 +9,29 @@ import { createMockLogger } from "../../test-support/mocks/logger"
 import { createMockDatabaseClient } from "../../test-support/mocks/database"
 import type { DatabaseClient } from "@/database/client"
 import type { Player } from "@repo/database/client"
+import type { IRankingService } from "@/modules/ranking/ranking.types"
 
 describe("PlayerService", () => {
   let playerService: PlayerService
   let mockRepository: PlayerRepository
   let mockLogger: ReturnType<typeof createMockLogger>
   let mockDatabase: ReturnType<typeof createMockDatabaseClient>
+  let mockRankingService: IRankingService
 
   beforeEach(() => {
     mockLogger = createMockLogger()
     mockDatabase = createMockDatabaseClient()
     mockRepository = new PlayerRepository(mockDatabase as unknown as DatabaseClient, mockLogger)
-    playerService = new PlayerService(mockRepository, mockLogger)
+    
+    // Create mock ranking service
+    mockRankingService = {
+      handleRatingUpdate: vi.fn().mockResolvedValue({ success: true }),
+      calculateRatingAdjustment: vi.fn().mockResolvedValue({ winner: 10, loser: -8 }),
+      calculateSkillAdjustment: vi.fn().mockResolvedValue({ killerChange: 10, victimChange: -8 }),
+      calculateSuicidePenalty: vi.fn().mockReturnValue(-5),
+    }
+    
+    playerService = new PlayerService(mockRepository, mockLogger, mockRankingService)
   })
 
   describe("getOrCreatePlayer", () => {

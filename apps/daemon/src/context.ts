@@ -5,7 +5,7 @@
  */
 
 import { DatabaseClient } from "@/database/client"
-import { createLogger } from "@/shared/utils/logger.types"
+import Logger from "@/shared/utils/logger"
 import type { ILogger } from "@/shared/utils/logger.types"
 
 // Module imports
@@ -35,7 +35,7 @@ import { GameDetectionService } from "@/modules/game/game-detection.service"
 
 import { ServerRepository } from "@/modules/server/server.repository"
 import { ServerService } from "@/modules/server/server.service"
-import type { IServerService } from "@/modules/server/server.service"
+import type { IServerService } from "@/modules/server/server.types"
 import { IGameDetectionService } from "./modules/game/game-detection.types"
 
 export interface AppContext {
@@ -57,7 +57,7 @@ export interface AppContext {
 export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   // Infrastructure
   const database = new DatabaseClient()
-  const logger = createLogger()
+  const logger = new Logger()
 
   // Repositories
   const playerRepository = new PlayerRepository(database, logger)

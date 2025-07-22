@@ -560,8 +560,12 @@ export class PlayerService implements IPlayerService {
 
   private async handleChatMessage(event: PlayerEvent): Promise<HandlerResult> {
     try {
-      // Extract data from chat event - using any cast to handle union type
-      const { playerId, message, messageMode } = (event as any).data
+      // Type guard to ensure we have the correct event type
+      if (event.eventType !== EventType.CHAT_MESSAGE) {
+        return { success: false, error: "Invalid event type for handleChatMessage" }
+      }
+
+      const { playerId, message, messageMode } = event.data
 
       // Get current map from the server context (use empty string as fallback)
       const map = "" // TODO: Get actual map from server context or event data

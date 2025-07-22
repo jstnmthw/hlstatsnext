@@ -2,11 +2,11 @@
  * WeaponRepository Unit Tests
  */
 
+import type { DatabaseClient } from "@/database/client"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { WeaponRepository } from "./weapon.repository"
 import { createMockLogger } from "../../test-support/mocks/logger"
 import { createMockDatabaseClient } from "../../test-support/mocks/database"
-import type { DatabaseClient } from "@/database/client"
 
 describe("WeaponRepository", () => {
   let weaponRepository: WeaponRepository
@@ -16,6 +16,12 @@ describe("WeaponRepository", () => {
   beforeEach(() => {
     mockLogger = createMockLogger()
     mockDatabase = createMockDatabaseClient()
+
+    // Set up specific mock functions - using any for complex Prisma types in tests
+    mockDatabase.prisma.weapon.upsert = vi.fn()
+    mockDatabase.prisma.weapon.findUnique = vi.fn()
+    mockDatabase.prisma.weapon.findUniqueOrThrow = vi.fn()
+
     weaponRepository = new WeaponRepository(mockDatabase as unknown as DatabaseClient, mockLogger)
   })
 
@@ -38,7 +44,7 @@ describe("WeaponRepository", () => {
       const weaponCode = "ak47"
       const updates = { shots: { increment: 5 }, hits: { increment: 3 } }
 
-      mockDatabase.prisma.weapon.upsert.mockResolvedValue({
+      vi.mocked(mockDatabase.prisma.weapon.upsert).mockResolvedValue({
         weaponId: 1,
         game: "csgo",
         code: weaponCode,
@@ -164,27 +170,26 @@ describe("WeaponRepository", () => {
 
   describe("findWeaponByCode", () => {
     it("should find weapon by code", async () => {
-      const weaponCode = "ak47"
       const mockWeapon = {
         weaponId: 3,
         game: "csgo",
-        code: weaponCode,
-        name: weaponCode,
+        code: "ak47",
+        name: "ak47",
         modifier: 1,
         kills: 100,
         headshots: 25,
       }
 
-      mockDatabase.prisma.weapon.findUnique.mockResolvedValue(mockWeapon)
+      vi.mocked(mockDatabase.prisma.weapon.findUnique).mockResolvedValue(mockWeapon)
 
-      const result = await weaponRepository.findWeaponByCode(weaponCode)
+      const result = await weaponRepository.findWeaponByCode("ak47")
 
       expect(result).toEqual(mockWeapon)
       expect(mockDatabase.prisma.weapon.findUnique).toHaveBeenCalledWith({
         where: {
           gamecode: {
             game: "cstrike",
-            code: weaponCode,
+            code: "ak47",
           },
         },
         include: undefined,
@@ -195,7 +200,7 @@ describe("WeaponRepository", () => {
     it("should return null for non-existent weapon", async () => {
       const weaponCode = "non_existent"
 
-      mockDatabase.prisma.weapon.findUnique.mockResolvedValue(null)
+      vi.mocked(mockDatabase.prisma.weapon.findUnique).mockResolvedValue(null)
 
       const result = await weaponRepository.findWeaponByCode(weaponCode)
 
@@ -219,7 +224,7 @@ describe("WeaponRepository", () => {
         select: { weapon: true, shots: true },
       }
 
-      mockDatabase.prisma.weapon.findUnique.mockResolvedValue({
+      vi.mocked(mockDatabase.prisma.weapon.findUnique).mockResolvedValue({
         weaponId: 4,
         game: "csgo",
         code: weaponCode,
@@ -259,7 +264,7 @@ describe("WeaponRepository", () => {
       const weaponCode = "error_weapon"
       const updates = { shots: { increment: 1 } }
 
-      mockDatabase.prisma.weapon.upsert.mockRejectedValue(new Error("Database error"))
+      vi.mocked(mockDatabase.prisma.weapon.upsert).mockRejectedValue(new Error("Database error"))
 
       // The base repository should handle errors, but let's test graceful handling
       await expect(weaponRepository.updateWeaponStats(weaponCode, updates)).rejects.toThrow()
@@ -268,7 +273,9 @@ describe("WeaponRepository", () => {
     it("should handle database errors in findWeaponByCode", async () => {
       const weaponCode = "error_weapon"
 
-      mockDatabase.prisma.weapon.findUnique.mockRejectedValue(new Error("Database error"))
+      vi.mocked(mockDatabase.prisma.weapon.findUnique).mockRejectedValue(
+        new Error("Database error"),
+      )
 
       await expect(weaponRepository.findWeaponByCode(weaponCode)).rejects.toThrow()
     })
@@ -279,7 +286,7 @@ describe("WeaponRepository", () => {
       const weaponCode = ""
       const updates = { shots: { increment: 1 } }
 
-      mockDatabase.prisma.weapon.upsert.mockResolvedValue({
+      vi.mocked(mockDatabase.prisma.weapon.upsert).mockResolvedValue({
         weaponId: 1,
         code: weaponCode,
         kills: 0,
@@ -315,7 +322,7 @@ describe("WeaponRepository", () => {
       const weaponCode = "a".repeat(100)
       const updates = { shots: { increment: 1 } }
 
-      mockDatabase.prisma.weapon.upsert.mockResolvedValue({
+      vi.mocked(mockDatabase.prisma.weapon.upsert).mockResolvedValue({
         weaponId: 1,
         code: weaponCode,
         kills: 0,
@@ -345,7 +352,7 @@ describe("WeaponRepository", () => {
       const weaponCode = "weapon-with_special.chars!"
       const updates = { hits: { increment: 1 } }
 
-      mockDatabase.prisma.weapon.upsert.mockResolvedValue({
+      vi.mocked(mockDatabase.prisma.weapon.upsert).mockResolvedValue({
         weaponId: 1,
         code: weaponCode,
         kills: 0,
@@ -375,7 +382,7 @@ describe("WeaponRepository", () => {
       const weaponCode = "ak47"
       const updates = {}
 
-      mockDatabase.prisma.weapon.upsert.mockResolvedValue({
+      vi.mocked(mockDatabase.prisma.weapon.upsert).mockResolvedValue({
         weaponId: 1,
         code: weaponCode,
         kills: 0,

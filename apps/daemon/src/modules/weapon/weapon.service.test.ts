@@ -2,15 +2,15 @@
  * WeaponService Unit Tests
  */
 
+import type { DatabaseClient } from "@/database/client"
+import type { BaseEvent } from "@/shared/types/events"
+import type { WeaponFireEvent, WeaponHitEvent } from "./weapon.types"
 import { describe, it, expect, beforeEach, vi } from "vitest"
+import { EventType } from "@/shared/types/events"
 import { WeaponService } from "./weapon.service"
 import { WeaponRepository } from "./weapon.repository"
 import { createMockLogger } from "../../test-support/mocks/logger"
 import { createMockDatabaseClient } from "../../test-support/mocks/database"
-import type { WeaponFireEvent, WeaponHitEvent } from "./weapon.types"
-import type { DatabaseClient } from "@/database/client"
-import { EventType } from "@/shared/types/events"
-import type { BaseEvent } from "@/shared/types/events"
 
 describe("WeaponService", () => {
   let weaponService: WeaponService
@@ -118,7 +118,6 @@ describe("WeaponService", () => {
       const unknownEvent = {
         timestamp: new Date(),
         serverId: 1,
-        // @ts-expect-error - Testing unknown event type
         eventType: "UNKNOWN_WEAPON_EVENT" as EventType,
         data: {
           weaponCode: "knife",

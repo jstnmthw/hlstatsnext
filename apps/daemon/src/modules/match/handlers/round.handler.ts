@@ -12,7 +12,7 @@ import type {
   MapChangeEvent,
 } from "../match.types"
 import type { IMatchService } from "../match.types"
-import type { ILogger } from "@/shared/utils/logger"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 
 export class RoundHandler implements IRoundHandler {

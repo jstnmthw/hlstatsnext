@@ -51,11 +51,11 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { 
+        where: {
           gamecode: {
             game: "cstrike",
-            code: weaponCode
-          }
+            code: weaponCode,
+          },
         },
         create: {
           code: weaponCode,
@@ -75,7 +75,7 @@ describe("WeaponRepository", () => {
       const weaponCode = "new_weapon"
       const updates = { shots: { increment: 1 } }
 
-      mockDatabase.prisma.weapon.upsert.mockResolvedValue({
+      vi.mocked(mockDatabase.prisma.weapon.upsert).mockResolvedValue({
         weaponId: 2,
         game: "csgo",
         code: weaponCode,
@@ -88,11 +88,11 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { 
+        where: {
           gamecode: {
             game: "cstrike",
-            code: weaponCode
-          }
+            code: weaponCode,
+          },
         },
         create: {
           code: weaponCode,
@@ -115,7 +115,7 @@ describe("WeaponRepository", () => {
         damage: { increment: 350 },
       }
 
-      mockDatabase.prisma.weapon.upsert.mockResolvedValue({
+      vi.mocked(mockDatabase.prisma.weapon.upsert).mockResolvedValue({
         weaponId: 1,
         code: weaponCode,
         kills: 0,
@@ -128,11 +128,11 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { 
+        where: {
           gamecode: {
             game: "cstrike",
-            code: weaponCode
-          }
+            code: weaponCode,
+          },
         },
         create: {
           code: weaponCode,
@@ -181,11 +181,11 @@ describe("WeaponRepository", () => {
 
       expect(result).toEqual(mockWeapon)
       expect(mockDatabase.prisma.weapon.findUnique).toHaveBeenCalledWith({
-        where: { 
+        where: {
           gamecode: {
             game: "cstrike",
-            code: weaponCode
-          }
+            code: weaponCode,
+          },
         },
         include: undefined,
         select: undefined,
@@ -201,11 +201,11 @@ describe("WeaponRepository", () => {
 
       expect(result).toBeNull()
       expect(mockDatabase.prisma.weapon.findUnique).toHaveBeenCalledWith({
-        where: { 
+        where: {
           gamecode: {
             game: "cstrike",
-            code: weaponCode
-          }
+            code: weaponCode,
+          },
         },
         include: undefined,
         select: undefined,
@@ -232,11 +232,11 @@ describe("WeaponRepository", () => {
       await weaponRepository.findWeaponByCode(weaponCode, options)
 
       expect(mockDatabase.prisma.weapon.findUnique).toHaveBeenCalledWith({
-        where: { 
+        where: {
           gamecode: {
             game: "cstrike",
-            code: weaponCode
-          }
+            code: weaponCode,
+          },
         },
         include: options.include,
         select: options.select,
@@ -292,11 +292,11 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { 
+        where: {
           gamecode: {
             game: "cstrike",
-            code: ""
-          }
+            code: "",
+          },
         },
         create: {
           code: "",
@@ -328,11 +328,11 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { 
+        where: {
           gamecode: {
             game: "cstrike",
-            code: weaponCode
-          }
+            code: weaponCode,
+          },
         },
         create: expect.objectContaining({
           code: weaponCode,
@@ -358,11 +358,11 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { 
+        where: {
           gamecode: {
             game: "cstrike",
-            code: weaponCode
-          }
+            code: weaponCode,
+          },
         },
         create: expect.objectContaining({
           code: weaponCode,
@@ -388,11 +388,11 @@ describe("WeaponRepository", () => {
       await weaponRepository.updateWeaponStats(weaponCode, updates)
 
       expect(mockDatabase.prisma.weapon.upsert).toHaveBeenCalledWith({
-        where: { 
+        where: {
           gamecode: {
             game: "cstrike",
-            code: weaponCode
-          }
+            code: weaponCode,
+          },
         },
         create: {
           code: weaponCode,

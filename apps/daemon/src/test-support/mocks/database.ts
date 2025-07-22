@@ -17,35 +17,59 @@ export interface MockDatabaseClient {
   >
 }
 
-// Utility to deeply mock any object
-function deepMock<T extends object>(overrides?: Partial<T>): T {
-  const proxy = new Proxy(
-    {},
-    {
-      get: () => vi.fn(),
-    },
-  ) as unknown as T
-  return { ...proxy, ...overrides } as T
+/**
+ * Deeply mock any object
+ *
+ * This function creates a proxy that can be used to mock any object.
+ * It is useful for mocking the database client in tests.
+ *
+ * @example
+ * const prisma = deepMock<TransactionalPrisma>()
+ * prisma.player.findUnique = vi.fn()
+ * prisma.player.update = vi.fn()
+ * prisma.player.create = vi.fn()
+ * prisma.player.findMany = vi.fn()
+ *
+ */
+export function deepMock<T extends object>(): T {
+  const cache = new Map<string, unknown>()
+
+  function makeProxy(path: string[] = [], isFunction = false): unknown {
+    const handler: ProxyHandler<object> = {
+      get(_target, prop) {
+        if (prop === "then") return undefined
+        if (prop === Symbol.iterator) {
+          return function* () {}
+        }
+        const key = [...path, String(prop)].join(".")
+        if (cache.has(key)) {
+          return cache.get(key)
+        }
+        const value = makeProxy([...path, String(prop)], false)
+        cache.set(key, value)
+        return value
+      },
+      set(_target, prop, value) {
+        const key = [...path, String(prop)].join(".")
+        cache.set(key, value)
+        return true
+      },
+      apply(_target, _thisArg, _args) {
+        const key = path.join(".")
+        if (!cache.has(key)) {
+          cache.set(key, vi.fn())
+        }
+        return (cache.get(key) as unknown as (...args: unknown[]) => unknown)(..._args)
+      },
+    }
+    return new Proxy(isFunction ? function () {} : {}, handler)
+  }
+
+  return makeProxy([], false) as T
 }
 
 export function createMockDatabaseClient(): MockDatabaseClient {
   const prisma = deepMock<TransactionalPrisma>()
-
-  // Optionally override only the methods you care about:
-  prisma.player.findUnique = vi.fn()
-  prisma.player.update = vi.fn()
-  prisma.player.create = vi.fn()
-  prisma.player.findMany = vi.fn()
-
-  prisma.playerUniqueId.findUnique = vi.fn()
-  prisma.playerUniqueId.create = vi.fn()
-  prisma.playerUniqueId.update = vi.fn()
-
-  prisma.server.findUnique = vi.fn()
-  prisma.server.update = vi.fn()
-
-  prisma.weapon.findUnique = vi.fn()
-  prisma.weapon.upsert = vi.fn()
 
   return {
     prisma,

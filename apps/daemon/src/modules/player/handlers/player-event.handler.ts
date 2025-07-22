@@ -7,7 +7,7 @@
 
 import type { IPlayerEventHandler, PlayerEvent } from "../player.types"
 import type { IPlayerService } from "../player.types"
-import type { ILogger } from "@/shared/utils/logger"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 
 export class PlayerEventHandler implements IPlayerEventHandler {

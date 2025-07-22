@@ -4,7 +4,7 @@
 
 import { BaseRepository } from "@/shared/infrastructure/repository.base"
 import type { DatabaseClient } from "@/database/client"
-import type { ILogger } from "@/shared/utils/logger"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { IWeaponRepository } from "./weapon.types"
 import type { FindOptions, UpdateOptions } from "@/shared/types/database"
 import type { Prisma } from "@repo/database/client"

@@ -5,7 +5,7 @@
  */
 
 import type { IIngressService, IngressOptions, IngressStats } from "./ingress.types"
-import type { ILogger } from "@/shared/utils/logger"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
 import type { DatabaseClient } from "@/database/client"
 import { UdpServer } from "./udp-server"
@@ -117,7 +117,11 @@ export class IngressService implements IIngressService {
     return logLine.includes("<BOT>")
   }
 
-  private async parseAndProcessLogLine(logLine: string, serverAddress?: string, serverPort?: number): Promise<void> {
+  private async parseAndProcessLogLine(
+    logLine: string,
+    serverAddress?: string,
+    serverPort?: number,
+  ): Promise<void> {
     // Extract basic info and process different event types
     if (logLine.includes("connected, address")) {
       if (serverAddress && serverPort) {
@@ -138,7 +142,11 @@ export class IngressService implements IIngressService {
     }
   }
 
-  private async handlePlayerConnect(logLine: string, serverAddress: string, serverPort: number): Promise<void> {
+  private async handlePlayerConnect(
+    logLine: string,
+    serverAddress: string,
+    serverPort: number,
+  ): Promise<void> {
     const playerMatch = logLine.match(/"([^"]+)<\d+><([^>]+)><[^>]*>"/)
     if (!playerMatch) return
 
@@ -150,7 +158,9 @@ export class IngressService implements IIngressService {
     // Get server info to determine game type
     const serverId = await this.authenticateServer(serverAddress, serverPort)
     if (!serverId) {
-      this.logger.warn(`Cannot process player connect - server not authenticated: ${serverAddress}:${serverPort}`)
+      this.logger.warn(
+        `Cannot process player connect - server not authenticated: ${serverAddress}:${serverPort}`,
+      )
       return
     }
 
@@ -287,11 +297,13 @@ export class IngressService implements IIngressService {
           const gameDetection = await this.context.gameDetectionService.detectGame(
             address,
             port,
-            []
+            [],
           )
-          
-          this.logger.info(`Detected game ${gameDetection.gameCode} for ${serverKey} (confidence: ${gameDetection.confidence}, method: ${gameDetection.detection_method})`)
-          
+
+          this.logger.info(
+            `Detected game ${gameDetection.gameCode} for ${serverKey} (confidence: ${gameDetection.confidence}, method: ${gameDetection.detection_method})`,
+          )
+
           // Auto-create server in development mode
           server = await this.database.prisma.server.create({
             data: {
@@ -300,7 +312,7 @@ export class IngressService implements IIngressService {
               port,
               publicaddress: `${address}:${port}`,
               name: `Dev Server ${address}:${port}`,
-              rcon_password: '',
+              rcon_password: "",
               sortorder: 0,
               act_players: 0,
               max_players: 0,
@@ -309,7 +321,9 @@ export class IngressService implements IIngressService {
               serverId: true,
             },
           })
-          this.logger.info(`Auto-created development server ${serverKey} with ID ${server.serverId} (game: ${gameDetection.gameCode})`)
+          this.logger.info(
+            `Auto-created development server ${serverKey} with ID ${server.serverId} (game: ${gameDetection.gameCode})`,
+          )
         }
 
         this.authenticatedServers.set(serverKey, server.serverId)

@@ -6,7 +6,7 @@
 
 import { BaseRepository } from "@/shared/infrastructure/repository.base"
 import type { DatabaseClient } from "@/database/client"
-import type { ILogger } from "@/shared/utils/logger"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository, PlayerCreateData } from "./player.types"
 import type { FindOptions, CreateOptions, UpdateOptions } from "@/shared/types/database"
 import type { Player, Prisma } from "@repo/database/client"
@@ -331,7 +331,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
   async getPlayerStats(playerId: number, options?: FindOptions): Promise<Player | null> {
     try {
       this.validateId(playerId, "getPlayerStats")
-      
+
       return await this.executeWithTransaction(async (client) => {
         return client.player.findUnique({
           where: { playerId },
@@ -381,13 +381,13 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
           data: {
             eventTime: new Date(),
             serverId,
-            map: map || '',
+            map: map || "",
             killerId,
             victimId,
-            weapon: weapon || '',
+            weapon: weapon || "",
             headshot: headshot ? 1 : 0,
-            killerRole: killerRole || '',
-            victimRole: victimRole || '',
+            killerRole: killerRole || "",
+            victimRole: victimRole || "",
             pos_x: killerX || null,
             pos_y: killerY || null,
             pos_z: killerZ || null,

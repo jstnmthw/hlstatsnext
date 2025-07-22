@@ -3,7 +3,7 @@
  */
 
 import type { IWeaponService, IWeaponRepository, WeaponEvent } from "./weapon.types"
-import type { ILogger } from "@/shared/utils/logger"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 import { EventType } from "@/shared/types/events"
 

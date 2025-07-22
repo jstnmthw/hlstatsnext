@@ -1,18 +1,6 @@
-import type { DatabaseClient } from '@/database/client'
-import type { ILogger } from '@/shared/utils/logger'
-
-export interface ServerInfo {
-  serverId: number
-  game: string
-  name: string
-  address: string
-  port: number
-}
-
-export interface IServerRepository {
-  findById(serverId: number): Promise<ServerInfo | null>
-  findByAddress(address: string, port: number): Promise<ServerInfo | null>
-}
+import type { DatabaseClient } from "@/database/client"
+import type { ILogger } from "@/shared/utils/logger.types"
+import type { IServerRepository, ServerInfo } from "./server.repository.types"
 
 export class ServerRepository implements IServerRepository {
   constructor(

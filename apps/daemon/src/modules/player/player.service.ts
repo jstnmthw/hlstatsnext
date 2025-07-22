@@ -13,14 +13,13 @@ import type {
   PlayerEvent,
   PlayerKillEvent,
 } from "./player.types"
-import type { ILogger } from "@/shared/utils/logger"
-import type { HandlerResult } from "@/shared/types/common"
 import type { Player } from "@repo/database/client"
-import { validateSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
-import { EventType } from "@/shared/types/events"
-import type { PlayerChatEvent } from "./player.types"
-import type { IRankingService } from "@/modules/ranking/ranking.types"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { KillContext } from "@/modules/ranking/ranking.service"
+import type { HandlerResult } from "@/shared/types/common"
+import type { IRankingService } from "@/modules/ranking/ranking.types"
+import { EventType } from "@/shared/types/events"
+import { validateSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
 
 export class PlayerService implements IPlayerService {
   // Rating system constants
@@ -282,16 +281,16 @@ export class PlayerService implements IPlayerService {
       if (!killerStats || !victimStats) {
         return {
           success: false,
-          error: 'Unable to retrieve player stats for skill calculation',
+          error: "Unable to retrieve player stats for skill calculation",
         }
       }
 
       // Calculate skill changes using the enhanced ranking system
       const killContext: KillContext = {
-        weapon: weapon || 'unknown',
+        weapon: weapon || "unknown",
         headshot: headshot || false,
-        killerTeam: killerTeam || 'UNKNOWN',
-        victimTeam: victimTeam || 'UNKNOWN',
+        killerTeam: killerTeam || "UNKNOWN",
+        victimTeam: victimTeam || "UNKNOWN",
       }
 
       const killerRating: SkillRating = {
@@ -357,8 +356,8 @@ export class PlayerService implements IPlayerService {
           killerId,
           victimId,
           event.serverId,
-          '', // TODO: Get current map from MatchService
-          weapon || 'unknown',
+          "", // TODO: Get current map from MatchService
+          weapon || "unknown",
           headshot || false,
           undefined, // killerRole - TODO: Get from player roles
           undefined, // victimRole - TODO: Get from player roles
@@ -373,14 +372,16 @@ export class PlayerService implements IPlayerService {
       ])
 
       // Log kill event
-      this.logger.event(`Kill: ${killerId} -> ${victimId} (${weapon}${headshot ? ', headshot' : ''})`)
-      
+      this.logger.event(
+        `Kill: ${killerId} -> ${victimId} (${weapon}${headshot ? ", headshot" : ""})`,
+      )
+
       // Log skill calculation details
       this.logger.event(
         `Skill calculation: killer ${killerRating.rating}→${killerRating.rating + skillAdjustment.killerChange} ` +
-        `(${skillAdjustment.killerChange > 0 ? '+' : ''}${skillAdjustment.killerChange}), ` +
-        `victim ${victimRating.rating}→${victimRating.rating + skillAdjustment.victimChange} ` +
-        `(${skillAdjustment.victimChange})`
+          `(${skillAdjustment.killerChange > 0 ? "+" : ""}${skillAdjustment.killerChange}), ` +
+          `victim ${victimRating.rating}→${victimRating.rating + skillAdjustment.victimChange} ` +
+          `(${skillAdjustment.victimChange})`,
       )
 
       return { success: true, affected: 2 }
@@ -396,7 +397,7 @@ export class PlayerService implements IPlayerService {
     try {
       // Player ID should already be resolved by event processor
       if (event.eventType !== EventType.PLAYER_CONNECT) {
-        return { success: false, error: 'Invalid event type for handlePlayerConnect' }
+        return { success: false, error: "Invalid event type for handlePlayerConnect" }
       }
       const { playerId } = event.data
 
@@ -405,7 +406,7 @@ export class PlayerService implements IPlayerService {
       })
 
       this.logger.event(`Player connected: ${playerId}`)
-      
+
       return { success: true, affected: 1 }
     } catch (error) {
       return {
@@ -431,7 +432,7 @@ export class PlayerService implements IPlayerService {
       await this.updatePlayerStats(playerId, updates)
 
       this.logger.event(`Player disconnected: ${playerId}`)
-      
+
       return { success: true, affected: 1 }
     } catch (error) {
       return {
@@ -478,25 +479,25 @@ export class PlayerService implements IPlayerService {
   private async handlePlayerSuicide(event: PlayerEvent): Promise<HandlerResult> {
     try {
       if (event.eventType !== EventType.PLAYER_SUICIDE) {
-        return { success: false, error: 'Invalid event type for handlePlayerSuicide' }
+        return { success: false, error: "Invalid event type for handlePlayerSuicide" }
       }
-      
+
       const { playerId } = event.data
       const timestamp = Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR)
 
       // Get current player stats for streak tracking
       const playerStats = await this.repository.getPlayerStats(playerId)
-      
+
       if (!playerStats) {
         return {
           success: false,
-          error: 'Unable to retrieve player stats for suicide processing',
+          error: "Unable to retrieve player stats for suicide processing",
         }
       }
 
       // Calculate skill penalty for suicide
       const skillPenalty = this.rankingService.calculateSuicidePenalty()
-      
+
       // Update death streak, reset kill streak
       const newDeathStreak = (playerStats.death_streak || 0) + 1
 
@@ -510,7 +511,7 @@ export class PlayerService implements IPlayerService {
       }
 
       await this.updatePlayerStats(playerId, updates)
-      
+
       this.logger.event(`Player suicide: ${playerId} (penalty: ${skillPenalty})`)
 
       return { success: true, affected: 1 }

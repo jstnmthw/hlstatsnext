@@ -7,7 +7,7 @@
 import { getAppContext } from "@/context"
 import { EventProcessor } from "@/shared/infrastructure/event-processor"
 import type { AppContext } from "@/context"
-import type { ILogger } from "@/shared/utils/logger"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 export class HLStatsDaemon {
   private context: AppContext

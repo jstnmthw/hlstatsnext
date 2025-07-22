@@ -16,7 +16,7 @@ import type {
   TeamWinEvent,
   MapChangeEvent,
 } from "./match.types"
-import type { ILogger } from "@/shared/utils/logger"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"

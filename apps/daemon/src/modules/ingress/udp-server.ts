@@ -6,7 +6,7 @@
 
 import { EventEmitter } from "events"
 import { createSocket, Socket } from "dgram"
-import type { ILogger } from "@/shared/utils/logger"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 export interface UdpServerOptions {
   port: number

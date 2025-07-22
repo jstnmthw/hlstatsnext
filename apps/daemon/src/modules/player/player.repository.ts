@@ -398,7 +398,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
         })
       }, options)
 
-      this.logger.debug(`Logged EventFrag: ${killerId} -> ${victimId} (${weapon}) on ${map}`)
+      this.logger.debug(`Logged EventFrag: ${killerId} → ${victimId} (${weapon}) on ${map}`)
     } catch (error) {
       this.handleError("logEventFrag", error)
     }

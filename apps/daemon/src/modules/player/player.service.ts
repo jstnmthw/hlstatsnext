@@ -373,14 +373,14 @@ export class PlayerService implements IPlayerService {
 
       // Log kill event
       this.logger.event(
-        `Kill: ${killerId} -> ${victimId} (${weapon}${headshot ? ", headshot" : ""})`,
+        `Kill event: ${killerId} → ${victimId} (${weapon}${headshot ? ", headshot" : ""})`,
       )
 
       // Log skill calculation details
       this.logger.event(
-        `Skill calculation: killer ${killerRating.rating}→${killerRating.rating + skillAdjustment.killerChange} ` +
+        `Skill adjustment: killer ${killerRating.rating} → ${killerRating.rating + skillAdjustment.killerChange} ` +
           `(${skillAdjustment.killerChange > 0 ? "+" : ""}${skillAdjustment.killerChange}), ` +
-          `victim ${victimRating.rating}→${victimRating.rating + skillAdjustment.victimChange} ` +
+          `victim ${victimRating.rating} → ${victimRating.rating + skillAdjustment.victimChange} ` +
           `(${skillAdjustment.victimChange})`,
       )
 

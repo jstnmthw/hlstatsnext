@@ -5,7 +5,7 @@
  */
 
 import type { DatabaseClient, TransactionalPrisma } from "@/database/client"
-import type { ILogger } from "@/utils/logger.types"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { RepositoryOptions } from "@/shared/types/database"
 
 export abstract class BaseRepository<T extends Record<string, unknown>> {

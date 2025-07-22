@@ -1,4 +1,4 @@
-import type { ILogger } from "@/shared/utils/logger"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { GameDetectionResult, IGameDetectionService } from "./game-detection.types"
 
 export class GameDetectionService implements IGameDetectionService {

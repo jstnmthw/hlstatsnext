@@ -5,8 +5,8 @@
  */
 
 import { DatabaseClient } from "@/database/client"
-import { createLogger } from "@/shared/utils/logger"
-import type { ILogger } from "@/shared/utils/logger"
+import { createLogger } from "@/shared/utils/logger.types"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 // Module imports
 import { PlayerRepository } from "@/modules/player/player.repository"

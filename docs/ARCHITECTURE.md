@@ -75,7 +75,7 @@ apps/web/
 import { PlayerService } from "@/modules/player/player.service"
 import { MatchService } from "@/modules/match/match.service"
 import type { PlayerStats } from "@/modules/player/player.types"
-import { logger } from "@/shared/utils/logger"
+import { logger } from "@/shared/utils/logger.types"
 
 // ❌ BAD: Importing private files (ESLint will catch this)
 import { internalHelper } from "@/modules/player/_player.internal"

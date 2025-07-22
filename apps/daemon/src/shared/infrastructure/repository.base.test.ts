@@ -2,13 +2,14 @@
  * BaseRepository Unit Tests
  */
 
+import type { Player } from "@repo/database/client"
+import type { ILogger } from "@/shared/utils/logger.types"
+import type { DatabaseClient, TransactionalPrisma } from "@/database/client"
+import type { RepositoryOptions } from "@/shared/types/database"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { BaseRepository } from "./repository.base"
 import { createMockLogger } from "../../test-support/mocks/logger"
-import { createMockDatabaseClient } from "../../test-support/mocks/database"
-import type { DatabaseClient, TransactionalPrisma } from "@/database/client"
-import type { ILogger } from "@/shared/utils/logger"
-import type { RepositoryOptions } from "@/shared/types/database"
+import { createMockDatabaseClient, deepMock } from "../../test-support/mocks/database"
 
 // Concrete implementation for testing
 interface TestRecord extends Record<string, unknown> {
@@ -26,7 +27,6 @@ class TestRepository extends BaseRepository<TestRecord> {
     super(db, logger)
   }
 
-  // Expose protected methods for testing
   public validateIdPublic(id: number, operation: string): void {
     return this.validateId(id, operation)
   }
@@ -87,7 +87,7 @@ describe("BaseRepository", () => {
     })
 
     it("should work with different table names", () => {
-      class PlayerRepository extends BaseRepository<any> {
+      class PlayerRepository extends BaseRepository<Player> {
         protected tableName = "player"
 
         public get tablePublic() {
@@ -104,10 +104,9 @@ describe("BaseRepository", () => {
 
   describe("executeWithTransaction", () => {
     it("should use provided transaction when available", async () => {
-      const mockTransaction = { test: { findMany: vi.fn() } }
+      const mockTransaction = deepMock<TransactionalPrisma>()
       const operation = vi.fn().mockResolvedValue("result")
       const options = { transaction: mockTransaction }
-
       const result = await repository.executeWithTransactionPublic(operation, options)
 
       expect(result).toBe("result")
@@ -137,11 +136,8 @@ describe("BaseRepository", () => {
 
     it("should propagate transaction errors", async () => {
       const operation = vi.fn().mockRejectedValue(new Error("Transaction failed"))
-      const mockTransaction = {
-        test: {
-          findMany: vi.fn(),
-        },
-      }
+      const mockTransaction = deepMock<TransactionalPrisma>()
+
       const options = { transaction: mockTransaction }
 
       await expect(repository.executeWithTransactionPublic(operation, options)).rejects.toThrow(

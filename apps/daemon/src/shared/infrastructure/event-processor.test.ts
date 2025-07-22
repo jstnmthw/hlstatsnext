@@ -2,63 +2,60 @@
  * EventProcessor Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { EventProcessor } from "./event-processor"
-import { createMockLogger } from "../../test-support/mocks/logger"
 import type { BaseEvent } from "@/shared/types/events"
 import type { AppContext } from "@/context"
-import { EventType } from "@/shared/types/events"
-import type { IPlayerService } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IPlayerService } from "@/modules/player/player.types"
 import type { IWeaponService } from "@/modules/weapon/weapon.types"
-import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IActionService } from "@/modules/action/action.types"
+import type { IRankingService } from "@/modules/ranking/ranking.types"
+import { EventType } from "@/shared/types/events"
+import { EventProcessor } from "./event-processor"
+import { IServerService } from "@/modules/server/server.types"
+import { createMockLogger } from "../../test-support/mocks/logger"
+import { IGameDetectionService } from "@/modules/game/game-detection.types"
+import { describe, it, expect, beforeEach, vi, type MockedFunction } from "vitest"
+import { DatabaseClient } from "@/database/client"
+import { deepMock } from "@/test-support/mocks/database"
+import { IIngressService } from "@/modules/ingress/ingress.types"
 
 describe("EventProcessor", () => {
   let eventProcessor: EventProcessor
   let mockContext: AppContext
   let mockLogger: ReturnType<typeof createMockLogger>
 
+  // Store mock functions as variables for easy access
+  let mockHandlePlayerEvent: MockedFunction<IPlayerService["handlePlayerEvent"]>
+  let mockHandleKillEvent: MockedFunction<IPlayerService["handleKillEvent"]>
+
   beforeEach(() => {
     mockLogger = createMockLogger()
-    const playerServiceMock: IPlayerService = {
-      handlePlayerEvent: vi.fn().mockResolvedValue({ success: true }),
-      handleKillEvent: vi.fn().mockResolvedValue({ success: true }),
-      getOrCreatePlayer: vi.fn(),
-      getPlayerStats: vi.fn(),
-      updatePlayerStats: vi.fn(),
-      getPlayerRating: vi.fn(),
-      updatePlayerRatings: vi.fn(),
-      getTopPlayers: vi.fn(),
-      getRoundParticipants: vi.fn(),
-    }
 
-    const matchServiceMock: IMatchService = {
-      handleMatchEvent: vi.fn().mockResolvedValue({ success: true }),
-      handleObjectiveEvent: vi.fn().mockResolvedValue({ success: true }),
-      handleKillInMatch: vi.fn().mockResolvedValue({ success: true }),
-      getMatchStats: vi.fn(),
-      resetMatchStats: vi.fn(),
-      updatePlayerWeaponStats: vi.fn(),
-      calculateMatchMVP: vi.fn(),
-      calculatePlayerScore: vi.fn(),
-    }
+    // Use deepMock for all service mocks to get proper Vitest mock functionality
+    const playerServiceMock = deepMock<IPlayerService>()
+    mockHandlePlayerEvent = vi.fn().mockResolvedValue({ success: true })
+    mockHandleKillEvent = vi.fn().mockResolvedValue({ success: true })
+    playerServiceMock.handlePlayerEvent = mockHandlePlayerEvent
+    playerServiceMock.handleKillEvent = mockHandleKillEvent
 
-    const weaponServiceMock: IWeaponService = {
-      handleWeaponEvent: vi.fn().mockResolvedValue({ success: true }),
-      updateWeaponStats: vi.fn(),
-    }
+    const matchServiceMock = deepMock<IMatchService>()
+    matchServiceMock.handleMatchEvent = vi.fn().mockResolvedValue({ success: true })
+    matchServiceMock.handleObjectiveEvent = vi.fn().mockResolvedValue({ success: true })
+    matchServiceMock.handleKillInMatch = vi.fn().mockResolvedValue({ success: true })
 
-    const rankingServiceMock: IRankingService = {
-      handleRatingUpdate: vi.fn().mockResolvedValue({ success: true }),
-      calculateRatingAdjustment: vi.fn(),
-      calculateSkillAdjustment: vi.fn(),
-      calculateSuicidePenalty: vi.fn(),
-    }
+    const weaponServiceMock = deepMock<IWeaponService>()
+    weaponServiceMock.handleWeaponEvent = vi.fn().mockResolvedValue({ success: true })
 
-    const actionServiceMock: IActionService = {
-      handleActionEvent: vi.fn().mockResolvedValue({ success: true }),
-    }
+    const rankingServiceMock = deepMock<IRankingService>()
+    rankingServiceMock.handleRatingUpdate = vi.fn().mockResolvedValue({ success: true })
+
+    const actionServiceMock = deepMock<IActionService>()
+    actionServiceMock.handleActionEvent = vi.fn().mockResolvedValue({ success: true })
+
+    const gameDetectionServiceMock = deepMock<IGameDetectionService>()
+    const serverServiceMock = deepMock<IServerService>()
+    const databaseMock = deepMock<DatabaseClient>()
+    const ingressServiceMock = deepMock<IIngressService>()
 
     mockContext = {
       logger: mockLogger,
@@ -67,6 +64,10 @@ describe("EventProcessor", () => {
       weaponService: weaponServiceMock,
       rankingService: rankingServiceMock,
       actionService: actionServiceMock,
+      gameDetectionService: gameDetectionServiceMock,
+      serverService: serverServiceMock,
+      database: databaseMock,
+      ingressService: ingressServiceMock,
     }
 
     eventProcessor = new EventProcessor(mockContext)
@@ -100,7 +101,7 @@ describe("EventProcessor", () => {
       await eventProcessor.processEvent(playerConnectEvent)
 
       expect(mockContext.playerService.handlePlayerEvent).toHaveBeenCalledWith(playerConnectEvent)
-      expect(mockLogger.info).toHaveBeenCalledWith("Processing event: PLAYER_CONNECT for server 1")
+      expect(mockLogger.debug).toHaveBeenCalledWith("Processing event: PLAYER_CONNECT for server 1")
       expect(mockLogger.debug).toHaveBeenCalledWith("Event processed successfully: PLAYER_CONNECT")
     })
 
@@ -120,7 +121,7 @@ describe("EventProcessor", () => {
       expect(mockContext.playerService.handlePlayerEvent).toHaveBeenCalledWith(
         playerDisconnectEvent,
       )
-      expect(mockLogger.info).toHaveBeenCalledWith(
+      expect(mockLogger.debug).toHaveBeenCalledWith(
         "Processing event: PLAYER_DISCONNECT for server 1",
       )
     })
@@ -175,7 +176,7 @@ describe("EventProcessor", () => {
       }
 
       const error = new Error("Player service failed")
-      mockContext.playerService.handleKillEvent.mockRejectedValue(error)
+      mockHandleKillEvent.mockRejectedValue(error)
 
       await expect(eventProcessor.processEvent(killEvent)).rejects.toThrow("Player service failed")
       expect(mockLogger.error).toHaveBeenCalledWith(
@@ -488,7 +489,7 @@ describe("EventProcessor", () => {
       ]
 
       const error = new Error("Processing failed")
-      mockContext.playerService.handlePlayerEvent.mockRejectedValue(error)
+      mockHandlePlayerEvent.mockRejectedValue(error)
 
       await expect(eventProcessor.processEvents(events)).rejects.toThrow("Processing failed")
 
@@ -539,7 +540,7 @@ describe("EventProcessor", () => {
       }))
 
       const error = new Error("Concurrent processing failed")
-      mockContext.playerService.handlePlayerEvent.mockRejectedValue(error)
+      mockHandlePlayerEvent.mockRejectedValue(error)
 
       await expect(eventProcessor.processEventsConcurrent(events, 2)).rejects.toThrow(
         "Concurrent processing failed",
@@ -568,8 +569,9 @@ describe("EventProcessor", () => {
 
   describe("Error handling and edge cases", () => {
     it("should handle service method not found gracefully", async () => {
-      // Remove a service method
-      delete mockContext.playerService.handlePlayerEvent
+      // Remove a service method by setting to undefined
+      // @ts-expect-error - This is a test
+      mockContext.playerService.handlePlayerEvent = undefined
 
       const playerEvent: BaseEvent = {
         eventType: EventType.PLAYER_CONNECT,

@@ -353,8 +353,8 @@ describe("BaseParser", () => {
       const csgoParser = new TestParser("csgo")
       const tf2Parser = new TestParser("tf2")
 
-      expect((csgoParser as any).game).toBe("csgo")
-      expect((tf2Parser as any).game).toBe("tf2")
+      expect((csgoParser as unknown as ParserWithMethods).game).toBe("csgo")
+      expect((tf2Parser as unknown as ParserWithMethods).game).toBe("tf2")
     })
   })
 })

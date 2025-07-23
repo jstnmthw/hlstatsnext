@@ -9,7 +9,11 @@ import type { RepositoryOptions } from "@/shared/types/database"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { BaseRepository } from "./repository.base"
 import { createMockLogger } from "../../test-support/mocks/logger"
-import { createMockDatabaseClient } from "../../test-support/mocks/database"
+import {
+  createMockDatabaseClient,
+  type TransactionCallback,
+  type MockDatabaseClient,
+} from "../../test-support/mocks/database"
 import { mockDeep as deepMock } from "vitest-mock-extended"
 
 // Concrete implementation for testing
@@ -79,7 +83,7 @@ const createTestRecordWithInvalidValue = (value: unknown): Partial<TestRecord> =
 describe("BaseRepository", () => {
   let repository: TestRepository
   let mockLogger: ReturnType<typeof createMockLogger>
-  let mockDatabase: ReturnType<typeof createMockDatabaseClient>
+  let mockDatabase: MockDatabaseClient & DatabaseClient
 
   beforeEach(() => {
     mockLogger = createMockLogger()
@@ -110,7 +114,7 @@ describe("BaseRepository", () => {
 
       expect(table).toBeDefined()
       // The table should be the mock's test property
-      expect(table).toBe((mockDatabase.prisma as any).test)
+      expect(table).toBe((mockDatabase.prisma as Record<string, unknown>).test)
     })
 
     it("should work with different table names", () => {
@@ -136,31 +140,27 @@ describe("BaseRepository", () => {
 
       expect(result).toBe("result")
       expect(operation).toHaveBeenCalledWith(mockTransaction)
-      expect(vi.mocked(mockDatabase.transaction)).not.toHaveBeenCalled()
+      expect(mockDatabase.transaction).not.toHaveBeenCalled()
     })
 
     it("should create new transaction when not provided", async () => {
       const operation = vi.fn().mockResolvedValue("result")
-      vi.mocked(mockDatabase.transaction).mockImplementation(
-        async <T>(op: (tx: TransactionalPrisma) => Promise<T>) => op(mockDatabase.prisma),
-      )
+      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) => op(mockDatabase.prisma))
 
       const result = await repository.executeWithTransactionPublic(operation)
 
       expect(result).toBe("result")
-      expect(vi.mocked(mockDatabase.transaction)).toHaveBeenCalledWith(operation)
+      expect(mockDatabase.transaction).toHaveBeenCalledWith(operation)
     })
 
     it("should create new transaction when options undefined", async () => {
       const operation = vi.fn().mockResolvedValue("result")
-      vi.mocked(mockDatabase.transaction).mockImplementation(
-        async <T>(op: (tx: TransactionalPrisma) => Promise<T>) => op(mockDatabase.prisma),
-      )
+      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) => op(mockDatabase.prisma))
 
       const result = await repository.executeWithTransactionPublic(operation, undefined)
 
       expect(result).toBe("result")
-      expect(vi.mocked(mockDatabase.transaction)).toHaveBeenCalledWith(operation)
+      expect(mockDatabase.transaction).toHaveBeenCalledWith(operation)
     })
 
     it("should propagate transaction errors", async () => {
@@ -177,7 +177,7 @@ describe("BaseRepository", () => {
     it("should propagate database transaction errors", async () => {
       const operation = vi.fn()
       const transactionError = new Error("Database transaction failed")
-      vi.mocked(mockDatabase.transaction).mockRejectedValue(transactionError)
+      mockDatabase.transaction.mockRejectedValue(transactionError)
 
       await expect(repository.executeWithTransactionPublic(operation)).rejects.toThrow(
         "Database transaction failed",
@@ -436,9 +436,7 @@ describe("BaseRepository", () => {
   describe("Integration scenarios", () => {
     it("should handle complete repository workflow", async () => {
       const operation = vi.fn().mockResolvedValue({ id: 1, name: "test" })
-      vi.mocked(mockDatabase.transaction).mockImplementation(
-        async <T>(op: (tx: TransactionalPrisma) => Promise<T>) => op(mockDatabase.prisma),
-      )
+      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) => op(mockDatabase.prisma))
 
       // Test ID validation, transaction, and error handling together
       expect(() => repository.validateIdPublic(1, "findById")).not.toThrow()
@@ -463,9 +461,7 @@ describe("BaseRepository", () => {
 
       // Test transaction error
       const operation = vi.fn().mockRejectedValue(new Error("DB Error"))
-      vi.mocked(mockDatabase.transaction).mockImplementation(
-        async <T>(op: (tx: TransactionalPrisma) => Promise<T>) => op(mockDatabase.prisma),
-      )
+      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) => op(mockDatabase.prisma))
 
       await expect(repository.executeWithTransactionPublic(operation)).rejects.toThrow("DB Error")
 
@@ -497,9 +493,7 @@ describe("BaseRepository", () => {
       }
 
       const operation = vi.fn().mockResolvedValue(complexResult)
-      vi.mocked(mockDatabase.transaction).mockImplementation(
-        async <T>(op: (tx: TransactionalPrisma) => Promise<T>) => op(mockDatabase.prisma),
-      )
+      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) => op(mockDatabase.prisma))
 
       const result = await repository.executeWithTransactionPublic(operation)
 

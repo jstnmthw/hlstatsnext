@@ -3,8 +3,7 @@
  */
 
 import type { DatabaseClient } from "@/database/client"
-import type { BaseEvent } from "@/shared/types/events"
-import type { WeaponFireEvent, WeaponHitEvent } from "./weapon.types"
+import type { WeaponFireEvent, WeaponHitEvent, WeaponEvent } from "./weapon.types"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { EventType } from "@/shared/types/events"
 import { WeaponService } from "./weapon.service"
@@ -122,7 +121,7 @@ describe("WeaponService", () => {
         data: {
           weaponCode: "knife",
         },
-      } as BaseEvent
+      } as WeaponEvent
 
       const result = await weaponService.handleWeaponEvent(unknownEvent)
 

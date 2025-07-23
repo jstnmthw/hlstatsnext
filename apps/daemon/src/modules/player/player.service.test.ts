@@ -7,7 +7,6 @@ import { PlayerService } from "./player.service"
 import { PlayerRepository } from "./player.repository"
 import { createMockLogger } from "../../test-support/mocks/logger"
 import { createMockDatabaseClient } from "../../test-support/mocks/database"
-import type { DatabaseClient } from "@/database/client"
 import type { Player } from "@repo/database/client"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 
@@ -21,8 +20,8 @@ describe("PlayerService", () => {
   beforeEach(() => {
     mockLogger = createMockLogger()
     mockDatabase = createMockDatabaseClient()
-    mockRepository = new PlayerRepository(mockDatabase as unknown as DatabaseClient, mockLogger)
-    
+    mockRepository = new PlayerRepository(mockDatabase, mockLogger)
+
     // Create mock ranking service
     mockRankingService = {
       handleRatingUpdate: vi.fn().mockResolvedValue({ success: true }),
@@ -30,7 +29,7 @@ describe("PlayerService", () => {
       calculateSkillAdjustment: vi.fn().mockResolvedValue({ killerChange: 10, victimChange: -8 }),
       calculateSuicidePenalty: vi.fn().mockReturnValue(-5),
     }
-    
+
     playerService = new PlayerService(mockRepository, mockLogger, mockRankingService)
   })
 

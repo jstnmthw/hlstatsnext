@@ -7,21 +7,48 @@ import { EventEmitter } from "events"
 import { UdpServer } from "./udp-server"
 import { createMockLogger } from "../../test-support/mocks/logger"
 import type { UdpServerOptions, ISocketFactory } from "./udp-server"
-import type { Socket } from "dgram"
+import type { Socket, RemoteInfo } from "dgram"
 
-// Create a mock socket
-const mockSocket = {
-  bind: vi.fn(),
-  close: vi.fn(),
-  on: vi.fn(),
+// Create mock event handlers to capture registered callbacks
+let registeredMessageHandler: ((buffer: Buffer, rinfo: RemoteInfo) => void) | null = null
+let registeredErrorHandler: ((error: Error) => void) | null = null
+
+// Create mock socket with proper method signatures
+const createMockSocket = () => ({
+  bind: vi.fn(((...args: unknown[]) => {
+    const callback = args[args.length - 1]
+    if (typeof callback === 'function') {
+      setImmediate(callback as () => void)
+    }
+    mockSocket.listening = true
+    return mockSocket
+  }) as unknown as Socket['bind']),
+  
+  close: vi.fn(((callback?: () => void) => {
+    mockSocket.listening = false
+    if (callback) setImmediate(callback)
+    return mockSocket
+  }) as unknown as Socket['close']),
+  
+  on: vi.fn(((event: string, listener: (...args: unknown[]) => void) => {
+    if (event === 'message') {
+      registeredMessageHandler = listener as (buffer: Buffer, rinfo: RemoteInfo) => void
+    } else if (event === 'error') {
+      registeredErrorHandler = listener as (error: Error) => void
+    }
+    return mockSocket
+  }) as unknown as Socket['on']),
+  
   removeAllListeners: vi.fn(),
   address: vi.fn(() => ({ address: "0.0.0.0", family: "IPv4", port: 30000 })),
   listening: false,
-} as unknown as Socket
+})
 
-// Create a mock socket factory
+const mockSocket = createMockSocket()
+
+// Create mock socket factory
 const mockSocketFactory: ISocketFactory = {
-  createSocket: vi.fn(() => mockSocket),
+  createSocket: vi.fn(() => mockSocket as unknown as Socket),
 }
 
 describe("UdpServer", () => {
@@ -36,24 +63,14 @@ describe("UdpServer", () => {
       host: "0.0.0.0",
     }
 
-    // Reset all mocks
+    // Reset all mocks and handlers
     vi.clearAllMocks()
-
-    // Restore the socket factory mock
-    mockSocketFactory.createSocket = vi.fn(() => mockSocket)
-
-    // Set up default mock behaviors
-    mockSocket.bind.mockImplementation((port: number, host: string, callback: () => void) => {
-      mockSocket.listening = true
-      if (callback) setImmediate(callback)
-    })
-
-    mockSocket.close.mockImplementation((callback) => {
-      mockSocket.listening = false
-      if (callback) setImmediate(callback)
-    })
-
-    mockSocket.on.mockReturnValue(mockSocket)
+    registeredMessageHandler = null
+    registeredErrorHandler = null
+    
+    // Reset mock socket
+    Object.assign(mockSocket, createMockSocket())
+    mockSocketFactory.createSocket = vi.fn(() => mockSocket as unknown as Socket)
 
     udpServer = new UdpServer(options, mockLogger, mockSocketFactory)
   })
@@ -146,7 +163,7 @@ describe("UdpServer", () => {
   describe("Error handling", () => {
     it("should handle bind errors", async () => {
       const bindError = new Error("Port already in use")
-      mockSocket.bind.mockImplementationOnce((port, host, callback) => {
+      vi.mocked(mockSocket.bind).mockImplementationOnce(() => {
         throw bindError
       })
 
@@ -169,15 +186,19 @@ describe("UdpServer", () => {
 
       await udpServer.start()
 
-      // Get the message handler that was registered
-      const messageHandler = mockSocket.on.mock.calls.find((call) => call[0] === "message")?.[1]
-
-      // Simulate incoming message
-      if (messageHandler) {
+      // Use the captured message handler
+      expect(registeredMessageHandler).toBeDefined()
+      
+      if (registeredMessageHandler) {
         const buffer = Buffer.from("Test log line", "utf8")
-        const rinfo = { address: "192.168.1.100", port: 27015 }
+        const rinfo: RemoteInfo = { 
+          address: "192.168.1.100", 
+          port: 27015, 
+          family: "IPv4", 
+          size: buffer.length 
+        }
 
-        messageHandler(buffer, rinfo)
+        registeredMessageHandler(buffer, rinfo)
 
         expect(logReceivedSpy).toHaveBeenCalledWith({
           logLine: "Test log line",
@@ -194,13 +215,12 @@ describe("UdpServer", () => {
 
       await udpServer.start()
 
-      // Get the error handler that was registered
-      const errorHandler = mockSocket.on.mock.calls.find((call) => call[0] === "error")?.[1]
-
-      // Simulate error
-      if (errorHandler) {
+      // Use the captured error handler
+      expect(registeredErrorHandler).toBeDefined()
+      
+      if (registeredErrorHandler) {
         const testError = new Error("UDP socket error")
-        errorHandler(testError)
+        registeredErrorHandler(testError)
 
         expect(mockLogger.error).toHaveBeenCalledWith("UDP server error: UDP socket error")
         expect(errorSpy).toHaveBeenCalledWith(testError)
@@ -213,14 +233,19 @@ describe("UdpServer", () => {
 
       await udpServer.start()
 
-      const messageHandler = mockSocket.on.mock.calls.find((call) => call[0] === "message")?.[1]
-
-      if (messageHandler) {
+      expect(registeredMessageHandler).toBeDefined()
+      
+      if (registeredMessageHandler) {
         // Test empty and whitespace-only messages
         const emptyBuffer = Buffer.from("   \n  ", "utf8")
-        const rinfo = { address: "192.168.1.100", port: 27015 }
+        const rinfo: RemoteInfo = { 
+          address: "192.168.1.100", 
+          port: 27015, 
+          family: "IPv4", 
+          size: emptyBuffer.length 
+        }
 
-        messageHandler(emptyBuffer, rinfo)
+        registeredMessageHandler(emptyBuffer, rinfo)
 
         expect(logReceivedSpy).not.toHaveBeenCalled()
       }

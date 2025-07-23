@@ -16,7 +16,6 @@ import { createMockLogger } from "../../test-support/mocks/logger"
 import { IGameDetectionService } from "@/modules/game/game-detection.types"
 import { describe, it, expect, beforeEach, vi, type MockedFunction } from "vitest"
 import { DatabaseClient } from "@/database/client"
-import { deepMock } from "@/test-support/mocks/database"
 import { IIngressService } from "@/modules/ingress/ingress.types"
 
 describe("EventProcessor", () => {

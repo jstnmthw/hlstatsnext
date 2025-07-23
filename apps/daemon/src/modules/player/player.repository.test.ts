@@ -2,11 +2,10 @@
  * PlayerRepository Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeEach } from "vitest"
 import { PlayerRepository } from "./player.repository"
 import { createMockLogger } from "../../test-support/mocks/logger"
 import { createMockDatabaseClient } from "../../test-support/mocks/database"
-import type { DatabaseClient } from "@/database/client"
 import type { Player } from "@repo/database/client"
 
 describe("PlayerRepository", () => {
@@ -17,7 +16,7 @@ describe("PlayerRepository", () => {
   beforeEach(() => {
     mockLogger = createMockLogger()
     mockDatabase = createMockDatabaseClient()
-    playerRepository = new PlayerRepository(mockDatabase as unknown as DatabaseClient, mockLogger)
+    playerRepository = new PlayerRepository(mockDatabase, mockLogger)
   })
 
   describe("Repository instantiation", () => {
@@ -31,6 +30,7 @@ describe("PlayerRepository", () => {
       expect(playerRepository.findByUniqueId).toBeDefined()
       expect(playerRepository.create).toBeDefined()
       expect(playerRepository.update).toBeDefined()
+      expect(playerRepository.findTopPlayers).toBeDefined()
       expect(typeof playerRepository.findById).toBe("function")
       expect(typeof playerRepository.findByUniqueId).toBe("function")
     })
@@ -177,7 +177,7 @@ describe("PlayerRepository", () => {
 
       mockDatabase.prisma.player.create.mockResolvedValue(mockCreatedPlayer as Player)
 
-      const result = await playerRepository.create(playerData as any)
+      const result = await playerRepository.create(playerData)
 
       expect(result).toEqual(mockCreatedPlayer)
       expect(mockDatabase.prisma.player.create).toHaveBeenCalledWith({
@@ -205,7 +205,7 @@ describe("PlayerRepository", () => {
 
       mockDatabase.prisma.player.create.mockResolvedValue({ playerId: 1 } as Player)
 
-      await playerRepository.create(playerData as any, options)
+      await playerRepository.create(playerData, options)
 
       // Verify the method was called without throwing
       expect(mockDatabase.prisma.player.create).toHaveBeenCalled()

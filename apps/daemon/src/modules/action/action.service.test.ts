@@ -89,6 +89,9 @@ describe("ActionService", () => {
     })
 
     it("should handle ACTION_PLAYER_PLAYER events", async () => {
+      // Mock repository to return null (action not found)
+      vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
+      
       const playerPlayerActionEvent: ActionPlayerPlayerEvent = {
         timestamp: new Date(),
         serverId: 1,
@@ -106,10 +109,13 @@ describe("ActionService", () => {
       const result = await actionService.handleActionEvent(playerPlayerActionEvent)
 
       expect(result.success).toBe(true)
-      expect(mockLogger.debug).toHaveBeenCalledWith("Player-player action: assist by 1 on 2")
+      expect(mockLogger.warn).toHaveBeenCalledWith("Unknown action code: assist for game csgo")
     })
 
     it("should handle ACTION_TEAM events", async () => {
+      // Mock repository to return null (action not found)
+      vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
+      
       const teamActionEvent: ActionTeamEvent = {
         timestamp: new Date(),
         serverId: 1,
@@ -126,10 +132,13 @@ describe("ActionService", () => {
       const result = await actionService.handleActionEvent(teamActionEvent)
 
       expect(result.success).toBe(true)
-      expect(mockLogger.debug).toHaveBeenCalledWith("Team action: round_win by team ct")
+      expect(mockLogger.warn).toHaveBeenCalledWith("Unknown action code: round_win for game csgo")
     })
 
     it("should handle ACTION_WORLD events", async () => {
+      // Mock repository to return null (action not found)
+      vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
+      
       const worldActionEvent: WorldActionEvent = {
         timestamp: new Date(),
         serverId: 1,
@@ -144,7 +153,7 @@ describe("ActionService", () => {
       const result = await actionService.handleActionEvent(worldActionEvent)
 
       expect(result.success).toBe(true)
-      expect(mockLogger.debug).toHaveBeenCalledWith("World action: map_start")
+      expect(mockLogger.warn).toHaveBeenCalledWith("Unknown action code: map_start for game csgo")
     })
 
     it("should handle unknown event types gracefully", async () => {
@@ -190,6 +199,9 @@ describe("ActionService", () => {
 
   describe("Action event data validation", () => {
     it("should handle minimal ACTION_PLAYER event data", async () => {
+      // Mock repository to return null (action not found)
+      vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
+      
       const minimalEvent: ActionPlayerEvent = {
         timestamp: new Date(),
         serverId: 1,
@@ -204,10 +216,13 @@ describe("ActionService", () => {
       const result = await actionService.handleActionEvent(minimalEvent)
 
       expect(result.success).toBe(true)
-      expect(mockLogger.debug).toHaveBeenCalledWith("Player action: basic_action by player 1")
+      expect(mockLogger.warn).toHaveBeenCalledWith("Unknown action code: basic_action for game csgo")
     })
 
     it("should handle ACTION_TEAM event without players affected", async () => {
+      // Mock repository to return null (action not found)
+      vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
+      
       const teamEvent: ActionTeamEvent = {
         timestamp: new Date(),
         serverId: 1,
@@ -222,10 +237,13 @@ describe("ActionService", () => {
       const result = await actionService.handleActionEvent(teamEvent)
 
       expect(result.success).toBe(true)
-      expect(mockLogger.debug).toHaveBeenCalledWith("Team action: bomb_plant by team terrorist")
+      expect(mockLogger.warn).toHaveBeenCalledWith("Unknown action code: bomb_plant for game csgo")
     })
 
     it("should handle ACTION_WORLD event with zero bonus", async () => {
+      // Mock repository to return null (action not found)
+      vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
+      
       const worldEvent: WorldActionEvent = {
         timestamp: new Date(),
         serverId: 1,
@@ -240,7 +258,7 @@ describe("ActionService", () => {
       const result = await actionService.handleActionEvent(worldEvent)
 
       expect(result.success).toBe(true)
-      expect(mockLogger.debug).toHaveBeenCalledWith("World action: round_start")
+      expect(mockLogger.warn).toHaveBeenCalledWith("Unknown action code: round_start for game csgo")
     })
   })
 

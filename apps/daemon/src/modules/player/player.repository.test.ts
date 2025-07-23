@@ -5,8 +5,9 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { PlayerRepository } from "./player.repository"
 import { createMockLogger } from "../../test-support/mocks/logger"
-import { createMockDatabaseClient } from "../../test-support/mocks/database"
+import { createMockDatabaseClient, type MockDatabaseClient } from "../../test-support/mocks/database"
 import type { Player } from "@repo/database/client"
+import type { DatabaseClient } from "@/database/client"
 
 // Helper function to create a complete Player object with defaults
 function createMockPlayer(overrides: Partial<Player> = {}): Player {
@@ -52,7 +53,7 @@ function createMockPlayer(overrides: Partial<Player> = {}): Player {
 describe("PlayerRepository", () => {
   let playerRepository: PlayerRepository
   let mockLogger: ReturnType<typeof createMockLogger>
-  let mockDatabase: ReturnType<typeof createMockDatabaseClient>
+  let mockDatabase: MockDatabaseClient & DatabaseClient
 
   beforeEach(() => {
     mockLogger = createMockLogger()
@@ -87,12 +88,12 @@ describe("PlayerRepository", () => {
         skill: 1000,
       })
 
-      mockDatabase.prisma.player.findUnique.mockResolvedValue(mockPlayer)
+      mockDatabase.mockPrisma.player.findUnique.mockResolvedValue(mockPlayer)
 
       const result = await playerRepository.findById(playerId)
 
       expect(result).toEqual(mockPlayer)
-      expect(mockDatabase.prisma.player.findUnique).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.player.findUnique).toHaveBeenCalledWith({
         where: { playerId },
         include: undefined,
         select: undefined,
@@ -102,12 +103,12 @@ describe("PlayerRepository", () => {
     it("should return null for non-existent player", async () => {
       const playerId = 999
 
-      mockDatabase.prisma.player.findUnique.mockResolvedValue(null)
+      mockDatabase.mockPrisma.player.findUnique.mockResolvedValue(null)
 
       const result = await playerRepository.findById(playerId)
 
       expect(result).toBeNull()
-      expect(mockDatabase.prisma.player.findUnique).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.player.findUnique).toHaveBeenCalledWith({
         where: { playerId },
         include: undefined,
         select: undefined,
@@ -121,7 +122,7 @@ describe("PlayerRepository", () => {
         select: { playerId: true, lastName: true },
       }
 
-      mockDatabase.prisma.player.findUnique.mockResolvedValue(
+      mockDatabase.mockPrisma.player.findUnique.mockResolvedValue(
         createMockPlayer({
           playerId: 1,
           lastName: "TestPlayer",
@@ -130,7 +131,7 @@ describe("PlayerRepository", () => {
 
       await playerRepository.findById(playerId, options)
 
-      expect(mockDatabase.prisma.player.findUnique).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.player.findUnique).toHaveBeenCalledWith({
         where: { playerId },
         include: options.include,
         select: options.select,
@@ -162,13 +163,13 @@ describe("PlayerRepository", () => {
         player: mockPlayer, // Include the player relation
       }
 
-      mockDatabase.prisma.playerUniqueId.findUnique.mockResolvedValue(mockUniqueIdEntry)
-      mockDatabase.prisma.player.findUnique.mockResolvedValue(mockPlayer)
+      mockDatabase.mockPrisma.playerUniqueId.findUnique.mockResolvedValue(mockUniqueIdEntry)
+      mockDatabase.mockPrisma.player.findUnique.mockResolvedValue(mockPlayer)
 
       const result = await playerRepository.findByUniqueId(uniqueId, game)
 
       expect(result).toEqual(mockPlayer)
-      expect(mockDatabase.prisma.playerUniqueId.findUnique).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.playerUniqueId.findUnique).toHaveBeenCalledWith({
         where: {
           uniqueId_game: {
             uniqueId,
@@ -185,7 +186,7 @@ describe("PlayerRepository", () => {
       const uniqueId = "76561198000000000"
       const game = "csgo"
 
-      mockDatabase.prisma.playerUniqueId.findUnique.mockResolvedValue(null)
+      mockDatabase.mockPrisma.playerUniqueId.findUnique.mockResolvedValue(null)
 
       const result = await playerRepository.findByUniqueId(uniqueId, game)
 
@@ -218,12 +219,12 @@ describe("PlayerRepository", () => {
         last_event: Math.floor(Date.now() / 1000),
       })
 
-      mockDatabase.prisma.player.create.mockResolvedValue(mockCreatedPlayer)
+      mockDatabase.mockPrisma.player.create.mockResolvedValue(mockCreatedPlayer)
 
       const result = await playerRepository.create(playerData)
 
       expect(result).toEqual(mockCreatedPlayer)
-      expect(mockDatabase.prisma.player.create).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.player.create).toHaveBeenCalledWith({
         data: {
           lastName: playerData.lastName,
           game: playerData.game,
@@ -246,12 +247,12 @@ describe("PlayerRepository", () => {
       }
       const options = { transaction: mockDatabase.prisma }
 
-      mockDatabase.prisma.player.create.mockResolvedValue(createMockPlayer({ playerId: 1 }))
+      mockDatabase.mockPrisma.player.create.mockResolvedValue(createMockPlayer({ playerId: 1 }))
 
       await playerRepository.create(playerData, options)
 
       // Verify the method was called without throwing
-      expect(mockDatabase.prisma.player.create).toHaveBeenCalled()
+      expect(mockDatabase.mockPrisma.player.create).toHaveBeenCalled()
     })
   })
 
@@ -269,12 +270,12 @@ describe("PlayerRepository", () => {
         ...updateData,
       })
 
-      mockDatabase.prisma.player.update.mockResolvedValue(mockUpdatedPlayer)
+      mockDatabase.mockPrisma.player.update.mockResolvedValue(mockUpdatedPlayer)
 
       const result = await playerRepository.update(playerId, updateData)
 
       expect(result).toEqual(mockUpdatedPlayer)
-      expect(mockDatabase.prisma.player.update).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.player.update).toHaveBeenCalledWith({
         where: { playerId },
         data: updateData,
       })
@@ -284,7 +285,7 @@ describe("PlayerRepository", () => {
       const playerId = 1
       const updateData = { skill: 1500 }
 
-      mockDatabase.prisma.player.update.mockResolvedValue(
+      mockDatabase.mockPrisma.player.update.mockResolvedValue(
         createMockPlayer({
           playerId,
           skill: 1500,
@@ -293,7 +294,7 @@ describe("PlayerRepository", () => {
 
       await playerRepository.update(playerId, updateData)
 
-      expect(mockDatabase.prisma.player.update).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.player.update).toHaveBeenCalledWith({
         where: { playerId },
         data: updateData,
       })
@@ -304,12 +305,12 @@ describe("PlayerRepository", () => {
       const updateData = { skill: 1300 }
       const options = { transaction: mockDatabase.prisma }
 
-      mockDatabase.prisma.player.update.mockResolvedValue(createMockPlayer({ playerId }))
+      mockDatabase.mockPrisma.player.update.mockResolvedValue(createMockPlayer({ playerId }))
 
       await playerRepository.update(playerId, updateData, options)
 
       // Verify the method was called without throwing
-      expect(mockDatabase.prisma.player.update).toHaveBeenCalled()
+      expect(mockDatabase.mockPrisma.player.update).toHaveBeenCalled()
     })
   })
 
@@ -325,12 +326,12 @@ describe("PlayerRepository", () => {
         createMockPlayer({ playerId: 3, lastName: "Player3", skill: 1600 }),
       ]
 
-      mockDatabase.prisma.player.findMany.mockResolvedValue(mockTopPlayers)
+      mockDatabase.mockPrisma.player.findMany.mockResolvedValue(mockTopPlayers)
 
       const result = await playerRepository.findTopPlayers(limit, game, includeHidden)
 
       expect(result).toEqual(mockTopPlayers)
-      expect(mockDatabase.prisma.player.findMany).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.player.findMany).toHaveBeenCalledWith({
         where: {
           game,
           hideranking: includeHidden ? undefined : 0,
@@ -345,11 +346,11 @@ describe("PlayerRepository", () => {
       const game = "csgo"
       const includeHidden = true
 
-      mockDatabase.prisma.player.findMany.mockResolvedValue([])
+      mockDatabase.mockPrisma.player.findMany.mockResolvedValue([])
 
       await playerRepository.findTopPlayers(limit, game, includeHidden)
 
-      expect(mockDatabase.prisma.player.findMany).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.player.findMany).toHaveBeenCalledWith({
         where: {
           game,
           hideranking: undefined,
@@ -364,7 +365,7 @@ describe("PlayerRepository", () => {
     it("should handle database errors gracefully", async () => {
       const playerId = 1
 
-      mockDatabase.prisma.player.findUnique.mockRejectedValue(
+      mockDatabase.mockPrisma.player.findUnique.mockRejectedValue(
         new Error("Database connection failed"),
       )
 
@@ -382,12 +383,12 @@ describe("PlayerRepository", () => {
     it("should handle very large player IDs", async () => {
       const largePlayerId = 999999999
 
-      mockDatabase.prisma.player.findUnique.mockResolvedValue(null)
+      mockDatabase.mockPrisma.player.findUnique.mockResolvedValue(null)
 
       const result = await playerRepository.findById(largePlayerId)
 
       expect(result).toBeNull()
-      expect(mockDatabase.prisma.player.findUnique).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.player.findUnique).toHaveBeenCalledWith({
         where: { playerId: largePlayerId },
         include: undefined,
         select: undefined,
@@ -398,12 +399,12 @@ describe("PlayerRepository", () => {
       const specialUniqueId = "STEAM_1:0:12345"
       const game = "csgo"
 
-      mockDatabase.prisma.playerUniqueId.findUnique.mockResolvedValue(null)
+      mockDatabase.mockPrisma.playerUniqueId.findUnique.mockResolvedValue(null)
 
       const result = await playerRepository.findByUniqueId(specialUniqueId, game)
 
       expect(result).toBeNull()
-      expect(mockDatabase.prisma.playerUniqueId.findUnique).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.playerUniqueId.findUnique).toHaveBeenCalledWith({
         where: {
           uniqueId_game: {
             uniqueId: specialUniqueId,

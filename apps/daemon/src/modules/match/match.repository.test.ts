@@ -9,12 +9,13 @@ import {
   createMockDatabaseClient,
   type MockDatabaseClient,
 } from "../../test-support/mocks/database"
+import type { DatabaseClient } from "@/database/client"
 import { createMockServerRecord } from "../../test-support/mocks/server"
 
 describe("MatchRepository", () => {
   let matchRepository: MatchRepository
   let mockLogger: ReturnType<typeof createMockLogger>
-  let mockDatabase: MockDatabaseClient
+  let mockDatabase: MockDatabaseClient & DatabaseClient
 
   beforeEach(() => {
     mockLogger = createMockLogger()
@@ -47,7 +48,7 @@ describe("MatchRepository", () => {
 
       await matchRepository.updateServerStats(serverId, updates)
 
-      expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
         where: { serverId },
         data: updates,
       })
@@ -59,7 +60,7 @@ describe("MatchRepository", () => {
 
       await matchRepository.updateServerStats(serverId, updates)
 
-      expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
         where: { serverId },
         data: updates,
       })
@@ -79,7 +80,7 @@ describe("MatchRepository", () => {
 
       await matchRepository.updateServerStats(serverId, updates, options)
 
-      expect(mockDatabase.prisma.server.update).toHaveBeenCalled()
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalled()
     })
 
     it("should handle empty updates", async () => {
@@ -88,7 +89,7 @@ describe("MatchRepository", () => {
 
       await matchRepository.updateServerStats(serverId, updates)
 
-      expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
         where: { serverId },
         data: updates,
       })
@@ -99,12 +100,12 @@ describe("MatchRepository", () => {
     it("should find server by ID", async () => {
       const serverId = 1
 
-      mockDatabase.prisma.server.findUnique.mockResolvedValue(createMockServerRecord())
+      mockDatabase.mockPrisma.server.findUnique.mockResolvedValue(createMockServerRecord())
 
       const result = await matchRepository.findServerById(serverId)
 
       expect(result).toBeDefined()
-      expect(mockDatabase.prisma.server.findUnique).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.findUnique).toHaveBeenCalledWith({
         where: { serverId },
         include: undefined,
         select: undefined,
@@ -114,12 +115,12 @@ describe("MatchRepository", () => {
     it("should return null for non-existent server", async () => {
       const serverId = 999
 
-      mockDatabase.prisma.server.findUnique.mockResolvedValue(null)
+      mockDatabase.mockPrisma.server.findUnique.mockResolvedValue(null)
 
       const result = await matchRepository.findServerById(serverId)
 
       expect(result).toBeNull()
-      expect(mockDatabase.prisma.server.findUnique).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.findUnique).toHaveBeenCalledWith({
         where: { serverId },
         include: undefined,
         select: undefined,
@@ -133,11 +134,11 @@ describe("MatchRepository", () => {
         select: { serverId: true, game: true },
       }
 
-      mockDatabase.prisma.server.findUnique.mockResolvedValue(createMockServerRecord())
+      mockDatabase.mockPrisma.server.findUnique.mockResolvedValue(createMockServerRecord())
 
       await matchRepository.findServerById(serverId, options)
 
-      expect(mockDatabase.prisma.server.findUnique).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.findUnique).toHaveBeenCalledWith({
         where: { serverId },
         include: options.include,
         select: options.select,
@@ -154,12 +155,12 @@ describe("MatchRepository", () => {
       const serverId = 1
       const options = { transaction: mockDatabase.prisma }
 
-      mockDatabase.prisma.server.findUnique.mockResolvedValue(createMockServerRecord())
+      mockDatabase.mockPrisma.server.findUnique.mockResolvedValue(createMockServerRecord())
 
       await matchRepository.findServerById(serverId, options)
 
       // Verify the method was called without throwing
-      expect(mockDatabase.prisma.server.findUnique).toHaveBeenCalled()
+      expect(mockDatabase.mockPrisma.server.findUnique).toHaveBeenCalled()
     })
   })
 
@@ -168,11 +169,11 @@ describe("MatchRepository", () => {
       const serverId = 1
 
       // Test that updateServerStats can be used for round increments
-      mockDatabase.prisma.server.update.mockResolvedValue(createMockServerRecord())
+      mockDatabase.mockPrisma.server.update.mockResolvedValue(createMockServerRecord())
 
       await matchRepository.updateServerStats(serverId, { rounds: { increment: 1 } })
 
-      expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
         where: { serverId },
         data: { rounds: { increment: 1 } },
       })
@@ -190,7 +191,7 @@ describe("MatchRepository", () => {
 
       await matchRepository.updateServerStats(serverId, teamWinUpdate)
 
-      expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
         where: { serverId },
         data: teamWinUpdate,
       })
@@ -209,7 +210,7 @@ describe("MatchRepository", () => {
 
       await matchRepository.updateServerStats(serverId, bombUpdate)
 
-      expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
         where: { serverId },
         data: bombUpdate,
       })
@@ -232,7 +233,7 @@ describe("MatchRepository", () => {
 
       await matchRepository.updateServerStats(serverId, resetUpdate)
 
-      expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
         where: { serverId },
         data: resetUpdate,
       })
@@ -244,7 +245,7 @@ describe("MatchRepository", () => {
       const serverId = 1
       const updates = { players: 10 }
 
-      mockDatabase.prisma.server.update.mockRejectedValue(new Error("Database error"))
+      mockDatabase.mockPrisma.server.update.mockRejectedValue(new Error("Database error"))
 
       await expect(matchRepository.updateServerStats(serverId, updates)).rejects.toThrow()
     })
@@ -252,7 +253,7 @@ describe("MatchRepository", () => {
     it("should handle database errors in findServerById", async () => {
       const serverId = 1
 
-      mockDatabase.prisma.server.findUnique.mockRejectedValue(new Error("Database error"))
+      mockDatabase.mockPrisma.server.findUnique.mockRejectedValue(new Error("Database error"))
 
       await expect(matchRepository.findServerById(serverId)).rejects.toThrow()
     })
@@ -261,7 +262,7 @@ describe("MatchRepository", () => {
       const serverId = 1
       const updates = { players: -1 } // Potentially invalid value
 
-      mockDatabase.prisma.server.update.mockRejectedValue(new Error("Constraint violation"))
+      mockDatabase.mockPrisma.server.update.mockRejectedValue(new Error("Constraint violation"))
 
       await expect(matchRepository.updateServerStats(serverId, updates)).rejects.toThrow()
     })
@@ -272,11 +273,11 @@ describe("MatchRepository", () => {
       const largeServerId = 999999999
       const updates = { players: 1 }
 
-      mockDatabase.prisma.server.update.mockResolvedValue(createMockServerRecord())
+      mockDatabase.mockPrisma.server.update.mockResolvedValue(createMockServerRecord())
 
       await matchRepository.updateServerStats(largeServerId, updates)
 
-      expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
         where: { serverId: largeServerId },
         data: updates,
       })
@@ -292,11 +293,11 @@ describe("MatchRepository", () => {
         lastUpdate: new Date(),
       }
 
-      mockDatabase.prisma.server.update.mockResolvedValue(createMockServerRecord())
+      mockDatabase.mockPrisma.server.update.mockResolvedValue(createMockServerRecord())
 
       await matchRepository.updateServerStats(serverId, complexUpdates)
 
-      expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
         where: { serverId },
         data: complexUpdates,
       })
@@ -310,11 +311,11 @@ describe("MatchRepository", () => {
         players: 0,
       }
 
-      mockDatabase.prisma.server.update.mockResolvedValue(createMockServerRecord())
+      mockDatabase.mockPrisma.server.update.mockResolvedValue(createMockServerRecord())
 
       await matchRepository.updateServerStats(serverId, updatesWithNulls)
 
-      expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
         where: { serverId },
         data: updatesWithNulls,
       })

@@ -3,7 +3,7 @@
  */
 
 import type { ObjectiveEvent, IMatchService } from "../match.types"
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeEach, vi, type MockedFunction } from "vitest"
 import { ObjectiveHandler } from "./objective.handler"
 import { createMockLogger } from "../../../test-support/mocks/logger"
 import { EventType } from "@/shared/types/events"
@@ -12,11 +12,18 @@ describe("ObjectiveHandler", () => {
   let objectiveHandler: ObjectiveHandler
   let mockMatchService: IMatchService
   let mockLogger: ReturnType<typeof createMockLogger>
+  
+  // Store specific mock functions for easy access
+  let mockHandleObjectiveEvent: MockedFunction<IMatchService["handleObjectiveEvent"]>
 
   beforeEach(() => {
     mockLogger = createMockLogger()
+    
+    // Create properly typed mock functions
+    mockHandleObjectiveEvent = vi.fn()
+    
     mockMatchService = {
-      handleObjectiveEvent: vi.fn(),
+      handleObjectiveEvent: mockHandleObjectiveEvent,
       handleMatchEvent: vi.fn(),
       handleKillInMatch: vi.fn(),
       getMatchStats: vi.fn(),
@@ -24,7 +31,7 @@ describe("ObjectiveHandler", () => {
       updatePlayerWeaponStats: vi.fn(),
       calculateMatchMVP: vi.fn(),
       calculatePlayerScore: vi.fn(),
-    }
+    } as unknown as IMatchService
 
     objectiveHandler = new ObjectiveHandler(mockMatchService, mockLogger)
   })
@@ -57,7 +64,7 @@ describe("ObjectiveHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleObjectiveEvent.mockResolvedValue(expectedResult)
+      mockHandleObjectiveEvent.mockResolvedValue(expectedResult)
 
       const result = await objectiveHandler.handleObjectiveEvent(bombPlantEvent)
 
@@ -79,7 +86,7 @@ describe("ObjectiveHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleObjectiveEvent.mockResolvedValue(expectedResult)
+      mockHandleObjectiveEvent.mockResolvedValue(expectedResult)
 
       const result = await objectiveHandler.handleObjectiveEvent(bombDefuseEvent)
 
@@ -98,7 +105,7 @@ describe("ObjectiveHandler", () => {
       }
 
       const expectedResult = { success: true }
-      mockMatchService.handleObjectiveEvent.mockResolvedValue(expectedResult)
+      mockHandleObjectiveEvent.mockResolvedValue(expectedResult)
 
       const result = await objectiveHandler.handleObjectiveEvent(bombExplodeEvent)
 
@@ -118,7 +125,7 @@ describe("ObjectiveHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleObjectiveEvent.mockResolvedValue(expectedResult)
+      mockHandleObjectiveEvent.mockResolvedValue(expectedResult)
 
       const result = await objectiveHandler.handleObjectiveEvent(hostageRescueEvent)
 
@@ -139,7 +146,7 @@ describe("ObjectiveHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleObjectiveEvent.mockResolvedValue(expectedResult)
+      mockHandleObjectiveEvent.mockResolvedValue(expectedResult)
 
       const result = await objectiveHandler.handleObjectiveEvent(flagCaptureEvent)
 
@@ -160,7 +167,7 @@ describe("ObjectiveHandler", () => {
       }
 
       const serviceError = new Error("Match service failure")
-      mockMatchService.handleObjectiveEvent.mockRejectedValue(serviceError)
+      mockHandleObjectiveEvent.mockRejectedValue(serviceError)
 
       const result = await objectiveHandler.handleObjectiveEvent(objectiveEvent)
 
@@ -183,7 +190,7 @@ describe("ObjectiveHandler", () => {
         },
       }
 
-      mockMatchService.handleObjectiveEvent.mockRejectedValue("String error")
+      mockHandleObjectiveEvent.mockRejectedValue("String error")
 
       const result = await objectiveHandler.handleObjectiveEvent(objectiveEvent)
 
@@ -209,7 +216,7 @@ describe("ObjectiveHandler", () => {
         success: true,
         affected: 1,
       }
-      mockMatchService.handleObjectiveEvent.mockResolvedValue(serviceResult)
+      mockHandleObjectiveEvent.mockResolvedValue(serviceResult)
 
       const result = await objectiveHandler.handleObjectiveEvent(objectiveEvent)
 
@@ -269,7 +276,7 @@ describe("ObjectiveHandler", () => {
 
       const timeoutError = new Error("Request timeout")
       timeoutError.name = "TimeoutError"
-      mockMatchService.handleObjectiveEvent.mockRejectedValue(timeoutError)
+      mockHandleObjectiveEvent.mockRejectedValue(timeoutError)
 
       const result = await objectiveHandler.handleObjectiveEvent(objectiveEvent)
 
@@ -293,7 +300,7 @@ describe("ObjectiveHandler", () => {
         success: false,
         error: "Invalid player ID",
       }
-      mockMatchService.handleObjectiveEvent.mockResolvedValue(serviceResult)
+      mockHandleObjectiveEvent.mockResolvedValue(serviceResult)
 
       const result = await objectiveHandler.handleObjectiveEvent(invalidEvent)
 
@@ -315,7 +322,7 @@ describe("ObjectiveHandler", () => {
       }
 
       const expectedResult = { success: true }
-      mockMatchService.handleObjectiveEvent.mockResolvedValue(expectedResult)
+      mockHandleObjectiveEvent.mockResolvedValue(expectedResult)
 
       const result = await objectiveHandler.handleObjectiveEvent(minimalEvent)
 
@@ -341,7 +348,7 @@ describe("ObjectiveHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleObjectiveEvent.mockResolvedValue(expectedResult)
+      mockHandleObjectiveEvent.mockResolvedValue(expectedResult)
 
       const result = await objectiveHandler.handleObjectiveEvent(eventWithMeta)
 
@@ -363,7 +370,7 @@ describe("ObjectiveHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleObjectiveEvent.mockResolvedValue(expectedResult)
+      mockHandleObjectiveEvent.mockResolvedValue(expectedResult)
 
       const result = await objectiveHandler.handleObjectiveEvent(largeEvent)
 

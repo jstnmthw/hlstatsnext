@@ -201,7 +201,7 @@ describe("Validation Utilities", () => {
         "Event.With.Dots",
         "EventWithNumbers123",
         "A", // Single character
-        "A".repeat(100), // Long event type
+        "A".repeat(64), // Maximum length event type
       ]
 
       validEventTypes.forEach((eventType) => {
@@ -401,7 +401,7 @@ describe("Validation Utilities", () => {
 
       expect(validatePlayerName(veryLongName)).toBe(false)
       expect(validateSteamId(veryLongSteamId)).toBe(false)
-      expect(validateEventType(veryLongEventType)).toBe(true)
+      expect(validateEventType(veryLongEventType)).toBe(false)
 
       const sanitized = sanitizePlayerName(veryLongName)
       expect(sanitized.length).toBe(48)

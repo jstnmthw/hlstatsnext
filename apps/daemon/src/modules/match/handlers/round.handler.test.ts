@@ -2,27 +2,46 @@
  * RoundHandler Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeEach, vi, type MockedFunction } from "vitest"
 import { RoundHandler } from "./round.handler"
 import { createMockLogger } from "../../../test-support/mocks/logger"
 import type { RoundStartEvent, RoundEndEvent, TeamWinEvent, MapChangeEvent, IMatchService } from "../match.types"
 import { EventType } from "@/shared/types/events"
 
+// Helper types for testing
+type TestResult = {
+  success: boolean
+  error?: string
+}
+
+type RoundHandlerWithMethods = {
+  [method: string]: (event: unknown) => Promise<TestResult>
+}
+
 describe("RoundHandler", () => {
   let roundHandler: RoundHandler
   let mockMatchService: IMatchService
   let mockLogger: ReturnType<typeof createMockLogger>
+  
+  // Store specific mock functions for easy access
+  let mockHandleMatchEvent: MockedFunction<IMatchService["handleMatchEvent"]>
 
   beforeEach(() => {
     mockLogger = createMockLogger()
+    
+    // Create properly typed mock functions
+    mockHandleMatchEvent = vi.fn()
+    
     mockMatchService = {
-      handleMatchEvent: vi.fn(),
-      updateServerStats: vi.fn(),
-      processRoundEnd: vi.fn(),
-      processTeamWin: vi.fn(),
-      processMapChange: vi.fn(),
-      incrementRounds: vi.fn(),
-    }
+      handleMatchEvent: mockHandleMatchEvent,
+      handleObjectiveEvent: vi.fn(),
+      handleKillInMatch: vi.fn(),
+      getMatchStats: vi.fn(),
+      resetMatchStats: vi.fn(),
+      updatePlayerWeaponStats: vi.fn(),
+      calculateMatchMVP: vi.fn(),
+      calculatePlayerScore: vi.fn(),
+    } as unknown as IMatchService
 
     roundHandler = new RoundHandler(mockMatchService, mockLogger)
   })
@@ -59,7 +78,7 @@ describe("RoundHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleMatchEvent.mockResolvedValue(expectedResult)
+      mockHandleMatchEvent.mockResolvedValue(expectedResult)
 
       const result = await roundHandler.handleRoundStart(roundStartEvent)
 
@@ -80,7 +99,7 @@ describe("RoundHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleMatchEvent.mockResolvedValue(expectedResult)
+      mockHandleMatchEvent.mockResolvedValue(expectedResult)
 
       const result = await roundHandler.handleRoundStart(pistolRoundEvent)
 
@@ -101,7 +120,7 @@ describe("RoundHandler", () => {
       }
 
       const serviceError = new Error("Round start processing failed")
-      mockMatchService.handleMatchEvent.mockRejectedValue(serviceError)
+      mockHandleMatchEvent.mockRejectedValue(serviceError)
 
       const result = await roundHandler.handleRoundStart(roundStartEvent)
 
@@ -130,7 +149,7 @@ describe("RoundHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleMatchEvent.mockResolvedValue(expectedResult)
+      mockHandleMatchEvent.mockResolvedValue(expectedResult)
 
       const result = await roundHandler.handleRoundEnd(roundEndEvent)
 
@@ -154,7 +173,7 @@ describe("RoundHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 2 }
-      mockMatchService.handleMatchEvent.mockResolvedValue(expectedResult)
+      mockHandleMatchEvent.mockResolvedValue(expectedResult)
 
       const result = await roundHandler.handleRoundEnd(bombDefuseEndEvent)
 
@@ -178,7 +197,7 @@ describe("RoundHandler", () => {
       }
 
       const serviceError = new Error("Round end processing failed")
-      mockMatchService.handleMatchEvent.mockRejectedValue(serviceError)
+      mockHandleMatchEvent.mockRejectedValue(serviceError)
 
       const result = await roundHandler.handleRoundEnd(roundEndEvent)
 
@@ -207,7 +226,7 @@ describe("RoundHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleMatchEvent.mockResolvedValue(expectedResult)
+      mockHandleMatchEvent.mockResolvedValue(expectedResult)
 
       const result = await roundHandler.handleTeamWin(teamWinEvent)
 
@@ -231,7 +250,7 @@ describe("RoundHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleMatchEvent.mockResolvedValue(expectedResult)
+      mockHandleMatchEvent.mockResolvedValue(expectedResult)
 
       const result = await roundHandler.handleTeamWin(overtimeWinEvent)
 
@@ -255,7 +274,7 @@ describe("RoundHandler", () => {
       }
 
       const serviceError = new Error("Team win processing failed")
-      mockMatchService.handleMatchEvent.mockRejectedValue(serviceError)
+      mockHandleMatchEvent.mockRejectedValue(serviceError)
 
       const result = await roundHandler.handleTeamWin(teamWinEvent)
 
@@ -281,7 +300,7 @@ describe("RoundHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleMatchEvent.mockResolvedValue(expectedResult)
+      mockHandleMatchEvent.mockResolvedValue(expectedResult)
 
       const result = await roundHandler.handleMapChange(mapChangeEvent)
 
@@ -302,7 +321,7 @@ describe("RoundHandler", () => {
       }
 
       const expectedResult = { success: true, affected: 1 }
-      mockMatchService.handleMatchEvent.mockResolvedValue(expectedResult)
+      mockHandleMatchEvent.mockResolvedValue(expectedResult)
 
       const result = await roundHandler.handleMapChange(initialMapEvent)
 
@@ -323,7 +342,7 @@ describe("RoundHandler", () => {
       }
 
       const serviceError = new Error("Map change processing failed")
-      mockMatchService.handleMatchEvent.mockRejectedValue(serviceError)
+      mockHandleMatchEvent.mockRejectedValue(serviceError)
 
       const result = await roundHandler.handleMapChange(mapChangeEvent)
 
@@ -377,12 +396,12 @@ describe("RoundHandler", () => {
       ]
 
       for (const { method, event } of events) {
-        mockMatchService.handleMatchEvent.mockRejectedValue("String error")
+        mockHandleMatchEvent.mockRejectedValue("String error")
 
-        const result = await (roundHandler as unknown as Record<string, (event: unknown) => Promise<unknown>>)[method](event)
+        const result = await (roundHandler as unknown as RoundHandlerWithMethods)[method]?.(event)
 
-        expect(result.success).toBe(false)
-        expect(result.error).toBe("String error")
+        expect(result?.success).toBe(false)
+        expect(result?.error).toBe("String error")
       }
     })
 
@@ -400,7 +419,7 @@ describe("RoundHandler", () => {
 
       const timeoutError = new Error("Request timeout")
       timeoutError.name = "TimeoutError"
-      mockMatchService.handleMatchEvent.mockRejectedValue(timeoutError)
+      mockHandleMatchEvent.mockRejectedValue(timeoutError)
 
       const result = await roundHandler.handleRoundStart(roundStartEvent)
 
@@ -421,7 +440,7 @@ describe("RoundHandler", () => {
       }
 
       const expectedResult = { success: true }
-      mockMatchService.handleMatchEvent.mockResolvedValue(expectedResult)
+      mockHandleMatchEvent.mockResolvedValue(expectedResult)
 
       const result = await roundHandler.handleRoundEnd(minimalRoundEnd)
 
@@ -453,7 +472,7 @@ describe("RoundHandler", () => {
           mvp: { playerId: 5, rating: 1.45 },
         },
       }
-      mockMatchService.handleMatchEvent.mockResolvedValue(serviceResult)
+      mockHandleMatchEvent.mockResolvedValue(serviceResult)
 
       const result = await roundHandler.handleTeamWin(teamWinEvent)
 
@@ -477,7 +496,7 @@ describe("RoundHandler", () => {
         success: false,
         error: "Invalid map name",
       }
-      mockMatchService.handleMatchEvent.mockResolvedValue(serviceResult)
+      mockHandleMatchEvent.mockResolvedValue(serviceResult)
 
       const result = await roundHandler.handleMapChange(mapChangeEvent)
 

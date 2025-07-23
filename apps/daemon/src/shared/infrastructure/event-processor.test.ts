@@ -15,6 +15,7 @@ import { IServerService } from "@/modules/server/server.types"
 import { createMockLogger } from "../../test-support/mocks/logger"
 import { IGameDetectionService } from "@/modules/game/game-detection.types"
 import { describe, it, expect, beforeEach, vi, type MockedFunction } from "vitest"
+import { mockDeep as deepMock } from "vitest-mock-extended"
 import { DatabaseClient } from "@/database/client"
 import { IIngressService } from "@/modules/ingress/ingress.types"
 
@@ -30,27 +31,33 @@ describe("EventProcessor", () => {
   beforeEach(() => {
     mockLogger = createMockLogger()
 
-    // Use deepMock for all service mocks to get proper Vitest mock functionality
-    const playerServiceMock = deepMock<IPlayerService>()
+    // Create clean mock services using native vi.fn() for better control
     mockHandlePlayerEvent = vi.fn().mockResolvedValue({ success: true })
     mockHandleKillEvent = vi.fn().mockResolvedValue({ success: true })
-    playerServiceMock.handlePlayerEvent = mockHandlePlayerEvent
-    playerServiceMock.handleKillEvent = mockHandleKillEvent
+    const playerServiceMock = {
+      handlePlayerEvent: mockHandlePlayerEvent,
+      handleKillEvent: mockHandleKillEvent,
+    } as unknown as IPlayerService
 
-    const matchServiceMock = deepMock<IMatchService>()
-    matchServiceMock.handleMatchEvent = vi.fn().mockResolvedValue({ success: true })
-    matchServiceMock.handleObjectiveEvent = vi.fn().mockResolvedValue({ success: true })
-    matchServiceMock.handleKillInMatch = vi.fn().mockResolvedValue({ success: true })
+    const matchServiceMock = {
+      handleMatchEvent: vi.fn().mockResolvedValue({ success: true }),
+      handleObjectiveEvent: vi.fn().mockResolvedValue({ success: true }),
+      handleKillInMatch: vi.fn().mockResolvedValue({ success: true }),
+    } as unknown as IMatchService
 
-    const weaponServiceMock = deepMock<IWeaponService>()
-    weaponServiceMock.handleWeaponEvent = vi.fn().mockResolvedValue({ success: true })
+    const weaponServiceMock = {
+      handleWeaponEvent: vi.fn().mockResolvedValue({ success: true }),
+    } as unknown as IWeaponService
 
-    const rankingServiceMock = deepMock<IRankingService>()
-    rankingServiceMock.handleRatingUpdate = vi.fn().mockResolvedValue({ success: true })
+    const rankingServiceMock = {
+      handleRatingUpdate: vi.fn().mockResolvedValue({ success: true }),
+    } as unknown as IRankingService
 
-    const actionServiceMock = deepMock<IActionService>()
-    actionServiceMock.handleActionEvent = vi.fn().mockResolvedValue({ success: true })
+    const actionServiceMock = {
+      handleActionEvent: vi.fn().mockResolvedValue({ success: true }),
+    } as unknown as IActionService
 
+    // Use deepMock for services that don't need specific method access
     const gameDetectionServiceMock = deepMock<IGameDetectionService>()
     const serverServiceMock = deepMock<IServerService>()
     const databaseMock = deepMock<DatabaseClient>()

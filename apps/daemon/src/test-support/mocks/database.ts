@@ -15,6 +15,10 @@ export class MockDatabaseClient extends DatabaseClient {
     const mockPrisma = mockDeep<TransactionalPrisma>()
     super(mockPrisma)
     this.mockPrisma = mockPrisma
+
+    this.transaction = async <T>(callback: (tx: TransactionalPrisma) => Promise<T>): Promise<T> => {
+      return callback(this.mockPrisma)
+    }
   }
 
   get prisma(): DeepMockProxy<TransactionalPrisma> {

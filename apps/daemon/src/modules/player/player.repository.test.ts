@@ -8,6 +8,47 @@ import { createMockLogger } from "../../test-support/mocks/logger"
 import { createMockDatabaseClient } from "../../test-support/mocks/database"
 import type { Player } from "@repo/database/client"
 
+// Helper function to create a complete Player object with defaults
+function createMockPlayer(overrides: Partial<Player> = {}): Player {
+  return {
+    playerId: 1,
+    last_event: Math.floor(Date.now() / 1000),
+    connection_time: 0,
+    last_skill_change: Math.floor(Date.now() / 1000),
+    lastName: "TestPlayer",
+    lastAddress: "127.0.0.1",
+    fullName: "",
+    email: "",
+    homepage: "",
+    icq: 0,
+    city: "",
+    state: "",
+    country: "",
+    flag: "",
+    lat: null,
+    lng: null,
+    clan: null,
+    kills: 0,
+    deaths: 0,
+    suicides: 0,
+    skill: 1000,
+    shots: 0,
+    hits: 0,
+    teamkills: 0,
+    headshots: 0,
+    kill_streak: 0,
+    death_streak: 0,
+    activity: 0,
+    game: "csgo",
+    hideranking: 0,
+    displayEvents: 1,
+    blockavatar: 0,
+    mmrank: null,
+    createdate: Math.floor(Date.now() / 1000),
+    ...overrides,
+  }
+}
+
 describe("PlayerRepository", () => {
   let playerRepository: PlayerRepository
   let mockLogger: ReturnType<typeof createMockLogger>
@@ -39,14 +80,14 @@ describe("PlayerRepository", () => {
   describe("findById", () => {
     it("should find player by ID", async () => {
       const playerId = 1
-      const mockPlayer: Partial<Player> = {
+      const mockPlayer = createMockPlayer({
         playerId: 1,
         lastName: "TestPlayer",
         game: "csgo",
         skill: 1000,
-      }
+      })
 
-      mockDatabase.prisma.player.findUnique.mockResolvedValue(mockPlayer as Player)
+      mockDatabase.prisma.player.findUnique.mockResolvedValue(mockPlayer)
 
       const result = await playerRepository.findById(playerId)
 
@@ -80,10 +121,12 @@ describe("PlayerRepository", () => {
         select: { playerId: true, lastName: true },
       }
 
-      mockDatabase.prisma.player.findUnique.mockResolvedValue({
-        playerId: 1,
-        lastName: "TestPlayer",
-      } as Player)
+      mockDatabase.prisma.player.findUnique.mockResolvedValue(
+        createMockPlayer({
+          playerId: 1,
+          lastName: "TestPlayer",
+        }),
+      )
 
       await playerRepository.findById(playerId, options)
 
@@ -105,11 +148,11 @@ describe("PlayerRepository", () => {
     it("should find player by unique ID", async () => {
       const uniqueId = "76561198000000000"
       const game = "csgo"
-      const mockPlayer: Partial<Player> = {
+      const mockPlayer = createMockPlayer({
         playerId: 1,
         lastName: "TestPlayer",
         game: "csgo",
-      }
+      })
 
       const mockUniqueIdEntry = {
         uniqueId,
@@ -120,7 +163,7 @@ describe("PlayerRepository", () => {
       }
 
       mockDatabase.prisma.playerUniqueId.findUnique.mockResolvedValue(mockUniqueIdEntry)
-      mockDatabase.prisma.player.findUnique.mockResolvedValue(mockPlayer as Player)
+      mockDatabase.prisma.player.findUnique.mockResolvedValue(mockPlayer)
 
       const result = await playerRepository.findByUniqueId(uniqueId, game)
 
@@ -169,13 +212,13 @@ describe("PlayerRepository", () => {
         skill: 1000,
       }
 
-      const mockCreatedPlayer: Partial<Player> = {
+      const mockCreatedPlayer = createMockPlayer({
         playerId: 1,
         ...playerData,
         last_event: Math.floor(Date.now() / 1000),
-      }
+      })
 
-      mockDatabase.prisma.player.create.mockResolvedValue(mockCreatedPlayer as Player)
+      mockDatabase.prisma.player.create.mockResolvedValue(mockCreatedPlayer)
 
       const result = await playerRepository.create(playerData)
 
@@ -203,7 +246,7 @@ describe("PlayerRepository", () => {
       }
       const options = { transaction: mockDatabase.prisma }
 
-      mockDatabase.prisma.player.create.mockResolvedValue({ playerId: 1 } as Player)
+      mockDatabase.prisma.player.create.mockResolvedValue(createMockPlayer({ playerId: 1 }))
 
       await playerRepository.create(playerData, options)
 
@@ -221,12 +264,12 @@ describe("PlayerRepository", () => {
         kills: 10,
       }
 
-      const mockUpdatedPlayer: Partial<Player> = {
+      const mockUpdatedPlayer = createMockPlayer({
         playerId,
         ...updateData,
-      }
+      })
 
-      mockDatabase.prisma.player.update.mockResolvedValue(mockUpdatedPlayer as Player)
+      mockDatabase.prisma.player.update.mockResolvedValue(mockUpdatedPlayer)
 
       const result = await playerRepository.update(playerId, updateData)
 
@@ -241,10 +284,12 @@ describe("PlayerRepository", () => {
       const playerId = 1
       const updateData = { skill: 1500 }
 
-      mockDatabase.prisma.player.update.mockResolvedValue({
-        playerId,
-        skill: 1500,
-      } as Player)
+      mockDatabase.prisma.player.update.mockResolvedValue(
+        createMockPlayer({
+          playerId,
+          skill: 1500,
+        }),
+      )
 
       await playerRepository.update(playerId, updateData)
 
@@ -259,7 +304,7 @@ describe("PlayerRepository", () => {
       const updateData = { skill: 1300 }
       const options = { transaction: mockDatabase.prisma }
 
-      mockDatabase.prisma.player.update.mockResolvedValue({ playerId } as Player)
+      mockDatabase.prisma.player.update.mockResolvedValue(createMockPlayer({ playerId }))
 
       await playerRepository.update(playerId, updateData, options)
 
@@ -274,13 +319,13 @@ describe("PlayerRepository", () => {
       const game = "csgo"
       const includeHidden = false
 
-      const mockTopPlayers: Partial<Player>[] = [
-        { playerId: 1, lastName: "Player1", skill: 2000 },
-        { playerId: 2, lastName: "Player2", skill: 1800 },
-        { playerId: 3, lastName: "Player3", skill: 1600 },
+      const mockTopPlayers: Player[] = [
+        createMockPlayer({ playerId: 1, lastName: "Player1", skill: 2000 }),
+        createMockPlayer({ playerId: 2, lastName: "Player2", skill: 1800 }),
+        createMockPlayer({ playerId: 3, lastName: "Player3", skill: 1600 }),
       ]
 
-      mockDatabase.prisma.player.findMany.mockResolvedValue(mockTopPlayers as Player[])
+      mockDatabase.prisma.player.findMany.mockResolvedValue(mockTopPlayers)
 
       const result = await playerRepository.findTopPlayers(limit, game, includeHidden)
 

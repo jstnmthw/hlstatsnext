@@ -532,9 +532,9 @@ export class PlayerService implements IPlayerService {
   private async handlePlayerDamage(event: PlayerEvent): Promise<HandlerResult> {
     try {
       if (event.eventType !== EventType.PLAYER_DAMAGE) {
-        return { success: false, error: 'Invalid event type for handlePlayerDamage' }
+        return { success: false, error: "Invalid event type for handlePlayerDamage" }
       }
-      
+
       const { attackerId, victimId, weapon, damage, hitgroup } = event.data
       const timestamp = Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR)
 
@@ -546,15 +546,15 @@ export class PlayerService implements IPlayerService {
       }
 
       // If it's a headshot, update headshot count
-      if (hitgroup === 'head') {
+      if (hitgroup === "head") {
         attackerUpdates.headshots = 1
       }
 
       await this.updatePlayerStats(attackerId, attackerUpdates)
-      
+
       // Log damage event for accuracy tracking
       this.logger.debug(
-        `Damage: ${attackerId} -> ${victimId} (${damage} damage with ${weapon}, hitgroup: ${hitgroup})`
+        `Damage: ${attackerId} -> ${victimId} (${damage} damage with ${weapon}, hitgroup: ${hitgroup})`,
       )
 
       return { success: true, affected: 1 }

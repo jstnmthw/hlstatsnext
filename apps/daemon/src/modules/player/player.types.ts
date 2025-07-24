@@ -275,13 +275,13 @@ export interface IPlayerRepository {
     messageMode?: number,
     options?: CreateOptions,
   ): Promise<void>
-  
+
   // Player stats retrieval for skill calculations
   getPlayerStats(
     playerId: number,
     options?: FindOptions,
   ): Promise<import("@repo/database/client").Player | null>
-  
+
   // EventFrag logging for kill events
   logEventFrag(
     killerId: number,

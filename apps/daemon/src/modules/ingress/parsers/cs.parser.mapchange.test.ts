@@ -1,6 +1,6 @@
 /**
  * CS Parser Map Change Tests
- * 
+ *
  * Tests for map change event parsing and round start map tracking
  */
 
@@ -19,9 +19,9 @@ describe("CsParser - Map Change Events", () => {
 
   describe("parseMapChangeEvent", () => {
     it("should parse mapchange to pattern", () => {
-      const logLine = '-------- Mapchange to cs_havana --------'
+      const logLine = "-------- Mapchange to cs_havana --------"
       const result = parser.parseLine(logLine, serverId)
-      
+
       expect(result.success).toBe(true)
       expect(result.event).toBeDefined()
       expect(result.event?.eventType).toBe(EventType.MAP_CHANGE)
@@ -33,7 +33,7 @@ describe("CsParser - Map Change Events", () => {
     it("should parse started map pattern", () => {
       const logLine = 'Started map "de_dust2" (CRC "-1352213912")'
       const result = parser.parseLine(logLine, serverId)
-      
+
       expect(result.success).toBe(true)
       expect(result.event).toBeDefined()
       expect(result.event?.eventType).toBe(EventType.MAP_CHANGE)
@@ -43,9 +43,9 @@ describe("CsParser - Map Change Events", () => {
 
     it("should track previous map in subsequent changes", () => {
       // First map change
-      const firstMapLine = '-------- Mapchange to cs_havana --------'
+      const firstMapLine = "-------- Mapchange to cs_havana --------"
       const firstResult = parser.parseLine(firstMapLine, serverId)
-      
+
       expect(firstResult.success).toBe(true)
       const firstMapEvent = firstResult.event as MapChangeEvent
       expect(firstMapEvent.data.newMap).toBe("cs_havana")
@@ -54,7 +54,7 @@ describe("CsParser - Map Change Events", () => {
       // Second map change should have previous map
       const secondMapLine = 'Started map "de_dust2" (CRC "-1352213912")'
       const secondResult = parser.parseLine(secondMapLine, serverId)
-      
+
       expect(secondResult.success).toBe(true)
       const secondMapEvent = secondResult.event as MapChangeEvent
       expect(secondMapEvent.data.newMap).toBe("de_dust2")
@@ -62,9 +62,9 @@ describe("CsParser - Map Change Events", () => {
     })
 
     it("should handle changelevel command pattern", () => {
-      const logLine = 'changelevel: de_mirage'
+      const logLine = "changelevel: de_mirage"
       const result = parser.parseLine(logLine, serverId)
-      
+
       expect(result.success).toBe(true)
       expect(result.event).toBeDefined()
       expect(result.event?.eventType).toBe(EventType.MAP_CHANGE)
@@ -76,13 +76,13 @@ describe("CsParser - Map Change Events", () => {
   describe("parseRoundStartEvent with map tracking", () => {
     it("should use current map from parser state", () => {
       // Set a map first
-      const mapChangeLine = '-------- Mapchange to cs_havana --------'
+      const mapChangeLine = "-------- Mapchange to cs_havana --------"
       parser.parseLine(mapChangeLine, serverId)
 
       // Now parse a round start
       const roundStartLine = 'World triggered "Round_Start"'
       const result = parser.parseLine(roundStartLine, serverId)
-      
+
       expect(result.success).toBe(true)
       expect(result.event).toBeDefined()
       expect(result.event?.eventType).toBe(EventType.ROUND_START)
@@ -93,7 +93,7 @@ describe("CsParser - Map Change Events", () => {
     it("should handle round start without previous map change", () => {
       const roundStartLine = 'World triggered "Round_Start"'
       const result = parser.parseLine(roundStartLine, serverId)
-      
+
       expect(result.success).toBe(true)
       expect(result.event).toBeDefined()
       expect(result.event?.eventType).toBe(EventType.ROUND_START)
@@ -121,9 +121,9 @@ describe("CsParser - Map Change Events", () => {
 
   describe("map change error handling", () => {
     it("should handle malformed map change events", () => {
-      const logLine = '-------- Mapchange to  --------'
+      const logLine = "-------- Mapchange to  --------"
       const result = parser.parseLine(logLine, serverId)
-      
+
       expect(result.success).toBe(false)
       expect(result.error).toContain("Could not extract map name")
     })
@@ -131,7 +131,7 @@ describe("CsParser - Map Change Events", () => {
     it("should handle missing map name in started map pattern", () => {
       const logLine = 'Started map "" (CRC "-1352213912")'
       const result = parser.parseLine(logLine, serverId)
-      
+
       expect(result.success).toBe(false)
       expect(result.error).toContain("Could not extract map name")
     })

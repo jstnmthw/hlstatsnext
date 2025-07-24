@@ -14,20 +14,20 @@ export type TransactionCallback<T = unknown> = (tx: TransactionalPrisma) => Prom
 // Dedicated mock type that extends DatabaseClient with proper mock capabilities
 export interface MockDatabaseClient {
   readonly prisma: TransactionalPrisma
-  transaction: MockedFunction<DatabaseClient['transaction']>
+  transaction: MockedFunction<DatabaseClient["transaction"]>
   testConnection(): Promise<boolean>
   disconnect(): Promise<void>
   // Expose the mock for easy access in tests
   readonly mockPrisma: ReturnType<typeof mockDeep<TransactionalPrisma>>
 }
 
-// Factory function that creates a properly typed mock database client  
+// Factory function that creates a properly typed mock database client
 export function createMockDatabaseClient(): MockDatabaseClient & DatabaseClient {
   const mockPrisma = mockDeep<TransactionalPrisma>()
-  
+
   const mockTransaction = vi.fn().mockImplementation(async (callback: TransactionCallback) => {
     return callback(mockPrisma)
-  }) as MockedFunction<DatabaseClient['transaction']>
+  }) as MockedFunction<DatabaseClient["transaction"]>
 
   // Create the mock client with proper typing
   const mockClient = {

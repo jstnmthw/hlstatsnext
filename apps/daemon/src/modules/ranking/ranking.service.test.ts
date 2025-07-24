@@ -4,8 +4,8 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { RankingService, type KillContext } from "./ranking.service"
-import { createMockLogger } from "../../test-support/mocks/logger"
-import { createMockWeaponRepository } from "../../test-support/mocks/weapon-repository"
+import { createMockLogger } from "../../tests/mocks/logger"
+import { createMockWeaponRepository } from "../../tests/mocks/weapon-repository"
 import type { SkillRating } from "./ranking.types"
 import type { IWeaponRepository } from "../weapon/weapon.types"
 
@@ -49,7 +49,10 @@ describe("RankingService", () => {
     it("should handle errors gracefully", async () => {
       // Create a service that throws an error internally
       const errorService = new RankingService(mockLogger, mockWeaponRepository)
-      vi.spyOn(errorService as unknown as { calculateRatingAdjustment: () => SkillRating }, "calculateRatingAdjustment").mockImplementation(() => {
+      vi.spyOn(
+        errorService as unknown as { calculateRatingAdjustment: () => SkillRating },
+        "calculateRatingAdjustment",
+      ).mockImplementation(() => {
         throw new Error("Rating calculation failed")
       })
 
@@ -234,7 +237,10 @@ describe("RankingService", () => {
         gamesPlayed: 50,
       }
 
-      const adjustment = await rankingService.calculateRatingAdjustment(identicalRating, identicalRating)
+      const adjustment = await rankingService.calculateRatingAdjustment(
+        identicalRating,
+        identicalRating,
+      )
 
       expect(adjustment.winner).toBe(16) // K/2 for 50% expected outcome
       expect(adjustment.loser).toBe(-13) // -16 * 0.8 = -12.8, rounded
@@ -291,7 +297,11 @@ describe("RankingService", () => {
         victimTeam: "TERRORIST",
       }
 
-      const adjustment = await rankingService.calculateSkillAdjustment(killerRating, victimRating, context)
+      const adjustment = await rankingService.calculateSkillAdjustment(
+        killerRating,
+        victimRating,
+        context,
+      )
 
       // Base 16 * 1.4 (AWP multiplier) = 22.4, rounded to 22
       expect(adjustment.killerChange).toBe(22)
@@ -322,7 +332,11 @@ describe("RankingService", () => {
         victimTeam: "TERRORIST",
       }
 
-      const adjustment = await rankingService.calculateSkillAdjustment(killerRating, victimRating, context)
+      const adjustment = await rankingService.calculateSkillAdjustment(
+        killerRating,
+        victimRating,
+        context,
+      )
 
       // Base 16 * 1.0 (AK) * 1.2 (headshot) = 19.2, rounded to 19
       expect(adjustment.killerChange).toBe(19)
@@ -353,7 +367,11 @@ describe("RankingService", () => {
         victimTeam: "CT", // Same team
       }
 
-      const adjustment = await rankingService.calculateSkillAdjustment(killerRating, victimRating, context)
+      const adjustment = await rankingService.calculateSkillAdjustment(
+        killerRating,
+        victimRating,
+        context,
+      )
 
       expect(adjustment.killerChange).toBe(-10) // Team kill penalty
       expect(adjustment.victimChange).toBe(2) // Victim compensation
@@ -383,7 +401,11 @@ describe("RankingService", () => {
         victimTeam: "TERRORIST",
       }
 
-      const adjustment = await rankingService.calculateSkillAdjustment(killerRating, victimRating, context)
+      const adjustment = await rankingService.calculateSkillAdjustment(
+        killerRating,
+        victimRating,
+        context,
+      )
 
       expect(adjustment.killerChange).toBe(50) // Capped at maximum
       expect(adjustment.victimChange).toBe(-40) // -50 * 0.8
@@ -490,7 +512,10 @@ describe("RankingService", () => {
       }
 
       // Low rated player loses
-      const adjustment = await rankingService.calculateRatingAdjustment(highRatedPlayer, lowRatedPlayer)
+      const adjustment = await rankingService.calculateRatingAdjustment(
+        highRatedPlayer,
+        lowRatedPlayer,
+      )
 
       // Should not allow rating to go below 100
       const newRating = lowRatedPlayer.rating + adjustment.loser
@@ -515,7 +540,10 @@ describe("RankingService", () => {
       }
 
       // High rated player wins
-      const adjustment = await rankingService.calculateRatingAdjustment(highRatedPlayer, lowRatedPlayer)
+      const adjustment = await rankingService.calculateRatingAdjustment(
+        highRatedPlayer,
+        lowRatedPlayer,
+      )
 
       // Should not allow rating to exceed 3000
       const newRating = highRatedPlayer.rating + adjustment.winner
@@ -548,11 +576,15 @@ describe("RankingService", () => {
         victimTeam: "TERRORIST",
       }
 
-      const adjustment = await rankingService.calculateSkillAdjustment(killerRating, victimRating, context)
+      const adjustment = await rankingService.calculateSkillAdjustment(
+        killerRating,
+        victimRating,
+        context,
+      )
 
       // Verify weapon repository was called
       expect(mockWeaponRepository.findWeaponByCode).toHaveBeenCalledWith("awp")
-      
+
       // AWP has 1.4 modifier in mock data
       expect(adjustment.killerChange).toBe(22) // 16 * 1.4 = 22.4, rounded
       expect(adjustment.victimChange).toBe(-18) // -22 * 0.8 = -17.6, rounded
@@ -582,7 +614,11 @@ describe("RankingService", () => {
         victimTeam: "TERRORIST",
       }
 
-      const adjustment = await rankingService.calculateSkillAdjustment(killerRating, victimRating, context)
+      const adjustment = await rankingService.calculateSkillAdjustment(
+        killerRating,
+        victimRating,
+        context,
+      )
 
       // Should use default modifier of 1.0
       expect(adjustment.killerChange).toBe(16)
@@ -618,7 +654,7 @@ describe("RankingService", () => {
 
       // First call
       await rankingService.calculateSkillAdjustment(killerRating, victimRating, context)
-      
+
       // Second call
       await rankingService.calculateSkillAdjustment(killerRating, victimRating, context)
 
@@ -628,7 +664,9 @@ describe("RankingService", () => {
 
     it("should handle database errors gracefully", async () => {
       // Mock database error
-      vi.mocked(mockWeaponRepository.findWeaponByCode).mockRejectedValueOnce(new Error("Database error"))
+      vi.mocked(mockWeaponRepository.findWeaponByCode).mockRejectedValueOnce(
+        new Error("Database error"),
+      )
 
       const killerRating: SkillRating = {
         playerId: 1,
@@ -653,12 +691,18 @@ describe("RankingService", () => {
         victimTeam: "TERRORIST",
       }
 
-      const adjustment = await rankingService.calculateSkillAdjustment(killerRating, victimRating, context)
+      const adjustment = await rankingService.calculateSkillAdjustment(
+        killerRating,
+        victimRating,
+        context,
+      )
 
       // Should use default modifier when database fails
       expect(adjustment.killerChange).toBe(16)
       expect(adjustment.victimChange).toBe(-13)
-      expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining("Error fetching weapon modifier"))
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Error fetching weapon modifier"),
+      )
     })
 
     it("should clear weapon cache", () => {

@@ -8,12 +8,12 @@ import type { DatabaseClient, TransactionalPrisma } from "@/database/client"
 import type { RepositoryOptions } from "@/shared/types/database"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { BaseRepository } from "./repository.base"
-import { createMockLogger } from "../../test-support/mocks/logger"
+import { createMockLogger } from "../../tests/mocks/logger"
 import {
   createMockDatabaseClient,
   type TransactionCallback,
   type MockDatabaseClient,
-} from "../../test-support/mocks/database"
+} from "../../tests/mocks/database"
 import { mockDeep as deepMock } from "vitest-mock-extended"
 
 // Concrete implementation for testing
@@ -145,7 +145,9 @@ describe("BaseRepository", () => {
 
     it("should create new transaction when not provided", async () => {
       const operation = vi.fn().mockResolvedValue("result")
-      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) => op(mockDatabase.prisma))
+      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) =>
+        op(mockDatabase.prisma),
+      )
 
       const result = await repository.executeWithTransactionPublic(operation)
 
@@ -155,7 +157,9 @@ describe("BaseRepository", () => {
 
     it("should create new transaction when options undefined", async () => {
       const operation = vi.fn().mockResolvedValue("result")
-      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) => op(mockDatabase.prisma))
+      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) =>
+        op(mockDatabase.prisma),
+      )
 
       const result = await repository.executeWithTransactionPublic(operation, undefined)
 
@@ -436,7 +440,9 @@ describe("BaseRepository", () => {
   describe("Integration scenarios", () => {
     it("should handle complete repository workflow", async () => {
       const operation = vi.fn().mockResolvedValue({ id: 1, name: "test" })
-      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) => op(mockDatabase.prisma))
+      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) =>
+        op(mockDatabase.prisma),
+      )
 
       // Test ID validation, transaction, and error handling together
       expect(() => repository.validateIdPublic(1, "findById")).not.toThrow()
@@ -461,7 +467,9 @@ describe("BaseRepository", () => {
 
       // Test transaction error
       const operation = vi.fn().mockRejectedValue(new Error("DB Error"))
-      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) => op(mockDatabase.prisma))
+      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) =>
+        op(mockDatabase.prisma),
+      )
 
       await expect(repository.executeWithTransactionPublic(operation)).rejects.toThrow("DB Error")
 
@@ -493,7 +501,9 @@ describe("BaseRepository", () => {
       }
 
       const operation = vi.fn().mockResolvedValue(complexResult)
-      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) => op(mockDatabase.prisma))
+      mockDatabase.transaction.mockImplementation(async (op: TransactionCallback) =>
+        op(mockDatabase.prisma),
+      )
 
       const result = await repository.executeWithTransactionPublic(operation)
 

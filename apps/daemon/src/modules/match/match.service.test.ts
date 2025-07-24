@@ -5,8 +5,8 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { MatchService } from "./match.service"
 import { MatchRepository } from "./match.repository"
-import { createMockLogger } from "../../test-support/mocks/logger"
-import { createMockDatabaseClient } from "../../test-support/mocks/database"
+import { createMockLogger } from "../../tests/mocks/logger"
+import { createMockDatabaseClient } from "../../tests/mocks/database"
 import type { DatabaseClient } from "@/database/client"
 
 describe("MatchService", () => {

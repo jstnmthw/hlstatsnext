@@ -14,7 +14,7 @@ describe("CsParser - Map Change Events", () => {
   const serverId = 1
 
   beforeEach(() => {
-    parser = new CsParser("csgo")
+    parser = new CsParser("cstrike")
   })
 
   describe("parseMapChangeEvent", () => {

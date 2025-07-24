@@ -189,7 +189,7 @@ export interface MatchStats {
   mvpPlayer?: number
   startTime: Date
   playerStats: Map<number, PlayerRoundStats>
-  currentMap?: string
+  currentMap: string
 }
 
 export interface PlayerRoundStats {
@@ -225,7 +225,8 @@ export interface IMatchService {
 
   // Match state
   getMatchStats(serverId: number): MatchStats | undefined
-  getCurrentMap(serverId: number): string | undefined
+  getCurrentMap(serverId: number): string
+  initializeMapForServer(serverId: number): Promise<string>
   resetMatchStats(serverId: number): void
   updatePlayerWeaponStats(
     serverId: number,
@@ -271,6 +272,9 @@ export interface IMatchRepository {
 
   // Match history
   createPlayerHistory(data: PlayerHistoryData, options?: CreateOptions): Promise<void>
+
+  // Map detection
+  getLastKnownMap(serverId: number): Promise<string | null>
 
   // Map statistics
   updateMapCount(

@@ -174,8 +174,11 @@ describe("ActionService", () => {
     })
 
     it("should handle errors and return failure result", async () => {
+      // Mock repository to return null (unknown action)
+      vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
+      
       // Mock logger to throw an error
-      vi.spyOn(mockLogger, "debug").mockImplementation(() => {
+      vi.spyOn(mockLogger, "warn").mockImplementation(() => {
         throw new Error("Logger error")
       })
 
@@ -266,7 +269,10 @@ describe("ActionService", () => {
 
   describe("Error handling edge cases", () => {
     it("should handle non-Error exceptions", async () => {
-      vi.spyOn(mockLogger, "debug").mockImplementation(() => {
+      // Mock repository to return null (unknown action)
+      vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
+      
+      vi.spyOn(mockLogger, "warn").mockImplementation(() => {
         throw "String error"
       })
 

@@ -4,7 +4,7 @@ import { EventType } from "@/shared/types/events"
 import type { PlayerDamageEvent } from "@/modules/player/player.types"
 
 describe("CsParser - Damage Events", () => {
-  const parser = new CsParser("csgo")
+  const parser = new CsParser("cstrike")
   const serverId = 1
 
   describe("parseDamageEvent", () => {

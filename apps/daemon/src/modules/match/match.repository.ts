@@ -200,4 +200,38 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
       this.handleError("resetMapStats", error)
     }
   }
+
+  async getLastKnownMap(serverId: number): Promise<string | null> {
+    try {
+      this.validateId(serverId, "getLastKnownMap")
+
+      return await this.executeWithTransaction(async (client) => {
+        // Try to get the most recent ServerLoad entry with a map
+        const serverLoad = await client.serverLoad.findFirst({
+          where: { 
+            server_id: serverId,
+            map: { not: null }
+          },
+          orderBy: { timestamp: "desc" },
+          select: { map: true }
+        })
+
+        if (serverLoad?.map) {
+          return serverLoad.map
+        }
+
+        // Fallback: Check most recent EventFrag for a map
+        const eventFrag = await client.eventFrag.findFirst({
+          where: { serverId },
+          orderBy: { eventTime: "desc" },
+          select: { map: true }
+        })
+
+        return eventFrag?.map || null
+      })
+    } catch (error) {
+      this.handleError("getLastKnownMap", error)
+      return null
+    }
+  }
 }

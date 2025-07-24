@@ -18,6 +18,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { KillContext } from "@/modules/ranking/ranking.service"
 import type { HandlerResult } from "@/shared/types/common"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
+import type { IMatchService } from "@/modules/match/match.types"
 import { EventType } from "@/shared/types/events"
 import { validateSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
 
@@ -33,6 +34,7 @@ export class PlayerService implements IPlayerService {
     private readonly repository: IPlayerRepository,
     private readonly logger: ILogger,
     private readonly rankingService: IRankingService,
+    private readonly matchService?: IMatchService,
   ) {}
 
   async getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number> {
@@ -102,6 +104,8 @@ export class PlayerService implements IPlayerService {
       }
       if (updates.skill !== undefined) {
         updateData.skill = { increment: updates.skill }
+        // Update last skill change timestamp when skill is modified
+        updateData.last_skill_change = Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR)
       }
       if (updates.shots !== undefined) {
         updateData.shots = { increment: updates.shots }
@@ -252,6 +256,8 @@ export class PlayerService implements IPlayerService {
           return await this.handlePlayerChangeName(event)
         case EventType.PLAYER_SUICIDE:
           return await this.handlePlayerSuicide(event)
+        case EventType.PLAYER_DAMAGE:
+          return await this.handlePlayerDamage(event)
         case EventType.PLAYER_TEAMKILL:
           return await this.handlePlayerTeamkill(event)
         case EventType.CHAT_MESSAGE:
@@ -523,6 +529,43 @@ export class PlayerService implements IPlayerService {
     }
   }
 
+  private async handlePlayerDamage(event: PlayerEvent): Promise<HandlerResult> {
+    try {
+      if (event.eventType !== EventType.PLAYER_DAMAGE) {
+        return { success: false, error: 'Invalid event type for handlePlayerDamage' }
+      }
+      
+      const { attackerId, victimId, weapon, damage, hitgroup } = event.data
+      const timestamp = Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR)
+
+      // Update attacker's shots and hits statistics
+      const attackerUpdates: PlayerStatsUpdate = {
+        shots: 1, // Each damage event counts as a hit
+        hits: 1,
+        last_event: timestamp,
+      }
+
+      // If it's a headshot, update headshot count
+      if (hitgroup === 'head') {
+        attackerUpdates.headshots = 1
+      }
+
+      await this.updatePlayerStats(attackerId, attackerUpdates)
+      
+      // Log damage event for accuracy tracking
+      this.logger.debug(
+        `Damage: ${attackerId} -> ${victimId} (${damage} damage with ${weapon}, hitgroup: ${hitgroup})`
+      )
+
+      return { success: true, affected: 1 }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      }
+    }
+  }
+
   private async handlePlayerTeamkill(event: PlayerEvent): Promise<HandlerResult> {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -567,8 +610,8 @@ export class PlayerService implements IPlayerService {
 
       const { playerId, message, messageMode } = event.data
 
-      // Get current map from the server context (use empty string as fallback)
-      const map = "" // TODO: Get actual map from server context or event data
+      // Get current map from the match service
+      const map = this.matchService?.getCurrentMap(event.serverId) || ""
 
       // Store chat message in database
       await this.repository.createChatEvent(

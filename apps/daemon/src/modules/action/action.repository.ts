@@ -5,61 +5,25 @@
  */
 
 import type { DatabaseClient } from "@/database/client"
-
-export interface ActionDefinition {
-  id: number
-  game: string
-  code: string
-  rewardPlayer: number
-  rewardTeam: number
-  team: string
-  description: string | null
-  forPlayerActions: boolean
-  forPlayerPlayerActions: boolean
-  forTeamActions: boolean
-  forWorldActions: boolean
-}
-
-export interface IActionRepository {
-  findActionByCode(game: string, actionCode: string, team?: string): Promise<ActionDefinition | null>
-  logPlayerAction(
-    playerId: number,
-    actionId: number,
-    serverId: number,
-    map: string,
-    bonus?: number,
-  ): Promise<void>
-  logPlayerPlayerAction(
-    playerId: number,
-    victimId: number,
-    actionId: number,
-    serverId: number,
-    map: string,
-    bonus?: number,
-  ): Promise<void>
-  logTeamAction(
-    serverId: number,
-    actionId: number,
-    map: string,
-    bonus?: number,
-  ): Promise<void>
-  logWorldAction(
-    serverId: number,
-    actionId: number,
-    map: string,
-    bonus?: number,
-  ): Promise<void>
-}
+import type { IActionRepository, ActionDefinition } from "./action.types"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 export class ActionRepository implements IActionRepository {
-  constructor(private readonly database: DatabaseClient) {
-    this.database = database
-  }
+  constructor(
+    private readonly database: DatabaseClient,
+    private readonly logger: ILogger,
+  ) {}
 
-  async findActionByCode(game: string, actionCode: string, team?: string): Promise<ActionDefinition | null> {
+  async findActionByCode(
+    game: string,
+    actionCode: string,
+    team?: string,
+  ): Promise<ActionDefinition | null> {
     try {
-      console.log(`[DEBUG] Looking up action: game=${game}, code=${actionCode}, team=${team || 'undefined'}`)
-      
+      this.logger.debug(
+        `Looking up action: game=${game}, code=${actionCode}, team=${team || "undefined"}`,
+      )
+
       const action = await this.database.prisma.action.findFirst({
         where: {
           game,
@@ -72,8 +36,8 @@ export class ActionRepository implements IActionRepository {
           { team: team ? "desc" : "asc" },
         ],
       })
-      
-      console.log(`[DEBUG] Action lookup result:`, action ? `Found ID ${action.id}` : 'Not found')
+
+      this.logger.debug(`Action lookup result: ${action ? `Found ID ${action.id}` : "Not found"}`)
 
       if (!action) {
         return null
@@ -105,8 +69,10 @@ export class ActionRepository implements IActionRepository {
     bonus: number = 0,
   ): Promise<void> {
     try {
-      console.log(`[DEBUG] Attempting to log player action: playerId=${playerId}, actionId=${actionId}, serverId=${serverId}, map="${map}", bonus=${bonus}`)
-      
+      this.logger.debug(
+        `Attempting to log player action: playerId=${playerId}, actionId=${actionId}, serverId=${serverId}, map="${map}", bonus=${bonus}`,
+      )
+
       const result = await this.database.prisma.eventPlayerAction.create({
         data: {
           eventTime: new Date(),
@@ -117,10 +83,10 @@ export class ActionRepository implements IActionRepository {
           bonus,
         },
       })
-      
-      console.log(`[DEBUG] Player action logged successfully: record ID ${result.id}`)
+
+      this.logger.debug(`Player action logged successfully: record ID ${result.id}`)
     } catch (error) {
-      console.error(`[ERROR] Failed to log player action:`, error)
+      this.logger.error(`Failed to log player action: ${error}`)
       throw new Error(`Failed to log player action: ${error}`)
     }
   }

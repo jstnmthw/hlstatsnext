@@ -59,3 +59,42 @@ export type ActionEvent =
 export interface IActionService {
   handleActionEvent(event: ActionEvent): Promise<HandlerResult>
 }
+
+export interface ActionDefinition {
+  id: number
+  game: string
+  code: string
+  rewardPlayer: number
+  rewardTeam: number
+  team: string
+  description: string | null
+  forPlayerActions: boolean
+  forPlayerPlayerActions: boolean
+  forTeamActions: boolean
+  forWorldActions: boolean
+}
+
+export interface IActionRepository {
+  findActionByCode(
+    game: string,
+    actionCode: string,
+    team?: string,
+  ): Promise<ActionDefinition | null>
+  logPlayerAction(
+    playerId: number,
+    actionId: number,
+    serverId: number,
+    map: string,
+    bonus?: number,
+  ): Promise<void>
+  logPlayerPlayerAction(
+    playerId: number,
+    victimId: number,
+    actionId: number,
+    serverId: number,
+    map: string,
+    bonus?: number,
+  ): Promise<void>
+  logTeamAction(serverId: number, actionId: number, map: string, bonus?: number): Promise<void>
+  logWorldAction(serverId: number, actionId: number, map: string, bonus?: number): Promise<void>
+}

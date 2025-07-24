@@ -12,6 +12,8 @@ import { EventType } from "@/shared/types/events"
 export class CsParser extends BaseParser {
   // Track the last winning team for Round_End events
   private lastWinningTeam: string | undefined
+  // Track the current map for Round_Start events
+  private currentMap: string = ""
 
   constructor(game: string = "csgo") {
     super(game)
@@ -25,6 +27,11 @@ export class CsParser extends BaseParser {
       // Player kill events
       if (cleanLine.includes(" killed ")) {
         return this.parseKillEvent(cleanLine, serverId)
+      }
+      
+      // Player damage events
+      if (cleanLine.includes(" attacked ")) {
+        return this.parseDamageEvent(cleanLine, serverId)
       }
 
       // Player connect/disconnect
@@ -48,6 +55,11 @@ export class CsParser extends BaseParser {
           return actionResult
         }
         // Fall through to other event parsing if not an action
+      }
+
+      // Map change events (before round events)
+      if (cleanLine.includes('Mapchange to ') || cleanLine.includes('Started map ') || cleanLine.includes('changelevel:')) {
+        return this.parseMapChangeEvent(cleanLine, serverId)
       }
 
       // Round events
@@ -138,6 +150,79 @@ export class CsParser extends BaseParser {
           steamId: killerSteamId,
           playerName: killerName,
           isBot: killerSteamId === "BOT",
+        },
+        victim: {
+          steamId: victimSteamId,
+          playerName: victimName,
+          isBot: victimSteamId === "BOT",
+        },
+      },
+    }
+
+    return { event, success: true }
+  }
+
+  private parseDamageEvent(logLine: string, serverId: number): ParseResult {
+    // Example: "Player1<2><STEAM_ID><CT>" attacked "Player2<3><STEAM_ID><TERRORIST>" with "ak47" (damage "27") (damage_armor "0") (health "73") (armor "100") (hitgroup "chest")
+    const damageRegex =
+      /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" attacked "([^"]+)<(\d+)><([^>]+)><([^>]*)>" with "([^"]+)" \(damage "(\d+)"\) \(damage_armor "(\d+)"\) \(health "(\d+)"\) \(armor "(\d+)"\)(?:\s+\(hitgroup "([^"]+)"\))?/
+    const match = logLine.match(damageRegex)
+
+    if (!match) {
+      return { event: null, success: false, error: "Could not parse damage event" }
+    }
+
+    const [
+      ,
+      attackerName,
+      attackerIdStr,
+      attackerSteamId,
+      attackerTeam,
+      victimName,
+      victimIdStr,
+      victimSteamId,
+      victimTeam,
+      weapon,
+      damage,
+      damageArmor,
+      healthRemaining,
+      armorRemaining,
+      hitgroup,
+    ] = match
+
+    if (!attackerName || !attackerIdStr || !attackerSteamId || !victimName || !victimIdStr || !victimSteamId) {
+      return { event: null, success: false, error: "Missing required fields in damage event" }
+    }
+
+    const attackerId = parseInt(attackerIdStr)
+    const victimId = parseInt(victimIdStr)
+
+    if (isNaN(attackerId) || isNaN(victimId)) {
+      return { event: null, success: false, error: "Invalid player ID in damage event" }
+    }
+
+    const event: BaseEvent = {
+      eventType: EventType.PLAYER_DAMAGE,
+      timestamp: this.createTimestamp(),
+      serverId,
+      raw: logLine,
+      data: {
+        attackerId,
+        victimId,
+        weapon,
+        damage: parseInt(damage || "0") || 0,
+        damageArmor: parseInt(damageArmor || "0") || 0,
+        healthRemaining: parseInt(healthRemaining || "0") || 0,
+        armorRemaining: parseInt(armorRemaining || "0") || 0,
+        hitgroup: hitgroup || "generic",
+        attackerTeam,
+        victimTeam,
+      },
+      meta: {
+        killer: {
+          steamId: attackerSteamId,
+          playerName: attackerName,
+          isBot: attackerSteamId === "BOT",
         },
         victim: {
           steamId: victimSteamId,
@@ -271,78 +356,6 @@ export class CsParser extends BaseParser {
     return { event, success: true }
   }
 
-  private parseRoundStartEvent(logLine: string, serverId: number): ParseResult {
-    const event: BaseEvent = {
-      eventType: EventType.ROUND_START,
-      timestamp: this.createTimestamp(),
-      serverId,
-      raw: logLine,
-      data: {
-        map: "unknown", // Would need additional parsing to get map name
-        roundNumber: 1, // Would need round tracking
-        maxPlayers: 32,
-      },
-    }
-
-    return { event, success: true }
-  }
-
-  private parseTeamWinEvent(logLine: string, serverId: number): ParseResult {
-    // Parse: Team "TERRORIST" triggered "Terrorists_Win" (CT "4") (T "4")
-    const teamWinMatch = logLine.match(/Team "([^"]+)" triggered "([^"]+)"/i)
-    
-    if (teamWinMatch) {
-      const [, team, triggerName] = teamWinMatch
-      
-      // Store the winning team for the subsequent Round_End event
-      this.lastWinningTeam = team
-      
-      // Extract scores if available: (CT "4") (T "4")
-      const scoreMatch = logLine.match(/\(CT "(\d+)"\) \(T "(\d+)"\)/)
-      let score
-      if (scoreMatch && scoreMatch[1] && scoreMatch[2]) {
-        const [, ctScore, tScore] = scoreMatch
-        score = {
-          ct: parseInt(ctScore, 10),
-          t: parseInt(tScore, 10),
-        }
-      }
-
-      const event: BaseEvent = {
-        eventType: EventType.TEAM_WIN,
-        timestamp: this.createTimestamp(),
-        serverId,
-        raw: logLine,
-        data: {
-          winningTeam: team,
-          triggerName,
-          score: score || { ct: 0, t: 0 },
-        },
-      }
-
-      return { event, success: true }
-    }
-
-    return { event: null, success: false }
-  }
-
-  private parseRoundEndEvent(logLine: string, serverId: number): ParseResult {
-    const event: BaseEvent = {
-      eventType: EventType.ROUND_END,
-      timestamp: this.createTimestamp(),
-      serverId,
-      raw: logLine,
-      data: {
-        winningTeam: this.lastWinningTeam || undefined,
-        duration: 0, // Could be extracted from match time if available
-      },
-    }
-
-    // Clear the winning team after using it
-    this.lastWinningTeam = undefined
-
-    return { event, success: true }
-  }
 
   private parseActionEvent(logLine: string, serverId: number): ParseResult {
     // Parse player action events like:
@@ -389,5 +402,126 @@ export class CsParser extends BaseParser {
 
     // Not an action event we handle
     return { event: null, success: false }
+  }
+
+  private parseRoundStartEvent(logLine: string, serverId: number): ParseResult {
+    // Example: World triggered "Round_Start"
+    // Map info comes from previously parsed map change events
+    
+    const event: BaseEvent = {
+      eventType: EventType.ROUND_START,
+      timestamp: this.createTimestamp(),
+      serverId,
+      raw: logLine,
+      data: {
+        map: this.currentMap || '', // Use current map from parser state
+        roundNumber: 1, // TODO: Track actual round number
+        maxPlayers: 0, // TODO: Get from server info
+      },
+    }
+
+    return { event, success: true }
+  }
+
+  private parseRoundEndEvent(logLine: string, serverId: number): ParseResult {
+    // Example: World triggered "Round_End"
+    // The winning team was captured from the previous Terrorists_Win/CTs_Win event
+    
+    const event: BaseEvent = {
+      eventType: EventType.ROUND_END,
+      timestamp: this.createTimestamp(),
+      serverId,
+      raw: logLine,
+      data: {
+        winningTeam: this.lastWinningTeam,
+      },
+    }
+
+    // Clear the winning team after using it
+    this.lastWinningTeam = undefined
+
+    return { event, success: true }
+  }
+
+  private parseTeamWinEvent(logLine: string, serverId: number): ParseResult {
+    // Parse: Team "TERRORIST" triggered "Terrorists_Win" (CT "4") (T "4")
+    const teamWinMatch = logLine.match(/Team "([^"]+)" triggered "([^"]+)"/i)
+    if (teamWinMatch) {
+      const [, team, triggerName] = teamWinMatch
+      
+      // Store winning team for subsequent Round_End event
+      this.lastWinningTeam = team
+      
+      // Extract scores
+      const scoreMatch = logLine.match(/\(CT "(\d+)"\) \(T "(\d+)"\)/)
+      let ctScore = 0
+      let tScore = 0
+      
+      if (scoreMatch) {
+        ctScore = parseInt(scoreMatch[1] || "0") || 0
+        tScore = parseInt(scoreMatch[2] || "0") || 0
+      }
+      
+      const event: BaseEvent = {
+        eventType: EventType.TEAM_WIN,
+        timestamp: this.createTimestamp(),
+        serverId,
+        raw: logLine,
+        data: {
+          winningTeam: team,
+          triggerName,
+          score: {
+            ct: ctScore,
+            t: tScore,
+          },
+        },
+      }
+
+      return { event, success: true }
+    }
+    
+    return { event: null, success: false, error: "Could not parse team win event" }
+  }
+
+  private parseMapChangeEvent(logLine: string, serverId: number): ParseResult {
+    // Parse map change events like:
+    // "-------- Mapchange to cs_havana --------"
+    // "Started map "cs_havana" (CRC "-1352213912")"
+    // "changelevel: de_mirage"
+    
+    let mapName = ""
+    
+    // Try different map change patterns
+    const mapchangeToMatch = logLine.match(/Mapchange to (\w+)/)
+    const startedMapMatch = logLine.match(/Started map "(\w+)"/)
+    const changelevelMatch = logLine.match(/changelevel:?\s+(\w+)/)
+    
+    if (mapchangeToMatch && mapchangeToMatch[1]) {
+      mapName = mapchangeToMatch[1]
+    } else if (startedMapMatch && startedMapMatch[1]) {
+      mapName = startedMapMatch[1]  
+    } else if (changelevelMatch && changelevelMatch[1]) {
+      mapName = changelevelMatch[1]
+    } else {
+      return { event: null, success: false, error: "Could not extract map name from change event" }
+    }
+    
+    // Store the previous map and update current map
+    const previousMap = this.currentMap || undefined
+    this.currentMap = mapName
+    
+    const event: BaseEvent = {
+      eventType: EventType.MAP_CHANGE,
+      timestamp: this.createTimestamp(),
+      serverId,
+      raw: logLine,
+      data: {
+        newMap: mapName,
+        playerCount: 0, // Would need additional parsing to get player count
+        previousMap: previousMap,
+      },
+    }
+
+    return { event, success: true }
   }
 }

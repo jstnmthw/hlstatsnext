@@ -64,6 +64,7 @@ export class MatchService implements IMatchService {
           teamScores: {},
           startTime: new Date(),
           playerStats: new Map(),
+          currentMap: undefined,
         }
         this.currentMatches.set(serverId, matchStats)
       }
@@ -119,6 +120,7 @@ export class MatchService implements IMatchService {
           teamScores: {},
           startTime: new Date(),
           playerStats: new Map(),
+          currentMap: undefined,
         }
         this.currentMatches.set(serverId, matchStats)
       }
@@ -159,6 +161,11 @@ export class MatchService implements IMatchService {
 
   getMatchStats(serverId: number): MatchStats | undefined {
     return this.currentMatches.get(serverId)
+  }
+
+  getCurrentMap(serverId: number): string | undefined {
+    const matchStats = this.currentMatches.get(serverId)
+    return matchStats?.currentMap
   }
 
   resetMatchStats(serverId: number): void {
@@ -269,7 +276,12 @@ export class MatchService implements IMatchService {
           teamScores: {},
           startTime: new Date(),
           playerStats: new Map(),
+          currentMap: event.data.map,
         })
+      } else {
+        // Update the current map if it has changed
+        const matchStats = this.currentMatches.get(serverId)!
+        matchStats.currentMap = event.data.map
       }
 
       this.logger.event(`Round started on server ${serverId}`)
@@ -297,6 +309,7 @@ export class MatchService implements IMatchService {
           teamScores: {},
           startTime: new Date(),
           playerStats: new Map(),
+          currentMap: undefined,
         }
         this.currentMatches.set(serverId, matchStats)
       }
@@ -382,6 +395,17 @@ export class MatchService implements IMatchService {
 
       // Reset match stats for new map
       this.currentMatches.delete(serverId)
+
+      // Create new match stats with the current map
+      const newMatchStats: MatchStats = {
+        duration: 0,
+        totalRounds: 0,
+        teamScores: {},
+        startTime: new Date(),
+        playerStats: new Map(),
+        currentMap: newMap, // Set the current map
+      }
+      this.currentMatches.set(serverId, newMatchStats)
 
       // Update server record for the new map
       await this.repository.resetMapStats(serverId, newMap)

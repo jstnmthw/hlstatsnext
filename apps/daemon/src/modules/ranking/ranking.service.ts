@@ -166,7 +166,9 @@ export class RankingService implements IRankingService {
 
     try {
       // Fetch from database
-      const weaponData = (await this.weaponRepository.findWeaponByCode(normalizedWeapon)) as Weapon | null
+      const weaponData = (await this.weaponRepository.findWeaponByCode(
+        normalizedWeapon,
+      )) as Weapon | null
 
       if (weaponData && weaponData.modifier) {
         const modifier = Number(weaponData.modifier)

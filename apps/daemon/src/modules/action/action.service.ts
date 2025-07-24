@@ -191,12 +191,7 @@ export class ActionService implements IActionService {
       const currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
 
       // Log the action event to database
-      await this.repository.logTeamAction(
-        event.serverId,
-        actionDef.id,
-        currentMap,
-        bonus || 0,
-      )
+      await this.repository.logTeamAction(event.serverId, actionDef.id, currentMap, bonus || 0)
 
       // Log the event with point information
       this.logger.event(
@@ -237,12 +232,7 @@ export class ActionService implements IActionService {
       const currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
 
       // Log the action event to database
-      await this.repository.logWorldAction(
-        event.serverId,
-        actionDef.id,
-        currentMap,
-        bonus || 0,
-      )
+      await this.repository.logWorldAction(event.serverId, actionDef.id, currentMap, bonus || 0)
 
       // Log the event
       this.logger.event(

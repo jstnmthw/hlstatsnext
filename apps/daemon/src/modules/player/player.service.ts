@@ -21,6 +21,7 @@ import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import { EventType } from "@/shared/types/events"
 import { validateSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
+import { GameConfig } from "@/config/game.config"
 
 export class PlayerService implements IPlayerService {
   // Rating system constants
@@ -216,7 +217,7 @@ export class PlayerService implements IPlayerService {
 
   async getTopPlayers(
     limit: number = 50,
-    game: string = "cstrike",
+    game: string = GameConfig.getDefaultGame(),
     includeHidden: boolean = false,
   ): Promise<Player[]> {
     try {

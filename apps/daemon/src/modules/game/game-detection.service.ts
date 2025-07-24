@@ -1,5 +1,6 @@
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { GameDetectionResult, IGameDetectionService } from "./game-detection.types"
+import { GameConfig, GAMES } from "@/config/game.config"
 
 export class GameDetectionService implements IGameDetectionService {
   constructor(private readonly logger: ILogger) {}
@@ -10,7 +11,7 @@ export class GameDetectionService implements IGameDetectionService {
    */
   detectGameFromLogContent(logLines: string[]): GameDetectionResult {
     const patterns = {
-      csgo: {
+      [GAMES.COUNTER_STRIKE_GO]: {
         patterns: [
           /CT.*TERRORIST/i,
           /weapon_ak47|weapon_m4a1|weapon_awp/i,
@@ -19,7 +20,7 @@ export class GameDetectionService implements IGameDetectionService {
         ],
         weight: 1,
       },
-      css: {
+      [GAMES.COUNTER_STRIKE_SOURCE]: {
         patterns: [
           /CT.*Terrorist/i,
           /weapon_ak47|weapon_m4a1|weapon_awp/i,
@@ -27,7 +28,7 @@ export class GameDetectionService implements IGameDetectionService {
         ],
         weight: 1,
       },
-      tf: {
+      [GAMES.TEAM_FORTRESS_2]: {
         patterns: [
           /Red.*Blue/i,
           /sentry_built|dispenser_built|teleporter_built/i,
@@ -36,15 +37,15 @@ export class GameDetectionService implements IGameDetectionService {
         ],
         weight: 1,
       },
-      tfc: {
+      [GAMES.TEAM_FORTRESS_CLASSIC]: {
         patterns: [/Red.*Blue/i, /flag_captured|flag_returned/i, /sentry_gun|dispenser/i],
         weight: 1,
       },
-      hl2dm: {
+      [GAMES.HALF_LIFE_2_DEATHMATCH]: {
         patterns: [/weapon_crowbar|weapon_physcannon/i, /dm_|hl2mp_/i],
         weight: 1,
       },
-      l4d2: {
+      [GAMES.LEFT_4_DEAD_2]: {
         patterns: [
           /Infected.*Survivor/i,
           /infected_hurt|survivor_rescued/i,
@@ -79,7 +80,7 @@ export class GameDetectionService implements IGameDetectionService {
       // Default fallback - try to detect from common patterns
       if (/weapon_|Round_Start/i.test(logContent)) {
         return {
-          gameCode: "csgo",
+          gameCode: GAMES.COUNTER_STRIKE_GO,
           confidence: 0.3,
           detection_method: "fallback_pattern",
         }
@@ -147,7 +148,7 @@ export class GameDetectionService implements IGameDetectionService {
     // Fallback: Default to CS:GO for development
     this.logger.warn(`Could not reliably detect game for ${address}:${port}, defaulting to cstrike`)
     return {
-      gameCode: "cstrike",
+      gameCode: GameConfig.getDefaultGame(),
       confidence: 0.2,
       detection_method: "development_fallback",
     }
@@ -159,18 +160,18 @@ export class GameDetectionService implements IGameDetectionService {
    */
   normalizeGameCode(detectedCode: string): string {
     const gameCodeMap: Record<string, string> = {
-      cs: "css",
-      cstrike: "css",
-      "counter-strike": "css",
-      "counter-strike: source": "css",
-      "counter-strike: global offensive": "csgo",
-      cs2: "csgo", // CS2 uses same tracking as CS:GO for now
-      tf2: "tf",
-      "team fortress 2": "tf",
-      "team fortress classic": "tfc",
-      "half-life 2: deathmatch": "hl2dm",
-      "left 4 dead 2": "l4d2",
-      "left 4 dead": "l4d",
+      cs: GAMES.COUNTER_STRIKE_16,
+      cstrike: GAMES.COUNTER_STRIKE_16,
+      "counter-strike": GAMES.COUNTER_STRIKE_16,
+      "counter-strike: source": GAMES.COUNTER_STRIKE_SOURCE,
+      "counter-strike: global offensive": GAMES.COUNTER_STRIKE_GO,
+      cs2: GAMES.COUNTER_STRIKE_GO, // CS2 uses same tracking as CS:GO for now
+      tf2: GAMES.TEAM_FORTRESS_2,
+      "team fortress 2": GAMES.TEAM_FORTRESS_2,
+      "team fortress classic": GAMES.TEAM_FORTRESS_CLASSIC,
+      "half-life 2: deathmatch": GAMES.HALF_LIFE_2_DEATHMATCH,
+      "left 4 dead 2": GAMES.LEFT_4_DEAD_2,
+      "left 4 dead": "l4d", // Keep this as is since we don't have L4D1 in config
     }
 
     return gameCodeMap[detectedCode.toLowerCase()] || detectedCode.toLowerCase()

@@ -20,6 +20,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
+import { GameConfig } from "@/config/game.config"
 
 export class MatchService implements IMatchService {
   private currentMatches: Map<number, MatchStats> = new Map() // serverId -> MatchStats
@@ -234,7 +235,7 @@ export class MatchService implements IMatchService {
     const currentMap = matchStats?.currentMap || ""
 
     // If no map is set, use a fallback to indicate unknown map
-    return currentMap || "unknown"
+    return currentMap || GameConfig.getUnknownMap()
   }
 
   resetMatchStats(serverId: number): void {
@@ -516,6 +517,7 @@ export class MatchService implements IMatchService {
         await this.repository.createPlayerHistory({
           playerId: playerStats.playerId,
           eventTime: new Date(),
+          game: server.game || GameConfig.getDefaultGame(),
           kills: playerStats.kills,
           deaths: playerStats.deaths,
           suicides: playerStats.suicides,

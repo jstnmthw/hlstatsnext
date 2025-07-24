@@ -12,6 +12,7 @@ import { UdpServer } from "./udp-server"
 import { CsParser } from "./parsers/cs.parser"
 import { EventProcessor } from "@/shared/infrastructure/event-processor"
 import type { AppContext } from "@/context"
+import { GameConfig } from "@/config/game.config"
 
 export class IngressService implements IIngressService {
   private readonly udpServer: UdpServer
@@ -45,7 +46,7 @@ export class IngressService implements IIngressService {
       this.logger,
     )
 
-    this.parser = new CsParser("cstrike")
+    this.parser = new CsParser(GameConfig.getDefaultGame())
     this.eventProcessor = new EventProcessor(this.context)
   }
 
@@ -206,12 +207,12 @@ export class IngressService implements IIngressService {
     const killerId = await this.context.playerService.getOrCreatePlayer(
       killerSteamId,
       killerName || "Unknown",
-      "cstrike",
+      GameConfig.getDefaultGame(),
     )
     const victimId = await this.context.playerService.getOrCreatePlayer(
       victimSteamId,
       victimName || "Unknown",
-      "cstrike",
+      GameConfig.getDefaultGame(),
     )
 
     // Update killer stats

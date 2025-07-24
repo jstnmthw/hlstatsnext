@@ -1,6 +1,6 @@
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IServerRepository, ServerInfo } from "./server.repository.types"
+import type { IServerRepository, ServerInfo } from "./server.types"
 
 export class ServerRepository implements IServerRepository {
   constructor(

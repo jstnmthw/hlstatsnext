@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { ActionService } from "./action.service"
-import { createMockLogger } from "../../test-support/mocks/logger"
+import { createMockLogger } from "../../tests/mocks/logger"
 import type { IActionRepository, ActionDefinition } from "./action.types"
 import type {
   ActionPlayerEvent,

@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { EventEmitter } from "events"
 import { UdpServer } from "./udp-server"
-import { createMockLogger } from "../../test-support/mocks/logger"
+import { createMockLogger } from "../../tests/mocks/logger"
 import type { UdpServerOptions, ISocketFactory } from "./udp-server"
 import type { Socket, RemoteInfo } from "dgram"
 
@@ -17,28 +17,28 @@ let registeredErrorHandler: ((error: Error) => void) | null = null
 const createMockSocket = () => ({
   bind: vi.fn(((...args: unknown[]) => {
     const callback = args[args.length - 1]
-    if (typeof callback === 'function') {
+    if (typeof callback === "function") {
       setImmediate(callback as () => void)
     }
     mockSocket.listening = true
     return mockSocket
-  }) as unknown as Socket['bind']),
-  
+  }) as unknown as Socket["bind"]),
+
   close: vi.fn(((callback?: () => void) => {
     mockSocket.listening = false
     if (callback) setImmediate(callback)
     return mockSocket
-  }) as unknown as Socket['close']),
-  
+  }) as unknown as Socket["close"]),
+
   on: vi.fn(((event: string, listener: (...args: unknown[]) => void) => {
-    if (event === 'message') {
+    if (event === "message") {
       registeredMessageHandler = listener as (buffer: Buffer, rinfo: RemoteInfo) => void
-    } else if (event === 'error') {
+    } else if (event === "error") {
       registeredErrorHandler = listener as (error: Error) => void
     }
     return mockSocket
-  }) as unknown as Socket['on']),
-  
+  }) as unknown as Socket["on"]),
+
   removeAllListeners: vi.fn(),
   address: vi.fn(() => ({ address: "0.0.0.0", family: "IPv4", port: 30000 })),
   listening: false,
@@ -67,7 +67,7 @@ describe("UdpServer", () => {
     vi.clearAllMocks()
     registeredMessageHandler = null
     registeredErrorHandler = null
-    
+
     // Reset mock socket
     Object.assign(mockSocket, createMockSocket())
     mockSocketFactory.createSocket = vi.fn(() => mockSocket as unknown as Socket)
@@ -188,14 +188,14 @@ describe("UdpServer", () => {
 
       // Use the captured message handler
       expect(registeredMessageHandler).toBeDefined()
-      
+
       if (registeredMessageHandler) {
         const buffer = Buffer.from("Test log line", "utf8")
-        const rinfo: RemoteInfo = { 
-          address: "192.168.1.100", 
-          port: 27015, 
-          family: "IPv4", 
-          size: buffer.length 
+        const rinfo: RemoteInfo = {
+          address: "192.168.1.100",
+          port: 27015,
+          family: "IPv4",
+          size: buffer.length,
         }
 
         registeredMessageHandler(buffer, rinfo)
@@ -217,7 +217,7 @@ describe("UdpServer", () => {
 
       // Use the captured error handler
       expect(registeredErrorHandler).toBeDefined()
-      
+
       if (registeredErrorHandler) {
         const testError = new Error("UDP socket error")
         registeredErrorHandler(testError)
@@ -234,15 +234,15 @@ describe("UdpServer", () => {
       await udpServer.start()
 
       expect(registeredMessageHandler).toBeDefined()
-      
+
       if (registeredMessageHandler) {
         // Test empty and whitespace-only messages
         const emptyBuffer = Buffer.from("   \n  ", "utf8")
-        const rinfo: RemoteInfo = { 
-          address: "192.168.1.100", 
-          port: 27015, 
-          family: "IPv4", 
-          size: emptyBuffer.length 
+        const rinfo: RemoteInfo = {
+          address: "192.168.1.100",
+          port: 27015,
+          family: "IPv4",
+          size: emptyBuffer.length,
         }
 
         registeredMessageHandler(emptyBuffer, rinfo)

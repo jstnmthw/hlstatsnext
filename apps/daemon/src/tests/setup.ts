@@ -7,7 +7,7 @@
 
 import { beforeAll, afterAll, beforeEach, afterEach, vi } from "vitest"
 import { resetAppContext } from "../context"
-import { cleanupDatabase, seedTestDatabase } from "./fixtures/database"
+import { cleanupDatabase, seedTestDatabase } from "../tests/fixtures/database"
 
 // Global setup - runs once before all tests
 beforeAll(async () => {

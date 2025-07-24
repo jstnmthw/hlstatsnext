@@ -4,8 +4,14 @@
 
 import { describe, it, expect, beforeEach, vi, type MockedFunction } from "vitest"
 import { RoundHandler } from "./round.handler"
-import { createMockLogger } from "../../../test-support/mocks/logger"
-import type { RoundStartEvent, RoundEndEvent, TeamWinEvent, MapChangeEvent, IMatchService } from "../match.types"
+import { createMockLogger } from "../../../tests/mocks/logger"
+import type {
+  RoundStartEvent,
+  RoundEndEvent,
+  TeamWinEvent,
+  MapChangeEvent,
+  IMatchService,
+} from "../match.types"
 import { EventType } from "@/shared/types/events"
 
 // Helper types for testing
@@ -22,16 +28,16 @@ describe("RoundHandler", () => {
   let roundHandler: RoundHandler
   let mockMatchService: IMatchService
   let mockLogger: ReturnType<typeof createMockLogger>
-  
+
   // Store specific mock functions for easy access
   let mockHandleMatchEvent: MockedFunction<IMatchService["handleMatchEvent"]>
 
   beforeEach(() => {
     mockLogger = createMockLogger()
-    
+
     // Create properly typed mock functions
     mockHandleMatchEvent = vi.fn()
-    
+
     mockMatchService = {
       handleMatchEvent: mockHandleMatchEvent,
       handleObjectiveEvent: vi.fn(),

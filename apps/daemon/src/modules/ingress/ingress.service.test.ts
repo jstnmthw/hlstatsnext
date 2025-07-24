@@ -4,8 +4,8 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { IngressService } from "./ingress.service"
-import { createMockLogger } from "../../test-support/mocks/logger"
-import { createMockDatabaseClient } from "../../test-support/mocks/database"
+import { createMockLogger } from "../../tests/mocks/logger"
+import { createMockDatabaseClient } from "../../tests/mocks/database"
 import type { AppContext } from "../../context"
 import type { DatabaseClient } from "@/database/client"
 import type { IIngressService } from "./ingress.types"

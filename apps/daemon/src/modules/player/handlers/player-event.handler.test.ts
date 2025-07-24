@@ -5,7 +5,7 @@
 import type { PlayerEvent, IPlayerService } from "../player.types"
 import { describe, it, expect, beforeEach, vi, Mocked } from "vitest"
 import { PlayerEventHandler } from "./player-event.handler"
-import { createMockLogger } from "../../../test-support/mocks/logger"
+import { createMockLogger } from "../../../tests/mocks/logger"
 import { EventType } from "@/shared/types/events"
 
 describe("PlayerEventHandler", () => {

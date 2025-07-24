@@ -5,8 +5,8 @@
 import type { DatabaseClient } from "@/database/client"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { WeaponRepository } from "./weapon.repository"
-import { createMockLogger } from "../../test-support/mocks/logger"
-import { createMockDatabaseClient } from "../../test-support/mocks/database"
+import { createMockLogger } from "../../tests/mocks/logger"
+import { createMockDatabaseClient } from "../../tests/mocks/database"
 
 describe("WeaponRepository", () => {
   let weaponRepository: WeaponRepository

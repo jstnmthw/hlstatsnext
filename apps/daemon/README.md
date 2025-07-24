@@ -47,7 +47,7 @@ apps/daemon/
 │   ├── utils/         # Logging and utility functions
 │   ├── index.ts       # Main entrypoint (production)
 │   └── main.dev.ts    # Dev entrypoint (minimal pipeline)
-├── tests/             # Unit, integration, and type tests
+├── tests/             # Integration, mocks and setup (modules have colocated test file)
 ├── scripts/           # CLI/dev scripts (e.g., test-player-lifecycle.ts)
 ├── env.example        # Example environment variables
 └── package.json

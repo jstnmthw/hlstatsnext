@@ -5,23 +5,23 @@
 import type { ObjectiveEvent, IMatchService } from "../match.types"
 import { describe, it, expect, beforeEach, vi, type MockedFunction } from "vitest"
 import { ObjectiveHandler } from "./objective.handler"
-import { createMockLogger } from "../../../test-support/mocks/logger"
+import { createMockLogger } from "../../../tests/mocks/logger"
 import { EventType } from "@/shared/types/events"
 
 describe("ObjectiveHandler", () => {
   let objectiveHandler: ObjectiveHandler
   let mockMatchService: IMatchService
   let mockLogger: ReturnType<typeof createMockLogger>
-  
+
   // Store specific mock functions for easy access
   let mockHandleObjectiveEvent: MockedFunction<IMatchService["handleObjectiveEvent"]>
 
   beforeEach(() => {
     mockLogger = createMockLogger()
-    
+
     // Create properly typed mock functions
     mockHandleObjectiveEvent = vi.fn()
-    
+
     mockMatchService = {
       handleObjectiveEvent: mockHandleObjectiveEvent,
       handleMatchEvent: vi.fn(),

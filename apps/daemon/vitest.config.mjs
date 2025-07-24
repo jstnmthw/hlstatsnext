@@ -17,10 +17,12 @@ export default defineConfig({
       exclude: [
         "node_modules/",
         "src/tests/",
+        "src/types/",
         "dist/",
         "**/*.d.ts",
         "**/*.config.*",
         "**/generated/**",
+        "**/*.types.ts",
       ],
       thresholds: {
         global: {

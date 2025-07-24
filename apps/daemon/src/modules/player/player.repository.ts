@@ -10,6 +10,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository, PlayerCreateData } from "./player.types"
 import type { FindOptions, CreateOptions, UpdateOptions } from "@/shared/types/database"
 import type { Player, Prisma } from "@repo/database/client"
+import { GameConfig } from "@/config/game.config"
 
 export class PlayerRepository extends BaseRepository<Player> implements IPlayerRepository {
   protected tableName = "player"
@@ -164,7 +165,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
             const createData: Prisma.PlayerUncheckedCreateInput = {
               playerId,
               lastName: `Player${playerId}`,
-              game: "cstrike",
+              game: GameConfig.getDefaultGame(),
               skill: 1000,
             }
 

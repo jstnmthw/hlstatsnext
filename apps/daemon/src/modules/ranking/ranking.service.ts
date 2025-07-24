@@ -8,6 +8,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 import type { IWeaponRepository } from "../weapon/weapon.types"
 import type { Weapon } from "@repo/database/client"
+import { GameConfig } from "@/config/game.config"
 
 export interface KillContext {
   weapon: string
@@ -142,7 +143,7 @@ export class RankingService implements IRankingService {
   /**
    * Get weapon multiplier for skill calculations
    */
-  private async getWeaponMultiplier(weapon: string, game: string = "cstrike"): Promise<number> {
+  private async getWeaponMultiplier(weapon: string, game: string = GameConfig.getDefaultGame()): Promise<number> {
     // Normalize weapon name (remove prefixes, convert to lowercase)
     const normalizedWeapon = weapon
       .toLowerCase()

@@ -46,7 +46,7 @@ describe("WeaponRepository", () => {
 
       vi.mocked(mockDatabase.prisma.weapon.upsert).mockResolvedValue({
         weaponId: 1,
-        game: "csgo",
+        game: "cstrike",
         code: weaponCode,
         name: weaponCode,
         modifier: 1,
@@ -65,7 +65,7 @@ describe("WeaponRepository", () => {
         },
         create: {
           code: weaponCode,
-          game: "csgo",
+          game: "cstrike",
           name: weaponCode,
           modifier: 1,
           kills: 0,
@@ -83,7 +83,7 @@ describe("WeaponRepository", () => {
 
       vi.mocked(mockDatabase.prisma.weapon.upsert).mockResolvedValue({
         weaponId: 2,
-        game: "csgo",
+        game: "cstrike",
         code: weaponCode,
         name: weaponCode,
         modifier: 1,
@@ -102,7 +102,7 @@ describe("WeaponRepository", () => {
         },
         create: {
           code: weaponCode,
-          game: "csgo",
+          game: "cstrike",
           name: weaponCode,
           modifier: 1,
           kills: 0,
@@ -127,7 +127,7 @@ describe("WeaponRepository", () => {
         kills: 0,
         headshots: 0,
         name: weaponCode,
-        game: "csgo",
+        game: "cstrike",
         modifier: 1,
       })
 
@@ -142,7 +142,7 @@ describe("WeaponRepository", () => {
         },
         create: {
           code: weaponCode,
-          game: "csgo",
+          game: "cstrike",
           name: weaponCode,
           modifier: 1,
           kills: 0,
@@ -172,7 +172,7 @@ describe("WeaponRepository", () => {
     it("should find weapon by code", async () => {
       const mockWeapon = {
         weaponId: 3,
-        game: "csgo",
+        game: "cstrike",
         code: "ak47",
         name: "ak47",
         modifier: 1,
@@ -226,7 +226,7 @@ describe("WeaponRepository", () => {
 
       vi.mocked(mockDatabase.prisma.weapon.findUnique).mockResolvedValue({
         weaponId: 4,
-        game: "csgo",
+        game: "cstrike",
         code: weaponCode,
         name: weaponCode,
         modifier: 1,
@@ -292,7 +292,7 @@ describe("WeaponRepository", () => {
         kills: 0,
         headshots: 0,
         name: weaponCode,
-        game: "csgo",
+        game: "cstrike",
         modifier: 1,
       })
 
@@ -307,7 +307,7 @@ describe("WeaponRepository", () => {
         },
         create: {
           code: "",
-          game: "csgo",
+          game: "cstrike",
           name: "",
           modifier: 1,
           kills: 0,
@@ -328,7 +328,7 @@ describe("WeaponRepository", () => {
         kills: 0,
         headshots: 0,
         name: weaponCode,
-        game: "csgo",
+        game: "cstrike",
         modifier: 1,
       })
 
@@ -358,7 +358,7 @@ describe("WeaponRepository", () => {
         kills: 0,
         headshots: 0,
         name: weaponCode,
-        game: "csgo",
+        game: "cstrike",
         modifier: 1,
       })
 
@@ -403,7 +403,7 @@ describe("WeaponRepository", () => {
         },
         create: {
           code: weaponCode,
-          game: "csgo",
+          game: "cstrike",
           name: weaponCode,
           modifier: 1,
           kills: 0,

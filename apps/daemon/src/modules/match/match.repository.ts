@@ -10,6 +10,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IMatchRepository, ServerRecord, PlayerHistoryData } from "./match.types"
 import type { UpdateOptions, CreateOptions, FindOptions } from "@/shared/types/database"
 import type { Prisma } from "@repo/database/client"
+import { GameConfig } from "@/config/game.config"
 
 export class MatchRepository extends BaseRepository<ServerRecord> implements IMatchRepository {
   protected tableName = "server"
@@ -67,6 +68,7 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
           data: {
             playerId: data.playerId,
             eventTime: data.eventTime,
+            game: data.game || GameConfig.getDefaultGame(),
             kills: data.kills || 0,
             deaths: data.deaths || 0,
             suicides: data.suicides || 0,
@@ -75,6 +77,10 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
             hits: data.hits || 0,
             headshots: data.headshots || 0,
             teamkills: data.teamkills || 0,
+            connection_time: data.connection_time || 0,
+            kill_streak: data.kill_streak || 0,
+            death_streak: data.death_streak || 0, 
+            skill_change: data.skill_change || 0,
           },
         })
       }, options)
@@ -206,23 +212,12 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
       this.validateId(serverId, "getLastKnownMap")
 
       return await this.executeWithTransaction(async (client) => {
-        // Try to get the most recent ServerLoad entry with a map
-        const serverLoad = await client.serverLoad.findFirst({
-          where: { 
-            server_id: serverId,
-            map: { not: null }
-          },
-          orderBy: { timestamp: "desc" },
-          select: { map: true }
-        })
-
-        if (serverLoad?.map) {
-          return serverLoad.map
-        }
-
-        // Fallback: Check most recent EventFrag for a map
+        // Check most recent EventFrag for a map (we populate this table)
         const eventFrag = await client.eventFrag.findFirst({
-          where: { serverId },
+          where: { 
+            serverId,
+            map: { not: "" }
+          },
           orderBy: { eventTime: "desc" },
           select: { map: true }
         })

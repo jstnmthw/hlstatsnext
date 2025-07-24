@@ -251,6 +251,7 @@ export interface ServerRecord {
 export interface PlayerHistoryData {
   playerId: number
   eventTime: Date
+  game?: string
   kills?: number
   deaths?: number
   suicides?: number
@@ -259,6 +260,10 @@ export interface PlayerHistoryData {
   hits?: number
   headshots?: number
   teamkills?: number
+  connection_time?: number
+  kill_streak?: number
+  death_streak?: number
+  skill_change?: number
 }
 
 export interface IMatchRepository {

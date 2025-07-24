@@ -8,6 +8,7 @@ import { BaseParser } from "./base.parser"
 import type { ParseResult } from "./base.parser"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
+import { GameConfig } from "@/config/game.config"
 
 export class CsParser extends BaseParser {
   // Track the last winning team for Round_End events
@@ -15,7 +16,7 @@ export class CsParser extends BaseParser {
   // Track the current map for Round_Start events
   private currentMap: string = ""
 
-  constructor(game: string = "cstrike") {
+  constructor(game: string = GameConfig.getDefaultGame()) {
     super(game)
   }
 

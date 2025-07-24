@@ -15,7 +15,7 @@ export class CsParser extends BaseParser {
   // Track the current map for Round_Start events
   private currentMap: string = ""
 
-  constructor(game: string = "csgo") {
+  constructor(game: string = "cstrike") {
     super(game)
   }
 

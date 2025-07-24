@@ -52,7 +52,6 @@ export class ActionService implements IActionService {
       const { playerId, actionCode, game, team, bonus } = event.data
 
       // Look up action definition from database
-      this.logger.debug(`Looking up action: ${actionCode} for game ${game}, team ${team}`)
       const actionDef = await this.repository.findActionByCode(game, actionCode, team)
 
       if (!actionDef) {
@@ -60,25 +59,20 @@ export class ActionService implements IActionService {
         return { success: true } // Don't fail on unknown actions
       }
 
-      this.logger.debug(
-        `Found action definition: ID ${actionDef.id}, reward ${actionDef.rewardPlayer}`,
-      )
-
       if (!actionDef.forPlayerActions) {
-        this.logger.debug(`Action ${actionCode} not enabled for player actions`)
         return { success: true }
       }
 
       // Calculate total points (base reward + bonus)
       const totalPoints = actionDef.rewardPlayer + (bonus || 0)
 
-      // Get current map from match service
-      const currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
+      // Get current map from match service, initialize if needed
+      let currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
+      if (currentMap === "unknown" && this.matchService) {
+        currentMap = await this.matchService.initializeMapForServer(event.serverId)
+      }
 
       // Log the action event to database
-      this.logger.debug(
-        `Logging player action to database: player ${playerId}, action ${actionDef.id}, server ${event.serverId}, map ${currentMap}`,
-      )
       await this.repository.logPlayerAction(
         playerId,
         actionDef.id,
@@ -86,15 +80,12 @@ export class ActionService implements IActionService {
         currentMap,
         bonus || 0,
       )
-      this.logger.debug(`Player action successfully logged to database`)
 
       // Update player skill points if player service is available
       if (this.playerService && totalPoints !== 0) {
-        this.logger.debug(`Updating player skill: ${totalPoints} points for player ${playerId}`)
         await this.playerService.updatePlayerStats(playerId, {
           skill: totalPoints,
         })
-        this.logger.debug(`Player skill updated successfully`)
       }
 
       // Log the event with point information
@@ -125,15 +116,17 @@ export class ActionService implements IActionService {
       }
 
       if (!actionDef.forPlayerPlayerActions) {
-        this.logger.debug(`Action ${actionCode} not enabled for player-player actions`)
         return { success: true }
       }
 
       // Calculate total points (base reward + bonus)
       const totalPoints = actionDef.rewardPlayer + (bonus || 0)
 
-      // Get current map from match service
-      const currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
+      // Get current map from match service, initialize if needed
+      let currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
+      if (currentMap === "unknown" && this.matchService) {
+        currentMap = await this.matchService.initializeMapForServer(event.serverId)
+      }
 
       // Log the action event to database
       await this.repository.logPlayerPlayerAction(
@@ -180,15 +173,17 @@ export class ActionService implements IActionService {
       }
 
       if (!actionDef.forTeamActions) {
-        this.logger.debug(`Action ${actionCode} not enabled for team actions`)
         return { success: true }
       }
 
       // Calculate total points (base reward + bonus)
       const totalPoints = actionDef.rewardTeam + (bonus || 0)
 
-      // Get current map from match service
-      const currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
+      // Get current map from match service, initialize if needed
+      let currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
+      if (currentMap === "unknown" && this.matchService) {
+        currentMap = await this.matchService.initializeMapForServer(event.serverId)
+      }
 
       // Log the action event to database
       await this.repository.logTeamAction(event.serverId, actionDef.id, currentMap, bonus || 0)
@@ -221,15 +216,17 @@ export class ActionService implements IActionService {
       }
 
       if (!actionDef.forWorldActions) {
-        this.logger.debug(`Action ${actionCode} not enabled for world actions`)
         return { success: true }
       }
 
       // World actions typically don't have player rewards, but may have server-wide effects
       const totalPoints = bonus || 0
 
-      // Get current map from match service
-      const currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
+      // Get current map from match service, initialize if needed
+      let currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
+      if (currentMap === "unknown" && this.matchService) {
+        currentMap = await this.matchService.initializeMapForServer(event.serverId)
+      }
 
       // Log the action event to database
       await this.repository.logWorldAction(event.serverId, actionDef.id, currentMap, bonus || 0)

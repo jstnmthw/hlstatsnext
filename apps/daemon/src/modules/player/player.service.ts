@@ -610,8 +610,11 @@ export class PlayerService implements IPlayerService {
 
       const { playerId, message, messageMode } = event.data
 
-      // Get current map from the match service
-      const map = this.matchService?.getCurrentMap(event.serverId) || ""
+      // Get current map from the match service, initialize if needed
+      let map = this.matchService?.getCurrentMap(event.serverId) || ""
+      if (map === "unknown" && this.matchService) {
+        map = await this.matchService.initializeMapForServer(event.serverId)
+      }
 
       // Store chat message in database
       await this.repository.createChatEvent(

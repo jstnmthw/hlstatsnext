@@ -41,6 +41,7 @@ describe("IngressService", () => {
         handleKillInMatch: vi.fn().mockResolvedValue({ success: true }),
         getMatchStats: vi.fn(),
         getCurrentMap: vi.fn(),
+        initializeMapForServer: vi.fn().mockResolvedValue("unknown"),
         resetMatchStats: vi.fn(),
         updatePlayerWeaponStats: vi.fn(),
         calculateMatchMVP: vi.fn(),

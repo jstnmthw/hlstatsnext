@@ -45,7 +45,7 @@ export class IngressService implements IIngressService {
       this.logger,
     )
 
-    this.parser = new CsParser("csgo")
+    this.parser = new CsParser("cstrike")
     this.eventProcessor = new EventProcessor(this.context)
   }
 
@@ -206,12 +206,12 @@ export class IngressService implements IIngressService {
     const killerId = await this.context.playerService.getOrCreatePlayer(
       killerSteamId,
       killerName || "Unknown",
-      "csgo",
+      "cstrike",
     )
     const victimId = await this.context.playerService.getOrCreatePlayer(
       victimSteamId,
       victimName || "Unknown",
-      "csgo",
+      "cstrike",
     )
 
     // Update killer stats

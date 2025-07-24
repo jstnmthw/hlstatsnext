@@ -64,7 +64,7 @@ export class MatchService implements IMatchService {
           teamScores: {},
           startTime: new Date(),
           playerStats: new Map(),
-          currentMap: undefined,
+          currentMap: "",
         }
         this.currentMatches.set(serverId, matchStats)
       }
@@ -120,7 +120,7 @@ export class MatchService implements IMatchService {
           teamScores: {},
           startTime: new Date(),
           playerStats: new Map(),
-          currentMap: undefined,
+          currentMap: "",
         }
         this.currentMatches.set(serverId, matchStats)
       }
@@ -159,13 +159,82 @@ export class MatchService implements IMatchService {
     }
   }
 
+  async initializeMapForServer(serverId: number): Promise<string> {
+    try {
+      // Check if we already have match stats for this server
+      const existingStats = this.currentMatches.get(serverId)
+      if (existingStats && existingStats.currentMap) {
+        return existingStats.currentMap
+      }
+
+      // Try to get the last known map from the database
+      const lastKnownMap = await this.repository.getLastKnownMap(serverId)
+
+      if (lastKnownMap) {
+        // Initialize match stats with the detected map
+        const matchStats: MatchStats = {
+          duration: 0,
+          totalRounds: 0,
+          teamScores: {},
+          startTime: new Date(),
+          playerStats: new Map(),
+          currentMap: lastKnownMap,
+        }
+        this.currentMatches.set(serverId, matchStats)
+
+        this.logger.info(`Detected map from database for server ${serverId}: ${lastKnownMap}`)
+        return lastKnownMap
+      }
+
+      // No map found - use fallback
+      const fallbackMap = "unknown"
+      const matchStats: MatchStats = {
+        duration: 0,
+        totalRounds: 0,
+        teamScores: {},
+        startTime: new Date(),
+        playerStats: new Map(),
+        currentMap: fallbackMap,
+      }
+      this.currentMatches.set(serverId, matchStats)
+
+      this.logger.warn(`No map found for server ${serverId} - using fallback: ${fallbackMap}`)
+      return fallbackMap
+    } catch (error) {
+      this.logger.error(`Failed to initialize map for server ${serverId}: ${error}`)
+      return "unknown"
+    }
+  }
+
+  async calculateMatchMVP(serverId: number): Promise<number | undefined> {
+    const matchStats = this.currentMatches.get(serverId)
+    if (!matchStats || matchStats.playerStats.size === 0) return undefined
+
+    let mvpPlayerId: number | undefined
+    let highestScore = 0
+
+    // Calculate MVP based on scoring algorithm
+    for (const [playerId, stats] of matchStats.playerStats) {
+      const score = this.calculatePlayerScore(stats)
+      if (score > highestScore) {
+        highestScore = score
+        mvpPlayerId = playerId
+      }
+    }
+
+    return mvpPlayerId
+  }
+
   getMatchStats(serverId: number): MatchStats | undefined {
     return this.currentMatches.get(serverId)
   }
 
-  getCurrentMap(serverId: number): string | undefined {
+  getCurrentMap(serverId: number): string {
     const matchStats = this.currentMatches.get(serverId)
-    return matchStats?.currentMap
+    const currentMap = matchStats?.currentMap || ""
+
+    // If no map is set, use a fallback to indicate unknown map
+    return currentMap || "unknown"
   }
 
   resetMatchStats(serverId: number): void {
@@ -193,25 +262,6 @@ export class MatchService implements IMatchService {
     this.logger.debug(
       `Updated weapon stats for player ${playerId}: +${stats.shots || 0} shots, +${stats.hits || 0} hits, +${stats.damage || 0} damage`,
     )
-  }
-
-  async calculateMatchMVP(serverId: number): Promise<number | undefined> {
-    const matchStats = this.currentMatches.get(serverId)
-    if (!matchStats || matchStats.playerStats.size === 0) return undefined
-
-    let mvpPlayerId: number | undefined
-    let highestScore = 0
-
-    // Calculate MVP based on scoring algorithm
-    for (const [playerId, stats] of matchStats.playerStats) {
-      const score = this.calculatePlayerScore(stats)
-      if (score > highestScore) {
-        highestScore = score
-        mvpPlayerId = playerId
-      }
-    }
-
-    return mvpPlayerId
   }
 
   calculatePlayerScore(stats: PlayerRoundStats): number {
@@ -309,7 +359,7 @@ export class MatchService implements IMatchService {
           teamScores: {},
           startTime: new Date(),
           playerStats: new Map(),
-          currentMap: undefined,
+          currentMap: "",
         }
         this.currentMatches.set(serverId, matchStats)
       }
@@ -352,6 +402,7 @@ export class MatchService implements IMatchService {
           teamScores: {},
           startTime: new Date(),
           playerStats: new Map(),
+          currentMap: "",
         })
       }
 

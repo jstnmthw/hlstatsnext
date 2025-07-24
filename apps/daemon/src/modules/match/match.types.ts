@@ -189,6 +189,7 @@ export interface MatchStats {
   mvpPlayer?: number
   startTime: Date
   playerStats: Map<number, PlayerRoundStats>
+  currentMap?: string
 }
 
 export interface PlayerRoundStats {
@@ -224,6 +225,7 @@ export interface IMatchService {
 
   // Match state
   getMatchStats(serverId: number): MatchStats | undefined
+  getCurrentMap(serverId: number): string | undefined
   resetMatchStats(serverId: number): void
   updatePlayerWeaponStats(
     serverId: number,

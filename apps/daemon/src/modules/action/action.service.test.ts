@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { ActionService } from "./action.service"
 import { createMockLogger } from "../../test-support/mocks/logger"
-import type { IActionRepository, ActionDefinition } from "./action.repository"
+import type { IActionRepository, ActionDefinition } from "./action.types"
 import type {
   ActionPlayerEvent,
   ActionPlayerPlayerEvent,
@@ -62,7 +62,7 @@ describe("ActionService", () => {
         forTeamActions: false,
         forWorldActions: false,
       }
-      
+
       vi.mocked(mockRepository.findActionByCode).mockResolvedValue(mockActionDef)
       vi.mocked(mockRepository.logPlayerAction).mockResolvedValue()
 
@@ -91,7 +91,7 @@ describe("ActionService", () => {
     it("should handle ACTION_PLAYER_PLAYER events", async () => {
       // Mock repository to return null (action not found)
       vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
-      
+
       const playerPlayerActionEvent: ActionPlayerPlayerEvent = {
         timestamp: new Date(),
         serverId: 1,
@@ -115,7 +115,7 @@ describe("ActionService", () => {
     it("should handle ACTION_TEAM events", async () => {
       // Mock repository to return null (action not found)
       vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
-      
+
       const teamActionEvent: ActionTeamEvent = {
         timestamp: new Date(),
         serverId: 1,
@@ -138,7 +138,7 @@ describe("ActionService", () => {
     it("should handle ACTION_WORLD events", async () => {
       // Mock repository to return null (action not found)
       vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
-      
+
       const worldActionEvent: WorldActionEvent = {
         timestamp: new Date(),
         serverId: 1,
@@ -201,7 +201,7 @@ describe("ActionService", () => {
     it("should handle minimal ACTION_PLAYER event data", async () => {
       // Mock repository to return null (action not found)
       vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
-      
+
       const minimalEvent: ActionPlayerEvent = {
         timestamp: new Date(),
         serverId: 1,
@@ -216,13 +216,15 @@ describe("ActionService", () => {
       const result = await actionService.handleActionEvent(minimalEvent)
 
       expect(result.success).toBe(true)
-      expect(mockLogger.warn).toHaveBeenCalledWith("Unknown action code: basic_action for game csgo")
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        "Unknown action code: basic_action for game csgo",
+      )
     })
 
     it("should handle ACTION_TEAM event without players affected", async () => {
       // Mock repository to return null (action not found)
       vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
-      
+
       const teamEvent: ActionTeamEvent = {
         timestamp: new Date(),
         serverId: 1,
@@ -243,7 +245,7 @@ describe("ActionService", () => {
     it("should handle ACTION_WORLD event with zero bonus", async () => {
       // Mock repository to return null (action not found)
       vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
-      
+
       const worldEvent: WorldActionEvent = {
         timestamp: new Date(),
         serverId: 1,

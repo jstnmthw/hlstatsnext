@@ -54,6 +54,23 @@ export interface PlayerSuicideEvent extends BaseEvent {
   meta?: PlayerMeta
 }
 
+export interface PlayerDamageEvent extends BaseEvent {
+  eventType: EventType.PLAYER_DAMAGE
+  data: {
+    attackerId: number
+    victimId: number
+    weapon: string
+    damage: number
+    damageArmor: number
+    healthRemaining: number
+    armorRemaining: number
+    hitgroup: string
+    attackerTeam: string
+    victimTeam: string
+  }
+  meta?: DualPlayerMeta
+}
+
 export interface PlayerTeamkillEvent extends BaseEvent {
   eventType: EventType.PLAYER_TEAMKILL
   data: {
@@ -121,6 +138,7 @@ export type PlayerEvent =
   | PlayerConnectEvent
   | PlayerDisconnectEvent
   | PlayerSuicideEvent
+  | PlayerDamageEvent
   | PlayerTeamkillEvent
   | PlayerEntryEvent
   | PlayerChangeTeamEvent

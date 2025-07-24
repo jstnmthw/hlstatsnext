@@ -10,8 +10,9 @@ import type {
   ActionTeamEvent,
   WorldActionEvent,
 } from "./action.types"
-import type { IActionRepository } from "./action.repository"
+import type { IActionRepository } from "./action.types"
 import type { IPlayerService } from "@/modules/player/player.types"
+import type { IMatchService } from "@/modules/match/match.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 import { EventType } from "@/shared/types/events"
@@ -21,6 +22,7 @@ export class ActionService implements IActionService {
     private readonly repository: IActionRepository,
     private readonly logger: ILogger,
     private readonly playerService?: IPlayerService, // Optional to avoid circular dependency
+    private readonly matchService?: IMatchService, // Optional to avoid circular dependency
   ) {}
 
   async handleActionEvent(event: ActionEvent): Promise<HandlerResult> {
@@ -70,15 +72,18 @@ export class ActionService implements IActionService {
       // Calculate total points (base reward + bonus)
       const totalPoints = actionDef.rewardPlayer + (bonus || 0)
 
+      // Get current map from match service
+      const currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
+
       // Log the action event to database
       this.logger.debug(
-        `Logging player action to database: player ${playerId}, action ${actionDef.id}, server ${event.serverId}`,
+        `Logging player action to database: player ${playerId}, action ${actionDef.id}, server ${event.serverId}, map ${currentMap}`,
       )
       await this.repository.logPlayerAction(
         playerId,
         actionDef.id,
         event.serverId,
-        "", // TODO: Get current map from event context
+        currentMap,
         bonus || 0,
       )
       this.logger.debug(`Player action successfully logged to database`)
@@ -127,13 +132,16 @@ export class ActionService implements IActionService {
       // Calculate total points (base reward + bonus)
       const totalPoints = actionDef.rewardPlayer + (bonus || 0)
 
+      // Get current map from match service
+      const currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
+
       // Log the action event to database
       await this.repository.logPlayerPlayerAction(
         playerId,
         victimId,
         actionDef.id,
         event.serverId,
-        "", // TODO: Get current map from event context
+        currentMap,
         bonus || 0,
       )
 
@@ -179,11 +187,14 @@ export class ActionService implements IActionService {
       // Calculate total points (base reward + bonus)
       const totalPoints = actionDef.rewardTeam + (bonus || 0)
 
+      // Get current map from match service
+      const currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
+
       // Log the action event to database
       await this.repository.logTeamAction(
         event.serverId,
         actionDef.id,
-        "", // TODO: Get current map from event context
+        currentMap,
         bonus || 0,
       )
 
@@ -222,11 +233,14 @@ export class ActionService implements IActionService {
       // World actions typically don't have player rewards, but may have server-wide effects
       const totalPoints = bonus || 0
 
+      // Get current map from match service
+      const currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
+
       // Log the action event to database
       await this.repository.logWorldAction(
         event.serverId,
         actionDef.id,
-        "", // TODO: Get current map from event context
+        currentMap,
         bonus || 0,
       )
 

@@ -316,8 +316,7 @@ describe("ActionService", () => {
       expect(result.success).toBe(true)
       expect(result.affected).toBe(1)
       expect(mockRepository.logPlayerAction).toHaveBeenCalledWith(1, 1, 1, "", 0)
-      expect(mockPlayerService.updatePlayerStats).not.toHaveBeenCalled() // Should NOT be called
-      expect(mockLogger.debug).not.toHaveBeenCalledWith("Updated player stats for 1") // Should NOT log stats update
+      expect(mockPlayerService.updatePlayerStats).not.toHaveBeenCalled() // Should NOT be called when totalPoints is 0
       expect(mockLogger.event).toHaveBeenCalledWith("Player action: no_reward_action by player 1 (0 points)")
     })
   })

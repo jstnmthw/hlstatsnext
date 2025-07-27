@@ -95,7 +95,6 @@ export class ActionService implements IActionService {
         await this.playerService.updatePlayerStats(playerId, {
           skill: totalPoints,
         })
-        this.logger.debug(`Updated player stats for ${playerId}`)
       }
 
       // Log the event with point information
@@ -171,7 +170,6 @@ export class ActionService implements IActionService {
         await this.playerService.updatePlayerStats(playerId, {
           skill: totalPoints,
         })
-        this.logger.debug(`Updated player stats for ${playerId}`)
       }
 
       // Log the event with point information

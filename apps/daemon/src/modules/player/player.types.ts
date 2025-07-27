@@ -5,6 +5,7 @@
 import type { BaseEvent, EventType, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
 import type { HandlerResult } from "@/shared/types/common"
 import type { FindOptions, UpdateOptions, CreateOptions } from "@/shared/types/database"
+import type { Player } from "@repo/database/client"
 
 // Player-specific event types
 export interface PlayerKillEvent extends BaseEvent {
@@ -203,7 +204,7 @@ export interface RatingUpdate {
 export interface IPlayerService {
   // Player management
   getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number>
-  getPlayerStats(playerId: number): Promise<import("@repo/database/client").Player | null>
+  getPlayerStats(playerId: number): Promise<Player | null>
   updatePlayerStats(playerId: number, updates: PlayerStatsUpdate): Promise<void>
 
   // Rating system
@@ -211,11 +212,7 @@ export interface IPlayerService {
   updatePlayerRatings(updates: RatingUpdate[]): Promise<void>
 
   // Queries
-  getTopPlayers(
-    limit?: number,
-    game?: string,
-    includeHidden?: boolean,
-  ): Promise<import("@repo/database/client").Player[]>
+  getTopPlayers(limit?: number, game?: string, includeHidden?: boolean): Promise<Player[]>
   getRoundParticipants(serverId: number, duration: number): Promise<unknown[]>
 
   // Event handling
@@ -225,24 +222,10 @@ export interface IPlayerService {
 
 export interface IPlayerRepository {
   // CRUD operations
-  findById(
-    playerId: number,
-    options?: FindOptions,
-  ): Promise<import("@repo/database/client").Player | null>
-  findByUniqueId(
-    uniqueId: string,
-    game: string,
-    options?: FindOptions,
-  ): Promise<import("@repo/database/client").Player | null>
-  create(
-    data: PlayerCreateData,
-    options?: CreateOptions,
-  ): Promise<import("@repo/database/client").Player>
-  update(
-    playerId: number,
-    data: Partial<import("@repo/database/client").Player>,
-    options?: UpdateOptions,
-  ): Promise<import("@repo/database/client").Player>
+  findById(playerId: number, options?: FindOptions): Promise<Player | null>
+  findByUniqueId(uniqueId: string, game: string, options?: FindOptions): Promise<Player | null>
+  create(data: PlayerCreateData, options?: CreateOptions): Promise<Player>
+  update(playerId: number, data: Partial<Player>, options?: UpdateOptions): Promise<Player>
 
   // Specialized queries
   findTopPlayers(
@@ -250,7 +233,7 @@ export interface IPlayerRepository {
     game: string,
     includeHidden: boolean,
     options?: FindOptions,
-  ): Promise<import("@repo/database/client").Player[]>
+  ): Promise<Player[]>
   findRoundParticipants(
     serverId: number,
     startTime: Date,
@@ -277,10 +260,7 @@ export interface IPlayerRepository {
   ): Promise<void>
 
   // Player stats retrieval for skill calculations
-  getPlayerStats(
-    playerId: number,
-    options?: FindOptions,
-  ): Promise<import("@repo/database/client").Player | null>
+  getPlayerStats(playerId: number, options?: FindOptions): Promise<Player | null>
 
   // EventFrag logging for kill events
   logEventFrag(

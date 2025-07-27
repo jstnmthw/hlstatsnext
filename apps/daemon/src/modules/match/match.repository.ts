@@ -64,6 +64,17 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
       }
 
       await this.executeWithTransaction(async (client) => {
+        // First check if the player exists
+        const playerExists = await client.player.findUnique({
+          where: { playerId: data.playerId },
+          select: { playerId: true },
+        })
+
+        if (!playerExists) {
+          this.logger.warn(`Player ${data.playerId} not found when creating player history, skipping`)
+          return
+        }
+
         await client.playerHistory.create({
           data: {
             playerId: data.playerId,

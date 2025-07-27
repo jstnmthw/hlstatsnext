@@ -3,6 +3,9 @@ import type { GameDetectionResult, IGameDetectionService } from "./game-detectio
 import { GameConfig, GAMES } from "@/config/game.config"
 
 export class GameDetectionService implements IGameDetectionService {
+  private readonly gameCache = new Map<string, { result: GameDetectionResult; timestamp: number }>()
+  private readonly CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
   constructor(private readonly logger: ILogger) {}
 
   /**
@@ -109,8 +112,13 @@ export class GameDetectionService implements IGameDetectionService {
    */
   async detectGameFromServerQuery(address: string, port: number): Promise<GameDetectionResult> {
     // TODO: Implement Source Engine Query protocol
-    // For now, return unknown
-    this.logger.debug(`Server query detection not yet implemented for ${address}:${port}`)
+    // For now, return unknown (debug log only once per server per cache period)
+    const serverKey = `${address}:${port}`
+    const cached = this.gameCache.get(serverKey)
+    
+    if (!cached) {
+      this.logger.debug(`Server query detection not yet implemented for ${address}:${port}`)
+    }
 
     return {
       gameCode: "unknown",
@@ -128,9 +136,18 @@ export class GameDetectionService implements IGameDetectionService {
     port: number,
     logLines: string[] = [],
   ): Promise<GameDetectionResult> {
+    const serverKey = `${address}:${port}`
+    
+    // Check cache first
+    const cached = this.gameCache.get(serverKey)
+    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+      return cached.result
+    }
+
     // Method 1: Try server query (when implemented)
     const serverResult = await this.detectGameFromServerQuery(address, port)
     if (serverResult.gameCode !== "unknown" && serverResult.confidence > 0.7) {
+      this.cacheResult(serverKey, serverResult)
       return serverResult
     }
 
@@ -138,6 +155,7 @@ export class GameDetectionService implements IGameDetectionService {
     if (logLines.length > 0) {
       const logResult = this.detectGameFromLogContent(logLines)
       if (logResult.confidence > 0.5) {
+        this.cacheResult(serverKey, logResult)
         return logResult
       }
     }
@@ -145,13 +163,27 @@ export class GameDetectionService implements IGameDetectionService {
     // Method 3: Check if we have existing server data
     // This would query the database for previously detected game type
 
-    // Fallback: Default to CS:GO for development
-    this.logger.warn(`Could not reliably detect game for ${address}:${port}, defaulting to cstrike`)
-    return {
+    // Fallback: Default to CS:GO for development (only warn once per cache period)
+    const fallbackResult = {
       gameCode: GameConfig.getDefaultGame(),
       confidence: 0.2,
       detection_method: "development_fallback",
     }
+    
+    // Only log warning if not in cache (prevents spam)
+    if (!cached) {
+      this.logger.warn(`Could not reliably detect game for ${address}:${port}, defaulting to cstrike`)
+    }
+    
+    this.cacheResult(serverKey, fallbackResult)
+    return fallbackResult
+  }
+
+  private cacheResult(serverKey: string, result: GameDetectionResult): void {
+    this.gameCache.set(serverKey, {
+      result,
+      timestamp: Date.now(),
+    })
   }
 
   /**

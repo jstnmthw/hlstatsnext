@@ -514,19 +514,26 @@ export class MatchService implements IMatchService {
         totalKills += playerStats.kills
         totalHeadshots += playerStats.headshots
 
-        await this.repository.createPlayerHistory({
-          playerId: playerStats.playerId,
-          eventTime: new Date(),
-          game: server.game || GameConfig.getDefaultGame(),
-          kills: playerStats.kills,
-          deaths: playerStats.deaths,
-          suicides: playerStats.suicides,
-          skill: this.calculatePlayerScore(playerStats),
-          shots: playerStats.shots,
-          hits: playerStats.hits,
-          headshots: playerStats.headshots,
-          teamkills: playerStats.teamkills,
-        })
+        try {
+          await this.repository.createPlayerHistory({
+            playerId: playerStats.playerId,
+            eventTime: new Date(),
+            game: server.game || GameConfig.getDefaultGame(),
+            kills: playerStats.kills,
+            deaths: playerStats.deaths,
+            suicides: playerStats.suicides,
+            skill: this.calculatePlayerScore(playerStats),
+            shots: playerStats.shots,
+            hits: playerStats.hits,
+            headshots: playerStats.headshots,
+            teamkills: playerStats.teamkills,
+          })
+        } catch (error) {
+          this.logger.warn(
+            `Failed to create player history for player ${playerStats.playerId}: ${error instanceof Error ? error.message : String(error)}`
+          )
+          // Continue with other players instead of failing the entire operation
+        }
       }
 
       if (totalKills > 0 || totalHeadshots > 0) {

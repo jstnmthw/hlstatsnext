@@ -22,6 +22,7 @@ import type { GameDetectionResult } from "@/modules/game/game-detection.types"
  */
 export class DatabaseServerAuthenticator implements IServerAuthenticator {
   private readonly authenticatedServers = new Map<string, number>()
+  private readonly pendingCreations = new Map<string, Promise<number>>()
 
   constructor(
     private readonly database: DatabaseClient,
@@ -82,6 +83,8 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
  * Server information provider implementation
  */
 export class ServerInfoProviderAdapter implements IServerInfoProvider {
+  private readonly pendingCreations = new Map<string, Promise<{ serverId: number }>>()
+
   constructor(
     private readonly database: DatabaseClient,
     private readonly serverService: IServerService,
@@ -101,6 +104,35 @@ export class ServerInfoProviderAdapter implements IServerInfoProvider {
     address: string,
     port: number,
     gameCode: string,
+  ): Promise<{ serverId: number }> {
+    const serverKey = `${address}:${port}`
+    
+    // Check if there's already a pending creation for this server
+    const pendingCreation = this.pendingCreations.get(serverKey)
+    if (pendingCreation) {
+      return pendingCreation
+    }
+
+    // Create the server creation promise
+    const creationPromise = this.createServerInternal(address, port, gameCode, serverKey)
+    
+    // Store the promise to prevent concurrent creations
+    this.pendingCreations.set(serverKey, creationPromise)
+    
+    try {
+      const result = await creationPromise
+      return result
+    } finally {
+      // Clean up the pending creation regardless of success/failure
+      this.pendingCreations.delete(serverKey)
+    }
+  }
+
+  private async createServerInternal(
+    address: string,
+    port: number,
+    gameCode: string,
+    serverKey: string,
   ): Promise<{ serverId: number }> {
     try {
       let server = await this.database.prisma.server.findFirst({

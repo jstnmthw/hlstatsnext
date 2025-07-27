@@ -415,7 +415,7 @@ describe("CsParser", () => {
   describe("Error handling", () => {
     it("should handle exceptions gracefully", () => {
       // Test with a line that might cause internal errors
-      const logLine = null as any
+      const logLine = null as unknown as string
       const result = parser.parseLine(logLine, serverId)
 
       expect(result.success).toBe(false)

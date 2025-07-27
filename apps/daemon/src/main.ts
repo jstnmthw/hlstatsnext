@@ -4,7 +4,7 @@
  * Refactored to use modular architecture with dependency injection.
  */
 
-import { getAppContext } from "@/context"
+import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { EventProcessor } from "@/shared/infrastructure/event-processor"
 import type { AppContext } from "@/context"
 import type { ILogger } from "@/shared/utils/logger.types"
@@ -41,6 +41,9 @@ export class HLStatsDaemon {
 
       this.logger.connected("database")
 
+      // Initialize queue infrastructure (dual publishing)
+      await initializeQueueInfrastructure(this.context)
+
       // Start all services through the context
       this.logger.info("Starting services")
       await Promise.all([
@@ -65,6 +68,8 @@ export class HLStatsDaemon {
     try {
       await Promise.all([
         this.context.ingressService.stop(),
+        // Shutdown queue module if available
+        this.context.queueModule?.shutdown() || Promise.resolve(),
         // Other cleanup as needed
       ])
       await this.disconnectDatabase()

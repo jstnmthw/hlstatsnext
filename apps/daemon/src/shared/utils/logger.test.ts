@@ -1,9 +1,9 @@
 /**
- * Logger Implementation Unit Tests
+ * Logger Implementation Unit Tests - Optimized
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { Logger, logger, type LogStatus } from "./logger"
+import { Logger, LogLevel, logger, type LogStatus } from "./logger"
 import type { ILogger } from "./logger.types"
 import type { MockInstance } from "vitest"
 
@@ -12,9 +12,9 @@ describe("Logger", () => {
   let consoleSpy: MockInstance
 
   beforeEach(() => {
-    // Mock console.log to capture output
+    delete process.env.LOG_LEVEL
     consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {})
-    testLogger = new Logger({ enableColors: false, showTimestamp: false })
+    testLogger = new Logger({ enableColors: false, showTimestamp: false, logLevel: LogLevel.DEBUG })
   })
 
   afterEach(() => {
@@ -22,153 +22,75 @@ describe("Logger", () => {
     vi.clearAllMocks()
   })
 
-  describe("Logger instantiation", () => {
-    it("should create logger with default options", () => {
+  describe("Instantiation and Interface", () => {
+    it("should create logger with default and custom options", () => {
       const defaultLogger = new Logger()
-      expect(defaultLogger).toBeDefined()
+      const customLogger = new Logger({ enableColors: false, showTimestamp: false })
+      
       expect(defaultLogger).toBeInstanceOf(Logger)
-    })
-
-    it("should create logger with custom options", () => {
-      const customLogger = new Logger({
-        enableColors: false,
-        showTimestamp: false,
-      })
-      expect(customLogger).toBeDefined()
       expect(customLogger).toBeInstanceOf(Logger)
-    })
 
-    it("should implement ILogger interface", () => {
-      const loggerAsInterface: ILogger = new Logger()
-      expect(loggerAsInterface).toBeDefined()
-
-      // Test that all required methods exist
-      expect(typeof loggerAsInterface.ok).toBe("function")
-      expect(typeof loggerAsInterface.error).toBe("function")
-      expect(typeof loggerAsInterface.info).toBe("function")
-      expect(typeof loggerAsInterface.warn).toBe("function")
-      expect(typeof loggerAsInterface.debug).toBe("function")
-    })
-
-    it("should have default options when not provided", () => {
-      const logger = new Logger()
-
-      // Test with colors enabled (default)
-      logger.info("test message")
+      // Test default behavior (colors enabled)
+      defaultLogger.info("test message")
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining("\x1b[34m[ INFO ]\x1b[0m test message"),
       )
     })
+
+    it("should implement ILogger interface completely", () => {
+      const loggerAsInterface: ILogger = new Logger()
+      
+      // Test all interface methods exist with correct types
+      const methods = [
+        'ok', 'error', 'info', 'warn', 'debug', 'event', 'chat',
+        'starting', 'started', 'stopping', 'stopped', 'connecting', 
+        'connected', 'disconnected', 'failed', 'ready', 'received',
+        'shutdown', 'shutdownComplete', 'fatal', 'disableTimestamps',
+        'enableTimestamps', 'disableColors', 'setColorsEnabled',
+        'getLogLevel', 'setLogLevel', 'setLogLevelFromString'
+      ]
+      
+      methods.forEach(method => {
+        expect(typeof loggerAsInterface[method as keyof ILogger]).toBe("function")
+      })
+    })
   })
 
-  describe("Basic logging methods", () => {
-    it("should log OK messages", () => {
-      testLogger.ok("Operation successful")
+  describe("Basic Logging Methods", () => {
+    const logMethods: Array<{ method: keyof Logger, level: string, message: string }> = [
+      { method: 'ok', level: 'OK', message: 'Operation successful' },
+      { method: 'error', level: 'ERROR', message: 'Something went wrong' },
+      { method: 'info', level: 'INFO', message: 'Information message' },
+      { method: 'warn', level: 'WARN', message: 'Warning message' },
+      { method: 'debug', level: 'DEBUG', message: 'Debug information' },
+      { method: 'event', level: 'EVENT', message: 'Event occurred' },
+      { method: 'chat', level: 'CHAT', message: 'Player chat message' },
+    ]
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ OK ] Operation successful"),
-      )
-    })
-
-    it("should log ERROR messages", () => {
-      testLogger.error("Something went wrong")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ ERROR ] Something went wrong"),
-      )
-    })
-
-    it("should log INFO messages", () => {
-      testLogger.info("Information message")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ INFO ] Information message"),
-      )
-    })
-
-    it("should log WARN messages", () => {
-      testLogger.warn("Warning message")
-
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[ WARN ] Warning message"))
-    })
-
-    it("should log DEBUG messages", () => {
-      testLogger.debug("Debug information")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ DEBUG ] Debug information"),
-      )
-    })
-
-    it("should log EVENT messages", () => {
-      testLogger.event("Event occurred")
-
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[ EVENT ] Event occurred"))
-    })
-
-    it("should log CHAT messages", () => {
-      testLogger.chat("Player chat message")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ CHAT ] Player chat message"),
-      )
+    it.each(logMethods)("should log $level messages", ({ method, level, message }) => {
+      ;(testLogger[method] as (msg: string) => void)(message)
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`[ ${level} ] ${message}`))
     })
   })
 
   describe("Service lifecycle methods", () => {
-    it("should log service starting", () => {
-      testLogger.starting("Database")
+    const lifecycleMethods = [
+      { method: 'starting', service: 'Database', expectedLevel: 'INFO', expectedMessage: 'Starting Database' },
+      { method: 'started', service: 'Database', expectedLevel: 'OK', expectedMessage: 'Database started successfully' },
+      { method: 'stopping', service: 'UDP Server', expectedLevel: 'INFO', expectedMessage: 'Stopping UDP Server' },
+      { method: 'stopped', service: 'UDP Server', expectedLevel: 'OK', expectedMessage: 'UDP Server stopped successfully' },
+      { method: 'connecting', service: 'MySQL Database', expectedLevel: 'INFO', expectedMessage: 'Connecting to MySQL Database' },
+      { method: 'connected', service: 'MySQL Database', expectedLevel: 'OK', expectedMessage: 'Connected to MySQL Database' },
+      { method: 'disconnected', service: 'Redis Cache', expectedLevel: 'OK', expectedMessage: 'Disconnected from Redis Cache' },
+    ]
 
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[ INFO ] Starting Database"))
-    })
-
-    it("should log service started", () => {
-      testLogger.started("Database")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ OK ] Database started successfully"),
-      )
-    })
-
-    it("should log service stopping", () => {
-      testLogger.stopping("UDP Server")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ INFO ] Stopping UDP Server"),
-      )
-    })
-
-    it("should log service stopped", () => {
-      testLogger.stopped("UDP Server")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ OK ] UDP Server stopped successfully"),
-      )
-    })
-
-    it("should log connecting to service", () => {
-      testLogger.connecting("MySQL Database")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ INFO ] Connecting to MySQL Database"),
-      )
-    })
-
-    it("should log connected to service", () => {
-      testLogger.connected("MySQL Database")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ OK ] Connected to MySQL Database"),
-      )
-    })
-
-    it("should log disconnected from service", () => {
-      testLogger.disconnected("Redis Cache")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ OK ] Disconnected from Redis Cache"),
-      )
-    })
+    it.each(lifecycleMethods)(
+      "should log $method for $service",
+      ({ method, service, expectedLevel, expectedMessage }) => {
+        ;(testLogger[method as keyof Logger] as (service: string) => void)(service)
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`[ ${expectedLevel} ] ${expectedMessage}`))
+      }
+    )
   })
 
   describe("Error and status methods", () => {
@@ -230,77 +152,41 @@ describe("Logger", () => {
   })
 
   describe("Color formatting", () => {
-    it("should apply green color to OK status", () => {
-      const colorLogger = new Logger({ enableColors: true })
-      colorLogger.ok("Success message")
+    const colorTests = [
+      { status: 'OK', color: '\x1b[32m\x1b[1m[ OK ]\x1b[0m', message: 'Success message' },
+      { status: 'ERROR', color: '\x1b[31m\x1b[1m[ ERROR ]\x1b[0m', message: 'Error message' },
+      { status: 'INFO', color: '\x1b[34m[ INFO ]\x1b[0m', message: 'Info message' },
+      { status: 'WARN', color: '\x1b[33m[ WARN ]\x1b[0m', message: 'Warning message' },
+      { status: 'EVENT', color: '\x1b[36m\x1b[1m[ EVENT ]\x1b[0m', message: 'Event message' },
+      { status: 'CHAT', color: '\x1b[33m\x1b[1m[ CHAT ]\x1b[0m', message: 'Chat message' },
+    ]
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("\x1b[32m\x1b[1m[ OK ]\x1b[0m"),
-      )
-    })
-
-    it("should apply red color to ERROR status", () => {
-      const colorLogger = new Logger({ enableColors: true })
-      colorLogger.error("Error message")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("\x1b[31m\x1b[1m[ ERROR ]\x1b[0m"),
-      )
-    })
-
-    it("should apply blue color to INFO status", () => {
-      const colorLogger = new Logger({ enableColors: true })
-      colorLogger.info("Info message")
-
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("\x1b[34m[ INFO ]\x1b[0m"))
-    })
-
-    it("should apply yellow color to WARN status", () => {
-      const colorLogger = new Logger({ enableColors: true })
-      colorLogger.warn("Warning message")
-
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("\x1b[33m[ WARN ]\x1b[0m"))
-    })
+    it.each(colorTests)(
+      "should apply correct color to $status status",
+      ({ status, color, message }) => {
+        const colorLogger = new Logger({ enableColors: true, logLevel: LogLevel.DEBUG })
+        const method = status.toLowerCase() as keyof Logger
+        ;(colorLogger[method] as (msg: string) => void)(message)
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(color))
+      }
+    )
 
     it("should apply magenta color to DEBUG status", () => {
-      const colorLogger = new Logger({ enableColors: true })
+      const colorLogger = new Logger({ enableColors: true, logLevel: LogLevel.DEBUG })
       colorLogger.debug("Debug message")
-
       expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("\x1b[35m[ DEBUG ]\x1b[0m"))
-    })
-
-    it("should apply cyan color to EVENT status", () => {
-      const colorLogger = new Logger({ enableColors: true })
-      colorLogger.event("Event message")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("\x1b[36m\x1b[1m[ EVENT ]\x1b[0m"),
-      )
-    })
-
-    it("should apply yellow bright color to CHAT status", () => {
-      const colorLogger = new Logger({ enableColors: true })
-      colorLogger.chat("Chat message")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("\x1b[33m\x1b[1m[ CHAT ]\x1b[0m"),
-      )
     })
 
     it("should not apply colors when disabled", () => {
       const noColorLogger = new Logger({ enableColors: false })
       noColorLogger.error("Error without color")
-
       expect(consoleSpy).toHaveBeenCalledWith(expect.not.stringContaining("\x1b["))
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ ERROR ] Error without color"),
-      )
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[ ERROR ] Error without color"))
     })
   })
 
   describe("Timestamp formatting", () => {
     beforeEach(() => {
-      // Mock Date to have predictable timestamps
       vi.useFakeTimers()
       vi.setSystemTime(new Date("2023-12-25T10:30:45.123Z"))
     })
@@ -309,77 +195,92 @@ describe("Logger", () => {
       vi.useRealTimers()
     })
 
-    it("should include timestamp when enabled", () => {
-      const timestampLogger = new Logger({ showTimestamp: true })
-      timestampLogger.info("Message with timestamp")
+    const timestampTests = [
+      {
+        name: "include timestamp when enabled",
+        options: { showTimestamp: true },
+        expectContains: "[2023-12-25 10:30:45]"
+      },
+      {
+        name: "not include timestamp when disabled", 
+        options: { showTimestamp: false },
+        expectNotContains: "[2023-12-25 10:30:45]"
+      },
+      {
+        name: "format timestamp with gray color when colors enabled",
+        options: { enableColors: true, showTimestamp: true },
+        expectContains: "\x1b[90m[2023-12-25 10:30:45]\x1b[0m"
+      },
+      {
+        name: "format timestamp without color when colors disabled",
+        options: { enableColors: false, showTimestamp: true },
+        expectContains: "[2023-12-25 10:30:45]",
+        expectNotContains: "\x1b[90m"
+      }
+    ]
 
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[2023-12-25 10:30:45]"))
-    })
-
-    it("should not include timestamp when disabled", () => {
-      const noTimestampLogger = new Logger({ showTimestamp: false })
-      noTimestampLogger.info("Message without timestamp")
-
-      expect(consoleSpy).toHaveBeenCalledWith(expect.not.stringContaining("[2023-12-25 10:30:45]"))
-    })
-
-    it("should format timestamp with gray color when colors enabled", () => {
-      const colorTimestampLogger = new Logger({ enableColors: true, showTimestamp: true })
-      colorTimestampLogger.info("Colored timestamp")
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("\x1b[90m[2023-12-25 10:30:45]\x1b[0m"),
-      )
-    })
-
-    it("should format timestamp without color when colors disabled", () => {
-      const noColorTimestampLogger = new Logger({ enableColors: false, showTimestamp: true })
-      noColorTimestampLogger.info("No color timestamp")
-
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[2023-12-25 10:30:45]"))
-      expect(consoleSpy).toHaveBeenCalledWith(expect.not.stringContaining("\x1b[90m"))
-    })
+    it.each(timestampTests)(
+      "should $name",
+      ({ options, expectContains, expectNotContains }) => {
+        const logger = new Logger(options)
+        logger.info("Test message")
+        
+        if (expectContains) {
+          expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(expectContains))
+        }
+        if (expectNotContains) {
+          expect(consoleSpy).toHaveBeenCalledWith(expect.not.stringContaining(expectNotContains))
+        }
+      }
+    )
   })
 
   describe("Configuration methods", () => {
-    it("should disable timestamps", () => {
-      testLogger.enableTimestamps()
-      testLogger.info("With timestamp")
+    const configTests = [
+      {
+        name: "timestamp toggling",
+        setup: () => {
+          testLogger.enableTimestamps()
+          testLogger.info("With timestamp")
+          testLogger.disableTimestamps()
+          testLogger.info("Without timestamp")
+        },
+        expects: [
+          { call: 1, contains: "[" },
+          { call: 2, notContains: "[2" }
+        ]
+      },
+      {
+        name: "color toggling",
+        setup: () => {
+          testLogger.setColorsEnabled(false)
+          testLogger.error("Error without colors")
+          testLogger.setColorsEnabled(true)
+          testLogger.error("Error with colors")
+        },
+        expects: [
+          { call: 1, notContains: "\x1b[" },
+          { call: 2, contains: "\x1b[" }
+        ]
+      }
+    ]
 
-      testLogger.disableTimestamps()
-      testLogger.info("Without timestamp")
-
-      expect(consoleSpy).toHaveBeenNthCalledWith(1, expect.stringContaining("["))
-      expect(consoleSpy).toHaveBeenNthCalledWith(2, expect.not.stringContaining("[2"))
+    it.each(configTests)("should handle $name", ({ setup, expects }) => {
+      setup()
+      expects.forEach(({ call, contains, notContains }) => {
+        if (contains) {
+          expect(consoleSpy).toHaveBeenNthCalledWith(call, expect.stringContaining(contains))
+        }
+        if (notContains) {
+          expect(consoleSpy).toHaveBeenNthCalledWith(call, expect.not.stringContaining(notContains))
+        }
+      })
     })
 
-    it("should enable timestamps", () => {
-      testLogger.disableTimestamps()
-      testLogger.info("Without timestamp")
-
-      testLogger.enableTimestamps()
-      testLogger.info("With timestamp")
-
-      expect(consoleSpy).toHaveBeenNthCalledWith(1, expect.not.stringContaining("[2"))
-      expect(consoleSpy).toHaveBeenNthCalledWith(2, expect.stringContaining("["))
-    })
-
-    it("should disable colors", () => {
+    it("should disable colors via disableColors method", () => {
       testLogger.disableColors()
       testLogger.error("Error without colors")
-
       expect(consoleSpy).toHaveBeenCalledWith(expect.not.stringContaining("\x1b["))
-    })
-
-    it("should set colors enabled/disabled", () => {
-      testLogger.setColorsEnabled(false)
-      testLogger.error("Error without colors")
-
-      testLogger.setColorsEnabled(true)
-      testLogger.error("Error with colors")
-
-      expect(consoleSpy).toHaveBeenNthCalledWith(1, expect.not.stringContaining("\x1b["))
-      expect(consoleSpy).toHaveBeenNthCalledWith(2, expect.stringContaining("\x1b["))
     })
   })
 
@@ -609,6 +510,159 @@ describe("Logger", () => {
       expect(consoleSpy).toHaveBeenLastCalledWith(
         expect.stringContaining("[ INFO ] Memory test complete"),
       )
+    })
+  })
+
+  describe("Log Levels", () => {
+    beforeEach(() => {
+      delete process.env.LOG_LEVEL
+    })
+
+    describe("Environment-based log level detection", () => {
+      const envLevelTests = [
+        { envValue: undefined, expected: LogLevel.INFO, description: "default to INFO when no env vars set" },
+        { envValue: "debug", expected: LogLevel.DEBUG, description: "read debug from LOG_LEVEL" },
+        { envValue: "DEBUG", expected: LogLevel.DEBUG, description: "handle case-insensitive DEBUG" },
+        { envValue: "warn", expected: LogLevel.WARN, description: "read warn from LOG_LEVEL" },
+        { envValue: "error", expected: LogLevel.ERROR, description: "read error from LOG_LEVEL" },
+        { envValue: "invalid", expected: LogLevel.INFO, description: "default to INFO for unknown levels" },
+      ]
+
+      it.each(envLevelTests)(
+        "should $description", 
+        ({ envValue, expected }) => {
+          if (envValue) {
+            process.env.LOG_LEVEL = envValue
+          }
+          const logger = new Logger({ enableColors: false, showTimestamp: false })
+          expect(logger.getLogLevel()).toBe(expected)
+        }
+      )
+    })
+
+    describe("Log level filtering", () => {
+      const filteringTests = [
+        {
+          level: LogLevel.ERROR,
+          description: "only ERROR when level is ERROR",
+          expectedCalls: 1,
+          expectedMessages: ["[ ERROR ] Error message"]
+        },
+        {
+          level: LogLevel.WARN, 
+          description: "ERROR and WARN when level is WARN",
+          expectedCalls: 2,
+          expectedMessages: ["[ ERROR ] Error message", "[ WARN ] Warn message"]
+        },
+        {
+          level: LogLevel.INFO,
+          description: "ERROR, WARN, INFO, OK, EVENT, CHAT when level is INFO", 
+          expectedCalls: 6,
+          expectedMessages: [
+            "[ ERROR ] Error message",
+            "[ WARN ] Warn message", 
+            "[ INFO ] Info message",
+            "[ OK ] OK message",
+            "[ EVENT ] Event message",
+            "[ CHAT ] Chat message"
+          ]
+        },
+        {
+          level: LogLevel.DEBUG,
+          description: "all messages when level is DEBUG",
+          expectedCalls: 7, 
+          expectedMessages: [
+            "[ ERROR ] Error message",
+            "[ WARN ] Warn message",
+            "[ INFO ] Info message", 
+            "[ DEBUG ] Debug message",
+            "[ OK ] OK message",
+            "[ EVENT ] Event message",
+            "[ CHAT ] Chat message"
+          ]
+        }
+      ]
+
+      it.each(filteringTests)(
+        "should log $description",
+        ({ level, expectedCalls, expectedMessages }) => {
+          const logger = new Logger({ enableColors: false, showTimestamp: false, logLevel: level })
+          
+          logger.error("Error message")
+          logger.warn("Warn message")
+          logger.info("Info message")
+          logger.debug("Debug message")
+          logger.ok("OK message")
+          logger.event("Event message")
+          logger.chat("Chat message")
+
+          expect(consoleSpy).toHaveBeenCalledTimes(expectedCalls)
+          expectedMessages.forEach((message, index) => {
+            expect(consoleSpy).toHaveBeenNthCalledWith(index + 1, message)
+          })
+        }
+      )
+    })
+
+    describe("Dynamic log level changes", () => {
+      const dynamicTests = [
+        {
+          name: "change log level dynamically",
+          test: (logger: Logger) => {
+            logger.info("Should not log")
+            expect(consoleSpy).toHaveBeenCalledTimes(0)
+            logger.setLogLevel(LogLevel.INFO)
+            logger.info("Should log now")
+            expect(consoleSpy).toHaveBeenCalledTimes(1)
+          }
+        },
+        {
+          name: "change log level from valid strings",
+          test: (logger: Logger) => {
+            logger.setLogLevelFromString("debug")
+            expect(logger.getLogLevel()).toBe(LogLevel.DEBUG)
+            logger.setLogLevelFromString("WARN")
+            expect(logger.getLogLevel()).toBe(LogLevel.WARN)
+            logger.setLogLevelFromString("warning")
+            expect(logger.getLogLevel()).toBe(LogLevel.WARN)
+          }
+        }
+      ]
+
+      it.each(dynamicTests)("should $name", ({ test }) => {
+        const logger = new Logger({ enableColors: false, showTimestamp: false, logLevel: LogLevel.ERROR })
+        test(logger)
+      })
+
+      it("should warn on invalid log level string", () => {
+        const logger = new Logger({ enableColors: false, showTimestamp: false, logLevel: LogLevel.INFO })
+        const originalLevel = logger.getLogLevel()
+        logger.setLogLevelFromString("invalid")
+        
+        expect(logger.getLogLevel()).toBe(originalLevel)
+        expect(consoleSpy).toHaveBeenCalledWith(
+          expect.stringContaining("[ WARN ] Unknown log level: invalid, keeping current level")
+        )
+      })
+    })
+
+    describe("Log level enum", () => {
+      const enumTests = [
+        { level: 'ERROR', value: 0 },
+        { level: 'WARN', value: 1 },
+        { level: 'INFO', value: 2 },
+        { level: 'DEBUG', value: 3 }
+      ]
+
+      it.each(enumTests)("should have $level = $value", ({ level, value }) => {
+        expect(LogLevel[level as keyof typeof LogLevel]).toBe(value)
+      })
+
+      it("should have correct ordering for filtering", () => {
+        expect(LogLevel.ERROR < LogLevel.WARN).toBe(true)
+        expect(LogLevel.WARN < LogLevel.INFO).toBe(true)
+        expect(LogLevel.INFO < LogLevel.DEBUG).toBe(true)
+      })
     })
   })
 })

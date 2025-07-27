@@ -5,6 +5,7 @@
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
+import { LogLevel } from "@/shared/utils/logger"
 import { vi } from "vitest"
 
 export function createMockLogger(): ILogger {
@@ -33,5 +34,8 @@ export function createMockLogger(): ILogger {
     enableTimestamps: vi.fn(),
     disableColors: vi.fn(),
     setColorsEnabled: vi.fn(),
+    getLogLevel: vi.fn().mockReturnValue(LogLevel.INFO),
+    setLogLevel: vi.fn(),
+    setLogLevelFromString: vi.fn(),
   }
 }

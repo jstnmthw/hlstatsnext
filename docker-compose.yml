@@ -19,10 +19,46 @@ services:
       - default
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root}"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${DB_ROOT_PASSWORD:-root}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  rabbitmq:
+    image: rabbitmq:4.1.2-management-alpine
+    container_name: hlstatsnext-rabbitmq
+    hostname: hlstatsnext-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-hlstats}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-hlstats}
+      - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_VHOST:-hlstats}
+      - RABBITMQ_ERLANG_COOKIE=${RABBITMQ_ERLANG_COOKIE:-hlstats-cookie}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+      - ./docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./docker/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+    ports:
+      - "5672:5672" # AMQP
+      - "15672:15672" # Management UI
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
 
   cstrike:
     image: gameservermanagers/gameserver:cs
@@ -69,3 +105,4 @@ networks:
 
 volumes:
   db-volume:
+  rabbitmq-data:

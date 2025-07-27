@@ -232,7 +232,7 @@ describe("GameDetectionService", () => {
     })
 
     it("should fallback to default game when log analysis confidence is low", async () => {
-      const serverQuerySpy = vi.spyOn(service, "detectGameFromServerQuery")
+      vi.spyOn(service, "detectGameFromServerQuery")
         .mockResolvedValue({
           gameCode: "unknown",
           confidence: 0.0,

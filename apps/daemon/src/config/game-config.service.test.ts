@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { GameConfigService, BOOTSTRAP_CONFIG, type GameRecord } from "./game-config.service"
+import { GameConfigService, BOOTSTRAP_CONFIG, getDefaultGame, getUnknownMap } from "./game-config.service"
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 
@@ -283,13 +283,11 @@ describe("GameConfigService", () => {
 })
 
 describe("compatibility functions", () => {
-  it("should export getDefaultGame function", async () => {
-    const { getDefaultGame } = await import("./game-config.service")
+  it("should export getDefaultGame function", () => {
     expect(getDefaultGame()).toBe(BOOTSTRAP_CONFIG.DEFAULT_GAME)
   })
 
-  it("should export getUnknownMap function", async () => {
-    const { getUnknownMap } = await import("./game-config.service")
+  it("should export getUnknownMap function", () => {
     expect(getUnknownMap()).toBe(BOOTSTRAP_CONFIG.MAP.UNKNOWN)
   })
 })

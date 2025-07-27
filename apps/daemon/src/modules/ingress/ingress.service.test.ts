@@ -5,83 +5,61 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { IngressService } from "./ingress.service"
 import { createMockLogger } from "../../tests/mocks/logger"
-import { createMockDatabaseClient } from "../../tests/mocks/database"
-import type { AppContext } from "../../context"
-import type { DatabaseClient } from "@/database/client"
-import type { IIngressService } from "./ingress.types"
+import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
+import type { IngressDependencies } from "./ingress.dependencies"
 
 describe("IngressService", () => {
   let ingressService: IngressService
   let mockLogger: ReturnType<typeof createMockLogger>
-  let mockDatabase: ReturnType<typeof createMockDatabaseClient>
-  let mockContext: AppContext
+  let mockEventBus: IEventBus
+  let mockDependencies: IngressDependencies
 
   beforeEach(() => {
     mockLogger = createMockLogger()
-    mockDatabase = createMockDatabaseClient()
+    
+    // Mock EventBus
+    mockEventBus = {
+      emit: vi.fn().mockResolvedValue(undefined),
+      on: vi.fn().mockReturnValue("handler-id"),
+      off: vi.fn(),
+      clearHandlers: vi.fn(),
+      getStats: vi.fn().mockReturnValue({
+        totalHandlers: 0,
+        handlersByType: new Map(),
+        eventsEmitted: 0,
+        errors: 0,
+      }),
+    }
 
-    // Create simplified mock context
-    mockContext = {
-      database: mockDatabase as unknown as DatabaseClient,
-      logger: mockLogger,
-      playerService: {
-        getOrCreatePlayer: vi.fn().mockResolvedValue(1),
-        getPlayerStats: vi.fn(),
-        updatePlayerStats: vi.fn(),
-        getPlayerRating: vi.fn(),
-        updatePlayerRatings: vi.fn(),
-        getTopPlayers: vi.fn(),
-        getRoundParticipants: vi.fn(),
-        handlePlayerEvent: vi.fn(),
-        handleKillEvent: vi.fn(),
+    // Mock dependencies
+    mockDependencies = {
+      serverAuthenticator: {
+        authenticateServer: vi.fn().mockResolvedValue(1),
+        cacheServer: vi.fn().mockResolvedValue(undefined),
       },
-      matchService: {
-        handleMatchEvent: vi.fn().mockResolvedValue({ success: true }),
-        handleObjectiveEvent: vi.fn().mockResolvedValue({ success: true }),
-        handleKillInMatch: vi.fn().mockResolvedValue({ success: true }),
-        getMatchStats: vi.fn(),
-        getCurrentMap: vi.fn(),
-        initializeMapForServer: vi.fn().mockResolvedValue("unknown"),
-        resetMatchStats: vi.fn(),
-        updatePlayerWeaponStats: vi.fn(),
-        calculateMatchMVP: vi.fn(),
-        calculatePlayerScore: vi.fn(),
-      },
-      weaponService: {
-        handleWeaponEvent: vi.fn(),
-        updateWeaponStats: vi.fn(),
-      },
-      rankingService: {
-        handleRatingUpdate: vi.fn(),
-        calculateRatingAdjustment: vi.fn(),
-        calculateSkillAdjustment: vi.fn(),
-        calculateSuicidePenalty: vi.fn(),
-      },
-      actionService: {
-        handleActionEvent: vi.fn(),
-      },
-      gameDetectionService: {
+      gameDetector: {
         detectGame: vi.fn().mockResolvedValue({
           gameCode: "csgo",
           confidence: 0.8,
           detection_method: "mock",
         }),
-        detectGameFromLogContent: vi.fn(),
-        detectGameFromServerQuery: vi.fn(),
-        normalizeGameCode: vi.fn(),
       },
-      serverService: {
-        getServer: vi.fn(),
-        getServerByAddress: vi.fn(),
+      serverInfoProvider: {
         getServerGame: vi.fn().mockResolvedValue("csgo"),
+        findOrCreateServer: vi.fn().mockResolvedValue({
+          serverId: 1,
+          address: "127.0.0.1",
+          port: 27015,
+          game: "csgo",
+          name: "Test Server",
+        }),
       },
-      ingressService: {} as IIngressService,
     }
 
     ingressService = new IngressService(
       mockLogger,
-      mockDatabase as unknown as DatabaseClient,
-      mockContext,
+      mockEventBus,
+      mockDependencies,
       {
         port: 27501,
         skipAuth: true,
@@ -96,46 +74,67 @@ describe("IngressService", () => {
     }
   })
 
-  describe("Service instantiation", () => {
-    it("should create service instance", () => {
+  describe("Service lifecycle", () => {
+    it("should initialize with correct configuration", () => {
       expect(ingressService).toBeDefined()
-      expect(ingressService).toBeInstanceOf(IngressService)
-    })
-
-    it("should have required methods", () => {
-      expect(ingressService.start).toBeDefined()
-      expect(ingressService.stop).toBeDefined()
-      expect(ingressService.isRunning).toBeDefined()
-      expect(ingressService.processLogLine).toBeDefined()
-      expect(ingressService.getStats).toBeDefined()
-    })
-  })
-
-  describe("Server state management", () => {
-    it("should start in stopped state", () => {
       expect(ingressService.isRunning()).toBe(false)
     })
 
-    it("should track statistics", () => {
+    it("should start successfully", async () => {
+      await ingressService.start()
+      expect(ingressService.isRunning()).toBe(true)
+      expect(mockLogger.starting).toHaveBeenCalledWith("Ingress Server")
+      expect(mockLogger.started).toHaveBeenCalledWith("Ingress Server on 0.0.0.0:27501")
+    })
+
+    it("should stop successfully", async () => {
+      await ingressService.start()
+      ingressService.stop()
+      expect(ingressService.isRunning()).toBe(false)
+      expect(mockLogger.stopping).toHaveBeenCalledWith("Ingress Server")
+    })
+
+    it("should throw error when starting twice", async () => {
+      await ingressService.start()
+      await expect(ingressService.start()).rejects.toThrow("IngressService is already running")
+    })
+
+    it("should return stats", () => {
       const stats = ingressService.getStats()
       expect(stats).toHaveProperty("totalLogsProcessed")
       expect(stats).toHaveProperty("totalErrors")
-      expect(typeof stats.totalLogsProcessed).toBe("number")
-      expect(typeof stats.totalErrors).toBe("number")
+      expect(stats).toHaveProperty("startTime")
+      expect(stats).toHaveProperty("uptime")
     })
   })
 
-  describe("Log processing", () => {
-    it("should process log lines without throwing", async () => {
-      const logLine = 'L 01/01/2024 - 12:00:00: World triggered "Round_Start"'
+  describe("Event processing", () => {
+    it("should process raw events and emit through event bus", async () => {
+      const event = await ingressService.processRawEvent(
+        'L 03/15/2023 - 12:30:45: "Player<1><STEAM_1:1:12345><CT>" connected',
+        "127.0.0.1",
+        27015
+      )
 
-      await expect(ingressService.processLogLine(logLine)).resolves.not.toThrow()
+      expect(event).toBeDefined()
+      expect(mockDependencies.serverAuthenticator.authenticateServer).toHaveBeenCalledWith("127.0.0.1", 27015)
     })
 
-    it("should handle malformed log lines gracefully", async () => {
-      const logLine = "Invalid log line format"
+    it("should handle server authentication", async () => {
+      const serverId = await ingressService.authenticateServer("127.0.0.1", 27015)
+      expect(serverId).toBe(1)
+      expect(mockDependencies.serverAuthenticator.authenticateServer).toHaveBeenCalledWith("127.0.0.1", 27015)
+    })
 
-      await expect(ingressService.processLogLine(logLine)).resolves.not.toThrow()
+    it("should handle development mode server creation", async () => {
+      const authenticateServerMock = mockDependencies.serverAuthenticator.authenticateServer as ReturnType<typeof vi.fn>
+      authenticateServerMock.mockResolvedValue(-1)
+      
+      const serverId = await ingressService.authenticateServer("127.0.0.1", 27015)
+      
+      expect(serverId).toBe(1)
+      expect(mockDependencies.gameDetector.detectGame).toHaveBeenCalled()
+      expect(mockDependencies.serverInfoProvider.findOrCreateServer).toHaveBeenCalled()
     })
   })
 })

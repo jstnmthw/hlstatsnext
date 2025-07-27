@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { createAppContext, getAppContext, resetAppContext, type AppContext } from "./context"
+import { createAppContext, getAppContext, resetAppContext } from "./context"
 
 // Mock all the imported modules
 vi.mock("@/database/client")

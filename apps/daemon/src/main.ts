@@ -23,7 +23,7 @@ export class HLStatsDaemon {
 
     this.context = getAppContext(ingressOptions)
     this.logger = this.context.logger
-    this.eventProcessor = new EventProcessor(this.context)
+    this.eventProcessor = this.context.eventProcessor
 
     this.logger.info("Initializing HLStatsNext Daemon with modular architecture")
   }
@@ -78,10 +78,10 @@ export class HLStatsDaemon {
   }
 
   /**
-   * Process a single event through the new modular architecture
+   * Emit events through the event bus for processing
    */
-  async processEvent(event: import("@/shared/types/events").BaseEvent): Promise<void> {
-    await this.eventProcessor.processEvent(event)
+  async emitEvents(events: import("@/shared/types/events").BaseEvent[]): Promise<void> {
+    await this.eventProcessor.emitEvents(events)
   }
 
   /**

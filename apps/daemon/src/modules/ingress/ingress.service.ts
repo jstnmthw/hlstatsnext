@@ -7,19 +7,16 @@
 import type { IIngressService, IngressOptions, IngressStats } from "./ingress.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
-import type { DatabaseClient } from "@/database/client"
+import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
+import type { IngressDependencies } from "./ingress.dependencies"
 import { UdpServer } from "./udp-server"
 import { CsParser } from "./parsers/cs.parser"
-import { EventProcessor } from "@/shared/infrastructure/event-processor"
-import type { AppContext } from "@/context"
 import { GameConfig } from "@/config/game.config"
 
 export class IngressService implements IIngressService {
   private readonly udpServer: UdpServer
   private readonly parser: CsParser
   private readonly options: Required<IngressOptions>
-  private readonly authenticatedServers: Map<string, number> = new Map()
-  private eventProcessor: EventProcessor | null = null
   private readonly stats: IngressStats = {
     totalLogsProcessed: 0,
     totalErrors: 0,
@@ -29,8 +26,8 @@ export class IngressService implements IIngressService {
 
   constructor(
     private readonly logger: ILogger,
-    private readonly database: DatabaseClient,
-    private readonly context: AppContext,
+    private readonly eventBus: IEventBus,
+    private readonly dependencies: IngressDependencies,
     options: IngressOptions = {},
   ) {
     this.options = {
@@ -47,7 +44,6 @@ export class IngressService implements IIngressService {
     )
 
     this.parser = new CsParser(GameConfig.getDefaultGame())
-    this.eventProcessor = new EventProcessor(this.context)
   }
 
   async start(): Promise<void> {
@@ -78,7 +74,6 @@ export class IngressService implements IIngressService {
     if (this.running) {
       this.logger.stopping("Ingress Server")
       this.udpServer.stop()
-      this.authenticatedServers.clear()
       this.running = false
     }
   }
@@ -104,8 +99,8 @@ export class IngressService implements IIngressService {
         return
       }
 
-      // Parse the log line and process events
-      await this.parseAndProcessLogLine(logLine)
+      // This method now just processes the log line directly
+      // The actual parsing and event processing happens in handleLogLine
     } catch (error) {
       this.stats.totalErrors++
       this.logger.error(
@@ -118,134 +113,30 @@ export class IngressService implements IIngressService {
     return logLine.includes("<BOT>")
   }
 
-  private async parseAndProcessLogLine(
-    logLine: string,
-    serverAddress?: string,
-    serverPort?: number,
-  ): Promise<void> {
-    // Extract basic info and process different event types
-    if (logLine.includes("connected, address")) {
-      if (serverAddress && serverPort) {
-        await this.handlePlayerConnect(logLine, serverAddress, serverPort)
-      } else {
-        this.logger.warn(`Cannot process player connect without server info: ${logLine}`)
-      }
-    } else if (logLine.includes("disconnected")) {
-      await this.handlePlayerDisconnect(logLine)
-    } else if (logLine.includes("killed")) {
-      await this.handlePlayerKill(logLine)
-    } else if (logLine.includes("Round_Start")) {
-      this.logger.event("Round started")
-    } else if (logLine.includes("Round_Win")) {
-      await this.handleRoundWin(logLine)
-    } else {
-      this.logger.warn(`Unrecognized log format: ${logLine}`)
-    }
+  private async parseAndProcessLogLine(): Promise<void> {
+    // This method is now deprecated in favor of proper parsing
+    // The parser should handle all log line parsing
+    this.logger.warn("Using deprecated parseAndProcessLogLine method")
   }
 
-  private async handlePlayerConnect(
-    logLine: string,
-    serverAddress: string,
-    serverPort: number,
-  ): Promise<void> {
-    const playerMatch = logLine.match(/"([^"]+)<\d+><([^>]+)><[^>]*>"/)
-    if (!playerMatch) return
-
-    const [, playerName, steamId] = playerMatch
-    if (!playerName || !steamId) return
-
-    this.logger.event(`Player connect: ${playerName} (${steamId})`)
-
-    // Get server info to determine game type
-    const serverId = await this.authenticateServer(serverAddress, serverPort)
-    if (!serverId) {
-      this.logger.warn(
-        `Cannot process player connect - server not authenticated: ${serverAddress}:${serverPort}`,
-      )
-      return
-    }
-
-    // Look up server to get game type
-    const server = await this.database.prisma.server.findUnique({
-      where: { serverId },
-      select: { game: true },
-    })
-
-    if (!server) {
-      this.logger.error(`Server ${serverId} not found in database`)
-      return
-    }
-
-    // Create or get player using the server's game type
-    await this.context.playerService.getOrCreatePlayer(steamId, playerName, server.game)
+  private async handlePlayerConnect(): Promise<void> {
+    // This method is deprecated - events should be parsed and emitted via event bus
+    this.logger.warn("Using deprecated handlePlayerConnect method")
   }
 
-  private async handlePlayerDisconnect(logLine: string): Promise<void> {
-    const playerMatch = logLine.match(/"([^"]+)<\d+><([^>]+)><[^>]*>"/)
-    if (!playerMatch) return
-
-    const [, playerName, steamId] = playerMatch
-    this.logger.event(`Player disconnect: ${playerName} (${steamId})`)
+  private async handlePlayerDisconnect(): Promise<void> {
+    // This method is deprecated - events should be parsed and emitted via event bus
+    this.logger.warn("Using deprecated handlePlayerDisconnect method")
   }
 
-  private async handlePlayerKill(logLine: string): Promise<void> {
-    const killMatch = logLine.match(
-      /"([^"]+)<\d+><([^>]+)><[^>]*>" killed "([^"]+)<\d+><([^>]+)><[^>]*>" with "([^"]+)"(\s+\(headshot\))?/,
-    )
-    if (!killMatch) return
-
-    const [, killerName, killerSteamId, victimName, victimSteamId, weapon, headshot] = killMatch
-    if (!killerSteamId || !victimSteamId || !weapon) return
-
-    const isHeadshot = !!headshot
-
-    this.logger.event(
-      `Kill: ${killerName || "Unknown"} → ${victimName || "Unknown"} (${weapon}${isHeadshot ? ", headshot" : ""})`,
-    )
-
-    // Get or create players using the available service method
-    const killerId = await this.context.playerService.getOrCreatePlayer(
-      killerSteamId,
-      killerName || "Unknown",
-      GameConfig.getDefaultGame(),
-    )
-    const victimId = await this.context.playerService.getOrCreatePlayer(
-      victimSteamId,
-      victimName || "Unknown",
-      GameConfig.getDefaultGame(),
-    )
-
-    // Update killer stats
-    await this.context.playerService.updatePlayerStats(killerId, {
-      kills: 1,
-      headshots: isHeadshot ? 1 : 0,
-    })
-
-    // Update victim stats
-    await this.context.playerService.updatePlayerStats(victimId, {
-      deaths: 1,
-    })
-
-    // Update weapon stats using the available service method
-    await this.context.weaponService.updateWeaponStats(weapon, {
-      shots: 1,
-      hits: 1,
-      damage: isHeadshot ? 100 : 50,
-    })
+  private async handlePlayerKill(): Promise<void> {
+    // This method is deprecated - events should be parsed and emitted via event bus
+    this.logger.warn("Using deprecated handlePlayerKill method")
   }
 
-  private async handleRoundWin(logLine: string): Promise<void> {
-    const roundMatch = logLine.match(/Team "([^"]+)" triggered "Round_Win".*\(([^)]+)\)/)
-    if (!roundMatch) return
-
-    const [, team, scores] = roundMatch
-    if (!team) return
-
-    this.logger.event(`Round won by ${team} (${scores || "unknown score"})`)
-
-    // Assume server ID 1 for now - in real implementation this would be determined from the log source
-    // TODO: Implement proper round result handling through match service
-    // await this.context.matchService.handleMatchEvent(roundEndEvent)
+  private async handleRoundWin(): Promise<void> {
+    // This method is deprecated - events should be parsed and emitted via event bus
+    this.logger.warn("Using deprecated handleRoundWin method")
   }
 
   async processRawEvent(
@@ -272,94 +163,31 @@ export class IngressService implements IIngressService {
   }
 
   async authenticateServer(address: string, port: number): Promise<number | null> {
-    const serverKey = `${address}:${port}`
+    const serverId = await this.dependencies.serverAuthenticator.authenticateServer(address, port)
 
-    // Check cache first
-    if (this.authenticatedServers.has(serverKey)) {
-      return this.authenticatedServers.get(serverKey)!
+    // Handle development mode
+    if (serverId === -1 && this.options.skipAuth) {
+      // Auto-detect game type for new servers in development mode
+      const gameDetection = await this.dependencies.gameDetector.detectGame(address, port, [])
+
+      this.logger.info(
+        `Detected game ${gameDetection.gameCode} for ${address}:${port} (confidence: ${gameDetection.confidence}, method: ${gameDetection.detection_method})`,
+      )
+
+      // Auto-create server in development mode
+      const server = await this.dependencies.serverInfoProvider.findOrCreateServer(
+        address,
+        port,
+        gameDetection.gameCode,
+      )
+
+      // Cache the created server ID in the authenticator
+      await this.dependencies.serverAuthenticator.cacheServer(address, port, server.serverId)
+
+      return server.serverId
     }
 
-    // Handle authentication based on mode
-    if (this.options.skipAuth) {
-      // In development mode, try to find or create the server
-      try {
-        let server = await this.database.prisma.server.findFirst({
-          where: {
-            address,
-            port,
-          },
-          select: {
-            serverId: true,
-          },
-        })
-
-        if (!server) {
-          // Auto-detect game type for new servers in development mode
-          const gameDetection = await this.context.gameDetectionService.detectGame(
-            address,
-            port,
-            [],
-          )
-
-          this.logger.info(
-            `Detected game ${gameDetection.gameCode} for ${serverKey} (confidence: ${gameDetection.confidence}, method: ${gameDetection.detection_method})`,
-          )
-
-          // Auto-create server in development mode
-          server = await this.database.prisma.server.create({
-            data: {
-              game: gameDetection.gameCode,
-              address,
-              port,
-              publicaddress: `${address}:${port}`,
-              name: `Dev Server ${address}:${port}`,
-              rcon_password: "",
-              sortorder: 0,
-              act_players: 0,
-              max_players: 0,
-            },
-            select: {
-              serverId: true,
-            },
-          })
-          this.logger.info(
-            `Auto-created development server ${serverKey} with ID ${server.serverId} (game: ${gameDetection.gameCode})`,
-          )
-        }
-
-        this.authenticatedServers.set(serverKey, server.serverId)
-        this.logger.debug(`Development server ${serverKey} mapped to ID ${server.serverId}`)
-        return server.serverId
-      } catch (error) {
-        this.logger.error(`Failed to handle development server ${serverKey}: ${error}`)
-        return null
-      }
-    }
-
-    // Look up server in database
-    try {
-      const server = await this.database.prisma.server.findFirst({
-        where: {
-          address,
-          port,
-        },
-        select: {
-          serverId: true,
-        },
-      })
-
-      if (server) {
-        this.authenticatedServers.set(serverKey, server.serverId)
-        this.logger.info(`Authenticated server ${serverKey} as ID ${server.serverId}`)
-        return server.serverId
-      } else {
-        this.logger.warn(`Unknown server attempted connection: ${serverKey}`)
-        return null
-      }
-    } catch (error) {
-      this.logger.error(`Database error during server authentication: ${error}`)
-      return null
-    }
+    return serverId
   }
 
   private async handleLogLine(
@@ -377,10 +205,8 @@ export class IngressService implements IIngressService {
       const event = await this.processRawEvent(logLine.trim(), serverAddress, serverPort)
 
       if (event) {
-        // Send to event processor
-        if (this.eventProcessor) {
-          await this.eventProcessor.processEvent(event)
-        }
+        // Emit event via event bus
+        await this.eventBus.emit(event)
       }
     } catch (error) {
       this.logger.error(`Error processing log line: ${error}`)

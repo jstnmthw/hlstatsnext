@@ -1,150 +1,261 @@
 /**
  * Event Processor
  *
- * Clean event orchestration that delegates to appropriate modules.
- * Replaces the complex EventProcessorService with pure orchestration logic.
+ * Event handler that registers with the EventBus and orchestrates event processing.
+ * Follows the Observer pattern for decoupled event handling.
  */
 
-import type { AppContext } from "@/context"
 import type { BaseEvent, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
 import type { PlayerEvent, PlayerKillEvent } from "@/modules/player/player.types"
 import type { WeaponEvent } from "@/modules/weapon/weapon.types"
 import type { ActionEvent } from "@/modules/action/action.types"
 import type { MatchEvent, ObjectiveEvent } from "@/modules/match/match.types"
+import type { IPlayerService } from "@/modules/player/player.types"
+import type { IMatchService } from "@/modules/match/match.types"
+import type { IWeaponService } from "@/modules/weapon/weapon.types"
+import type { IRankingService } from "@/modules/ranking/ranking.types"
+import type { IActionService } from "@/modules/action/action.types"
+import type { IServerService } from "@/modules/server/server.types"
 import { EventType } from "@/shared/types/events"
 
-export class EventProcessor {
-  private readonly logger: ILogger
+/**
+ * Dependencies required by the EventProcessor
+ */
+export interface EventProcessorDependencies {
+  readonly playerService: IPlayerService
+  readonly matchService: IMatchService
+  readonly weaponService: IWeaponService
+  readonly rankingService: IRankingService
+  readonly actionService: IActionService
+  readonly serverService: IServerService
+  readonly logger: ILogger
+}
 
-  constructor(private readonly context: AppContext) {
-    this.logger = context.logger
+export class EventProcessor {
+  private readonly handlerIds: string[] = []
+
+  constructor(
+    private readonly eventBus: IEventBus,
+    private readonly dependencies: EventProcessorDependencies,
+  ) {
+    this.registerEventHandlers()
   }
 
-  async processEvent(event: BaseEvent): Promise<void> {
-    const { playerService, matchService, weaponService, rankingService, actionService } =
-      this.context
+  /**
+   * Register event handlers with the event bus
+   */
+  private registerEventHandlers(): void {
+    // Player events
+    const playerEvents = [
+      EventType.PLAYER_CONNECT,
+      EventType.PLAYER_DISCONNECT,
+      EventType.PLAYER_ENTRY,
+      EventType.PLAYER_CHANGE_TEAM,
+      EventType.PLAYER_CHANGE_ROLE,
+      EventType.PLAYER_CHANGE_NAME,
+      EventType.PLAYER_SUICIDE,
+      EventType.PLAYER_TEAMKILL,
+      EventType.CHAT_MESSAGE,
+    ]
 
+    for (const eventType of playerEvents) {
+      const handlerId = this.eventBus.on(eventType, async (event) => {
+        await this.handlePlayerEvent(event)
+      })
+      this.handlerIds.push(handlerId)
+    }
+
+    // Kill events
+    const killHandlerId = this.eventBus.on(EventType.PLAYER_KILL, async (event) => {
+      await this.handleKillEvent(event)
+    })
+    this.handlerIds.push(killHandlerId)
+
+    // Match events
+    const matchEvents = [
+      EventType.ROUND_START,
+      EventType.ROUND_END,
+      EventType.TEAM_WIN,
+      EventType.MAP_CHANGE,
+    ]
+
+    for (const eventType of matchEvents) {
+      const handlerId = this.eventBus.on(eventType, async (event) => {
+        await this.handleMatchEvent(event)
+      })
+      this.handlerIds.push(handlerId)
+    }
+
+    // Objective events
+    const objectiveEvents = [
+      EventType.BOMB_PLANT,
+      EventType.BOMB_DEFUSE,
+      EventType.BOMB_EXPLODE,
+      EventType.HOSTAGE_RESCUE,
+      EventType.HOSTAGE_TOUCH,
+      EventType.FLAG_CAPTURE,
+      EventType.FLAG_DEFEND,
+      EventType.FLAG_PICKUP,
+      EventType.FLAG_DROP,
+      EventType.CONTROL_POINT_CAPTURE,
+      EventType.CONTROL_POINT_DEFEND,
+    ]
+
+    for (const eventType of objectiveEvents) {
+      const handlerId = this.eventBus.on(eventType, async (event) => {
+        await this.handleObjectiveEvent(event)
+      })
+      this.handlerIds.push(handlerId)
+    }
+
+    // Weapon events
+    const weaponEvents = [EventType.WEAPON_FIRE, EventType.WEAPON_HIT]
+
+    for (const eventType of weaponEvents) {
+      const handlerId = this.eventBus.on(eventType, async (event) => {
+        await this.handleWeaponEvent(event)
+      })
+      this.handlerIds.push(handlerId)
+    }
+
+    // Action events
+    const actionEvents = [
+      EventType.ACTION_PLAYER,
+      EventType.ACTION_PLAYER_PLAYER,
+      EventType.ACTION_TEAM,
+      EventType.ACTION_WORLD,
+    ]
+
+    for (const eventType of actionEvents) {
+      const handlerId = this.eventBus.on(eventType, async (event) => {
+        await this.handleActionEvent(event)
+      })
+      this.handlerIds.push(handlerId)
+    }
+
+    this.dependencies.logger.info(
+      `EventProcessor registered ${this.handlerIds.length} event handlers`,
+    )
+  }
+
+  /**
+   * Unregister all event handlers
+   */
+  destroy(): void {
+    for (const handlerId of this.handlerIds) {
+      this.eventBus.off(handlerId)
+    }
+    this.handlerIds.length = 0
+    this.dependencies.logger.info("EventProcessor unregistered all event handlers")
+  }
+
+  private async handlePlayerEvent(event: BaseEvent): Promise<void> {
     try {
-      // Log event for debugging
-      this.logger.debug(`Processing event: ${event.eventType} for server ${event.serverId}`)
+      this.dependencies.logger.debug(
+        `Processing player event: ${event.eventType} for server ${event.serverId}`,
+      )
 
-      // Resolve player IDs from Steam IDs for events that need it
       const resolvedEvent = await this.resolvePlayerIds(event)
-
-      // Route to appropriate modules based on event type
-      switch (resolvedEvent.eventType) {
-        // Player events
-        case EventType.PLAYER_CONNECT:
-        case EventType.PLAYER_DISCONNECT:
-        case EventType.PLAYER_ENTRY:
-        case EventType.PLAYER_CHANGE_TEAM:
-        case EventType.PLAYER_CHANGE_ROLE:
-        case EventType.PLAYER_CHANGE_NAME:
-        case EventType.PLAYER_SUICIDE:
-        case EventType.PLAYER_TEAMKILL:
-        case EventType.CHAT_MESSAGE:
-          await playerService.handlePlayerEvent(resolvedEvent as PlayerEvent)
-          break
-
-        // Kill events - multiple modules involved
-        case EventType.PLAYER_KILL:
-          await Promise.all([
-            playerService.handleKillEvent(resolvedEvent as PlayerKillEvent),
-            weaponService.handleWeaponEvent(resolvedEvent as WeaponEvent),
-            rankingService.handleRatingUpdate(),
-            matchService.handleKillInMatch(resolvedEvent),
-          ])
-          break
-
-        // Match events
-        case EventType.ROUND_START:
-        case EventType.ROUND_END:
-        case EventType.TEAM_WIN:
-        case EventType.MAP_CHANGE:
-          await matchService.handleMatchEvent(resolvedEvent as MatchEvent)
-          break
-
-        // Objective events
-        case EventType.BOMB_PLANT:
-        case EventType.BOMB_DEFUSE:
-        case EventType.BOMB_EXPLODE:
-        case EventType.HOSTAGE_RESCUE:
-        case EventType.HOSTAGE_TOUCH:
-        case EventType.FLAG_CAPTURE:
-        case EventType.FLAG_DEFEND:
-        case EventType.FLAG_PICKUP:
-        case EventType.FLAG_DROP:
-        case EventType.CONTROL_POINT_CAPTURE:
-        case EventType.CONTROL_POINT_DEFEND:
-          await matchService.handleObjectiveEvent(resolvedEvent as ObjectiveEvent)
-          break
-
-        // Weapon events
-        case EventType.WEAPON_FIRE:
-        case EventType.WEAPON_HIT:
-          await weaponService.handleWeaponEvent(resolvedEvent as WeaponEvent)
-          break
-
-        // Action events
-        case EventType.ACTION_PLAYER:
-        case EventType.ACTION_PLAYER_PLAYER:
-        case EventType.ACTION_TEAM:
-        case EventType.ACTION_WORLD:
-          await actionService.handleActionEvent(resolvedEvent as ActionEvent)
-          break
-
-        // Server events
-        case EventType.SERVER_STATS_UPDATE:
-          // Server stats events are typically handled by ingress or dedicated handlers
-          this.logger.debug(`Server stats update event for server ${resolvedEvent.serverId}`)
-          break
-
-        case EventType.SERVER_SHUTDOWN:
-        case EventType.ADMIN_ACTION:
-          // These events might not need processing or have dedicated handlers
-          this.logger.info(`System event: ${event.eventType}`)
-          break
-
-        default:
-          this.logger.warn(`Unhandled event type: ${event.eventType}`)
-      }
-
-      this.logger.debug(`Event processed successfully: ${event.eventType}`)
+      await this.dependencies.playerService.handlePlayerEvent(resolvedEvent as PlayerEvent)
     } catch (error) {
-      this.logger.error(`Failed to process event ${event.eventType}: ${error}`)
+      this.dependencies.logger.error(
+        `Failed to process player event ${event.eventType}: ${error}`,
+      )
+      throw error
+    }
+  }
+
+  private async handleKillEvent(event: BaseEvent): Promise<void> {
+    try {
+      this.dependencies.logger.debug(
+        `Processing kill event for server ${event.serverId}`,
+      )
+
+      const resolvedEvent = await this.resolvePlayerIds(event)
+      
+      // Kill events involve multiple services
+      await Promise.all([
+        this.dependencies.playerService.handleKillEvent(resolvedEvent as PlayerKillEvent),
+        this.dependencies.weaponService.handleWeaponEvent(resolvedEvent as WeaponEvent),
+        this.dependencies.rankingService.handleRatingUpdate(),
+        this.dependencies.matchService.handleKillInMatch(resolvedEvent),
+      ])
+    } catch (error) {
+      this.dependencies.logger.error(
+        `Failed to process kill event: ${error}`,
+      )
+      throw error
+    }
+  }
+
+  private async handleMatchEvent(event: BaseEvent): Promise<void> {
+    try {
+      this.dependencies.logger.debug(
+        `Processing match event: ${event.eventType} for server ${event.serverId}`,
+      )
+
+      await this.dependencies.matchService.handleMatchEvent(event as MatchEvent)
+    } catch (error) {
+      this.dependencies.logger.error(
+        `Failed to process match event ${event.eventType}: ${error}`,
+      )
+      throw error
+    }
+  }
+
+  private async handleObjectiveEvent(event: BaseEvent): Promise<void> {
+    try {
+      this.dependencies.logger.debug(
+        `Processing objective event: ${event.eventType} for server ${event.serverId}`,
+      )
+
+      await this.dependencies.matchService.handleObjectiveEvent(event as ObjectiveEvent)
+    } catch (error) {
+      this.dependencies.logger.error(
+        `Failed to process objective event ${event.eventType}: ${error}`,
+      )
+      throw error
+    }
+  }
+
+  private async handleWeaponEvent(event: BaseEvent): Promise<void> {
+    try {
+      this.dependencies.logger.debug(
+        `Processing weapon event: ${event.eventType} for server ${event.serverId}`,
+      )
+
+      await this.dependencies.weaponService.handleWeaponEvent(event as WeaponEvent)
+    } catch (error) {
+      this.dependencies.logger.error(
+        `Failed to process weapon event ${event.eventType}: ${error}`,
+      )
+      throw error
+    }
+  }
+
+  private async handleActionEvent(event: BaseEvent): Promise<void> {
+    try {
+      this.dependencies.logger.debug(
+        `Processing action event: ${event.eventType} for server ${event.serverId}`,
+      )
+
+      await this.dependencies.actionService.handleActionEvent(event as ActionEvent)
+    } catch (error) {
+      this.dependencies.logger.error(
+        `Failed to process action event ${event.eventType}: ${error}`,
+      )
       throw error
     }
   }
 
   /**
-   * Process multiple events in sequence
+   * Emit multiple events to the event bus
    */
-  async processEvents(events: BaseEvent[]): Promise<void> {
+  async emitEvents(events: BaseEvent[]): Promise<void> {
     for (const event of events) {
-      await this.processEvent(event)
-    }
-  }
-
-  /**
-   * Process events with concurrency control
-   */
-  async processEventsConcurrent(events: BaseEvent[], concurrency: number = 10): Promise<void> {
-    const promises: Promise<void>[] = []
-
-    for (const event of events) {
-      promises.push(this.processEvent(event))
-
-      // Control concurrency
-      if (promises.length >= concurrency) {
-        await Promise.all(promises)
-        promises.length = 0
-      }
-    }
-
-    // Process remaining events
-    if (promises.length > 0) {
-      await Promise.all(promises)
+      await this.eventBus.emit(event)
     }
   }
 
@@ -166,12 +277,12 @@ export class EventProcessor {
 
     try {
       // Get the server's game type for player creation
-      const serverGame = await this.context.serverService.getServerGame(event.serverId)
+      const serverGame = await this.dependencies.serverService.getServerGame(event.serverId)
       // Handle PLAYER_KILL events
       if (event.eventType === EventType.PLAYER_KILL) {
         const dualMeta = meta as DualPlayerMeta
         if (dualMeta.killer?.steamId && dualMeta.killer?.playerName) {
-          const killerId = await this.context.playerService.getOrCreatePlayer(
+          const killerId = await this.dependencies.playerService.getOrCreatePlayer(
             dualMeta.killer.steamId,
             dualMeta.killer.playerName,
             serverGame,
@@ -180,7 +291,7 @@ export class EventProcessor {
         }
 
         if (dualMeta.victim?.steamId && dualMeta.victim?.playerName) {
-          const victimId = await this.context.playerService.getOrCreatePlayer(
+          const victimId = await this.dependencies.playerService.getOrCreatePlayer(
             dualMeta.victim.steamId,
             dualMeta.victim.playerName,
             serverGame,
@@ -196,7 +307,7 @@ export class EventProcessor {
       else {
         const playerMeta = meta as PlayerMeta
         if (playerMeta.steamId && playerMeta.playerName) {
-          const playerId = await this.context.playerService.getOrCreatePlayer(
+          const playerId = await this.dependencies.playerService.getOrCreatePlayer(
             playerMeta.steamId,
             playerMeta.playerName,
             serverGame,
@@ -207,7 +318,7 @@ export class EventProcessor {
 
       return resolvedEvent
     } catch (error) {
-      this.logger.error(`Failed to resolve player IDs for event ${event.eventType}: ${error}`)
+      this.dependencies.logger.error(`Failed to resolve player IDs for event ${event.eventType}: ${error}`)
       return event // Return original event if resolution fails
     }
   }

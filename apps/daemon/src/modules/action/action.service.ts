@@ -90,11 +90,12 @@ export class ActionService implements IActionService {
         bonus || 0,
       )
 
-      // Update player skill points if player service is available
+      // Update player skill points if player service is available and there are points to award
       if (this.playerService && totalPoints !== 0) {
         await this.playerService.updatePlayerStats(playerId, {
           skill: totalPoints,
         })
+        this.logger.debug(`Updated player stats for ${playerId}`)
       }
 
       // Log the event with point information
@@ -165,11 +166,12 @@ export class ActionService implements IActionService {
         bonus || 0,
       )
 
-      // Update player skill points if player service is available
+      // Update player skill points if player service is available and there are points to award
       if (this.playerService && totalPoints !== 0) {
         await this.playerService.updatePlayerStats(playerId, {
           skill: totalPoints,
         })
+        this.logger.debug(`Updated player stats for ${playerId}`)
       }
 
       // Log the event with point information

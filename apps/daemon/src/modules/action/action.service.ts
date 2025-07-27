@@ -63,6 +63,15 @@ export class ActionService implements IActionService {
         return { success: true }
       }
 
+      // Verify player exists before logging action
+      if (this.playerService) {
+        const playerStats = await this.playerService.getPlayerStats(playerId)
+        if (!playerStats) {
+          this.logger.warn(`Player ${playerId} not found, skipping action: ${actionCode}`)
+          return { success: true } // Don't fail, but skip the action
+        }
+      }
+
       // Calculate total points (base reward + bonus)
       const totalPoints = actionDef.rewardPlayer + (bonus || 0)
 
@@ -117,6 +126,24 @@ export class ActionService implements IActionService {
 
       if (!actionDef.forPlayerPlayerActions) {
         return { success: true }
+      }
+
+      // Verify both players exist before logging action
+      if (this.playerService) {
+        const [playerStats, victimStats] = await Promise.all([
+          this.playerService.getPlayerStats(playerId),
+          this.playerService.getPlayerStats(victimId),
+        ])
+        
+        if (!playerStats) {
+          this.logger.warn(`Player ${playerId} not found, skipping action: ${actionCode}`)
+          return { success: true } // Don't fail, but skip the action
+        }
+        
+        if (!victimStats) {
+          this.logger.warn(`Victim ${victimId} not found, skipping action: ${actionCode}`)
+          return { success: true } // Don't fail, but skip the action
+        }
       }
 
       // Calculate total points (base reward + bonus)

@@ -160,21 +160,17 @@ export class EventProcessor {
       const resolvedEvent = await this.resolvePlayerIds(event)
       await this.dependencies.playerService.handlePlayerEvent(resolvedEvent as PlayerEvent)
     } catch (error) {
-      this.dependencies.logger.error(
-        `Failed to process player event ${event.eventType}: ${error}`,
-      )
+      this.dependencies.logger.error(`Failed to process player event ${event.eventType}: ${error}`)
       throw error
     }
   }
 
   private async handleKillEvent(event: BaseEvent): Promise<void> {
     try {
-      this.dependencies.logger.debug(
-        `Processing kill event for server ${event.serverId}`,
-      )
+      this.dependencies.logger.debug(`Processing kill event for server ${event.serverId}`)
 
       const resolvedEvent = await this.resolvePlayerIds(event)
-      
+
       // Kill events involve multiple services
       await Promise.all([
         this.dependencies.playerService.handleKillEvent(resolvedEvent as PlayerKillEvent),
@@ -183,9 +179,7 @@ export class EventProcessor {
         this.dependencies.matchService.handleKillInMatch(resolvedEvent),
       ])
     } catch (error) {
-      this.dependencies.logger.error(
-        `Failed to process kill event: ${error}`,
-      )
+      this.dependencies.logger.error(`Failed to process kill event: ${error}`)
       throw error
     }
   }
@@ -198,9 +192,7 @@ export class EventProcessor {
 
       await this.dependencies.matchService.handleMatchEvent(event as MatchEvent)
     } catch (error) {
-      this.dependencies.logger.error(
-        `Failed to process match event ${event.eventType}: ${error}`,
-      )
+      this.dependencies.logger.error(`Failed to process match event ${event.eventType}: ${error}`)
       throw error
     }
   }
@@ -228,24 +220,33 @@ export class EventProcessor {
 
       await this.dependencies.weaponService.handleWeaponEvent(event as WeaponEvent)
     } catch (error) {
-      this.dependencies.logger.error(
-        `Failed to process weapon event ${event.eventType}: ${error}`,
-      )
+      this.dependencies.logger.error(`Failed to process weapon event ${event.eventType}: ${error}`)
       throw error
     }
   }
 
   private async handleActionEvent(event: BaseEvent): Promise<void> {
     try {
+      const actionEvent = event as ActionEvent
+      let playerInfo = ""
+
+      // Add player information to the log based on event type
+      if (actionEvent.eventType === EventType.ACTION_PLAYER && "playerId" in actionEvent.data) {
+        playerInfo = `, playerId=${actionEvent.data.playerId}`
+      } else if (
+        actionEvent.eventType === EventType.ACTION_PLAYER_PLAYER &&
+        "playerId" in actionEvent.data
+      ) {
+        playerInfo = `, playerId=${actionEvent.data.playerId}, victimId=${actionEvent.data.victimId}`
+      }
+
       this.dependencies.logger.debug(
-        `Processing action event: ${event.eventType} for server ${event.serverId}`,
+        `Processing action event: ${event.eventType} for server ${event.serverId}${playerInfo}`,
       )
 
-      await this.dependencies.actionService.handleActionEvent(event as ActionEvent)
+      await this.dependencies.actionService.handleActionEvent(actionEvent)
     } catch (error) {
-      this.dependencies.logger.error(
-        `Failed to process action event ${event.eventType}: ${error}`,
-      )
+      this.dependencies.logger.error(`Failed to process action event ${event.eventType}: ${error}`)
       throw error
     }
   }
@@ -318,7 +319,9 @@ export class EventProcessor {
 
       return resolvedEvent
     } catch (error) {
-      this.dependencies.logger.error(`Failed to resolve player IDs for event ${event.eventType}: ${error}`)
+      this.dependencies.logger.error(
+        `Failed to resolve player IDs for event ${event.eventType}: ${error}`,
+      )
       return event // Return original event if resolution fails
     }
   }

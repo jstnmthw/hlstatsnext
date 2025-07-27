@@ -265,6 +265,61 @@ describe("ActionService", () => {
       expect(result.success).toBe(true)
       expect(mockLogger.warn).toHaveBeenCalledWith("Unknown action code: round_start for game csgo")
     })
+
+    it("should not update player stats when totalPoints is 0", async () => {
+      // Mock player service
+      const mockPlayerService = {
+        getPlayerStats: vi.fn().mockResolvedValue({ playerId: 1 }),
+        updatePlayerStats: vi.fn().mockResolvedValue(undefined),
+      }
+
+      // Create service with player service
+      const serviceWithPlayerService = new ActionService(
+        mockRepository,
+        mockLogger,
+        mockPlayerService as any,
+      )
+
+      // Mock action definition with 0 reward
+      const mockActionDef: ActionDefinition = {
+        id: 1,
+        game: "csgo",
+        code: "no_reward_action",
+        rewardPlayer: 0, // Zero reward
+        rewardTeam: 0,
+        team: "ct",
+        description: "Action with no reward",
+        forPlayerActions: true,
+        forPlayerPlayerActions: false,
+        forTeamActions: false,
+        forWorldActions: false,
+      }
+
+      vi.mocked(mockRepository.findActionByCode).mockResolvedValue(mockActionDef)
+      vi.mocked(mockRepository.logPlayerAction).mockResolvedValue()
+
+      const playerActionEvent: ActionPlayerEvent = {
+        timestamp: new Date(),
+        serverId: 1,
+        eventType: EventType.ACTION_PLAYER,
+        data: {
+          playerId: 1,
+          actionCode: "no_reward_action",
+          game: "csgo",
+          team: "ct",
+          bonus: 0, // Zero bonus
+        },
+      }
+
+      const result = await serviceWithPlayerService.handleActionEvent(playerActionEvent)
+
+      expect(result.success).toBe(true)
+      expect(result.affected).toBe(1)
+      expect(mockRepository.logPlayerAction).toHaveBeenCalledWith(1, 1, 1, "", 0)
+      expect(mockPlayerService.updatePlayerStats).not.toHaveBeenCalled() // Should NOT be called
+      expect(mockLogger.debug).not.toHaveBeenCalledWith("Updated player stats for 1") // Should NOT log stats update
+      expect(mockLogger.event).toHaveBeenCalledWith("Player action: no_reward_action by player 1 (0 points)")
+    })
   })
 
   describe("Error handling edge cases", () => {

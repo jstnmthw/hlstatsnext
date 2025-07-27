@@ -8,6 +8,7 @@ import { getAppContext } from "@/context"
 import { EventProcessor } from "@/shared/infrastructure/event-processor"
 import type { AppContext } from "@/context"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { BaseEvent } from "@/shared/types/events"
 
 export class HLStatsDaemon {
   private context: AppContext
@@ -80,7 +81,7 @@ export class HLStatsDaemon {
   /**
    * Emit events through the event bus for processing
    */
-  async emitEvents(events: import("@/shared/types/events").BaseEvent[]): Promise<void> {
+  async emitEvents(events: BaseEvent[]): Promise<void> {
     await this.eventProcessor.emitEvents(events)
   }
 

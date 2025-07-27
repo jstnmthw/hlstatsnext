@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { HLStatsDaemon } from "./main"
 import type { AppContext } from "@/context"
-import type { BaseEvent } from "@/shared/types/events"
+import type { BaseEvent, EventType } from "@/shared/types/events"
 import { getAppContext } from "@/context"
 
 vi.mock("@/context")
@@ -41,7 +41,7 @@ describe("HLStatsDaemon", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    
+
     vi.mocked(getAppContext).mockReturnValue(mockContext)
 
     daemon = new HLStatsDaemon()
@@ -54,34 +54,34 @@ describe("HLStatsDaemon", () => {
   describe("constructor", () => {
     it("should initialize with development environment", async () => {
       process.env.NODE_ENV = "development"
-      
+
       const mockedGetAppContext = vi.mocked(getAppContext)
-      
+
       new HLStatsDaemon()
-      
+
       expect(mockedGetAppContext).toHaveBeenCalledWith({ skipAuth: true })
       expect(mockContext.logger.info).toHaveBeenCalledWith(
-        "Initializing HLStatsNext Daemon with modular architecture"
+        "Initializing HLStatsNext Daemon with modular architecture",
       )
     })
 
     it("should initialize with production environment", async () => {
       process.env.NODE_ENV = "production"
-      
+
       const mockedGetAppContext = vi.mocked(getAppContext)
-      
+
       new HLStatsDaemon()
-      
+
       expect(mockedGetAppContext).toHaveBeenCalledWith({ skipAuth: false })
     })
 
     it("should default to development when NODE_ENV is not set", async () => {
       delete process.env.NODE_ENV
-      
+
       const mockedGetAppContext = vi.mocked(getAppContext)
-      
+
       new HLStatsDaemon()
-      
+
       expect(mockedGetAppContext).toHaveBeenCalledWith({ skipAuth: true })
     })
   })
@@ -100,7 +100,7 @@ describe("HLStatsDaemon", () => {
       expect(mockContext.ingressService.start).toHaveBeenCalled()
       expect(mockContext.logger.ok).toHaveBeenCalledWith("All services started successfully")
       expect(mockContext.logger.ready).toHaveBeenCalledWith(
-        "HLStatsNext Daemon is ready to receive game server data"
+        "HLStatsNext Daemon is ready to receive game server data",
       )
     })
 
@@ -112,10 +112,10 @@ describe("HLStatsDaemon", () => {
 
       expect(mockContext.logger.failed).toHaveBeenCalledWith(
         "Failed to start daemon",
-        "Failed to connect to database"
+        "Failed to connect to database",
       )
       expect(mockExit).toHaveBeenCalledWith(1)
-      
+
       mockExit.mockRestore()
     })
 
@@ -128,10 +128,10 @@ describe("HLStatsDaemon", () => {
 
       expect(mockContext.logger.failed).toHaveBeenCalledWith(
         "Failed to start daemon",
-        "Service error"
+        "Service error",
       )
       expect(mockExit).toHaveBeenCalledWith(1)
-      
+
       mockExit.mockRestore()
     })
 
@@ -143,14 +143,14 @@ describe("HLStatsDaemon", () => {
 
       expect(mockContext.logger.failed).toHaveBeenCalledWith(
         "Database connection test failed",
-        "DB Error"
+        "DB Error",
       )
       expect(mockContext.logger.failed).toHaveBeenCalledWith(
         "Failed to start daemon",
-        "Failed to connect to database"
+        "Failed to connect to database",
       )
       expect(mockExit).toHaveBeenCalledWith(1)
-      
+
       mockExit.mockRestore()
     })
   })
@@ -175,10 +175,7 @@ describe("HLStatsDaemon", () => {
 
       await daemon.stop()
 
-      expect(mockContext.logger.failed).toHaveBeenCalledWith(
-        "Error during shutdown",
-        "Stop error"
-      )
+      expect(mockContext.logger.failed).toHaveBeenCalledWith("Error during shutdown", "Stop error")
     })
 
     it("should handle database disconnect errors", async () => {
@@ -189,18 +186,18 @@ describe("HLStatsDaemon", () => {
 
       expect(mockContext.logger.failed).toHaveBeenCalledWith(
         "Error closing database connection",
-        "Disconnect error"
+        "Disconnect error",
       )
     })
   })
 
   describe("emitEvents", () => {
     it("should emit events through event processor", async () => {
-      const mockEvent: BaseEvent = { 
-        eventType: "PLAYER_CONNECT" as import("@/shared/types/events").EventType,
+      const mockEvent: BaseEvent = {
+        eventType: "PLAYER_CONNECT" as EventType,
         timestamp: new Date(),
         serverId: 1,
-        data: {}
+        data: {},
       }
       vi.mocked(mockEventProcessor.emitEvents).mockResolvedValue(undefined)
 

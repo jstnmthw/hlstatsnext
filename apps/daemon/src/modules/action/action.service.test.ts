@@ -271,13 +271,20 @@ describe("ActionService", () => {
       const mockPlayerService = {
         getPlayerStats: vi.fn().mockResolvedValue({ playerId: 1 }),
         updatePlayerStats: vi.fn().mockResolvedValue(undefined),
+        getOrCreatePlayer: vi.fn().mockResolvedValue(1),
+        getPlayerRating: vi.fn().mockResolvedValue({ skill: 1000, uncertainty: 100 }),
+        updatePlayerRatings: vi.fn().mockResolvedValue(undefined),
+        getTopPlayers: vi.fn().mockResolvedValue([]),
+        getRoundParticipants: vi.fn().mockResolvedValue([]),
+        handlePlayerEvent: vi.fn().mockResolvedValue({ success: true }),
+        handleKillEvent: vi.fn().mockResolvedValue({ success: true }),
       }
 
       // Create service with player service
       const serviceWithPlayerService = new ActionService(
         mockRepository,
         mockLogger,
-        mockPlayerService as any,
+        mockPlayerService,
       )
 
       // Mock action definition with 0 reward

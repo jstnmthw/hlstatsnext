@@ -27,4 +27,7 @@ export interface ILogger {
   enableTimestamps(): void
   disableColors(): void
   setColorsEnabled(enabled: boolean): void
+  getLogLevel(): import('./logger').LogLevel
+  setLogLevel(level: import('./logger').LogLevel): void
+  setLogLevelFromString(level: string): void
 }

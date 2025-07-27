@@ -21,20 +21,63 @@ const colors = {
 // Status types
 export type LogStatus = "OK" | "ERROR" | "INFO" | "WARN" | "DEBUG" | "EVENT" | "CHAT"
 
+// Log levels ordered by priority (higher number = more verbose)
+export enum LogLevel {
+  ERROR = 0,
+  WARN = 1,
+  INFO = 2,
+  DEBUG = 3,
+}
+
+// Log level mapping for status types
+const STATUS_LOG_LEVEL: Record<LogStatus, LogLevel> = {
+  ERROR: LogLevel.ERROR,
+  WARN: LogLevel.WARN,
+  INFO: LogLevel.INFO,
+  DEBUG: LogLevel.DEBUG,
+  OK: LogLevel.INFO, // Treat OK as INFO level
+  EVENT: LogLevel.INFO, // Treat EVENT as INFO level
+  CHAT: LogLevel.INFO, // Treat CHAT as INFO level
+}
+
 // Options for the logger
 interface LoggerOptions {
   enableColors?: boolean
   timestamp?: boolean
   showTimestamp?: boolean
+  logLevel?: LogLevel
 }
 
 export class Logger implements ILogger {
   private enableColors: boolean
   private showTimestamp: boolean
+  private logLevel: LogLevel
 
   constructor(options: LoggerOptions = {}) {
     this.enableColors = options.enableColors ?? true
     this.showTimestamp = options.showTimestamp ?? true
+    this.logLevel = options.logLevel ?? this.getLogLevelFromEnv()
+  }
+
+  /**
+   * Get log level from environment variables
+   */
+  private getLogLevelFromEnv(): LogLevel {
+    const envLevel = process.env.LOG_LEVEL || "info"
+
+    switch (envLevel.toLowerCase()) {
+      case "error":
+        return LogLevel.ERROR
+      case "warn":
+      case "warning":
+        return LogLevel.WARN
+      case "info":
+        return LogLevel.INFO
+      case "debug":
+        return LogLevel.DEBUG
+      default:
+        return LogLevel.INFO
+    }
   }
 
   /**
@@ -100,6 +143,12 @@ export class Logger implements ILogger {
    * @param message - The message to log
    */
   private log(status: LogStatus, message: string): void {
+    // Check if this message should be logged based on current log level
+    const messageLevel = STATUS_LOG_LEVEL[status]
+    if (messageLevel > this.logLevel) {
+      return // Skip logging if message level is more verbose than current log level
+    }
+
     const timestamp = this.formatTimestamp()
     const formattedStatus = this.formatStatus(status)
 
@@ -201,6 +250,43 @@ export class Logger implements ILogger {
 
   setColorsEnabled(enabled: boolean): void {
     this.enableColors = enabled
+  }
+
+  /**
+   * Get the current log level
+   */
+  getLogLevel(): LogLevel {
+    return this.logLevel
+  }
+
+  /**
+   * Set the log level dynamically
+   */
+  setLogLevel(level: LogLevel): void {
+    this.logLevel = level
+  }
+
+  /**
+   * Set log level from string (for CLI/API usage)
+   */
+  setLogLevelFromString(level: string): void {
+    switch (level.toLowerCase()) {
+      case "error":
+        this.logLevel = LogLevel.ERROR
+        break
+      case "warn":
+      case "warning":
+        this.logLevel = LogLevel.WARN
+        break
+      case "info":
+        this.logLevel = LogLevel.INFO
+        break
+      case "debug":
+        this.logLevel = LogLevel.DEBUG
+        break
+      default:
+        this.warn(`Unknown log level: ${level}, keeping current level`)
+    }
   }
 }
 

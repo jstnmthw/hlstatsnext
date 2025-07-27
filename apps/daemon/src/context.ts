@@ -35,6 +35,16 @@ import { EventBus } from "@/shared/infrastructure/event-bus/event-bus"
 import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
 import { EventProcessor } from "@/shared/infrastructure/event-processor"
 import type { EventProcessorDependencies } from "@/shared/infrastructure/event-processor"
+import {
+  QueueModule,
+  createDevelopmentRabbitMQConfig,
+  DualEventPublisher,
+} from "@/shared/infrastructure/queue"
+import {
+  EventBusAdapter,
+  type IEventEmitter,
+} from "@/shared/infrastructure/event-publisher-adapter"
+import type { BaseEvent } from "@/shared/types/events"
 
 import { GameDetectionService } from "@/modules/game/game-detection.service"
 
@@ -49,6 +59,10 @@ export interface AppContext {
   logger: ILogger
   eventBus: IEventBus
 
+  // Queue Infrastructure (optional for migration)
+  queueModule?: QueueModule
+  dualPublisher?: DualEventPublisher
+
   // Business Services
   playerService: IPlayerService
   matchService: IMatchService
@@ -58,7 +72,7 @@ export interface AppContext {
   ingressService: IIngressService
   gameDetectionService: IGameDetectionService
   serverService: IServerService
-  
+
   // Event Processing
   eventProcessor: EventProcessor
 }
@@ -78,6 +92,44 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   // Create event bus
   const eventBus = new EventBus(logger)
 
+  // Create queue module for RabbitMQ integration (optional)
+  let queueModule: QueueModule | undefined
+  let dualPublisher: DualEventPublisher | undefined
+
+  try {
+    const rabbitmqConfig = createDevelopmentRabbitMQConfig()
+    queueModule = new QueueModule(
+      {
+        rabbitmq: rabbitmqConfig,
+        autoStartConsumers: false, // We'll start consumers manually
+        autoStartShadowConsumer: true, // Start shadow consumer for validation
+        autoSetupTopology: true,
+        dualPublisher: {
+          enableQueue: true,
+          enableEventBus: true,
+          gracefulFallback: true,
+          queueTimeout: 5000,
+        },
+        shadowConsumer: {
+          queues: ['hlstats.events.priority', 'hlstats.events.standard', 'hlstats.events.bulk'],
+          metricsInterval: 30000, // Log metrics every 30 seconds
+          logEvents: process.env.LOG_LEVEL === 'debug',
+          logParsingErrors: true, // Always log parsing errors
+          logRawMessages: process.env.LOG_LEVEL === 'debug',
+          maxBufferSize: 10000,
+        },
+      },
+      logger,
+    )
+
+    logger.info("Queue module created - will initialize during ingress service creation")
+  } catch (error) {
+    logger.warn(
+      `Failed to create queue module: ${error instanceof Error ? error.message : String(error)}`,
+    )
+    logger.warn("Continuing with EventBus only")
+  }
+
   // Services (order matters for dependencies)
   const rankingService = new RankingService(logger, weaponRepository)
   const matchService = new MatchService(matchRepository, logger)
@@ -96,10 +148,24 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     { skipAuth: ingressOptions?.skipAuth },
   )
 
+  // Initialize queue module and create dual publisher if available
+  if (queueModule) {
+    try {
+      // Initialize queue module asynchronously - we'll handle this in an async wrapper
+      logger.info("Queue module available - dual publisher will be created asynchronously")
+    } catch (error) {
+      logger.error(`Failed to initialize queue module: ${error}`)
+      queueModule = undefined
+    }
+  }
+
+  // Create event emitter adapter (start with EventBus)
+  const eventEmitter: IEventEmitter = new EventBusAdapter(eventBus)
+
   // Create ingress service without circular dependency
   const ingressService = new IngressService(
     logger,
-    eventBus,
+    eventEmitter,
     ingressDependencies,
     ingressOptions,
   )
@@ -122,6 +188,8 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     database,
     logger,
     eventBus,
+    queueModule,
+    dualPublisher,
     playerService,
     matchService,
     weaponService,
@@ -142,6 +210,55 @@ export function getAppContext(ingressOptions?: IngressOptions): AppContext {
     appContext = createAppContext(ingressOptions)
   }
   return appContext
+}
+
+/**
+ * Initialize queue infrastructure and enable dual publishing
+ * This should be called after the app context is created but before starting services
+ */
+export async function initializeQueueInfrastructure(context: AppContext): Promise<void> {
+  if (!context.queueModule) {
+    context.logger.info("No queue module available - skipping queue initialization")
+    return
+  }
+
+  try {
+    context.logger.info("Initializing queue infrastructure...")
+
+    // Initialize the queue module first
+    await context.queueModule.initialize()
+
+    // Create dual publisher
+    context.dualPublisher = context.queueModule.createDualPublisher(context.eventBus)
+
+    // Replace the ingress service's event emitter with the dual publisher
+    // This is a bit of a hack but necessary for the migration
+    const ingressService = context.ingressService as unknown as {
+      eventEmitter: IEventEmitter
+    }
+
+    // Create adapter for dual publisher
+    const dualEventEmitter = {
+      emit: async (event: BaseEvent) => {
+        await context.dualPublisher!.publish(event)
+      },
+    }
+
+    // Replace the event emitter
+    Object.defineProperty(ingressService, "eventEmitter", {
+      value: dualEventEmitter,
+      writable: false,
+    })
+
+    context.logger.info("Queue infrastructure initialized - dual publishing enabled")
+  } catch (error) {
+    context.logger.error(`Failed to initialize queue infrastructure: ${error}`)
+    context.logger.warn("Continuing with EventBus only")
+
+    // Clean up failed queue module
+    context.queueModule = undefined
+    context.dualPublisher = undefined
+  }
 }
 
 export function resetAppContext(): void {

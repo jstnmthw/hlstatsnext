@@ -22,7 +22,6 @@ import type { GameDetectionResult } from "@/modules/game/game-detection.types"
  */
 export class DatabaseServerAuthenticator implements IServerAuthenticator {
   private readonly authenticatedServers = new Map<string, number>()
-  private readonly pendingCreations = new Map<string, Promise<number>>()
 
   constructor(
     private readonly database: DatabaseClient,
@@ -106,7 +105,7 @@ export class ServerInfoProviderAdapter implements IServerInfoProvider {
     gameCode: string,
   ): Promise<{ serverId: number }> {
     const serverKey = `${address}:${port}`
-    
+
     // Check if there's already a pending creation for this server
     const pendingCreation = this.pendingCreations.get(serverKey)
     if (pendingCreation) {
@@ -114,11 +113,11 @@ export class ServerInfoProviderAdapter implements IServerInfoProvider {
     }
 
     // Create the server creation promise
-    const creationPromise = this.createServerInternal(address, port, gameCode, serverKey)
-    
+    const creationPromise = this.createServerInternal(address, port, gameCode)
+
     // Store the promise to prevent concurrent creations
     this.pendingCreations.set(serverKey, creationPromise)
-    
+
     try {
       const result = await creationPromise
       return result
@@ -132,7 +131,6 @@ export class ServerInfoProviderAdapter implements IServerInfoProvider {
     address: string,
     port: number,
     gameCode: string,
-    serverKey: string,
   ): Promise<{ serverId: number }> {
     try {
       let server = await this.database.prisma.server.findFirst({
@@ -156,25 +154,30 @@ export class ServerInfoProviderAdapter implements IServerInfoProvider {
             },
             select: { serverId: true },
           })
-          
+
           this.logger.info(
             `Auto-created development server ${address}:${port} with ID ${server.serverId} (game: ${gameCode})`,
           )
         } catch (createError) {
           // Handle race condition - another process might have created the server
-          if (createError instanceof Error && createError.message.includes("Unique constraint failed")) {
+          if (
+            createError instanceof Error &&
+            createError.message.includes("Unique constraint failed")
+          ) {
             this.logger.debug(
               `Race condition detected creating server ${address}:${port}, fetching existing server`,
             )
-            
+
             // Try to find the server that was created by another process
             server = await this.database.prisma.server.findFirst({
               where: { address, port },
               select: { serverId: true },
             })
-            
+
             if (!server) {
-              throw new Error(`Server ${address}:${port} still not found after unique constraint error`)
+              throw new Error(
+                `Server ${address}:${port} still not found after unique constraint error`,
+              )
             }
           } else {
             throw createError

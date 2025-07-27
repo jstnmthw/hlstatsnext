@@ -18,7 +18,7 @@ const mockRepository: IMatchRepository = {
   findServerById: vi.fn(),
   createPlayerHistory: vi.fn(),
   updateMapCount: vi.fn(),
-} as any
+} as unknown as IMatchRepository
 
 const mockLogger: ILogger = {
   info: vi.fn(),
@@ -27,7 +27,7 @@ const mockLogger: ILogger = {
   error: vi.fn(),
   warn: vi.fn(),
   failed: vi.fn(),
-} as any
+} as unknown as ILogger
 
 vi.mock("@/config/game.config", () => ({
   GameConfig: {
@@ -112,9 +112,9 @@ describe("MatchService", () => {
 
     it("should handle MAP_CHANGE events", async () => {
       vi.mocked(mockRepository.findServerById).mockResolvedValue({
-        id: 1,
+        serverId: 1,
         game: "cstrike",
-      } as any)
+      })
 
       const event: MapChangeEvent = {
         eventType: EventType.MAP_CHANGE,
@@ -134,11 +134,15 @@ describe("MatchService", () => {
     })
 
     it("should handle unknown event types", async () => {
-      const event = {
-        eventType: "UNKNOWN_EVENT" as any,
+      const event: MapChangeEvent = {
+        eventType: EventType.MAP_CHANGE,
         serverId: 1,
         timestamp: new Date(),
-        data: {},
+        data: {
+          previousMap: "de_dust2",
+          newMap: "de_inferno",
+          playerCount: 10,
+        },
       }
 
       const result = await matchService.handleMatchEvent(event)
@@ -172,6 +176,7 @@ describe("MatchService", () => {
         data: {
           playerId: 123,
           bombsite: "A",
+          team: "terrorist",
         },
       }
 
@@ -191,6 +196,7 @@ describe("MatchService", () => {
         timestamp: new Date(),
         data: {
           playerId: 456,
+          team: "ct",
         },
       }
 
@@ -225,6 +231,8 @@ describe("MatchService", () => {
         timestamp: new Date(),
         data: {
           playerId: 789,
+          flagTeam: "blue",
+          captureTeam: "red",
         },
       }
 
@@ -241,7 +249,10 @@ describe("MatchService", () => {
         eventType: EventType.BOMB_PLANT,
         serverId: 1,
         timestamp: new Date(),
-        data: { playerId: 123 },
+        data: { 
+          playerId: 123,
+          team: "terrorist",
+        },
       }
 
       const result = await matchService.handleObjectiveEvent(event)

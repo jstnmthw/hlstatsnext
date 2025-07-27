@@ -7,7 +7,7 @@ vi.mock("@repo/database/client", () => ({
     $queryRaw: vi.fn(),
     $transaction: vi.fn(),
     $disconnect: vi.fn(),
-  } as any,
+  } as Record<string, unknown>,
 }))
 
 describe("DatabaseClient", () => {
@@ -67,7 +67,9 @@ describe("DatabaseClient", () => {
       const result = await client.testConnection()
 
       expect(result).toBe(false)
-      expect(consoleErrorSpy).toHaveBeenCalledWith("Database connection test failed:", expect.any(Error))
+      expect(consoleErrorSpy).toHaveBeenCalledWith("Database connection test failed:", expect.objectContaining({
+        message: expect.stringContaining("Connection failed")
+      }))
       
       consoleErrorSpy.mockRestore()
     })

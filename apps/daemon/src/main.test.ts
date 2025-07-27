@@ -2,9 +2,15 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { HLStatsDaemon } from "./main"
 import type { AppContext } from "@/context"
 import type { BaseEvent } from "@/shared/types/events"
+import { getAppContext } from "@/context"
 
 vi.mock("@/context")
 vi.mock("@/shared/infrastructure/event-processor")
+
+const mockEventProcessor = {
+  emitEvents: vi.fn(),
+  destroy: vi.fn(),
+}
 
 const mockContext = {
   logger: {
@@ -27,11 +33,8 @@ const mockContext = {
     start: vi.fn(),
     stop: vi.fn(),
   },
+  eventProcessor: mockEventProcessor,
 } as unknown as AppContext
-
-const mockEventProcessor = {
-  processEvent: vi.fn(),
-}
 
 describe("HLStatsDaemon", () => {
   let daemon: HLStatsDaemon
@@ -39,11 +42,7 @@ describe("HLStatsDaemon", () => {
   beforeEach(async () => {
     vi.clearAllMocks()
     
-    const { getAppContext } = vi.mocked(await import("@/context"))
-    getAppContext.mockReturnValue(mockContext)
-
-    const { EventProcessor } = vi.mocked(await import("@/shared/infrastructure/event-processor"))
-    EventProcessor.mockReturnValue(mockEventProcessor as any)
+    vi.mocked(getAppContext).mockReturnValue(mockContext)
 
     daemon = new HLStatsDaemon()
   })
@@ -56,11 +55,11 @@ describe("HLStatsDaemon", () => {
     it("should initialize with development environment", async () => {
       process.env.NODE_ENV = "development"
       
-      const { getAppContext } = vi.mocked(await import("@/context"))
+      const mockedGetAppContext = vi.mocked(getAppContext)
       
       new HLStatsDaemon()
       
-      expect(getAppContext).toHaveBeenCalledWith({ skipAuth: true })
+      expect(mockedGetAppContext).toHaveBeenCalledWith({ skipAuth: true })
       expect(mockContext.logger.info).toHaveBeenCalledWith(
         "Initializing HLStatsNext Daemon with modular architecture"
       )
@@ -69,21 +68,21 @@ describe("HLStatsDaemon", () => {
     it("should initialize with production environment", async () => {
       process.env.NODE_ENV = "production"
       
-      const { getAppContext } = vi.mocked(await import("@/context"))
+      const mockedGetAppContext = vi.mocked(getAppContext)
       
       new HLStatsDaemon()
       
-      expect(getAppContext).toHaveBeenCalledWith({ skipAuth: false })
+      expect(mockedGetAppContext).toHaveBeenCalledWith({ skipAuth: false })
     })
 
     it("should default to development when NODE_ENV is not set", async () => {
       delete process.env.NODE_ENV
       
-      const { getAppContext } = vi.mocked(await import("@/context"))
+      const mockedGetAppContext = vi.mocked(getAppContext)
       
       new HLStatsDaemon()
       
-      expect(getAppContext).toHaveBeenCalledWith({ skipAuth: true })
+      expect(mockedGetAppContext).toHaveBeenCalledWith({ skipAuth: true })
     })
   })
 
@@ -195,14 +194,19 @@ describe("HLStatsDaemon", () => {
     })
   })
 
-  describe("processEvent", () => {
-    it("should process events through event processor", async () => {
-      const mockEvent = { type: "test" } as BaseEvent
-      vi.mocked(mockEventProcessor.processEvent).mockResolvedValue(undefined)
+  describe("emitEvents", () => {
+    it("should emit events through event processor", async () => {
+      const mockEvent: BaseEvent = { 
+        eventType: "PLAYER_CONNECT" as import("@/shared/types/events").EventType,
+        timestamp: new Date(),
+        serverId: 1,
+        data: {}
+      }
+      vi.mocked(mockEventProcessor.emitEvents).mockResolvedValue(undefined)
 
-      await daemon.processEvent(mockEvent)
+      await daemon.emitEvents([mockEvent])
 
-      expect(mockEventProcessor.processEvent).toHaveBeenCalledWith(mockEvent)
+      expect(mockEventProcessor.emitEvents).toHaveBeenCalledWith([mockEvent])
     })
   })
 

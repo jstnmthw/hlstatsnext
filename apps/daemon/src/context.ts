@@ -30,6 +30,11 @@ import type { IActionService } from "@/modules/action/action.types"
 
 import { IngressService } from "@/modules/ingress/ingress.service"
 import type { IIngressService, IngressOptions } from "@/modules/ingress/ingress.types"
+import { createIngressDependencies } from "@/modules/ingress/ingress.adapter"
+import { EventBus } from "@/shared/infrastructure/event-bus/event-bus"
+import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
+import { EventProcessor } from "@/shared/infrastructure/event-processor"
+import type { EventProcessorDependencies } from "@/shared/infrastructure/event-processor"
 
 import { GameDetectionService } from "@/modules/game/game-detection.service"
 
@@ -42,6 +47,7 @@ export interface AppContext {
   // Infrastructure
   database: DatabaseClient
   logger: ILogger
+  eventBus: IEventBus
 
   // Business Services
   playerService: IPlayerService
@@ -52,6 +58,9 @@ export interface AppContext {
   ingressService: IIngressService
   gameDetectionService: IGameDetectionService
   serverService: IServerService
+  
+  // Event Processing
+  eventProcessor: EventProcessor
 }
 
 export function createAppContext(ingressOptions?: IngressOptions): AppContext {
@@ -66,6 +75,9 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const actionRepository = new ActionRepository(database, logger)
   const serverRepository = new ServerRepository(database, logger)
 
+  // Create event bus
+  const eventBus = new EventBus(logger)
+
   // Services (order matters for dependencies)
   const rankingService = new RankingService(logger, weaponRepository)
   const matchService = new MatchService(matchRepository, logger)
@@ -75,26 +87,51 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const gameDetectionService = new GameDetectionService(logger)
   const serverService = new ServerService(serverRepository, logger)
 
-  // Create context object for circular dependency resolution
-  const context = {
+  // Create ingress dependencies adapter
+  const ingressDependencies = createIngressDependencies(
     database,
+    serverService,
+    gameDetectionService,
     logger,
+    { skipAuth: ingressOptions?.skipAuth },
+  )
+
+  // Create ingress service without circular dependency
+  const ingressService = new IngressService(
+    logger,
+    eventBus,
+    ingressDependencies,
+    ingressOptions,
+  )
+
+  // Create event processor with its dependencies
+  const eventProcessorDeps: EventProcessorDependencies = {
     playerService,
     matchService,
     weaponService,
     rankingService,
     actionService,
+    serverService,
+    logger,
+  }
+
+  const eventProcessor = new EventProcessor(eventBus, eventProcessorDeps)
+
+  // Return complete context
+  return {
+    database,
+    logger,
+    eventBus,
+    playerService,
+    matchService,
+    weaponService,
+    rankingService,
+    actionService,
+    ingressService,
     gameDetectionService,
     serverService,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ingressService: null as any, // Will be set below
-  } as AppContext
-
-  // Create ingress service with full context
-  const ingressService = new IngressService(logger, database, context, ingressOptions)
-  context.ingressService = ingressService
-
-  return context
+    eventProcessor,
+  }
 }
 
 // Singleton instance for the application

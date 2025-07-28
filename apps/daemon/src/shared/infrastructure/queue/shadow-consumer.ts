@@ -196,12 +196,12 @@ export class ShadowConsumer {
     }
 
     // Convert timestamp to Date if it's a string
-    const shadowTimestamp = typeof shadowEvent.timestamp === 'string' 
-      ? new Date(shadowEvent.timestamp) 
-      : shadowEvent.timestamp
-    const eventTimestamp = typeof event.timestamp === 'string' 
-      ? new Date(event.timestamp) 
-      : event.timestamp
+    const shadowTimestamp =
+      typeof shadowEvent.timestamp === "string"
+        ? new Date(shadowEvent.timestamp)
+        : shadowEvent.timestamp
+    const eventTimestamp =
+      typeof event.timestamp === "string" ? new Date(event.timestamp) : event.timestamp
 
     // Basic validation - compare event types and timestamps
     const isValid =
@@ -255,7 +255,7 @@ export class ShadowConsumer {
       const event = eventMessage.payload
 
       // Convert timestamp string back to Date object if needed
-      if (typeof event.timestamp === 'string') {
+      if (typeof event.timestamp === "string") {
         event.timestamp = new Date(event.timestamp)
       }
 

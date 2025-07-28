@@ -20,7 +20,7 @@ describe("ServerRepository", () => {
     address: "192.168.1.100",
     port: 27015,
     country: "US",
-    city: "Test City", 
+    city: "Test City",
     last_event: 0,
     lat: null,
     lng: null,
@@ -143,7 +143,9 @@ describe("ServerRepository", () => {
 
       for (const serverId of testServerIds) {
         const expectedServer = { ...mockServerData, serverId }
-        vi.mocked(mockDatabase.prisma.server.findUnique).mockResolvedValueOnce(expectedServer as never)
+        vi.mocked(mockDatabase.prisma.server.findUnique).mockResolvedValueOnce(
+          expectedServer as never,
+        )
 
         const result = await serverRepository.findById(serverId)
         expect(result).toEqual(expectedServer)
@@ -233,7 +235,9 @@ describe("ServerRepository", () => {
 
       for (const { address, port } of testCases) {
         const expectedServer = { ...mockServerData, address, port }
-        vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValueOnce(expectedServer as never)
+        vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValueOnce(
+          expectedServer as never,
+        )
 
         const result = await serverRepository.findByAddress(address, port)
         expect(result).toEqual(expectedServer)
@@ -248,7 +252,9 @@ describe("ServerRepository", () => {
 
       for (const port of testPorts) {
         const expectedServer = { ...mockServerData, port }
-        vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValueOnce(expectedServer as never)
+        vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValueOnce(
+          expectedServer as never,
+        )
 
         const result = await serverRepository.findByAddress(address, port)
         expect(result).toEqual(expectedServer)
@@ -335,7 +341,9 @@ describe("ServerRepository", () => {
       const promises = testCases.map(({ serverId, shouldSucceed, shouldFail }) => {
         if (shouldSucceed) {
           const serverData = { ...mockServerData, serverId }
-          vi.mocked(mockDatabase.prisma.server.findUnique).mockResolvedValueOnce(serverData as never)
+          vi.mocked(mockDatabase.prisma.server.findUnique).mockResolvedValueOnce(
+            serverData as never,
+          )
         } else if (shouldFail) {
           vi.mocked(mockDatabase.prisma.server.findUnique).mockRejectedValueOnce(
             new Error("Database error"),
@@ -374,7 +382,9 @@ describe("ServerRepository", () => {
         port: 27015,
       }
 
-      vi.mocked(mockDatabase.prisma.server.findUnique).mockResolvedValue(completeServerData as never)
+      vi.mocked(mockDatabase.prisma.server.findUnique).mockResolvedValue(
+        completeServerData as never,
+      )
 
       const result = await serverRepository.findById(42)
 

@@ -1,6 +1,6 @@
 /**
  * Server Module Event Handler
- * 
+ *
  * Handles server-specific events including server lifecycle events,
  * admin actions, and server statistics updates.
  */
@@ -33,27 +33,30 @@ export class ServerEventHandler extends BaseModuleEventHandler {
 
   private async handleServerShutdown(event: BaseEvent): Promise<void> {
     this.logger.debug(`Server module handling SERVER_SHUTDOWN for server ${event.serverId}`)
-    
+
     // Handle server shutdown logic
     await this.serverService.handleServerShutdown?.(event.serverId)
   }
 
   private async handleServerStatsUpdate(event: BaseEvent): Promise<void> {
     this.logger.debug(`Server module handling SERVER_STATS_UPDATE for server ${event.serverId}`)
-    
+
     // Handle server statistics update
-    await this.serverService.handleStatsUpdate?.(event.serverId, event.data as Record<string, unknown> || {})
+    await this.serverService.handleStatsUpdate?.(
+      event.serverId,
+      (event.data as Record<string, unknown>) || {},
+    )
   }
 
   private async handleAdminAction(event: BaseEvent): Promise<void> {
     this.logger.debug(`Server module handling ADMIN_ACTION for server ${event.serverId}`)
-    
+
     // Handle admin actions
     const adminData = event.data as Record<string, unknown>
     await this.serverService.handleAdminAction?.(
-      (adminData?.adminId as number) || 0, 
-      (adminData?.action as string) || "unknown", 
-      adminData?.target as string
+      (adminData?.adminId as number) || 0,
+      (adminData?.action as string) || "unknown",
+      adminData?.target as string,
     )
   }
 }

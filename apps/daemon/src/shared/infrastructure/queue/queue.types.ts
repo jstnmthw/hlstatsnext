@@ -76,19 +76,19 @@ export interface QueueConfig {
 export interface EventMessage<T extends BaseEvent = BaseEvent> {
   /** Unique message identifier */
   readonly id: string
-  
+
   /** Message version for schema evolution */
-  readonly version: '1.0'
-  
+  readonly version: "1.0"
+
   /** ISO timestamp of message creation */
   readonly timestamp: string
-  
+
   /** Correlation ID for distributed tracing */
   readonly correlationId: string
-  
+
   /** Message metadata */
   readonly metadata: MessageMetadata
-  
+
   /** The actual event payload */
   readonly payload: T
 }
@@ -103,14 +103,14 @@ export interface MessageMetadata {
     readonly serverAddress: string
     readonly serverPort: number
   }
-  
+
   /** Message routing information */
   readonly routing: {
     readonly key: string
     readonly priority: MessagePriority
     readonly retryCount: number
   }
-  
+
   /** Processing hints */
   readonly hints?: {
     readonly skipValidation?: boolean
@@ -124,7 +124,7 @@ export interface MessageMetadata {
 export enum MessagePriority {
   HIGH = 10,
   NORMAL = 5,
-  LOW = 1
+  LOW = 1,
 }
 
 /**
@@ -133,29 +133,29 @@ export enum MessagePriority {
 export interface QueueTopology {
   exchanges: {
     events: {
-      name: 'hlstats.events'
-      type: 'topic'
+      name: "hlstats.events"
+      type: "topic"
       durable: true
     }
     dlx: {
-      name: 'hlstats.events.dlx'
-      type: 'topic'
+      name: "hlstats.events.dlx"
+      type: "topic"
       durable: true
     }
   }
   queues: {
     priority: {
-      name: 'hlstats.events.priority'
+      name: "hlstats.events.priority"
       bindings: readonly string[]
       options: QueueOptions
     }
     standard: {
-      name: 'hlstats.events.standard'
+      name: "hlstats.events.standard"
       bindings: readonly string[]
       options: QueueOptions
     }
     bulk: {
-      name: 'hlstats.events.bulk'
+      name: "hlstats.events.bulk"
       bindings: readonly string[]
       options: QueueOptions
     }
@@ -201,7 +201,11 @@ export interface ConsumerStats {
  */
 export interface QueueChannel {
   publish(exchange: string, routingKey: string, content: Buffer, options?: PublishOptions): boolean
-  consume(queue: string, onMessage: (msg: ConsumeMessage | null) => void, options?: ConsumeOptions): Promise<string>
+  consume(
+    queue: string,
+    onMessage: (msg: ConsumeMessage | null) => void,
+    options?: ConsumeOptions,
+  ): Promise<string>
   cancel(consumerTag: string): Promise<void>
   ack(message: ConsumeMessage): void
   nack(message: ConsumeMessage, allUpTo?: boolean, requeue?: boolean): void
@@ -298,30 +302,33 @@ export interface AssertQueueOptions {
  * Queue error types
  */
 export class QueueError extends Error {
-  constructor(message: string, public readonly cause?: Error) {
+  constructor(
+    message: string,
+    public readonly cause?: Error,
+  ) {
     super(message)
-    this.name = 'QueueError'
+    this.name = "QueueError"
   }
 }
 
 export class QueueConnectionError extends QueueError {
   constructor(message: string, cause?: Error) {
     super(message, cause)
-    this.name = 'QueueConnectionError'
+    this.name = "QueueConnectionError"
   }
 }
 
 export class QueuePublishError extends QueueError {
   constructor(message: string, cause?: Error) {
     super(message, cause)
-    this.name = 'QueuePublishError'
+    this.name = "QueuePublishError"
   }
 }
 
 export class QueueConsumeError extends QueueError {
   constructor(message: string, cause?: Error) {
     super(message, cause)
-    this.name = 'QueueConsumeError'
+    this.name = "QueueConsumeError"
   }
 }
 

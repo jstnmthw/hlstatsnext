@@ -35,7 +35,7 @@ describe("EventBus", () => {
       eventBus.on(EventType.PLAYER_KILL, handler2)
 
       expect(id1).toBeDefined()
-      
+
       const stats = eventBus.getStats()
       expect(stats.totalHandlers).toBe(2)
       expect(stats.handlersByType.get(EventType.PLAYER_KILL)).toBe(2)
@@ -118,14 +118,12 @@ describe("EventBus", () => {
 
       eventBus.on(EventType.PLAYER_KILL, failingHandler)
       eventBus.on(EventType.PLAYER_KILL, successHandler)
-      
+
       await eventBus.emit(event)
 
       expect(failingHandler).toHaveBeenCalled()
       expect(successHandler).toHaveBeenCalled()
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("Handler failed")
-      )
+      expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining("Handler failed"))
 
       const stats = eventBus.getStats()
       expect(stats.errors).toBe(1)
@@ -141,7 +139,7 @@ describe("EventBus", () => {
       }
 
       eventBus.on(EventType.ROUND_START, handler)
-      
+
       await eventBus.emit(event)
       await eventBus.emit(event)
       await eventBus.emit(event)
@@ -161,7 +159,7 @@ describe("EventBus", () => {
       await eventBus.emit(event)
 
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        "No handlers registered for event type: SERVER_SHUTDOWN"
+        "No handlers registered for event type: SERVER_SHUTDOWN",
       )
     })
   })
@@ -183,7 +181,7 @@ describe("EventBus", () => {
     it("should not affect other handlers when unregistering", () => {
       const handler1 = vi.fn()
       const handler2 = vi.fn()
-      
+
       const id1 = eventBus.on(EventType.PLAYER_KILL, handler1)
       eventBus.on(EventType.PLAYER_KILL, handler2)
 
@@ -196,9 +194,9 @@ describe("EventBus", () => {
 
     it("should handle unregistering non-existent handler", () => {
       eventBus.off("non-existent-id")
-      
+
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        "Attempted to unregister unknown handler: non-existent-id"
+        "Attempted to unregister unknown handler: non-existent-id",
       )
     })
   })
@@ -234,7 +232,7 @@ describe("EventBus", () => {
     it("should return accurate statistics", async () => {
       const handler1 = vi.fn().mockResolvedValue(undefined)
       const handler2 = vi.fn().mockRejectedValue(new Error("Test error"))
-      
+
       eventBus.on(EventType.PLAYER_CONNECT, handler1)
       eventBus.on(EventType.PLAYER_KILL, handler1)
       eventBus.on(EventType.PLAYER_KILL, handler2)

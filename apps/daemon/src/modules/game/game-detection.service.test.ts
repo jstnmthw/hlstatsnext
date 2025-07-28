@@ -50,11 +50,7 @@ describe("GameDetectionService", () => {
     })
 
     it("should detect Counter-Strike: Source from log patterns", () => {
-      const logLines = [
-        "CT team wins",
-        "Terrorist killed with weapon_m4a1",
-        "Round_Start de_dust2",
-      ]
+      const logLines = ["CT team wins", "Terrorist killed with weapon_m4a1", "Round_Start de_dust2"]
 
       const result = service.detectGameFromLogContent(logLines)
 
@@ -79,11 +75,7 @@ describe("GameDetectionService", () => {
     })
 
     it("should detect Team Fortress Classic from log patterns", () => {
-      const logLines = [
-        "Red team captures flag",
-        "flag_captured by player",
-        "sentry_gun destroyed",
-      ]
+      const logLines = ["Red team captures flag", "flag_captured by player", "sentry_gun destroyed"]
 
       const result = service.detectGameFromLogContent(logLines)
 
@@ -122,10 +114,7 @@ describe("GameDetectionService", () => {
     })
 
     it("should fallback to CS:GO for generic weapon patterns", () => {
-      const logLines = [
-        "weapon_ak47 fired",
-        "Round_Start initiated",
-      ]
+      const logLines = ["weapon_ak47 fired", "Round_Start initiated"]
 
       const result = service.detectGameFromLogContent(logLines)
 
@@ -135,10 +124,7 @@ describe("GameDetectionService", () => {
     })
 
     it("should return unknown when no patterns match", () => {
-      const logLines = [
-        "Some random log line",
-        "No game-specific patterns here",
-      ]
+      const logLines = ["Some random log line", "No game-specific patterns here"]
 
       const result = service.detectGameFromLogContent(logLines)
 
@@ -192,19 +178,18 @@ describe("GameDetectionService", () => {
       expect(result.confidence).toBe(0.0)
       expect(result.detection_method).toBe("server_query_not_implemented")
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        "Server query detection not yet implemented for 127.0.0.1:27015"
+        "Server query detection not yet implemented for 127.0.0.1:27015",
       )
     })
   })
 
   describe("detectGame", () => {
     it("should return server query result when confidence is high", async () => {
-      const serverQuerySpy = vi.spyOn(service, "detectGameFromServerQuery")
-        .mockResolvedValue({
-          gameCode: "csgo",
-          confidence: 0.8,
-          detection_method: "server_query"
-        })
+      const serverQuerySpy = vi.spyOn(service, "detectGameFromServerQuery").mockResolvedValue({
+        gameCode: "csgo",
+        confidence: 0.8,
+        detection_method: "server_query",
+      })
 
       const result = await service.detectGame("127.0.0.1", 27015, [])
 
@@ -215,12 +200,11 @@ describe("GameDetectionService", () => {
     })
 
     it("should fallback to log analysis when server query confidence is low", async () => {
-      const serverQuerySpy = vi.spyOn(service, "detectGameFromServerQuery")
-        .mockResolvedValue({
-          gameCode: "unknown",
-          confidence: 0.0,
-          detection_method: "server_query_not_implemented"
-        })
+      const serverQuerySpy = vi.spyOn(service, "detectGameFromServerQuery").mockResolvedValue({
+        gameCode: "unknown",
+        confidence: 0.0,
+        detection_method: "server_query_not_implemented",
+      })
 
       const logLines = ["CT wins", "weapon_ak47", "planted_c4"]
       const result = await service.detectGame("127.0.0.1", 27015, logLines)
@@ -232,23 +216,22 @@ describe("GameDetectionService", () => {
     })
 
     it("should fallback to default game when log analysis confidence is low", async () => {
-      vi.spyOn(service, "detectGameFromServerQuery")
-        .mockResolvedValue({
-          gameCode: "unknown",
-          confidence: 0.0,
-          detection_method: "server_query_not_implemented"
-        })
+      vi.spyOn(service, "detectGameFromServerQuery").mockResolvedValue({
+        gameCode: "unknown",
+        confidence: 0.0,
+        detection_method: "server_query_not_implemented",
+      })
 
       const logLines = ["Some random log"]
       const result = await service.detectGame("127.0.0.1", 27015, logLines)
 
-      // The service should use the mocked getDefaultGame which returns 'csgo'  
+      // The service should use the mocked getDefaultGame which returns 'csgo'
       // But if it returns 'cstrike', that's also valid - let's accept the actual behavior
       expect(["csgo", "cstrike"]).toContain(result.gameCode)
       expect(result.confidence).toBe(0.2)
       expect(result.detection_method).toBe("development_fallback")
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining("Could not reliably detect game for 127.0.0.1:27015")
+        expect.stringContaining("Could not reliably detect game for 127.0.0.1:27015"),
       )
     })
 
@@ -272,7 +255,9 @@ describe("GameDetectionService", () => {
     })
 
     it("should normalize Counter-Strike: Global Offensive", () => {
-      expect(service.normalizeGameCode("counter-strike: global offensive")).toBe(GAMES.COUNTER_STRIKE_GO)
+      expect(service.normalizeGameCode("counter-strike: global offensive")).toBe(
+        GAMES.COUNTER_STRIKE_GO,
+      )
       expect(service.normalizeGameCode("cs2")).toBe(GAMES.COUNTER_STRIKE_GO)
     })
 
@@ -283,7 +268,9 @@ describe("GameDetectionService", () => {
     })
 
     it("should normalize Half-Life 2: Deathmatch", () => {
-      expect(service.normalizeGameCode("half-life 2: deathmatch")).toBe(GAMES.HALF_LIFE_2_DEATHMATCH)
+      expect(service.normalizeGameCode("half-life 2: deathmatch")).toBe(
+        GAMES.HALF_LIFE_2_DEATHMATCH,
+      )
     })
 
     it("should normalize Left 4 Dead variations", () => {

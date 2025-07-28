@@ -21,7 +21,7 @@ export type {
   MessageValidator,
   HealthCheckResult,
   QueueHealthConfig,
-} from './queue.types'
+} from "./queue.types"
 
 export {
   MessagePriority,
@@ -29,18 +29,18 @@ export {
   QueueConnectionError,
   QueuePublishError,
   QueueConsumeError,
-} from './queue.types'
+} from "./queue.types"
 
 // Core implementations
-export { RabbitMQClient } from './rabbitmq.client'
-export { EventPublisher, defaultRoutingKeyMapper, defaultPriorityMapper } from './event-publisher'
-export { 
-  EventConsumer, 
-  defaultConsumerConfig, 
+export { RabbitMQClient } from "./rabbitmq.client"
+export { EventPublisher, defaultRoutingKeyMapper, defaultPriorityMapper } from "./event-publisher"
+export {
+  EventConsumer,
+  defaultConsumerConfig,
   defaultMessageValidator,
   type IEventProcessor,
   type ConsumerConfig,
-} from './event-consumer'
+} from "./event-consumer"
 
 // Utilities
 export {
@@ -57,16 +57,16 @@ export {
   formatDuration,
   safeJsonStringify,
   safeJsonParse,
-} from './utils'
+} from "./utils"
 
 // Migration support
-export { 
-  DualEventPublisher, 
-  defaultDualPublisherConfig, 
+export {
+  DualEventPublisher,
+  defaultDualPublisherConfig,
   createDualEventPublisher,
   type DualPublisherConfig,
   type DualPublisherStats,
-} from './dual-event-publisher'
+} from "./dual-event-publisher"
 
 export {
   ShadowConsumer,
@@ -74,7 +74,7 @@ export {
   createShadowConsumer,
   type ShadowConsumerConfig,
   type ShadowConsumerStats,
-} from './shadow-consumer'
+} from "./shadow-consumer"
 
 // Dependency injection module
 export {
@@ -84,7 +84,7 @@ export {
   createDevelopmentRabbitMQConfig,
   type QueueModuleConfig,
   type QueueModuleStatus,
-} from './queue.module'
+} from "./queue.module"
 
 // Adapters (typically not needed by consumers)
-export { AmqpChannelAdapter, AmqpConnectionAdapter } from './adapters'
+export { AmqpChannelAdapter, AmqpConnectionAdapter } from "./adapters"

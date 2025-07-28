@@ -13,15 +13,12 @@ import type {
   MessageMetadata,
   RoutingKeyMapper,
   PriorityMapper,
-} from './queue.types'
-import {
-  MessagePriority,
-  QueuePublishError,
-} from './queue.types'
-import type { BaseEvent } from '@/shared/types/events'
-import { EventType } from '@/shared/types/events'
-import type { ILogger } from '@/shared/utils/logger.types'
-import { generateMessageId, generateCorrelationId } from './utils'
+} from "./queue.types"
+import { MessagePriority, QueuePublishError } from "./queue.types"
+import type { BaseEvent } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { generateMessageId, generateCorrelationId } from "./utils"
 
 /**
  * Event publisher for RabbitMQ with comprehensive message handling
@@ -47,7 +44,7 @@ export class EventPublisher implements IEventPublisher {
       await this.ensureChannel()
 
       const published = this.channel!.publish(
-        'hlstats.events',
+        "hlstats.events",
         routingKey,
         Buffer.from(JSON.stringify(message)),
         {
@@ -56,28 +53,32 @@ export class EventPublisher implements IEventPublisher {
           messageId: message.id,
           timestamp: Date.now(),
           headers: {
-            'x-correlation-id': message.correlationId,
-            'x-event-type': event.eventType,
-            'x-server-id': event.serverId,
-            'x-routing-key': routingKey,
+            "x-correlation-id": message.correlationId,
+            "x-event-type": event.eventType,
+            "x-server-id": event.serverId,
+            "x-routing-key": routingKey,
           },
         },
       )
 
       if (!published) {
-        throw new QueuePublishError('Channel buffer full - message not published')
+        throw new QueuePublishError("Channel buffer full - message not published")
       }
 
       this.publishedCount++
 
-      this.logger.debug(`Event published successfully: messageId=${message.id}, eventType=${event.eventType}, routingKey=${routingKey}, priority=${priority}, serverId=${event.serverId}`)
+      this.logger.debug(
+        `Event published successfully: messageId=${message.id}, eventType=${event.eventType}, routingKey=${routingKey}, priority=${priority}, serverId=${event.serverId}`,
+      )
     } catch (error) {
       this.failedCount++
-      
-      this.logger.error(`Failed to publish event ${event.eventType} to ${routingKey}: ${error instanceof Error ? error.message : String(error)}`)
 
-      throw error instanceof QueuePublishError 
-        ? error 
+      this.logger.error(
+        `Failed to publish event ${event.eventType} to ${routingKey}: ${error instanceof Error ? error.message : String(error)}`,
+      )
+
+      throw error instanceof QueuePublishError
+        ? error
         : new QueuePublishError(`Failed to publish ${event.eventType}`, error as Error)
     }
   }
@@ -94,16 +95,20 @@ export class EventPublisher implements IEventPublisher {
     const batchSize = 50 // Process in chunks of 50
     for (let i = 0; i < events.length; i += batchSize) {
       const chunk = events.slice(i, i + batchSize)
-      
+
       try {
-        await Promise.all(chunk.map(event => this.publish(event)))
+        await Promise.all(chunk.map((event) => this.publish(event)))
       } catch (error) {
-        this.logger.error(`Batch publish failed at chunk ${Math.floor(i / batchSize) + 1} (batchId: ${batchId}, chunkStart: ${i}, chunkSize: ${chunk.length}): ${error instanceof Error ? error.message : String(error)}`)
+        this.logger.error(
+          `Batch publish failed at chunk ${Math.floor(i / batchSize) + 1} (batchId: ${batchId}, chunkStart: ${i}, chunkSize: ${chunk.length}): ${error instanceof Error ? error.message : String(error)}`,
+        )
         throw error
       }
     }
 
-    this.logger.info(`Successfully published batch of ${events.length} events (batchId: ${batchId})`)
+    this.logger.info(
+      `Successfully published batch of ${events.length} events (batchId: ${batchId})`,
+    )
   }
 
   /**
@@ -118,7 +123,7 @@ export class EventPublisher implements IEventPublisher {
 
   private async ensureChannel(): Promise<void> {
     if (!this.channel) {
-      this.channel = await this.client.createChannel('publisher')
+      this.channel = await this.client.createChannel("publisher")
     }
   }
 
@@ -130,7 +135,7 @@ export class EventPublisher implements IEventPublisher {
     const metadata: MessageMetadata = {
       source: {
         serverId: event.serverId,
-        serverAddress: event.serverAddress ?? 'unknown',
+        serverAddress: event.serverAddress ?? "unknown",
         serverPort: event.serverPort ?? 0,
       },
       routing: {
@@ -146,7 +151,7 @@ export class EventPublisher implements IEventPublisher {
 
     return {
       id: generateMessageId(),
-      version: '1.0',
+      version: "1.0",
       timestamp: new Date().toISOString(),
       correlationId,
       metadata,
@@ -161,55 +166,55 @@ export class EventPublisher implements IEventPublisher {
 export function defaultRoutingKeyMapper(event: BaseEvent): string {
   const routingMap: Record<EventType, string> = {
     // Player events
-    [EventType.PLAYER_KILL]: 'player.kill',
-    [EventType.PLAYER_DEATH]: 'player.death',
-    [EventType.PLAYER_SUICIDE]: 'player.suicide',
-    [EventType.PLAYER_TEAMKILL]: 'player.teamkill',
-    [EventType.PLAYER_CONNECT]: 'player.connect',
-    [EventType.PLAYER_DISCONNECT]: 'player.disconnect',
-    [EventType.PLAYER_ENTRY]: 'player.entry',
-    [EventType.PLAYER_CHANGE_TEAM]: 'player.change.team',
-    [EventType.PLAYER_CHANGE_ROLE]: 'player.change.role',
-    [EventType.PLAYER_CHANGE_NAME]: 'player.change.name',
-    [EventType.PLAYER_DAMAGE]: 'player.damage',
+    [EventType.PLAYER_KILL]: "player.kill",
+    [EventType.PLAYER_DEATH]: "player.death",
+    [EventType.PLAYER_SUICIDE]: "player.suicide",
+    [EventType.PLAYER_TEAMKILL]: "player.teamkill",
+    [EventType.PLAYER_CONNECT]: "player.connect",
+    [EventType.PLAYER_DISCONNECT]: "player.disconnect",
+    [EventType.PLAYER_ENTRY]: "player.entry",
+    [EventType.PLAYER_CHANGE_TEAM]: "player.change.team",
+    [EventType.PLAYER_CHANGE_ROLE]: "player.change.role",
+    [EventType.PLAYER_CHANGE_NAME]: "player.change.name",
+    [EventType.PLAYER_DAMAGE]: "player.damage",
 
     // Action events
-    [EventType.ACTION_PLAYER]: 'action.player',
-    [EventType.ACTION_PLAYER_PLAYER]: 'action.player.player',
-    [EventType.ACTION_TEAM]: 'action.team',
-    [EventType.ACTION_WORLD]: 'action.world',
+    [EventType.ACTION_PLAYER]: "action.player",
+    [EventType.ACTION_PLAYER_PLAYER]: "action.player.player",
+    [EventType.ACTION_TEAM]: "action.team",
+    [EventType.ACTION_WORLD]: "action.world",
 
     // Match events
-    [EventType.ROUND_START]: 'round.start',
-    [EventType.ROUND_END]: 'round.end',
-    [EventType.TEAM_WIN]: 'team.win',
-    [EventType.MAP_CHANGE]: 'map.change',
+    [EventType.ROUND_START]: "round.start",
+    [EventType.ROUND_END]: "round.end",
+    [EventType.TEAM_WIN]: "team.win",
+    [EventType.MAP_CHANGE]: "map.change",
 
     // Objective events
-    [EventType.BOMB_PLANT]: 'bomb.plant',
-    [EventType.BOMB_DEFUSE]: 'bomb.defuse',
-    [EventType.BOMB_EXPLODE]: 'bomb.explode',
-    [EventType.HOSTAGE_RESCUE]: 'hostage.rescue',
-    [EventType.HOSTAGE_TOUCH]: 'hostage.touch',
-    [EventType.FLAG_CAPTURE]: 'flag.capture',
-    [EventType.FLAG_DEFEND]: 'flag.defend',
-    [EventType.FLAG_PICKUP]: 'flag.pickup',
-    [EventType.FLAG_DROP]: 'flag.drop',
-    [EventType.CONTROL_POINT_CAPTURE]: 'control.capture',
-    [EventType.CONTROL_POINT_DEFEND]: 'control.defend',
+    [EventType.BOMB_PLANT]: "bomb.plant",
+    [EventType.BOMB_DEFUSE]: "bomb.defuse",
+    [EventType.BOMB_EXPLODE]: "bomb.explode",
+    [EventType.HOSTAGE_RESCUE]: "hostage.rescue",
+    [EventType.HOSTAGE_TOUCH]: "hostage.touch",
+    [EventType.FLAG_CAPTURE]: "flag.capture",
+    [EventType.FLAG_DEFEND]: "flag.defend",
+    [EventType.FLAG_PICKUP]: "flag.pickup",
+    [EventType.FLAG_DROP]: "flag.drop",
+    [EventType.CONTROL_POINT_CAPTURE]: "control.capture",
+    [EventType.CONTROL_POINT_DEFEND]: "control.defend",
 
     // Weapon events
-    [EventType.WEAPON_FIRE]: 'weapon.fire',
-    [EventType.WEAPON_HIT]: 'weapon.hit',
+    [EventType.WEAPON_FIRE]: "weapon.fire",
+    [EventType.WEAPON_HIT]: "weapon.hit",
 
     // System events
-    [EventType.SERVER_SHUTDOWN]: 'server.shutdown',
-    [EventType.SERVER_STATS_UPDATE]: 'server.stats',
-    [EventType.ADMIN_ACTION]: 'admin.action',
-    [EventType.CHAT_MESSAGE]: 'chat.message',
+    [EventType.SERVER_SHUTDOWN]: "server.shutdown",
+    [EventType.SERVER_STATS_UPDATE]: "server.stats",
+    [EventType.ADMIN_ACTION]: "admin.action",
+    [EventType.CHAT_MESSAGE]: "chat.message",
   }
 
-  return routingMap[event.eventType] ?? 'unknown'
+  return routingMap[event.eventType] ?? "unknown"
 }
 
 /**

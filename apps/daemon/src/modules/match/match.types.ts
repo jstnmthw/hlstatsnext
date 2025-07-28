@@ -237,7 +237,7 @@ export interface IMatchService {
   // MVP calculations
   calculateMatchMVP(serverId: number): Promise<number | undefined>
   calculatePlayerScore(stats: PlayerRoundStats): number
-  
+
   // Saga compensation methods
   compensateKillInMatch?(serverId: number, killerId: number, victimId: number): Promise<void>
 }

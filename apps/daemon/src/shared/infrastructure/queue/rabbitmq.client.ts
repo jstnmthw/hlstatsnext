@@ -5,20 +5,17 @@
  * topology setup, and error handling.
  */
 
-import * as amqp from 'amqplib'
+import * as amqp from "amqplib"
 import type {
   IQueueClient,
   QueueConnection,
   QueueChannel,
   RabbitMQConfig,
   ConnectionStats,
-} from './queue.types'
-import {
-  QueueConnectionError,
-  QueueError,
-} from './queue.types'
-import { AmqpConnectionAdapter } from './adapters'
-import type { ILogger } from '@/shared/utils/logger.types'
+} from "./queue.types"
+import { QueueConnectionError, QueueError } from "./queue.types"
+import { AmqpConnectionAdapter } from "./adapters"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 /**
  * RabbitMQ client implementation with connection management and topology setup
@@ -44,11 +41,11 @@ export class RabbitMQClient implements IQueueClient {
 
   async connect(): Promise<void> {
     if (this.isConnecting) {
-      throw new QueueError('Connection already in progress')
+      throw new QueueError("Connection already in progress")
     }
 
     if (this.connection) {
-      throw new QueueError('Already connected')
+      throw new QueueError("Already connected")
     }
 
     this.isConnecting = true
@@ -61,11 +58,11 @@ export class RabbitMQClient implements IQueueClient {
       this.reconnectAttempts = 0
       this.isConnecting = false
 
-      this.logger.info('RabbitMQ connection established successfully')
+      this.logger.info("RabbitMQ connection established successfully")
     } catch (error) {
       this.isConnecting = false
       this.logger.error(`Failed to establish RabbitMQ connection: ${error}`)
-      throw new QueueConnectionError('RabbitMQ connection failed', error as Error)
+      throw new QueueConnectionError("RabbitMQ connection failed", error as Error)
     }
   }
 
@@ -92,16 +89,16 @@ export class RabbitMQClient implements IQueueClient {
       this.connectionStats.connected = false
       this.connectionStartTime = null
 
-      this.logger.info('RabbitMQ connection closed')
+      this.logger.info("RabbitMQ connection closed")
     } catch (error) {
       this.logger.error(`Error during RabbitMQ disconnection: ${error}`)
-      throw new QueueError('Failed to disconnect', error as Error)
+      throw new QueueError("Failed to disconnect", error as Error)
     }
   }
 
   async createChannel(name: string): Promise<QueueChannel> {
     if (!this.connection) {
-      throw new QueueError('No active connection')
+      throw new QueueError("No active connection")
     }
 
     if (this.channels.has(name)) {
@@ -111,7 +108,7 @@ export class RabbitMQClient implements IQueueClient {
     try {
       const channel = await this.connection.createChannel()
       await channel.prefetch(this.config.prefetchCount)
-      
+
       this.channels.set(name, channel)
       this.connectionStats.channelsCount = this.channels.size
 
@@ -140,7 +137,9 @@ export class RabbitMQClient implements IQueueClient {
 
     for (let attempt = 1; attempt <= this.config.connectionRetry.maxAttempts; attempt++) {
       try {
-        this.logger.debug(`Connection attempt ${attempt}/${this.config.connectionRetry.maxAttempts}`)
+        this.logger.debug(
+          `Connection attempt ${attempt}/${this.config.connectionRetry.maxAttempts}`,
+        )
 
         const amqpConnection = await amqp.connect(this.config.url, {
           heartbeat: this.config.heartbeatInterval,
@@ -175,24 +174,24 @@ export class RabbitMQClient implements IQueueClient {
   private setupConnectionEventHandlers(): void {
     if (!this.connection) return
 
-    this.connection.on('error', (error) => {
+    this.connection.on("error", (error) => {
       this.logger.error(`RabbitMQ connection error: ${error}`)
       this.connectionStats.connected = false
       this.handleConnectionError(error as Error)
     })
 
-    this.connection.on('close', () => {
-      this.logger.warn('RabbitMQ connection closed unexpectedly')
+    this.connection.on("close", () => {
+      this.logger.warn("RabbitMQ connection closed unexpectedly")
       this.connectionStats.connected = false
       this.handleConnectionClose()
     })
 
-    this.connection.on('blocked', (reason) => {
+    this.connection.on("blocked", (reason) => {
       this.logger.warn(`RabbitMQ connection blocked: ${reason}`)
     })
 
-    this.connection.on('unblocked', () => {
-      this.logger.info('RabbitMQ connection unblocked')
+    this.connection.on("unblocked", () => {
+      this.logger.info("RabbitMQ connection unblocked")
     })
   }
 
@@ -200,7 +199,7 @@ export class RabbitMQClient implements IQueueClient {
     this.logger.error(`Handling connection error: ${error}`)
     this.connection = null
     this.channels.clear()
-    
+
     // Attempt to reconnect
     if (this.reconnectAttempts < this.config.connectionRetry.maxAttempts) {
       this.reconnectAttempts++
@@ -208,9 +207,9 @@ export class RabbitMQClient implements IQueueClient {
         this.config.connectionRetry.initialDelay * Math.pow(2, this.reconnectAttempts - 1),
         this.config.connectionRetry.maxDelay,
       )
-      
+
       this.logger.info(`Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts})`)
-      
+
       setTimeout(async () => {
         try {
           await this.connect()
@@ -219,7 +218,7 @@ export class RabbitMQClient implements IQueueClient {
         }
       }, delay)
     } else {
-      this.logger.error('Maximum reconnection attempts reached')
+      this.logger.error("Maximum reconnection attempts reached")
     }
   }
 
@@ -227,63 +226,63 @@ export class RabbitMQClient implements IQueueClient {
     this.connection = null
     this.channels.clear()
     this.connectionStats.channelsCount = 0
-    
+
     // Attempt reconnection
-    await this.handleConnectionError(new Error('Connection closed'))
+    await this.handleConnectionError(new Error("Connection closed"))
   }
 
   private async setupTopology(): Promise<void> {
     if (!this.connection) {
-      throw new QueueError('Cannot setup topology without connection')
+      throw new QueueError("Cannot setup topology without connection")
     }
 
-    const setupChannel = await this.createChannel('topology-setup')
+    const setupChannel = await this.createChannel("topology-setup")
 
     try {
       // Create exchanges
-      await setupChannel.assertExchange('hlstats.events', 'topic', {
+      await setupChannel.assertExchange("hlstats.events", "topic", {
         durable: true,
         autoDelete: false,
       })
 
-      await setupChannel.assertExchange('hlstats.events.dlx', 'topic', {
+      await setupChannel.assertExchange("hlstats.events.dlx", "topic", {
         durable: true,
         autoDelete: false,
       })
 
       // Create priority queue
-      await setupChannel.assertQueue('hlstats.events.priority', {
+      await setupChannel.assertQueue("hlstats.events.priority", {
         durable: true,
         autoDelete: false,
         arguments: {
-          'x-dead-letter-exchange': 'hlstats.events.dlx',
-          'x-message-ttl': 3600000, // 1 hour
-          'x-max-priority': 10,
+          "x-dead-letter-exchange": "hlstats.events.dlx",
+          "x-message-ttl": 3600000, // 1 hour
+          "x-max-priority": 10,
         },
       })
 
       // Create standard queue
-      await setupChannel.assertQueue('hlstats.events.standard', {
+      await setupChannel.assertQueue("hlstats.events.standard", {
         durable: true,
         autoDelete: false,
         arguments: {
-          'x-dead-letter-exchange': 'hlstats.events.dlx',
-          'x-message-ttl': 3600000, // 1 hour
+          "x-dead-letter-exchange": "hlstats.events.dlx",
+          "x-message-ttl": 3600000, // 1 hour
         },
       })
 
       // Create bulk queue
-      await setupChannel.assertQueue('hlstats.events.bulk', {
+      await setupChannel.assertQueue("hlstats.events.bulk", {
         durable: true,
         autoDelete: false,
         arguments: {
-          'x-dead-letter-exchange': 'hlstats.events.dlx',
-          'x-message-ttl': 3600000, // 1 hour
+          "x-dead-letter-exchange": "hlstats.events.dlx",
+          "x-message-ttl": 3600000, // 1 hour
         },
       })
 
       // Create dead letter queue
-      await setupChannel.assertQueue('hlstats.events.dlq', {
+      await setupChannel.assertQueue("hlstats.events.dlq", {
         durable: true,
         autoDelete: false,
       })
@@ -291,64 +290,60 @@ export class RabbitMQClient implements IQueueClient {
       // Create bindings
       await this.createBindings(setupChannel)
 
-      this.logger.info('RabbitMQ topology setup completed')
+      this.logger.info("RabbitMQ topology setup completed")
     } finally {
       await setupChannel.close()
-      this.channels.delete('topology-setup')
+      this.channels.delete("topology-setup")
     }
   }
 
   private async createBindings(channel: QueueChannel): Promise<void> {
     // Priority queue bindings (high-priority events)
     const priorityBindings = [
-      'player.kill',
-      'player.suicide',
-      'player.teamkill',
-      'round.start',
-      'round.end',
-      'bomb.*',
-      'hostage.*',
-      'flag.*',
-      'control.*',
+      "player.kill",
+      "player.suicide",
+      "player.teamkill",
+      "round.start",
+      "round.end",
+      "bomb.*",
+      "hostage.*",
+      "flag.*",
+      "control.*",
     ]
 
     for (const binding of priorityBindings) {
-      await channel.bindQueue('hlstats.events.priority', 'hlstats.events', binding)
+      await channel.bindQueue("hlstats.events.priority", "hlstats.events", binding)
     }
 
     // Standard queue bindings (normal events)
     const standardBindings = [
-      'player.connect',
-      'player.disconnect',
-      'player.change.*',
-      'chat.*',
-      'admin.*',
-      'team.*',
-      'map.*',
+      "player.connect",
+      "player.disconnect",
+      "player.change.*",
+      "chat.*",
+      "admin.*",
+      "team.*",
+      "map.*",
     ]
 
     for (const binding of standardBindings) {
-      await channel.bindQueue('hlstats.events.standard', 'hlstats.events', binding)
+      await channel.bindQueue("hlstats.events.standard", "hlstats.events", binding)
     }
 
     // Bulk queue bindings (high-volume events)
-    const bulkBindings = [
-      'weapon.*',
-      'action.*',
-      'stats.*',
-    ]
+    const bulkBindings = ["weapon.*", "action.*", "stats.*"]
 
     for (const binding of bulkBindings) {
-      await channel.bindQueue('hlstats.events.bulk', 'hlstats.events', binding)
+      await channel.bindQueue("hlstats.events.bulk", "hlstats.events", binding)
     }
 
     // Dead letter queue binding
-    await channel.bindQueue('hlstats.events.dlq', 'hlstats.events.dlx', '#')
+    await channel.bindQueue("hlstats.events.dlq", "hlstats.events.dlx", "#")
 
-    this.logger.debug('Queue bindings created successfully')
+    this.logger.debug("Queue bindings created successfully")
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise((resolve) => setTimeout(resolve, ms))
   }
 }

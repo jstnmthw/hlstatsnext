@@ -4,7 +4,7 @@
  * Wraps amqplib types to match our queue interfaces
  */
 
-import type * as amqp from 'amqplib'
+import type * as amqp from "amqplib"
 import type {
   QueueChannel,
   QueueConnection,
@@ -13,7 +13,7 @@ import type {
   ConsumeOptions,
   AssertExchangeOptions,
   AssertQueueOptions,
-} from './queue.types'
+} from "./queue.types"
 
 /**
  * Adapter class that wraps amqplib Channel to match our QueueChannel interface
@@ -21,37 +21,50 @@ import type {
 export class AmqpChannelAdapter implements QueueChannel {
   constructor(private readonly channel: amqp.Channel) {}
 
-  publish(exchange: string, routingKey: string, content: Buffer, options?: PublishOptions): boolean {
+  publish(
+    exchange: string,
+    routingKey: string,
+    content: Buffer,
+    options?: PublishOptions,
+  ): boolean {
     return this.channel.publish(exchange, routingKey, content, options)
   }
 
-  async consume(queue: string, onMessage: (msg: ConsumeMessage | null) => void, options?: ConsumeOptions): Promise<string> {
-    const result = await this.channel.consume(queue, (msg: amqp.ConsumeMessage | null) => {
-      if (msg) {
-        const adaptedMsg: ConsumeMessage = {
-          content: msg.content,
-          fields: {
-            deliveryTag: msg.fields.deliveryTag,
-            redelivered: msg.fields.redelivered,
-            exchange: msg.fields.exchange,
-            routingKey: msg.fields.routingKey,
-          },
-          properties: {
-            messageId: msg.properties.messageId,
-            timestamp: msg.properties.timestamp,
-            headers: msg.properties.headers,
-            correlationId: msg.properties.correlationId,
-            replyTo: msg.properties.replyTo,
-            expiration: msg.properties.expiration,
-            priority: msg.properties.priority,
-          },
+  async consume(
+    queue: string,
+    onMessage: (msg: ConsumeMessage | null) => void,
+    options?: ConsumeOptions,
+  ): Promise<string> {
+    const result = await this.channel.consume(
+      queue,
+      (msg: amqp.ConsumeMessage | null) => {
+        if (msg) {
+          const adaptedMsg: ConsumeMessage = {
+            content: msg.content,
+            fields: {
+              deliveryTag: msg.fields.deliveryTag,
+              redelivered: msg.fields.redelivered,
+              exchange: msg.fields.exchange,
+              routingKey: msg.fields.routingKey,
+            },
+            properties: {
+              messageId: msg.properties.messageId,
+              timestamp: msg.properties.timestamp,
+              headers: msg.properties.headers,
+              correlationId: msg.properties.correlationId,
+              replyTo: msg.properties.replyTo,
+              expiration: msg.properties.expiration,
+              priority: msg.properties.priority,
+            },
+          }
+          onMessage(adaptedMsg)
+        } else {
+          onMessage(null)
         }
-        onMessage(adaptedMsg)
-      } else {
-        onMessage(null)
-      }
-    }, options)
-    
+      },
+      options,
+    )
+
     return result.consumerTag
   }
 
@@ -66,7 +79,7 @@ export class AmqpChannelAdapter implements QueueChannel {
       fields: message.fields,
       properties: message.properties,
     } as amqp.ConsumeMessage
-    
+
     this.channel.ack(amqpMessage)
   }
 
@@ -77,7 +90,7 @@ export class AmqpChannelAdapter implements QueueChannel {
       fields: message.fields,
       properties: message.properties,
     } as amqp.ConsumeMessage
-    
+
     this.channel.nack(amqpMessage, allUpTo, requeue)
   }
 
@@ -85,7 +98,11 @@ export class AmqpChannelAdapter implements QueueChannel {
     await this.channel.prefetch(count)
   }
 
-  async assertExchange(exchange: string, type: string, options?: AssertExchangeOptions): Promise<void> {
+  async assertExchange(
+    exchange: string,
+    type: string,
+    options?: AssertExchangeOptions,
+  ): Promise<void> {
     await this.channel.assertExchange(exchange, type, options)
   }
 
@@ -109,7 +126,9 @@ export class AmqpConnectionAdapter implements QueueConnection {
   constructor(private readonly connection: amqp.Connection) {}
 
   async createChannel(): Promise<QueueChannel> {
-    const channel = await (this.connection as unknown as { createChannel(): Promise<amqp.Channel> }).createChannel()
+    const channel = await (
+      this.connection as unknown as { createChannel(): Promise<amqp.Channel> }
+    ).createChannel()
     return new AmqpChannelAdapter(channel)
   }
 

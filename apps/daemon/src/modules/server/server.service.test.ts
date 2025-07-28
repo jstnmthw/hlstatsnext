@@ -105,7 +105,9 @@ describe("ServerService", () => {
       const port = 27015
       mockRepository.findByAddress.mockRejectedValue(new Error("Database error"))
 
-      await expect(serverService.getServerByAddress(address, port)).rejects.toThrow("Database error")
+      await expect(serverService.getServerByAddress(address, port)).rejects.toThrow(
+        "Database error",
+      )
       expect(mockRepository.findByAddress).toHaveBeenCalledWith(address, port)
     })
 

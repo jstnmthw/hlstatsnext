@@ -25,7 +25,7 @@ export interface IRankingService {
     context: KillContext,
   ): Promise<{ killerChange: number; victimChange: number }>
   calculateSuicidePenalty(): number
-  
+
   // Saga methods for snapshot and compensation
   getCurrentRankings?(playerIds: number[]): Promise<SkillRating[]>
   restoreRankings?(rankings: SkillRating[]): Promise<void>

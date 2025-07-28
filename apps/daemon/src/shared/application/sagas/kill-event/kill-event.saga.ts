@@ -1,6 +1,6 @@
 /**
  * Kill Event Saga
- * 
+ *
  * Orchestrates the complex multi-module processing required for player kill events.
  * Ensures transactional consistency across player, weapon, match, and ranking modules
  * with proper compensation handling for failures.
@@ -66,12 +66,12 @@ export class PlayerKillStep implements SagaStep {
 
   async execute(context: SagaContext): Promise<void> {
     const event = context.originalEvent as PlayerKillEvent
-    
+
     // Store the result for potential compensation
     const result = await this.playerService.handleKillEvent(event)
     context.data.playerKillResult = result
     context.data.playerKillProcessed = true
-    
+
     this.logger.debug("Player kill step completed", {
       eventId: context.eventId,
       killerId: event.data?.killerId,
@@ -88,7 +88,7 @@ export class PlayerKillStep implements SagaStep {
       const event = context.originalEvent as PlayerKillEvent
       // Implement compensation logic - reverse the kill statistics
       await this.playerService.compensateKillEvent?.(event.data.killerId, event.data.victimId)
-      
+
       this.logger.debug("Player kill step compensated", {
         eventId: context.eventId,
       })
@@ -114,13 +114,15 @@ export class WeaponStatsStep implements SagaStep {
 
   async execute(context: SagaContext): Promise<void> {
     const event = context.originalEvent as WeaponEvent
-    
+
     await this.weaponService.handleWeaponEvent(event)
     context.data.weaponStatsProcessed = true
-    
+
     this.logger.debug("Weapon stats step completed", {
       eventId: context.eventId,
-      weapon: (event.data as Record<string, unknown>)?.weaponCode || (event.data as Record<string, unknown>)?.weapon,
+      weapon:
+        (event.data as Record<string, unknown>)?.weaponCode ||
+        (event.data as Record<string, unknown>)?.weapon,
     })
   }
 
@@ -133,7 +135,7 @@ export class WeaponStatsStep implements SagaStep {
       const event = context.originalEvent as WeaponEvent
       // Implement compensation logic - reverse weapon statistics
       await this.weaponService.compensateWeaponEvent?.(event.data.weaponCode, event.data.playerId)
-      
+
       this.logger.debug("Weapon stats step compensated", {
         eventId: context.eventId,
       })
@@ -159,10 +161,10 @@ export class MatchStatsStep implements SagaStep {
 
   async execute(context: SagaContext): Promise<void> {
     const event = context.originalEvent
-    
+
     await this.matchService.handleKillInMatch(event)
     context.data.matchStatsProcessed = true
-    
+
     this.logger.debug("Match stats step completed", {
       eventId: context.eventId,
       serverId: event.serverId,
@@ -178,8 +180,12 @@ export class MatchStatsStep implements SagaStep {
       const event = context.originalEvent
       // Implement compensation logic - reverse match statistics
       const killEvent = event as PlayerKillEvent
-      await this.matchService.compensateKillInMatch?.(event.serverId, killEvent.data.killerId, killEvent.data.victimId)
-      
+      await this.matchService.compensateKillInMatch?.(
+        event.serverId,
+        killEvent.data.killerId,
+        killEvent.data.victimId,
+      )
+
       this.logger.debug("Match stats step compensated", {
         eventId: context.eventId,
       })
@@ -209,10 +215,10 @@ export class RankingUpdateStep implements SagaStep {
     const playerIds = [killEvent.data.killerId, killEvent.data.victimId]
     const currentRankings = await this.rankingService.getCurrentRankings?.(playerIds)
     context.data.previousRankings = currentRankings
-    
+
     await this.rankingService.handleRatingUpdate()
     context.data.rankingUpdateProcessed = true
-    
+
     this.logger.debug("Ranking update step completed", {
       eventId: context.eventId,
     })
@@ -229,7 +235,7 @@ export class RankingUpdateStep implements SagaStep {
       if (previousRankings) {
         await this.rankingService.restoreRankings?.(previousRankings)
       }
-      
+
       this.logger.debug("Ranking update step compensated", {
         eventId: context.eventId,
       })

@@ -15,7 +15,7 @@ export interface IServerAuthenticator {
    * @returns Server ID if authenticated, null otherwise
    */
   authenticateServer(address: string, port: number): Promise<number | null>
-  
+
   /**
    * Cache a server ID for a given address and port
    */
@@ -40,15 +40,11 @@ export interface IServerInfoProvider {
    * Get the game type for a specific server
    */
   getServerGame(serverId: number): Promise<string>
-  
+
   /**
    * Find or create a server in development mode
    */
-  findOrCreateServer(
-    address: string,
-    port: number,
-    gameCode: string,
-  ): Promise<{ serverId: number }>
+  findOrCreateServer(address: string, port: number, gameCode: string): Promise<{ serverId: number }>
 }
 
 /**

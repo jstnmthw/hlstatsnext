@@ -5,7 +5,14 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { MatchService } from "./match.service"
 import { EventType } from "@/shared/types/events"
-import type { IMatchRepository, RoundStartEvent, RoundEndEvent, TeamWinEvent, MapChangeEvent, ObjectiveEvent } from "./match.types"
+import type {
+  IMatchRepository,
+  RoundStartEvent,
+  RoundEndEvent,
+  TeamWinEvent,
+  MapChangeEvent,
+  ObjectiveEvent,
+} from "./match.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
 
@@ -185,7 +192,9 @@ describe("MatchService", () => {
       expect(result.success).toBe(true)
       expect(mockRepository.updateBombStats).toHaveBeenCalledWith(1, "plant")
       expect(mockLogger.event).toHaveBeenCalledWith(
-        expect.stringContaining("Objective event on server 1: BOMB_PLANT by player 123 (+3 points)")
+        expect.stringContaining(
+          "Objective event on server 1: BOMB_PLANT by player 123 (+3 points)",
+        ),
       )
     })
 
@@ -220,7 +229,7 @@ describe("MatchService", () => {
 
       expect(result.success).toBe(true)
       expect(mockLogger.event).toHaveBeenCalledWith(
-        expect.stringContaining("Objective event on server 1: BOMB_EXPLODE")
+        expect.stringContaining("Objective event on server 1: BOMB_EXPLODE"),
       )
     })
 
@@ -249,7 +258,7 @@ describe("MatchService", () => {
         eventType: EventType.BOMB_PLANT,
         serverId: 1,
         timestamp: new Date(),
-        data: { 
+        data: {
           playerId: 123,
           team: "terrorist",
         },
@@ -279,7 +288,7 @@ describe("MatchService", () => {
 
       expect(result.success).toBe(true)
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        "Kill event processed in match: player 123 killed player 456 (headshot)"
+        "Kill event processed in match: player 123 killed player 456 (headshot)",
       )
     })
 
@@ -299,7 +308,7 @@ describe("MatchService", () => {
 
       expect(result.success).toBe(true)
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        "Kill event processed in match: player 123 killed player 456"
+        "Kill event processed in match: player 123 killed player 456",
       )
     })
 
@@ -343,7 +352,9 @@ describe("MatchService", () => {
       const map = await matchService.initializeMapForServer(2)
 
       expect(map).toBe("de_mirage")
-      expect(mockLogger.info).toHaveBeenCalledWith("Detected map from database for server 2: de_mirage")
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        "Detected map from database for server 2: de_mirage",
+      )
     })
 
     it("should use fallback when no map found", async () => {
@@ -352,7 +363,9 @@ describe("MatchService", () => {
       const map = await matchService.initializeMapForServer(3)
 
       expect(map).toBe("unknown")
-      expect(mockLogger.warn).toHaveBeenCalledWith("No map found for server 3 - using fallback: unknown")
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        "No map found for server 3 - using fallback: unknown",
+      )
     })
 
     it("should handle errors gracefully", async () => {
@@ -361,7 +374,9 @@ describe("MatchService", () => {
       const map = await matchService.initializeMapForServer(4)
 
       expect(map).toBe("unknown")
-      expect(mockLogger.error).toHaveBeenCalledWith("Failed to initialize map for server 4: Error: Database error")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        "Failed to initialize map for server 4: Error: Database error",
+      )
     })
   })
 
@@ -479,7 +494,7 @@ describe("MatchService", () => {
       })
 
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        "Updated weapon stats for player 123: +10 shots, +3 hits, +75 damage"
+        "Updated weapon stats for player 123: +10 shots, +3 hits, +75 damage",
       )
     })
 
@@ -494,7 +509,7 @@ describe("MatchService", () => {
       matchService.updatePlayerWeaponStats(1, 123, { hits: 2 })
 
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        "Updated weapon stats for player 123: +0 shots, +2 hits, +0 damage"
+        "Updated weapon stats for player 123: +0 shots, +2 hits, +0 damage",
       )
     })
 

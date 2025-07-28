@@ -530,7 +530,7 @@ export class MatchService implements IMatchService {
           })
         } catch (error) {
           this.logger.warn(
-            `Failed to create player history for player ${playerStats.playerId}: ${error instanceof Error ? error.message : String(error)}`
+            `Failed to create player history for player ${playerStats.playerId}: ${error instanceof Error ? error.message : String(error)}`,
           )
           // Continue with other players instead of failing the entire operation
         }

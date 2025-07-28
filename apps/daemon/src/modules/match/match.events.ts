@@ -1,6 +1,6 @@
 /**
  * Match Module Event Handler
- * 
+ *
  * Handles match-specific events including rounds, objectives, and match statistics.
  * This handler manages match lifecycle events and coordinates match-related
  * statistics independently from other modules.
@@ -31,7 +31,7 @@ export class MatchEventHandler extends BaseModuleEventHandler {
     this.registerHandler(EventType.ROUND_END, this.handleRoundEnd.bind(this))
     this.registerHandler(EventType.TEAM_WIN, this.handleTeamWin.bind(this))
     this.registerHandler(EventType.MAP_CHANGE, this.handleMapChange.bind(this))
-    
+
     // Objective events
     this.registerHandler(EventType.BOMB_PLANT, this.handleBombPlant.bind(this))
     this.registerHandler(EventType.BOMB_DEFUSE, this.handleBombDefuse.bind(this))
@@ -44,7 +44,7 @@ export class MatchEventHandler extends BaseModuleEventHandler {
     this.registerHandler(EventType.FLAG_DROP, this.handleFlagDrop.bind(this))
     this.registerHandler(EventType.CONTROL_POINT_CAPTURE, this.handleControlPointCapture.bind(this))
     this.registerHandler(EventType.CONTROL_POINT_DEFEND, this.handleControlPointDefend.bind(this))
-    
+
     // Listen to PLAYER_KILL for match statistics
     this.registerHandler(EventType.PLAYER_KILL, this.handleKillInMatch.bind(this))
   }

@@ -1,6 +1,6 @@
 /**
  * Saga Monitor Implementation
- * 
+ *
  * Provides monitoring and logging capabilities for saga execution,
  * including metrics collection and debugging information.
  */
@@ -9,13 +9,16 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { ISagaMonitor, SagaExecutionResult } from "./saga.types"
 
 export class SagaMonitor implements ISagaMonitor {
-  private readonly executionMetrics = new Map<string, {
-    totalExecutions: number
-    successfulExecutions: number
-    failedExecutions: number
-    totalExecutionTime: number
-    averageExecutionTime: number
-  }>()
+  private readonly executionMetrics = new Map<
+    string,
+    {
+      totalExecutions: number
+      successfulExecutions: number
+      failedExecutions: number
+      totalExecutionTime: number
+      averageExecutionTime: number
+    }
+  >()
 
   constructor(private readonly logger: ILogger) {}
 
@@ -45,7 +48,7 @@ export class SagaMonitor implements ISagaMonitor {
 
   onSagaCompleted(result: SagaExecutionResult): void {
     this.updateMetrics(result)
-    
+
     this.logger.info(`Saga completed successfully: ${result.sagaName}`, {
       sagaName: result.sagaName,
       eventId: result.eventId,
@@ -58,7 +61,7 @@ export class SagaMonitor implements ISagaMonitor {
 
   onSagaFailed(result: SagaExecutionResult): void {
     this.updateMetrics(result)
-    
+
     this.logger.error(`Saga failed: ${result.sagaName}`, {
       sagaName: result.sagaName,
       eventId: result.eventId,

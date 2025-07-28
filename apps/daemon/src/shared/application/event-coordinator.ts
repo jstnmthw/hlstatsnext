@@ -1,6 +1,6 @@
 /**
  * Event Coordinator
- * 
+ *
  * Provides coordination patterns for cross-module event handling.
  * Coordinators handle concerns that span multiple modules and require
  * orchestration beyond what individual module handlers can provide.
@@ -25,7 +25,7 @@ export interface EventCoordinator {
 
 /**
  * Kill Event Coordinator
- * 
+ *
  * Handles cross-module coordination for kill events, ensuring that
  * all modules process the event and managing concerns like ranking
  * updates that depend on multiple module states.
@@ -41,13 +41,13 @@ export class KillEventCoordinator implements EventCoordinator {
       return
     }
 
-    this.logger.debug('Coordinating cross-module kill event processing')
-    
+    this.logger.debug("Coordinating cross-module kill event processing")
+
     try {
       // Handle cross-module concerns that require coordination
       // For example: ranking updates that depend on multiple module states
       await this.rankingService.handleRatingUpdate()
-      
+
       // Future enhancements:
       // - Add transaction coordination
       // - Implement saga patterns
@@ -62,16 +62,14 @@ export class KillEventCoordinator implements EventCoordinator {
 
 /**
  * Saga Event Coordinator
- * 
+ *
  * Handles event coordination through saga patterns, providing transactional
  * consistency and compensating actions for complex multi-module workflows.
  */
 export class SagaEventCoordinator implements EventCoordinator {
   private readonly sagas: Map<EventType, ISaga> = new Map()
 
-  constructor(
-    private readonly logger: ILogger,
-  ) {}
+  constructor(private readonly logger: ILogger) {}
 
   /**
    * Register a saga for a specific event type
@@ -104,7 +102,7 @@ export class SagaEventCoordinator implements EventCoordinator {
 
 /**
  * Composite Event Coordinator
- * 
+ *
  * Allows multiple coordinators to handle the same event,
  * useful for complex events that require multiple coordination strategies.
  */
@@ -120,7 +118,7 @@ export class CompositeEventCoordinator implements EventCoordinator {
         await coordinator.coordinateEvent(event)
       } catch (error) {
         this.logger.error(
-          `Coordinator ${coordinator.constructor.name} failed for event ${event.eventType}: ${error}`
+          `Coordinator ${coordinator.constructor.name} failed for event ${event.eventType}: ${error}`,
         )
         // Decide based on requirements: continue with other coordinators or throw
         // For now, we'll continue to allow other coordinators to process

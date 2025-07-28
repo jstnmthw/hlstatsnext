@@ -5,6 +5,7 @@ The infrastructure layer provides the foundational building blocks for the HLSta
 ## Design Patterns
 
 ### 1. Event Bus Pattern
+
 **File**: `event-bus/`
 
 The Event Bus provides a decoupled publish-subscribe messaging system:
@@ -23,12 +24,14 @@ eventBus.unsubscribe(handlerId)
 ```
 
 **Key Features:**
+
 - Type-safe event handling
 - Automatic error handling and retry logic
 - Event filtering and routing
 - Performance metrics and monitoring
 
 ### 2. Base Module Event Handler Pattern
+
 **File**: `module-event-handler.base.ts`
 
 Provides a consistent foundation for all module event handlers:
@@ -47,12 +50,14 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
 ```
 
 **Benefits:**
+
 - Consistent event handler lifecycle
 - Automatic registration/cleanup
 - Built-in error handling and metrics
 - Standardized logging patterns
 
 ### 3. Repository Base Pattern
+
 **File**: `repository.base.ts`
 
 Provides common database operations and connection management:
@@ -60,22 +65,24 @@ Provides common database operations and connection management:
 ```typescript
 export class PlayerRepository extends BaseRepository {
   async findById(playerId: number): Promise<Player | null> {
-    return this.queryOne<Player>('SELECT * FROM players WHERE id = ?', [playerId])
+    return this.queryOne<Player>("SELECT * FROM players WHERE id = ?", [playerId])
   }
 
   async create(data: PlayerCreateData): Promise<Player> {
-    return this.insert<Player>('players', data)
+    return this.insert<Player>("players", data)
   }
 }
 ```
 
 **Features:**
+
 - Transaction management
 - Connection pooling
 - Query optimization
 - Error handling and logging
 
 ### 4. Module Registry Pattern
+
 **File**: `module-registry.ts`
 
 Centralized registration and lifecycle management for module handlers:
@@ -84,21 +91,23 @@ Centralized registration and lifecycle management for module handlers:
 const registry = new ModuleRegistry(logger)
 
 registry.register({
-  name: 'player',
+  name: "player",
   handler: playerEventHandler,
-  handledEvents: [EventType.PLAYER_CONNECT, EventType.PLAYER_DISCONNECT]
+  handledEvents: [EventType.PLAYER_CONNECT, EventType.PLAYER_DISCONNECT],
 })
 
 await registry.initializeAll()
 ```
 
 **Purpose:**
+
 - Centralized module management
 - Dependency injection
 - Lifecycle coordination
 - Health monitoring
 
 ### 5. Event Metrics Pattern
+
 **File**: `event-metrics.ts`
 
 Comprehensive performance and error tracking:
@@ -107,22 +116,24 @@ Comprehensive performance and error tracking:
 const metrics = new EventMetrics(logger)
 
 // Record processing time
-metrics.recordProcessingTime(EventType.PLAYER_KILL, 150, 'player-module')
+metrics.recordProcessingTime(EventType.PLAYER_KILL, 150, "player-module")
 
 // Record errors
-metrics.recordError(EventType.PLAYER_KILL, error, 'player-module')
+metrics.recordError(EventType.PLAYER_KILL, error, "player-module")
 
 // Get metrics
 const summary = metrics.getMetrics()
 ```
 
 **Metrics Collected:**
+
 - Processing times (avg, min, max)
 - Error rates and types
 - Module-specific performance
 - Event type statistics
 
 ### 6. Dual Event Publisher Pattern
+
 **File**: `queue/`
 
 Enables publishing to both EventBus and RabbitMQ simultaneously:
@@ -135,6 +146,7 @@ await dualPublisher.publish(event)
 ```
 
 **Features:**
+
 - Graceful fallback on queue failures
 - Configurable timeouts
 - Message routing and priorities
@@ -177,13 +189,14 @@ The infrastructure provides a robust database abstraction:
 ### Creating a New Module Handler
 
 1. **Extend Base Handler**:
+
 ```typescript
 export class WeaponEventHandler extends BaseModuleEventHandler {
   constructor(
     eventBus: IEventBus,
     logger: ILogger,
     private readonly weaponService: IWeaponService,
-    metrics?: EventMetrics
+    metrics?: EventMetrics,
   ) {
     super(eventBus, logger, metrics)
     this.registerEventHandlers()
@@ -200,34 +213,34 @@ export class WeaponEventHandler extends BaseModuleEventHandler {
 ```
 
 2. **Register with Module Registry**:
+
 ```typescript
 moduleRegistry.register({
-  name: 'weapon',
+  name: "weapon",
   handler: weaponEventHandler,
-  handledEvents: [EventType.WEAPON_FIRE, EventType.WEAPON_HIT]
+  handledEvents: [EventType.WEAPON_FIRE, EventType.WEAPON_HIT],
 })
 ```
 
 ### Adding New Repository
 
 1. **Extend Base Repository**:
+
 ```typescript
 export class WeaponRepository extends BaseRepository {
-  async updateWeaponStats(
-    weaponCode: string,
-    updates: Record<string, unknown>
-  ): Promise<void> {
-    await this.update('weapons', { weapon_code: weaponCode }, updates)
+  async updateWeaponStats(weaponCode: string, updates: Record<string, unknown>): Promise<void> {
+    await this.update("weapons", { weapon_code: weaponCode }, updates)
   }
 }
 ```
 
 2. **Use in Service Layer**:
+
 ```typescript
 export class WeaponService {
   constructor(
     private readonly repository: WeaponRepository,
-    private readonly logger: ILogger
+    private readonly logger: ILogger,
   ) {}
 }
 ```
@@ -235,19 +248,24 @@ export class WeaponService {
 ### Integrating RabbitMQ
 
 1. **Configure Queue Module**:
+
 ```typescript
-const queueModule = new QueueModule({
-  rabbitmq: rabbitmqConfig,
-  autoStartConsumers: true,
-  dualPublisher: {
-    enableQueue: true,
-    enableEventBus: true,
-    gracefulFallback: true
-  }
-}, logger)
+const queueModule = new QueueModule(
+  {
+    rabbitmq: rabbitmqConfig,
+    autoStartConsumers: true,
+    dualPublisher: {
+      enableQueue: true,
+      enableEventBus: true,
+      gracefulFallback: true,
+    },
+  },
+  logger,
+)
 ```
 
 2. **Create Dual Publisher**:
+
 ```typescript
 await queueModule.initialize()
 const dualPublisher = queueModule.createDualPublisher(eventBus)
@@ -265,16 +283,19 @@ const dualPublisher = queueModule.createDualPublisher(eventBus)
 ### Debugging
 
 1. **Enable Debug Logging**:
+
 ```typescript
 logger.setLogLevel(LogLevel.DEBUG)
 ```
 
 2. **Check Module Registry**:
+
 ```typescript
 const modules = moduleRegistry.getRegisteredModules()
 ```
 
 3. **Review Event Metrics**:
+
 ```typescript
 const metrics = eventMetrics.getMetrics()
 console.log(metrics)
@@ -302,6 +323,7 @@ console.log(metrics)
 ### Adding New Infrastructure Components
 
 1. **Create Base Interface**:
+
 ```typescript
 export interface INewComponent {
   initialize(): Promise<void>
@@ -311,15 +333,16 @@ export interface INewComponent {
 ```
 
 2. **Implement Base Class**:
+
 ```typescript
 export abstract class BaseNewComponent implements INewComponent {
   protected abstract processInternal(data: unknown): Promise<void>
-  
+
   async process(data: unknown): Promise<void> {
     try {
       await this.processInternal(data)
     } catch (error) {
-      this.logger.error('Processing failed', { error })
+      this.logger.error("Processing failed", { error })
       throw error
     }
   }
@@ -327,6 +350,7 @@ export abstract class BaseNewComponent implements INewComponent {
 ```
 
 3. **Register with Context**:
+
 ```typescript
 // In context.ts
 const newComponent = new ConcreteNewComponent(dependencies)
@@ -336,6 +360,7 @@ return { ...context, newComponent }
 ### Custom Event Types
 
 1. **Define Event Interface**:
+
 ```typescript
 export interface CustomEvent extends BaseEvent {
   eventType: EventType.CUSTOM_EVENT
@@ -347,14 +372,16 @@ export interface CustomEvent extends BaseEvent {
 ```
 
 2. **Add to Event Types**:
+
 ```typescript
 export enum EventType {
   // ... existing events
-  CUSTOM_EVENT = "CUSTOM_EVENT"
+  CUSTOM_EVENT = "CUSTOM_EVENT",
 }
 ```
 
 3. **Create Handler**:
+
 ```typescript
 registerHandler(EventType.CUSTOM_EVENT, this.handleCustomEvent.bind(this))
 ```
@@ -364,7 +391,7 @@ registerHandler(EventType.CUSTOM_EVENT, this.handleCustomEvent.bind(this))
 ### Unit Testing Infrastructure Components
 
 ```typescript
-describe('EventBus', () => {
+describe("EventBus", () => {
   let eventBus: EventBus
   let mockLogger: ILogger
 
@@ -373,13 +400,13 @@ describe('EventBus', () => {
     eventBus = new EventBus(mockLogger)
   })
 
-  it('should publish and handle events', async () => {
+  it("should publish and handle events", async () => {
     const handler = vi.fn()
     const handlerId = eventBus.subscribe(EventType.PLAYER_KILL, handler)
-    
+
     const event = createMockEvent(EventType.PLAYER_KILL)
     await eventBus.publish(event)
-    
+
     expect(handler).toHaveBeenCalledWith(event)
   })
 })
@@ -388,7 +415,7 @@ describe('EventBus', () => {
 ### Integration Testing
 
 ```typescript
-describe('Module Integration', () => {
+describe("Module Integration", () => {
   let context: AppContext
 
   beforeEach(async () => {
@@ -396,10 +423,10 @@ describe('Module Integration', () => {
     await context.moduleRegistry.initializeAll()
   })
 
-  it('should process events end-to-end', async () => {
+  it("should process events end-to-end", async () => {
     const event = createPlayerKillEvent()
     await context.eventBus.publish(event)
-    
+
     // Assert expected side effects
     expect(mockPlayerService.handleKillEvent).toHaveBeenCalled()
   })
@@ -409,13 +436,15 @@ describe('Module Integration', () => {
 ### Performance Testing
 
 ```typescript
-describe('Event Processing Performance', () => {
-  it('should handle high event volume', async () => {
-    const events = Array(1000).fill(null).map(() => createMockEvent())
+describe("Event Processing Performance", () => {
+  it("should handle high event volume", async () => {
+    const events = Array(1000)
+      .fill(null)
+      .map(() => createMockEvent())
     const startTime = Date.now()
-    
-    await Promise.all(events.map(event => eventBus.publish(event)))
-    
+
+    await Promise.all(events.map((event) => eventBus.publish(event)))
+
     const duration = Date.now() - startTime
     expect(duration).toBeLessThan(5000) // 5 seconds max
   })

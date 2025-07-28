@@ -115,7 +115,7 @@ export class GameDetectionService implements IGameDetectionService {
     // For now, return unknown (debug log only once per server per cache period)
     const serverKey = `${address}:${port}`
     const cached = this.gameCache.get(serverKey)
-    
+
     if (!cached) {
       this.logger.debug(`Server query detection not yet implemented for ${address}:${port}`)
     }
@@ -137,7 +137,7 @@ export class GameDetectionService implements IGameDetectionService {
     logLines: string[] = [],
   ): Promise<GameDetectionResult> {
     const serverKey = `${address}:${port}`
-    
+
     // Check cache first
     const cached = this.gameCache.get(serverKey)
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
@@ -169,12 +169,14 @@ export class GameDetectionService implements IGameDetectionService {
       confidence: 0.2,
       detection_method: "development_fallback",
     }
-    
+
     // Only log warning if not in cache (prevents spam)
     if (!cached) {
-      this.logger.warn(`Could not reliably detect game for ${address}:${port}, defaulting to cstrike`)
+      this.logger.warn(
+        `Could not reliably detect game for ${address}:${port}, defaulting to cstrike`,
+      )
     }
-    
+
     this.cacheResult(serverKey, fallbackResult)
     return fallbackResult
   }

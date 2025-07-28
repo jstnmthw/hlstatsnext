@@ -1,9 +1,8 @@
 /**
  * Weapon Module Event Handler
  *
- * Handles weapon-specific events including weapon fire, weapon hits,
- * and weapon statistics from kill events. This handler allows the weapon
- * module to manage its own events and statistics independently.
+ * Handles weapon-specific events including weapon fire and weapon hits.
+ * This handler allows the weapon module to manage its own events and statistics independently.
  */
 
 import { BaseModuleEventHandler } from "@/shared/infrastructure/module-event-handler.base"
@@ -12,7 +11,6 @@ import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.type
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/event-metrics"
 import type { IWeaponService, WeaponEvent } from "@/modules/weapon/weapon.types"
-import { EventType } from "@/shared/types/events"
 
 export class WeaponEventHandler extends BaseModuleEventHandler {
   constructor(
@@ -26,13 +24,10 @@ export class WeaponEventHandler extends BaseModuleEventHandler {
   }
 
   registerEventHandlers(): void {
-    // Direct weapon events
-    this.registerHandler(EventType.WEAPON_FIRE, this.handleWeaponFire.bind(this))
-    this.registerHandler(EventType.WEAPON_HIT, this.handleWeaponHit.bind(this))
-
-    // Listen to PLAYER_KILL for weapon statistics
-    // This demonstrates how modules can independently listen to the same event
-    this.registerHandler(EventType.PLAYER_KILL, this.handleKillForWeaponStats.bind(this))
+    // All weapon events have been migrated to queue-only processing (Phase 1 & 3)
+    // - Direct weapon events: WEAPON_FIRE, WEAPON_HIT (Phase 1)
+    // - Kill events: PLAYER_KILL (Phase 3)
+    // These are now handled via RabbitMQConsumer and no longer use EventBus
   }
 
   private async handleWeaponFire(event: BaseEvent): Promise<void> {
@@ -44,14 +39,6 @@ export class WeaponEventHandler extends BaseModuleEventHandler {
   private async handleWeaponHit(event: BaseEvent): Promise<void> {
     this.logger.debug(`Weapon module handling WEAPON_HIT for server ${event.serverId}`)
 
-    await this.weaponService.handleWeaponEvent(event as WeaponEvent)
-  }
-
-  private async handleKillForWeaponStats(event: BaseEvent): Promise<void> {
-    this.logger.debug(`Weapon module processing kill event for weapon stats`)
-
-    // Extract weapon information from kill event and update statistics
-    // The weapon service only cares about weapon-related data from the kill
     await this.weaponService.handleWeaponEvent(event as WeaponEvent)
   }
 }

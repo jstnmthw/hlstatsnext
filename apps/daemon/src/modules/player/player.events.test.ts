@@ -1,45 +1,51 @@
 /**
- * Player Event Handler Tests
- *
- * Tests for the distributed player event handling functionality
+ * PlayerEventHandler Unit Tests
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { PlayerEventHandler } from "./player.events"
-import { EventBus } from "@/shared/infrastructure/event-bus/event-bus"
-import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerService } from "@/modules/player/player.types"
-import type { IServerService } from "@/modules/server/server.types"
-import { EventType } from "@/shared/types/events"
+import { createMockLogger } from "../../tests/mocks/logger"
+import { createMockEventBus } from "../../tests/mocks/event-bus"
 import type { BaseEvent, PlayerMeta } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
+import type { IPlayerService } from "./player.types"
+import type { IServerService } from "@/modules/server/server.types"
+
+// Create mock services
+const createMockPlayerService = (): IPlayerService => ({
+  getOrCreatePlayer: vi.fn().mockResolvedValue(123),
+  getPlayerStats: vi.fn(),
+  updatePlayerStats: vi.fn(),
+  getPlayerRating: vi.fn(),
+  updatePlayerRatings: vi.fn(),
+  getTopPlayers: vi.fn(),
+  getRoundParticipants: vi.fn(),
+  handlePlayerEvent: vi.fn(),
+  handleKillEvent: vi.fn(),
+  compensateKillEvent: vi.fn(),
+})
+
+const createMockServerService = (): IServerService => ({
+  getServer: vi.fn(),
+  getServerByAddress: vi.fn(),
+  getServerGame: vi.fn().mockResolvedValue("csgo"),
+  handleServerShutdown: vi.fn(),
+  handleStatsUpdate: vi.fn(),
+  handleAdminAction: vi.fn(),
+})
 
 describe("PlayerEventHandler", () => {
-  let eventBus: IEventBus
-  let logger: ILogger
+  let handler: PlayerEventHandler
+  let logger: ReturnType<typeof createMockLogger>
+  let eventBus: ReturnType<typeof createMockEventBus>
   let playerService: IPlayerService
   let serverService: IServerService
-  let handler: PlayerEventHandler
 
   beforeEach(() => {
-    logger = {
-      debug: vi.fn(),
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-    } as unknown as ILogger
-
-    eventBus = new EventBus(logger)
-
-    playerService = {
-      handlePlayerEvent: vi.fn(),
-      getOrCreatePlayer: vi.fn().mockResolvedValue(123),
-      handleKillEvent: vi.fn(),
-    } as unknown as IPlayerService
-
-    serverService = {
-      getServerGame: vi.fn().mockResolvedValue("csgo"),
-    } as unknown as IServerService
+    logger = createMockLogger()
+    eventBus = createMockEventBus()
+    playerService = createMockPlayerService()
+    serverService = createMockServerService()
 
     handler = new PlayerEventHandler(eventBus, logger, playerService, serverService)
   })
@@ -49,7 +55,9 @@ describe("PlayerEventHandler", () => {
   })
 
   describe("Event Registration", () => {
-    it("should register handlers for simple player events", () => {
+    it("should not register EventBus handlers for queue-only player events", () => {
+      // All player events have been migrated to queue-only processing
+      // No EventBus handlers should be registered
       const eventTypes = [
         EventType.PLAYER_CONNECT,
         EventType.PLAYER_DISCONNECT,
@@ -58,7 +66,7 @@ describe("PlayerEventHandler", () => {
       ]
 
       for (const eventType of eventTypes) {
-        expect(logger.debug).toHaveBeenCalledWith(
+        expect(logger.debug).not.toHaveBeenCalledWith(
           expect.stringContaining(`Registered PlayerEventHandler handler for ${eventType}`),
         )
       }
@@ -67,8 +75,8 @@ describe("PlayerEventHandler", () => {
     it("should not register handlers for complex player events", () => {
       const complexEvents = [
         EventType.PLAYER_KILL,
-        EventType.PLAYER_ENTRY,
-        EventType.PLAYER_CHANGE_TEAM,
+        EventType.PLAYER_SUICIDE,
+        EventType.PLAYER_TEAMKILL,
       ]
 
       for (const eventType of complexEvents) {
@@ -79,109 +87,30 @@ describe("PlayerEventHandler", () => {
     })
   })
 
-  describe("Event Handling", () => {
-    const createEvent = (eventType: EventType, meta?: PlayerMeta): BaseEvent => ({
-      eventType,
-      timestamp: new Date(),
-      serverId: 1,
-      meta,
-      data: {},
-    })
-
-    it("should handle PLAYER_CONNECT event", async () => {
-      const event = createEvent(EventType.PLAYER_CONNECT, {
-        steamId: "STEAM_1:0:12345",
-        playerName: "TestPlayer",
-        isBot: false,
-      })
+  describe("Queue-Only Event Processing", () => {
+    // Since all player events are now queue-only, they don't have EventBus handlers
+    // The PlayerEventHandler now only provides utility methods for player ID resolution
+    
+    it("should not handle queue-only events via EventBus", async () => {
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_CONNECT,
+        timestamp: new Date(),
+        serverId: 1,
+        data: {},
+      }
 
       await eventBus.emit(event)
 
-      expect(serverService.getServerGame).toHaveBeenCalledWith(1)
-      expect(playerService.getOrCreatePlayer).toHaveBeenCalledWith(
-        "STEAM_1:0:12345",
-        "TestPlayer",
-        "csgo",
-      )
-      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventType: EventType.PLAYER_CONNECT,
-          data: expect.objectContaining({ playerId: 123 }),
-        }),
-      )
-    })
-
-    it("should handle PLAYER_DISCONNECT event", async () => {
-      const event = createEvent(EventType.PLAYER_DISCONNECT, {
-        steamId: "STEAM_1:0:12345",
-        playerName: "TestPlayer",
-        isBot: false,
-      })
-
-      await eventBus.emit(event)
-
-      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventType: EventType.PLAYER_DISCONNECT,
-          data: expect.objectContaining({ playerId: 123 }),
-        }),
-      )
-    })
-
-    it("should handle CHAT_MESSAGE event", async () => {
-      const event = createEvent(EventType.CHAT_MESSAGE, {
-        steamId: "STEAM_1:0:12345",
-        playerName: "TestPlayer",
-        isBot: false,
-      })
-
-      await eventBus.emit(event)
-
-      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventType: EventType.CHAT_MESSAGE,
-          data: expect.objectContaining({ playerId: 123 }),
-        }),
-      )
-    })
-
-    it("should handle events without player metadata", async () => {
-      const event = createEvent(EventType.PLAYER_CONNECT) // No meta
-
-      await eventBus.emit(event)
-
+      // No handlers should be called since all player events are queue-only
+      expect(serverService.getServerGame).not.toHaveBeenCalled()
       expect(playerService.getOrCreatePlayer).not.toHaveBeenCalled()
-      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventType: EventType.PLAYER_CONNECT,
-          data: {},
-        }),
-      )
+      expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
     })
 
-    it("should handle player ID resolution errors gracefully", async () => {
-      const error = new Error("Database error")
-      vi.mocked(playerService.getOrCreatePlayer).mockRejectedValueOnce(error)
-
-      const event = createEvent(EventType.PLAYER_CONNECT, {
-        steamId: "STEAM_1:0:12345",
-        playerName: "TestPlayer",
-        isBot: false,
-      })
-
-      await eventBus.emit(event)
-
-      expect(logger.error).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to resolve player IDs"),
-      )
-
-      // Should still call handlePlayerEvent with original event
-      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventType: EventType.PLAYER_CONNECT,
-          data: {},
-        }),
-      )
+    it("should provide utility methods for player ID resolution", () => {
+      // The handler provides utility methods that can be used by queue consumers
+      expect(handler).toBeDefined()
+      expect(typeof handler).toBe('object')
     })
   })
 

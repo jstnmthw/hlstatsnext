@@ -9,6 +9,7 @@ import type { ParseResult } from "./base.parser"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import { GameConfig } from "@/config/game.config"
+import { generateMessageId, generateCorrelationId } from "@/shared/infrastructure/queue/utils"
 
 export class CsParser extends BaseParser {
   // Track the last winning team for Round_End events
@@ -145,6 +146,8 @@ export class CsParser extends BaseParser {
       timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
       data: {
         killerId,
         victimId,
@@ -221,6 +224,8 @@ export class CsParser extends BaseParser {
       timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
       data: {
         attackerId,
         victimId,
@@ -275,6 +280,8 @@ export class CsParser extends BaseParser {
       timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
       data: {
         playerId,
         steamId,
@@ -316,6 +323,8 @@ export class CsParser extends BaseParser {
       timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
       data: {
         playerId,
         reason,
@@ -355,6 +364,8 @@ export class CsParser extends BaseParser {
       timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
       data: {
         playerId,
         message,
@@ -398,6 +409,8 @@ export class CsParser extends BaseParser {
         timestamp: this.createTimestamp(),
         serverId,
         raw: logLine,
+        eventId: generateMessageId(),
+        correlationId: generateCorrelationId(),
         data: {
           playerId,
           actionCode,
@@ -431,6 +444,8 @@ export class CsParser extends BaseParser {
       timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
       data: {
         map: this.currentMap || "", // Use current map from parser state
         roundNumber: 1, // TODO: Track actual round number
@@ -450,6 +465,8 @@ export class CsParser extends BaseParser {
       timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
       data: {
         winningTeam: this.lastWinningTeam,
       },
@@ -485,6 +502,8 @@ export class CsParser extends BaseParser {
         timestamp: this.createTimestamp(),
         serverId,
         raw: logLine,
+        eventId: generateMessageId(),
+        correlationId: generateCorrelationId(),
         data: {
           winningTeam: team,
           triggerName,
@@ -533,6 +552,8 @@ export class CsParser extends BaseParser {
       timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
       data: {
         newMap: mapName,
         playerCount: 0, // Would need additional parsing to get player count

@@ -9,7 +9,7 @@
 import type { BaseEvent, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
-import type { PlayerEvent, PlayerKillEvent } from "@/modules/player/player.types"
+import type { PlayerEvent } from "@/modules/player/player.types"
 import type { IPlayerService } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IWeaponService } from "@/modules/weapon/weapon.types"
@@ -47,27 +47,22 @@ export class EventProcessor {
    * Register event handlers with the event bus
    */
   private registerEventHandlers(): void {
-    // Player events - excluding simple events migrated to PlayerEventHandler
-    const playerEvents = [
+    // Only handle EventBus fallback events (not migrated to queue-only)
+    const eventBusFallbackEvents = [
       EventType.PLAYER_ENTRY,
       EventType.PLAYER_CHANGE_TEAM,
       EventType.PLAYER_CHANGE_ROLE,
-      EventType.PLAYER_SUICIDE,
-      EventType.PLAYER_TEAMKILL,
+      // Note: PLAYER_SUICIDE, PLAYER_TEAMKILL, PLAYER_KILL are now queue-only
     ]
 
-    for (const eventType of playerEvents) {
+    for (const eventType of eventBusFallbackEvents) {
       const handlerId = this.eventBus.on(eventType, async (event) => {
         await this.handlePlayerEvent(event)
       })
       this.handlerIds.push(handlerId)
     }
 
-    // Kill events
-    const killHandlerId = this.eventBus.on(EventType.PLAYER_KILL, async (event) => {
-      await this.handleKillEvent(event)
-    })
-    this.handlerIds.push(killHandlerId)
+    // Note: PLAYER_KILL is now handled by queue-only processing via RabbitMQConsumer
 
     this.dependencies.logger.info(
       `EventProcessor registered ${this.handlerIds.length} event handlers`,
@@ -117,19 +112,7 @@ export class EventProcessor {
     }
   }
 
-  private async handleKillEvent(event: BaseEvent): Promise<void> {
-    try {
-      this.dependencies.logger.debug(`Processing kill event for server ${event.serverId}`)
-      const resolvedEvent = await this.resolvePlayerIds(event)
-
-      await this.dependencies.playerService.handleKillEvent(resolvedEvent as PlayerKillEvent)
-
-      await this.runCoordinators(resolvedEvent)
-    } catch (error) {
-      this.dependencies.logger.error(`Failed to process kill event: ${error}`)
-      throw error
-    }
-  }
+  // handleKillEvent removed - now handled by queue-only processing via RabbitMQConsumer
 
   /**
    * Emit multiple events to the event bus

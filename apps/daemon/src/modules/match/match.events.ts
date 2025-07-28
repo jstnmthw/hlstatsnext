@@ -12,7 +12,6 @@ import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.type
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/event-metrics"
 import type { IMatchService, MatchEvent, ObjectiveEvent } from "@/modules/match/match.types"
-import { EventType } from "@/shared/types/events"
 
 export class MatchEventHandler extends BaseModuleEventHandler {
   constructor(
@@ -26,27 +25,11 @@ export class MatchEventHandler extends BaseModuleEventHandler {
   }
 
   registerEventHandlers(): void {
-    // Match lifecycle events
-    this.registerHandler(EventType.ROUND_START, this.handleRoundStart.bind(this))
-    this.registerHandler(EventType.ROUND_END, this.handleRoundEnd.bind(this))
-    this.registerHandler(EventType.TEAM_WIN, this.handleTeamWin.bind(this))
-    this.registerHandler(EventType.MAP_CHANGE, this.handleMapChange.bind(this))
-
-    // Objective events
-    this.registerHandler(EventType.BOMB_PLANT, this.handleBombPlant.bind(this))
-    this.registerHandler(EventType.BOMB_DEFUSE, this.handleBombDefuse.bind(this))
-    this.registerHandler(EventType.BOMB_EXPLODE, this.handleBombExplode.bind(this))
-    this.registerHandler(EventType.HOSTAGE_RESCUE, this.handleHostageRescue.bind(this))
-    this.registerHandler(EventType.HOSTAGE_TOUCH, this.handleHostageTouch.bind(this))
-    this.registerHandler(EventType.FLAG_CAPTURE, this.handleFlagCapture.bind(this))
-    this.registerHandler(EventType.FLAG_DEFEND, this.handleFlagDefend.bind(this))
-    this.registerHandler(EventType.FLAG_PICKUP, this.handleFlagPickup.bind(this))
-    this.registerHandler(EventType.FLAG_DROP, this.handleFlagDrop.bind(this))
-    this.registerHandler(EventType.CONTROL_POINT_CAPTURE, this.handleControlPointCapture.bind(this))
-    this.registerHandler(EventType.CONTROL_POINT_DEFEND, this.handleControlPointDefend.bind(this))
-
-    // Listen to PLAYER_KILL for match statistics
-    this.registerHandler(EventType.PLAYER_KILL, this.handleKillInMatch.bind(this))
+    // All match events have been migrated to queue-only processing (Phase 2 & 3)
+    // - Match lifecycle: ROUND_START, ROUND_END, TEAM_WIN, MAP_CHANGE
+    // - Objective events: BOMB_*, HOSTAGE_*, FLAG_*, CONTROL_POINT_*
+    // - Kill events: PLAYER_KILL
+    // These are now handled via RabbitMQConsumer and no longer use EventBus
   }
 
   // Match lifecycle handlers

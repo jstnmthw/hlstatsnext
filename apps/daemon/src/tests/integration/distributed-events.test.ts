@@ -110,7 +110,7 @@ describe("Distributed Event Processing", () => {
   })
 
   describe("Simple Player Events", () => {
-    it("should process player events through player module only", async () => {
+    it("should no longer process simple player events through EventBus (migrated to queue-only)", async () => {
       const event: BaseEvent = {
         eventType: EventType.PLAYER_CONNECT,
         serverId: 1,
@@ -124,25 +124,19 @@ describe("Distributed Event Processing", () => {
 
       await eventBus.emit(event)
 
-      // Should be handled by PlayerEventHandler
-      expect(playerService.handlePlayerEvent).toHaveBeenCalledTimes(1)
-      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventType: EventType.PLAYER_CONNECT,
-          data: expect.objectContaining({ playerId: 123 }),
-        }),
-      )
+      // Should NOT be handled by EventBus - migrated to queue-only processing
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledTimes(0)
     })
 
-    it("should not duplicate processing for migrated events", async () => {
-      const events = [
+    it("should confirm migrated events are not processed through EventBus", async () => {
+      const migratedEvents = [
         EventType.PLAYER_CONNECT,
         EventType.PLAYER_DISCONNECT,
         EventType.PLAYER_CHANGE_NAME,
         EventType.CHAT_MESSAGE,
       ]
 
-      for (const eventType of events) {
+      for (const eventType of migratedEvents) {
         vi.clearAllMocks()
 
         const event: BaseEvent = {
@@ -158,8 +152,8 @@ describe("Distributed Event Processing", () => {
 
         await eventBus.emit(event)
 
-        // Should only be called once (by PlayerEventHandler)
-        expect(playerService.handlePlayerEvent).toHaveBeenCalledTimes(1)
+        // Should NOT be processed through EventBus (migrated to queue-only)
+        expect(playerService.handlePlayerEvent).toHaveBeenCalledTimes(0)
       }
     })
   })
@@ -190,7 +184,7 @@ describe("Distributed Event Processing", () => {
   })
 
   describe("Kill Events", () => {
-    it("should coordinate kill events across multiple modules", async () => {
+    it("should no longer process kill events through EventBus (migrated to queue-only)", async () => {
       const killEvent: BaseEvent = {
         eventType: EventType.PLAYER_KILL,
         serverId: 1,
@@ -215,23 +209,23 @@ describe("Distributed Event Processing", () => {
 
       await eventBus.emit(killEvent)
 
-      // Verify each module processed the event
-      // EventProcessor handles the kill event and calls player service directly
-      expect(playerService.handleKillEvent).toHaveBeenCalledTimes(1)
-      // WeaponEventHandler handles weapon statistics from kill events
-      expect(weaponService.handleWeaponEvent).toHaveBeenCalledTimes(1)
-      // MatchEventHandler handles match statistics from kill events
-      expect(matchService.handleKillInMatch).toHaveBeenCalledTimes(1)
-      // Coordinator handles ranking updates
-      expect(rankingService.handleRatingUpdate).toHaveBeenCalledTimes(1)
+      // Verify no EventBus handlers processed the kill event (migrated to queue-only)
+      // EventProcessor no longer handles kill events (migrated to RabbitMQ)
+      expect(playerService.handleKillEvent).toHaveBeenCalledTimes(0)
+      // WeaponEventHandler should not handle kill events via EventBus anymore
+      expect(weaponService.handleWeaponEvent).toHaveBeenCalledTimes(0)
+      // MatchEventHandler should not handle kill events via EventBus anymore
+      expect(matchService.handleKillInMatch).toHaveBeenCalledTimes(0)
+      // Coordinator should not handle kill events via EventBus anymore
+      expect(rankingService.handleRatingUpdate).toHaveBeenCalledTimes(0)
 
-      // Verify player IDs were resolved
-      expect(playerService.getOrCreatePlayer).toHaveBeenCalledTimes(2)
+      // No player ID resolution should occur via EventBus path
+      expect(playerService.getOrCreatePlayer).toHaveBeenCalledTimes(0)
     })
   })
 
   describe("Event Isolation", () => {
-    it("should not affect non-player events", async () => {
+    it("should confirm match events are no longer processed through EventBus (migrated to queue-only)", async () => {
       const matchEvent: BaseEvent = {
         eventType: EventType.ROUND_START,
         serverId: 1,
@@ -241,11 +235,12 @@ describe("Distributed Event Processing", () => {
 
       await eventBus.emit(matchEvent)
 
-      expect(matchService.handleMatchEvent).toHaveBeenCalledTimes(1)
-      expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
+      // Should NOT be processed through EventBus (migrated to queue-only)
+      expect(matchService.handleMatchEvent).toHaveBeenCalledTimes(0)
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledTimes(0)
     })
 
-    it("should handle weapon events correctly", async () => {
+    it("should confirm weapon events are no longer processed through EventBus (migrated to queue-only)", async () => {
       const weaponEvent: BaseEvent = {
         eventType: EventType.WEAPON_FIRE,
         serverId: 1,
@@ -255,8 +250,9 @@ describe("Distributed Event Processing", () => {
 
       await eventBus.emit(weaponEvent)
 
-      expect(weaponService.handleWeaponEvent).toHaveBeenCalledTimes(1)
-      expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
+      // Should NOT be processed through EventBus (migrated to queue-only)
+      expect(weaponService.handleWeaponEvent).toHaveBeenCalledTimes(0)
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledTimes(0)
     })
   })
 
@@ -280,10 +276,7 @@ describe("Distributed Event Processing", () => {
       await expect(eventBus.emit(event)).resolves.toBeUndefined()
     })
 
-    it("should handle errors in EventProcessor without affecting PlayerEventHandler", async () => {
-      const error = new Error("Match handler error")
-      vi.mocked(matchService.handleMatchEvent).mockRejectedValueOnce(error)
-
+    it("should confirm no error isolation needed (all handlers migrated to queue-only)", async () => {
       const matchEvent: BaseEvent = {
         eventType: EventType.ROUND_START,
         serverId: 1,
@@ -306,8 +299,9 @@ describe("Distributed Event Processing", () => {
       await eventBus.emit(matchEvent)
       await eventBus.emit(playerEvent)
 
-      // Player event should still be processed
-      expect(playerService.handlePlayerEvent).toHaveBeenCalledTimes(1)
+      // Neither event should be processed through EventBus (both migrated to queue-only)
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledTimes(0)
+      expect(matchService.handleMatchEvent).toHaveBeenCalledTimes(0)
     })
   })
 })

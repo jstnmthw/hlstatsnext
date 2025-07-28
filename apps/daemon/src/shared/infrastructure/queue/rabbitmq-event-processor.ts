@@ -11,6 +11,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IEventProcessor } from "./event-consumer"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import type { ModuleRegistry } from "@/shared/infrastructure/module-registry"
+import type { BaseModuleEventHandler } from "@/shared/infrastructure/module-event-handler.base"
 import { generateMessageId, generateCorrelationId } from "./utils"
 
 /**
@@ -103,7 +104,7 @@ export class RabbitMQEventProcessor implements IEventProcessor {
       
       try {
         // Get the handler instance (e.g., PlayerEventHandler)
-        const handler = moduleHandler.handler as any
+        const handler = moduleHandler.handler as BaseModuleEventHandler & Record<string, unknown>
         
         // Call the appropriate handler method based on event type
         const eventTypeParts = event.eventType.split('_')

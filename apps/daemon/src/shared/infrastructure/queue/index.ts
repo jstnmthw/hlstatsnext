@@ -77,6 +77,11 @@ export {
 } from "./dual-event-publisher"
 
 export {
+  QueueFirstPublisher,
+  type QueueFirstMetrics,
+} from "./queue-first-publisher"
+
+export {
   ShadowConsumer,
   defaultShadowConsumerConfig,
   createShadowConsumer,

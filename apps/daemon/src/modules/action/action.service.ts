@@ -97,8 +97,8 @@ export class ActionService implements IActionService {
         })
       }
 
-      // Log the event with point information
-      this.logger.event(
+      // Log the event with point information (using queue logging for queue-only event)
+      this.logger.queue(
         `Player action: ${actionCode} by player ${playerId} ` +
           `(${totalPoints > 0 ? "+" : ""}${totalPoints} points)`,
       )
@@ -172,8 +172,8 @@ export class ActionService implements IActionService {
         })
       }
 
-      // Log the event with point information
-      this.logger.event(
+      // Log the event with point information (using queue logging for queue-only event)
+      this.logger.queue(
         `Player action: ${actionCode} by player ${playerId} on ${victimId} ` +
           `(${totalPoints > 0 ? "+" : ""}${totalPoints} points)`,
       )
@@ -215,8 +215,8 @@ export class ActionService implements IActionService {
       // Log the action event to database
       await this.repository.logTeamAction(event.serverId, actionDef.id, currentMap, bonus || 0)
 
-      // Log the event with point information
-      this.logger.event(
+      // Log the event with point information (using queue logging for queue-only event)
+      this.logger.queue(
         `Team action: ${actionCode} by team ${team} ` +
           `(${totalPoints > 0 ? "+" : ""}${totalPoints} points)`,
       )
@@ -258,8 +258,8 @@ export class ActionService implements IActionService {
       // Log the action event to database
       await this.repository.logWorldAction(event.serverId, actionDef.id, currentMap, bonus || 0)
 
-      // Log the event
-      this.logger.event(
+      // Log the event (using queue logging for queue-only event)
+      this.logger.queue(
         `World action: ${actionCode}${totalPoints !== 0 ? ` (${totalPoints > 0 ? "+" : ""}${totalPoints} points)` : ""}`,
       )
 

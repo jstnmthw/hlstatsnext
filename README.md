@@ -1,6 +1,6 @@
 # HLStatsNext
 
-⚠️ This project is in very early staged of evelopement (07/28/2025).
+⚠️ This project is in very early staged of developement (07/28/2025).
 
 **HLStatsNext** is a comprehensive game statistics platform designed for Half-Life engine games. It offers real-time statistics, analytics dashboards, and server management tools, all built with modern web technologies. The platform is a complete modernization of the HLstatsX Community Edition, utilizing a TypeScript stack, Next.js interface, and GraphQL API to provide a scalable and user-friendly experience.
 

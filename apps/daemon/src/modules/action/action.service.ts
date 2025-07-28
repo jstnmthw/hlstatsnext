@@ -98,8 +98,8 @@ export class ActionService implements IActionService {
       }
 
       // Log the event with point information
-      this.logger.debug(
-        `Player action: ${actionCode} by player ${playerId} ` +
+      this.logger.info(
+        `Player action processed: ${actionCode} by player ${playerId} ` +
           `(${totalPoints > 0 ? "+" : ""}${totalPoints} points)`,
       )
 

@@ -53,8 +53,8 @@ export class CsParser extends BaseParser {
         return this.parseChatEvent(cleanLine, serverId)
       }
 
-      // Player action triggers
-      if (cleanLine.includes('triggered "')) {
+      // Player action triggers (exclude world events)
+      if (cleanLine.includes('triggered "') && !cleanLine.includes('World triggered')) {
         const actionResult = this.parseActionEvent(cleanLine, serverId)
         if (actionResult.success && actionResult.event) {
           return actionResult

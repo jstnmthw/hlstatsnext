@@ -335,7 +335,7 @@ export class MatchService implements IMatchService {
         matchStats.currentMap = event.data.map
       }
 
-      this.logger.queue(`Round started on server ${serverId}`)
+      this.logger.queue(`[${EventType.ROUND_START} Event] Round started on server ${serverId}`)
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -375,7 +375,7 @@ export class MatchService implements IMatchService {
       await this.repository.incrementServerRounds(serverId)
 
       this.logger.queue(
-        `Round ended on server ${serverId}${winningTeam ? `: ${winningTeam} won` : ""}${
+        `(${EventType.ROUND_END}) Round ended on server ${serverId}${winningTeam ? `: ${winningTeam} won` : ""}${
           score ? ` (${score.team1}-${score.team2})` : ""
         }`,
       )

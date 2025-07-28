@@ -67,9 +67,13 @@ export class EventPublisher implements IEventPublisher {
 
       this.publishedCount++
 
-      this.logger.debug(
-        `Event published successfully: messageId=${message.id}, eventType=${event.eventType}, routingKey=${routingKey}, priority=${priority}, serverId=${event.serverId}`,
-      )
+      this.logger.queue(`(${event.eventType}) Event published successfully:`, {
+        messageId: message.id,
+        eventType: event.eventType,
+        routingKey,
+        priority,
+        serverId: event.serverId,
+      })
     } catch (error) {
       this.failedCount++
 

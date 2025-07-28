@@ -1,6 +1,6 @@
 /**
  * Distributed Event Processing Integration Tests
- * 
+ *
  * Tests that ensure the migration from centralized to distributed
  * event processing maintains system integrity
  */
@@ -81,34 +81,25 @@ describe("Distributed Event Processing", () => {
     const coordinators = [killEventCoordinator]
 
     // Create both handlers
-    eventProcessor = new EventProcessor(eventBus, {
-      playerService,
-      matchService,
-      weaponService,
-      rankingService,
-      actionService,
-      serverService,
-      logger,
-    }, coordinators)
+    eventProcessor = new EventProcessor(
+      eventBus,
+      {
+        playerService,
+        matchService,
+        weaponService,
+        rankingService,
+        actionService,
+        serverService,
+        logger,
+      },
+      coordinators,
+    )
 
-    playerEventHandler = new PlayerEventHandler(
-      eventBus,
-      logger,
-      playerService,
-      serverService
-    )
-    
-    weaponEventHandler = new WeaponEventHandler(
-      eventBus,
-      logger,
-      weaponService
-    )
-    
-    matchEventHandler = new MatchEventHandler(
-      eventBus,
-      logger,
-      matchService
-    )
+    playerEventHandler = new PlayerEventHandler(eventBus, logger, playerService, serverService)
+
+    weaponEventHandler = new WeaponEventHandler(eventBus, logger, weaponService)
+
+    matchEventHandler = new MatchEventHandler(eventBus, logger, matchService)
   })
 
   afterEach(() => {
@@ -139,7 +130,7 @@ describe("Distributed Event Processing", () => {
         expect.objectContaining({
           eventType: EventType.PLAYER_CONNECT,
           data: expect.objectContaining({ playerId: 123 }),
-        })
+        }),
       )
     })
 
@@ -193,7 +184,7 @@ describe("Distributed Event Processing", () => {
       expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           eventType: EventType.PLAYER_ENTRY,
-        })
+        }),
       )
     })
   })

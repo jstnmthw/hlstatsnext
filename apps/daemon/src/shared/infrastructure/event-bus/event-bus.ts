@@ -53,11 +53,11 @@ export class EventBus implements IEventBus {
       } catch (error) {
         this.stats.errors++
         const errorObj = error instanceof Error ? error : new Error(String(error))
-        
+
         this.logger.error(
           `Handler ${registration.id} failed for event ${event.eventType}: ${errorObj.message}`,
         )
-        
+
         results.push({
           handlerId: registration.id,
           success: false,
@@ -143,7 +143,7 @@ export class EventBus implements IEventBus {
 
   getStats(): EventBusStats {
     const handlersByType = new Map<EventType, number>()
-    
+
     for (const [eventType, handlers] of this.handlers) {
       handlersByType.set(eventType, handlers.size)
     }

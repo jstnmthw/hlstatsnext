@@ -87,17 +87,17 @@ export interface AppContext {
 
   // Event Processing
   eventProcessor: EventProcessor
-  
+
   // Module Event Handlers
   playerEventHandler: PlayerEventHandler
   weaponEventHandler: WeaponEventHandler
   matchEventHandler: MatchEventHandler
   actionEventHandler: ActionEventHandler
   serverEventHandler: ServerEventHandler
-  
+
   // Module Registry
   moduleRegistry: ModuleRegistry
-  
+
   // Performance Monitoring
   eventMetrics: EventMetrics
 }
@@ -136,11 +136,11 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
           queueTimeout: 5000,
         },
         shadowConsumer: {
-          queues: ['hlstats.events.priority', 'hlstats.events.standard', 'hlstats.events.bulk'],
+          queues: ["hlstats.events.priority", "hlstats.events.standard", "hlstats.events.bulk"],
           metricsInterval: 30000, // Log metrics every 30 seconds
-          logEvents: process.env.LOG_LEVEL === 'debug',
+          logEvents: process.env.LOG_LEVEL === "debug",
           logParsingErrors: true, // Always log parsing errors
-          logRawMessages: process.env.LOG_LEVEL === 'debug',
+          logRawMessages: process.env.LOG_LEVEL === "debug",
           maxBufferSize: 10000,
         },
       },
@@ -209,7 +209,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   // Create event metrics and saga monitor
   const eventMetrics = new EventMetrics(logger)
   const sagaMonitor = new SagaMonitor(logger)
-  
+
   // Create sagas
   const killEventSaga = new KillEventSaga(
     logger,
@@ -218,19 +218,18 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     weaponService,
     matchService,
     rankingService,
-    sagaMonitor
+    sagaMonitor,
   )
-  
+
   // Create saga coordinator
   const sagaCoordinator = new SagaEventCoordinator(logger)
   sagaCoordinator.registerSaga(EventType.PLAYER_KILL, killEventSaga)
-  
+
   // Keep the simple kill event coordinator for now (Phase 2 compatibility)
   const killEventCoordinator = new KillEventCoordinator(logger, rankingService)
   const coordinators = [sagaCoordinator, killEventCoordinator]
-  
   const eventProcessor = new EventProcessor(eventBus, eventProcessorDeps, coordinators)
-  
+
   // Create module event handlers with metrics
   const playerEventHandler = new PlayerEventHandler(
     eventBus,
@@ -239,40 +238,20 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     serverService,
     eventMetrics,
   )
-  
-  const weaponEventHandler = new WeaponEventHandler(
-    eventBus,
-    logger,
-    weaponService,
-    eventMetrics,
-  )
-  
-  const matchEventHandler = new MatchEventHandler(
-    eventBus,
-    logger,
-    matchService,
-    eventMetrics,
-  )
-  
-  const actionEventHandler = new ActionEventHandler(
-    eventBus,
-    logger,
-    actionService,
-    eventMetrics,
-  )
-  
-  const serverEventHandler = new ServerEventHandler(
-    eventBus,
-    logger,
-    serverService,
-    eventMetrics,
-  )
-  
+
+  const weaponEventHandler = new WeaponEventHandler(eventBus, logger, weaponService, eventMetrics)
+
+  const matchEventHandler = new MatchEventHandler(eventBus, logger, matchService, eventMetrics)
+
+  const actionEventHandler = new ActionEventHandler(eventBus, logger, actionService, eventMetrics)
+
+  const serverEventHandler = new ServerEventHandler(eventBus, logger, serverService, eventMetrics)
+
   // Create module registry and register all handlers
   const moduleRegistry = new ModuleRegistry(logger)
-  
+
   moduleRegistry.register({
-    name: 'player',
+    name: "player",
     handler: playerEventHandler,
     handledEvents: [
       EventType.PLAYER_CONNECT,
@@ -281,9 +260,9 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
       EventType.CHAT_MESSAGE,
     ],
   })
-  
+
   moduleRegistry.register({
-    name: 'weapon',
+    name: "weapon",
     handler: weaponEventHandler,
     handledEvents: [
       EventType.WEAPON_FIRE,
@@ -291,9 +270,9 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
       EventType.PLAYER_KILL, // For weapon statistics
     ],
   })
-  
+
   moduleRegistry.register({
-    name: 'match',
+    name: "match",
     handler: matchEventHandler,
     handledEvents: [
       EventType.ROUND_START,
@@ -314,9 +293,9 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
       EventType.PLAYER_KILL, // For match statistics
     ],
   })
-  
+
   moduleRegistry.register({
-    name: 'action',
+    name: "action",
     handler: actionEventHandler,
     handledEvents: [
       EventType.ACTION_PLAYER,
@@ -325,9 +304,9 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
       EventType.ACTION_WORLD,
     ],
   })
-  
+
   moduleRegistry.register({
-    name: 'server',
+    name: "server",
     handler: serverEventHandler,
     handledEvents: [
       EventType.SERVER_SHUTDOWN,

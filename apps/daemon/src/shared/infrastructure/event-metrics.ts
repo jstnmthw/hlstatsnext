@@ -1,6 +1,6 @@
 /**
  * Event Metrics Collection
- * 
+ *
  * Provides comprehensive metrics collection for the distributed event
  * processing system, including performance monitoring, error tracking,
  * and system health indicators.
@@ -12,29 +12,38 @@ import { EventType } from "@/shared/types/events"
 export interface EventProcessingMetrics {
   readonly totalEvents: number
   readonly eventsByType: Record<EventType, number>
-  readonly processingTimes: Record<EventType, {
-    count: number
-    totalTime: number
-    averageTime: number
-    minTime: number
-    maxTime: number
-  }>
+  readonly processingTimes: Record<
+    EventType,
+    {
+      count: number
+      totalTime: number
+      averageTime: number
+      minTime: number
+      maxTime: number
+    }
+  >
   readonly errorCounts: Record<EventType, number>
-  readonly moduleMetrics: Record<string, {
-    eventsProcessed: number
-    averageProcessingTime: number
-    errorCount: number
-  }>
+  readonly moduleMetrics: Record<
+    string,
+    {
+      eventsProcessed: number
+      averageProcessingTime: number
+      errorCount: number
+    }
+  >
 }
 
 export class EventMetrics {
   private readonly processingTimes: Map<EventType, number[]> = new Map()
   private readonly errorCounts: Map<EventType, number> = new Map()
-  private readonly moduleMetrics: Map<string, {
-    eventsProcessed: number
-    totalProcessingTime: number
-    errorCount: number
-  }> = new Map()
+  private readonly moduleMetrics: Map<
+    string,
+    {
+      eventsProcessed: number
+      totalProcessingTime: number
+      errorCount: number
+    }
+  > = new Map()
   private totalEvents = 0
 
   constructor(private readonly logger: ILogger) {}
@@ -65,7 +74,8 @@ export class EventMetrics {
     }
 
     // Log slow events
-    if (duration > 1000) { // Log events taking more than 1 second
+    if (duration > 1000) {
+      // Log events taking more than 1 second
       this.logger.warn(`Slow event processing detected`, {
         eventType,
         duration: `${duration}ms`,
@@ -106,13 +116,19 @@ export class EventMetrics {
    */
   getMetrics(): EventProcessingMetrics {
     const eventsByType: Record<EventType, number> = {} as Record<EventType, number>
-    const processingTimes: Record<EventType, { count: number; totalTime: number; averageTime: number; minTime: number; maxTime: number }> = {} as Record<EventType, { count: number; totalTime: number; averageTime: number; minTime: number; maxTime: number }>
+    const processingTimes: Record<
+      EventType,
+      { count: number; totalTime: number; averageTime: number; minTime: number; maxTime: number }
+    > = {} as Record<
+      EventType,
+      { count: number; totalTime: number; averageTime: number; minTime: number; maxTime: number }
+    >
     const errorCounts: Record<EventType, number> = {} as Record<EventType, number>
 
     // Calculate event type metrics
     for (const [eventType, times] of this.processingTimes.entries()) {
       eventsByType[eventType] = times.length
-      
+
       if (times.length > 0) {
         const totalTime = times.reduce((sum, time) => sum + time, 0)
         processingTimes[eventType] = {
@@ -131,13 +147,15 @@ export class EventMetrics {
     }
 
     // Calculate module metrics
-    const moduleMetrics: Record<string, { eventsProcessed: number; averageProcessingTime: number; errorCount: number }> = {}
+    const moduleMetrics: Record<
+      string,
+      { eventsProcessed: number; averageProcessingTime: number; errorCount: number }
+    > = {}
     for (const [moduleName, stats] of this.moduleMetrics.entries()) {
       moduleMetrics[moduleName] = {
         eventsProcessed: stats.eventsProcessed,
-        averageProcessingTime: stats.eventsProcessed > 0 
-          ? stats.totalProcessingTime / stats.eventsProcessed 
-          : 0,
+        averageProcessingTime:
+          stats.eventsProcessed > 0 ? stats.totalProcessingTime / stats.eventsProcessed : 0,
         errorCount: stats.errorCount,
       }
     }
@@ -162,7 +180,7 @@ export class EventMetrics {
     mostErrorProneEventType: { eventType: EventType; errorCount: number } | null
   } {
     const metrics = this.getMetrics()
-    
+
     let totalProcessingTime = 0
     let totalProcessedEvents = 0
     let totalErrors = 0
@@ -189,10 +207,15 @@ export class EventMetrics {
 
     return {
       totalEvents: metrics.totalEvents,
-      averageProcessingTime: totalProcessedEvents > 0 ? totalProcessingTime / totalProcessedEvents : 0,
+      averageProcessingTime:
+        totalProcessedEvents > 0 ? totalProcessingTime / totalProcessedEvents : 0,
       errorRate: metrics.totalEvents > 0 ? totalErrors / metrics.totalEvents : 0,
-      slowestEventType: slowestEventType?.averageTime && slowestEventType.averageTime > 0 ? slowestEventType : null,
-      mostErrorProneEventType: mostErrorProneEventType?.errorCount && mostErrorProneEventType.errorCount > 0 ? mostErrorProneEventType : null,
+      slowestEventType:
+        slowestEventType?.averageTime && slowestEventType.averageTime > 0 ? slowestEventType : null,
+      mostErrorProneEventType:
+        mostErrorProneEventType?.errorCount && mostErrorProneEventType.errorCount > 0
+          ? mostErrorProneEventType
+          : null,
     }
   }
 
@@ -212,19 +235,23 @@ export class EventMetrics {
    */
   logPerformanceSummary(): void {
     const summary = this.getPerformanceSummary()
-    
+
     this.logger.info("Event Processing Performance Summary", {
       totalEvents: summary.totalEvents,
       averageProcessingTime: `${summary.averageProcessingTime.toFixed(2)}ms`,
       errorRate: `${(summary.errorRate * 100).toFixed(2)}%`,
-      slowestEventType: summary.slowestEventType ? {
-        eventType: summary.slowestEventType.eventType,
-        averageTime: `${summary.slowestEventType.averageTime.toFixed(2)}ms`,
-      } : 'None',
-      mostErrorProneEventType: summary.mostErrorProneEventType ? {
-        eventType: summary.mostErrorProneEventType.eventType,
-        errorCount: summary.mostErrorProneEventType.errorCount,
-      } : 'None',
+      slowestEventType: summary.slowestEventType
+        ? {
+            eventType: summary.slowestEventType.eventType,
+            averageTime: `${summary.slowestEventType.averageTime.toFixed(2)}ms`,
+          }
+        : "None",
+      mostErrorProneEventType: summary.mostErrorProneEventType
+        ? {
+            eventType: summary.mostErrorProneEventType.eventType,
+            errorCount: summary.mostErrorProneEventType.errorCount,
+          }
+        : "None",
     })
   }
 }

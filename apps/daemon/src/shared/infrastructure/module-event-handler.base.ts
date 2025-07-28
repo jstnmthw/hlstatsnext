@@ -1,6 +1,6 @@
 /**
  * Base Module Event Handler
- * 
+ *
  * Abstract base class for module-specific event handlers that provides
  * common infrastructure for registering and managing event handlers.
  * This enables each module to handle its own events independently while
@@ -37,9 +37,7 @@ export abstract class BaseModuleEventHandler {
     eventType: EventType,
     handler: (event: T) => Promise<void>,
   ): void {
-    const wrappedHandler = this.metrics 
-      ? this.createMetricsWrapper(eventType, handler)
-      : handler
+    const wrappedHandler = this.metrics ? this.createMetricsWrapper(eventType, handler) : handler
 
     const handlerId = this.eventBus.on(eventType, wrappedHandler)
     this.handlerIds.push(handlerId)
@@ -57,16 +55,20 @@ export abstract class BaseModuleEventHandler {
 
     return async (event: T) => {
       const startTime = Date.now()
-      
+
       try {
         await handler(event)
-        
+
         const duration = Date.now() - startTime
         this.metrics!.recordProcessingTime(eventType, duration, moduleName)
       } catch (error) {
         const duration = Date.now() - startTime
         this.metrics!.recordProcessingTime(eventType, duration, moduleName)
-        this.metrics!.recordError(eventType, error instanceof Error ? error : new Error(String(error)), moduleName)
+        this.metrics!.recordError(
+          eventType,
+          error instanceof Error ? error : new Error(String(error)),
+          moduleName,
+        )
         throw error
       }
     }

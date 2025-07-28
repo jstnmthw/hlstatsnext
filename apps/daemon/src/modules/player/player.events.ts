@@ -1,6 +1,6 @@
 /**
  * Player Module Event Handler
- * 
+ *
  * Handles player-specific events including connections, disconnections,
  * name changes, and chat messages. This handler is responsible for
  * resolving player IDs and delegating to the player service.
@@ -37,28 +37,28 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
 
   private async handlePlayerConnect(event: BaseEvent): Promise<void> {
     this.logger.debug(`Player module handling PLAYER_CONNECT for server ${event.serverId}`)
-    
+
     const resolvedEvent = await this.resolvePlayerIds(event)
     await this.playerService.handlePlayerEvent(resolvedEvent as PlayerEvent)
   }
 
   private async handlePlayerDisconnect(event: BaseEvent): Promise<void> {
     this.logger.debug(`Player module handling PLAYER_DISCONNECT for server ${event.serverId}`)
-    
+
     const resolvedEvent = await this.resolvePlayerIds(event)
     await this.playerService.handlePlayerEvent(resolvedEvent as PlayerEvent)
   }
 
   private async handlePlayerChangeName(event: BaseEvent): Promise<void> {
     this.logger.debug(`Player module handling PLAYER_CHANGE_NAME for server ${event.serverId}`)
-    
+
     const resolvedEvent = await this.resolvePlayerIds(event)
     await this.playerService.handlePlayerEvent(resolvedEvent as PlayerEvent)
   }
 
   private async handleChatMessage(event: BaseEvent): Promise<void> {
     this.logger.debug(`Player module handling CHAT_MESSAGE for server ${event.serverId}`)
-    
+
     const resolvedEvent = await this.resolvePlayerIds(event)
     await this.playerService.handlePlayerEvent(resolvedEvent as PlayerEvent)
   }
@@ -83,7 +83,7 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
     try {
       // Get the server's game type for player creation
       const serverGame = await this.serverService.getServerGame(event.serverId)
-      
+
       // Handle single player events
       const playerMeta = meta as PlayerMeta
       if (playerMeta.steamId && playerMeta.playerName) {
@@ -97,9 +97,7 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
 
       return resolvedEvent
     } catch (error) {
-      this.logger.error(
-        `Failed to resolve player IDs for event ${event.eventType}: ${error}`,
-      )
+      this.logger.error(`Failed to resolve player IDs for event ${event.eventType}: ${error}`)
       return event // Return original event if resolution fails
     }
   }

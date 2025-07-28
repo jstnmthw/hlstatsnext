@@ -2,18 +2,18 @@
  * Shadow Consumer Tests
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { 
-  ShadowConsumer, 
-  defaultShadowConsumerConfig, 
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
+import {
+  ShadowConsumer,
+  defaultShadowConsumerConfig,
   createShadowConsumer,
-  type ShadowConsumerConfig 
-} from './shadow-consumer'
-import type { IQueueClient, QueueChannel } from './queue.types'
-import type { ILogger } from '@/shared/utils/logger.types'
-import { LogLevel } from '@/shared/utils/logger'
-import type { BaseEvent } from '@/shared/types/events'
-import { EventType } from '@/shared/types/events'
+  type ShadowConsumerConfig,
+} from "./shadow-consumer"
+import type { IQueueClient, QueueChannel } from "./queue.types"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { LogLevel } from "@/shared/utils/logger"
+import type { BaseEvent } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
 
 // Mock implementations
 const mockChannel = {
@@ -73,7 +73,7 @@ const mockEvent: BaseEvent = {
   serverId: 1,
 }
 
-describe('ShadowConsumer', () => {
+describe("ShadowConsumer", () => {
   let shadowConsumer: ShadowConsumer
   let config: ShadowConsumerConfig
 
@@ -104,27 +104,27 @@ describe('ShadowConsumer', () => {
     }
   })
 
-  describe('constructor', () => {
-    it('should create shadow consumer with default config', () => {
+  describe("constructor", () => {
+    it("should create shadow consumer with default config", () => {
       expect(shadowConsumer).toBeInstanceOf(ShadowConsumer)
     })
 
-    it('should initialize stats correctly', () => {
+    it("should initialize stats correctly", () => {
       const stats = shadowConsumer.getStats()
       expect(stats.eventsReceived).toBe(0)
       expect(stats.eventsProcessed).toBe(0)
       expect(stats.validationErrors).toBe(0)
       expect(stats.isRunning).toBe(false)
       expect(stats.queueStats).toEqual({
-        'hlstats.events.priority': { received: 0, processed: 0, errors: 0 },
-        'hlstats.events.standard': { received: 0, processed: 0, errors: 0 },
-        'hlstats.events.bulk': { received: 0, processed: 0, errors: 0 },
+        "hlstats.events.priority": { received: 0, processed: 0, errors: 0 },
+        "hlstats.events.standard": { received: 0, processed: 0, errors: 0 },
+        "hlstats.events.bulk": { received: 0, processed: 0, errors: 0 },
       })
     })
   })
 
-  describe('start', () => {
-    it('should start shadow consumer successfully', async () => {
+  describe("start", () => {
+    it("should start shadow consumer successfully", async () => {
       await shadowConsumer.start()
 
       expect(mockClient.createChannel).toHaveBeenCalledTimes(3)
@@ -132,27 +132,27 @@ describe('ShadowConsumer', () => {
       expect(shadowConsumer.getStats().isRunning).toBe(true)
     })
 
-    it('should throw error if already running', async () => {
+    it("should throw error if already running", async () => {
       await shadowConsumer.start()
-      
-      await expect(shadowConsumer.start()).rejects.toThrow('Shadow consumer is already running')
+
+      await expect(shadowConsumer.start()).rejects.toThrow("Shadow consumer is already running")
     })
 
-    it('should throw error if client not connected', async () => {
+    it("should throw error if client not connected", async () => {
       vi.mocked(mockClient.isConnected).mockReturnValue(false)
-      
-      await expect(shadowConsumer.start()).rejects.toThrow('Queue client is not connected')
+
+      await expect(shadowConsumer.start()).rejects.toThrow("Queue client is not connected")
     })
 
-    it('should handle start errors gracefully', async () => {
-      vi.mocked(mockClient.createChannel).mockRejectedValue(new Error('Connection failed'))
-      
-      await expect(shadowConsumer.start()).rejects.toThrow('Connection failed')
+    it("should handle start errors gracefully", async () => {
+      vi.mocked(mockClient.createChannel).mockRejectedValue(new Error("Connection failed"))
+
+      await expect(shadowConsumer.start()).rejects.toThrow("Connection failed")
     })
   })
 
-  describe('stop', () => {
-    it('should stop shadow consumer successfully', async () => {
+  describe("stop", () => {
+    it("should stop shadow consumer successfully", async () => {
       await shadowConsumer.start()
       await shadowConsumer.stop()
 
@@ -161,24 +161,24 @@ describe('ShadowConsumer', () => {
       expect(shadowConsumer.getStats().isRunning).toBe(false)
     })
 
-    it('should handle stop when not running', async () => {
+    it("should handle stop when not running", async () => {
       await shadowConsumer.stop()
       // Should not throw or cause issues
       expect(mockChannel.cancel).not.toHaveBeenCalled()
     })
   })
 
-  describe('validateEvent', () => {
-    it('should validate event successfully when found in buffer', async () => {
+  describe("validateEvent", () => {
+    it("should validate event successfully when found in buffer", async () => {
       await shadowConsumer.start()
 
       // Simulate receiving an event through message handler
       const eventMessage = {
-        id: 'msg-1',
+        id: "msg-1",
         payload: mockEvent,
         metadata: {
           timestamp: Date.now(),
-          routingKey: 'player.kill',
+          routingKey: "player.kill",
           priority: 5,
         },
       }
@@ -192,7 +192,7 @@ describe('ShadowConsumer', () => {
       const consumeCall = vi.mocked(mockChannel.consume).mock.calls[0]
       expect(consumeCall).toBeDefined()
       const messageHandler = consumeCall![1] as (msg: { content: Buffer } | null) => Promise<void>
-      
+
       // Simulate message reception
       await messageHandler(mockMsg)
 
@@ -201,20 +201,20 @@ describe('ShadowConsumer', () => {
       expect(isValid).toBe(true)
     })
 
-    it('should return false when event not found in buffer', () => {
+    it("should return false when event not found in buffer", () => {
       const isValid = shadowConsumer.validateEvent(mockEvent)
       expect(isValid).toBe(false)
     })
 
-    it('should return false for mismatched event data', async () => {
+    it("should return false for mismatched event data", async () => {
       await shadowConsumer.start()
 
       const eventMessage = {
-        id: 'msg-1',
+        id: "msg-1",
         payload: { ...mockEvent, eventType: EventType.PLAYER_CONNECT },
         metadata: {
           timestamp: Date.now(),
-          routingKey: 'player.kill',
+          routingKey: "player.kill",
           priority: 5,
         },
       }
@@ -233,16 +233,16 @@ describe('ShadowConsumer', () => {
     })
   })
 
-  describe('message handling', () => {
-    it('should handle valid message correctly', async () => {
+  describe("message handling", () => {
+    it("should handle valid message correctly", async () => {
       await shadowConsumer.start()
 
       const eventMessage = {
-        id: 'msg-1',
+        id: "msg-1",
         payload: mockEvent,
         metadata: {
           timestamp: Date.now(),
-          routingKey: 'player.kill',
+          routingKey: "player.kill",
           priority: 5,
         },
       }
@@ -262,11 +262,11 @@ describe('ShadowConsumer', () => {
       expect(stats.validationErrors).toBe(0)
     })
 
-    it('should handle invalid JSON gracefully', async () => {
+    it("should handle invalid JSON gracefully", async () => {
       await shadowConsumer.start()
 
       const mockMsg = {
-        content: Buffer.from('invalid json'),
+        content: Buffer.from("invalid json"),
       }
 
       const consumeCall = vi.mocked(mockChannel.consume).mock.calls[0]
@@ -280,13 +280,13 @@ describe('ShadowConsumer', () => {
       expect(stats.validationErrors).toBe(1)
     })
 
-    it('should handle message processing errors', async () => {
+    it("should handle message processing errors", async () => {
       await shadowConsumer.start()
 
       const consumeCall = vi.mocked(mockChannel.consume).mock.calls[0]
       expect(consumeCall).toBeDefined()
       const messageHandler = consumeCall![1] as (msg: { content: Buffer } | null) => Promise<void>
-      
+
       // Simulate error during message handling
       await messageHandler(null)
 
@@ -295,11 +295,11 @@ describe('ShadowConsumer', () => {
     })
   })
 
-  describe('buffer management', () => {
-    it('should respect max buffer size', async () => {
+  describe("buffer management", () => {
+    it("should respect max buffer size", async () => {
       const smallBufferConfig = { ...config, maxBufferSize: 2 }
       const consumer = new ShadowConsumer(mockClient, smallBufferConfig, mockLogger)
-      
+
       await consumer.start()
 
       // Simulate receiving 3 events (exceeds buffer size of 2)
@@ -312,7 +312,7 @@ describe('ShadowConsumer', () => {
         const eventMessage = {
           id: `msg-${i}`,
           payload: event,
-          metadata: { timestamp: Date.now(), routingKey: 'player.kill', priority: 5 },
+          metadata: { timestamp: Date.now(), routingKey: "player.kill", priority: 5 },
         }
         const mockMsg = { content: Buffer.from(JSON.stringify(eventMessage)) }
         await messageHandler(mockMsg)
@@ -327,25 +327,25 @@ describe('ShadowConsumer', () => {
   })
 })
 
-describe('createShadowConsumer', () => {
-  it('should create shadow consumer with factory function', () => {
+describe("createShadowConsumer", () => {
+  it("should create shadow consumer with factory function", () => {
     const consumer = createShadowConsumer(mockClient, mockLogger)
     expect(consumer).toBeInstanceOf(ShadowConsumer)
   })
 
-  it('should merge custom config with defaults', () => {
+  it("should merge custom config with defaults", () => {
     const customConfig = { metricsInterval: 5000 }
     const consumer = createShadowConsumer(mockClient, mockLogger, customConfig)
     expect(consumer).toBeInstanceOf(ShadowConsumer)
   })
 })
 
-describe('defaultShadowConsumerConfig', () => {
-  it('should have expected default values', () => {
+describe("defaultShadowConsumerConfig", () => {
+  it("should have expected default values", () => {
     expect(defaultShadowConsumerConfig.queues).toEqual([
-      'hlstats.events.priority',
-      'hlstats.events.standard', 
-      'hlstats.events.bulk',
+      "hlstats.events.priority",
+      "hlstats.events.standard",
+      "hlstats.events.bulk",
     ])
     expect(defaultShadowConsumerConfig.metricsInterval).toBe(30000)
     expect(defaultShadowConsumerConfig.logEvents).toBe(false)

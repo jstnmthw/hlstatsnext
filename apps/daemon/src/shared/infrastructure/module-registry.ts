@@ -1,6 +1,6 @@
 /**
  * Module Registry
- * 
+ *
  * Centralized registry for managing module event handlers,
  * providing discovery and lifecycle management capabilities.
  */
@@ -53,8 +53,9 @@ export class ModuleRegistry {
    * Get handlers for a specific event type
    */
   getHandlersForEvent(eventType: EventType): ModuleEventHandler[] {
-    return Array.from(this.modules.values())
-      .filter(module => module.handledEvents.includes(eventType))
+    return Array.from(this.modules.values()).filter((module) =>
+      module.handledEvents.includes(eventType),
+    )
   }
 
   /**
@@ -129,7 +130,7 @@ export class ModuleRegistry {
    */
   getStats() {
     const eventCoverage = new Map<EventType, string[]>()
-    
+
     for (const [name, module] of this.modules.entries()) {
       for (const eventType of module.handledEvents) {
         if (!eventCoverage.has(eventType)) {

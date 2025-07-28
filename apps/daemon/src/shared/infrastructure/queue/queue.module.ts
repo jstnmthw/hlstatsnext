@@ -11,14 +11,22 @@ import type {
   IEventConsumer,
   RabbitMQConfig,
   QueueModuleDependencies,
-} from './queue.types'
-import type { IEventBus } from '../event-bus/event-bus.types'
-import type { ILogger } from '@/shared/utils/logger.types'
-import { RabbitMQClient } from './rabbitmq.client'
-import { EventPublisher } from './event-publisher'
-import { EventConsumer, type IEventProcessor } from './event-consumer'
-import { DualEventPublisher, defaultDualPublisherConfig, type DualPublisherConfig } from './dual-event-publisher'
-import { ShadowConsumer, defaultShadowConsumerConfig, type ShadowConsumerConfig } from './shadow-consumer'
+} from "./queue.types"
+import type { IEventBus } from "../event-bus/event-bus.types"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { RabbitMQClient } from "./rabbitmq.client"
+import { EventPublisher } from "./event-publisher"
+import { EventConsumer, type IEventProcessor } from "./event-consumer"
+import {
+  DualEventPublisher,
+  defaultDualPublisherConfig,
+  type DualPublisherConfig,
+} from "./dual-event-publisher"
+import {
+  ShadowConsumer,
+  defaultShadowConsumerConfig,
+  type ShadowConsumerConfig,
+} from "./shadow-consumer"
 
 /**
  * Configuration for the queue module
@@ -68,7 +76,7 @@ export class QueueModule {
       // Create consumer if event processor is provided
       if (eventProcessor) {
         this.consumer = new EventConsumer(this.client, eventProcessor, this.logger)
-        
+
         if (this.config.autoStartConsumers) {
           await this.consumer.start()
         }
@@ -85,7 +93,7 @@ export class QueueModule {
         await this.shadowConsumer.start()
       }
 
-      this.logger.info('Queue module initialized successfully')
+      this.logger.info("Queue module initialized successfully")
 
       return {
         client: this.client,
@@ -103,15 +111,13 @@ export class QueueModule {
    */
   createDualPublisher(eventBus: IEventBus): DualEventPublisher {
     if (!this.publisher) {
-      throw new Error('Queue module not initialized - publisher not available')
+      throw new Error("Queue module not initialized - publisher not available")
     }
 
-    this.dualPublisher = new DualEventPublisher(
-      eventBus,
-      this.publisher,
-      this.logger,
-      { ...defaultDualPublisherConfig, ...this.config.dualPublisher },
-    )
+    this.dualPublisher = new DualEventPublisher(eventBus, this.publisher, this.logger, {
+      ...defaultDualPublisherConfig,
+      ...this.config.dualPublisher,
+    })
 
     return this.dualPublisher
   }
@@ -121,7 +127,7 @@ export class QueueModule {
    */
   getDualPublisher(): DualEventPublisher {
     if (!this.dualPublisher) {
-      throw new Error('Dual publisher not created - call createDualPublisher first')
+      throw new Error("Dual publisher not created - call createDualPublisher first")
     }
     return this.dualPublisher
   }
@@ -131,7 +137,7 @@ export class QueueModule {
    */
   getClient(): IQueueClient {
     if (!this.client) {
-      throw new Error('Queue module not initialized - client not available')
+      throw new Error("Queue module not initialized - client not available")
     }
     return this.client
   }
@@ -141,7 +147,7 @@ export class QueueModule {
    */
   getPublisher(): IEventPublisher {
     if (!this.publisher) {
-      throw new Error('Queue module not initialized - publisher not available')
+      throw new Error("Queue module not initialized - publisher not available")
     }
     return this.publisher
   }
@@ -151,7 +157,7 @@ export class QueueModule {
    */
   getConsumer(): IEventConsumer {
     if (!this.consumer) {
-      throw new Error('Queue module not initialized - consumer not available')
+      throw new Error("Queue module not initialized - consumer not available")
     }
     return this.consumer
   }
@@ -161,7 +167,7 @@ export class QueueModule {
    */
   getShadowConsumer(): ShadowConsumer {
     if (!this.shadowConsumer) {
-      throw new Error('Shadow consumer not available')
+      throw new Error("Shadow consumer not available")
     }
     return this.shadowConsumer
   }
@@ -171,7 +177,7 @@ export class QueueModule {
    */
   async startShadowConsumer(): Promise<void> {
     if (!this.shadowConsumer) {
-      throw new Error('Shadow consumer not available')
+      throw new Error("Shadow consumer not available")
     }
     await this.shadowConsumer.start()
   }
@@ -212,7 +218,7 @@ export class QueueModule {
    * Gracefully shutdown the queue module
    */
   async shutdown(): Promise<void> {
-    this.logger.info('Shutting down queue module...')
+    this.logger.info("Shutting down queue module...")
 
     try {
       // Stop shadow consumer first
@@ -237,7 +243,7 @@ export class QueueModule {
       this.publisher = null
       this.dualPublisher = null
 
-      this.logger.info('Queue module shutdown complete')
+      this.logger.info("Queue module shutdown complete")
     } catch (error) {
       this.logger.error(`Error during queue module shutdown: ${error}`)
       throw error
@@ -253,16 +259,16 @@ export interface QueueModuleStatus {
   readonly connected: boolean
   readonly hasDualPublisher: boolean
   readonly hasShadowConsumer: boolean
-  readonly connectionStats?: import('./queue.types').ConnectionStats
-  readonly consumerStats?: import('./queue.types').ConsumerStats
-  readonly dualPublisherStats?: import('./dual-event-publisher').DualPublisherStats
-  readonly shadowConsumerStats?: import('./shadow-consumer').ShadowConsumerStats
+  readonly connectionStats?: import("./queue.types").ConnectionStats
+  readonly consumerStats?: import("./queue.types").ConsumerStats
+  readonly dualPublisherStats?: import("./dual-event-publisher").DualPublisherStats
+  readonly shadowConsumerStats?: import("./shadow-consumer").ShadowConsumerStats
 }
 
 /**
  * Default queue module configuration
  */
-export const defaultQueueModuleConfig: Omit<QueueModuleConfig, 'rabbitmq'> = {
+export const defaultQueueModuleConfig: Omit<QueueModuleConfig, "rabbitmq"> = {
   autoStartConsumers: false,
   autoStartShadowConsumer: true,
   autoSetupTopology: true,
@@ -273,7 +279,7 @@ export const defaultQueueModuleConfig: Omit<QueueModuleConfig, 'rabbitmq'> = {
     queueTimeout: 5000,
   },
   shadowConsumer: {
-    queues: ['hlstats.events.priority', 'hlstats.events.standard', 'hlstats.events.bulk'],
+    queues: ["hlstats.events.priority", "hlstats.events.standard", "hlstats.events.bulk"],
     metricsInterval: 30000,
     logEvents: false,
     logParsingErrors: true,
@@ -304,7 +310,7 @@ export function createQueueModule(
  */
 export function createDevelopmentRabbitMQConfig(url?: string): RabbitMQConfig {
   return {
-    url: url || 'amqp://hlstats:hlstats@localhost:5672/hlstats',
+    url: url || "amqp://hlstats:hlstats@localhost:5672/hlstats",
     prefetchCount: 10,
     heartbeatInterval: 60,
     connectionRetry: {
@@ -314,57 +320,53 @@ export function createDevelopmentRabbitMQConfig(url?: string): RabbitMQConfig {
     },
     queues: {
       priority: {
-        name: 'hlstats.events.priority',
+        name: "hlstats.events.priority",
         bindings: [
-          'player.kill',
-          'player.suicide',
-          'player.teamkill',
-          'round.*',
-          'bomb.*',
-          'hostage.*',
-          'flag.*',
-          'control.*',
+          "player.kill",
+          "player.suicide",
+          "player.teamkill",
+          "round.*",
+          "bomb.*",
+          "hostage.*",
+          "flag.*",
+          "control.*",
         ],
         options: {
           durable: true,
           autoDelete: false,
           messageTtl: 3600000, // 1 hour
           maxLength: 50000,
-          deadLetterExchange: 'hlstats.events.dlx',
+          deadLetterExchange: "hlstats.events.dlx",
         },
       },
       standard: {
-        name: 'hlstats.events.standard',
+        name: "hlstats.events.standard",
         bindings: [
-          'player.connect',
-          'player.disconnect',
-          'player.change.*',
-          'chat.*',
-          'admin.*',
-          'team.*',
-          'map.*',
+          "player.connect",
+          "player.disconnect",
+          "player.change.*",
+          "chat.*",
+          "admin.*",
+          "team.*",
+          "map.*",
         ],
         options: {
           durable: true,
           autoDelete: false,
           messageTtl: 3600000, // 1 hour
           maxLength: 75000,
-          deadLetterExchange: 'hlstats.events.dlx',
+          deadLetterExchange: "hlstats.events.dlx",
         },
       },
       bulk: {
-        name: 'hlstats.events.bulk',
-        bindings: [
-          'weapon.*',
-          'action.*',
-          'stats.*',
-        ],
+        name: "hlstats.events.bulk",
+        bindings: ["weapon.*", "action.*", "stats.*"],
         options: {
           durable: true,
           autoDelete: false,
           messageTtl: 3600000, // 1 hour
           maxLength: 100000,
-          deadLetterExchange: 'hlstats.events.dlx',
+          deadLetterExchange: "hlstats.events.dlx",
         },
       },
     },

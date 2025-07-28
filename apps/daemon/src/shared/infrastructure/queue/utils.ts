@@ -5,14 +5,14 @@
  * queue-related helper functions.
  */
 
-import { randomBytes } from 'crypto'
+import { randomBytes } from "crypto"
 
 /**
  * Generates a unique message ID using timestamp and random bytes
  */
 export function generateMessageId(): string {
   const timestamp = Date.now().toString(36)
-  const random = randomBytes(8).toString('hex')
+  const random = randomBytes(8).toString("hex")
   return `msg_${timestamp}_${random}`
 }
 
@@ -21,7 +21,7 @@ export function generateMessageId(): string {
  */
 export function generateCorrelationId(): string {
   const timestamp = Date.now().toString(36)
-  const random = randomBytes(6).toString('hex')
+  const random = randomBytes(6).toString("hex")
   return `corr_${timestamp}_${random}`
 }
 
@@ -45,7 +45,7 @@ export function isValidCorrelationId(correlationId: string): boolean {
 export function extractTimestampFromMessageId(messageId: string): number | null {
   const match = messageId.match(/^msg_([a-z0-9]+)_[a-f0-9]{16}$/)
   if (!match || !match[1]) return null
-  
+
   try {
     return parseInt(match[1], 36)
   } catch {
@@ -59,7 +59,7 @@ export function extractTimestampFromMessageId(messageId: string): number | null 
 export function calculateMessageAge(messageId: string): number | null {
   const timestamp = extractTimestampFromMessageId(messageId)
   if (!timestamp) return null
-  
+
   return Date.now() - timestamp
 }
 
@@ -69,15 +69,19 @@ export function calculateMessageAge(messageId: string): number | null {
 export function sanitizeRoutingKey(key: string): string {
   return key
     .toLowerCase()
-    .replace(/[^a-z0-9.*#]/g, '.')
-    .replace(/\.+/g, '.')
-    .replace(/^\.|\.$/, '')
+    .replace(/[^a-z0-9.*#]/g, ".")
+    .replace(/\.+/g, ".")
+    .replace(/^\.|\.$/, "")
 }
 
 /**
  * Creates a retry delay using exponential backoff
  */
-export function calculateRetryDelay(retryCount: number, baseDelay = 1000, maxDelay = 30000): number {
+export function calculateRetryDelay(
+  retryCount: number,
+  baseDelay = 1000,
+  maxDelay = 30000,
+): number {
   const delay = baseDelay * Math.pow(2, retryCount)
   return Math.min(delay, maxDelay)
 }
@@ -94,12 +98,12 @@ export function addJitter(delay: number, jitterFactor = 0.1): number {
  * Formats bytes to human-readable string
  */
 export function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  
+  if (bytes === 0) return "0 B"
+
   const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
+  const sizes = ["B", "KB", "MB", "GB"]
   const i = Math.floor(Math.log(bytes) / Math.log(k))
-  
+
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
 }
 
@@ -121,7 +125,7 @@ export function safeJsonStringify(obj: unknown): string {
     return JSON.stringify(obj)
   } catch (error) {
     return JSON.stringify({
-      error: 'Failed to serialize object',
+      error: "Failed to serialize object",
       message: error instanceof Error ? error.message : String(error),
     })
   }
@@ -130,7 +134,9 @@ export function safeJsonStringify(obj: unknown): string {
 /**
  * Safely parses JSON with error handling
  */
-export function safeJsonParse<T = unknown>(json: string): { success: true; data: T } | { success: false; error: string } {
+export function safeJsonParse<T = unknown>(
+  json: string,
+): { success: true; data: T } | { success: false; error: string } {
   try {
     const data = JSON.parse(json) as T
     return { success: true, data }

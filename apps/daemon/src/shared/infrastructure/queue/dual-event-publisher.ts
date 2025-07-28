@@ -5,10 +5,10 @@
  * Publishes events to both systems with graceful fallback to EventBus on queue failures.
  */
 
-import type { IEventPublisher } from './queue.types'
-import type { IEventBus } from '../event-bus/event-bus.types'
-import type { BaseEvent } from '@/shared/types/events'
-import type { ILogger } from '@/shared/utils/logger.types'
+import type { IEventPublisher } from "./queue.types"
+import type { IEventBus } from "../event-bus/event-bus.types"
+import type { BaseEvent } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 /**
  * Configuration for dual event publisher
@@ -68,8 +68,8 @@ export class DualEventPublisher implements IEventPublisher {
     if (this.config.enableEventBus) {
       promises.push(
         this.publishToEventBus(event).then(
-          () => ({ source: 'eventbus', success: true }),
-          (error) => ({ source: 'eventbus', success: false, error: error as Error }),
+          () => ({ source: "eventbus", success: true }),
+          (error) => ({ source: "eventbus", success: false, error: error as Error }),
         ),
       )
     }
@@ -78,8 +78,8 @@ export class DualEventPublisher implements IEventPublisher {
     if (this.config.enableQueue) {
       promises.push(
         this.publishToQueue(event).then(
-          () => ({ source: 'queue', success: true }),
-          (error) => ({ source: 'queue', success: false, error: error as Error }),
+          () => ({ source: "queue", success: true }),
+          (error) => ({ source: "queue", success: false, error: error as Error }),
         ),
       )
     }
@@ -92,7 +92,7 @@ export class DualEventPublisher implements IEventPublisher {
     let queueSuccess = false
 
     for (const result of results) {
-      if (result.source === 'eventbus') {
+      if (result.source === "eventbus") {
         if (result.success) {
           this.stats.eventBusSuccess++
           eventBusSuccess = true
@@ -100,7 +100,7 @@ export class DualEventPublisher implements IEventPublisher {
           this.stats.eventBusFailures++
           this.logger.error(`EventBus publish failed: ${result.error?.message}`)
         }
-      } else if (result.source === 'queue') {
+      } else if (result.source === "queue") {
         if (result.success) {
           this.stats.queueSuccess++
           queueSuccess = true
@@ -174,26 +174,25 @@ export class DualEventPublisher implements IEventPublisher {
       this.logger.debug(`EventBus publish completed in ${duration}ms for ${event.eventType}`)
     } catch (error) {
       const duration = Date.now() - startTime
-      this.logger.error(`EventBus publish failed after ${duration}ms for ${event.eventType}: ${error}`)
+      this.logger.error(
+        `EventBus publish failed after ${duration}ms for ${event.eventType}: ${error}`,
+      )
       throw error
     }
   }
 
   private async publishToQueue<T extends BaseEvent>(event: T): Promise<void> {
     const startTime = Date.now()
-    
+
     // Create timeout promise
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Queue publish timeout')), this.config.queueTimeout)
+      setTimeout(() => reject(new Error("Queue publish timeout")), this.config.queueTimeout)
     })
 
     try {
       // Race between publish and timeout
-      await Promise.race([
-        this.queuePublisher.publish(event),
-        timeoutPromise,
-      ])
-      
+      await Promise.race([this.queuePublisher.publish(event), timeoutPromise])
+
       const duration = Date.now() - startTime
       this.logger.debug(`Queue publish completed in ${duration}ms for ${event.eventType}`)
     } catch (error) {

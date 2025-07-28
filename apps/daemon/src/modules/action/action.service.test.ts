@@ -176,7 +176,7 @@ describe("ActionService", () => {
     it("should handle errors and return failure result", async () => {
       // Mock repository to return null (unknown action)
       vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
-      
+
       // Mock logger to throw an error
       vi.spyOn(mockLogger, "warn").mockImplementation(() => {
         throw new Error("Logger error")
@@ -324,7 +324,9 @@ describe("ActionService", () => {
       expect(result.affected).toBe(1)
       expect(mockRepository.logPlayerAction).toHaveBeenCalledWith(1, 1, 1, "", 0)
       expect(mockPlayerService.updatePlayerStats).not.toHaveBeenCalled() // Should NOT be called when totalPoints is 0
-      expect(mockLogger.event).toHaveBeenCalledWith("Player action: no_reward_action by player 1 (0 points)")
+      expect(mockLogger.event).toHaveBeenCalledWith(
+        "Player action: no_reward_action by player 1 (0 points)",
+      )
     })
   })
 
@@ -332,7 +334,7 @@ describe("ActionService", () => {
     it("should handle non-Error exceptions", async () => {
       // Mock repository to return null (unknown action)
       vi.mocked(mockRepository.findActionByCode).mockResolvedValue(null)
-      
+
       vi.spyOn(mockLogger, "warn").mockImplementation(() => {
         throw "String error"
       })

@@ -13,11 +13,11 @@ import type {
   EventMessage,
   ConsumerStats,
   MessageValidator,
-} from './queue.types'
-import { QueueConsumeError } from './queue.types'
-import type { BaseEvent } from '@/shared/types/events'
-import type { ILogger } from '@/shared/utils/logger.types'
-import { safeJsonParse, calculateRetryDelay, addJitter, formatDuration } from './utils'
+} from "./queue.types"
+import { QueueConsumeError } from "./queue.types"
+import type { BaseEvent } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { safeJsonParse, calculateRetryDelay, addJitter, formatDuration } from "./utils"
 
 /**
  * Event processor interface for handling consumed events
@@ -45,7 +45,7 @@ export class EventConsumer implements IEventConsumer {
   private consumerTags: string[] = []
   private isConsuming = false
   private isPaused = false
-  
+
   private stats: ConsumerStats = {
     isConsuming: false,
     messagesProcessed: 0,
@@ -55,7 +55,7 @@ export class EventConsumer implements IEventConsumer {
     averageProcessingTime: 0,
     queueDepth: 0,
   }
-  
+
   private processingTimes: number[] = []
   private readonly maxProcessingTimesSamples = 1000
 
@@ -69,21 +69,23 @@ export class EventConsumer implements IEventConsumer {
 
   async start(): Promise<void> {
     if (this.isConsuming) {
-      throw new QueueConsumeError('Consumer is already running')
+      throw new QueueConsumeError("Consumer is already running")
     }
 
     try {
       // Start consuming from all configured queues
-      await Promise.all(this.config.queues.map(queueName => this.consumeQueue(queueName)))
-      
+      await Promise.all(this.config.queues.map((queueName) => this.consumeQueue(queueName)))
+
       this.isConsuming = true
       this.stats.isConsuming = true
       this.isPaused = false
 
-      this.logger.info(`Event consumer started successfully for queues: ${this.config.queues.join(', ')} with concurrency: ${this.config.concurrency}`)
+      this.logger.info(
+        `Event consumer started successfully for queues: ${this.config.queues.join(", ")} with concurrency: ${this.config.concurrency}`,
+      )
     } catch (error) {
       this.logger.error(`Failed to start event consumer: ${error}`)
-      throw new QueueConsumeError('Failed to start consumer', error as Error)
+      throw new QueueConsumeError("Failed to start consumer", error as Error)
     }
   }
 
@@ -95,7 +97,7 @@ export class EventConsumer implements IEventConsumer {
     try {
       // Cancel all consumers
       for (const [queueName, channel] of this.channels) {
-        const consumerTag = this.consumerTags.find(tag => tag.startsWith(queueName))
+        const consumerTag = this.consumerTags.find((tag) => tag.startsWith(queueName))
         if (consumerTag) {
           await channel.cancel(consumerTag)
         }
@@ -107,21 +109,21 @@ export class EventConsumer implements IEventConsumer {
       this.isConsuming = false
       this.stats.isConsuming = false
 
-      this.logger.info('Event consumer stopped')
+      this.logger.info("Event consumer stopped")
     } catch (error) {
       this.logger.error(`Error stopping consumer: ${error}`)
-      throw new QueueConsumeError('Failed to stop consumer', error as Error)
+      throw new QueueConsumeError("Failed to stop consumer", error as Error)
     }
   }
 
   async pause(): Promise<void> {
     this.isPaused = true
-    this.logger.info('Event consumer paused')
+    this.logger.info("Event consumer paused")
   }
 
   async resume(): Promise<void> {
     this.isPaused = false
-    this.logger.info('Event consumer resumed')
+    this.logger.info("Event consumer resumed")
   }
 
   getConsumerStats(): ConsumerStats {
@@ -162,17 +164,23 @@ export class EventConsumer implements IEventConsumer {
     this.logger.debug(`Started consuming from queue ${queueName} with consumerTag: ${consumerTag}`)
   }
 
-  private async handleMessage(msg: ConsumeMessage, channel: QueueChannel, queueName: string): Promise<void> {
+  private async handleMessage(
+    msg: ConsumeMessage,
+    channel: QueueChannel,
+    queueName: string,
+  ): Promise<void> {
     const startTime = Date.now()
-    let messageId = 'unknown'
+    let messageId = "unknown"
 
     try {
       // Parse message
       const parseResult = this.parseMessage(msg)
       if (!parseResult.success) {
-        this.logger.error(`Failed to parse message from ${queueName}: ${parseResult.error} (contentLength: ${msg.content.length})`)
-        
-        await this.rejectMessage(msg, channel, 'Invalid message format')
+        this.logger.error(
+          `Failed to parse message from ${queueName}: ${parseResult.error} (contentLength: ${msg.content.length})`,
+        )
+
+        await this.rejectMessage(msg, channel, "Invalid message format")
         return
       }
 
@@ -182,7 +190,9 @@ export class EventConsumer implements IEventConsumer {
       // Validate message
       await this.messageValidator(message)
 
-      this.logger.debug(`Processing message ${messageId} (${message.payload.eventType}) from ${queueName} (retry: ${message.metadata.routing.retryCount})`)
+      this.logger.debug(
+        `Processing message ${messageId} (${message.payload.eventType}) from ${queueName} (retry: ${message.metadata.routing.retryCount})`,
+      )
 
       // Process the event
       await this.processor.processEvent(message.payload)
@@ -195,22 +205,29 @@ export class EventConsumer implements IEventConsumer {
       const processingTime = Date.now() - startTime
       this.recordProcessingTime(processingTime)
 
-      this.logger.debug(`Message ${messageId} (${message.payload.eventType}) processed successfully in ${formatDuration(processingTime)}`)
-
+      this.logger.debug(
+        `Message ${messageId} (${message.payload.eventType}) processed successfully in ${formatDuration(processingTime)}`,
+      )
     } catch (error) {
       const processingTime = Date.now() - startTime
-      
-      this.logger.error(`Error processing message ${messageId} from ${queueName} in ${formatDuration(processingTime)}: ${error instanceof Error ? error.message : String(error)}`)
+
+      this.logger.error(
+        `Error processing message ${messageId} from ${queueName} in ${formatDuration(processingTime)}: ${error instanceof Error ? error.message : String(error)}`,
+      )
 
       await this.handleProcessingError(msg, channel, error as Error)
     }
   }
 
-  private async handleProcessingError(msg: ConsumeMessage, channel: QueueChannel, error: Error): Promise<void> {
+  private async handleProcessingError(
+    msg: ConsumeMessage,
+    channel: QueueChannel,
+    error: Error,
+  ): Promise<void> {
     try {
       const parseResult = this.parseMessage(msg)
       if (!parseResult.success) {
-        await this.rejectMessage(msg, channel, 'Unparseable message with processing error')
+        await this.rejectMessage(msg, channel, "Unparseable message with processing error")
         return
       }
 
@@ -219,10 +236,16 @@ export class EventConsumer implements IEventConsumer {
 
       if (retryCount < this.config.maxRetries) {
         // Calculate retry delay with jitter
-        const baseDelay = calculateRetryDelay(retryCount, this.config.retryDelay, this.config.maxRetryDelay)
+        const baseDelay = calculateRetryDelay(
+          retryCount,
+          this.config.retryDelay,
+          this.config.maxRetryDelay,
+        )
         const delay = addJitter(baseDelay)
 
-        this.logger.info(`Retrying message ${message.id} (attempt ${retryCount + 1}/${this.config.maxRetries}) in ${delay}ms`)
+        this.logger.info(
+          `Retrying message ${message.id} (attempt ${retryCount + 1}/${this.config.maxRetries}) in ${delay}ms`,
+        )
 
         // Nack with requeue after delay
         await channel.nack(msg, false, false)
@@ -233,23 +256,27 @@ export class EventConsumer implements IEventConsumer {
           try {
             await this.republishWithRetry(message, channel)
           } catch (republishError) {
-            this.logger.error(`Failed to republish message ${message.id} for retry: ${republishError}`)
+            this.logger.error(
+              `Failed to republish message ${message.id} for retry: ${republishError}`,
+            )
           }
         }, delay)
-
       } else {
         // Exceeded retry limit, send to dead letter queue
-        this.logger.error(`Message ${message.id} exceeded retry limit (${retryCount}/${this.config.maxRetries}), sending to DLQ`)
+        this.logger.error(
+          `Message ${message.id} exceeded retry limit (${retryCount}/${this.config.maxRetries}), sending to DLQ`,
+        )
 
         await channel.nack(msg, false, false)
         this.stats.messagesRejected++
       }
-
     } catch (handlingError) {
-      this.logger.error(`Error in error handling - original: ${error.message}, handling error: ${handlingError instanceof Error ? handlingError.message : String(handlingError)}`)
-      
+      this.logger.error(
+        `Error in error handling - original: ${error.message}, handling error: ${handlingError instanceof Error ? handlingError.message : String(handlingError)}`,
+      )
+
       // Last resort: reject the message
-      await this.rejectMessage(msg, channel, 'Error in error handling')
+      await this.rejectMessage(msg, channel, "Error in error handling")
     }
   }
 
@@ -266,7 +293,7 @@ export class EventConsumer implements IEventConsumer {
     }
 
     const published = channel.publish(
-      'hlstats.events',
+      "hlstats.events",
       message.metadata.routing.key,
       Buffer.from(JSON.stringify(updatedMessage)),
       {
@@ -274,26 +301,32 @@ export class EventConsumer implements IEventConsumer {
         priority: message.metadata.routing.priority,
         messageId: message.id,
         headers: {
-          'x-correlation-id': message.correlationId,
-          'x-retry-count': updatedMessage.metadata.routing.retryCount,
+          "x-correlation-id": message.correlationId,
+          "x-retry-count": updatedMessage.metadata.routing.retryCount,
         },
       },
     )
 
     if (!published) {
-      throw new Error('Failed to republish message: channel buffer full')
+      throw new Error("Failed to republish message: channel buffer full")
     }
   }
 
-  private async rejectMessage(msg: ConsumeMessage, channel: QueueChannel, reason: string): Promise<void> {
+  private async rejectMessage(
+    msg: ConsumeMessage,
+    channel: QueueChannel,
+    reason: string,
+  ): Promise<void> {
     this.logger.warn(`Rejecting message: ${reason}`)
     await channel.nack(msg, false, false)
     this.stats.messagesRejected++
   }
 
-  private parseMessage(msg: ConsumeMessage): { success: true; data: EventMessage } | { success: false; error: string } {
+  private parseMessage(
+    msg: ConsumeMessage,
+  ): { success: true; data: EventMessage } | { success: false; error: string } {
     try {
-      const content = msg.content.toString('utf8')
+      const content = msg.content.toString("utf8")
       return safeJsonParse<EventMessage>(content)
     } catch (error) {
       return {
@@ -305,7 +338,7 @@ export class EventConsumer implements IEventConsumer {
 
   private recordProcessingTime(time: number): void {
     this.processingTimes.push(time)
-    
+
     // Keep only the last N samples for rolling average
     if (this.processingTimes.length > this.maxProcessingTimesSamples) {
       this.processingTimes.shift()
@@ -316,7 +349,7 @@ export class EventConsumer implements IEventConsumer {
     if (this.processingTimes.length === 0) {
       return 0
     }
-    
+
     const sum = this.processingTimes.reduce((acc, time) => acc + time, 0)
     return sum / this.processingTimes.length
   }
@@ -330,11 +363,7 @@ export const defaultConsumerConfig: ConsumerConfig = {
   retryDelay: 1000,
   maxRetryDelay: 30000,
   concurrency: 10,
-  queues: [
-    'hlstats.events.priority',
-    'hlstats.events.standard',
-    'hlstats.events.bulk',
-  ],
+  queues: ["hlstats.events.priority", "hlstats.events.standard", "hlstats.events.bulk"],
 }
 
 /**
@@ -342,22 +371,22 @@ export const defaultConsumerConfig: ConsumerConfig = {
  */
 export async function defaultMessageValidator(message: EventMessage): Promise<void> {
   if (!message.id) {
-    throw new Error('Message missing ID')
+    throw new Error("Message missing ID")
   }
-  
+
   if (!message.payload) {
-    throw new Error('Message missing payload')
+    throw new Error("Message missing payload")
   }
-  
+
   if (!message.payload.eventType) {
-    throw new Error('Message payload missing eventType')
+    throw new Error("Message payload missing eventType")
   }
-  
+
   if (!message.metadata) {
-    throw new Error('Message missing metadata')
+    throw new Error("Message missing metadata")
   }
-  
-  if (typeof message.metadata.source.serverId !== 'number') {
-    throw new Error('Message metadata missing or invalid serverId')
+
+  if (typeof message.metadata.source.serverId !== "number") {
+    throw new Error("Message metadata missing or invalid serverId")
   }
 }

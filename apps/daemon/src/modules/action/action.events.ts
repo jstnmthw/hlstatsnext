@@ -1,6 +1,6 @@
 /**
  * Action Module Event Handler
- * 
+ *
  * Handles action-specific events including player actions, team actions,
  * and world actions. This handler manages all action event types independently.
  */
@@ -34,31 +34,31 @@ export class ActionEventHandler extends BaseModuleEventHandler {
 
   private async handleActionPlayer(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_PLAYER for server ${event.serverId}`)
-    
+
     const actionEvent = event as ActionEvent
     this.logPlayerInfo(actionEvent)
-    
+
     await this.actionService.handleActionEvent(actionEvent)
   }
 
   private async handleActionPlayerPlayer(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_PLAYER_PLAYER for server ${event.serverId}`)
-    
+
     const actionEvent = event as ActionEvent
     this.logPlayerInfo(actionEvent)
-    
+
     await this.actionService.handleActionEvent(actionEvent)
   }
 
   private async handleActionTeam(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_TEAM for server ${event.serverId}`)
-    
+
     await this.actionService.handleActionEvent(event as ActionEvent)
   }
 
   private async handleActionWorld(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_WORLD for server ${event.serverId}`)
-    
+
     await this.actionService.handleActionEvent(event as ActionEvent)
   }
 
@@ -81,7 +81,7 @@ export class ActionEventHandler extends BaseModuleEventHandler {
 
     if (playerInfo) {
       this.logger.debug(
-        `Processing action event: ${actionEvent.eventType} for server ${actionEvent.serverId}${playerInfo}`
+        `Processing action event: ${actionEvent.eventType} for server ${actionEvent.serverId}${playerInfo}`,
       )
     }
   }

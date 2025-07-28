@@ -1,6 +1,6 @@
 /**
  * Saga Types and Interfaces
- * 
+ *
  * Defines the core interfaces for implementing saga patterns in the distributed
  * event architecture. Sagas provide transactional consistency across modules
  * and handle compensating actions for failed operations.

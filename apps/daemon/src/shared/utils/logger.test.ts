@@ -26,7 +26,7 @@ describe("Logger", () => {
     it("should create logger with default and custom options", () => {
       const defaultLogger = new Logger()
       const customLogger = new Logger({ enableColors: false, showTimestamp: false })
-      
+
       expect(defaultLogger).toBeInstanceOf(Logger)
       expect(customLogger).toBeInstanceOf(Logger)
 
@@ -39,32 +39,53 @@ describe("Logger", () => {
 
     it("should implement ILogger interface completely", () => {
       const loggerAsInterface: ILogger = new Logger()
-      
+
       // Test all interface methods exist with correct types
       const methods = [
-        'ok', 'error', 'info', 'warn', 'debug', 'event', 'chat',
-        'starting', 'started', 'stopping', 'stopped', 'connecting', 
-        'connected', 'disconnected', 'failed', 'ready', 'received',
-        'shutdown', 'shutdownComplete', 'fatal', 'disableTimestamps',
-        'enableTimestamps', 'disableColors', 'setColorsEnabled',
-        'getLogLevel', 'setLogLevel', 'setLogLevelFromString'
+        "ok",
+        "error",
+        "info",
+        "warn",
+        "debug",
+        "event",
+        "chat",
+        "starting",
+        "started",
+        "stopping",
+        "stopped",
+        "connecting",
+        "connected",
+        "disconnected",
+        "failed",
+        "ready",
+        "received",
+        "shutdown",
+        "shutdownComplete",
+        "fatal",
+        "disableTimestamps",
+        "enableTimestamps",
+        "disableColors",
+        "setColorsEnabled",
+        "getLogLevel",
+        "setLogLevel",
+        "setLogLevelFromString",
       ]
-      
-      methods.forEach(method => {
+
+      methods.forEach((method) => {
         expect(typeof loggerAsInterface[method as keyof ILogger]).toBe("function")
       })
     })
   })
 
   describe("Basic Logging Methods", () => {
-    const logMethods: Array<{ method: keyof Logger, level: string, message: string }> = [
-      { method: 'ok', level: 'OK', message: 'Operation successful' },
-      { method: 'error', level: 'ERROR', message: 'Something went wrong' },
-      { method: 'info', level: 'INFO', message: 'Information message' },
-      { method: 'warn', level: 'WARN', message: 'Warning message' },
-      { method: 'debug', level: 'DEBUG', message: 'Debug information' },
-      { method: 'event', level: 'EVENT', message: 'Event occurred' },
-      { method: 'chat', level: 'CHAT', message: 'Player chat message' },
+    const logMethods: Array<{ method: keyof Logger; level: string; message: string }> = [
+      { method: "ok", level: "OK", message: "Operation successful" },
+      { method: "error", level: "ERROR", message: "Something went wrong" },
+      { method: "info", level: "INFO", message: "Information message" },
+      { method: "warn", level: "WARN", message: "Warning message" },
+      { method: "debug", level: "DEBUG", message: "Debug information" },
+      { method: "event", level: "EVENT", message: "Event occurred" },
+      { method: "chat", level: "CHAT", message: "Player chat message" },
     ]
 
     it.each(logMethods)("should log $level messages", ({ method, level, message }) => {
@@ -75,21 +96,58 @@ describe("Logger", () => {
 
   describe("Service lifecycle methods", () => {
     const lifecycleMethods = [
-      { method: 'starting', service: 'Database', expectedLevel: 'INFO', expectedMessage: 'Starting Database' },
-      { method: 'started', service: 'Database', expectedLevel: 'OK', expectedMessage: 'Database started successfully' },
-      { method: 'stopping', service: 'UDP Server', expectedLevel: 'INFO', expectedMessage: 'Stopping UDP Server' },
-      { method: 'stopped', service: 'UDP Server', expectedLevel: 'OK', expectedMessage: 'UDP Server stopped successfully' },
-      { method: 'connecting', service: 'MySQL Database', expectedLevel: 'INFO', expectedMessage: 'Connecting to MySQL Database' },
-      { method: 'connected', service: 'MySQL Database', expectedLevel: 'OK', expectedMessage: 'Connected to MySQL Database' },
-      { method: 'disconnected', service: 'Redis Cache', expectedLevel: 'OK', expectedMessage: 'Disconnected from Redis Cache' },
+      {
+        method: "starting",
+        service: "Database",
+        expectedLevel: "INFO",
+        expectedMessage: "Starting Database",
+      },
+      {
+        method: "started",
+        service: "Database",
+        expectedLevel: "OK",
+        expectedMessage: "Database started successfully",
+      },
+      {
+        method: "stopping",
+        service: "UDP Server",
+        expectedLevel: "INFO",
+        expectedMessage: "Stopping UDP Server",
+      },
+      {
+        method: "stopped",
+        service: "UDP Server",
+        expectedLevel: "OK",
+        expectedMessage: "UDP Server stopped successfully",
+      },
+      {
+        method: "connecting",
+        service: "MySQL Database",
+        expectedLevel: "INFO",
+        expectedMessage: "Connecting to MySQL Database",
+      },
+      {
+        method: "connected",
+        service: "MySQL Database",
+        expectedLevel: "OK",
+        expectedMessage: "Connected to MySQL Database",
+      },
+      {
+        method: "disconnected",
+        service: "Redis Cache",
+        expectedLevel: "OK",
+        expectedMessage: "Disconnected from Redis Cache",
+      },
     ]
 
     it.each(lifecycleMethods)(
       "should log $method for $service",
       ({ method, service, expectedLevel, expectedMessage }) => {
         ;(testLogger[method as keyof Logger] as (service: string) => void)(service)
-        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`[ ${expectedLevel} ] ${expectedMessage}`))
-      }
+        expect(consoleSpy).toHaveBeenCalledWith(
+          expect.stringContaining(`[ ${expectedLevel} ] ${expectedMessage}`),
+        )
+      },
     )
   })
 
@@ -153,12 +211,12 @@ describe("Logger", () => {
 
   describe("Color formatting", () => {
     const colorTests = [
-      { status: 'OK', color: '\x1b[32m\x1b[1m[ OK ]\x1b[0m', message: 'Success message' },
-      { status: 'ERROR', color: '\x1b[31m\x1b[1m[ ERROR ]\x1b[0m', message: 'Error message' },
-      { status: 'INFO', color: '\x1b[34m[ INFO ]\x1b[0m', message: 'Info message' },
-      { status: 'WARN', color: '\x1b[33m[ WARN ]\x1b[0m', message: 'Warning message' },
-      { status: 'EVENT', color: '\x1b[36m\x1b[1m[ EVENT ]\x1b[0m', message: 'Event message' },
-      { status: 'CHAT', color: '\x1b[33m\x1b[1m[ CHAT ]\x1b[0m', message: 'Chat message' },
+      { status: "OK", color: "\x1b[32m\x1b[1m[ OK ]\x1b[0m", message: "Success message" },
+      { status: "ERROR", color: "\x1b[31m\x1b[1m[ ERROR ]\x1b[0m", message: "Error message" },
+      { status: "INFO", color: "\x1b[34m[ INFO ]\x1b[0m", message: "Info message" },
+      { status: "WARN", color: "\x1b[33m[ WARN ]\x1b[0m", message: "Warning message" },
+      { status: "EVENT", color: "\x1b[36m\x1b[1m[ EVENT ]\x1b[0m", message: "Event message" },
+      { status: "CHAT", color: "\x1b[33m\x1b[1m[ CHAT ]\x1b[0m", message: "Chat message" },
     ]
 
     it.each(colorTests)(
@@ -168,7 +226,7 @@ describe("Logger", () => {
         const method = status.toLowerCase() as keyof Logger
         ;(colorLogger[method] as (msg: string) => void)(message)
         expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(color))
-      }
+      },
     )
 
     it("should apply magenta color to DEBUG status", () => {
@@ -181,7 +239,9 @@ describe("Logger", () => {
       const noColorLogger = new Logger({ enableColors: false })
       noColorLogger.error("Error without color")
       expect(consoleSpy).toHaveBeenCalledWith(expect.not.stringContaining("\x1b["))
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[ ERROR ] Error without color"))
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("[ ERROR ] Error without color"),
+      )
     })
   })
 
@@ -199,40 +259,37 @@ describe("Logger", () => {
       {
         name: "include timestamp when enabled",
         options: { showTimestamp: true },
-        expectContains: "[2023-12-25 10:30:45]"
+        expectContains: "[2023-12-25 10:30:45]",
       },
       {
-        name: "not include timestamp when disabled", 
+        name: "not include timestamp when disabled",
         options: { showTimestamp: false },
-        expectNotContains: "[2023-12-25 10:30:45]"
+        expectNotContains: "[2023-12-25 10:30:45]",
       },
       {
         name: "format timestamp with gray color when colors enabled",
         options: { enableColors: true, showTimestamp: true },
-        expectContains: "\x1b[90m[2023-12-25 10:30:45]\x1b[0m"
+        expectContains: "\x1b[90m[2023-12-25 10:30:45]\x1b[0m",
       },
       {
         name: "format timestamp without color when colors disabled",
         options: { enableColors: false, showTimestamp: true },
         expectContains: "[2023-12-25 10:30:45]",
-        expectNotContains: "\x1b[90m"
-      }
+        expectNotContains: "\x1b[90m",
+      },
     ]
 
-    it.each(timestampTests)(
-      "should $name",
-      ({ options, expectContains, expectNotContains }) => {
-        const logger = new Logger(options)
-        logger.info("Test message")
-        
-        if (expectContains) {
-          expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(expectContains))
-        }
-        if (expectNotContains) {
-          expect(consoleSpy).toHaveBeenCalledWith(expect.not.stringContaining(expectNotContains))
-        }
+    it.each(timestampTests)("should $name", ({ options, expectContains, expectNotContains }) => {
+      const logger = new Logger(options)
+      logger.info("Test message")
+
+      if (expectContains) {
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(expectContains))
       }
-    )
+      if (expectNotContains) {
+        expect(consoleSpy).toHaveBeenCalledWith(expect.not.stringContaining(expectNotContains))
+      }
+    })
   })
 
   describe("Configuration methods", () => {
@@ -247,8 +304,8 @@ describe("Logger", () => {
         },
         expects: [
           { call: 1, contains: "[" },
-          { call: 2, notContains: "[2" }
-        ]
+          { call: 2, notContains: "[2" },
+        ],
       },
       {
         name: "color toggling",
@@ -260,9 +317,9 @@ describe("Logger", () => {
         },
         expects: [
           { call: 1, notContains: "\x1b[" },
-          { call: 2, contains: "\x1b[" }
-        ]
-      }
+          { call: 2, contains: "\x1b[" },
+        ],
+      },
     ]
 
     it.each(configTests)("should handle $name", ({ setup, expects }) => {
@@ -518,35 +575,30 @@ describe("Logger", () => {
       const context = {
         sagaName: "KillEventSaga",
         eventType: "PLAYER_KILL",
-        error: "Connection timeout"
+        error: "Connection timeout",
       }
-      
+
       testLogger.error("Saga execution failed", context)
-      
+
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining("[ ERROR ] Saga execution failed"),
-        context
+        context,
       )
     })
 
     it("should log messages without context when not provided", () => {
       testLogger.info("Simple message")
-      
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[ INFO ] Simple message")
-      )
-      expect(consoleSpy).not.toHaveBeenCalledWith(
-        expect.anything(),
-        expect.any(Object)
-      )
+
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[ INFO ] Simple message"))
+      expect(consoleSpy).not.toHaveBeenCalledWith(expect.anything(), expect.any(Object))
     })
 
     it("should handle empty context objects", () => {
       testLogger.warn("Warning message", {})
-      
+
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining("[ WARN ] Warning message"),
-        {}
+        {},
       )
     })
 
@@ -556,44 +608,44 @@ describe("Logger", () => {
           type: "PLAYER_KILL",
           data: {
             killerId: 123,
-            victimId: 456
-          }
+            victimId: 456,
+          },
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          serverId: 1
-        }
+          serverId: 1,
+        },
       }
-      
+
       testLogger.debug("Processing complex event", complexContext)
-      
+
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining("[ DEBUG ] Processing complex event"),
-        complexContext
+        complexContext,
       )
     })
 
     const contextMethods = [
-      { method: 'ok', level: 'OK' },
-      { method: 'error', level: 'ERROR' },
-      { method: 'info', level: 'INFO' },
-      { method: 'warn', level: 'WARN' },
-      { method: 'debug', level: 'DEBUG' },
-      { method: 'event', level: 'EVENT' },
-      { method: 'chat', level: 'CHAT' },
+      { method: "ok", level: "OK" },
+      { method: "error", level: "ERROR" },
+      { method: "info", level: "INFO" },
+      { method: "warn", level: "WARN" },
+      { method: "debug", level: "DEBUG" },
+      { method: "event", level: "EVENT" },
+      { method: "chat", level: "CHAT" },
     ]
 
     it.each(contextMethods)("should support context parameter for $method", ({ method, level }) => {
       const context = { testKey: "testValue" }
-      
+
       ;(testLogger[method as keyof Logger] as (msg: string, ctx?: Record<string, unknown>) => void)(
-        "Test message", 
-        context
+        "Test message",
+        context,
       )
-      
+
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining(`[ ${level} ] Test message`),
-        context
+        context,
       )
     })
   })
@@ -605,24 +657,33 @@ describe("Logger", () => {
 
     describe("Environment-based log level detection", () => {
       const envLevelTests = [
-        { envValue: undefined, expected: LogLevel.INFO, description: "default to INFO when no env vars set" },
+        {
+          envValue: undefined,
+          expected: LogLevel.INFO,
+          description: "default to INFO when no env vars set",
+        },
         { envValue: "debug", expected: LogLevel.DEBUG, description: "read debug from LOG_LEVEL" },
-        { envValue: "DEBUG", expected: LogLevel.DEBUG, description: "handle case-insensitive DEBUG" },
+        {
+          envValue: "DEBUG",
+          expected: LogLevel.DEBUG,
+          description: "handle case-insensitive DEBUG",
+        },
         { envValue: "warn", expected: LogLevel.WARN, description: "read warn from LOG_LEVEL" },
         { envValue: "error", expected: LogLevel.ERROR, description: "read error from LOG_LEVEL" },
-        { envValue: "invalid", expected: LogLevel.INFO, description: "default to INFO for unknown levels" },
+        {
+          envValue: "invalid",
+          expected: LogLevel.INFO,
+          description: "default to INFO for unknown levels",
+        },
       ]
 
-      it.each(envLevelTests)(
-        "should $description", 
-        ({ envValue, expected }) => {
-          if (envValue) {
-            process.env.LOG_LEVEL = envValue
-          }
-          const logger = new Logger({ enableColors: false, showTimestamp: false })
-          expect(logger.getLogLevel()).toBe(expected)
+      it.each(envLevelTests)("should $description", ({ envValue, expected }) => {
+        if (envValue) {
+          process.env.LOG_LEVEL = envValue
         }
-      )
+        const logger = new Logger({ enableColors: false, showTimestamp: false })
+        expect(logger.getLogLevel()).toBe(expected)
+      })
     })
 
     describe("Log level filtering", () => {
@@ -631,48 +692,48 @@ describe("Logger", () => {
           level: LogLevel.ERROR,
           description: "only ERROR when level is ERROR",
           expectedCalls: 1,
-          expectedMessages: ["[ ERROR ] Error message"]
+          expectedMessages: ["[ ERROR ] Error message"],
         },
         {
-          level: LogLevel.WARN, 
+          level: LogLevel.WARN,
           description: "ERROR and WARN when level is WARN",
           expectedCalls: 2,
-          expectedMessages: ["[ ERROR ] Error message", "[ WARN ] Warn message"]
+          expectedMessages: ["[ ERROR ] Error message", "[ WARN ] Warn message"],
         },
         {
           level: LogLevel.INFO,
-          description: "ERROR, WARN, INFO, OK, EVENT, CHAT when level is INFO", 
+          description: "ERROR, WARN, INFO, OK, EVENT, CHAT when level is INFO",
           expectedCalls: 6,
           expectedMessages: [
             "[ ERROR ] Error message",
-            "[ WARN ] Warn message", 
+            "[ WARN ] Warn message",
             "[ INFO ] Info message",
             "[ OK ] OK message",
             "[ EVENT ] Event message",
-            "[ CHAT ] Chat message"
-          ]
+            "[ CHAT ] Chat message",
+          ],
         },
         {
           level: LogLevel.DEBUG,
           description: "all messages when level is DEBUG",
-          expectedCalls: 7, 
+          expectedCalls: 7,
           expectedMessages: [
             "[ ERROR ] Error message",
             "[ WARN ] Warn message",
-            "[ INFO ] Info message", 
+            "[ INFO ] Info message",
             "[ DEBUG ] Debug message",
             "[ OK ] OK message",
             "[ EVENT ] Event message",
-            "[ CHAT ] Chat message"
-          ]
-        }
+            "[ CHAT ] Chat message",
+          ],
+        },
       ]
 
       it.each(filteringTests)(
         "should log $description",
         ({ level, expectedCalls, expectedMessages }) => {
           const logger = new Logger({ enableColors: false, showTimestamp: false, logLevel: level })
-          
+
           logger.error("Error message")
           logger.warn("Warn message")
           logger.info("Info message")
@@ -685,7 +746,7 @@ describe("Logger", () => {
           expectedMessages.forEach((message, index) => {
             expect(consoleSpy).toHaveBeenNthCalledWith(index + 1, message)
           })
-        }
+        },
       )
     })
 
@@ -699,7 +760,7 @@ describe("Logger", () => {
             logger.setLogLevel(LogLevel.INFO)
             logger.info("Should log now")
             expect(consoleSpy).toHaveBeenCalledTimes(1)
-          }
+          },
         },
         {
           name: "change log level from valid strings",
@@ -710,33 +771,41 @@ describe("Logger", () => {
             expect(logger.getLogLevel()).toBe(LogLevel.WARN)
             logger.setLogLevelFromString("warning")
             expect(logger.getLogLevel()).toBe(LogLevel.WARN)
-          }
-        }
+          },
+        },
       ]
 
       it.each(dynamicTests)("should $name", ({ test }) => {
-        const logger = new Logger({ enableColors: false, showTimestamp: false, logLevel: LogLevel.ERROR })
+        const logger = new Logger({
+          enableColors: false,
+          showTimestamp: false,
+          logLevel: LogLevel.ERROR,
+        })
         test(logger)
       })
 
       it("should warn on invalid log level string", () => {
-        const logger = new Logger({ enableColors: false, showTimestamp: false, logLevel: LogLevel.INFO })
+        const logger = new Logger({
+          enableColors: false,
+          showTimestamp: false,
+          logLevel: LogLevel.INFO,
+        })
         const originalLevel = logger.getLogLevel()
         logger.setLogLevelFromString("invalid")
-        
+
         expect(logger.getLogLevel()).toBe(originalLevel)
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining("[ WARN ] Unknown log level: invalid, keeping current level")
+          expect.stringContaining("[ WARN ] Unknown log level: invalid, keeping current level"),
         )
       })
     })
 
     describe("Log level enum", () => {
       const enumTests = [
-        { level: 'ERROR', value: 0 },
-        { level: 'WARN', value: 1 },
-        { level: 'INFO', value: 2 },
-        { level: 'DEBUG', value: 3 }
+        { level: "ERROR", value: 0 },
+        { level: "WARN", value: 1 },
+        { level: "INFO", value: 2 },
+        { level: "DEBUG", value: 3 },
       ]
 
       it.each(enumTests)("should have $level = $value", ({ level, value }) => {

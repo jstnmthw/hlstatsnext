@@ -79,7 +79,7 @@ export interface BaseEvent {
   raw?: string
   meta?: unknown
   data?: unknown
-  
+
   // Optional fields for queue/messaging infrastructure
   correlationId?: string
   serverAddress?: string

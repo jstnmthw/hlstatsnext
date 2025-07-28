@@ -71,7 +71,9 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
         })
 
         if (!playerExists) {
-          this.logger.warn(`Player ${data.playerId} not found when creating player history, skipping`)
+          this.logger.warn(
+            `Player ${data.playerId} not found when creating player history, skipping`,
+          )
           return
         }
 
@@ -90,7 +92,7 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
             teamkills: data.teamkills || 0,
             connection_time: data.connection_time || 0,
             kill_streak: data.kill_streak || 0,
-            death_streak: data.death_streak || 0, 
+            death_streak: data.death_streak || 0,
             skill_change: data.skill_change || 0,
           },
         })
@@ -225,12 +227,12 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
       return await this.executeWithTransaction(async (client) => {
         // Check most recent EventFrag for a map (we populate this table)
         const eventFrag = await client.eventFrag.findFirst({
-          where: { 
+          where: {
             serverId,
-            map: { not: "" }
+            map: { not: "" },
           },
           orderBy: { eventTime: "desc" },
-          select: { map: true }
+          select: { map: true },
         })
 
         return eventFrag?.map || null

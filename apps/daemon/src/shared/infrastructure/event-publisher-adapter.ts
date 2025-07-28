@@ -5,9 +5,9 @@
  * to enable gradual migration from EventBus to RabbitMQ.
  */
 
-import type { BaseEvent } from '@/shared/types/events'
-import type { IEventBus } from './event-bus/event-bus.types'
-import type { IEventPublisher } from './queue/queue.types'
+import type { BaseEvent } from "@/shared/types/events"
+import type { IEventBus } from "./event-bus/event-bus.types"
+import type { IEventPublisher } from "./queue/queue.types"
 
 /**
  * Unified interface for event publishing
@@ -45,10 +45,10 @@ export function createEventEmitterAdapter(
   eventBusOrPublisher: IEventBus | IEventPublisher,
 ): IEventEmitter {
   // Check if it has an 'emit' method (EventBus)
-  if ('emit' in eventBusOrPublisher) {
+  if ("emit" in eventBusOrPublisher) {
     return new EventBusAdapter(eventBusOrPublisher as IEventBus)
   }
-  
+
   // Otherwise it's an EventPublisher
   return new EventPublisherAdapter(eventBusOrPublisher as IEventPublisher)
 }

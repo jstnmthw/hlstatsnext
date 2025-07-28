@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { GameConfigService, BOOTSTRAP_CONFIG, getDefaultGame, getUnknownMap } from "./game-config.service"
+import {
+  GameConfigService,
+  BOOTSTRAP_CONFIG,
+  getDefaultGame,
+  getUnknownMap,
+} from "./game-config.service"
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 
@@ -40,13 +45,13 @@ describe("GameConfigService", () => {
     it("should return existing instance on subsequent calls", () => {
       const instance1 = GameConfigService.getInstance(mockDb, mockLogger)
       const instance2 = GameConfigService.getInstance()
-      
+
       expect(instance1).toBe(instance2)
     })
 
     it("should throw error when called without parameters before initialization", () => {
       expect(() => GameConfigService.getInstance()).toThrow(
-        "GameConfigService must be initialized with db and logger first"
+        "GameConfigService must be initialized with db and logger first",
       )
     })
   })
@@ -63,9 +68,7 @@ describe("GameConfigService", () => {
         { code: "cstrike", name: "Counter-Strike", hidden: "0", realgame: "cstrike" },
         { code: "csgo", name: "Counter-Strike: GO", hidden: "0", realgame: "csgo" },
       ]
-      const mockSupported = [
-        { code: "tf2", name: "Team Fortress 2" },
-      ]
+      const mockSupported = [{ code: "tf2", name: "Team Fortress 2" }]
 
       vi.mocked(mockDb.prisma.game.findMany).mockResolvedValue(mockGames)
       vi.mocked(mockDb.prisma.gameSupported.findMany).mockResolvedValue(mockSupported)
@@ -73,7 +76,7 @@ describe("GameConfigService", () => {
       await service.initialize()
 
       expect(mockDb.prisma.game.findMany).toHaveBeenCalledWith({
-        where: { hidden: "0" }
+        where: { hidden: "0" },
       })
       expect(mockDb.prisma.gameSupported.findMany).toHaveBeenCalled()
       expect(mockLogger.info).toHaveBeenCalledWith("Loaded 3 games from database")
@@ -103,7 +106,7 @@ describe("GameConfigService", () => {
       await service.initialize()
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        "Failed to load games from database, using fallbacks: Error: DB Error"
+        "Failed to load games from database, using fallbacks: Error: DB Error",
       )
       expect(service.isValidGame("cstrike")).toBe(true)
       expect(service.isValidGame("csgo")).toBe(true)
@@ -131,8 +134,8 @@ describe("GameConfigService", () => {
       await service.initialize()
 
       const games = service.getAllGames()
-      const visibleGame = games.find(g => g.code === "visible")
-      const hiddenGame = games.find(g => g.code === "hidden")
+      const visibleGame = games.find((g) => g.code === "visible")
+      const hiddenGame = games.find((g) => g.code === "hidden")
 
       expect(visibleGame?.hidden).toBe(false)
       expect(hiddenGame?.hidden).toBe(true)
@@ -171,9 +174,9 @@ describe("GameConfigService", () => {
 
       it("should throw if not initialized", () => {
         const uninitializedService = new GameConfigService(mockDb, mockLogger)
-        
+
         expect(() => uninitializedService.isValidGame("cstrike")).toThrow(
-          "GameConfigService not initialized. Call initialize() first."
+          "GameConfigService not initialized. Call initialize() first.",
         )
       })
     })
@@ -273,9 +276,9 @@ describe("GameConfigService", () => {
   describe("reset static method", () => {
     it("should reset singleton instance", () => {
       const instance1 = GameConfigService.getInstance(mockDb, mockLogger)
-      
+
       GameConfigService.reset()
-      
+
       const instance2 = GameConfigService.getInstance(mockDb, mockLogger)
       expect(instance1).not.toBe(instance2)
     })

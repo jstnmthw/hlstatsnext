@@ -1,6 +1,6 @@
 /**
  * Weapon Event Handler Tests
- * 
+ *
  * Tests for the distributed weapon event handling functionality
  */
 
@@ -26,7 +26,7 @@ describe("WeaponEventHandler", () => {
       warn: vi.fn(),
       error: vi.fn(),
     } as unknown as ILogger
-    
+
     eventBus = new EventBus(logger)
 
     weaponService = {
@@ -50,7 +50,7 @@ describe("WeaponEventHandler", () => {
 
       for (const eventType of eventTypes) {
         expect(logger.debug).toHaveBeenCalledWith(
-          expect.stringContaining(`Registered WeaponEventHandler handler for ${eventType}`)
+          expect.stringContaining(`Registered WeaponEventHandler handler for ${eventType}`),
         )
       }
     })
@@ -74,7 +74,7 @@ describe("WeaponEventHandler", () => {
         expect.objectContaining({
           eventType: EventType.WEAPON_FIRE,
           data: expect.objectContaining({ weapon: "ak47" }),
-        })
+        }),
       )
     })
 
@@ -96,7 +96,7 @@ describe("WeaponEventHandler", () => {
         expect.objectContaining({
           eventType: EventType.WEAPON_HIT,
           data: expect.objectContaining({ weapon: "m4a1", damage: 27 }),
-        })
+        }),
       )
     })
 
@@ -116,13 +116,13 @@ describe("WeaponEventHandler", () => {
       await eventBus.emit(event)
 
       expect(logger.debug).toHaveBeenCalledWith(
-        "Weapon module processing kill event for weapon stats"
+        "Weapon module processing kill event for weapon stats",
       )
       expect(weaponService.handleWeaponEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           eventType: EventType.PLAYER_KILL,
           data: expect.objectContaining({ weapon: "awp" }),
-        })
+        }),
       )
     })
   })
@@ -132,7 +132,7 @@ describe("WeaponEventHandler", () => {
       handler.destroy()
 
       expect(logger.debug).toHaveBeenCalledWith(
-        "WeaponEventHandler unregistered all event handlers"
+        "WeaponEventHandler unregistered all event handlers",
       )
 
       // Verify handlers are actually removed

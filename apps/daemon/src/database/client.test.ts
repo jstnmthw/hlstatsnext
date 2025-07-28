@@ -32,13 +32,13 @@ describe("DatabaseClient", () => {
     it("should create instance with provided client", () => {
       const customClient = {} as PrismaClient
       const dbClient = new DatabaseClient(customClient)
-      
+
       expect(dbClient.prisma).toBe(customClient)
     })
 
     it("should create instance with default client when none provided", () => {
       const dbClient = new DatabaseClient()
-      
+
       // Should use the default client (which is mocked)
       expect(dbClient.prisma).toBeDefined()
     })
@@ -67,10 +67,13 @@ describe("DatabaseClient", () => {
       const result = await client.testConnection()
 
       expect(result).toBe(false)
-      expect(consoleErrorSpy).toHaveBeenCalledWith("Database connection test failed:", expect.objectContaining({
-        message: expect.stringContaining("Connection failed")
-      }))
-      
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Database connection test failed:",
+        expect.objectContaining({
+          message: expect.stringContaining("Connection failed"),
+        }),
+      )
+
       consoleErrorSpy.mockRestore()
     })
 
@@ -81,8 +84,11 @@ describe("DatabaseClient", () => {
       const result = await client.testConnection()
 
       expect(result).toBe(false)
-      expect(consoleErrorSpy).toHaveBeenCalledWith("Database connection test failed:", "String error")
-      
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Database connection test failed:",
+        "String error",
+      )
+
       consoleErrorSpy.mockRestore()
     })
   })
@@ -108,7 +114,7 @@ describe("DatabaseClient", () => {
       const mockCallback = vi.fn()
 
       await expect(clientWithoutTransaction.transaction(mockCallback)).rejects.toThrow(
-        "Cannot start a transaction within a transaction."
+        "Cannot start a transaction within a transaction.",
       )
       expect(mockCallback).not.toHaveBeenCalled()
     })

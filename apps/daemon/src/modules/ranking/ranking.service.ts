@@ -143,7 +143,10 @@ export class RankingService implements IRankingService {
   /**
    * Get weapon multiplier for skill calculations
    */
-  private async getWeaponMultiplier(weapon: string, game: string = GameConfig.getDefaultGame()): Promise<number> {
+  private async getWeaponMultiplier(
+    weapon: string,
+    game: string = GameConfig.getDefaultGame(),
+  ): Promise<number> {
     // Normalize weapon name (remove prefixes, convert to lowercase)
     const normalizedWeapon = weapon
       .toLowerCase()

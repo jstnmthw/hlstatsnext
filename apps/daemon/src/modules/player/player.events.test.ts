@@ -1,6 +1,6 @@
 /**
  * Player Event Handler Tests
- * 
+ *
  * Tests for the distributed player event handling functionality
  */
 
@@ -28,7 +28,7 @@ describe("PlayerEventHandler", () => {
       warn: vi.fn(),
       error: vi.fn(),
     } as unknown as ILogger
-    
+
     eventBus = new EventBus(logger)
 
     playerService = {
@@ -59,7 +59,7 @@ describe("PlayerEventHandler", () => {
 
       for (const eventType of eventTypes) {
         expect(logger.debug).toHaveBeenCalledWith(
-          expect.stringContaining(`Registered PlayerEventHandler handler for ${eventType}`)
+          expect.stringContaining(`Registered PlayerEventHandler handler for ${eventType}`),
         )
       }
     })
@@ -73,7 +73,7 @@ describe("PlayerEventHandler", () => {
 
       for (const eventType of complexEvents) {
         expect(logger.debug).not.toHaveBeenCalledWith(
-          expect.stringContaining(`Registered PlayerEventHandler handler for ${eventType}`)
+          expect.stringContaining(`Registered PlayerEventHandler handler for ${eventType}`),
         )
       }
     })
@@ -101,13 +101,13 @@ describe("PlayerEventHandler", () => {
       expect(playerService.getOrCreatePlayer).toHaveBeenCalledWith(
         "STEAM_1:0:12345",
         "TestPlayer",
-        "csgo"
+        "csgo",
       )
       expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           eventType: EventType.PLAYER_CONNECT,
           data: expect.objectContaining({ playerId: 123 }),
-        })
+        }),
       )
     })
 
@@ -124,7 +124,7 @@ describe("PlayerEventHandler", () => {
         expect.objectContaining({
           eventType: EventType.PLAYER_DISCONNECT,
           data: expect.objectContaining({ playerId: 123 }),
-        })
+        }),
       )
     })
 
@@ -141,7 +141,7 @@ describe("PlayerEventHandler", () => {
         expect.objectContaining({
           eventType: EventType.CHAT_MESSAGE,
           data: expect.objectContaining({ playerId: 123 }),
-        })
+        }),
       )
     })
 
@@ -155,7 +155,7 @@ describe("PlayerEventHandler", () => {
         expect.objectContaining({
           eventType: EventType.PLAYER_CONNECT,
           data: {},
-        })
+        }),
       )
     })
 
@@ -172,15 +172,15 @@ describe("PlayerEventHandler", () => {
       await eventBus.emit(event)
 
       expect(logger.error).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to resolve player IDs")
+        expect.stringContaining("Failed to resolve player IDs"),
       )
-      
+
       // Should still call handlePlayerEvent with original event
       expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           eventType: EventType.PLAYER_CONNECT,
           data: {},
-        })
+        }),
       )
     })
   })
@@ -190,7 +190,7 @@ describe("PlayerEventHandler", () => {
       handler.destroy()
 
       expect(logger.debug).toHaveBeenCalledWith(
-        "PlayerEventHandler unregistered all event handlers"
+        "PlayerEventHandler unregistered all event handlers",
       )
 
       // Verify handlers are actually removed by emitting an event

@@ -16,7 +16,7 @@ describe("IngressService", () => {
 
   beforeEach(() => {
     mockLogger = createMockLogger()
-    
+
     // Mock EventBus
     mockEventBus = {
       emit: vi.fn().mockResolvedValue(undefined),
@@ -56,16 +56,11 @@ describe("IngressService", () => {
       },
     }
 
-    ingressService = new IngressService(
-      mockLogger,
-      mockEventBus,
-      mockDependencies,
-      {
-        port: 27501,
-        skipAuth: true,
-        logBots: false,
-      },
-    )
+    ingressService = new IngressService(mockLogger, mockEventBus, mockDependencies, {
+      port: 27501,
+      skipAuth: true,
+      logBots: false,
+    })
   })
 
   afterEach(() => {
@@ -113,25 +108,32 @@ describe("IngressService", () => {
       const event = await ingressService.processRawEvent(
         'L 03/15/2023 - 12:30:45: "Player<1><STEAM_1:1:12345><CT>" connected',
         "127.0.0.1",
-        27015
+        27015,
       )
 
       expect(event).toBeDefined()
-      expect(mockDependencies.serverAuthenticator.authenticateServer).toHaveBeenCalledWith("127.0.0.1", 27015)
+      expect(mockDependencies.serverAuthenticator.authenticateServer).toHaveBeenCalledWith(
+        "127.0.0.1",
+        27015,
+      )
     })
 
     it("should handle server authentication", async () => {
       const serverId = await ingressService.authenticateServer("127.0.0.1", 27015)
       expect(serverId).toBe(1)
-      expect(mockDependencies.serverAuthenticator.authenticateServer).toHaveBeenCalledWith("127.0.0.1", 27015)
+      expect(mockDependencies.serverAuthenticator.authenticateServer).toHaveBeenCalledWith(
+        "127.0.0.1",
+        27015,
+      )
     })
 
     it("should handle development mode server creation", async () => {
-      const authenticateServerMock = mockDependencies.serverAuthenticator.authenticateServer as ReturnType<typeof vi.fn>
+      const authenticateServerMock = mockDependencies.serverAuthenticator
+        .authenticateServer as ReturnType<typeof vi.fn>
       authenticateServerMock.mockResolvedValue(-1)
-      
+
       const serverId = await ingressService.authenticateServer("127.0.0.1", 27015)
-      
+
       expect(serverId).toBe(1)
       expect(mockDependencies.gameDetector.detectGame).toHaveBeenCalled()
       expect(mockDependencies.serverInfoProvider.findOrCreateServer).toHaveBeenCalled()

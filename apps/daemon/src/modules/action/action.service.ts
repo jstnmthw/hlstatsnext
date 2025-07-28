@@ -134,12 +134,12 @@ export class ActionService implements IActionService {
           this.playerService.getPlayerStats(playerId),
           this.playerService.getPlayerStats(victimId),
         ])
-        
+
         if (!playerStats) {
           this.logger.warn(`Player ${playerId} not found, skipping action: ${actionCode}`)
           return { success: true } // Don't fail, but skip the action
         }
-        
+
         if (!victimStats) {
           this.logger.warn(`Victim ${victimId} not found, skipping action: ${actionCode}`)
           return { success: true } // Don't fail, but skip the action

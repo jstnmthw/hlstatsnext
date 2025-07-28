@@ -5,7 +5,7 @@
  * providing discovery and lifecycle management capabilities.
  */
 
-import type { BaseModuleEventHandler } from "./module-event-handler.base"
+import type { BaseModuleEventHandler } from "./event-handler.base"
 import type { ILogger } from "@/shared/utils/logger.types"
 import { EventType } from "@/shared/types/events"
 

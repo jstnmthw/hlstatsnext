@@ -8,12 +8,12 @@ import type { DatabaseClient, TransactionalPrisma } from "@/database/client"
 import type { RepositoryOptions } from "@/shared/types/database"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { BaseRepository } from "./repository.base"
-import { createMockLogger } from "../../tests/mocks/logger"
+import { createMockLogger } from "@/tests/mocks/logger"
 import {
   createMockDatabaseClient,
   type TransactionCallback,
   type MockDatabaseClient,
-} from "../../tests/mocks/database"
+} from "@/tests/mocks/database"
 import { mockDeep as deepMock } from "vitest-mock-extended"
 
 // Concrete implementation for testing

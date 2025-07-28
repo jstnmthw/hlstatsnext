@@ -8,11 +8,14 @@
 
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IEventProcessor } from "./event-consumer"
+import type { IEventProcessor } from "@/shared/infrastructure/messaging/queue/core/consumer"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
-import type { ModuleRegistry } from "@/shared/infrastructure/module-registry"
-import type { BaseModuleEventHandler } from "@/shared/infrastructure/module-event-handler.base"
-import { generateMessageId, generateCorrelationId } from "./utils"
+import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
+import type { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
+import {
+  generateMessageId,
+  generateCorrelationId,
+} from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 
 /**
  * RabbitMQ Event Processor implementation that routes events through
@@ -35,8 +38,8 @@ export class RabbitMQEventProcessor implements IEventProcessor {
       correlationId: event.correlationId || generateCorrelationId(),
     }
 
-    this.logger.debug(
-      `Processing event ${processedEvent.eventType} for server ${processedEvent.serverId}`,
+    this.logger.queue(
+      `Processing event: ${processedEvent.eventType}`,
       {
         eventId: processedEvent.eventId,
         correlationId: processedEvent.correlationId,

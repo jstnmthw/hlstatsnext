@@ -6,13 +6,20 @@
  * Uses "QUEUE" prefix logging to distinguish from EventBus processing.
  */
 
-import type { IQueueClient, MessageValidator } from "./queue.types"
-import type { ConsumerConfig } from "./event-consumer"
+import type {
+  IQueueClient,
+  MessageValidator,
+} from "@/shared/infrastructure/messaging/queue/core/types"
+import type { ConsumerConfig } from "@/shared/infrastructure/messaging/queue/core/consumer"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
-import type { ModuleRegistry } from "@/shared/infrastructure/module-registry"
-import { EventConsumer, defaultConsumerConfig, defaultMessageValidator } from "./event-consumer"
-import { RabbitMQEventProcessor } from "./rabbitmq-event-processor"
+import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
+import {
+  EventConsumer,
+  defaultConsumerConfig,
+  defaultMessageValidator,
+} from "@/shared/infrastructure/messaging/queue/core/consumer"
+import { RabbitMQEventProcessor } from "./event-processor"
 
 /**
  * Configuration for RabbitMQ consumer (extends base consumer config)

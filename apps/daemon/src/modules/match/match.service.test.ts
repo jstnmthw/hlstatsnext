@@ -193,9 +193,7 @@ describe("MatchService", () => {
       expect(result.success).toBe(true)
       expect(mockRepository.updateBombStats).toHaveBeenCalledWith(1, "plant")
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        expect.stringContaining(
-          "Objective event processed: BOMB_PLANT by player 123 (+3 points)",
-        ),
+        expect.stringContaining("Objective event processed: BOMB_PLANT by player 123 (+3 points)"),
       )
     })
 

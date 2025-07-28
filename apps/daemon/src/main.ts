@@ -88,12 +88,12 @@ export class HLStatsDaemon {
    * Emit events through the queue publisher (EventProcessor removed)
    */
   async emitEvents(events: BaseEvent[]): Promise<void> {
-    if (!this.context.queueFirstPublisher) {
-      throw new Error("Queue publisher not initialized")
+    if (!this.context.eventPublisher) {
+      throw new Error("Event publisher not initialized")
     }
-    
+
     for (const event of events) {
-      await this.context.queueFirstPublisher.emit(event)
+      await this.context.eventPublisher.publish(event)
     }
   }
 

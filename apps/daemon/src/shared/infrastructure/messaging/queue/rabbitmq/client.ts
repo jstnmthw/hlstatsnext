@@ -12,8 +12,11 @@ import type {
   QueueChannel,
   RabbitMQConfig,
   ConnectionStats,
-} from "./queue.types"
-import { QueueConnectionError, QueueError } from "./queue.types"
+} from "@/shared/infrastructure/messaging/queue/core/types"
+import {
+  QueueConnectionError,
+  QueueError,
+} from "@/shared/infrastructure/messaging/queue/core/types"
 import { AmqpConnectionAdapter } from "./adapters"
 import type { ILogger } from "@/shared/utils/logger.types"
 

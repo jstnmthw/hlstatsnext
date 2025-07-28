@@ -7,7 +7,7 @@
 import type { IIngressService, IngressOptions, IngressStats } from "./ingress.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
-import type { IEventEmitter } from "@/shared/infrastructure/event-publisher-adapter"
+import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { IngressDependencies } from "./ingress.dependencies"
 import { UdpServer } from "./udp-server"
 import { CsParser } from "./parsers/cs.parser"
@@ -26,7 +26,7 @@ export class IngressService implements IIngressService {
 
   constructor(
     private readonly logger: ILogger,
-    private readonly eventEmitter: IEventEmitter,
+    private readonly eventPublisher: IEventPublisher,
     private readonly dependencies: IngressDependencies,
     options: IngressOptions = {},
   ) {
@@ -205,8 +205,13 @@ export class IngressService implements IIngressService {
       const event = await this.processRawEvent(logLine.trim(), serverAddress, serverPort)
 
       if (event) {
-        // Emit event via event emitter (EventBus or Queue)
-        await this.eventEmitter.emit(event)
+        // Publish event to queue
+        await this.eventPublisher.publish(event)
+        this.logger.queue(`Event emitted: ${event.eventType}`, {
+          eventType: event.eventType,
+          serverId: event.serverId,
+          eventId: event.eventId,
+        })
       }
     } catch (error) {
       this.logger.error(`Error processing log line: ${error}`)

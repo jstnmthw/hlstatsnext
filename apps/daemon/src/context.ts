@@ -31,9 +31,11 @@ import type { IActionService } from "@/modules/action/action.types"
 import { IngressService } from "@/modules/ingress/ingress.service"
 import type { IIngressService, IngressOptions } from "@/modules/ingress/ingress.types"
 import { createIngressDependencies } from "@/modules/ingress/ingress.adapter"
-import { QueueModule, createDevelopmentRabbitMQConfig } from "@/shared/infrastructure/queue"
-import { QueueFirstPublisher } from "@/shared/infrastructure/queue/queue-first-publisher"
-import type { IEventEmitter } from "@/shared/infrastructure/event-publisher-adapter"
+import {
+  QueueModule,
+  createDevelopmentRabbitMQConfig,
+} from "@/shared/infrastructure/messaging/module"
+import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 // Remove unused import - BaseEvent not needed in context
 import { EventType } from "@/shared/types/events"
 
@@ -49,12 +51,12 @@ import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
 import { MatchEventHandler } from "@/modules/match/match.events"
 import { ActionEventHandler } from "@/modules/action/action.events"
 import { ServerEventHandler } from "@/modules/server/server.events"
-import { ModuleRegistry } from "@/shared/infrastructure/module-registry"
-import { EventMetrics } from "@/shared/infrastructure/event-metrics"
+import { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
+import { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import { KillEventCoordinator, SagaEventCoordinator } from "@/shared/application/event-coordinator"
 import { KillEventSaga } from "@/shared/application/sagas/kill-event/kill-event.saga"
 import { SagaMonitor } from "@/shared/application/sagas/saga.monitor"
-import { RabbitMQConsumer } from "@/shared/infrastructure/queue/rabbitmq-consumer"
+import { RabbitMQConsumer } from "@/shared/infrastructure/messaging/queue/rabbitmq/consumer"
 
 export interface AppContext {
   // Infrastructure
@@ -63,7 +65,7 @@ export interface AppContext {
 
   // Queue Infrastructure (migration to queue-first)
   queueModule?: QueueModule
-  queueFirstPublisher?: QueueFirstPublisher
+  eventPublisher?: IEventPublisher
   rabbitmqConsumer?: RabbitMQConsumer
 
   // Business Services
@@ -75,7 +77,6 @@ export interface AppContext {
   ingressService: IIngressService
   gameDetectionService: IGameDetectionService
   serverService: IServerService
-
 
   // Module Event Handlers
   playerEventHandler: PlayerEventHandler
@@ -103,7 +104,6 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const actionRepository = new ActionRepository(database, logger)
   const serverRepository = new ServerRepository(database, logger)
 
-
   // Create queue module for RabbitMQ integration (optional)
   let queueModule: QueueModule | undefined
 
@@ -115,12 +115,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
         autoStartConsumers: false, // We'll start consumers manually
         autoStartShadowConsumer: true, // Start shadow consumer for validation
         autoSetupTopology: true,
-        dualPublisher: {
-          enableQueue: true,
-          enableEventBus: true,
-          gracefulFallback: true,
-          queueTimeout: 5000,
-        },
+        // dualPublisher config removed - migration complete
         shadowConsumer: {
           queues: ["hlstats.events.priority", "hlstats.events.standard", "hlstats.events.bulk"],
           metricsInterval: 30000, // Log metrics every 30 seconds
@@ -171,16 +166,20 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   }
 
   // Temporary: Create minimal event emitter for ingress (will be replaced with queue publisher)
-  const eventEmitter: IEventEmitter = {
-    emit: async () => {
+  // Temporary placeholder - will be replaced with actual queue publisher
+  const eventPublisher: IEventPublisher = {
+    publish: async () => {
       throw new Error("EventBus removed - ingress service will use queue publisher")
-    }
+    },
+    publishBatch: async () => {
+      throw new Error("EventBus removed - ingress service will use queue publisher")
+    },
   }
 
   // Create ingress service without circular dependency
   const ingressService = new IngressService(
     logger,
-    eventEmitter,
+    eventPublisher,
     ingressDependencies,
     ingressOptions,
   )
@@ -278,7 +277,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     database,
     logger,
     queueModule,
-    queueFirstPublisher: undefined, // Will be created during queue initialization
+    eventPublisher: undefined, // Will be created during queue initialization
     rabbitmqConsumer: undefined, // Will be created during queue initialization
     playerService,
     matchService,
@@ -324,35 +323,36 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
     // Initialize the queue module first
     await context.queueModule.initialize()
 
-    // Create queue-first publisher (all events now queue-only)
-    const queuePublisher = context.queueModule.getPublisher()
-    context.queueFirstPublisher = new QueueFirstPublisher(
-      queuePublisher,
-      context.logger,
-      // No EventBus fallback needed - all events migrated to queue-only
-    )
+    // Get the queue publisher directly (all events now queue-only)
+    context.eventPublisher = context.queueModule.getPublisher()
 
     // Create coordinators for RabbitMQ consumer
     const killEventCoordinator = new KillEventCoordinator(context.logger, context.rankingService)
     const sagaCoordinator = new SagaEventCoordinator(context.logger)
-    
+
     // Register sagas with the saga coordinator
     const sagaMonitor = new SagaMonitor(context.logger)
-    
+
     // Create stub EventBus for saga compatibility (sagas don't actually emit events)
     const stubEventBus = {
-      emit: async () => { /* no-op */ },
+      emit: async () => {
+        /* no-op */
+      },
       on: () => "stub-id",
-      off: () => { /* no-op */ },
-      clearHandlers: () => { /* no-op */ },
-      getStats: () => ({ 
-        totalHandlers: 0, 
-        handlersByType: new Map(), 
-        eventsEmitted: 0, 
-        errors: 0 
-      })
+      off: () => {
+        /* no-op */
+      },
+      clearHandlers: () => {
+        /* no-op */
+      },
+      getStats: () => ({
+        totalHandlers: 0,
+        handlersByType: new Map(),
+        eventsEmitted: 0,
+        errors: 0,
+      }),
     }
-    
+
     const killEventSaga = new KillEventSaga(
       context.logger,
       stubEventBus,
@@ -363,7 +363,7 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
       sagaMonitor,
     )
     sagaCoordinator.registerSaga(EventType.PLAYER_KILL, killEventSaga)
-    
+
     const coordinators = [killEventCoordinator, sagaCoordinator]
 
     context.rabbitmqConsumer = new RabbitMQConsumer(
@@ -376,14 +376,14 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
     // Start the RabbitMQ consumer
     await context.rabbitmqConsumer.start()
 
-    // Replace the ingress service's event emitter with the queue-first publisher
+    // Replace the ingress service's event publisher with the actual queue publisher
     const ingressService = context.ingressService as unknown as {
-      eventEmitter: IEventEmitter
+      eventPublisher: IEventPublisher
     }
 
-    // Replace the event emitter with queue-first publisher
-    Object.defineProperty(ingressService, "eventEmitter", {
-      value: context.queueFirstPublisher,
+    // Replace the event publisher with the actual queue publisher
+    Object.defineProperty(ingressService, "eventPublisher", {
+      value: context.eventPublisher,
       writable: false,
     })
 
@@ -404,7 +404,7 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
       context.rabbitmqConsumer = undefined
     }
     context.queueModule = undefined
-    context.queueFirstPublisher = undefined
+    context.eventPublisher = undefined
   }
 }
 

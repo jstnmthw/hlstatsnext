@@ -9,7 +9,10 @@ import type { ParseResult } from "./base.parser"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import { GameConfig } from "@/config/game.config"
-import { generateMessageId, generateCorrelationId } from "@/shared/infrastructure/queue/utils"
+import {
+  generateMessageId,
+  generateCorrelationId,
+} from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 
 export class CsParser extends BaseParser {
   // Track the last winning team for Round_End events

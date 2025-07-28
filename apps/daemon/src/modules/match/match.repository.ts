@@ -4,7 +4,7 @@
  * Data access layer for match and server operations.
  */
 
-import { BaseRepository } from "@/shared/infrastructure/repository.base"
+import { BaseRepository } from "@/shared/infrastructure/persistence/repository.base"
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IMatchRepository, ServerRecord, PlayerHistoryData } from "./match.types"

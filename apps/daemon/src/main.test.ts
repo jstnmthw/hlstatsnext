@@ -6,8 +6,9 @@ import { getAppContext } from "@/context"
 
 vi.mock("@/context")
 
-const mockQueueFirstPublisher = {
-  emit: vi.fn(),
+const mockEventPublisher = {
+  publish: vi.fn(),
+  publishBatch: vi.fn(),
 }
 
 const mockContext = {
@@ -31,7 +32,7 @@ const mockContext = {
     start: vi.fn(),
     stop: vi.fn(),
   },
-  queueFirstPublisher: mockQueueFirstPublisher,
+  eventPublisher: mockEventPublisher,
 } as unknown as AppContext
 
 describe("HLStatsDaemon", () => {
@@ -195,11 +196,11 @@ describe("HLStatsDaemon", () => {
         serverId: 1,
         data: {},
       }
-      vi.mocked(mockQueueFirstPublisher.emit).mockResolvedValue(undefined)
+      vi.mocked(mockEventPublisher.publish).mockResolvedValue(undefined)
 
       await daemon.emitEvents([mockEvent])
 
-      expect(mockQueueFirstPublisher.emit).toHaveBeenCalledWith(mockEvent)
+      expect(mockEventPublisher.publish).toHaveBeenCalledWith(mockEvent)
     })
   })
 

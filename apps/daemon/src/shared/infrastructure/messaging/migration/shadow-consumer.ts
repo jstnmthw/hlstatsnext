@@ -6,10 +6,14 @@
  * that events are flowing correctly and compares metrics with the EventBus.
  */
 
-import type { IQueueClient, QueueChannel, EventMessage } from "./queue.types"
+import type {
+  IQueueClient,
+  QueueChannel,
+  EventMessage,
+} from "@/shared/infrastructure/messaging/queue/core/types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
-import { safeJsonParse } from "./utils"
+import { safeJsonParse } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 
 export interface ShadowConsumerConfig {
   /** Queues to consume from for validation */

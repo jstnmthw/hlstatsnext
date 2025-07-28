@@ -13,12 +13,15 @@ import type {
   MessageMetadata,
   RoutingKeyMapper,
   PriorityMapper,
-} from "./queue.types"
-import { MessagePriority, QueuePublishError } from "./queue.types"
+} from "./types"
+import { MessagePriority, QueuePublishError } from "./types"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import { generateMessageId, generateCorrelationId } from "./utils"
+import {
+  generateMessageId,
+  generateCorrelationId,
+} from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 
 /**
  * Event publisher for RabbitMQ with comprehensive message handling
@@ -67,7 +70,7 @@ export class EventPublisher implements IEventPublisher {
 
       this.publishedCount++
 
-      this.logger.debug(`Event published to queue:`, {
+      this.logger.queue(`Event published: ${event.eventType}`, {
         messageId: message.id,
         eventType: event.eventType,
         routingKey,
@@ -93,7 +96,7 @@ export class EventPublisher implements IEventPublisher {
     }
 
     const batchId = generateMessageId()
-    this.logger.debug(`Publishing batch of ${events.length} events (batchId: ${batchId})`)
+    this.logger.queue(`Publishing batch of ${events.length} events`, { batchId })
 
     // Process events in parallel but with controlled concurrency
     const batchSize = 50 // Process in chunks of 50
@@ -110,8 +113,9 @@ export class EventPublisher implements IEventPublisher {
       }
     }
 
-    this.logger.info(
-      `Successfully published batch of ${events.length} events (batchId: ${batchId})`,
+    this.logger.queue(
+      `Batch published: ${events.length} events`,
+      { batchId, eventCount: events.length },
     )
   }
 

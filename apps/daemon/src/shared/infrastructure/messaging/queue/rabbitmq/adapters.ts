@@ -13,7 +13,7 @@ import type {
   ConsumeOptions,
   AssertExchangeOptions,
   AssertQueueOptions,
-} from "./queue.types"
+} from "@/shared/infrastructure/messaging/queue/core/types"
 
 /**
  * Adapter class that wraps amqplib Channel to match our QueueChannel interface

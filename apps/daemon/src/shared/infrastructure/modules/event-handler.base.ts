@@ -8,7 +8,7 @@
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { EventMetrics } from "@/shared/infrastructure/event-metrics"
+import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 
 export abstract class BaseModuleEventHandler {
   constructor(

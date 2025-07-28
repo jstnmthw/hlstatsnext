@@ -106,8 +106,6 @@ export class ShadowConsumer {
       throw new Error("Queue client is not connected")
     }
 
-    this.logger.info("Starting shadow consumer for migration validation...")
-
     try {
       // Create channels and start consuming from each queue
       for (const queueName of this.config.queues) {
@@ -139,7 +137,7 @@ export class ShadowConsumer {
       // Start metrics reporting
       this.startMetricsReporting()
 
-      this.logger.info(`Shadow consumer started, monitoring ${this.config.queues.length} queues`)
+      this.logger.info(`Shadow consumer monitoring ${this.config.queues.length} queues`)
     } catch (error) {
       this.logger.error(`Failed to start shadow consumer: ${error}`)
       await this.cleanup()

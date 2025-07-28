@@ -26,7 +26,7 @@ export class HLStatsDaemon {
     this.logger = this.context.logger
     this.eventProcessor = this.context.eventProcessor
 
-    this.logger.info("Initializing HLStatsNext Daemon with modular architecture")
+    this.logger.info("Initializing HLStatsNext Daemon...")
   }
 
   async start(): Promise<void> {
@@ -52,7 +52,7 @@ export class HLStatsDaemon {
       ])
 
       this.logger.ok("All services started successfully")
-      this.logger.ready("HLStatsNext Daemon is ready to receive game server data")
+      this.logger.ok("🚀 HLStatsNext Daemon is ready to receive game server data")
     } catch (error) {
       this.logger.failed(
         "Failed to start daemon",
@@ -143,8 +143,6 @@ function main() {
     daemon.getContext().logger.fatal(error instanceof Error ? error.message : String(error))
     process.exit(1)
   })
-
-  daemon.getContext().logger.ok("🚀 HLStatsNext Daemon started with modular architecture")
 }
 
 // This allows the file to be imported for testing without executing the startup logic.

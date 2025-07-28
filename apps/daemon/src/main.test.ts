@@ -60,9 +60,7 @@ describe("HLStatsDaemon", () => {
       new HLStatsDaemon()
 
       expect(mockedGetAppContext).toHaveBeenCalledWith({ skipAuth: true })
-      expect(mockContext.logger.info).toHaveBeenCalledWith(
-        "Initializing HLStatsNext Daemon with modular architecture",
-      )
+      expect(mockContext.logger.info).toHaveBeenCalledWith("Initializing HLStatsNext Daemon...")
     })
 
     it("should initialize with production environment", async () => {

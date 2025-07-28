@@ -9,14 +9,12 @@ import dotenv from "dotenv"
 dotenv.config()
 
 import { getAppContext, initializeQueueInfrastructure } from "@/context"
-import { EventProcessor } from "@/shared/infrastructure/event-processor"
 import type { AppContext } from "@/context"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
 
 export class HLStatsDaemon {
   private context: AppContext
-  private eventProcessor: EventProcessor
   private logger: ILogger
 
   constructor() {
@@ -28,7 +26,6 @@ export class HLStatsDaemon {
 
     this.context = getAppContext(ingressOptions)
     this.logger = this.context.logger
-    this.eventProcessor = this.context.eventProcessor
 
     this.logger.info("Initializing HLStatsNext Daemon...")
   }
@@ -88,10 +85,16 @@ export class HLStatsDaemon {
   }
 
   /**
-   * Emit events through the event bus for processing
+   * Emit events through the queue publisher (EventProcessor removed)
    */
   async emitEvents(events: BaseEvent[]): Promise<void> {
-    await this.eventProcessor.emitEvents(events)
+    if (!this.context.queueFirstPublisher) {
+      throw new Error("Queue publisher not initialized")
+    }
+    
+    for (const event of events) {
+      await this.context.queueFirstPublisher.emit(event)
+    }
   }
 
   /**

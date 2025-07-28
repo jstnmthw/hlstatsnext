@@ -5,11 +5,9 @@ import type { BaseEvent, EventType } from "@/shared/types/events"
 import { getAppContext } from "@/context"
 
 vi.mock("@/context")
-vi.mock("@/shared/infrastructure/event-processor")
 
-const mockEventProcessor = {
-  emitEvents: vi.fn(),
-  destroy: vi.fn(),
+const mockQueueFirstPublisher = {
+  emit: vi.fn(),
 }
 
 const mockContext = {
@@ -33,7 +31,7 @@ const mockContext = {
     start: vi.fn(),
     stop: vi.fn(),
   },
-  eventProcessor: mockEventProcessor,
+  queueFirstPublisher: mockQueueFirstPublisher,
 } as unknown as AppContext
 
 describe("HLStatsDaemon", () => {
@@ -190,18 +188,18 @@ describe("HLStatsDaemon", () => {
   })
 
   describe("emitEvents", () => {
-    it("should emit events through event processor", async () => {
+    it("should emit events through queue publisher", async () => {
       const mockEvent: BaseEvent = {
         eventType: "PLAYER_CONNECT" as EventType,
         timestamp: new Date(),
         serverId: 1,
         data: {},
       }
-      vi.mocked(mockEventProcessor.emitEvents).mockResolvedValue(undefined)
+      vi.mocked(mockQueueFirstPublisher.emit).mockResolvedValue(undefined)
 
       await daemon.emitEvents([mockEvent])
 
-      expect(mockEventProcessor.emitEvents).toHaveBeenCalledWith([mockEvent])
+      expect(mockQueueFirstPublisher.emit).toHaveBeenCalledWith(mockEvent)
     })
   })
 

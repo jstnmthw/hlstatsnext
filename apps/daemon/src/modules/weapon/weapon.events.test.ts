@@ -28,7 +28,7 @@ describe("WeaponEventHandler", () => {
     eventBus = createMockEventBus()
     weaponService = createMockWeaponService()
 
-    handler = new WeaponEventHandler(eventBus, logger, weaponService)
+    handler = new WeaponEventHandler(logger, weaponService)
   })
 
   afterEach(() => {
@@ -104,7 +104,7 @@ describe("WeaponEventHandler", () => {
       handler.destroy()
 
       expect(logger.debug).toHaveBeenCalledWith(
-        "WeaponEventHandler unregistered all event handlers",
+        "WeaponEventHandler cleanup completed (queue-only processing)",
       )
 
       // Verify handlers are actually removed by emitting an event

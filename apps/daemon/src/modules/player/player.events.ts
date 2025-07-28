@@ -8,7 +8,6 @@
 
 import { BaseModuleEventHandler } from "@/shared/infrastructure/module-event-handler.base"
 import type { BaseEvent, PlayerMeta } from "@/shared/types/events"
-import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/event-metrics"
 import type { IPlayerService } from "@/modules/player/player.types"
@@ -16,13 +15,12 @@ import type { IServerService } from "@/modules/server/server.types"
 
 export class PlayerEventHandler extends BaseModuleEventHandler {
   constructor(
-    eventBus: IEventBus,
     logger: ILogger,
     private readonly playerService: IPlayerService,
     private readonly serverService: IServerService,
     metrics?: EventMetrics,
   ) {
-    super(eventBus, logger, metrics)
+    super(logger, metrics)
     this.registerEventHandlers()
   }
 

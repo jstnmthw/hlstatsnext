@@ -18,9 +18,9 @@ import { EventConsumer, defaultConsumerConfig, defaultMessageValidator } from ".
 import { RabbitMQEventProcessor } from "./rabbitmq-event-processor"
 
 /**
- * Configuration for RabbitMQ consumer
+ * Configuration for RabbitMQ consumer (extends base consumer config)
  */
-export interface RabbitMQConsumerConfig extends ConsumerConfig {}
+export type RabbitMQConsumerConfig = ConsumerConfig
 
 /**
  * Default configuration for RabbitMQ consumer

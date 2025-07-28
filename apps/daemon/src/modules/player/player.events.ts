@@ -11,9 +11,8 @@ import type { BaseEvent, PlayerMeta } from "@/shared/types/events"
 import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/event-metrics"
-import type { IPlayerService, PlayerEvent } from "@/modules/player/player.types"
+import type { IPlayerService } from "@/modules/player/player.types"
 import type { IServerService } from "@/modules/server/server.types"
-import { EventType } from "@/shared/types/events"
 
 export class PlayerEventHandler extends BaseModuleEventHandler {
   constructor(
@@ -28,40 +27,16 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
   }
 
   registerEventHandlers(): void {
-    // Simple player events (no cross-module coordination needed)
-    this.registerHandler(EventType.PLAYER_CONNECT, this.handlePlayerConnect.bind(this))
-    this.registerHandler(EventType.PLAYER_DISCONNECT, this.handlePlayerDisconnect.bind(this))
-    this.registerHandler(EventType.PLAYER_CHANGE_NAME, this.handlePlayerChangeName.bind(this))
-    this.registerHandler(EventType.CHAT_MESSAGE, this.handleChatMessage.bind(this))
+    // Note: All simple player events have been migrated to queue-only processing
+    // - PLAYER_CONNECT, PLAYER_DISCONNECT, PLAYER_CHANGE_NAME, CHAT_MESSAGE
+    // These are now handled via RabbitMQConsumer and no longer use EventBus
   }
 
-  private async handlePlayerConnect(event: BaseEvent): Promise<void> {
-    this.logger.debug(`Player module handling PLAYER_CONNECT for server ${event.serverId}`)
-
-    const resolvedEvent = await this.resolvePlayerIds(event)
-    await this.playerService.handlePlayerEvent(resolvedEvent as PlayerEvent)
-  }
-
-  private async handlePlayerDisconnect(event: BaseEvent): Promise<void> {
-    this.logger.debug(`Player module handling PLAYER_DISCONNECT for server ${event.serverId}`)
-
-    const resolvedEvent = await this.resolvePlayerIds(event)
-    await this.playerService.handlePlayerEvent(resolvedEvent as PlayerEvent)
-  }
-
-  private async handlePlayerChangeName(event: BaseEvent): Promise<void> {
-    this.logger.debug(`Player module handling PLAYER_CHANGE_NAME for server ${event.serverId}`)
-
-    const resolvedEvent = await this.resolvePlayerIds(event)
-    await this.playerService.handlePlayerEvent(resolvedEvent as PlayerEvent)
-  }
-
-  private async handleChatMessage(event: BaseEvent): Promise<void> {
-    this.logger.debug(`Player module handling CHAT_MESSAGE for server ${event.serverId}`)
-
-    const resolvedEvent = await this.resolvePlayerIds(event)
-    await this.playerService.handlePlayerEvent(resolvedEvent as PlayerEvent)
-  }
+  // All EventBus handlers removed - events now processed via queue-only (RabbitMQConsumer)
+  // - handlePlayerConnect
+  // - handlePlayerDisconnect 
+  // - handlePlayerChangeName
+  // - handleChatMessage
 
   /**
    * Resolve Steam IDs to database player IDs for events that contain player references

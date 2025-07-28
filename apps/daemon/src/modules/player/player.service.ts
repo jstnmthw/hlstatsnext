@@ -378,13 +378,13 @@ export class PlayerService implements IPlayerService {
         ),
       ])
 
-      // Log kill event
-      this.logger.event(
+      // Log kill event (now processed via queue)
+      this.logger.queue(
         `Kill event: ${killerId} → ${victimId} (${weapon}${headshot ? ", headshot" : ""})`,
       )
 
-      // Log skill calculation details
-      this.logger.event(
+      // Log skill calculation details (now processed via queue)
+      this.logger.queue(
         `Skill adjustment: killer ${killerRating.rating} → ${killerRating.rating + skillAdjustment.killerChange} ` +
           `(${skillAdjustment.killerChange > 0 ? "+" : ""}${skillAdjustment.killerChange}), ` +
           `victim ${victimRating.rating} → ${victimRating.rating + skillAdjustment.victimChange} ` +
@@ -412,7 +412,7 @@ export class PlayerService implements IPlayerService {
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
       })
 
-      this.logger.event(`Player connected: ${playerId}`)
+      this.logger.queue(`Player connected: ${playerId}`)
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -438,7 +438,7 @@ export class PlayerService implements IPlayerService {
 
       await this.updatePlayerStats(playerId, updates)
 
-      this.logger.event(`Player disconnected: ${playerId}`)
+      this.logger.queue(`Player disconnected: ${playerId}`)
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -519,7 +519,7 @@ export class PlayerService implements IPlayerService {
 
       await this.updatePlayerStats(playerId, updates)
 
-      this.logger.event(`Player suicide: ${playerId} (penalty: ${skillPenalty})`)
+      this.logger.queue(`Player suicide: ${playerId} (penalty: ${skillPenalty})`)
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -626,7 +626,7 @@ export class PlayerService implements IPlayerService {
         messageMode || 0,
       )
 
-      this.logger.event(`Player ${playerId} say: "${message}"`)
+      this.logger.queue(`Player ${playerId} say: "${message}"`)
 
       return { success: true, affected: 1 }
     } catch (error) {

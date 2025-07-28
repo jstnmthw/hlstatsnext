@@ -4,6 +4,10 @@
  * Refactored to use modular architecture with dependency injection.
  */
 
+// Load environment variables from .env file
+import dotenv from "dotenv"
+dotenv.config()
+
 import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { EventProcessor } from "@/shared/infrastructure/event-processor"
 import type { AppContext } from "@/context"

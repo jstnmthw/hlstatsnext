@@ -229,10 +229,10 @@ describe("Logger", () => {
       },
     )
 
-    it("should apply magenta color to DEBUG status", () => {
+    it("should apply gray color to DEBUG status", () => {
       const colorLogger = new Logger({ enableColors: true, logLevel: LogLevel.DEBUG })
       colorLogger.debug("Debug message")
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("\x1b[35m[ DEBUG ]\x1b[0m"))
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("\x1b[90m[ DEBUG ]\x1b[0m"))
     })
 
     it("should not apply colors when disabled", () => {

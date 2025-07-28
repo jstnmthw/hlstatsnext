@@ -1,5 +1,7 @@
 # HLStatsNext
 
+⚠️ This project is in very early stage developement (07/28/2025).
+
 **HLStatsNext** is a comprehensive game statistics platform designed for Half-Life engine games. It offers real-time statistics, analytics dashboards, and server management tools, all built with modern web technologies. The platform is a complete modernization of the HLstatsX Community Edition, utilizing a TypeScript stack, Next.js interface, and GraphQL API to provide a scalable and user-friendly experience.
 
 Key features include a Node.js-based real-time statistics engine, a responsive web interface, and a flexible GraphQL API for efficient data communication. HLStatsNext supports seamless server management with integrated LinuxGSM, ensuring reliable service communication through a custom network architecture. The platform also includes MySQL 8.4 integration for database management, with automated schema handling and persistent storage.
@@ -13,17 +15,6 @@ For developers, HLStatsNext offers a hot-reload development environment, type-sa
 - [Getting Started](#getting-started)
 - [Development](#development)
 - [Docker Management](#docker-management)
-  - [Quick Start with Docker](#quick-start-with-docker)
-  - [Main Docker Commands](#main-docker-commands)
-  - [Docker Services Overview](#docker-services-overview)
-  - [Network Configuration](#network-configuration)
-  - [Environment Variables](#environment-variables)
-  - [Service Details](#service-details)
-  - [Game Server Management](#game-server-management)
-  - [Database Management](#database-management)
-  - [Daemon Management](#daemon-management)
-  - [Utility Commands](#utility-commands)
-  - [Volumes and Data Persistence](#volumes-and-data-persistence)
 - [Project Structure](#project-structure)
 - [Adding Your Own Game Servers](#adding-your-own-game-servers)
 - [Port Reference](#port-reference)

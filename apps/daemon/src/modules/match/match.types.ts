@@ -237,6 +237,9 @@ export interface IMatchService {
   // MVP calculations
   calculateMatchMVP(serverId: number): Promise<number | undefined>
   calculatePlayerScore(stats: PlayerRoundStats): number
+  
+  // Saga compensation methods
+  compensateKillInMatch?(serverId: number, killerId: number, victimId: number): Promise<void>
 }
 
 // Type for server record from database
@@ -301,14 +304,4 @@ export interface IMatchRepository {
   resetMapStats(serverId: number, newMap: string, options?: UpdateOptions): Promise<void>
 }
 
-export interface IRoundHandler {
-  handleRoundStart(event: RoundStartEvent): Promise<HandlerResult>
-  handleRoundEnd(event: RoundEndEvent): Promise<HandlerResult>
-  handleTeamWin(event: TeamWinEvent): Promise<HandlerResult>
-  handleMapChange(event: MapChangeEvent): Promise<HandlerResult>
-}
-
-export interface IObjectiveHandler {
-  handleObjectiveEvent(event: ObjectiveEvent): Promise<HandlerResult>
-  getObjectivePoints(eventType: string): number
-}
+// Legacy IRoundHandler and IObjectiveHandler interfaces removed - now using distributed MatchEventHandler

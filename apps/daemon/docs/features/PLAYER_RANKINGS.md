@@ -323,4 +323,4 @@ WHERE playerId = ?
 
 The HLStats Daemon rating system provides a sophisticated, fair, and engaging skill assessment mechanism that encourages competitive play while maintaining long-term stability. By combining traditional ELO mathematics with FPS-specific modifications, it creates meaningful progression for players of all skill levels.
 
-The system's flexibility allows for future enhancements while maintaining backward compatibility with existing HLStatsX installations. Regular monitoring and adjustment ensure the rating system continues to accurately reflect player skill as the game and community evolve.
+Regular monitoring and adjustment ensure the rating system continues to accurately reflect player skill as the game and community evolve.

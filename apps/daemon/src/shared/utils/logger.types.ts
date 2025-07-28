@@ -3,13 +3,13 @@
  * This allows for dependency injection and mocking of the logger in tests.
  */
 export interface ILogger {
-  ok(message: string): void
-  error(message: string): void
-  info(message: string): void
-  warn(message: string): void
-  debug(message: string): void
-  event(message: string): void
-  chat(message: string): void
+  ok(message: string, context?: Record<string, unknown>): void
+  error(message: string, context?: Record<string, unknown>): void
+  info(message: string, context?: Record<string, unknown>): void
+  warn(message: string, context?: Record<string, unknown>): void
+  debug(message: string, context?: Record<string, unknown>): void
+  event(message: string, context?: Record<string, unknown>): void
+  chat(message: string, context?: Record<string, unknown>): void
   starting(service: string): void
   started(service: string): void
   stopping(service: string): void

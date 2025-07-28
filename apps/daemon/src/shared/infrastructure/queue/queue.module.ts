@@ -57,8 +57,6 @@ export class QueueModule {
    * Initialize the queue module and create all services
    */
   async initialize(eventProcessor?: IEventProcessor): Promise<QueueModuleDependencies> {
-    this.logger.info('Initializing queue module...')
-
     try {
       // Create and connect RabbitMQ client
       this.client = new RabbitMQClient(this.config.rabbitmq, this.logger)
@@ -85,7 +83,6 @@ export class QueueModule {
 
       if (this.config.autoStartShadowConsumer) {
         await this.shadowConsumer.start()
-        this.logger.info('Shadow consumer started for migration validation')
       }
 
       this.logger.info('Queue module initialized successfully')
@@ -116,7 +113,6 @@ export class QueueModule {
       { ...defaultDualPublisherConfig, ...this.config.dualPublisher },
     )
 
-    this.logger.info('Dual publisher created for migration')
     return this.dualPublisher
   }
 

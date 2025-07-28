@@ -72,6 +72,7 @@ export class PlayerKillStep implements SagaStep {
     context.data.playerKillResult = result
     context.data.playerKillProcessed = true
 
+
     this.logger.debug("Player kill step completed", {
       eventId: context.eventId,
       killerId: event.data?.killerId,

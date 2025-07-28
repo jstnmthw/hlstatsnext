@@ -67,7 +67,7 @@ export class EventPublisher implements IEventPublisher {
 
       this.publishedCount++
 
-      this.logger.queue(`(${event.eventType}) Event published successfully:`, {
+      this.logger.debug(`Event published to queue:`, {
         messageId: message.id,
         eventType: event.eventType,
         routingKey,

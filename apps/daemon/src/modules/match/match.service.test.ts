@@ -76,7 +76,7 @@ describe("MatchService", () => {
 
       expect(result.success).toBe(true)
       expect(result.affected).toBe(1)
-      expect(mockLogger.queue).toHaveBeenCalledWith("[ROUND_START Event] Round started on server 1")
+      expect(mockLogger.debug).toHaveBeenCalledWith("Round started on server 1")
     })
 
     it("should handle ROUND_END events", async () => {
@@ -192,9 +192,9 @@ describe("MatchService", () => {
 
       expect(result.success).toBe(true)
       expect(mockRepository.updateBombStats).toHaveBeenCalledWith(1, "plant")
-      expect(mockLogger.queue).toHaveBeenCalledWith(
+      expect(mockLogger.debug).toHaveBeenCalledWith(
         expect.stringContaining(
-          "Objective event on server 1: BOMB_PLANT by player 123 (+3 points)",
+          "Objective event processed: BOMB_PLANT by player 123 (+3 points)",
         ),
       )
     })
@@ -229,8 +229,8 @@ describe("MatchService", () => {
       const result = await matchService.handleObjectiveEvent(event)
 
       expect(result.success).toBe(true)
-      expect(mockLogger.queue).toHaveBeenCalledWith(
-        expect.stringContaining("Objective event on server 1: BOMB_EXPLODE"),
+      expect(mockLogger.debug).toHaveBeenCalledWith(
+        expect.stringContaining("Objective event processed: BOMB_EXPLODE"),
       )
     })
 

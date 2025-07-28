@@ -38,7 +38,10 @@ describe("KillEventSaga", () => {
     eventBus = new EventBus(logger)
 
     playerService = {
-      handleKillEvent: vi.fn(),
+      handleKillEvent: vi.fn().mockResolvedValue({ 
+        success: true, 
+        affected: 2,
+      }),
       compensateKillEvent: vi.fn(),
     } as unknown as IPlayerService
 

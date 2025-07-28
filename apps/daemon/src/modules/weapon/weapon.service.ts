@@ -60,7 +60,7 @@ export class WeaponService implements IWeaponService {
       const { weaponCode } = event.data
       await this.updateWeaponStats(weaponCode, { shots: 1 })
 
-      this.logger.queue(`Weapon fired: ${weaponCode}`)
+      this.logger.debug(`Weapon fired: ${weaponCode}`)
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -77,7 +77,7 @@ export class WeaponService implements IWeaponService {
       const { weaponCode, damage } = (event as any).data
       await this.updateWeaponStats(weaponCode, { hits: 1, damage: damage || 0 })
 
-      this.logger.queue(`Weapon hit: ${weaponCode} (${damage || 0} damage)`)
+      this.logger.debug(`Weapon hit: ${weaponCode} (${damage || 0} damage)`)
 
       return { success: true, affected: 1 }
     } catch (error) {

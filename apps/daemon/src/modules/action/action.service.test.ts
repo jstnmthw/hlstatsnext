@@ -85,7 +85,7 @@ describe("ActionService", () => {
       expect(result.affected).toBe(1)
       expect(mockRepository.findActionByCode).toHaveBeenCalledWith("csgo", "score", "ct")
       expect(mockRepository.logPlayerAction).toHaveBeenCalledWith(1, 1, 1, "", 10)
-      expect(mockLogger.queue).toHaveBeenCalledWith("Player action: score by player 1 (+15 points)")
+      expect(mockLogger.debug).toHaveBeenCalledWith("Player action: score by player 1 (+15 points)")
     })
 
     it("should handle ACTION_PLAYER_PLAYER events", async () => {
@@ -324,7 +324,7 @@ describe("ActionService", () => {
       expect(result.affected).toBe(1)
       expect(mockRepository.logPlayerAction).toHaveBeenCalledWith(1, 1, 1, "", 0)
       expect(mockPlayerService.updatePlayerStats).not.toHaveBeenCalled() // Should NOT be called when totalPoints is 0
-      expect(mockLogger.queue).toHaveBeenCalledWith(
+      expect(mockLogger.debug).toHaveBeenCalledWith(
         "Player action: no_reward_action by player 1 (0 points)",
       )
     })

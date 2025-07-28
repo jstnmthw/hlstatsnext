@@ -187,6 +187,15 @@ export class QueueFirstPublisher implements IEventEmitter {
    * Publish to queue only (migrated events)
    */
   private async publishToQueueOnly(event: BaseEvent): Promise<void> {
+    // Log when event is sent to queue with structured context
+    this.logger.queue(`Processing Event: ${event.eventType}`, {
+      eventId: event.eventId,
+      correlationId: event.correlationId,
+      serverId: event.serverId,
+      eventType: event.eventType,
+      timestamp: event.timestamp,
+    })
+
     await this.queuePublisher.publish(event)
   }
 

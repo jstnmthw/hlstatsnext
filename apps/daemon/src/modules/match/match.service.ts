@@ -91,8 +91,8 @@ export class MatchService implements IMatchService {
         await this.repository.updateBombStats(serverId, "defuse")
       }
 
-      this.logger.queue(
-        `Objective event on server ${serverId}: ${event.eventType}${
+      this.logger.debug(
+        `Objective event processed: ${event.eventType}${
           playerId
             ? ` by player ${playerId} (+${this.getObjectivePoints(event.eventType)} points)`
             : ""
@@ -335,7 +335,7 @@ export class MatchService implements IMatchService {
         matchStats.currentMap = event.data.map
       }
 
-      this.logger.queue(`[${EventType.ROUND_START} Event] Round started on server ${serverId}`)
+      this.logger.debug(`Round started on server ${serverId}`)
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -374,8 +374,8 @@ export class MatchService implements IMatchService {
 
       await this.repository.incrementServerRounds(serverId)
 
-      this.logger.queue(
-        `(${EventType.ROUND_END}) Round ended on server ${serverId}${winningTeam ? `: ${winningTeam} won` : ""}${
+      this.logger.debug(
+        `Round ended on server ${serverId}${winningTeam ? `: ${winningTeam} won` : ""}${
           score ? ` (${score.team1}-${score.team2})` : ""
         }`,
       )
@@ -421,7 +421,7 @@ export class MatchService implements IMatchService {
         await this.repository.updateTeamWins(serverId, winningTeam)
       }
 
-      this.logger.queue(
+      this.logger.debug(
         `Team win on server ${serverId}: ${winningTeam} won via ${triggerName} (CT: ${score.ct}, T: ${score.t})`,
       )
 
@@ -462,7 +462,7 @@ export class MatchService implements IMatchService {
       // Update server record for the new map
       await this.repository.resetMapStats(serverId, newMap)
 
-      this.logger.queue(
+      this.logger.debug(
         `Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`,
       )
 
@@ -484,7 +484,7 @@ export class MatchService implements IMatchService {
       // Save match statistics to database
       await this.saveMatchToDatabase(serverId, mapName, stats)
 
-      this.logger.queue(
+      this.logger.debug(
         `Match finalized on server ${serverId} for map ${mapName}: ${stats.totalRounds} rounds, ${stats.duration}s, MVP: ${mvpPlayerId}, scores: ${JSON.stringify(
           stats.teamScores,
         )}`,

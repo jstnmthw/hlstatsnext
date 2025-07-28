@@ -57,6 +57,7 @@ const mockLogger: ILogger = {
   ok: vi.fn(),
   event: vi.fn(),
   chat: vi.fn(),
+  queue: vi.fn(),
   disconnected: vi.fn(),
   disableTimestamps: vi.fn(),
   enableTimestamps: vi.fn(),

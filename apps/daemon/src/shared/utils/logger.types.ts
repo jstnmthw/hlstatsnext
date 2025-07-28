@@ -10,6 +10,7 @@ export interface ILogger {
   debug(message: string, context?: Record<string, unknown>): void
   event(message: string, context?: Record<string, unknown>): void
   chat(message: string, context?: Record<string, unknown>): void
+  queue(message: string, context?: Record<string, unknown>): void
   starting(service: string): void
   started(service: string): void
   stopping(service: string): void

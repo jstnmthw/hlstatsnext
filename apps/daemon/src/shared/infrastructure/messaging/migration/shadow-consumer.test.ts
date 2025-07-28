@@ -9,7 +9,7 @@ import {
   createShadowConsumer,
   type ShadowConsumerConfig,
 } from "./shadow-consumer"
-import type { IQueueClient, QueueChannel } from "./queue.types"
+import type { IQueueClient, QueueChannel } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import { LogLevel } from "@/shared/utils/logger"
 import type { BaseEvent } from "@/shared/types/events"

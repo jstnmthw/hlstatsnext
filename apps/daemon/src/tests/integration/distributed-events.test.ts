@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
-import { EventBus } from "@/shared/infrastructure/event-bus/event-bus"
+import { EventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus"
 import { EventType } from "@/shared/types/events"
 import { PlayerEventHandler } from "@/modules/player/player.events"
 import { WeaponEventHandler } from "@/modules/weapon/weapon.events"

@@ -5,30 +5,22 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { IngressService } from "./ingress.service"
 import { createMockLogger } from "../../tests/mocks/logger"
-import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
+import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { IngressDependencies } from "./ingress.dependencies"
 
 describe("IngressService", () => {
   let ingressService: IngressService
   let mockLogger: ReturnType<typeof createMockLogger>
-  let mockEventBus: IEventBus
+  let mockEventPublisher: IEventPublisher
   let mockDependencies: IngressDependencies
 
   beforeEach(() => {
     mockLogger = createMockLogger()
 
-    // Mock EventBus
-    mockEventBus = {
-      emit: vi.fn().mockResolvedValue(undefined),
-      on: vi.fn().mockReturnValue("handler-id"),
-      off: vi.fn(),
-      clearHandlers: vi.fn(),
-      getStats: vi.fn().mockReturnValue({
-        totalHandlers: 0,
-        handlersByType: new Map(),
-        eventsEmitted: 0,
-        errors: 0,
-      }),
+    // Mock EventPublisher
+    mockEventPublisher = {
+      publish: vi.fn().mockResolvedValue(undefined),
+      publishBatch: vi.fn().mockResolvedValue(undefined),
     }
 
     // Mock dependencies
@@ -56,7 +48,7 @@ describe("IngressService", () => {
       },
     }
 
-    ingressService = new IngressService(mockLogger, mockEventBus, mockDependencies, {
+    ingressService = new IngressService(mockLogger, mockEventPublisher, mockDependencies, {
       port: 27501,
       skipAuth: true,
       logBots: false,

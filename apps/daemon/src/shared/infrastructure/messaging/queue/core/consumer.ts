@@ -13,11 +13,16 @@ import type {
   EventMessage,
   ConsumerStats,
   MessageValidator,
-} from "./queue.types"
-import { QueueConsumeError } from "./queue.types"
+} from "./types"
+import { QueueConsumeError } from "./types"
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import { safeJsonParse, calculateRetryDelay, addJitter, formatDuration } from "./utils"
+import {
+  safeJsonParse,
+  calculateRetryDelay,
+  addJitter,
+  formatDuration,
+} from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 
 /**
  * Event processor interface for handling consumed events
@@ -190,8 +195,14 @@ export class EventConsumer implements IEventConsumer {
       // Validate message
       await this.messageValidator(message)
 
-      this.logger.debug(
-        `Processing message ${messageId} (${message.payload.eventType}) from ${queueName} (retry: ${message.metadata.routing.retryCount})`,
+      this.logger.queue(
+        `Event received: ${message.payload.eventType}`,
+        {
+          messageId,
+          eventType: message.payload.eventType,
+          queueName,
+          retryCount: message.metadata.routing.retryCount,
+        },
       )
 
       // Process the event

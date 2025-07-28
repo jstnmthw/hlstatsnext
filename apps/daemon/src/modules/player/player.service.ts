@@ -395,7 +395,7 @@ export class PlayerService implements IPlayerService {
           killerNewRating: killerRating.rating + skillAdjustment.killerChange,
           victimOldRating: victimRating.rating,
           victimNewRating: victimRating.rating + skillAdjustment.victimChange,
-        }
+        },
       )
 
       return {

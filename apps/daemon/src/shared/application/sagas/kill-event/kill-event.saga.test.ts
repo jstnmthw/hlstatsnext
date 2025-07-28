@@ -7,8 +7,8 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { KillEventSaga, PlayerKillStep } from "./kill-event.saga"
 import { SagaMonitor } from "../saga.monitor"
-import { EventBus } from "@/shared/infrastructure/event-bus/event-bus"
-import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
+import { EventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerService, PlayerKillEvent } from "@/modules/player/player.types"
 import type { IWeaponService } from "@/modules/weapon/weapon.types"
@@ -38,8 +38,8 @@ describe("KillEventSaga", () => {
     eventBus = new EventBus(logger)
 
     playerService = {
-      handleKillEvent: vi.fn().mockResolvedValue({ 
-        success: true, 
+      handleKillEvent: vi.fn().mockResolvedValue({
+        success: true,
         affected: 2,
       }),
       compensateKillEvent: vi.fn(),

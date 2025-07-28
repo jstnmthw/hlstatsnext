@@ -8,7 +8,7 @@
 
 import type { BaseEvent, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import type { PlayerEvent } from "@/modules/player/player.types"
 import type { IPlayerService } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"

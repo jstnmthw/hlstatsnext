@@ -4,7 +4,7 @@
  * Mock EventBus implementation for testing.
  */
 
-import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import { vi } from "vitest"
 
 export function createMockEventBus(): IEventBus {

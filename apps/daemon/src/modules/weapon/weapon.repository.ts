@@ -2,7 +2,7 @@
  * Weapon Repository
  */
 
-import { BaseRepository } from "@/shared/infrastructure/repository.base"
+import { BaseRepository } from "@/shared/infrastructure/persistence/repository.base"
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IWeaponRepository } from "./weapon.types"

@@ -10,7 +10,7 @@ import { BaseSaga } from "../saga.base"
 import type { SagaStep, SagaContext } from "../saga.types"
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import type { IPlayerService, PlayerKillEvent } from "@/modules/player/player.types"
 import type { IWeaponService, WeaponEvent } from "@/modules/weapon/weapon.types"
 import type { IMatchService } from "@/modules/match/match.types"
@@ -71,7 +71,6 @@ export class PlayerKillStep implements SagaStep {
     const result = await this.playerService.handleKillEvent(event)
     context.data.playerKillResult = result
     context.data.playerKillProcessed = true
-
 
     this.logger.debug("Player kill step completed", {
       eventId: context.eventId,

@@ -48,10 +48,6 @@ export class SagaMonitor implements ISagaMonitor {
 
   onSagaCompleted(result: SagaExecutionResult): void {
     this.updateMetrics(result)
-
-    this.logger.info(
-      `Saga completed successfully: ${result.sagaName} in ${result.executionTimeMs}ms with ${result.completedSteps} steps`,
-    )
   }
 
   onSagaFailed(result: SagaExecutionResult): void {

@@ -378,20 +378,30 @@ export class PlayerService implements IPlayerService {
         ),
       ])
 
-      // Log kill event (now processed via queue)
-      this.logger.queue(
+      // Log kill event details
+      this.logger.debug(
         `Kill event: ${killerId} → ${victimId} (${weapon}${headshot ? ", headshot" : ""})`,
       )
 
-      // Log skill calculation details (now processed via queue)
-      this.logger.queue(
-        `Skill adjustment: killer ${killerRating.rating} → ${killerRating.rating + skillAdjustment.killerChange} ` +
-          `(${skillAdjustment.killerChange > 0 ? "+" : ""}${skillAdjustment.killerChange}), ` +
-          `victim ${victimRating.rating} → ${victimRating.rating + skillAdjustment.victimChange} ` +
-          `(${skillAdjustment.victimChange})`,
+      // Log skill calculation results at INFO level for visibility
+      this.logger.info(
+        `Skill calculated: killer ${killerId} (${skillAdjustment.killerChange > 0 ? "+" : ""}${skillAdjustment.killerChange}) -> victim ${victimId} (${skillAdjustment.victimChange})`,
+        {
+          eventType: "PLAYER_KILL",
+          serverId: event.serverId,
+          killerId,
+          victimId,
+          killerOldRating: killerRating.rating,
+          killerNewRating: killerRating.rating + skillAdjustment.killerChange,
+          victimOldRating: victimRating.rating,
+          victimNewRating: victimRating.rating + skillAdjustment.victimChange,
+        }
       )
 
-      return { success: true, affected: 2 }
+      return {
+        success: true,
+        affected: 2,
+      }
     } catch (error) {
       return {
         success: false,
@@ -412,7 +422,7 @@ export class PlayerService implements IPlayerService {
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
       })
 
-      this.logger.queue(`Player connected: ${playerId}`)
+      this.logger.debug(`Player connected: ${playerId}`)
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -438,7 +448,7 @@ export class PlayerService implements IPlayerService {
 
       await this.updatePlayerStats(playerId, updates)
 
-      this.logger.queue(`Player disconnected: ${playerId}`)
+      this.logger.debug(`Player disconnected: ${playerId}`)
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -519,7 +529,7 @@ export class PlayerService implements IPlayerService {
 
       await this.updatePlayerStats(playerId, updates)
 
-      this.logger.queue(`Player suicide: ${playerId} (penalty: ${skillPenalty})`)
+      this.logger.debug(`Player suicide: ${playerId} (penalty: ${skillPenalty})`)
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -626,7 +636,7 @@ export class PlayerService implements IPlayerService {
         messageMode || 0,
       )
 
-      this.logger.queue(`(${EventType.CHAT_MESSAGE}) Player ${playerId} says: "${message}"`)
+      this.logger.debug(`(${EventType.CHAT_MESSAGE}) Player ${playerId} says: "${message}"`)
 
       return { success: true, affected: 1 }
     } catch (error) {

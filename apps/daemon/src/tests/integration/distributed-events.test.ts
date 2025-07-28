@@ -60,17 +60,12 @@ describe("Distributed Event Processing", () => {
       handleRatingUpdate: vi.fn(),
     } as unknown as IRankingService
 
-
     serverService = {
       getServerGame: vi.fn().mockResolvedValue("csgo"),
     } as unknown as IServerService
 
     // Create event bus
     eventBus = new EventBus(logger)
-
-    // Create event coordinators
-    // EventProcessor removed - all events now queue-only
-    // const killEventCoordinator = new KillEventCoordinator(logger, rankingService)
 
     playerEventHandler = new PlayerEventHandler(logger, playerService, serverService)
 

@@ -10,7 +10,6 @@ import type { MockedFunction } from "vitest"
 import { QueueFirstPublisher } from "./queue-first-publisher"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
-import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
 import type { IEventPublisher } from "./queue.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 
@@ -29,19 +28,6 @@ const mockQueuePublisher: IEventPublisher = {
   publishBatch: vi.fn(),
 }
 
-// Mock EventBus
-const mockEventBus: IEventBus = {
-  emit: vi.fn(),
-  on: vi.fn(),
-  off: vi.fn(),
-  clearHandlers: vi.fn(),
-  getStats: vi.fn().mockReturnValue({
-    totalHandlers: 0,
-    handlersByType: new Map(),
-    eventsEmitted: 0,
-    errors: 0,
-  }),
-}
 
 // Test event factory
 function createTestEvent(eventType: EventType): BaseEvent {
@@ -57,39 +43,24 @@ function createTestEvent(eventType: EventType): BaseEvent {
 describe("QueueFirstPublisher", () => {
   let publisher: QueueFirstPublisher
   let mockQueuePublish: MockedFunction<typeof mockQueuePublisher.publish>
-  let mockEventBusEmit: MockedFunction<typeof mockEventBus.emit>
 
   beforeEach(() => {
     vi.clearAllMocks()
     mockQueuePublish = mockQueuePublisher.publish as MockedFunction<
       typeof mockQueuePublisher.publish
     >
-    mockEventBusEmit = mockEventBus.emit as MockedFunction<typeof mockEventBus.emit>
 
-    publisher = new QueueFirstPublisher(mockQueuePublisher, mockLogger, mockEventBus)
+    publisher = new QueueFirstPublisher(mockQueuePublisher, mockLogger)
   })
 
   describe("initialization", () => {
     it("should initialize with correct logging", () => {
       expect(mockLogger.info).toHaveBeenCalledWith(
-        "Queue-first publisher initialized",
+        "Queue-only publisher initialized - EventBus migration complete!",
         expect.objectContaining({
           hasQueuePublisher: true,
-          hasEventBusFallback: true,
           queueOnlyEvents: expect.any(Number),
-          eventBusFallbackEvents: expect.any(Number),
-        }),
-      )
-    })
-
-    it("should work without EventBus fallback", () => {
-      const publisherWithoutFallback = new QueueFirstPublisher(mockQueuePublisher, mockLogger)
-
-      expect(publisherWithoutFallback).toBeDefined()
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        "Queue-first publisher initialized",
-        expect.objectContaining({
-          hasEventBusFallback: false,
+          migrationComplete: true,
         }),
       )
     })
@@ -141,7 +112,6 @@ describe("QueueFirstPublisher", () => {
       await publisher.emit(event)
 
       expect(mockQueuePublish).toHaveBeenCalledWith(event)
-      expect(mockEventBusEmit).not.toHaveBeenCalled()
     })
 
     it("should update metrics correctly for queue-only events", async () => {
@@ -175,7 +145,6 @@ describe("QueueFirstPublisher", () => {
         await publisher.emit(event)
 
         expect(mockQueuePublish).toHaveBeenCalledWith(event)
-        expect(mockEventBusEmit).not.toHaveBeenCalled()
         expect(mockLogger.debug).toHaveBeenCalledWith(
           "Event published successfully",
           expect.objectContaining({
@@ -212,16 +181,17 @@ describe("QueueFirstPublisher", () => {
   })
 
   describe("unknown event types", () => {
-    it("should use EventBus fallback for unknown event types", async () => {
+    it("should throw error for unknown event types", async () => {
       // Create event with a non-existent event type (cast to avoid TS error)
       const event = createTestEvent("UNKNOWN_EVENT" as EventType)
 
-      await publisher.emit(event)
+      await expect(publisher.emit(event)).rejects.toThrow(
+        "Unknown event type: UNKNOWN_EVENT. All events should be in QUEUE_ONLY_EVENTS."
+      )
 
-      expect(mockEventBusEmit).toHaveBeenCalledWith(event)
       expect(mockQueuePublish).not.toHaveBeenCalled()
-      expect(mockLogger.warn).toHaveBeenCalledWith(
-        "Unknown event type, using EventBus fallback",
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        "Unknown event type - all events should be queue-only",
         expect.objectContaining({
           eventType: "UNKNOWN_EVENT",
           eventId: event.eventId,

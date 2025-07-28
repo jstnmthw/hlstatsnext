@@ -8,7 +8,6 @@
 
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
-import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
 import type { IEventEmitter } from "@/shared/infrastructure/event-publisher-adapter"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IEventPublisher } from "./queue.types"
@@ -103,16 +102,14 @@ export class QueueFirstPublisher implements IEventEmitter {
   constructor(
     private readonly queuePublisher: IEventPublisher,
     private readonly logger: ILogger,
-    private readonly eventBusFallback?: IEventBus,
   ) {
-    this.logger.info("Queue-first publisher initialized", {
+    this.logger.info("Queue-only publisher initialized - EventBus migration complete!", {
       hasQueuePublisher: !!this.queuePublisher,
-      hasEventBusFallback: !!this.eventBusFallback,
       queueOnlyEvents: QUEUE_ONLY_EVENTS.size,
-      eventBusFallbackEvents: EVENTBUS_FALLBACK_EVENTS.size,
+      migrationComplete: EVENTBUS_FALLBACK_EVENTS.size === 0,
     })
 
-    // Log migration status
+    // Log final migration status
     this.logMigrationStatus()
   }
 
@@ -129,30 +126,19 @@ export class QueueFirstPublisher implements IEventEmitter {
       }
 
       if (QUEUE_ONLY_EVENTS.has(event.eventType)) {
-        // Fully migrated events - queue only
+        // All events are now queue-only
         await this.publishToQueueOnly(event)
         this.metrics = {
           ...this.metrics,
           queueOnlyEvents: this.metrics.queueOnlyEvents + 1,
         }
-      } else if (EVENTBUS_FALLBACK_EVENTS.has(event.eventType)) {
-        // Not yet migrated - use EventBus fallback
-        await this.publishToEventBusFallback(event)
-        this.metrics = {
-          ...this.metrics,
-          eventBusFallbackEvents: this.metrics.eventBusFallbackEvents + 1,
-        }
       } else {
-        // Unknown event type - log warning and use fallback
-        this.logger.warn("Unknown event type, using EventBus fallback", {
+        // Unknown event type - this shouldn't happen as all events are migrated
+        this.logger.error("Unknown event type - all events should be queue-only", {
           eventType: event.eventType,
           eventId: event.eventId,
         })
-        await this.publishToEventBusFallback(event)
-        this.metrics = {
-          ...this.metrics,
-          eventBusFallbackEvents: this.metrics.eventBusFallbackEvents + 1,
-        }
+        throw new Error(`Unknown event type: ${event.eventType}. All events should be in QUEUE_ONLY_EVENTS.`)
       }
 
       // Update success rate
@@ -199,21 +185,7 @@ export class QueueFirstPublisher implements IEventEmitter {
     await this.queuePublisher.publish(event)
   }
 
-  /**
-   * Publish to EventBus fallback (not yet migrated)
-   */
-  private async publishToEventBusFallback(event: BaseEvent): Promise<void> {
-    if (!this.eventBusFallback) {
-      throw new Error(`Event ${event.eventType} requires EventBus fallback but none provided`)
-    }
-
-    this.logger.debug(`Using EventBus fallback for ${event.eventType}`, {
-      eventId: event.eventId,
-      serverId: event.serverId,
-    })
-
-    await this.eventBusFallback.emit(event)
-  }
+  // EventBus fallback removed - all events now queue-only
 
   /**
    * Update queue-only success rate metric

@@ -6,19 +6,17 @@
  */
 
 import { BaseModuleEventHandler } from "@/shared/infrastructure/module-event-handler.base"
-import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/event-metrics"
 import type { IServerService } from "@/modules/server/server.types"
 
 export class ServerEventHandler extends BaseModuleEventHandler {
   constructor(
-    eventBus: IEventBus,
     logger: ILogger,
     private readonly serverService: IServerService,
     metrics?: EventMetrics,
   ) {
-    super(eventBus, logger, metrics)
+    super(logger, metrics)
     this.registerEventHandlers()
   }
 

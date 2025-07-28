@@ -8,19 +8,17 @@
 
 import { BaseModuleEventHandler } from "@/shared/infrastructure/module-event-handler.base"
 import type { BaseEvent } from "@/shared/types/events"
-import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/event-metrics"
 import type { IMatchService, MatchEvent, ObjectiveEvent } from "@/modules/match/match.types"
 
 export class MatchEventHandler extends BaseModuleEventHandler {
   constructor(
-    eventBus: IEventBus,
     logger: ILogger,
     private readonly matchService: IMatchService,
     metrics?: EventMetrics,
   ) {
-    super(eventBus, logger, metrics)
+    super(logger, metrics)
     this.registerEventHandlers()
   }
 

@@ -47,7 +47,7 @@ describe("PlayerEventHandler", () => {
     playerService = createMockPlayerService()
     serverService = createMockServerService()
 
-    handler = new PlayerEventHandler(eventBus, logger, playerService, serverService)
+    handler = new PlayerEventHandler(logger, playerService, serverService)
   })
 
   afterEach(() => {
@@ -119,7 +119,7 @@ describe("PlayerEventHandler", () => {
       handler.destroy()
 
       expect(logger.debug).toHaveBeenCalledWith(
-        "PlayerEventHandler unregistered all event handlers",
+        "PlayerEventHandler cleanup completed (queue-only processing)",
       )
 
       // Verify handlers are actually removed by emitting an event

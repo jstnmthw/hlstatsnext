@@ -7,19 +7,16 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
 import { EventBus } from "@/shared/infrastructure/event-bus/event-bus"
-import { EventProcessor } from "@/shared/infrastructure/event-processor"
+import { EventType } from "@/shared/types/events"
 import { PlayerEventHandler } from "@/modules/player/player.events"
 import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
 import { MatchEventHandler } from "@/modules/match/match.events"
-import { KillEventCoordinator } from "@/shared/application/event-coordinator"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerService } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IWeaponService } from "@/modules/weapon/weapon.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
-import type { IActionService } from "@/modules/action/action.types"
 import type { IServerService } from "@/modules/server/server.types"
-import { EventType } from "@/shared/types/events"
 import type { BaseEvent, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
 
 describe("Distributed Event Processing", () => {
@@ -29,9 +26,7 @@ describe("Distributed Event Processing", () => {
   let matchService: IMatchService
   let weaponService: IWeaponService
   let rankingService: IRankingService
-  let actionService: IActionService
   let serverService: IServerService
-  let eventProcessor: EventProcessor
   let playerEventHandler: PlayerEventHandler
   let weaponEventHandler: WeaponEventHandler
   let matchEventHandler: MatchEventHandler
@@ -65,9 +60,6 @@ describe("Distributed Event Processing", () => {
       handleRatingUpdate: vi.fn(),
     } as unknown as IRankingService
 
-    actionService = {
-      handleActionEvent: vi.fn(),
-    } as unknown as IActionService
 
     serverService = {
       getServerGame: vi.fn().mockResolvedValue("csgo"),
@@ -77,33 +69,18 @@ describe("Distributed Event Processing", () => {
     eventBus = new EventBus(logger)
 
     // Create event coordinators
-    const killEventCoordinator = new KillEventCoordinator(logger, rankingService)
-    const coordinators = [killEventCoordinator]
+    // EventProcessor removed - all events now queue-only
+    // const killEventCoordinator = new KillEventCoordinator(logger, rankingService)
 
-    // Create both handlers
-    eventProcessor = new EventProcessor(
-      eventBus,
-      {
-        playerService,
-        matchService,
-        weaponService,
-        rankingService,
-        actionService,
-        serverService,
-        logger,
-      },
-      coordinators,
-    )
+    playerEventHandler = new PlayerEventHandler(logger, playerService, serverService)
 
-    playerEventHandler = new PlayerEventHandler(eventBus, logger, playerService, serverService)
+    weaponEventHandler = new WeaponEventHandler(logger, weaponService)
 
-    weaponEventHandler = new WeaponEventHandler(eventBus, logger, weaponService)
-
-    matchEventHandler = new MatchEventHandler(eventBus, logger, matchService)
+    matchEventHandler = new MatchEventHandler(logger, matchService)
   })
 
   afterEach(() => {
-    eventProcessor.destroy()
+    // EventProcessor removed - all events now queue-only
     playerEventHandler.destroy()
     weaponEventHandler.destroy()
     matchEventHandler.destroy()
@@ -159,7 +136,7 @@ describe("Distributed Event Processing", () => {
   })
 
   describe("Complex Player Events", () => {
-    it("should still process complex player events through EventProcessor", async () => {
+    it("should no longer process complex player events through EventBus (migrated to queue-only)", async () => {
       const event: BaseEvent = {
         eventType: EventType.PLAYER_ENTRY,
         serverId: 1,
@@ -173,13 +150,8 @@ describe("Distributed Event Processing", () => {
 
       await eventBus.emit(event)
 
-      // Should be handled by EventProcessor
-      expect(playerService.handlePlayerEvent).toHaveBeenCalledTimes(1)
-      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventType: EventType.PLAYER_ENTRY,
-        }),
-      )
+      // Should NOT be handled by EventBus - all events migrated to queue-only
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledTimes(0)
     })
   })
 

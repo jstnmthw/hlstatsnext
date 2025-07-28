@@ -31,16 +31,9 @@ import type { IActionService } from "@/modules/action/action.types"
 import { IngressService } from "@/modules/ingress/ingress.service"
 import type { IIngressService, IngressOptions } from "@/modules/ingress/ingress.types"
 import { createIngressDependencies } from "@/modules/ingress/ingress.adapter"
-import { EventBus } from "@/shared/infrastructure/event-bus/event-bus"
-import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
-import { EventProcessor } from "@/shared/infrastructure/event-processor"
-import type { EventProcessorDependencies } from "@/shared/infrastructure/event-processor"
 import { QueueModule, createDevelopmentRabbitMQConfig } from "@/shared/infrastructure/queue"
 import { QueueFirstPublisher } from "@/shared/infrastructure/queue/queue-first-publisher"
-import {
-  EventBusAdapter,
-  type IEventEmitter,
-} from "@/shared/infrastructure/event-publisher-adapter"
+import type { IEventEmitter } from "@/shared/infrastructure/event-publisher-adapter"
 // Remove unused import - BaseEvent not needed in context
 import { EventType } from "@/shared/types/events"
 
@@ -67,7 +60,6 @@ export interface AppContext {
   // Infrastructure
   database: DatabaseClient
   logger: ILogger
-  eventBus: IEventBus
 
   // Queue Infrastructure (migration to queue-first)
   queueModule?: QueueModule
@@ -84,8 +76,6 @@ export interface AppContext {
   gameDetectionService: IGameDetectionService
   serverService: IServerService
 
-  // Event Processing
-  eventProcessor: EventProcessor
 
   // Module Event Handlers
   playerEventHandler: PlayerEventHandler
@@ -113,8 +103,6 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const actionRepository = new ActionRepository(database, logger)
   const serverRepository = new ServerRepository(database, logger)
 
-  // Create event bus
-  const eventBus = new EventBus(logger)
 
   // Create queue module for RabbitMQ integration (optional)
   let queueModule: QueueModule | undefined
@@ -182,8 +170,12 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     }
   }
 
-  // Create event emitter adapter (start with EventBus)
-  const eventEmitter: IEventEmitter = new EventBusAdapter(eventBus)
+  // Temporary: Create minimal event emitter for ingress (will be replaced with queue publisher)
+  const eventEmitter: IEventEmitter = {
+    emit: async () => {
+      throw new Error("EventBus removed - ingress service will use queue publisher")
+    }
+  }
 
   // Create ingress service without circular dependency
   const ingressService = new IngressService(
@@ -193,49 +185,26 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     ingressOptions,
   )
 
-  // Create event processor with its dependencies
-  const eventProcessorDeps: EventProcessorDependencies = {
-    playerService,
-    matchService,
-    weaponService,
-    rankingService,
-    actionService,
-    serverService,
-    logger,
-  }
-
   // Create event metrics
   const eventMetrics = new EventMetrics(logger)
 
-  // Note: KillEventSaga creation removed - PLAYER_KILL is now queue-only
-
-  // Create saga coordinator
-  const sagaCoordinator = new SagaEventCoordinator(logger)
-  // Note: PLAYER_KILL saga is no longer registered here - it's queue-only now
-
-  // Keep the simple kill event coordinator for now (Phase 2 compatibility)
-  const killEventCoordinator = new KillEventCoordinator(logger, rankingService)
-  const coordinators = [sagaCoordinator, killEventCoordinator]
-  const eventProcessor = new EventProcessor(eventBus, eventProcessorDeps, coordinators)
-
-  // Create module event handlers with metrics
+  // Create module event handlers (queue-only, no EventBus dependencies)
   const playerEventHandler = new PlayerEventHandler(
-    eventBus,
     logger,
     playerService,
     serverService,
     eventMetrics,
   )
 
-  const weaponEventHandler = new WeaponEventHandler(eventBus, logger, weaponService, eventMetrics)
+  const weaponEventHandler = new WeaponEventHandler(logger, weaponService, eventMetrics)
 
-  const matchEventHandler = new MatchEventHandler(eventBus, logger, matchService, eventMetrics)
+  const matchEventHandler = new MatchEventHandler(logger, matchService, eventMetrics)
 
-  const actionEventHandler = new ActionEventHandler(eventBus, logger, actionService, eventMetrics)
+  const actionEventHandler = new ActionEventHandler(logger, actionService, eventMetrics)
 
-  const serverEventHandler = new ServerEventHandler(eventBus, logger, serverService, eventMetrics)
+  const serverEventHandler = new ServerEventHandler(logger, serverService, eventMetrics)
 
-  // Create module registry and register all handlers
+  // Create module registry and register all handlers (queue-only processing)
   const moduleRegistry = new ModuleRegistry(logger)
 
   moduleRegistry.register({
@@ -308,7 +277,6 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   return {
     database,
     logger,
-    eventBus,
     queueModule,
     queueFirstPublisher: undefined, // Will be created during queue initialization
     rabbitmqConsumer: undefined, // Will be created during queue initialization
@@ -320,7 +288,6 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     ingressService,
     gameDetectionService,
     serverService,
-    eventProcessor,
     playerEventHandler,
     weaponEventHandler,
     matchEventHandler,
@@ -357,40 +324,47 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
     // Initialize the queue module first
     await context.queueModule.initialize()
 
-    // Create queue-first publisher (replaces dual publisher)
+    // Create queue-first publisher (all events now queue-only)
     const queuePublisher = context.queueModule.getPublisher()
     context.queueFirstPublisher = new QueueFirstPublisher(
       queuePublisher,
       context.logger,
-      context.eventBus, // EventBus fallback for non-migrated events
+      // No EventBus fallback needed - all events migrated to queue-only
     )
 
-    // Create RabbitMQ consumer for processing events from queues
-    const coordinators = [
-      // Get the saga coordinator from the event processor
-      // We need to access the coordinators from the event processor
-      new KillEventCoordinator(context.logger, context.rankingService),
-      new SagaEventCoordinator(context.logger),
-    ]
-
+    // Create coordinators for RabbitMQ consumer
+    const killEventCoordinator = new KillEventCoordinator(context.logger, context.rankingService)
+    const sagaCoordinator = new SagaEventCoordinator(context.logger)
+    
     // Register sagas with the saga coordinator
-    const sagaCoordinator = coordinators.find(
-      (c) => c instanceof SagaEventCoordinator,
-    ) as SagaEventCoordinator
-    if (sagaCoordinator) {
-      // Use standard SagaMonitor for queue-processed sagas
-      const sagaMonitor = new SagaMonitor(context.logger)
-      const killEventSaga = new KillEventSaga(
-        context.logger,
-        context.eventBus,
-        context.playerService,
-        context.weaponService,
-        context.matchService,
-        context.rankingService,
-        sagaMonitor,
-      )
-      sagaCoordinator.registerSaga(EventType.PLAYER_KILL, killEventSaga)
+    const sagaMonitor = new SagaMonitor(context.logger)
+    
+    // Create stub EventBus for saga compatibility (sagas don't actually emit events)
+    const stubEventBus = {
+      emit: async () => { /* no-op */ },
+      on: () => "stub-id",
+      off: () => { /* no-op */ },
+      clearHandlers: () => { /* no-op */ },
+      getStats: () => ({ 
+        totalHandlers: 0, 
+        handlersByType: new Map(), 
+        eventsEmitted: 0, 
+        errors: 0 
+      })
     }
+    
+    const killEventSaga = new KillEventSaga(
+      context.logger,
+      stubEventBus,
+      context.playerService,
+      context.weaponService,
+      context.matchService,
+      context.rankingService,
+      sagaMonitor,
+    )
+    sagaCoordinator.registerSaga(EventType.PLAYER_KILL, killEventSaga)
+    
+    const coordinators = [killEventCoordinator, sagaCoordinator]
 
     context.rabbitmqConsumer = new RabbitMQConsumer(
       context.queueModule.getClient(),

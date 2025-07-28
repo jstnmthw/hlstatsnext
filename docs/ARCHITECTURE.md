@@ -86,7 +86,7 @@ import { PlayerService } from "@/modules/player"
 
 ### TypeScript Configuration
 
-```json
+```typescript
 // tsconfig.json
 {
   "compilerOptions": {

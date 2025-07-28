@@ -127,7 +127,7 @@ export class Logger implements ILogger {
       case "WARN":
         return `${colors.yellow}${statusText}${colors.reset}`
       case "DEBUG":
-        return `${colors.magenta}${statusText}${colors.reset}`
+        return `${colors.gray}${statusText}${colors.reset}`
       case "EVENT":
         return `${colors.cyan}${colors.bright}${statusText}${colors.reset}`
       case "CHAT":

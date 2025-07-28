@@ -76,7 +76,7 @@ describe("MatchService", () => {
 
       expect(result.success).toBe(true)
       expect(result.affected).toBe(1)
-      expect(mockLogger.queue).toHaveBeenCalledWith("Round started on server 1")
+      expect(mockLogger.queue).toHaveBeenCalledWith("[ROUND_START Event] Round started on server 1")
     })
 
     it("should handle ROUND_END events", async () => {

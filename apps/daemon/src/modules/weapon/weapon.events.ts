@@ -30,14 +30,21 @@ export class WeaponEventHandler extends BaseModuleEventHandler {
     // These are now handled via RabbitMQConsumer and no longer use EventBus
   }
 
-  private async handleWeaponFire(event: BaseEvent): Promise<void> {
+  // Queue-compatible handler methods (called by RabbitMQConsumer)
+  async handleWeaponFire(event: BaseEvent): Promise<void> {
     this.logger.debug(`Weapon module handling WEAPON_FIRE for server ${event.serverId}`)
 
     await this.weaponService.handleWeaponEvent(event as WeaponEvent)
   }
 
-  private async handleWeaponHit(event: BaseEvent): Promise<void> {
+  async handleWeaponHit(event: BaseEvent): Promise<void> {
     this.logger.debug(`Weapon module handling WEAPON_HIT for server ${event.serverId}`)
+
+    await this.weaponService.handleWeaponEvent(event as WeaponEvent)
+  }
+
+  async handlePlayerKill(event: BaseEvent): Promise<void> {
+    this.logger.debug(`Weapon module handling PLAYER_KILL for server ${event.serverId}`)
 
     await this.weaponService.handleWeaponEvent(event as WeaponEvent)
   }

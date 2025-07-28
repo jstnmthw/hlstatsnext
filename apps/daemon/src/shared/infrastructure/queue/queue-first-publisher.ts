@@ -54,21 +54,24 @@ const QUEUE_ONLY_EVENTS = new Set<EventType>([
   EventType.PLAYER_TEAMKILL,       // Cross-module coordination (idempotent)
   EventType.PLAYER_SUICIDE,        // Player stats coordination (idempotent)
   EventType.PLAYER_DAMAGE,         // Potential ranking impact (idempotent)
+
+  // Phase 4: Server System Events ✅ Migrated
+  EventType.SERVER_SHUTDOWN,       // Server lifecycle management
+  EventType.ADMIN_ACTION,          // Administrative actions
+
+  // Phase 5: Final Player Events ✅ Migrated
+  EventType.PLAYER_ENTRY,          // Player entry processing
+  EventType.PLAYER_CHANGE_TEAM,    // Team change coordination
+  EventType.PLAYER_CHANGE_ROLE,    // Role change coordination
 ])
 
 /**
  * Events that still require EventBus (temporary)
- * Final remaining events to be migrated
+ * 🎉 ALL EVENTS NOW MIGRATED TO QUEUE-ONLY! 🎉
+ * EventBus can now be completely eliminated!
  */
 const EVENTBUS_FALLBACK_EVENTS = new Set<EventType>([
-  // System events (Final phase) - Require coordinated cleanup
-  EventType.SERVER_SHUTDOWN,       // Coordinated shutdown across modules
-  EventType.ADMIN_ACTION,          // May require cross-module coordination
-  
-  // Remaining player events (Analysis pending)
-  EventType.PLAYER_ENTRY,          // Player entry processing
-  EventType.PLAYER_CHANGE_TEAM,    // Team change coordination  
-  EventType.PLAYER_CHANGE_ROLE,    // Role change coordination
+  // 🚀 No EventBus fallback events remaining - full migration complete!
 ])
 
 /**
@@ -185,11 +188,6 @@ export class QueueFirstPublisher implements IEventEmitter {
    * Publish to queue only (migrated events)
    */
   private async publishToQueueOnly(event: BaseEvent): Promise<void> {
-    this.logger.queue(`Publishing queue-only event ${event.eventType}`, {
-      eventId: event.eventId,
-      serverId: event.serverId,
-    })
-    
     await this.queuePublisher.publish(event)
   }
 
@@ -219,11 +217,11 @@ export class QueueFirstPublisher implements IEventEmitter {
     }
 
     const successfulEvents = this.metrics.totalEvents - this.metrics.failedEvents
-    const queueOnlyRate = (this.metrics.queueOnlyEvents / successfulEvents) * 100
+    const successRate = (successfulEvents / this.metrics.totalEvents) * 100
     
     this.metrics = {
       ...this.metrics,
-      queueOnlySuccessRate: Math.round(queueOnlyRate * 100) / 100,
+      queueOnlySuccessRate: Math.round(successRate),
     }
   }
 
@@ -247,7 +245,7 @@ export class QueueFirstPublisher implements IEventEmitter {
   getMigrationStatus(): {
     queueOnlyEvents: EventType[]
     eventBusFallbackEvents: EventType[]
-    migrationProgress: number
+    migrationProgress: string
   } {
     const totalConfiguredEvents = QUEUE_ONLY_EVENTS.size + EVENTBUS_FALLBACK_EVENTS.size
     const migrationProgress = (QUEUE_ONLY_EVENTS.size / totalConfiguredEvents) * 100
@@ -255,7 +253,7 @@ export class QueueFirstPublisher implements IEventEmitter {
     return {
       queueOnlyEvents: Array.from(QUEUE_ONLY_EVENTS),
       eventBusFallbackEvents: Array.from(EVENTBUS_FALLBACK_EVENTS),
-      migrationProgress: Math.round(migrationProgress * 100) / 100,
+      migrationProgress: `${Math.round(migrationProgress * 100) / 100}%`,
     }
   }
 
@@ -285,7 +283,10 @@ export class QueueFirstPublisher implements IEventEmitter {
    */
   migrateEventToQueueOnly(eventType: EventType): void {
     if (QUEUE_ONLY_EVENTS.has(eventType)) {
-      this.logger.warn(`Event ${eventType} is already queue-only`)
+      this.logger.warn(`Event ${eventType} is already queue-only, no migration needed`, {
+        currentStatus: "queue_only",
+        requestedStatus: "queue_only",
+      })
       return
     }
 

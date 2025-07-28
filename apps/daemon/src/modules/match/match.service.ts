@@ -91,7 +91,7 @@ export class MatchService implements IMatchService {
         await this.repository.updateBombStats(serverId, "defuse")
       }
 
-      this.logger.event(
+      this.logger.queue(
         `Objective event on server ${serverId}: ${event.eventType}${
           playerId
             ? ` by player ${playerId} (+${this.getObjectivePoints(event.eventType)} points)`
@@ -335,7 +335,7 @@ export class MatchService implements IMatchService {
         matchStats.currentMap = event.data.map
       }
 
-      this.logger.event(`Round started on server ${serverId}`)
+      this.logger.queue(`Round started on server ${serverId}`)
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -374,7 +374,7 @@ export class MatchService implements IMatchService {
 
       await this.repository.incrementServerRounds(serverId)
 
-      this.logger.event(
+      this.logger.queue(
         `Round ended on server ${serverId}${winningTeam ? `: ${winningTeam} won` : ""}${
           score ? ` (${score.team1}-${score.team2})` : ""
         }`,
@@ -421,7 +421,7 @@ export class MatchService implements IMatchService {
         await this.repository.updateTeamWins(serverId, winningTeam)
       }
 
-      this.logger.event(
+      this.logger.queue(
         `Team win on server ${serverId}: ${winningTeam} won via ${triggerName} (CT: ${score.ct}, T: ${score.t})`,
       )
 
@@ -462,7 +462,7 @@ export class MatchService implements IMatchService {
       // Update server record for the new map
       await this.repository.resetMapStats(serverId, newMap)
 
-      this.logger.event(
+      this.logger.queue(
         `Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`,
       )
 
@@ -484,7 +484,7 @@ export class MatchService implements IMatchService {
       // Save match statistics to database
       await this.saveMatchToDatabase(serverId, mapName, stats)
 
-      this.logger.event(
+      this.logger.queue(
         `Match finalized on server ${serverId} for map ${mapName}: ${stats.totalRounds} rounds, ${stats.duration}s, MVP: ${mvpPlayerId}, scores: ${JSON.stringify(
           stats.teamScores,
         )}`,

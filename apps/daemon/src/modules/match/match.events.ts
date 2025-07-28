@@ -32,85 +32,86 @@ export class MatchEventHandler extends BaseModuleEventHandler {
     // These are now handled via RabbitMQConsumer and no longer use EventBus
   }
 
+  // Queue-compatible handler methods (called by RabbitMQConsumer)
   // Match lifecycle handlers
-  private async handleRoundStart(event: BaseEvent): Promise<void> {
+  async handleRoundStart(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling ROUND_START for server ${event.serverId}`)
     await this.matchService.handleMatchEvent(event as MatchEvent)
   }
 
-  private async handleRoundEnd(event: BaseEvent): Promise<void> {
+  async handleRoundEnd(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling ROUND_END for server ${event.serverId}`)
     await this.matchService.handleMatchEvent(event as MatchEvent)
   }
 
-  private async handleTeamWin(event: BaseEvent): Promise<void> {
+  async handleTeamWin(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling TEAM_WIN for server ${event.serverId}`)
     await this.matchService.handleMatchEvent(event as MatchEvent)
   }
 
-  private async handleMapChange(event: BaseEvent): Promise<void> {
+  async handleMapChange(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling MAP_CHANGE for server ${event.serverId}`)
     await this.matchService.handleMatchEvent(event as MatchEvent)
   }
 
   // Objective event handlers
-  private async handleBombPlant(event: BaseEvent): Promise<void> {
+  async handleBombPlant(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling BOMB_PLANT for server ${event.serverId}`)
     await this.matchService.handleObjectiveEvent(event as ObjectiveEvent)
   }
 
-  private async handleBombDefuse(event: BaseEvent): Promise<void> {
+  async handleBombDefuse(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling BOMB_DEFUSE for server ${event.serverId}`)
     await this.matchService.handleObjectiveEvent(event as ObjectiveEvent)
   }
 
-  private async handleBombExplode(event: BaseEvent): Promise<void> {
+  async handleBombExplode(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling BOMB_EXPLODE for server ${event.serverId}`)
     await this.matchService.handleObjectiveEvent(event as ObjectiveEvent)
   }
 
-  private async handleHostageRescue(event: BaseEvent): Promise<void> {
+  async handleHostageRescue(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling HOSTAGE_RESCUE for server ${event.serverId}`)
     await this.matchService.handleObjectiveEvent(event as ObjectiveEvent)
   }
 
-  private async handleHostageTouch(event: BaseEvent): Promise<void> {
+  async handleHostageTouch(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling HOSTAGE_TOUCH for server ${event.serverId}`)
     await this.matchService.handleObjectiveEvent(event as ObjectiveEvent)
   }
 
-  private async handleFlagCapture(event: BaseEvent): Promise<void> {
+  async handleFlagCapture(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling FLAG_CAPTURE for server ${event.serverId}`)
     await this.matchService.handleObjectiveEvent(event as ObjectiveEvent)
   }
 
-  private async handleFlagDefend(event: BaseEvent): Promise<void> {
+  async handleFlagDefend(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling FLAG_DEFEND for server ${event.serverId}`)
     await this.matchService.handleObjectiveEvent(event as ObjectiveEvent)
   }
 
-  private async handleFlagPickup(event: BaseEvent): Promise<void> {
+  async handleFlagPickup(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling FLAG_PICKUP for server ${event.serverId}`)
     await this.matchService.handleObjectiveEvent(event as ObjectiveEvent)
   }
 
-  private async handleFlagDrop(event: BaseEvent): Promise<void> {
+  async handleFlagDrop(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling FLAG_DROP for server ${event.serverId}`)
     await this.matchService.handleObjectiveEvent(event as ObjectiveEvent)
   }
 
-  private async handleControlPointCapture(event: BaseEvent): Promise<void> {
+  async handleControlPointCapture(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling CONTROL_POINT_CAPTURE for server ${event.serverId}`)
     await this.matchService.handleObjectiveEvent(event as ObjectiveEvent)
   }
 
-  private async handleControlPointDefend(event: BaseEvent): Promise<void> {
+  async handleControlPointDefend(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling CONTROL_POINT_DEFEND for server ${event.serverId}`)
     await this.matchService.handleObjectiveEvent(event as ObjectiveEvent)
   }
 
-  // Kill event handler for match statistics
-  private async handleKillInMatch(event: BaseEvent): Promise<void> {
+  // Kill event handler for match statistics  
+  async handlePlayerKill(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module processing kill event for match stats`)
     await this.matchService.handleKillInMatch(event)
   }

@@ -25,14 +25,13 @@ export class ActionEventHandler extends BaseModuleEventHandler {
   }
 
   registerEventHandlers(): void {
-    // All action event types
-    this.registerHandler(EventType.ACTION_PLAYER, this.handleActionPlayer.bind(this))
-    this.registerHandler(EventType.ACTION_PLAYER_PLAYER, this.handleActionPlayerPlayer.bind(this))
-    this.registerHandler(EventType.ACTION_TEAM, this.handleActionTeam.bind(this))
-    this.registerHandler(EventType.ACTION_WORLD, this.handleActionWorld.bind(this))
+    // All action events have been migrated to queue-only processing (Phase 1)
+    // - ACTION_PLAYER, ACTION_PLAYER_PLAYER, ACTION_TEAM, ACTION_WORLD
+    // These are now handled via RabbitMQConsumer and no longer use EventBus
   }
 
-  private async handleActionPlayer(event: BaseEvent): Promise<void> {
+  // Queue-compatible handler methods (called by RabbitMQConsumer)
+  async handleActionPlayer(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_PLAYER for server ${event.serverId}`)
 
     const actionEvent = event as ActionEvent
@@ -41,7 +40,7 @@ export class ActionEventHandler extends BaseModuleEventHandler {
     await this.actionService.handleActionEvent(actionEvent)
   }
 
-  private async handleActionPlayerPlayer(event: BaseEvent): Promise<void> {
+  async handleActionPlayerPlayer(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_PLAYER_PLAYER for server ${event.serverId}`)
 
     const actionEvent = event as ActionEvent
@@ -50,13 +49,13 @@ export class ActionEventHandler extends BaseModuleEventHandler {
     await this.actionService.handleActionEvent(actionEvent)
   }
 
-  private async handleActionTeam(event: BaseEvent): Promise<void> {
+  async handleActionTeam(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_TEAM for server ${event.serverId}`)
 
     await this.actionService.handleActionEvent(event as ActionEvent)
   }
 
-  private async handleActionWorld(event: BaseEvent): Promise<void> {
+  async handleActionWorld(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_WORLD for server ${event.serverId}`)
 
     await this.actionService.handleActionEvent(event as ActionEvent)

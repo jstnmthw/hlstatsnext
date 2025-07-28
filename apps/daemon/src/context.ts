@@ -35,10 +35,7 @@ import { EventBus } from "@/shared/infrastructure/event-bus/event-bus"
 import type { IEventBus } from "@/shared/infrastructure/event-bus/event-bus.types"
 import { EventProcessor } from "@/shared/infrastructure/event-processor"
 import type { EventProcessorDependencies } from "@/shared/infrastructure/event-processor"
-import {
-  QueueModule,
-  createDevelopmentRabbitMQConfig,
-} from "@/shared/infrastructure/queue"
+import { QueueModule, createDevelopmentRabbitMQConfig } from "@/shared/infrastructure/queue"
 import { QueueFirstPublisher } from "@/shared/infrastructure/queue/queue-first-publisher"
 import {
   EventBusAdapter,
@@ -300,9 +297,10 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     name: "server",
     handler: serverEventHandler,
     handledEvents: [
-      EventType.SERVER_SHUTDOWN,
-      EventType.SERVER_STATS_UPDATE,
-      EventType.ADMIN_ACTION,
+      // All server events migrated to queue-only processing (Phase 4):
+      // - SERVER_SHUTDOWN: Now queue-only
+      // - ADMIN_ACTION: Now queue-only
+      // - SERVER_STATS_UPDATE: Already queue-only
     ],
   })
 
@@ -374,9 +372,11 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
       new KillEventCoordinator(context.logger, context.rankingService),
       new SagaEventCoordinator(context.logger),
     ]
-    
+
     // Register sagas with the saga coordinator
-    const sagaCoordinator = coordinators.find(c => c instanceof SagaEventCoordinator) as SagaEventCoordinator
+    const sagaCoordinator = coordinators.find(
+      (c) => c instanceof SagaEventCoordinator,
+    ) as SagaEventCoordinator
     if (sagaCoordinator) {
       // Use standard SagaMonitor for queue-processed sagas
       const sagaMonitor = new SagaMonitor(context.logger)
@@ -400,9 +400,7 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
     )
 
     // Start the RabbitMQ consumer
-    context.logger.info("Starting RabbitMQ consumer...")
     await context.rabbitmqConsumer.start()
-    context.logger.info("RabbitMQ consumer started successfully")
 
     // Replace the ingress service's event emitter with the queue-first publisher
     const ingressService = context.ingressService as unknown as {
@@ -415,7 +413,9 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
       writable: false,
     })
 
-    context.logger.info("Queue infrastructure initialized - queue-first publishing and RabbitMQ consumer enabled")
+    context.logger.info(
+      "Queue infrastructure initialized - queue-first publishing and RabbitMQ consumer enabled",
+    )
   } catch (error) {
     context.logger.error(`Failed to initialize queue infrastructure: ${error}`)
     context.logger.warn("Continuing with EventBus only")

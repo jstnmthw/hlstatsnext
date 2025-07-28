@@ -31,6 +31,7 @@ const mockLogger: ILogger = {
   info: vi.fn(),
   debug: vi.fn(),
   event: vi.fn(),
+  queue: vi.fn(),
   error: vi.fn(),
   warn: vi.fn(),
   failed: vi.fn(),
@@ -75,7 +76,7 @@ describe("MatchService", () => {
 
       expect(result.success).toBe(true)
       expect(result.affected).toBe(1)
-      expect(mockLogger.event).toHaveBeenCalledWith("Round started on server 1")
+      expect(mockLogger.queue).toHaveBeenCalledWith("Round started on server 1")
     })
 
     it("should handle ROUND_END events", async () => {
@@ -191,7 +192,7 @@ describe("MatchService", () => {
 
       expect(result.success).toBe(true)
       expect(mockRepository.updateBombStats).toHaveBeenCalledWith(1, "plant")
-      expect(mockLogger.event).toHaveBeenCalledWith(
+      expect(mockLogger.queue).toHaveBeenCalledWith(
         expect.stringContaining(
           "Objective event on server 1: BOMB_PLANT by player 123 (+3 points)",
         ),
@@ -228,7 +229,7 @@ describe("MatchService", () => {
       const result = await matchService.handleObjectiveEvent(event)
 
       expect(result.success).toBe(true)
-      expect(mockLogger.event).toHaveBeenCalledWith(
+      expect(mockLogger.queue).toHaveBeenCalledWith(
         expect.stringContaining("Objective event on server 1: BOMB_EXPLODE"),
       )
     })

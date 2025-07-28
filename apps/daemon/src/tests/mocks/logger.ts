@@ -17,6 +17,7 @@ export function createMockLogger(): ILogger {
     debug: vi.fn(),
     event: vi.fn(),
     chat: vi.fn(),
+    queue: vi.fn(),
     starting: vi.fn(),
     started: vi.fn(),
     stopping: vi.fn(),

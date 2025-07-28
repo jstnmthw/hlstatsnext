@@ -42,6 +42,14 @@ export {
   type ConsumerConfig,
 } from "./event-consumer"
 
+export {
+  RabbitMQConsumer,
+  defaultRabbitMQConsumerConfig,
+  type RabbitMQConsumerConfig,
+} from "./rabbitmq-consumer"
+
+export { RabbitMQEventProcessor } from "./rabbitmq-event-processor"
+
 // Utilities
 export {
   generateMessageId,

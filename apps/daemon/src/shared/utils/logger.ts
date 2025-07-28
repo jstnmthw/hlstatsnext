@@ -19,7 +19,7 @@ const colors = {
 } as const
 
 // Status types
-export type LogStatus = "OK" | "ERROR" | "INFO" | "WARN" | "DEBUG" | "EVENT" | "CHAT"
+export type LogStatus = "OK" | "ERROR" | "INFO" | "WARN" | "DEBUG" | "EVENT" | "CHAT" | "QUEUE"
 
 // Log levels ordered by priority (higher number = more verbose)
 export enum LogLevel {
@@ -38,6 +38,7 @@ const STATUS_LOG_LEVEL: Record<LogStatus, LogLevel> = {
   OK: LogLevel.INFO, // Treat OK as INFO level
   EVENT: LogLevel.INFO, // Treat EVENT as INFO level
   CHAT: LogLevel.INFO, // Treat CHAT as INFO level
+  QUEUE: LogLevel.INFO, // Treat QUEUE as INFO level
 }
 
 // Options for the logger
@@ -131,6 +132,8 @@ export class Logger implements ILogger {
         return `${colors.cyan}${colors.bright}${statusText}${colors.reset}`
       case "CHAT":
         return `${colors.yellow}${colors.bright}${statusText}${colors.reset}`
+      case "QUEUE":
+        return `${colors.magenta}${colors.bright}${statusText}${colors.reset}`
       default:
         return statusText
     }
@@ -186,6 +189,10 @@ export class Logger implements ILogger {
 
   chat(message: string, context?: Record<string, unknown>): void {
     this.log("CHAT", message, context)
+  }
+
+  queue(message: string, context?: Record<string, unknown>): void {
+    this.log("QUEUE", message, context)
   }
 
   starting(service: string): void {

@@ -64,6 +64,7 @@ import { EventMetrics } from "@/shared/infrastructure/event-metrics"
 import { KillEventCoordinator, SagaEventCoordinator } from "@/shared/application/event-coordinator"
 import { KillEventSaga } from "@/shared/application/sagas/kill-event/kill-event.saga"
 import { SagaMonitor } from "@/shared/application/sagas/saga.monitor"
+import { RabbitMQConsumer } from "@/shared/infrastructure/queue/rabbitmq-consumer"
 
 export interface AppContext {
   // Infrastructure
@@ -74,6 +75,7 @@ export interface AppContext {
   // Queue Infrastructure (optional for migration)
   queueModule?: QueueModule
   dualPublisher?: DualEventPublisher
+  rabbitmqConsumer?: RabbitMQConsumer
 
   // Business Services
   playerService: IPlayerService
@@ -322,6 +324,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     eventBus,
     queueModule,
     dualPublisher,
+    rabbitmqConsumer: undefined, // Will be created during queue initialization
     playerService,
     matchService,
     weaponService,
@@ -370,6 +373,41 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
     // Create dual publisher
     context.dualPublisher = context.queueModule.createDualPublisher(context.eventBus)
 
+    // Create RabbitMQ consumer for processing events from queues
+    const coordinators = [
+      // Get the saga coordinator from the event processor
+      // We need to access the coordinators from the event processor
+      new KillEventCoordinator(context.logger, context.rankingService),
+      new SagaEventCoordinator(context.logger),
+    ]
+    
+    // Register sagas with the saga coordinator
+    const sagaCoordinator = coordinators.find(c => c instanceof SagaEventCoordinator) as SagaEventCoordinator
+    if (sagaCoordinator) {
+      const sagaMonitor = new SagaMonitor(context.logger)
+      const killEventSaga = new KillEventSaga(
+        context.logger,
+        context.eventBus,
+        context.playerService,
+        context.weaponService,
+        context.matchService,
+        context.rankingService,
+        sagaMonitor,
+      )
+      sagaCoordinator.registerSaga(EventType.PLAYER_KILL, killEventSaga)
+    }
+
+    context.rabbitmqConsumer = new RabbitMQConsumer(
+      context.queueModule.getClient(),
+      context.logger,
+      coordinators,
+    )
+
+    // Start the RabbitMQ consumer
+    context.logger.info("Starting RabbitMQ consumer...")
+    await context.rabbitmqConsumer.start()
+    context.logger.info("RabbitMQ consumer started successfully")
+
     // Replace the ingress service's event emitter with the dual publisher
     // This is a bit of a hack but necessary for the migration
     const ingressService = context.ingressService as unknown as {
@@ -389,12 +427,20 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
       writable: false,
     })
 
-    context.logger.info("Queue infrastructure initialized - dual publishing enabled")
+    context.logger.info("Queue infrastructure initialized - dual publishing and RabbitMQ consumer enabled")
   } catch (error) {
     context.logger.error(`Failed to initialize queue infrastructure: ${error}`)
     context.logger.warn("Continuing with EventBus only")
 
     // Clean up failed queue module
+    if (context.rabbitmqConsumer) {
+      try {
+        await context.rabbitmqConsumer.stop()
+      } catch (stopError) {
+        context.logger.error(`Failed to stop RabbitMQ consumer during cleanup: ${stopError}`)
+      }
+      context.rabbitmqConsumer = undefined
+    }
     context.queueModule = undefined
     context.dualPublisher = undefined
   }

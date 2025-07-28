@@ -400,6 +400,7 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
     context.rabbitmqConsumer = new RabbitMQConsumer(
       context.queueModule.getClient(),
       context.logger,
+      context.moduleRegistry,
       coordinators,
     )
 

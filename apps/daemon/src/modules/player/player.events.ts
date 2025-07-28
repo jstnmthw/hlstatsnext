@@ -32,11 +32,30 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
     // These are now handled via RabbitMQConsumer and no longer use EventBus
   }
 
-  // All EventBus handlers removed - events now processed via queue-only (RabbitMQConsumer)
-  // - handlePlayerConnect
-  // - handlePlayerDisconnect 
-  // - handlePlayerChangeName
-  // - handleChatMessage
+  // Queue-compatible handler methods (called by RabbitMQConsumer)
+  async handlePlayerConnect(event: BaseEvent): Promise<void> {
+    const resolvedEvent = await this.resolvePlayerIds(event)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+  }
+
+  async handlePlayerDisconnect(event: BaseEvent): Promise<void> {
+    const resolvedEvent = await this.resolvePlayerIds(event)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+  }
+
+  async handlePlayerChangeName(event: BaseEvent): Promise<void> {
+    const resolvedEvent = await this.resolvePlayerIds(event)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+  }
+
+  async handleChatMessage(event: BaseEvent): Promise<void> {
+    const resolvedEvent = await this.resolvePlayerIds(event)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+  }
 
   /**
    * Resolve Steam IDs to database player IDs for events that contain player references

@@ -35,7 +35,7 @@ export class RabbitMQEventProcessor implements IEventProcessor {
       correlationId: event.correlationId || generateCorrelationId(),
     }
     
-    this.logger.queue(
+    this.logger.debug(
       `Processing event ${processedEvent.eventType} for server ${processedEvent.serverId}`,
       {
         eventId: processedEvent.eventId,
@@ -53,7 +53,7 @@ export class RabbitMQEventProcessor implements IEventProcessor {
       await this.processCoordinators(processedEvent)
 
       const processingTime = Date.now() - startTime
-      this.logger.queue(
+      this.logger.debug(
         `Event ${processedEvent.eventType} processed successfully in ${processingTime}ms`,
         {
           eventId: processedEvent.eventId,
@@ -86,11 +86,11 @@ export class RabbitMQEventProcessor implements IEventProcessor {
     const handlers = this.moduleRegistry.getHandlersForEvent(event.eventType)
     
     if (handlers.length === 0) {
-      this.logger.debug(`No module handlers found for event type ${event.eventType}`)
+      this.logger.warn(`No module handlers found for event type ${event.eventType}`)
       return
     }
 
-    this.logger.debug(
+    this.logger.info(
       `Processing event ${event.eventType} through ${handlers.length} module handlers`,
       {
         eventId: event.eventId,
@@ -120,7 +120,7 @@ export class RabbitMQEventProcessor implements IEventProcessor {
             `Module ${moduleHandler.name} processed event ${event.eventType} successfully in ${processingTime}ms`,
           )
         } else {
-          this.logger.debug(
+          this.logger.warn(
             `No handler method ${handlerMethodName} found in ${moduleHandler.name} for event ${event.eventType}`,
           )
         }

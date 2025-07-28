@@ -46,10 +46,7 @@ export abstract class BaseSaga implements ISaga {
     }
 
     this.monitor?.onSagaStarted(this.name, eventId, correlationId)
-    this.logger.info(`Starting saga ${this.name} for event ${event.eventType}`, {
-      eventId,
-      correlationId,
-    })
+    this.logger.info(`Starting saga ${this.name} for event ${event.eventType}`)
 
     const completedSteps: SagaStep[] = []
 

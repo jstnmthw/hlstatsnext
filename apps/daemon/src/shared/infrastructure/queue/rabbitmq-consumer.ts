@@ -13,6 +13,7 @@ import type {
 import type { ConsumerConfig } from "./event-consumer"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
+import type { ModuleRegistry } from "@/shared/infrastructure/module-registry"
 import { EventConsumer, defaultConsumerConfig, defaultMessageValidator } from "./event-consumer"
 import { RabbitMQEventProcessor } from "./rabbitmq-event-processor"
 
@@ -38,6 +39,7 @@ export class RabbitMQConsumer {
   constructor(
     private readonly client: IQueueClient,
     private readonly logger: ILogger,
+    private readonly moduleRegistry: ModuleRegistry,
     private readonly coordinators: EventCoordinator[] = [],
     private readonly config: RabbitMQConsumerConfig = defaultRabbitMQConsumerConfig,
     private readonly messageValidator: MessageValidator = defaultMessageValidator,
@@ -45,6 +47,7 @@ export class RabbitMQConsumer {
     // Create the queue-specific event processor
     this.eventProcessor = new RabbitMQEventProcessor(
       this.logger,
+      this.moduleRegistry,
       this.coordinators,
     )
 

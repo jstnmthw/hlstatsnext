@@ -513,6 +513,91 @@ describe("Logger", () => {
     })
   })
 
+  describe("Context Parameter Support", () => {
+    it("should log messages with context objects", () => {
+      const context = {
+        sagaName: "KillEventSaga",
+        eventType: "PLAYER_KILL",
+        error: "Connection timeout"
+      }
+      
+      testLogger.error("Saga execution failed", context)
+      
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("[ ERROR ] Saga execution failed"),
+        context
+      )
+    })
+
+    it("should log messages without context when not provided", () => {
+      testLogger.info("Simple message")
+      
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("[ INFO ] Simple message")
+      )
+      expect(consoleSpy).not.toHaveBeenCalledWith(
+        expect.anything(),
+        expect.any(Object)
+      )
+    })
+
+    it("should handle empty context objects", () => {
+      testLogger.warn("Warning message", {})
+      
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("[ WARN ] Warning message"),
+        {}
+      )
+    })
+
+    it("should handle complex nested context objects", () => {
+      const complexContext = {
+        event: {
+          type: "PLAYER_KILL",
+          data: {
+            killerId: 123,
+            victimId: 456
+          }
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          serverId: 1
+        }
+      }
+      
+      testLogger.debug("Processing complex event", complexContext)
+      
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("[ DEBUG ] Processing complex event"),
+        complexContext
+      )
+    })
+
+    const contextMethods = [
+      { method: 'ok', level: 'OK' },
+      { method: 'error', level: 'ERROR' },
+      { method: 'info', level: 'INFO' },
+      { method: 'warn', level: 'WARN' },
+      { method: 'debug', level: 'DEBUG' },
+      { method: 'event', level: 'EVENT' },
+      { method: 'chat', level: 'CHAT' },
+    ]
+
+    it.each(contextMethods)("should support context parameter for $method", ({ method, level }) => {
+      const context = { testKey: "testValue" }
+      
+      ;(testLogger[method as keyof Logger] as (msg: string, ctx?: Record<string, unknown>) => void)(
+        "Test message", 
+        context
+      )
+      
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining(`[ ${level} ] Test message`),
+        context
+      )
+    })
+  })
+
   describe("Log Levels", () => {
     beforeEach(() => {
       delete process.env.LOG_LEVEL

@@ -141,8 +141,9 @@ export class Logger implements ILogger {
    *
    * @param status - The status of the message
    * @param message - The message to log
+   * @param context - Optional context object to log
    */
-  private log(status: LogStatus, message: string): void {
+  private log(status: LogStatus, message: string, context?: Record<string, unknown>): void {
     // Check if this message should be logged based on current log level
     const messageLevel = STATUS_LOG_LEVEL[status]
     if (messageLevel > this.logLevel) {
@@ -152,35 +153,39 @@ export class Logger implements ILogger {
     const timestamp = this.formatTimestamp()
     const formattedStatus = this.formatStatus(status)
 
-    console.log(`${timestamp}${formattedStatus} ${message}`)
+    if (context) {
+      console.log(`${timestamp}${formattedStatus} ${message}`, context)
+    } else {
+      console.log(`${timestamp}${formattedStatus} ${message}`)
+    }
   }
 
-  ok(message: string): void {
-    this.log("OK", message)
+  ok(message: string, context?: Record<string, unknown>): void {
+    this.log("OK", message, context)
   }
 
-  error(message: string): void {
-    this.log("ERROR", message)
+  error(message: string, context?: Record<string, unknown>): void {
+    this.log("ERROR", message, context)
   }
 
-  info(message: string): void {
-    this.log("INFO", message)
+  info(message: string, context?: Record<string, unknown>): void {
+    this.log("INFO", message, context)
   }
 
-  warn(message: string): void {
-    this.log("WARN", message)
+  warn(message: string, context?: Record<string, unknown>): void {
+    this.log("WARN", message, context)
   }
 
-  debug(message: string): void {
-    this.log("DEBUG", message)
+  debug(message: string, context?: Record<string, unknown>): void {
+    this.log("DEBUG", message, context)
   }
 
-  event(message: string): void {
-    this.log("EVENT", message)
+  event(message: string, context?: Record<string, unknown>): void {
+    this.log("EVENT", message, context)
   }
 
-  chat(message: string): void {
-    this.log("CHAT", message)
+  chat(message: string, context?: Record<string, unknown>): void {
+    this.log("CHAT", message, context)
   }
 
   starting(service: string): void {

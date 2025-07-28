@@ -2,6 +2,11 @@ export interface IServerService {
   getServer(serverId: number): Promise<ServerInfo | null>
   getServerByAddress(address: string, port: number): Promise<ServerInfo | null>
   getServerGame(serverId: number): Promise<string>
+  
+  // Event handlers for server events
+  handleServerShutdown?(serverId: number): Promise<void>
+  handleStatsUpdate?(serverId: number, stats: Record<string, unknown>): Promise<void>
+  handleAdminAction?(adminId: number, action: string, target?: string): Promise<void>
 }
 
 export interface ServerInfo {

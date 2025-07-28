@@ -40,6 +40,9 @@ export interface IWeaponService {
     weaponCode: string,
     stats: { shots?: number; hits?: number; damage?: number },
   ): Promise<void>
+  
+  // Saga compensation methods
+  compensateWeaponEvent?(weaponCode: string, playerId: number): Promise<void>
 }
 
 export interface IWeaponRepository {

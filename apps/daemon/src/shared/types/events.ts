@@ -83,6 +83,7 @@ export interface BaseEvent {
   // Optional fields for queue/messaging infrastructure
   correlationId?: string
   serverAddress?: string
+  eventId?: string
   serverPort?: number
 }
 

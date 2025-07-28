@@ -52,7 +52,7 @@ export class HLStatsDaemon {
       ])
 
       this.logger.ok("All services started successfully")
-      this.logger.ok("🚀 HLStatsNext Daemon is ready to receive game server data")
+      this.logger.ready("HLStatsNext Daemon is ready to receive game server data")
     } catch (error) {
       this.logger.failed(
         "Failed to start daemon",

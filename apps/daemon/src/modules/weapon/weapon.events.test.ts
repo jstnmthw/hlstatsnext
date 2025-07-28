@@ -55,7 +55,7 @@ describe("WeaponEventHandler", () => {
 
   describe("Queue-Only Event Processing", () => {
     // Since all weapon events are now queue-only, they don't have EventBus handlers
-    
+
     it("should not handle queue-only WEAPON_FIRE events via EventBus", async () => {
       const event: BaseEvent = {
         eventType: EventType.WEAPON_FIRE,

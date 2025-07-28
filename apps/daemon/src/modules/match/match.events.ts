@@ -110,7 +110,7 @@ export class MatchEventHandler extends BaseModuleEventHandler {
     await this.matchService.handleObjectiveEvent(event as ObjectiveEvent)
   }
 
-  // Kill event handler for match statistics  
+  // Kill event handler for match statistics
   async handlePlayerKill(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module processing kill event for match stats`)
     await this.matchService.handleKillInMatch(event)

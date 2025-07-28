@@ -76,10 +76,7 @@ export {
   type DualPublisherStats,
 } from "./dual-event-publisher"
 
-export {
-  QueueFirstPublisher,
-  type QueueFirstMetrics,
-} from "./queue-first-publisher"
+export { QueueFirstPublisher, type QueueFirstMetrics } from "./queue-first-publisher"
 
 export {
   ShadowConsumer,

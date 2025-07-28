@@ -32,6 +32,6 @@ export class ServerEventHandler extends BaseModuleEventHandler {
 
   // All EventBus handlers removed - server events are now queue-only (Phase 4)
   // - handleServerShutdown: SERVER_SHUTDOWN now processed via queue
-  // - handleAdminAction: ADMIN_ACTION now processed via queue  
+  // - handleAdminAction: ADMIN_ACTION now processed via queue
   // - handleServerStatsUpdate: SERVER_STATS_UPDATE already migrated to queue
 }

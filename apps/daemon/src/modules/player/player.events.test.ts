@@ -90,7 +90,7 @@ describe("PlayerEventHandler", () => {
   describe("Queue-Only Event Processing", () => {
     // Since all player events are now queue-only, they don't have EventBus handlers
     // The PlayerEventHandler now only provides utility methods for player ID resolution
-    
+
     it("should not handle queue-only events via EventBus", async () => {
       const event: BaseEvent = {
         eventType: EventType.PLAYER_CONNECT,
@@ -110,7 +110,7 @@ describe("PlayerEventHandler", () => {
     it("should provide utility methods for player ID resolution", () => {
       // The handler provides utility methods that can be used by queue consumers
       expect(handler).toBeDefined()
-      expect(typeof handler).toBe('object')
+      expect(typeof handler).toBe("object")
     })
   })
 

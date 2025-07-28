@@ -27,14 +27,14 @@ export class RabbitMQEventProcessor implements IEventProcessor {
 
   async processEvent(event: BaseEvent): Promise<void> {
     const startTime = Date.now()
-    
+
     // Ensure eventId and correlationId are present
     const processedEvent: BaseEvent = {
       ...event,
       eventId: event.eventId || generateMessageId(),
       correlationId: event.correlationId || generateCorrelationId(),
     }
-    
+
     this.logger.debug(
       `Processing event ${processedEvent.eventType} for server ${processedEvent.serverId}`,
       {
@@ -48,7 +48,7 @@ export class RabbitMQEventProcessor implements IEventProcessor {
     try {
       // Process through module handlers first (for business logic like chat persistence)
       await this.processModuleHandlers(processedEvent)
-      
+
       // Then process through coordinators (including sagas)
       await this.processCoordinators(processedEvent)
 
@@ -78,13 +78,12 @@ export class RabbitMQEventProcessor implements IEventProcessor {
     }
   }
 
-
   /**
    * Process event through registered module handlers (business logic)
    */
   private async processModuleHandlers(event: BaseEvent): Promise<void> {
     const handlers = this.moduleRegistry.getHandlersForEvent(event.eventType)
-    
+
     if (handlers.length === 0) {
       this.logger.warn(`No module handlers found for event type ${event.eventType}`)
       return
@@ -94,27 +93,27 @@ export class RabbitMQEventProcessor implements IEventProcessor {
       `Processing event ${event.eventType} through ${handlers.length} module handlers`,
       {
         eventId: event.eventId,
-        handlers: handlers.map(h => h.name),
+        handlers: handlers.map((h) => h.name),
       },
     )
 
     // Process through all matching module handlers in parallel
     const processingPromises = handlers.map(async (moduleHandler) => {
       const startTime = Date.now()
-      
+
       try {
         // Get the handler instance (e.g., PlayerEventHandler)
         const handler = moduleHandler.handler as BaseModuleEventHandler & Record<string, unknown>
-        
+
         // Call the appropriate handler method based on event type
-        const eventTypeParts = event.eventType.split('_')
-        const handlerMethodName = `handle${eventTypeParts.map(word => 
-          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-        ).join('')}`
-        
-        if (handler[handlerMethodName] && typeof handler[handlerMethodName] === 'function') {
+        const eventTypeParts = event.eventType.split("_")
+        const handlerMethodName = `handle${eventTypeParts
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join("")}`
+
+        if (handler[handlerMethodName] && typeof handler[handlerMethodName] === "function") {
           await handler[handlerMethodName](event)
-          
+
           const processingTime = Date.now() - startTime
           this.logger.debug(
             `Module ${moduleHandler.name} processed event ${event.eventType} successfully in ${processingTime}ms`,
@@ -154,14 +153,14 @@ export class RabbitMQEventProcessor implements IEventProcessor {
       `Processing event ${event.eventType} through ${this.coordinators.length} coordinators`,
       {
         eventId: event.eventId,
-        coordinators: this.coordinators.map(c => c.constructor.name),
+        coordinators: this.coordinators.map((c) => c.constructor.name),
       },
     )
 
     for (const coordinator of this.coordinators) {
       try {
         await coordinator.coordinateEvent(event)
-        
+
         this.logger.debug(
           `Coordinator ${coordinator.constructor.name} processed event ${event.eventType} successfully`,
         )

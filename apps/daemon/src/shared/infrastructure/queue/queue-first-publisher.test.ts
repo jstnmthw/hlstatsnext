@@ -61,14 +61,12 @@ describe("QueueFirstPublisher", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    mockQueuePublish = mockQueuePublisher.publish as MockedFunction<typeof mockQueuePublisher.publish>
+    mockQueuePublish = mockQueuePublisher.publish as MockedFunction<
+      typeof mockQueuePublisher.publish
+    >
     mockEventBusEmit = mockEventBus.emit as MockedFunction<typeof mockEventBus.emit>
-    
-    publisher = new QueueFirstPublisher(
-      mockQueuePublisher,
-      mockLogger,
-      mockEventBus,
-    )
+
+    publisher = new QueueFirstPublisher(mockQueuePublisher, mockLogger, mockEventBus)
   })
 
   describe("initialization", () => {
@@ -85,10 +83,7 @@ describe("QueueFirstPublisher", () => {
     })
 
     it("should work without EventBus fallback", () => {
-      const publisherWithoutFallback = new QueueFirstPublisher(
-        mockQueuePublisher,
-        mockLogger,
-      )
+      const publisherWithoutFallback = new QueueFirstPublisher(mockQueuePublisher, mockLogger)
 
       expect(publisherWithoutFallback).toBeDefined()
       expect(mockLogger.info).toHaveBeenCalledWith(
@@ -114,7 +109,7 @@ describe("QueueFirstPublisher", () => {
       EventType.SERVER_STATS_UPDATE,
       EventType.WEAPON_FIRE,
       EventType.WEAPON_HIT,
-      
+
       // Phase 2: Match & Objective events
       EventType.ROUND_START,
       EventType.ROUND_END,
@@ -131,10 +126,10 @@ describe("QueueFirstPublisher", () => {
       EventType.FLAG_DROP,
       EventType.CONTROL_POINT_CAPTURE,
       EventType.CONTROL_POINT_DEFEND,
-      
+
       // Phase 3: Complex events with idempotent sagas
       EventType.PLAYER_KILL,
-      EventType.PLAYER_DEATH, 
+      EventType.PLAYER_DEATH,
       EventType.PLAYER_TEAMKILL,
       EventType.PLAYER_SUICIDE,
       EventType.PLAYER_DAMAGE,
@@ -172,22 +167,25 @@ describe("QueueFirstPublisher", () => {
       EventType.PLAYER_CHANGE_ROLE,
     ]
 
-    it.each(formerlyEventBusFallbackEvents)("should publish %s to queue-only", async (eventType) => {
-      const event = createTestEvent(eventType)
+    it.each(formerlyEventBusFallbackEvents)(
+      "should publish %s to queue-only",
+      async (eventType) => {
+        const event = createTestEvent(eventType)
 
-      await publisher.emit(event)
+        await publisher.emit(event)
 
-      expect(mockQueuePublish).toHaveBeenCalledWith(event)
-      expect(mockEventBusEmit).not.toHaveBeenCalled()
-      expect(mockLogger.debug).toHaveBeenCalledWith(
-        "Event published successfully",
-        expect.objectContaining({
-          eventId: event.eventId,
-          eventType: eventType,
-          isQueueOnly: true,
-        }),
-      )
-    })
+        expect(mockQueuePublish).toHaveBeenCalledWith(event)
+        expect(mockEventBusEmit).not.toHaveBeenCalled()
+        expect(mockLogger.debug).toHaveBeenCalledWith(
+          "Event published successfully",
+          expect.objectContaining({
+            eventId: event.eventId,
+            eventType: eventType,
+            isQueueOnly: true,
+          }),
+        )
+      },
+    )
 
     it("should update metrics correctly for formerly EventBus fallback events", async () => {
       const event = createTestEvent(EventType.PLAYER_ENTRY) // Now queue-only event
@@ -203,15 +201,12 @@ describe("QueueFirstPublisher", () => {
     })
 
     it("should work perfectly without EventBus since all events are queue-only", async () => {
-      const publisherWithoutFallback = new QueueFirstPublisher(
-        mockQueuePublisher,
-        mockLogger,
-      )
+      const publisherWithoutFallback = new QueueFirstPublisher(mockQueuePublisher, mockLogger)
       const event = createTestEvent(EventType.PLAYER_ENTRY) // Now queue-only event
 
       // Should work fine without EventBus since all events are queue-only
       await publisherWithoutFallback.emit(event)
-      
+
       expect(mockQueuePublish).toHaveBeenCalledWith(event)
     })
   })
@@ -287,11 +282,11 @@ describe("QueueFirstPublisher", () => {
     it("should calculate success rate correctly with failures", async () => {
       // Successful queue-only event
       await publisher.emit(createTestEvent(EventType.CHAT_MESSAGE))
-      
+
       // Failed queue-only event
       mockQueuePublish.mockRejectedValueOnce(new Error("Failed"))
       await expect(publisher.emit(createTestEvent(EventType.PLAYER_CONNECT))).rejects.toThrow()
-      
+
       // Another successful queue-only event (formerly EventBus)
       await publisher.emit(createTestEvent(EventType.PLAYER_ENTRY)) // Now queue-only
 
@@ -312,7 +307,7 @@ describe("QueueFirstPublisher", () => {
   describe("migration status", () => {
     it("should provide correct migration status - 100% complete!", () => {
       const status = publisher.getMigrationStatus()
-      
+
       expect(status.queueOnlyEvents).toContain(EventType.CHAT_MESSAGE)
       expect(status.queueOnlyEvents).toContain(EventType.PLAYER_CONNECT)
       expect(status.queueOnlyEvents).toContain(EventType.ROUND_START) // Phase 2

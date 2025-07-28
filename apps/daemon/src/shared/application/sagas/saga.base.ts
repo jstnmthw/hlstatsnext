@@ -74,17 +74,9 @@ export abstract class BaseSaga implements ISaga {
       }
 
       this.monitor?.onSagaCompleted(result)
-      this.logger.info(`Saga ${this.name} completed successfully`, {
-        eventId,
-        correlationId,
-        executionTimeMs: result.executionTimeMs,
-      })
+      this.logger.info(`Saga ${this.name} completed successfully ${eventId}`)
     } catch (error) {
-      this.logger.error(`Saga ${this.name} failed, running compensations`, {
-        eventId,
-        correlationId,
-        error: error instanceof Error ? error.message : String(error),
-      })
+      this.logger.error(`Saga ${this.name} failed, running compensations ${eventId}`)
 
       const compensatedSteps = await this.runCompensations(completedSteps, context)
 

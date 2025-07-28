@@ -6,10 +6,7 @@
  * Uses "QUEUE" prefix logging to distinguish from EventBus processing.
  */
 
-import type {
-  IQueueClient,
-  MessageValidator,
-} from "./queue.types"
+import type { IQueueClient, MessageValidator } from "./queue.types"
 import type { ConsumerConfig } from "./event-consumer"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
@@ -61,7 +58,6 @@ export class RabbitMQConsumer {
     )
   }
 
-
   /**
    * Start consuming events from RabbitMQ
    */
@@ -73,7 +69,7 @@ export class RabbitMQConsumer {
     })
 
     await this.consumer.start()
-    
+
     this.logger.queue("RabbitMQ consumer started successfully")
   }
 
@@ -82,9 +78,9 @@ export class RabbitMQConsumer {
    */
   async stop(): Promise<void> {
     this.logger.queue("Stopping RabbitMQ consumer")
-    
+
     await this.consumer.stop()
-    
+
     this.logger.queue("RabbitMQ consumer stopped successfully")
   }
 

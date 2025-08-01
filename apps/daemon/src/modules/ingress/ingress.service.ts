@@ -113,32 +113,6 @@ export class IngressService implements IIngressService {
     return logLine.includes("<BOT>")
   }
 
-  private async parseAndProcessLogLine(): Promise<void> {
-    // This method is now deprecated in favor of proper parsing
-    // The parser should handle all log line parsing
-    this.logger.warn("Using deprecated parseAndProcessLogLine method")
-  }
-
-  private async handlePlayerConnect(): Promise<void> {
-    // This method is deprecated - events should be parsed and emitted via event bus
-    this.logger.warn("Using deprecated handlePlayerConnect method")
-  }
-
-  private async handlePlayerDisconnect(): Promise<void> {
-    // This method is deprecated - events should be parsed and emitted via event bus
-    this.logger.warn("Using deprecated handlePlayerDisconnect method")
-  }
-
-  private async handlePlayerKill(): Promise<void> {
-    // This method is deprecated - events should be parsed and emitted via event bus
-    this.logger.warn("Using deprecated handlePlayerKill method")
-  }
-
-  private async handleRoundWin(): Promise<void> {
-    // This method is deprecated - events should be parsed and emitted via event bus
-    this.logger.warn("Using deprecated handleRoundWin method")
-  }
-
   async processRawEvent(
     rawData: string,
     serverAddress: string,

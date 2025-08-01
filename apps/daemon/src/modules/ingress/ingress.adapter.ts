@@ -37,7 +37,8 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
       return this.authenticatedServers.get(serverKey)!
     }
 
-    // In skip auth mode (development), always return a default server ID
+    // In skip auth mode (development), return -1 to signal that server needs to be created
+    // The cache check above ensures we don't return -1 for already authenticated servers
     if (this.skipAuth) {
       // Will be handled by the server info provider
       return -1 // Special ID indicating development mode

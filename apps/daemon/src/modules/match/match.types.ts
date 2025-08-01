@@ -303,5 +303,3 @@ export interface IMatchRepository {
   ): Promise<void>
   resetMapStats(serverId: number, newMap: string, options?: UpdateOptions): Promise<void>
 }
-
-// Legacy IRoundHandler and IObjectiveHandler interfaces removed - now using distributed MatchEventHandler

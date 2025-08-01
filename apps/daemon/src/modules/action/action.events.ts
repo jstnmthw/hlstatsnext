@@ -19,13 +19,7 @@ export class ActionEventHandler extends BaseModuleEventHandler {
     metrics?: EventMetrics,
   ) {
     super(logger, metrics)
-    this.registerEventHandlers()
-  }
-
-  registerEventHandlers(): void {
-    // All action events have been migrated to queue-only processing (Phase 1)
-    // - ACTION_PLAYER, ACTION_PLAYER_PLAYER, ACTION_TEAM, ACTION_WORLD
-    // These are now handled via RabbitMQConsumer and no longer use EventBus
+    // No event registration needed - all events handled via RabbitMQ queue
   }
 
   // Queue-compatible handler methods (called by RabbitMQConsumer)

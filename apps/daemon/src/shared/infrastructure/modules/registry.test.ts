@@ -25,12 +25,10 @@ describe("ModuleRegistry", () => {
     } as unknown as ILogger
 
     mockHandler1 = {
-      registerEventHandlers: vi.fn(),
       destroy: vi.fn(),
     } as unknown as BaseModuleEventHandler
 
     mockHandler2 = {
-      registerEventHandlers: vi.fn(),
       destroy: vi.fn(),
     } as unknown as BaseModuleEventHandler
 

@@ -552,7 +552,6 @@ describe("RabbitMQEventProcessor", () => {
         handler: {
           handlePlayerChangeTeam: vi.fn().mockResolvedValue(undefined),
           logger: {} as ILogger,
-          registerEventHandlers: vi.fn(),
           destroy: vi.fn(),
         } as unknown as BaseModuleEventHandler,
       }
@@ -589,7 +588,6 @@ describe("RabbitMQEventProcessor", () => {
         handler: {
           handleActionPlayerPlayer: vi.fn().mockResolvedValue(undefined),
           logger: {} as ILogger,
-          registerEventHandlers: vi.fn(),
           destroy: vi.fn(),
         } as unknown as BaseModuleEventHandler,
       }

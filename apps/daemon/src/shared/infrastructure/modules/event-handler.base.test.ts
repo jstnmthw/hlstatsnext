@@ -8,12 +8,9 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import { EventType } from "@/shared/types/events"
 
-// Test implementation of the abstract base class
+// Test implementation for testing base functionality
 class TestModuleEventHandler extends BaseModuleEventHandler {
-  registerEventHandlers(): void {
-    // Implementation for testing
-    this.logger.info("Test module event handlers registered")
-  }
+  // No registration needed - events handled via RabbitMQ
 }
 
 describe("BaseModuleEventHandler", () => {
@@ -31,16 +28,10 @@ describe("BaseModuleEventHandler", () => {
 
     metrics = {
       recordProcessingTime: vi.fn(),
-      recordError: vi.fn(),
-      recordEvent: vi.fn(),
-      getMetrics: vi.fn(),
-      getPerformanceSummary: vi.fn(),
-      reset: vi.fn(),
-      logPerformanceSummary: vi.fn(),
     } as unknown as EventMetrics
   })
 
-  describe("Constructor", () => {
+  describe("Construction", () => {
     it("should create handler with logger only", () => {
       handler = new TestModuleEventHandler(logger)
 
@@ -56,18 +47,6 @@ describe("BaseModuleEventHandler", () => {
     })
   })
 
-  describe("Abstract Methods", () => {
-    beforeEach(() => {
-      handler = new TestModuleEventHandler(logger, metrics)
-    })
-
-    it("should call registerEventHandlers implementation", () => {
-      handler.registerEventHandlers()
-
-      expect(logger.info).toHaveBeenCalledWith("Test module event handlers registered")
-    })
-  })
-
   describe("Cleanup", () => {
     beforeEach(() => {
       handler = new TestModuleEventHandler(logger, metrics)
@@ -77,83 +56,8 @@ describe("BaseModuleEventHandler", () => {
       handler.destroy()
 
       expect(logger.debug).toHaveBeenCalledWith(
-        "TestModuleEventHandler cleanup completed (queue-only processing)",
+        "TestModuleEventHandler cleanup completed (queue-only processing)"
       )
-    })
-
-    it("should handle destroy with minimal setup", () => {
-      const minimalHandler = new TestModuleEventHandler(logger)
-
-      expect(() => minimalHandler.destroy()).not.toThrow()
-      expect(logger.debug).toHaveBeenCalledWith(
-        "TestModuleEventHandler cleanup completed (queue-only processing)",
-      )
-    })
-  })
-
-  describe("Inheritance", () => {
-    it("should allow concrete implementations to extend functionality", () => {
-      class ExtendedHandler extends BaseModuleEventHandler {
-        private handlersRegistered = false
-
-        registerEventHandlers(): void {
-          this.handlersRegistered = true
-          this.logger.info("Extended handlers registered")
-        }
-
-        isRegistered(): boolean {
-          return this.handlersRegistered
-        }
-      }
-
-      const extendedHandler = new ExtendedHandler(logger)
-      expect(extendedHandler.isRegistered()).toBe(false)
-
-      extendedHandler.registerEventHandlers()
-      expect(extendedHandler.isRegistered()).toBe(true)
-      expect(logger.info).toHaveBeenCalledWith("Extended handlers registered")
-    })
-
-    it("should provide access to protected members in subclasses", () => {
-      class AccessTestHandler extends BaseModuleEventHandler {
-        registerEventHandlers(): void {
-          // Test that protected members are accessible
-          this.logger.info("Testing protected access")
-          if (this.metrics) {
-            this.metrics.recordProcessingTime(EventType.PLAYER_KILL, 100, "TestModule")
-          }
-        }
-
-        testProtectedAccess(): void {
-          this.logger.debug("Testing protected logger access")
-        }
-      }
-
-      const accessHandler = new AccessTestHandler(logger, metrics)
-      accessHandler.registerEventHandlers()
-      accessHandler.testProtectedAccess()
-
-      expect(logger.info).toHaveBeenCalledWith("Testing protected access")
-      expect(logger.debug).toHaveBeenCalledWith("Testing protected logger access")
-      expect(metrics.recordProcessingTime).toHaveBeenCalledWith(
-        EventType.PLAYER_KILL,
-        100,
-        "TestModule",
-      )
-    })
-  })
-
-  describe("Error Handling", () => {
-    it("should handle errors in registerEventHandlers gracefully", () => {
-      class ErrorHandler extends BaseModuleEventHandler {
-        registerEventHandlers(): void {
-          throw new Error("Registration failed")
-        }
-      }
-
-      const errorHandler = new ErrorHandler(logger)
-
-      expect(() => errorHandler.registerEventHandlers()).toThrow("Registration failed")
     })
 
     it("should handle destroy even if logger fails", () => {
@@ -161,9 +65,6 @@ describe("BaseModuleEventHandler", () => {
         debug: vi.fn().mockImplementation(() => {
           throw new Error("Logger failed")
         }),
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
       } as unknown as ILogger
 
       const failingHandler = new TestModuleEventHandler(failingLogger)
@@ -172,14 +73,59 @@ describe("BaseModuleEventHandler", () => {
     })
   })
 
+  describe("Inheritance", () => {
+    it("should allow concrete implementations to extend functionality", () => {
+      class ExtendedHandler extends BaseModuleEventHandler {
+        private initialized = false
+
+        initialize(): void {
+          this.initialized = true
+          this.logger.info("Extended handler initialized")
+        }
+
+        isInitialized(): boolean {
+          return this.initialized
+        }
+      }
+
+      const extendedHandler = new ExtendedHandler(logger)
+      expect(extendedHandler.isInitialized()).toBe(false)
+
+      extendedHandler.initialize()
+      expect(extendedHandler.isInitialized()).toBe(true)
+      expect(logger.info).toHaveBeenCalledWith("Extended handler initialized")
+    })
+
+    it("should provide access to protected members in subclasses", () => {
+      class AccessTestHandler extends BaseModuleEventHandler {
+        testProtectedAccess(): void {
+          // Test that protected members are accessible
+          this.logger.info("Testing protected access")
+          if (this.metrics) {
+            this.metrics.recordProcessingTime(EventType.PLAYER_KILL, 100, "TestModule")
+          }
+          this.logger.debug("Testing protected logger access")
+        }
+      }
+
+      const accessHandler = new AccessTestHandler(logger, metrics)
+      accessHandler.testProtectedAccess()
+
+      expect(logger.info).toHaveBeenCalledWith("Testing protected access")
+      expect(logger.debug).toHaveBeenCalledWith("Testing protected logger access")
+      expect(metrics.recordProcessingTime).toHaveBeenCalledWith(
+        EventType.PLAYER_KILL,
+        100,
+        "TestModule"
+      )
+    })
+  })
+
   describe("Optional Metrics", () => {
     it("should work without metrics", () => {
       class MetricsTestHandler extends BaseModuleEventHandler {
-        registerEventHandlers(): void {
+        testMetrics(): void {
           if (this.metrics) {
-            ;(
-              this.metrics as unknown as { recordEvent: (name: string, value: number) => void }
-            ).recordEvent("test", 1)
             this.logger.info("Metrics available")
           } else {
             this.logger.info("No metrics available")
@@ -188,18 +134,16 @@ describe("BaseModuleEventHandler", () => {
       }
 
       const handlerWithoutMetrics = new MetricsTestHandler(logger)
-      handlerWithoutMetrics.registerEventHandlers()
+      handlerWithoutMetrics.testMetrics()
 
       expect(logger.info).toHaveBeenCalledWith("No metrics available")
     })
 
     it("should use metrics when available", () => {
       class MetricsTestHandler extends BaseModuleEventHandler {
-        registerEventHandlers(): void {
+        testMetrics(): void {
           if (this.metrics) {
-            ;(
-              this.metrics as unknown as { recordEvent: (name: string, value: number) => void }
-            ).recordEvent("test", 1)
+            this.metrics.recordProcessingTime(EventType.PLAYER_CONNECT, 50, "TestModule")
             this.logger.info("Metrics available")
           } else {
             this.logger.info("No metrics available")
@@ -208,12 +152,14 @@ describe("BaseModuleEventHandler", () => {
       }
 
       const handlerWithMetrics = new MetricsTestHandler(logger, metrics)
-      handlerWithMetrics.registerEventHandlers()
+      handlerWithMetrics.testMetrics()
 
       expect(logger.info).toHaveBeenCalledWith("Metrics available")
-      expect(
-        (metrics as unknown as { recordEvent: ReturnType<typeof vi.fn> }).recordEvent,
-      ).toHaveBeenCalledWith("test", 1)
+      expect(metrics.recordProcessingTime).toHaveBeenCalledWith(
+        EventType.PLAYER_CONNECT,
+        50,
+        "TestModule"
+      )
     })
   })
 })

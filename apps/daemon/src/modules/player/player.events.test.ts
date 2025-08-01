@@ -22,7 +22,6 @@ const createMockPlayerService = (): IPlayerService => ({
   getRoundParticipants: vi.fn(),
   handlePlayerEvent: vi.fn(),
   handleKillEvent: vi.fn(),
-  compensateKillEvent: vi.fn(),
 })
 
 const createMockServerService = (): IServerService => ({

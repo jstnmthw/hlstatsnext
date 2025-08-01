@@ -5,13 +5,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import {
   KillEventCoordinator,
-  SagaEventCoordinator,
   CompositeEventCoordinator,
   type EventCoordinator,
 } from "./event-coordinator"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
-import type { ISaga } from "@/shared/application/sagas/saga.types"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 
@@ -32,8 +30,6 @@ describe("Event Coordinators", () => {
       calculateRatingAdjustment: vi.fn(),
       calculateSkillAdjustment: vi.fn(),
       calculateSuicidePenalty: vi.fn(),
-      getCurrentRankings: vi.fn(),
-      restoreRankings: vi.fn(),
     } as unknown as IRankingService
   })
 
@@ -93,114 +89,6 @@ describe("Event Coordinators", () => {
     })
   })
 
-  describe("SagaEventCoordinator", () => {
-    let coordinator: SagaEventCoordinator
-    let mockSaga: ISaga
-
-    beforeEach(() => {
-      coordinator = new SagaEventCoordinator(logger)
-      mockSaga = {
-        name: "TestSaga",
-        execute: vi.fn().mockResolvedValue(undefined),
-      }
-    })
-
-    it("should register and execute sagas for events", async () => {
-      coordinator.registerSaga(EventType.PLAYER_KILL, mockSaga)
-
-      const killEvent: BaseEvent = {
-        eventType: EventType.PLAYER_KILL,
-        serverId: 1,
-        timestamp: new Date(),
-        data: {},
-      }
-
-      await coordinator.coordinateEvent(killEvent)
-
-      expect(logger.debug).toHaveBeenCalledWith(
-        `Registered saga TestSaga for event type ${EventType.PLAYER_KILL}`,
-      )
-      expect(logger.debug).toHaveBeenCalledWith(
-        `Executing saga TestSaga for event ${EventType.PLAYER_KILL}`,
-      )
-      expect(mockSaga.execute).toHaveBeenCalledWith(killEvent)
-    })
-
-    it("should skip events without registered sagas", async () => {
-      const connectEvent: BaseEvent = {
-        eventType: EventType.PLAYER_CONNECT,
-        serverId: 1,
-        timestamp: new Date(),
-        data: {},
-      }
-
-      await coordinator.coordinateEvent(connectEvent)
-
-      expect(logger.debug).toHaveBeenCalledWith(
-        `No saga registered for event type: ${EventType.PLAYER_CONNECT}`,
-      )
-      expect(mockSaga.execute).not.toHaveBeenCalled()
-    })
-
-    it("should handle saga execution errors", async () => {
-      const error = new Error("Saga execution failed")
-      mockSaga.execute = vi.fn().mockRejectedValueOnce(error)
-
-      coordinator.registerSaga(EventType.PLAYER_KILL, mockSaga)
-
-      const killEvent: BaseEvent = {
-        eventType: EventType.PLAYER_KILL,
-        serverId: 1,
-        timestamp: new Date(),
-        data: {},
-      }
-
-      await expect(coordinator.coordinateEvent(killEvent)).rejects.toThrow("Saga execution failed")
-
-      expect(logger.error).toHaveBeenCalledWith(
-        `Saga execution failed for ${EventType.PLAYER_KILL}`,
-        expect.objectContaining({
-          sagaName: "TestSaga",
-          eventType: EventType.PLAYER_KILL,
-          error: "Saga execution failed",
-        }),
-      )
-    })
-
-    it("should support multiple saga registrations", async () => {
-      const killSaga = {
-        name: "KillSaga",
-        execute: vi.fn().mockResolvedValue(undefined),
-      }
-      const connectSaga = {
-        name: "ConnectSaga",
-        execute: vi.fn().mockResolvedValue(undefined),
-      }
-
-      coordinator.registerSaga(EventType.PLAYER_KILL, killSaga)
-      coordinator.registerSaga(EventType.PLAYER_CONNECT, connectSaga)
-
-      const killEvent: BaseEvent = {
-        eventType: EventType.PLAYER_KILL,
-        serverId: 1,
-        timestamp: new Date(),
-        data: {},
-      }
-
-      const connectEvent: BaseEvent = {
-        eventType: EventType.PLAYER_CONNECT,
-        serverId: 1,
-        timestamp: new Date(),
-        data: {},
-      }
-
-      await coordinator.coordinateEvent(killEvent)
-      await coordinator.coordinateEvent(connectEvent)
-
-      expect(killSaga.execute).toHaveBeenCalledWith(killEvent)
-      expect(connectSaga.execute).toHaveBeenCalledWith(connectEvent)
-    })
-  })
 
   describe("CompositeEventCoordinator", () => {
     let coordinator: CompositeEventCoordinator

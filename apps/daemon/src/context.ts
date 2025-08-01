@@ -53,9 +53,7 @@ import { ActionEventHandler } from "@/modules/action/action.events"
 import { ServerEventHandler } from "@/modules/server/server.events"
 import { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
-import { KillEventCoordinator, SagaEventCoordinator } from "@/shared/application/event-coordinator"
-import { KillEventSaga } from "@/shared/application/sagas/kill-event/kill-event.saga"
-import { SagaMonitor } from "@/shared/application/sagas/saga.monitor"
+import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import { RabbitMQConsumer } from "@/shared/infrastructure/messaging/queue/rabbitmq/consumer"
 
 export interface AppContext {
@@ -326,45 +324,8 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
     // Get the queue publisher directly (all events now queue-only)
     context.eventPublisher = context.queueModule.getPublisher()
 
-    // Create coordinators for RabbitMQ consumer
-    const killEventCoordinator = new KillEventCoordinator(context.logger, context.rankingService)
-    const sagaCoordinator = new SagaEventCoordinator(context.logger)
-
-    // Register sagas with the saga coordinator
-    const sagaMonitor = new SagaMonitor(context.logger)
-
-    // Create stub EventBus for saga compatibility (sagas don't actually emit events)
-    const stubEventBus = {
-      emit: async () => {
-        /* no-op */
-      },
-      on: () => "stub-id",
-      off: () => {
-        /* no-op */
-      },
-      clearHandlers: () => {
-        /* no-op */
-      },
-      getStats: () => ({
-        totalHandlers: 0,
-        handlersByType: new Map(),
-        eventsEmitted: 0,
-        errors: 0,
-      }),
-    }
-
-    const killEventSaga = new KillEventSaga(
-      context.logger,
-      stubEventBus,
-      context.playerService,
-      context.weaponService,
-      context.matchService,
-      context.rankingService,
-      sagaMonitor,
-    )
-    sagaCoordinator.registerSaga(EventType.PLAYER_KILL, killEventSaga)
-
-    const coordinators = [killEventCoordinator, sagaCoordinator]
+    // No coordinators needed - module handlers handle all logic
+    const coordinators: EventCoordinator[] = []
 
     context.rabbitmqConsumer = new RabbitMQConsumer(
       context.queueModule.getClient(),

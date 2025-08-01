@@ -9,7 +9,6 @@
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
-import type { ISaga } from "@/shared/application/sagas/saga.types"
 import { EventType } from "@/shared/types/events"
 
 /**
@@ -60,45 +59,6 @@ export class KillEventCoordinator implements EventCoordinator {
   }
 }
 
-/**
- * Saga Event Coordinator
- *
- * Handles event coordination through saga patterns, providing transactional
- * consistency and compensating actions for complex multi-module workflows.
- */
-export class SagaEventCoordinator implements EventCoordinator {
-  private readonly sagas: Map<EventType, ISaga> = new Map()
-
-  constructor(private readonly logger: ILogger) {}
-
-  /**
-   * Register a saga for a specific event type
-   */
-  registerSaga(eventType: EventType, saga: ISaga): void {
-    this.sagas.set(eventType, saga)
-    this.logger.debug(`Registered saga ${saga.name} for event type ${eventType}`)
-  }
-
-  async coordinateEvent(event: BaseEvent): Promise<void> {
-    const saga = this.sagas.get(event.eventType)
-    if (!saga) {
-      this.logger.debug(`No saga registered for event type: ${event.eventType}`)
-      return
-    }
-
-    try {
-      this.logger.debug(`Executing saga ${saga.name} for event ${event.eventType}`)
-      await saga.execute(event)
-    } catch (error) {
-      this.logger.error(`Saga execution failed for ${event.eventType}`, {
-        sagaName: saga.name,
-        eventType: event.eventType,
-        error: error instanceof Error ? error.message : String(error),
-      })
-      throw error
-    }
-  }
-}
 
 /**
  * Composite Event Coordinator

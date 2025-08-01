@@ -652,7 +652,7 @@ export class PlayerService implements IPlayerService {
         messageMode || 0,
       )
 
-      this.logger.debug(`(${EventType.CHAT_MESSAGE}) Player ${playerId} says: "${message}"`)
+      this.logger.debug(`Player ${playerId} says: "${message}"`)
 
       return { success: true, affected: 1 }
     } catch (error) {

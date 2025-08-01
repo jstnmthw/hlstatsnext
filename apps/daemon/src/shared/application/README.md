@@ -1,134 +1,102 @@
 # Application Layer
 
-The application layer contains the business logic and orchestration patterns for the HLStats Daemon. This layer implements domain-specific workflows, saga patterns for complex transactions, and event coordination logic.
+The application layer contains the business logic and orchestration patterns for the HLStats Daemon. This layer implements domain-specific workflows and event coordination logic using a simplified queue-only architecture.
 
 ## Design Patterns
 
-### 1. Saga Pattern
+### 1. Simple Event Coordination
 
-**Directory**: `sagas/`
+**File**: `event-coordinator.ts`
 
-Sagas provide transactional consistency across multiple modules with compensation logic for failures:
+Event coordinators handle cross-module concerns that require orchestration beyond individual module handlers:
 
 ```typescript
-export class KillEventSaga extends BaseSaga {
-  protected initializeSteps(): void {
-    this.steps = [
-      new PlayerKillStep(this.playerService, this.logger),
-      new WeaponStatsStep(this.weaponService, this.logger),
-      new MatchStatsStep(this.matchService, this.logger),
-      new RankingUpdateStep(this.rankingService, this.logger),
-    ]
-  }
+export class KillEventCoordinator implements EventCoordinator {
+  constructor(
+    private readonly logger: ILogger,
+    private readonly rankingService: IRankingService,
+  ) {}
 
-  async execute(event: BaseEvent): Promise<SagaExecutionResult> {
-    // Execute steps with automatic compensation on failure
-    return super.execute(event)
+  async coordinateEvent(event: BaseEvent): Promise<void> {
+    if (event.eventType !== EventType.PLAYER_KILL) {
+      return
+    }
+
+    // Handle cross-module concerns like ranking updates
+    await this.rankingService.handleRatingUpdate()
   }
 }
 ```
 
 **Key Benefits:**
 
-- **Transactional Consistency**: Ensures data consistency across modules
-- **Automatic Compensation**: Rolls back completed steps when later steps fail
-- **Failure Isolation**: Prevents cascade failures across modules
-- **Audit Trail**: Comprehensive logging of saga execution and compensation
+- **Simplicity**: Direct coordination without complex transaction management  
+- **Performance**: No overhead from saga state management
+- **Maintainability**: Easy to understand and debug
+- **Reliability**: Module handlers are responsible for their own consistency
 
-### 2. Event Coordinator Pattern
+**Current Architecture:**
 
-**File**: `event-coordinator.ts`
+- **Module Handlers**: Handle core business logic for their domain
+- **Event Coordinators**: Handle cross-module concerns (currently minimal)
+- **Queue Processing**: All events processed through RabbitMQ queues
+- **No Compensation**: Simplified approach relying on module-level consistency
 
-Coordinates complex event processing that requires multiple steps or modules:
+### 2. Module Handler Pattern
 
-```typescript
-export class SagaEventCoordinator implements IEventCoordinator {
-  private sagas = new Map<EventType, BaseSaga>()
+**Used throughout**: Module event handlers
 
-  registerSaga(eventType: EventType, saga: BaseSaga): void {
-    this.sagas.set(eventType, saga)
-  }
-
-  async coordinate(event: BaseEvent): Promise<void> {
-    const saga = this.sagas.get(event.eventType)
-    if (saga) {
-      await saga.execute(event)
-    }
-  }
-}
-```
-
-**Use Cases:**
-
-- Multi-module transactions (kill events affecting player, weapon, match, ranking)
-- Complex business workflows
-- Event orchestration with dependencies
-- Failure recovery and compensation
-
-### 3. Step Pattern
-
-**Used in**: Saga implementations
-
-Individual saga steps implement specific business operations:
+Module handlers encapsulate domain-specific business logic:
 
 ```typescript
-export class PlayerKillStep implements SagaStep {
-  async execute(context: SagaContext): Promise<void> {
-    const event = context.originalEvent as PlayerKillEvent
-    const result = await this.playerService.handleKillEvent(event)
-
-    // Store result for potential compensation
-    context.data.playerKillResult = result
-    context.data.playerKillProcessed = true
+export class PlayerEventHandler extends BaseModuleEventHandler {
+  constructor(
+    logger: ILogger,
+    private readonly playerService: IPlayerService,
+    private readonly serverService: IServerService,
+    metrics?: EventMetrics,
+  ) {
+    super(logger, metrics)
   }
 
-  async compensate(context: SagaContext): Promise<void> {
-    if (!context.data.playerKillProcessed) return
-
-    const event = context.originalEvent as PlayerKillEvent
-    await this.playerService.compensateKillEvent?.(event.data.killerId, event.data.victimId)
+  async handleEvent(event: BaseEvent): Promise<void> {
+    const resolvedEvent = await this.resolvePlayerIds(event)
+    await this.playerService.handlePlayerEvent(resolvedEvent)
   }
 }
 ```
 
 **Features:**
 
-- **Idempotency**: Steps can be safely retried
-- **State Tracking**: Context preserves execution state
-- **Compensation Logic**: Each step knows how to undo its operations
-- **Error Isolation**: Step failures don't affect other steps directly
+- **Domain Focus**: Each handler manages one business domain
+- **Type Safety**: Strong typing with event-specific interfaces
+- **Metrics Integration**: Built-in performance monitoring
+- **Error Isolation**: Handler failures don't affect other modules
 
-### 4. Saga Monitor Pattern
+### 3. Queue-First Processing
 
-**File**: `sagas/saga.monitor.ts`
+**Architecture**: RabbitMQ-based event processing
 
-Provides observability and debugging capabilities for saga execution:
+All events are processed through RabbitMQ queues for reliability and scalability:
 
 ```typescript
-export class SagaMonitor implements ISagaMonitor {
-  onSagaStarted(sagaName: string, eventId: string): void {
-    this.logger.debug(`Saga started: ${sagaName}`, { eventId })
-  }
+export class RabbitMQEventProcessor implements IEventProcessor {
+  async processEvent(event: BaseEvent): Promise<void> {
+    // Process through module handlers first (business logic)
+    await this.processModuleHandlers(event)
 
-  onStepExecuted(sagaName: string, stepName: string, eventId: string): void {
-    this.logger.debug(`Step completed: ${stepName}`, { sagaName, eventId })
-  }
-
-  onSagaCompleted(sagaName: string, result: SagaExecutionResult): void {
-    this.logger.info(`Saga completed: ${sagaName}`, {
-      duration: result.executionTimeMs,
-      steps: result.completedSteps,
-    })
-  }
-
-  onSagaFailed(sagaName: string, eventId: string, error: Error): void {
-    this.logger.error(`Saga failed: ${sagaName}`, {
-      eventId,
-      error: error.message,
-    })
+    // Then process through coordinators (cross-module concerns)
+    await this.processCoordinators(event)
   }
 }
 ```
+
+**Benefits:**
+
+- **Reliability**: Queue persistence ensures no event loss
+- **Scalability**: Multiple consumers can process events in parallel
+- **Observability**: Comprehensive metrics and logging
+- **Simplicity**: No complex state management or compensation logic
 
 ## Architecture
 
@@ -136,485 +104,256 @@ export class SagaMonitor implements ISagaMonitor {
 
 ```
 Application Layer
-├── sagas/
-│   ├── saga.base.ts           # Base saga implementation
-│   ├── saga.types.ts          # Saga interfaces and types
-│   ├── saga.monitor.ts        # Saga observability
-│   └── kill-event/
-│       ├── kill-event.saga.ts # Kill event saga implementation
-│       └── kill-event.saga.test.ts
-└── event-coordinator.ts      # Event coordination logic
+├── event-coordinator.ts          # Simple event coordination
+└── event-coordinator.test.ts     # Coordinator tests
 ```
 
-### Saga Execution Flow
+### Event Processing Flow
 
-1. **Event Arrives**: Event coordinator receives complex event
-2. **Saga Selection**: Appropriate saga is selected based on event type
-3. **Context Creation**: Saga context is created with event and correlation data
-4. **Step Execution**: Steps are executed sequentially
-5. **Success Path**: All steps complete successfully
-6. **Failure Path**: If any step fails, compensation runs in reverse order
-7. **Result**: Saga execution result is returned with metrics
+1. **Event Arrives**: RabbitMQ consumer receives event from queue
+2. **Module Processing**: Event is processed by relevant module handlers
+3. **Coordination**: Event is processed by any relevant coordinators
+4. **Completion**: Event processing completes with metrics logging
 
-### Transaction Boundaries
+### Processing Boundaries
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Kill Event Saga                          │
+│                    Queue Event Processing                   │
 ├─────────────────────────────────────────────────────────────┤
-│ Step 1: Player Stats Update                                 │
-│   - Update kill/death counts                                │
-│   - Compensation: Revert stat changes                       │
+│ Step 1: Module Handler Processing                           │
+│   - PlayerService handles player-related logic             │
+│   - WeaponService handles weapon statistics                 │
+│   - MatchService handles match/round statistics             │
 ├─────────────────────────────────────────────────────────────┤
-│ Step 2: Weapon Statistics                                   │
-│   - Update weapon usage stats                               │
-│   - Compensation: Revert weapon stats                       │
-├─────────────────────────────────────────────────────────────┤
-│ Step 3: Match Statistics                                    │
-│   - Update match/round stats                                │
-│   - Compensation: Revert match stats                        │
-├─────────────────────────────────────────────────────────────┤
-│ Step 4: Ranking Update                                      │
-│   - Calculate skill rating changes                          │
-│   - Compensation: Restore previous ratings                  │
+│ Step 2: Coordinator Processing (if needed)                  │
+│   - KillEventCoordinator handles cross-module concerns     │
+│   - Currently only rating updates                          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## Usage Guidelines
 
-### Creating a New Saga
+### Creating a New Coordinator
 
-1. **Define Saga Class**:
-
-```typescript
-export class CustomEventSaga extends BaseSaga {
-  readonly name = "CustomEventSaga"
-
-  constructor(
-    logger: ILogger,
-    eventBus: IEventBus,
-    private readonly customService: ICustomService,
-    monitor?: ISagaMonitor,
-  ) {
-    super(logger, eventBus, monitor)
-    this.initializeSteps()
-  }
-
-  protected initializeSteps(): void {
-    this.steps = [
-      new CustomStep1(this.customService, this.logger),
-      new CustomStep2(this.customService, this.logger),
-    ]
-  }
-
-  canHandle(event: BaseEvent): boolean {
-    return event.eventType === EventType.CUSTOM_EVENT
-  }
-}
-```
-
-2. **Implement Saga Steps**:
+1. **Define Coordinator Class**:
 
 ```typescript
-export class CustomStep1 implements SagaStep {
-  readonly name = "CustomStep1"
-
+export class CustomEventCoordinator implements EventCoordinator {
   constructor(
-    private readonly customService: ICustomService,
     private readonly logger: ILogger,
+    private readonly customService: ICustomService,
   ) {}
 
-  async execute(context: SagaContext): Promise<void> {
-    const event = context.originalEvent as CustomEvent
+  async coordinateEvent(event: BaseEvent): Promise<void> {
+    if (event.eventType !== EventType.CUSTOM_EVENT) {
+      return
+    }
 
-    // Execute business logic
-    await this.customService.processCustomLogic(event)
-
-    // Mark as processed for compensation
-    context.data.customStep1Processed = true
-
-    this.logger.debug("Custom step 1 completed", {
-      eventId: context.eventId,
+    // Handle cross-module concerns
+    await this.customService.handleCrossModuleConcern(event)
+    
+    this.logger.debug("Custom event coordinated", {
+      eventId: event.eventId,
+      eventType: event.eventType,
     })
   }
-
-  async compensate(context: SagaContext): Promise<void> {
-    if (!context.data.customStep1Processed) return
-
-    try {
-      const event = context.originalEvent as CustomEvent
-      await this.customService.compensateCustomLogic?.(event)
-
-      this.logger.debug("Custom step 1 compensated", {
-        eventId: context.eventId,
-      })
-    } catch (error) {
-      this.logger.error("Custom step 1 compensation failed", {
-        eventId: context.eventId,
-        error: error instanceof Error ? error.message : String(error),
-      })
-      // Don't rethrow - compensation failures shouldn't stop other compensations
-    }
-  }
 }
 ```
 
-3. **Register Saga**:
+2. **Register Coordinator**:
 
 ```typescript
-// In context.ts or application bootstrap
-const customSaga = new CustomEventSaga(logger, eventBus, customService, sagaMonitor)
-sagaCoordinator.registerSaga(EventType.CUSTOM_EVENT, customSaga)
+// In context.ts initialization
+const coordinators: EventCoordinator[] = [
+  new CustomEventCoordinator(logger, customService),
+]
+
+const rabbitmqConsumer = new RabbitMQConsumer(
+  queueClient,
+  logger,
+  moduleRegistry,
+  coordinators, // Pass coordinators here
+)
 ```
 
-### Adding Compensation Methods to Services
+### Module Handler Best Practices
 
-Services need to implement compensation methods for saga rollback:
-
-```typescript
-export interface ICustomService {
-  // Normal operations
-  processCustomLogic(event: CustomEvent): Promise<void>
-
-  // Compensation operations (optional)
-  compensateCustomLogic?(event: CustomEvent): Promise<void>
-}
-
-export class CustomService implements ICustomService {
-  async processCustomLogic(event: CustomEvent): Promise<void> {
-    // Store original state for compensation
-    const originalState = await this.getState(event.data.entityId)
-
-    // Perform operation
-    await this.updateState(event.data.entityId, event.data.newState)
-
-    // Store for potential rollback
-    await this.storeCompensationData(event.correlationId, originalState)
-  }
-
-  async compensateCustomLogic(event: CustomEvent): Promise<void> {
-    // Retrieve original state
-    const originalState = await this.getCompensationData(event.correlationId)
-
-    if (originalState) {
-      // Restore original state
-      await this.updateState(event.data.entityId, originalState)
-
-      // Cleanup compensation data
-      await this.deleteCompensationData(event.correlationId)
-    }
-  }
-}
-```
-
-### Event Coordination
-
-For events that don't require sagas but need coordination:
+Module handlers should focus on their domain's business logic:
 
 ```typescript
-export class SimpleEventCoordinator implements IEventCoordinator {
-  async coordinate(event: BaseEvent): Promise<void> {
-    switch (event.eventType) {
-      case EventType.PLAYER_CONNECT:
-        await this.handlePlayerConnect(event as PlayerConnectEvent)
-        break
-      case EventType.SERVER_SHUTDOWN:
-        await this.handleServerShutdown(event)
-        break
+export class CustomEventHandler extends BaseModuleEventHandler {
+  async handleEvent(event: BaseEvent): Promise<void> {
+    // 1. Validate event type and data
+    if (!this.canHandle(event)) {
+      return
     }
+
+    // 2. Process business logic
+    await this.customService.processEvent(event)
+
+    // 3. Update metrics (automatic via base class)
+    this.metrics?.recordEventProcessed(event.eventType)
   }
 
-  private async handlePlayerConnect(event: PlayerConnectEvent): Promise<void> {
-    // Simple coordination without saga complexity
-    await Promise.all([
-      this.playerService.handlePlayerEvent(event),
-      this.matchService.updatePlayerCount(event.serverId, 1),
-    ])
+  private canHandle(event: BaseEvent): boolean {
+    return event.eventType === EventType.CUSTOM_EVENT
   }
 }
 ```
 
 ## Maintenance
 
-### Monitoring Saga Health
+### Monitoring Event Processing
 
-1. **Saga Execution Metrics**:
+1. **Queue Metrics**:
 
 ```typescript
-// Monitor via saga monitor
-const sagaMetrics = sagaMonitor.getMetrics()
-console.log("Saga success rate:", sagaMetrics.successRate)
-console.log("Average execution time:", sagaMetrics.averageExecutionTime)
+// Monitor queue health via RabbitMQ management
+const queueMetrics = await rabbitmqClient.getQueueMetrics()
+console.log("Queue depth:", queueMetrics.messageCount)
+console.log("Consumer count:", queueMetrics.consumerCount)
 ```
 
-2. **Compensation Frequency**:
+2. **Handler Performance**:
 
 ```typescript
-// Track compensation events
-sagaMonitor.onCompensationStarted = (sagaName, eventId) => {
-  compensationCounter.increment({ sagaName })
-}
-```
-
-3. **Step Performance**:
-
-```typescript
-// Monitor individual step performance
-const stepMetrics = sagaMonitor.getStepMetrics()
-stepMetrics.forEach((step) => {
-  if (step.averageTime > STEP_THRESHOLD) {
-    logger.warn(`Slow step detected: ${step.name}`, { averageTime: step.averageTime })
+// Monitor via event metrics
+const handlerMetrics = eventMetrics.getHandlerMetrics()
+handlerMetrics.forEach((metric) => {
+  if (metric.averageProcessingTime > THRESHOLD) {
+    logger.warn(`Slow handler: ${metric.handlerName}`, {
+      averageTime: metric.averageProcessingTime
+    })
   }
 })
 ```
 
-### Debugging Saga Issues
+3. **Error Rates**:
+
+```typescript
+// Track processing failures
+eventMetrics.onProcessingError = (eventType, error) => {
+  errorCounter.increment({ eventType, error: error.name })
+}
+```
+
+### Debugging Event Issues
 
 1. **Enable Detailed Logging**:
 
 ```typescript
-const sagaMonitor = new SagaMonitor(logger, {
-  logStepDetails: true,
-  logCompensationDetails: true,
+// Set LOG_LEVEL=debug in environment
+const logger = new Logger({
+  level: process.env.LOG_LEVEL || 'info',
+  enableQueueLogging: true, // Enable queue-specific logs
 })
 ```
 
-2. **Check Saga Context**:
+2. **Trace Event Flow**:
 
 ```typescript
-// In saga steps, log context state
-this.logger.debug("Saga context state", {
-  eventId: context.eventId,
-  correlationId: context.correlationId,
-  data: context.data,
+// Events include correlation IDs for tracing
+this.logger.info("Processing event", {
+  eventId: event.eventId,
+  correlationId: event.correlationId,
+  eventType: event.eventType,
 })
 ```
 
-3. **Compensation Audit Trail**:
+3. **Queue Message Inspection**:
 
 ```typescript
-// Track which compensations were attempted
-const compensationAudit = new Map<string, string[]>()
-
-onCompensationAttempted(sagaName: string, stepName: string, eventId: string) {
-  if (!compensationAudit.has(eventId)) {
-    compensationAudit.set(eventId, [])
-  }
-  compensationAudit.get(eventId)!.push(`${sagaName}.${stepName}`)
-}
+// Use shadow consumer for non-destructive message inspection
+const shadowConsumer = new ShadowConsumer({
+  logEvents: true, // Log all messages
+  logParsingErrors: true, // Log parsing failures
+})
 ```
 
 ### Performance Optimization
 
-1. **Parallel Step Execution** (when safe):
+1. **Handler Optimization**:
 
 ```typescript
-// For independent steps that can run in parallel
-protected async executeStepsInParallel(
-  steps: SagaStep[],
-  context: SagaContext
-): Promise<void> {
-  await Promise.all(steps.map(step => step.execute(context)))
-}
-```
-
-2. **Step Timeout Management**:
-
-```typescript
-async execute(context: SagaContext): Promise<void> {
-  const timeoutMs = 30000 // 30 seconds
-
-  await Promise.race([
-    this.executeStep(context),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Step timeout')), timeoutMs)
-    )
-  ])
-}
-```
-
-3. **Compensation Data Cleanup**:
-
-```typescript
-// Implement cleanup for old compensation data
-async cleanupExpiredCompensationData(): Promise<void> {
-  const expiredThreshold = Date.now() - (24 * 60 * 60 * 1000) // 24 hours
-  await this.deleteCompensationDataOlderThan(expiredThreshold)
-}
-```
-
-## Extension Points
-
-### Custom Saga Types
-
-1. **Define Saga Interface**:
-
-```typescript
-export interface ICustomSaga extends BaseSaga {
-  readonly customProperty: string
-  customMethod(): Promise<void>
-}
-```
-
-2. **Implement Custom Base**:
-
-```typescript
-export abstract class CustomBaseSaga extends BaseSaga implements ICustomSaga {
-  abstract readonly customProperty: string
-
-  async customMethod(): Promise<void> {
-    // Custom saga behavior
-  }
-
-  protected override async executeSteps(context: SagaContext): Promise<void> {
-    // Custom execution logic
-    await this.customMethod()
-    await super.executeSteps(context)
-  }
-}
-```
-
-### Advanced Coordination Patterns
-
-1. **Event Aggregation**:
-
-```typescript
-export class AggregatingCoordinator implements IEventCoordinator {
-  private eventBuffer = new Map<string, BaseEvent[]>()
-
-  async coordinate(event: BaseEvent): Promise<void> {
-    const aggregationKey = this.getAggregationKey(event)
-
-    if (!this.eventBuffer.has(aggregationKey)) {
-      this.eventBuffer.set(aggregationKey, [])
-      // Start aggregation timer
-      setTimeout(() => this.processAggregatedEvents(aggregationKey), 1000)
+// Keep handlers lightweight and focused
+export class OptimizedHandler extends BaseModuleEventHandler {
+  async handleEvent(event: BaseEvent): Promise<void> {
+    // Use bulk operations where possible
+    await this.service.processBatch([event])
+    
+    // Avoid unnecessary database queries
+    if (this.shouldSkipProcessing(event)) {
+      return
     }
-
-    this.eventBuffer.get(aggregationKey)!.push(event)
-  }
-
-  private async processAggregatedEvents(key: string): Promise<void> {
-    const events = this.eventBuffer.get(key) || []
-    await this.processBatch(events)
-    this.eventBuffer.delete(key)
+    
+    await this.service.processEvent(event)
   }
 }
 ```
 
-2. **Conditional Saga Execution**:
+2. **Queue Configuration**:
 
 ```typescript
-export class ConditionalSagaCoordinator extends SagaEventCoordinator {
-  async coordinate(event: BaseEvent): Promise<void> {
-    const saga = this.sagas.get(event.eventType)
-
-    if (saga && (await this.shouldExecuteSaga(event, saga))) {
-      await saga.execute(event)
-    }
-  }
-
-  private async shouldExecuteSaga(event: BaseEvent, saga: BaseSaga): Promise<boolean> {
-    // Custom logic to determine if saga should run
-    return saga.canHandle(event) && (await this.checkPreconditions(event))
-  }
+// Optimize queue settings for throughput
+const rabbitmqConfig = {
+  prefetchCount: 10, // Process multiple messages at once
+  maxRetries: 3, // Limit retry attempts
+  retryDelay: 1000, // Exponential backoff
 }
+```
+
+3. **Parallel Processing**:
+
+```typescript
+// Module handlers process in parallel automatically
+const processingPromises = handlers.map(async (handler) => {
+  await handler.handleEvent(event)
+})
+await Promise.all(processingPromises)
 ```
 
 ## Testing
 
-### Saga Testing
+### Coordinator Testing
 
 ```typescript
-describe("KillEventSaga", () => {
-  let saga: KillEventSaga
-  let mockServices: MockServices
-  let mockMonitor: ISagaMonitor
+describe("KillEventCoordinator", () => {
+  let coordinator: KillEventCoordinator
+  let mockRankingService: IRankingService
 
   beforeEach(() => {
-    mockServices = createMockServices()
-    mockMonitor = createMockSagaMonitor()
-    saga = new KillEventSaga(
-      mockLogger,
-      mockEventBus,
-      mockServices.playerService,
-      mockServices.weaponService,
-      mockServices.matchService,
-      mockServices.rankingService,
-      mockMonitor,
-    )
+    mockRankingService = {
+      handleRatingUpdate: vi.fn().mockResolvedValue({ success: true }),
+    } as unknown as IRankingService
+    
+    coordinator = new KillEventCoordinator(mockLogger, mockRankingService)
   })
 
-  describe("Successful Execution", () => {
-    it("should execute all steps successfully", async () => {
-      const killEvent = createMockKillEvent()
+  it("should handle kill events", async () => {
+    const killEvent: BaseEvent = {
+      eventType: EventType.PLAYER_KILL,
+      serverId: 1,
+      timestamp: new Date(),
+      data: { killerId: 123, victimId: 456 },
+    }
 
-      const result = await saga.execute(killEvent)
+    await coordinator.coordinateEvent(killEvent)
 
-      expect(result.success).toBe(true)
-      expect(result.completedSteps).toBe(4)
-      expect(mockServices.playerService.handleKillEvent).toHaveBeenCalled()
-      expect(mockServices.weaponService.handleWeaponEvent).toHaveBeenCalled()
-    })
+    expect(mockRankingService.handleRatingUpdate).toHaveBeenCalledTimes(1)
   })
 
-  describe("Failure and Compensation", () => {
-    it("should compensate completed steps when later step fails", async () => {
-      // Setup: Make the 3rd step fail
-      vi.mocked(mockServices.matchService.handleKillInMatch).mockRejectedValueOnce(
-        new Error("Match service failed"),
-      )
+  it("should skip non-kill events", async () => {
+    const connectEvent: BaseEvent = {
+      eventType: EventType.PLAYER_CONNECT,
+      serverId: 1,
+      timestamp: new Date(),
+      data: {},
+    }
 
-      const killEvent = createMockKillEvent()
+    await coordinator.coordinateEvent(connectEvent)
 
-      await expect(saga.execute(killEvent)).rejects.toThrow("Match service failed")
-
-      // Verify compensation was called for completed steps (in reverse order)
-      expect(mockServices.weaponService.compensateWeaponEvent).toHaveBeenCalled()
-      expect(mockServices.playerService.compensateKillEvent).toHaveBeenCalled()
-      expect(mockServices.matchService.compensateKillInMatch).not.toHaveBeenCalled()
-    })
-  })
-})
-```
-
-### Step Testing
-
-```typescript
-describe("PlayerKillStep", () => {
-  let step: PlayerKillStep
-  let mockPlayerService: IPlayerService
-
-  beforeEach(() => {
-    mockPlayerService = createMockPlayerService()
-    step = new PlayerKillStep(mockPlayerService, mockLogger)
-  })
-
-  it("should execute and mark context as processed", async () => {
-    const context = createMockSagaContext()
-
-    await step.execute(context)
-
-    expect(mockPlayerService.handleKillEvent).toHaveBeenCalledWith(context.originalEvent)
-    expect(context.data.playerKillProcessed).toBe(true)
-  })
-
-  it("should compensate only if processed", async () => {
-    const context = createMockSagaContext()
-    context.data.playerKillProcessed = true
-
-    await step.compensate(context)
-
-    expect(mockPlayerService.compensateKillEvent).toHaveBeenCalled()
-  })
-
-  it("should skip compensation if not processed", async () => {
-    const context = createMockSagaContext()
-    // Don't set playerKillProcessed
-
-    await step.compensate(context)
-
-    expect(mockPlayerService.compensateKillEvent).not.toHaveBeenCalled()
+    expect(mockRankingService.handleRatingUpdate).not.toHaveBeenCalled()
   })
 })
 ```
@@ -622,84 +361,80 @@ describe("PlayerKillStep", () => {
 ### Integration Testing
 
 ```typescript
-describe("Saga Integration", () => {
+describe("Event Processing Integration", () => {
   let context: AppContext
-  let sagaCoordinator: SagaEventCoordinator
+  let eventPublisher: IEventPublisher
 
   beforeEach(async () => {
     context = await createTestContext()
-    sagaCoordinator = context.sagaCoordinator
+    eventPublisher = context.eventPublisher!
   })
 
-  it("should process kill events end-to-end", async () => {
-    const killEvent = createRealKillEvent()
+  it("should process events end-to-end", async () => {
+    const killEvent: BaseEvent = {
+      eventType: EventType.PLAYER_KILL,
+      serverId: 1,
+      timestamp: new Date(),
+      data: { killerId: 123, victimId: 456 },
+    }
 
-    // Publish event through the system
-    await context.eventBus.publish(killEvent)
+    // Publish to queue
+    await eventPublisher.publish(killEvent)
 
     // Wait for processing
-    await new Promise((resolve) => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 100))
 
-    // Verify all expected changes occurred
-    const player = await context.playerService.getPlayerStats(killEvent.data.killerId)
-    expect(player.kills).toBe(1)
-
-    const weapon = await context.weaponService.getWeaponStats(killEvent.data.weapon)
-    expect(weapon.kills).toBe(1)
-  })
-
-  it("should handle saga failures gracefully", async () => {
-    // Setup: Make weapon service fail
-    vi.spyOn(context.weaponService, "handleWeaponEvent").mockRejectedValueOnce(
-      new Error("Weapon service down"),
-    )
-
-    const killEvent = createRealKillEvent()
-
-    // Should not throw, but should log error
-    await expect(context.eventBus.publish(killEvent)).resolves.not.toThrow()
-
-    // Verify compensation occurred
-    const player = await context.playerService.getPlayerStats(killEvent.data.killerId)
-    expect(player.kills).toBe(0) // Should be compensated back to 0
+    // Verify processing occurred
+    const playerStats = await context.playerService.getPlayerStats(123)
+    expect(playerStats?.kills).toBeGreaterThan(0)
   })
 })
 ```
 
 ## Best Practices
 
-1. **Saga Design**:
-   - Keep sagas focused on a single business transaction
-   - Make steps idempotent and atomic
-   - Always implement compensation logic
-   - Use meaningful step names and logging
+1. **Handler Design**:
+   - Keep handlers focused on single business domains
+   - Use strong typing for event data
+   - Implement proper error handling
+   - Log with correlation IDs
 
-2. **Error Handling**:
-   - Don't let compensation failures stop other compensations
-   - Log all errors with sufficient context
-   - Implement retry logic where appropriate
-   - Use timeouts to prevent hanging sagas
+2. **Coordinator Usage**:
+   - Only use coordinators for true cross-module concerns
+   - Keep coordination logic simple and fast
+   - Avoid complex state management
+   - Prefer module-level consistency over distributed transactions
 
 3. **Performance**:
-   - Keep saga steps as fast as possible
-   - Use parallel execution when steps are independent
-   - Clean up compensation data regularly
-   - Monitor saga execution times
+   - Process events as quickly as possible
+   - Use bulk operations where beneficial
+   - Monitor queue depths and processing times
+   - Implement circuit breakers for external dependencies
 
-4. **Testing**:
-   - Test both success and failure paths
-   - Verify compensation logic thoroughly
+4. **Error Handling**:
+   - Log errors with sufficient context
+   - Implement retry logic with exponential backoff
+   - Use dead letter queues for failed messages
+   - Monitor error rates and alert on anomalies
+
+5. **Testing**:
+   - Test handlers in isolation with mocked dependencies
    - Use integration tests for end-to-end validation
-   - Mock external dependencies appropriately
+   - Test error scenarios and retry logic
+   - Verify queue message processing
 
-5. **Observability**:
-   - Implement comprehensive logging
-   - Use correlation IDs throughout
-   - Monitor saga metrics and alerts
-   - Create dashboards for saga health
+6. **Observability**:
+   - Use structured logging with correlation IDs
+   - Implement comprehensive metrics collection
+   - Set up alerting for critical failures
+   - Create dashboards for system health monitoring
 
-6. **Data Management**:
-   - Store minimal data in saga context
-   - Use correlation IDs for data lookup
-   - Implement data cleanup strategies
-   - Consider data retention policies
+## Migration Notes
+
+The daemon has been simplified from a complex saga-based architecture to a queue-only approach:
+
+- **Removed**: Saga pattern, compensation logic, complex transaction management
+- **Kept**: Event coordination for cross-module concerns, module handlers for business logic
+- **Added**: Direct RabbitMQ queue processing, simplified error handling
+
+This change reduces complexity while maintaining reliability through queue persistence and retry mechanisms.

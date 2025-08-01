@@ -200,6 +200,12 @@ export interface RatingUpdate {
   gamesPlayed: number
 }
 
+export interface PlayerWithCounts extends Player {
+  _count: {
+    fragsAsKiller: number
+  }
+}
+
 // Service interfaces
 export interface IPlayerService {
   // Player management

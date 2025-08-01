@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { RankingService, type KillContext } from "./ranking.service"
 import { createMockLogger } from "../../tests/mocks/logger"
-import { createMockWeaponRepository } from "../../tests/mocks/weapon-repository"
+import { createMockWeaponRepository } from "../../tests/mocks/weapon.repository"
 import type { SkillRating } from "./ranking.types"
 import type { IWeaponRepository } from "../weapon/weapon.types"
 

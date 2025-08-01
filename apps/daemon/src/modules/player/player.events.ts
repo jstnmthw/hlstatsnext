@@ -10,7 +10,17 @@ import { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-ha
 import type { BaseEvent, PlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
-import type { IPlayerService } from "@/modules/player/player.types"
+import type {
+  IPlayerService,
+  PlayerConnectEvent,
+  PlayerDisconnectEvent,
+  PlayerChangeNameEvent,
+  PlayerChatEvent,
+  PlayerEntryEvent,
+  PlayerChangeTeamEvent,
+  PlayerChangeRoleEvent,
+  PlayerEvent,
+} from "@/modules/player/player.types"
 import type { IServerService } from "@/modules/server/server.types"
 
 export class PlayerEventHandler extends BaseModuleEventHandler {
@@ -33,62 +43,59 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
 
   // Queue-compatible handler methods (called by RabbitMQConsumer)
   async handlePlayerConnect(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds(event)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+    const resolvedEvent = await this.resolvePlayerIds<PlayerConnectEvent>(event)
+    await this.playerService.handlePlayerEvent(resolvedEvent)
   }
 
   async handlePlayerDisconnect(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds(event)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+    const resolvedEvent = await this.resolvePlayerIds<PlayerDisconnectEvent>(event)
+    await this.playerService.handlePlayerEvent(resolvedEvent)
   }
 
   async handlePlayerChangeName(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds(event)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+    const resolvedEvent = await this.resolvePlayerIds<PlayerChangeNameEvent>(event)
+    await this.playerService.handlePlayerEvent(resolvedEvent)
   }
 
   async handleChatMessage(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds(event)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+    const resolvedEvent = await this.resolvePlayerIds<PlayerChatEvent>(event)
+    await this.playerService.handlePlayerEvent(resolvedEvent)
   }
 
   async handlePlayerEntry(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds(event)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+    const resolvedEvent = await this.resolvePlayerIds<PlayerEntryEvent>(event)
+    await this.playerService.handlePlayerEvent(resolvedEvent)
   }
 
   async handlePlayerChangeTeam(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds(event)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+    const resolvedEvent = await this.resolvePlayerIds<PlayerChangeTeamEvent>(event)
+    await this.playerService.handlePlayerEvent(resolvedEvent)
   }
 
   async handlePlayerChangeRole(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds(event)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+    const resolvedEvent = await this.resolvePlayerIds<PlayerChangeRoleEvent>(event)
+    await this.playerService.handlePlayerEvent(resolvedEvent)
   }
 
   /**
    * Resolve Steam IDs to database player IDs for events that contain player references
    * This is moved from EventProcessor to make the player module self-contained
    */
-  private async resolvePlayerIds(event: BaseEvent): Promise<BaseEvent> {
+  private async resolvePlayerIds<T extends PlayerEvent>(event: BaseEvent): Promise<T> {
     // Only resolve for events that have player data
     if (!event.meta || typeof event.meta !== "object") {
-      return event
+      // For events without meta, create a minimal resolved event with just playerId if needed
+      return {
+        ...event,
+        data: { ...((event.data as Record<string, unknown>) ?? {}), playerId: 0 },
+      } as T
     }
 
     const meta = event.meta
-    const resolvedEvent = { ...event }
+    const resolvedEvent = { ...event } as T
 
     if (!meta || typeof meta !== "object") {
-      return event
+      return event as T
     }
 
     try {
@@ -109,7 +116,7 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
       return resolvedEvent
     } catch (error) {
       this.logger.error(`Failed to resolve player IDs for event ${event.eventType}: ${error}`)
-      return event // Return original event if resolution fails
+      return event as T // Return original event if resolution fails
     }
   }
 }

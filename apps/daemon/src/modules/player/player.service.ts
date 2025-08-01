@@ -12,6 +12,14 @@ import type {
   RatingUpdate,
   PlayerEvent,
   PlayerKillEvent,
+  PlayerConnectEvent,
+  PlayerDisconnectEvent,
+  PlayerChangeNameEvent,
+  PlayerSuicideEvent,
+  PlayerDamageEvent,
+  PlayerTeamkillEvent,
+  PlayerChatEvent,
+  PlayerWithCounts,
 } from "./player.types"
 import type { Player } from "@repo/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
@@ -145,7 +153,7 @@ export class PlayerService implements IPlayerService {
 
   async getPlayerRating(playerId: number): Promise<SkillRating> {
     try {
-      const player = await this.repository.findById(playerId, {
+      const player = (await this.repository.findById(playerId, {
         select: {
           skill: true,
           _count: {
@@ -154,7 +162,7 @@ export class PlayerService implements IPlayerService {
             },
           },
         },
-      })
+      })) as PlayerWithCounts | null
 
       if (!player) {
         // Return default rating for new players
@@ -169,8 +177,7 @@ export class PlayerService implements IPlayerService {
 
       // Confidence decreases with experience (more games = more confident rating)
       const confidenceReduction = Math.min(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (player as any)._count.fragsAsKiller,
+        player._count.fragsAsKiller,
         this.MAX_CONFIDENCE_REDUCTION,
       )
       const adjustedConfidence = this.DEFAULT_CONFIDENCE - confidenceReduction
@@ -180,8 +187,7 @@ export class PlayerService implements IPlayerService {
         rating: player.skill,
         confidence: adjustedConfidence,
         volatility: this.DEFAULT_VOLATILITY,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        gamesPlayed: (player as any)._count.fragsAsKiller,
+        gamesPlayed: player._count.fragsAsKiller,
       }
     } catch (error) {
       this.logger.error(`Failed to get player rating for ${playerId}: ${error}`)
@@ -416,7 +422,8 @@ export class PlayerService implements IPlayerService {
       if (event.eventType !== EventType.PLAYER_CONNECT) {
         return { success: false, error: "Invalid event type for handlePlayerConnect" }
       }
-      const { playerId } = event.data
+      const connectEvent = event as PlayerConnectEvent
+      const { playerId } = connectEvent.data
 
       await this.updatePlayerStats(playerId, {
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
@@ -435,8 +442,11 @@ export class PlayerService implements IPlayerService {
 
   private async handlePlayerDisconnect(event: PlayerEvent): Promise<HandlerResult> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { playerId, sessionDuration } = (event as any).data
+      if (event.eventType !== EventType.PLAYER_DISCONNECT) {
+        return { success: false, error: "Invalid event type for handlePlayerDisconnect" }
+      }
+      const disconnectEvent = event as PlayerDisconnectEvent
+      const { playerId, sessionDuration } = disconnectEvent.data
 
       const updates: PlayerStatsUpdate = {
         last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
@@ -476,8 +486,11 @@ export class PlayerService implements IPlayerService {
 
   private async handlePlayerChangeName(event: PlayerEvent): Promise<HandlerResult> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { playerId, newName } = (event as any).data
+      if (event.eventType !== EventType.PLAYER_CHANGE_NAME) {
+        return { success: false, error: "Invalid event type for handlePlayerChangeName" }
+      }
+      const changeNameEvent = event as PlayerChangeNameEvent
+      const { playerId, newName } = changeNameEvent.data
 
       await this.updatePlayerStats(playerId, {
         lastName: newName,
@@ -498,8 +511,8 @@ export class PlayerService implements IPlayerService {
       if (event.eventType !== EventType.PLAYER_SUICIDE) {
         return { success: false, error: "Invalid event type for handlePlayerSuicide" }
       }
-
-      const { playerId } = event.data
+      const suicideEvent = event as PlayerSuicideEvent
+      const { playerId } = suicideEvent.data
       const timestamp = Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR)
 
       // Get current player stats for streak tracking
@@ -545,8 +558,8 @@ export class PlayerService implements IPlayerService {
       if (event.eventType !== EventType.PLAYER_DAMAGE) {
         return { success: false, error: "Invalid event type for handlePlayerDamage" }
       }
-
-      const { attackerId, victimId, weapon, damage, hitgroup } = event.data
+      const damageEvent = event as PlayerDamageEvent
+      const { attackerId, victimId, weapon, damage, hitgroup } = damageEvent.data
       const timestamp = Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR)
 
       // Update attacker's shots and hits statistics
@@ -579,8 +592,11 @@ export class PlayerService implements IPlayerService {
 
   private async handlePlayerTeamkill(event: PlayerEvent): Promise<HandlerResult> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { killerId, victimId, headshot } = (event as any).data
+      if (event.eventType !== EventType.PLAYER_TEAMKILL) {
+        return { success: false, error: "Invalid event type for handlePlayerTeamkill" }
+      }
+      const teamkillEvent = event as PlayerTeamkillEvent
+      const { killerId, victimId, headshot } = teamkillEvent.data
 
       // Update killer stats (teamkill)
       const killerUpdates: PlayerStatsUpdate = {
@@ -618,8 +634,8 @@ export class PlayerService implements IPlayerService {
       if (event.eventType !== EventType.CHAT_MESSAGE) {
         return { success: false, error: "Invalid event type for handleChatMessage" }
       }
-
-      const { playerId, message, messageMode } = event.data
+      const chatEvent = event as PlayerChatEvent
+      const { playerId, message, messageMode } = chatEvent.data
 
       // Get current map from the match service, initialize if needed
       let map = this.matchService?.getCurrentMap(event.serverId) || ""

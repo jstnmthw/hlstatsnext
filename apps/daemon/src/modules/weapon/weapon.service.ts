@@ -2,7 +2,13 @@
  * Weapon Service
  */
 
-import type { IWeaponService, IWeaponRepository, WeaponEvent } from "./weapon.types"
+import type {
+  IWeaponService,
+  IWeaponRepository,
+  WeaponEvent,
+  WeaponFireEvent,
+  WeaponHitEvent,
+} from "./weapon.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 import { EventType } from "@/shared/types/events"
@@ -57,7 +63,11 @@ export class WeaponService implements IWeaponService {
 
   private async handleWeaponFire(event: WeaponEvent): Promise<HandlerResult> {
     try {
-      const { weaponCode } = event.data
+      if (event.eventType !== EventType.WEAPON_FIRE) {
+        return { success: false, error: "Invalid event type for handleWeaponFire" }
+      }
+      const fireEvent = event as WeaponFireEvent
+      const { weaponCode } = fireEvent.data
       await this.updateWeaponStats(weaponCode, { shots: 1 })
 
       this.logger.debug(`Weapon fired: ${weaponCode}`)
@@ -73,8 +83,11 @@ export class WeaponService implements IWeaponService {
 
   private async handleWeaponHit(event: WeaponEvent): Promise<HandlerResult> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { weaponCode, damage } = (event as any).data
+      if (event.eventType !== EventType.WEAPON_HIT) {
+        return { success: false, error: "Invalid event type for handleWeaponHit" }
+      }
+      const hitEvent = event as WeaponHitEvent
+      const { weaponCode, damage } = hitEvent.data
       await this.updateWeaponStats(weaponCode, { hits: 1, damage: damage || 0 })
 
       this.logger.debug(`Weapon hit: ${weaponCode} (${damage || 0} damage)`)

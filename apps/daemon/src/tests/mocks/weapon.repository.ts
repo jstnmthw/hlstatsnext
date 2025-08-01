@@ -3,7 +3,6 @@
  */
 
 import type { IWeaponRepository } from "@/modules/weapon/weapon.types"
-import type { FindOptions, UpdateOptions } from "@/shared/types/database"
 import { vi } from "vitest"
 
 interface MockWeapon {
@@ -14,6 +13,10 @@ interface MockWeapon {
   modifier: number
   kills: number
   headshots: number
+  shots?: number
+  hits?: number
+  damage?: number
+  [key: string]: unknown // Allow additional properties for mock flexibility
 }
 
 export function createMockWeaponRepository(): IWeaponRepository {
@@ -76,14 +79,26 @@ export function createMockWeaponRepository(): IWeaponRepository {
   }
 
   return {
-    updateWeaponStats: vi.fn(
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async (_weaponCode: string, _updates: Record<string, unknown>, _options?: UpdateOptions) => {
-        // Mock implementation
-      },
-    ),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    findWeaponByCode: vi.fn(async (weaponCode: string, _options?: FindOptions) => {
+    updateWeaponStats: vi.fn(async (weaponCode: string, updates: Record<string, unknown>) => {
+      // Mock implementation that updates the weapon data
+      if (defaultWeaponData[weaponCode]) {
+        // Apply increment operations similar to Prisma
+        Object.entries(updates).forEach(([key, value]) => {
+          const currentWeapon = defaultWeaponData[weaponCode]
+          if (typeof value === "object" && value !== null && "increment" in value) {
+            const incrementValue = (value as { increment: number }).increment
+            if (currentWeapon && typeof currentWeapon[key] === "number") {
+              currentWeapon[key] = (currentWeapon[key] as number) + incrementValue
+            }
+          } else {
+            if (currentWeapon) {
+              currentWeapon[key] = value
+            }
+          }
+        })
+      }
+    }),
+    findWeaponByCode: vi.fn(async (weaponCode: string): Promise<MockWeapon | null> => {
       // Return mock weapon data if it exists
       return defaultWeaponData[weaponCode] || null
     }),

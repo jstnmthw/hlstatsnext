@@ -30,14 +30,11 @@ describe("SagaMonitor", () => {
 
       monitor.onSagaStarted(sagaName, eventId, correlationId)
 
-      expect(logger.debug).toHaveBeenCalledWith(
-        `Saga started: ${sagaName}`,
-        {
-          sagaName,
-          eventId,
-          correlationId,
-        }
-      )
+      expect(logger.debug).toHaveBeenCalledWith(`Saga started: ${sagaName}`, {
+        sagaName,
+        eventId,
+        correlationId,
+      })
     })
 
     it("should log step execution events", () => {
@@ -47,14 +44,11 @@ describe("SagaMonitor", () => {
 
       monitor.onStepExecuted(sagaName, stepName, eventId)
 
-      expect(logger.debug).toHaveBeenCalledWith(
-        `Saga step executed: ${sagaName}.${stepName}`,
-        {
-          sagaName,
-          stepName,
-          eventId,
-        }
-      )
+      expect(logger.debug).toHaveBeenCalledWith(`Saga step executed: ${sagaName}.${stepName}`, {
+        sagaName,
+        stepName,
+        eventId,
+      })
     })
 
     it("should log step compensation events with warning level", () => {
@@ -64,14 +58,11 @@ describe("SagaMonitor", () => {
 
       monitor.onStepCompensated(sagaName, stepName, eventId)
 
-      expect(logger.warn).toHaveBeenCalledWith(
-        `Saga step compensated: ${sagaName}.${stepName}`,
-        {
-          sagaName,
-          stepName,
-          eventId,
-        }
-      )
+      expect(logger.warn).toHaveBeenCalledWith(`Saga step compensated: ${sagaName}.${stepName}`, {
+        sagaName,
+        stepName,
+        eventId,
+      })
     })
   })
 
@@ -161,19 +152,16 @@ describe("SagaMonitor", () => {
 
       monitor.onSagaFailed(result)
 
-      expect(logger.error).toHaveBeenCalledWith(
-        `Saga failed: ${result.sagaName}`,
-        {
-          sagaName: "TestSaga",
-          eventId: "event-123",
-          correlationId: "correlation-456",
-          executionTimeMs: 75,
-          completedSteps: 2,
-          totalSteps: 4,
-          compensatedSteps: 2,
-          error: "Step 3 failed",
-        }
-      )
+      expect(logger.error).toHaveBeenCalledWith(`Saga failed: ${result.sagaName}`, {
+        sagaName: "TestSaga",
+        eventId: "event-123",
+        correlationId: "correlation-456",
+        executionTimeMs: 75,
+        completedSteps: 2,
+        totalSteps: 4,
+        compensatedSteps: 2,
+        error: "Step 3 failed",
+      })
 
       const metrics = monitor.getMetrics("TestSaga")
       expect(metrics).toEqual({
@@ -310,7 +298,7 @@ describe("SagaMonitor", () => {
         },
       ]
 
-      results.forEach(result => {
+      results.forEach((result) => {
         if (result.success) {
           monitor.onSagaCompleted(result)
         } else {
@@ -373,7 +361,7 @@ describe("SagaMonitor", () => {
         },
       ]
 
-      results.forEach(result => monitor.onSagaCompleted(result))
+      results.forEach((result) => monitor.onSagaCompleted(result))
 
       // Verify metrics exist
       expect(monitor.getMetrics("SagaToReset1")).toBeDefined()

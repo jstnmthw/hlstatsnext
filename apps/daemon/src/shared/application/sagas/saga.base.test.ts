@@ -13,12 +13,8 @@ import { EventType } from "@/shared/types/events"
 // Test saga implementation
 class TestSaga extends BaseSaga {
   readonly name = "TestSaga"
-  
-  constructor(
-    logger: ILogger,
-    eventBus: IEventBus,
-    monitor?: ISagaMonitor,
-  ) {
+
+  constructor(logger: ILogger, eventBus: IEventBus, monitor?: ISagaMonitor) {
     super(logger, eventBus, monitor)
     this.initializeSteps()
   }
@@ -51,13 +47,16 @@ class FailingStep implements SagaStep {
 
 class DataMutatingStep implements SagaStep {
   readonly name = "DataMutatingStep"
-  
-  constructor(private dataKey: string, private dataValue: unknown) {}
-  
+
+  constructor(
+    private dataKey: string,
+    private dataValue: unknown,
+  ) {}
+
   async execute(context: SagaContext): Promise<void> {
     context.data[this.dataKey] = this.dataValue
   }
-  
+
   async compensate(context: SagaContext): Promise<void> {
     delete context.data[this.dataKey]
   }
@@ -127,7 +126,7 @@ describe("BaseSaga", () => {
       expect(monitor.onSagaStarted).toHaveBeenCalledWith(
         "TestSaga",
         expect.any(String),
-        expect.any(String)
+        expect.any(String),
       )
       expect(monitor.onStepExecuted).toHaveBeenCalledTimes(3)
       expect(monitor.onSagaCompleted).toHaveBeenCalledWith(
@@ -136,7 +135,7 @@ describe("BaseSaga", () => {
           success: true,
           completedSteps: 3,
           totalSteps: 3,
-        })
+        }),
       )
     })
 
@@ -150,10 +149,10 @@ describe("BaseSaga", () => {
 
       saga.addStep(step1)
       saga.addStep(step2)
-      saga.addStep({ 
-        name: "VerifyStep", 
-        execute: step3, 
-        compensate: vi.fn() 
+      saga.addStep({
+        name: "VerifyStep",
+        execute: step3,
+        compensate: vi.fn(),
       })
 
       const event: BaseEvent = {
@@ -176,10 +175,10 @@ describe("BaseSaga", () => {
         expect(context.correlationId).toMatch(/^\d+-[a-z0-9]+$/)
       })
 
-      saga.addStep({ 
-        name: "CheckIdsStep", 
-        execute: step, 
-        compensate: vi.fn() 
+      saga.addStep({
+        name: "CheckIdsStep",
+        execute: step,
+        compensate: vi.fn(),
       })
 
       const event: BaseEvent = {
@@ -203,10 +202,10 @@ describe("BaseSaga", () => {
         expect(context.correlationId).toBe(providedCorrelationId)
       })
 
-      saga.addStep({ 
-        name: "CheckProvidedIdsStep", 
-        execute: step, 
-        compensate: vi.fn() 
+      saga.addStep({
+        name: "CheckProvidedIdsStep",
+        execute: step,
+        compensate: vi.fn(),
       })
 
       const event: BaseEvent = {
@@ -254,7 +253,7 @@ describe("BaseSaga", () => {
       // Verify compensations were called in reverse order
       expect(step2.compensate).toHaveBeenCalledTimes(1)
       expect(step1.compensate).toHaveBeenCalledTimes(1)
-      
+
       // Step 3 and 4 should not be compensated (3 failed, 4 wasn't executed)
       expect(step3.compensate).not.toHaveBeenCalled()
       expect(step4.compensate).not.toHaveBeenCalled()
@@ -268,7 +267,7 @@ describe("BaseSaga", () => {
           completedSteps: 2,
           totalSteps: 4,
           compensatedSteps: 2,
-        })
+        }),
       )
     })
 
@@ -304,13 +303,13 @@ describe("BaseSaga", () => {
       // Error should be logged for failed compensation
       expect(logger.error).toHaveBeenCalledWith(
         expect.stringContaining("Compensation failed for step FailingCompensationStep"),
-        expect.any(Object)
+        expect.any(Object),
       )
     })
 
     it("should maintain context during compensations", async () => {
       const compensationOrder: string[] = []
-      
+
       const step1 = {
         name: "Step1",
         execute: vi.fn().mockImplementation(async (context: SagaContext) => {
@@ -386,7 +385,7 @@ describe("BaseSaga", () => {
           success: true,
           completedSteps: 0,
           totalSteps: 0,
-        })
+        }),
       )
     })
 
@@ -409,25 +408,25 @@ describe("BaseSaga", () => {
 
       expect(logger.debug).toHaveBeenCalledWith(
         expect.stringContaining("Executing saga step:"),
-        expect.any(Object)
+        expect.any(Object),
       )
     })
 
     it("should preserve original event data", async () => {
       const originalData = { important: "value", nested: { data: true } }
-      
+
       const step = vi.fn().mockImplementation(async (context: SagaContext) => {
         // Verify original event is preserved
         expect(context.originalEvent.data).toEqual(originalData)
-        
+
         // Modifying context data should not affect original
         context.data.modified = true
       })
 
-      saga.addStep({ 
-        name: "PreserveDataStep", 
-        execute: step, 
-        compensate: vi.fn() 
+      saga.addStep({
+        name: "PreserveDataStep",
+        execute: step,
+        compensate: vi.fn(),
       })
 
       const event: BaseEvent = {
@@ -466,7 +465,7 @@ describe("BaseSaga", () => {
       expect(monitor.onSagaFailed).toHaveBeenCalledWith(
         expect.objectContaining({
           error: expect.any(Error),
-        })
+        }),
       )
     })
   })

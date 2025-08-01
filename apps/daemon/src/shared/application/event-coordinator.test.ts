@@ -87,7 +87,9 @@ describe("Event Coordinators", () => {
       }
 
       await expect(coordinator.coordinateEvent(killEvent)).rejects.toThrow("Ranking update failed")
-      expect(logger.error).toHaveBeenCalledWith(expect.stringContaining("Kill event coordination failed"))
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Kill event coordination failed"),
+      )
     })
   })
 
@@ -116,10 +118,10 @@ describe("Event Coordinators", () => {
       await coordinator.coordinateEvent(killEvent)
 
       expect(logger.debug).toHaveBeenCalledWith(
-        `Registered saga TestSaga for event type ${EventType.PLAYER_KILL}`
+        `Registered saga TestSaga for event type ${EventType.PLAYER_KILL}`,
       )
       expect(logger.debug).toHaveBeenCalledWith(
-        `Executing saga TestSaga for event ${EventType.PLAYER_KILL}`
+        `Executing saga TestSaga for event ${EventType.PLAYER_KILL}`,
       )
       expect(mockSaga.execute).toHaveBeenCalledWith(killEvent)
     })
@@ -135,7 +137,7 @@ describe("Event Coordinators", () => {
       await coordinator.coordinateEvent(connectEvent)
 
       expect(logger.debug).toHaveBeenCalledWith(
-        `No saga registered for event type: ${EventType.PLAYER_CONNECT}`
+        `No saga registered for event type: ${EventType.PLAYER_CONNECT}`,
       )
       expect(mockSaga.execute).not.toHaveBeenCalled()
     })
@@ -143,7 +145,7 @@ describe("Event Coordinators", () => {
     it("should handle saga execution errors", async () => {
       const error = new Error("Saga execution failed")
       mockSaga.execute = vi.fn().mockRejectedValueOnce(error)
-      
+
       coordinator.registerSaga(EventType.PLAYER_KILL, mockSaga)
 
       const killEvent: BaseEvent = {
@@ -154,14 +156,14 @@ describe("Event Coordinators", () => {
       }
 
       await expect(coordinator.coordinateEvent(killEvent)).rejects.toThrow("Saga execution failed")
-      
+
       expect(logger.error).toHaveBeenCalledWith(
         `Saga execution failed for ${EventType.PLAYER_KILL}`,
         expect.objectContaining({
           sagaName: "TestSaga",
           eventType: EventType.PLAYER_KILL,
           error: "Saga execution failed",
-        })
+        }),
       )
     })
 
@@ -219,7 +221,7 @@ describe("Event Coordinators", () => {
 
       coordinator = new CompositeEventCoordinator(
         [mockCoordinator1, mockCoordinator2, mockCoordinator3],
-        logger
+        logger,
       )
     })
 
@@ -263,7 +265,7 @@ describe("Event Coordinators", () => {
     it("should handle multiple coordinator failures", async () => {
       const error1 = new Error("Coordinator 1 failed")
       const error3 = new Error("Coordinator 3 failed")
-      
+
       vi.mocked(mockCoordinator1.coordinateEvent).mockRejectedValueOnce(error1)
       vi.mocked(mockCoordinator3.coordinateEvent).mockRejectedValueOnce(error3)
 
@@ -294,19 +296,19 @@ describe("Event Coordinators", () => {
 
     it("should preserve coordinator execution order", async () => {
       const executionOrder: string[] = []
-      
+
       const orderedCoordinator1 = {
         coordinateEvent: vi.fn().mockImplementation(async () => {
           executionOrder.push("coordinator1")
         }),
       }
-      
+
       const orderedCoordinator2 = {
         coordinateEvent: vi.fn().mockImplementation(async () => {
           executionOrder.push("coordinator2")
         }),
       }
-      
+
       const orderedCoordinator3 = {
         coordinateEvent: vi.fn().mockImplementation(async () => {
           executionOrder.push("coordinator3")
@@ -315,7 +317,7 @@ describe("Event Coordinators", () => {
 
       const orderedComposite = new CompositeEventCoordinator(
         [orderedCoordinator1, orderedCoordinator2, orderedCoordinator3],
-        logger
+        logger,
       )
 
       const event: BaseEvent = {

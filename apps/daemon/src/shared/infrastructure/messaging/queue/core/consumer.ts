@@ -195,15 +195,12 @@ export class EventConsumer implements IEventConsumer {
       // Validate message
       await this.messageValidator(message)
 
-      this.logger.queue(
-        `Event received: ${message.payload.eventType}`,
-        {
-          messageId,
-          eventType: message.payload.eventType,
-          queueName,
-          retryCount: message.metadata.routing.retryCount,
-        },
-      )
+      this.logger.queue(`Event received: ${message.payload.eventType}`, {
+        messageId,
+        eventType: message.payload.eventType,
+        queueName,
+        retryCount: message.metadata.routing.retryCount,
+      })
 
       // Process the event
       await this.processor.processEvent(message.payload)

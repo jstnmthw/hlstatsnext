@@ -76,14 +76,18 @@ describe("BaseModuleEventHandler", () => {
     it("should destroy handler successfully", () => {
       handler.destroy()
 
-      expect(logger.debug).toHaveBeenCalledWith("TestModuleEventHandler cleanup completed (queue-only processing)")
+      expect(logger.debug).toHaveBeenCalledWith(
+        "TestModuleEventHandler cleanup completed (queue-only processing)",
+      )
     })
 
     it("should handle destroy with minimal setup", () => {
       const minimalHandler = new TestModuleEventHandler(logger)
-      
+
       expect(() => minimalHandler.destroy()).not.toThrow()
-      expect(logger.debug).toHaveBeenCalledWith("TestModuleEventHandler cleanup completed (queue-only processing)")
+      expect(logger.debug).toHaveBeenCalledWith(
+        "TestModuleEventHandler cleanup completed (queue-only processing)",
+      )
     })
   })
 
@@ -131,7 +135,11 @@ describe("BaseModuleEventHandler", () => {
 
       expect(logger.info).toHaveBeenCalledWith("Testing protected access")
       expect(logger.debug).toHaveBeenCalledWith("Testing protected logger access")
-      expect(metrics.recordProcessingTime).toHaveBeenCalledWith(EventType.PLAYER_KILL, 100, "TestModule")
+      expect(metrics.recordProcessingTime).toHaveBeenCalledWith(
+        EventType.PLAYER_KILL,
+        100,
+        "TestModule",
+      )
     })
   })
 
@@ -144,7 +152,7 @@ describe("BaseModuleEventHandler", () => {
       }
 
       const errorHandler = new ErrorHandler(logger)
-      
+
       expect(() => errorHandler.registerEventHandlers()).toThrow("Registration failed")
     })
 
@@ -159,7 +167,7 @@ describe("BaseModuleEventHandler", () => {
       } as unknown as ILogger
 
       const failingHandler = new TestModuleEventHandler(failingLogger)
-      
+
       expect(() => failingHandler.destroy()).toThrow("Logger failed")
     })
   })
@@ -169,7 +177,9 @@ describe("BaseModuleEventHandler", () => {
       class MetricsTestHandler extends BaseModuleEventHandler {
         registerEventHandlers(): void {
           if (this.metrics) {
-            (this.metrics as unknown as { recordEvent: (name: string, value: number) => void }).recordEvent("test", 1)
+            ;(
+              this.metrics as unknown as { recordEvent: (name: string, value: number) => void }
+            ).recordEvent("test", 1)
             this.logger.info("Metrics available")
           } else {
             this.logger.info("No metrics available")
@@ -187,7 +197,9 @@ describe("BaseModuleEventHandler", () => {
       class MetricsTestHandler extends BaseModuleEventHandler {
         registerEventHandlers(): void {
           if (this.metrics) {
-            (this.metrics as unknown as { recordEvent: (name: string, value: number) => void }).recordEvent("test", 1)
+            ;(
+              this.metrics as unknown as { recordEvent: (name: string, value: number) => void }
+            ).recordEvent("test", 1)
             this.logger.info("Metrics available")
           } else {
             this.logger.info("No metrics available")
@@ -199,7 +211,9 @@ describe("BaseModuleEventHandler", () => {
       handlerWithMetrics.registerEventHandlers()
 
       expect(logger.info).toHaveBeenCalledWith("Metrics available")
-      expect((metrics as unknown as { recordEvent: ReturnType<typeof vi.fn> }).recordEvent).toHaveBeenCalledWith("test", 1)
+      expect(
+        (metrics as unknown as { recordEvent: ReturnType<typeof vi.fn> }).recordEvent,
+      ).toHaveBeenCalledWith("test", 1)
     })
   })
 })

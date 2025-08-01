@@ -6,7 +6,11 @@ import { describe, it, expect, beforeEach, vi } from "vitest"
 import { AmqpChannelAdapter, AmqpConnectionAdapter } from "./adapters"
 import type * as amqp from "amqplib"
 import type { Connection } from "amqplib"
-import type { ConsumeMessage, PublishOptions, ConsumeOptions } from "@/shared/infrastructure/messaging/queue/core/types"
+import type {
+  ConsumeMessage,
+  PublishOptions,
+  ConsumeOptions,
+} from "@/shared/infrastructure/messaging/queue/core/types"
 
 describe("AmqpChannelAdapter", () => {
   let adapter: AmqpChannelAdapter
@@ -45,7 +49,7 @@ describe("AmqpChannelAdapter", () => {
         "test.exchange",
         "test.routing.key",
         content,
-        options
+        options,
       )
     })
 
@@ -59,7 +63,7 @@ describe("AmqpChannelAdapter", () => {
         "test.exchange",
         "test.routing.key",
         content,
-        undefined
+        undefined,
       )
     })
 
@@ -87,7 +91,7 @@ describe("AmqpChannelAdapter", () => {
       expect(mockAmqpChannel.consume).toHaveBeenCalledWith(
         "test.queue",
         expect.any(Function),
-        options
+        options,
       )
     })
 
@@ -100,7 +104,7 @@ describe("AmqpChannelAdapter", () => {
       expect(mockAmqpChannel.consume).toHaveBeenCalledWith(
         "test.queue",
         expect.any(Function),
-        undefined
+        undefined,
       )
     })
 
@@ -245,7 +249,7 @@ describe("AmqpChannelAdapter", () => {
           properties: message.properties,
         },
         false,
-        true
+        true,
       )
     })
 
@@ -272,7 +276,7 @@ describe("AmqpChannelAdapter", () => {
           properties: message.properties,
         },
         undefined,
-        undefined
+        undefined,
       )
     })
   })
@@ -295,11 +299,7 @@ describe("AmqpChannelAdapter", () => {
 
       await adapter.assertExchange("test.exchange", "topic", options)
 
-      expect(mockAmqpChannel.assertExchange).toHaveBeenCalledWith(
-        "test.exchange",
-        "topic",
-        options
-      )
+      expect(mockAmqpChannel.assertExchange).toHaveBeenCalledWith("test.exchange", "topic", options)
     })
 
     it("should assert exchange without options", async () => {
@@ -308,7 +308,7 @@ describe("AmqpChannelAdapter", () => {
       expect(mockAmqpChannel.assertExchange).toHaveBeenCalledWith(
         "test.exchange",
         "direct",
-        undefined
+        undefined,
       )
     })
 
@@ -337,7 +337,7 @@ describe("AmqpChannelAdapter", () => {
       expect(mockAmqpChannel.bindQueue).toHaveBeenCalledWith(
         "test.queue",
         "test.exchange",
-        "test.pattern"
+        "test.pattern",
       )
     })
   })

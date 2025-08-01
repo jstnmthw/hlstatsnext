@@ -64,14 +64,11 @@ describe("EventMetrics", () => {
     it("should log warnings for slow events", () => {
       eventMetrics.recordProcessingTime(EventType.PLAYER_KILL, 1500, "PlayerModule")
 
-      expect(logger.warn).toHaveBeenCalledWith(
-        "Slow event processing detected",
-        {
-          eventType: EventType.PLAYER_KILL,
-          duration: "1500ms",
-          moduleName: "PlayerModule",
-        }
-      )
+      expect(logger.warn).toHaveBeenCalledWith("Slow event processing detected", {
+        eventType: EventType.PLAYER_KILL,
+        duration: "1500ms",
+        moduleName: "PlayerModule",
+      })
     })
 
     it("should not log warnings for fast events", () => {
@@ -115,14 +112,11 @@ describe("EventMetrics", () => {
 
       eventMetrics.recordError(EventType.PLAYER_KILL, error, "PlayerModule")
 
-      expect(logger.error).toHaveBeenCalledWith(
-        "Event processing error recorded",
-        {
-          eventType: EventType.PLAYER_KILL,
-          error: "Test error",
-          moduleName: "PlayerModule",
-        }
-      )
+      expect(logger.error).toHaveBeenCalledWith("Event processing error recorded", {
+        eventType: EventType.PLAYER_KILL,
+        error: "Test error",
+        moduleName: "PlayerModule",
+      })
     })
 
     it("should create module metrics entry when recording error for new module", () => {
@@ -247,7 +241,7 @@ describe("EventMetrics", () => {
             eventType: EventType.PLAYER_KILL,
             errorCount: 2,
           },
-        })
+        }),
       )
     })
 
@@ -260,7 +254,7 @@ describe("EventMetrics", () => {
         expect.objectContaining({
           slowestEventType: "None",
           mostErrorProneEventType: "None",
-        })
+        }),
       )
     })
   })
@@ -326,7 +320,7 @@ describe("EventMetrics", () => {
         "Slow event processing detected",
         expect.objectContaining({
           duration: `${largeTime}ms`,
-        })
+        }),
       )
     })
 
@@ -339,7 +333,10 @@ describe("EventMetrics", () => {
     })
 
     it("should handle errors with undefined or null messages", () => {
-      const errorWithUndefinedMessage = { name: "TestError", message: undefined } as unknown as Error
+      const errorWithUndefinedMessage = {
+        name: "TestError",
+        message: undefined,
+      } as unknown as Error
       const errorWithNullMessage = { name: "TestError", message: null } as unknown as Error
 
       eventMetrics.recordError(EventType.PLAYER_KILL, errorWithUndefinedMessage)

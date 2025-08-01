@@ -53,10 +53,9 @@ describe("ModuleRegistry", () => {
     it("should register a module successfully", () => {
       registry.register(module1)
 
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        "Registered module handler: PlayerModule",
-        { handledEvents: [EventType.PLAYER_KILL, EventType.PLAYER_CONNECT] }
-      )
+      expect(mockLogger.info).toHaveBeenCalledWith("Registered module handler: PlayerModule", {
+        handledEvents: [EventType.PLAYER_KILL, EventType.PLAYER_CONNECT],
+      })
       expect(registry.hasModule("PlayerModule")).toBe(true)
     })
 
@@ -71,7 +70,7 @@ describe("ModuleRegistry", () => {
       registry.register(duplicateModule)
 
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        "Module PlayerModule is already registered, replacing"
+        "Module PlayerModule is already registered, replacing",
       )
       expect(registry.getModule("PlayerModule")).toBe(duplicateModule)
     })
@@ -105,7 +104,7 @@ describe("ModuleRegistry", () => {
       registry.unregister("UnknownModule")
 
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        "Attempted to unregister unknown module: UnknownModule"
+        "Attempted to unregister unknown module: UnknownModule",
       )
     })
 
@@ -234,10 +233,9 @@ describe("ModuleRegistry", () => {
       })
 
       await expect(registry.initializeAll()).rejects.toThrow("Initialization failed")
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "Failed to initialize module ErrorModule",
-        { error: "Initialization failed" }
-      )
+      expect(mockLogger.error).toHaveBeenCalledWith("Failed to initialize module ErrorModule", {
+        error: "Initialization failed",
+      })
     })
   })
 
@@ -266,10 +264,9 @@ describe("ModuleRegistry", () => {
 
       await registry.destroyAll()
 
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "Failed to destroy module PlayerModule",
-        { error: "Destroy failed" }
-      )
+      expect(mockLogger.error).toHaveBeenCalledWith("Failed to destroy module PlayerModule", {
+        error: "Destroy failed",
+      })
       expect(mockHandler2.destroy).toHaveBeenCalledTimes(1) // Should continue with other modules
       expect(registry.getAllModules()).toHaveLength(0) // Registry should still be cleared
     })
@@ -334,12 +331,12 @@ describe("ModuleRegistry", () => {
       const stats = registry.getStats()
 
       expect(stats.duplicateHandlers).toHaveLength(2)
-      
+
       const killDuplicate = stats.duplicateHandlers.find(
-        d => d.eventType === EventType.PLAYER_KILL
+        (d) => d.eventType === EventType.PLAYER_KILL,
       )
       const chatDuplicate = stats.duplicateHandlers.find(
-        d => d.eventType === EventType.CHAT_MESSAGE
+        (d) => d.eventType === EventType.CHAT_MESSAGE,
       )
 
       expect(killDuplicate?.handlers).toContain("PlayerModule")
@@ -430,7 +427,7 @@ describe("ModuleRegistry", () => {
       await expect(registry.initializeAll()).rejects.toThrow("String error")
       expect(mockLogger.error).toHaveBeenCalledWith(
         "Failed to initialize module StringErrorModule",
-        { error: "String error" }
+        { error: "String error" },
       )
     })
 
@@ -443,10 +440,9 @@ describe("ModuleRegistry", () => {
 
       await registry.destroyAll()
 
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "Failed to destroy module PlayerModule",
-        { error: "String destroy error" }
-      )
+      expect(mockLogger.error).toHaveBeenCalledWith("Failed to destroy module PlayerModule", {
+        error: "String destroy error",
+      })
     })
   })
 })

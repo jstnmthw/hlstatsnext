@@ -62,7 +62,7 @@ describe("EventProcessor", () => {
 
       expect(eventBus.on).toHaveBeenCalledTimes(3) // PLAYER_ENTRY, PLAYER_CHANGE_TEAM, PLAYER_CHANGE_ROLE
       expect(dependencies.logger.info).toHaveBeenCalledWith(
-        "EventProcessor registered 3 event handlers"
+        "EventProcessor registered 3 event handlers",
       )
     })
 
@@ -92,13 +92,13 @@ describe("EventProcessor", () => {
       expect(eventBus.off).toHaveBeenCalledWith("handler-id-123")
       expect(eventBus.off).toHaveBeenCalledTimes(3)
       expect(dependencies.logger.info).toHaveBeenCalledWith(
-        "EventProcessor unregistered all event handlers"
+        "EventProcessor unregistered all event handlers",
       )
     })
 
     it("should clear handler IDs array", () => {
       eventProcessor.destroy()
-      
+
       // Call destroy again to ensure no handlers are left
       eventProcessor.destroy()
       expect(eventBus.off).toHaveBeenCalledTimes(3) // Should still be 3 from first call
@@ -145,11 +145,11 @@ describe("EventProcessor", () => {
 
     beforeEach(() => {
       eventProcessor = new EventProcessor(eventBus, dependencies)
-      
+
       // Get the event handler that was registered
-      const onCall = vi.mocked(eventBus.on).mock.calls.find(
-        call => call[0] === EventType.PLAYER_ENTRY
-      )
+      const onCall = vi
+        .mocked(eventBus.on)
+        .mock.calls.find((call) => call[0] === EventType.PLAYER_ENTRY)
       eventHandler = onCall?.[1] as (event: BaseEvent) => Promise<void>
     })
 
@@ -169,13 +169,13 @@ describe("EventProcessor", () => {
       await eventHandler(playerEvent)
 
       expect(dependencies.logger.debug).toHaveBeenCalledWith(
-        "Processing player event: PLAYER_ENTRY for server 1"
+        "Processing player event: PLAYER_ENTRY for server 1",
       )
       expect(dependencies.serverService.getServerGame).toHaveBeenCalledWith(1)
       expect(dependencies.playerService.getOrCreatePlayer).toHaveBeenCalledWith(
         "STEAM_1:0:12345",
         "TestPlayer",
-        "csgo"
+        "csgo",
       )
       expect(dependencies.playerService.handlePlayerEvent).toHaveBeenCalled()
     })
@@ -207,7 +207,7 @@ describe("EventProcessor", () => {
       await expect(eventHandler(playerEvent)).rejects.toThrow("Player service failed")
 
       expect(dependencies.logger.error).toHaveBeenCalledWith(
-        "Failed to process player event PLAYER_ENTRY: Error: Player service failed"
+        "Failed to process player event PLAYER_ENTRY: Error: Player service failed",
       )
     })
   })
@@ -217,10 +217,10 @@ describe("EventProcessor", () => {
 
     beforeEach(() => {
       eventProcessor = new EventProcessor(eventBus, dependencies)
-      
-      const onCall = vi.mocked(eventBus.on).mock.calls.find(
-        call => call[0] === EventType.PLAYER_ENTRY
-      )
+
+      const onCall = vi
+        .mocked(eventBus.on)
+        .mock.calls.find((call) => call[0] === EventType.PLAYER_ENTRY)
       eventHandler = onCall?.[1] as (event: BaseEvent) => Promise<void>
     })
 
@@ -242,11 +242,12 @@ describe("EventProcessor", () => {
       expect(dependencies.playerService.getOrCreatePlayer).toHaveBeenCalledWith(
         "STEAM_1:0:12345",
         "TestPlayer",
-        "csgo"
+        "csgo",
       )
 
       // Check that the resolved event includes the player ID
-      const handlePlayerEventCall = vi.mocked(dependencies.playerService.handlePlayerEvent).mock.calls[0]
+      const handlePlayerEventCall = vi.mocked(dependencies.playerService.handlePlayerEvent).mock
+        .calls[0]
       expect(handlePlayerEventCall?.[0].data).toEqual({
         existingData: true,
         playerId: 42,
@@ -272,9 +273,9 @@ describe("EventProcessor", () => {
       await eventHandler(playerEvent)
 
       expect(dependencies.logger.error).toHaveBeenCalledWith(
-        "Failed to resolve player IDs for event PLAYER_ENTRY: Error: Database connection failed"
+        "Failed to resolve player IDs for event PLAYER_ENTRY: Error: Database connection failed",
       )
-      
+
       // Should still process the event with original data
       expect(dependencies.playerService.handlePlayerEvent).toHaveBeenCalledWith(playerEvent)
     })
@@ -325,15 +326,16 @@ describe("EventProcessor", () => {
       expect(dependencies.playerService.getOrCreatePlayer).toHaveBeenCalledWith(
         "STEAM_1:0:11111",
         "Killer",
-        "csgo"
+        "csgo",
       )
       expect(dependencies.playerService.getOrCreatePlayer).toHaveBeenCalledWith(
         "STEAM_1:0:22222",
         "Victim",
-        "csgo"
+        "csgo",
       )
 
-      const handlePlayerEventCall = vi.mocked(dependencies.playerService.handlePlayerEvent).mock.calls[0]
+      const handlePlayerEventCall = vi.mocked(dependencies.playerService.handlePlayerEvent).mock
+        .calls[0]
       expect(handlePlayerEventCall?.[0].data).toEqual({
         weapon: "ak47",
         killerId: 100,
@@ -367,7 +369,7 @@ describe("EventProcessor", () => {
       expect(dependencies.playerService.getOrCreatePlayer).toHaveBeenCalledWith(
         "STEAM_1:0:11111",
         "Killer",
-        "csgo"
+        "csgo",
       )
     })
   })
@@ -399,10 +401,10 @@ describe("EventProcessor", () => {
 
     beforeEach(() => {
       eventProcessor = new EventProcessor(eventBus, dependencies)
-      
-      const onCall = vi.mocked(eventBus.on).mock.calls.find(
-        call => call[0] === EventType.PLAYER_ENTRY
-      )
+
+      const onCall = vi
+        .mocked(eventBus.on)
+        .mock.calls.find((call) => call[0] === EventType.PLAYER_ENTRY)
       eventHandler = onCall?.[1] as (event: BaseEvent) => Promise<void>
     })
 
@@ -427,7 +429,7 @@ describe("EventProcessor", () => {
       expect(dependencies.playerService.getOrCreatePlayer).toHaveBeenCalledWith(
         "STEAM_1:0:12345",
         "TestPlayer",
-        "css"
+        "css",
       )
     })
 
@@ -450,7 +452,7 @@ describe("EventProcessor", () => {
       await eventHandler(playerEvent)
 
       expect(dependencies.logger.error).toHaveBeenCalledWith(
-        "Failed to resolve player IDs for event PLAYER_ENTRY: Error: Server not found"
+        "Failed to resolve player IDs for event PLAYER_ENTRY: Error: Server not found",
       )
     })
   })

@@ -7,6 +7,7 @@ This document explains the complete event lifecycle in the HLStats daemon, from 
 ## Event Lifecycle Stages
 
 ### 1. 🌐 **EMIT** (Event Creation)
+
 **Location**: `IngressService.processLogLine()`  
 **Log Level**: `QUEUE`  
 **Log Message**: `Event emitted: PLAYER_KILL`
@@ -15,7 +16,7 @@ This document explains the complete event lifecycle in the HLStats daemon, from 
 // Raw UDP log line received: "L 10/15/2023 - 10:15:32: Player<1><STEAM_1:0:123><CT> killed Player<2><STEAM_1:0:456><T> with ak47"
 const event = await this.processRawEvent(logLine.trim(), serverAddress, serverPort)
 if (event) {
-  await this.eventPublisher.publish(event)  // ← Event emitted here
+  await this.eventPublisher.publish(event) // ← Event emitted here
   this.logger.queue(`Event emitted: ${event.eventType}`, {
     eventType: event.eventType,
     serverId: event.serverId,
@@ -25,6 +26,7 @@ if (event) {
 ```
 
 **What Happens**:
+
 - Raw log line is parsed by game-specific parser (CS, DOD, etc.)
 - Structured event object is created with proper typing
 - Event is validated and enriched with metadata
@@ -35,6 +37,7 @@ if (event) {
 ---
 
 ### 2. 📤 **PUBLISHED** (Queue Publishing)
+
 **Location**: `EventPublisher.publish()`  
 **Log Level**: `QUEUE`  
 **Log Message**: `Event published: PLAYER_KILL`
@@ -42,8 +45,8 @@ if (event) {
 ```typescript
 // Event is serialized and published to RabbitMQ
 const published = await channel.publish(
-  "hlstats.events",                    // Exchange
-  routingKey,                          // Queue routing key
+  "hlstats.events", // Exchange
+  routingKey, // Queue routing key
   Buffer.from(JSON.stringify(message)), // Serialized event
   {
     persistent: true,
@@ -54,7 +57,7 @@ const published = await channel.publish(
       "x-server-id": event.serverId,
       "x-routing-key": routingKey,
     },
-  }
+  },
 )
 
 this.logger.queue(`Event published: ${event.eventType}`, {
@@ -67,6 +70,7 @@ this.logger.queue(`Event published: ${event.eventType}`, {
 ```
 
 **What Happens**:
+
 - Event is wrapped in queue message format with metadata
 - Message is routed to appropriate queue based on priority
 - Event is persisted in RabbitMQ for reliable delivery
@@ -77,6 +81,7 @@ this.logger.queue(`Event published: ${event.eventType}`, {
 ---
 
 ### 3. 📥 **RECEIVED** (Queue Consumption)
+
 **Location**: `EventConsumer.handleMessage()`  
 **Log Level**: `QUEUE`  
 **Log Message**: `Event received: PLAYER_KILL`
@@ -98,6 +103,7 @@ await this.processor.processEvent(message.payload)
 ```
 
 **What Happens**:
+
 - Message is dequeued from RabbitMQ
 - Message is parsed and validated
 - Event payload is extracted from message wrapper
@@ -108,6 +114,7 @@ await this.processor.processEvent(message.payload)
 ---
 
 ### 4. ⚙️ **PROCESSING** (Business Logic Start)
+
 **Location**: `RabbitMQEventProcessor.processEvent()`  
 **Log Level**: `QUEUE`  
 **Log Message**: `Processing event: PLAYER_KILL`
@@ -129,6 +136,7 @@ this.logger.queue(`Processing event: ${processedEvent.eventType}`, {
 ```
 
 **What Happens**:
+
 - Event IDs and correlation IDs are ensured
 - Event enters the business logic processing pipeline
 - Module handlers and coordinators are about to be invoked
@@ -138,6 +146,7 @@ this.logger.queue(`Processing event: ${processedEvent.eventType}`, {
 ---
 
 ### 5. ✅ **PROCESSED** (Business Logic Complete)
+
 **Location**: `RabbitMQEventProcessor.processEvent()`  
 **Log Level**: `INFO` (not QUEUE!)  
 **Log Message**: `Event processed: PLAYER_KILL`
@@ -164,6 +173,7 @@ try {
 ```
 
 **What Happens**:
+
 - **Module Handlers**: Business logic like chat message persistence, player updates
 - **Coordinators**: Complex workflows like kill tracking, ranking updates
 - **Sagas**: Multi-step business processes like weapon statistics
@@ -177,12 +187,14 @@ try {
 ## Log Level Distinction
 
 ### **QUEUE** Logs (Magenta)
+
 - Infrastructure and transport operations
 - Queue publishing, consuming, routing
 - Message broker interactions
 - Event flow through messaging system
 
 ### **INFO** Logs (Standard)
+
 - Business logic completion
 - Successful persistence operations
 - Application-level milestones
@@ -203,26 +215,31 @@ try {
 ## Debugging Guide
 
 ### **Missing "Emitted" Logs**
+
 - Check UDP server connectivity
 - Verify log parsing logic in game parsers
 - Look for authentication failures
 
-### **Missing "Published" Logs**  
+### **Missing "Published" Logs**
+
 - Check RabbitMQ connection health
 - Verify exchange and queue topology
 - Look for publishing errors or timeouts
 
 ### **Missing "Received" Logs**
+
 - Check RabbitMQ consumer status
 - Verify queue bindings and routing keys
 - Look for message validation failures
 
 ### **Missing "Processing" Logs**
+
 - Check event processor initialization
 - Verify module registry setup
 - Look for coordinator startup issues
 
 ### **Missing "Processed" Logs**
+
 - Check module handler implementations
 - Verify database connectivity
 - Look for saga execution failures
@@ -231,6 +248,7 @@ try {
 ## Performance Monitoring
 
 ### **Key Metrics**
+
 - **Emit Rate**: Events per second from ingress
 - **Publish Latency**: Emit → Published time (should be 1-5ms)
 - **Queue Depth**: Published - Received events
@@ -238,6 +256,7 @@ try {
 - **Success Rate**: Processed / Received ratio
 
 ### **Health Indicators**
+
 - **Published count ≈ Processed count** (over time)
 - **Low queue depth** (< 1000 messages)
 - **Fast processing times** (< 100ms average)

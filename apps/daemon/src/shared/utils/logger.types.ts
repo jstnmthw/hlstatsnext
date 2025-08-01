@@ -1,3 +1,5 @@
+import { LogLevel } from "./logger"
+
 /**
  * Interface for the Logger class.
  * This allows for dependency injection and mocking of the logger in tests.
@@ -28,7 +30,7 @@ export interface ILogger {
   enableTimestamps(): void
   disableColors(): void
   setColorsEnabled(enabled: boolean): void
-  getLogLevel(): import("./logger").LogLevel
-  setLogLevel(level: import("./logger").LogLevel): void
+  getLogLevel(): LogLevel
+  setLogLevel(level: LogLevel): void
   setLogLevelFromString(level: string): void
 }

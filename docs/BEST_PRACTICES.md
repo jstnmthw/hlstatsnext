@@ -1703,27 +1703,6 @@ const player = playerFactory.build({ rating: 1500 })
 const players = playerFactory.buildList(10)
 ```
 
-**Fixtures**:
-
-```typescript
-// tests/fixtures/database.ts
-export async function seedTestDatabase() {
-  await prisma.$transaction([
-    prisma.player.createMany({ data: testPlayers }),
-    prisma.server.createMany({ data: testServers }),
-    prisma.gameEvent.createMany({ data: testEvents }),
-  ])
-}
-
-export async function cleanupDatabase() {
-  await prisma.$transaction([
-    prisma.gameEvent.deleteMany(),
-    prisma.player.deleteMany(),
-    prisma.server.deleteMany(),
-  ])
-}
-```
-
 ---
 
 ## **5. Performance Guidelines**

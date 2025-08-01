@@ -10,17 +10,7 @@ import { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-ha
 import type { BaseEvent, PlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
-import type {
-  IPlayerService,
-  PlayerConnectEvent,
-  PlayerDisconnectEvent,
-  PlayerChangeNameEvent,
-  PlayerChatEvent,
-  PlayerEntryEvent,
-  PlayerChangeTeamEvent,
-  PlayerChangeRoleEvent,
-  PlayerEvent,
-} from "@/modules/player/player.types"
+import type { IPlayerService, PlayerEvent } from "@/modules/player/player.types"
 import type { IServerService } from "@/modules/server/server.types"
 
 export class PlayerEventHandler extends BaseModuleEventHandler {
@@ -31,49 +21,14 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
     metrics?: EventMetrics,
   ) {
     super(logger, metrics)
-    this.registerEventHandlers()
   }
 
-  registerEventHandlers(): void {
-    // Note: All player events have been migrated to queue-only processing
-    // - PLAYER_CONNECT, PLAYER_DISCONNECT, PLAYER_CHANGE_NAME, CHAT_MESSAGE
-    // - PLAYER_ENTRY, PLAYER_CHANGE_TEAM, PLAYER_CHANGE_ROLE
-    // These are now handled via RabbitMQConsumer and no longer use EventBus
-  }
-
-  // Queue-compatible handler methods (called by RabbitMQConsumer)
-  async handlePlayerConnect(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds<PlayerConnectEvent>(event)
-    await this.playerService.handlePlayerEvent(resolvedEvent)
-  }
-
-  async handlePlayerDisconnect(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds<PlayerDisconnectEvent>(event)
-    await this.playerService.handlePlayerEvent(resolvedEvent)
-  }
-
-  async handlePlayerChangeName(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds<PlayerChangeNameEvent>(event)
-    await this.playerService.handlePlayerEvent(resolvedEvent)
-  }
-
-  async handleChatMessage(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds<PlayerChatEvent>(event)
-    await this.playerService.handlePlayerEvent(resolvedEvent)
-  }
-
-  async handlePlayerEntry(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds<PlayerEntryEvent>(event)
-    await this.playerService.handlePlayerEvent(resolvedEvent)
-  }
-
-  async handlePlayerChangeTeam(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds<PlayerChangeTeamEvent>(event)
-    await this.playerService.handlePlayerEvent(resolvedEvent)
-  }
-
-  async handlePlayerChangeRole(event: BaseEvent): Promise<void> {
-    const resolvedEvent = await this.resolvePlayerIds<PlayerChangeRoleEvent>(event)
+  /**
+   * Single event handler for all player events
+   * This is much cleaner than having multiple methods that do the same thing
+   */
+  async handleEvent(event: BaseEvent): Promise<void> {
+    const resolvedEvent = await this.resolvePlayerIds(event)
     await this.playerService.handlePlayerEvent(resolvedEvent)
   }
 
@@ -81,21 +36,21 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
    * Resolve Steam IDs to database player IDs for events that contain player references
    * This is moved from EventProcessor to make the player module self-contained
    */
-  private async resolvePlayerIds<T extends PlayerEvent>(event: BaseEvent): Promise<T> {
+  private async resolvePlayerIds(event: BaseEvent): Promise<PlayerEvent> {
     // Only resolve for events that have player data
     if (!event.meta || typeof event.meta !== "object") {
       // For events without meta, create a minimal resolved event with just playerId if needed
       return {
         ...event,
         data: { ...((event.data as Record<string, unknown>) ?? {}), playerId: 0 },
-      } as T
+      } as PlayerEvent
     }
 
     const meta = event.meta
-    const resolvedEvent = { ...event } as T
+    const resolvedEvent = { ...event } as PlayerEvent
 
     if (!meta || typeof meta !== "object") {
-      return event as T
+      return event as PlayerEvent
     }
 
     try {
@@ -116,7 +71,7 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
       return resolvedEvent
     } catch (error) {
       this.logger.error(`Failed to resolve player IDs for event ${event.eventType}: ${error}`)
-      return event as T // Return original event if resolution fails
+      return event as PlayerEvent // Return original event if resolution fails
     }
   }
 }

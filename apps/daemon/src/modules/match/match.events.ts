@@ -19,15 +19,7 @@ export class MatchEventHandler extends BaseModuleEventHandler {
     metrics?: EventMetrics,
   ) {
     super(logger, metrics)
-    this.registerEventHandlers()
-  }
-
-  registerEventHandlers(): void {
-    // All match events have been migrated to queue-only processing (Phase 2 & 3)
-    // - Match lifecycle: ROUND_START, ROUND_END, TEAM_WIN, MAP_CHANGE
-    // - Objective events: BOMB_*, HOSTAGE_*, FLAG_*, CONTROL_POINT_*
-    // - Kill events: PLAYER_KILL
-    // These are now handled via RabbitMQConsumer and no longer use EventBus
+    // No event registration needed - all events handled via RabbitMQ queue
   }
 
   // Queue-compatible handler methods (called by RabbitMQConsumer)

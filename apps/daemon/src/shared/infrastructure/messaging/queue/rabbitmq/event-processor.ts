@@ -101,22 +101,36 @@ export class RabbitMQEventProcessor implements IEventProcessor {
         // Get the handler instance (e.g., PlayerEventHandler)
         const handler = moduleHandler.handler as BaseModuleEventHandler & Record<string, unknown>
 
-        // Call the appropriate handler method based on event type
-        const eventTypeParts = event.eventType.split("_")
-        const handlerMethodName = `handle${eventTypeParts
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-          .join("")}`
+        // Try to call handler methods in order of preference:
+        // 1. Generic handleEvent method (cleanest approach)
+        // 2. Specific handler method based on event type (legacy support)
+        
+        let methodCalled = false
+        
+        if (handler.handleEvent && typeof handler.handleEvent === "function") {
+          await handler.handleEvent(event)
+          methodCalled = true
+        } else {
+          // Fallback to specific handler method for backward compatibility
+          const eventTypeParts = event.eventType.split("_")
+          const handlerMethodName = `handle${eventTypeParts
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join("")}`
 
-        if (handler[handlerMethodName] && typeof handler[handlerMethodName] === "function") {
-          await handler[handlerMethodName](event)
+          if (handler[handlerMethodName] && typeof handler[handlerMethodName] === "function") {
+            await handler[handlerMethodName](event)
+            methodCalled = true
+          }
+        }
 
+        if (methodCalled) {
           const processingTime = Date.now() - startTime
           this.logger.debug(
             `Module ${moduleHandler.name} processed event ${event.eventType} successfully in ${processingTime}ms`,
           )
         } else {
           this.logger.warn(
-            `No handler method ${handlerMethodName} found in ${moduleHandler.name} for event ${event.eventType}`,
+            `No handler method found in ${moduleHandler.name} for event ${event.eventType}`,
           )
         }
       } catch (error) {

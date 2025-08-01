@@ -18,14 +18,7 @@ export class WeaponEventHandler extends BaseModuleEventHandler {
     metrics?: EventMetrics,
   ) {
     super(logger, metrics)
-    this.registerEventHandlers()
-  }
-
-  registerEventHandlers(): void {
-    // All weapon events have been migrated to queue-only processing (Phase 1 & 3)
-    // - Direct weapon events: WEAPON_FIRE, WEAPON_HIT (Phase 1)
-    // - Kill events: PLAYER_KILL (Phase 3)
-    // These are now handled via RabbitMQConsumer and no longer use EventBus
+    // No event registration needed - all events handled via RabbitMQ queue
   }
 
   // Queue-compatible handler methods (called by RabbitMQConsumer)

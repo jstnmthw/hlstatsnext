@@ -17,15 +17,7 @@ export class ServerEventHandler extends BaseModuleEventHandler {
     metrics?: EventMetrics,
   ) {
     super(logger, metrics)
-    this.registerEventHandlers()
-  }
-
-  registerEventHandlers(): void {
-    // All server events have been migrated to queue-only processing (Phase 4)
-    // - SERVER_SHUTDOWN: Queue-only server lifecycle management
-    // - ADMIN_ACTION: Queue-only administrative actions
-    // - SERVER_STATS_UPDATE: Queue-only periodic statistics (already migrated)
-    // These are now handled via RabbitMQConsumer and no longer use EventBus
+    // No event registration needed - all events handled via RabbitMQ queue
   }
 
   // All EventBus handlers removed - server events are now queue-only (Phase 4)

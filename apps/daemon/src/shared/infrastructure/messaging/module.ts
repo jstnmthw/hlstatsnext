@@ -300,6 +300,7 @@ export function createDevelopmentRabbitMQConfig(url?: string): RabbitMQConfig {
         bindings: [
           "player.connect",
           "player.disconnect",
+          "player.entry",
           "player.change.*",
           "chat.*",
           "admin.*",

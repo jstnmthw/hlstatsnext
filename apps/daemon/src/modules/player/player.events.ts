@@ -25,8 +25,9 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
   }
 
   registerEventHandlers(): void {
-    // Note: All simple player events have been migrated to queue-only processing
+    // Note: All player events have been migrated to queue-only processing
     // - PLAYER_CONNECT, PLAYER_DISCONNECT, PLAYER_CHANGE_NAME, CHAT_MESSAGE
+    // - PLAYER_ENTRY, PLAYER_CHANGE_TEAM, PLAYER_CHANGE_ROLE
     // These are now handled via RabbitMQConsumer and no longer use EventBus
   }
 
@@ -50,6 +51,24 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
   }
 
   async handleChatMessage(event: BaseEvent): Promise<void> {
+    const resolvedEvent = await this.resolvePlayerIds(event)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+  }
+
+  async handlePlayerEntry(event: BaseEvent): Promise<void> {
+    const resolvedEvent = await this.resolvePlayerIds(event)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+  }
+
+  async handlePlayerChangeTeam(event: BaseEvent): Promise<void> {
+    const resolvedEvent = await this.resolvePlayerIds(event)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.playerService.handlePlayerEvent(resolvedEvent as any)
+  }
+
+  async handlePlayerChangeRole(event: BaseEvent): Promise<void> {
     const resolvedEvent = await this.resolvePlayerIds(event)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await this.playerService.handlePlayerEvent(resolvedEvent as any)

@@ -4,8 +4,14 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { RabbitMQClient } from "./client"
-import type { RabbitMQConfig, QueueChannel } from "@/shared/infrastructure/messaging/queue/core/types"
-import { QueueConnectionError, QueueError } from "@/shared/infrastructure/messaging/queue/core/types"
+import type {
+  RabbitMQConfig,
+  QueueChannel,
+} from "@/shared/infrastructure/messaging/queue/core/types"
+import {
+  QueueConnectionError,
+  QueueError,
+} from "@/shared/infrastructure/messaging/queue/core/types"
 import type { Connection } from "amqplib"
 import type { ILogger } from "@/shared/utils/logger.types"
 
@@ -67,8 +73,16 @@ describe.skip("RabbitMQClient", () => {
         maxDelay: 30000,
       },
       queues: {
-        priority: { name: "test.priority", bindings: [], options: { durable: true, autoDelete: false } },
-        standard: { name: "test.standard", bindings: [], options: { durable: true, autoDelete: false } },
+        priority: {
+          name: "test.priority",
+          bindings: [],
+          options: { durable: true, autoDelete: false },
+        },
+        standard: {
+          name: "test.standard",
+          bindings: [],
+          options: { durable: true, autoDelete: false },
+        },
         bulk: { name: "test.bulk", bindings: [], options: { durable: true, autoDelete: false } },
       },
     }
@@ -104,7 +118,9 @@ describe.skip("RabbitMQClient", () => {
       const connectPromise2 = client.connect()
 
       await expect(connectPromise1).resolves.toBeUndefined()
-      await expect(connectPromise2).rejects.toThrow(new QueueError("Connection already in progress"))
+      await expect(connectPromise2).rejects.toThrow(
+        new QueueError("Connection already in progress"),
+      )
     })
 
     it("should prevent connecting when already connected", async () => {
@@ -127,8 +143,12 @@ describe.skip("RabbitMQClient", () => {
       await client.connect()
 
       expect(mockConnect).toHaveBeenCalledTimes(3)
-      expect(mockLogger.warn).toHaveBeenCalledWith("Connection attempt 1 failed: Error: Connection refused")
-      expect(mockLogger.warn).toHaveBeenCalledWith("Connection attempt 2 failed: Error: Connection refused")
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        "Connection attempt 1 failed: Error: Connection refused",
+      )
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        "Connection attempt 2 failed: Error: Connection refused",
+      )
       expect(mockLogger.info).toHaveBeenCalledWith("RabbitMQ connection established successfully")
     })
 
@@ -138,7 +158,7 @@ describe.skip("RabbitMQClient", () => {
 
       await expect(client.connect()).rejects.toThrow(QueueConnectionError)
       expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to establish RabbitMQ connection")
+        expect.stringContaining("Failed to establish RabbitMQ connection"),
       )
       expect(mockConnect).toHaveBeenCalledTimes(3) // maxAttempts
     })
@@ -181,7 +201,7 @@ describe.skip("RabbitMQClient", () => {
       await client.disconnect()
 
       await expect(client.createChannel("test-channel")).rejects.toThrow(
-        new QueueError("No active connection")
+        new QueueError("No active connection"),
       )
     })
   })
@@ -240,10 +260,26 @@ describe.skip("RabbitMQClient", () => {
       await client.connect()
 
       // Verify some key bindings
-      expect(mockChannel.bindQueue).toHaveBeenCalledWith("hlstats.events.priority", "hlstats.events", "player.kill")
-      expect(mockChannel.bindQueue).toHaveBeenCalledWith("hlstats.events.standard", "hlstats.events", "player.connect")
-      expect(mockChannel.bindQueue).toHaveBeenCalledWith("hlstats.events.bulk", "hlstats.events", "weapon.*")
-      expect(mockChannel.bindQueue).toHaveBeenCalledWith("hlstats.events.dlq", "hlstats.events.dlx", "#")
+      expect(mockChannel.bindQueue).toHaveBeenCalledWith(
+        "hlstats.events.priority",
+        "hlstats.events",
+        "player.kill",
+      )
+      expect(mockChannel.bindQueue).toHaveBeenCalledWith(
+        "hlstats.events.standard",
+        "hlstats.events",
+        "player.connect",
+      )
+      expect(mockChannel.bindQueue).toHaveBeenCalledWith(
+        "hlstats.events.bulk",
+        "hlstats.events",
+        "weapon.*",
+      )
+      expect(mockChannel.bindQueue).toHaveBeenCalledWith(
+        "hlstats.events.dlq",
+        "hlstats.events.dlx",
+        "#",
+      )
 
       expect(mockLogger.debug).toHaveBeenCalledWith("Queue bindings created successfully")
     })
@@ -261,9 +297,21 @@ describe.skip("RabbitMQClient", () => {
           maxDelay: 60000,
         },
         queues: {
-          priority: { name: "custom.priority", bindings: [], options: { durable: true, autoDelete: false } },
-          standard: { name: "custom.standard", bindings: [], options: { durable: true, autoDelete: false } },
-          bulk: { name: "custom.bulk", bindings: [], options: { durable: true, autoDelete: false } },
+          priority: {
+            name: "custom.priority",
+            bindings: [],
+            options: { durable: true, autoDelete: false },
+          },
+          standard: {
+            name: "custom.standard",
+            bindings: [],
+            options: { durable: true, autoDelete: false },
+          },
+          bulk: {
+            name: "custom.bulk",
+            bindings: [],
+            options: { durable: true, autoDelete: false },
+          },
         },
       }
 
@@ -295,7 +343,7 @@ describe.skip("RabbitMQClient", () => {
 
       await expect(client.connect()).rejects.toThrow(QueueConnectionError)
       expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to establish RabbitMQ connection")
+        expect.stringContaining("Failed to establish RabbitMQ connection"),
       )
     })
   })

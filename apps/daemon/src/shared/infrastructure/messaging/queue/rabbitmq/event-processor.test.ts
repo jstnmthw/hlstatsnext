@@ -56,15 +56,12 @@ describe("RabbitMQEventProcessor", () => {
 
       await processor.processEvent(event)
 
-      expect(mockLogger.queue).toHaveBeenCalledWith(
-        "Processing event: PLAYER_KILL",
-        {
-          eventId: "existing-event-123",
-          correlationId: "existing-corr-456",
-          eventType: EventType.PLAYER_KILL,
-          serverId: 1,
-        }
-      )
+      expect(mockLogger.queue).toHaveBeenCalledWith("Processing event: PLAYER_KILL", {
+        eventId: "existing-event-123",
+        correlationId: "existing-corr-456",
+        eventType: EventType.PLAYER_KILL,
+        serverId: 1,
+      })
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         "Event processed: PLAYER_KILL",
@@ -74,7 +71,7 @@ describe("RabbitMQEventProcessor", () => {
           serverId: 1,
           processingTimeMs: expect.any(Number),
           status: "success",
-        })
+        }),
       )
     })
 
@@ -95,7 +92,7 @@ describe("RabbitMQEventProcessor", () => {
           correlationId: expect.any(String),
           eventType: EventType.PLAYER_CONNECT,
           serverId: 1,
-        })
+        }),
       )
 
       expect(mockLogger.info).toHaveBeenCalledWith(
@@ -103,7 +100,7 @@ describe("RabbitMQEventProcessor", () => {
         expect.objectContaining({
           eventId: expect.any(String),
           correlationId: expect.any(String),
-        })
+        }),
       )
     })
 
@@ -138,7 +135,7 @@ describe("RabbitMQEventProcessor", () => {
           processingTimeMs: expect.any(Number),
           status: "failed",
           error: "Handler failed",
-        })
+        }),
       )
     })
   })
@@ -171,7 +168,7 @@ describe("RabbitMQEventProcessor", () => {
         {
           eventId: "test-event-123",
           handlers: ["PlayerHandler"],
-        }
+        },
       )
 
       expect(mockHandlerMethod).toHaveBeenCalledWith(
@@ -181,10 +178,10 @@ describe("RabbitMQEventProcessor", () => {
           serverId: 1,
           data: { killerId: 1, victimId: 2 },
           correlationId: expect.any(String),
-        })
+        }),
       )
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        expect.stringContaining("Module PlayerHandler processed event PLAYER_KILL successfully")
+        expect.stringContaining("Module PlayerHandler processed event PLAYER_KILL successfully"),
       )
     })
 
@@ -216,7 +213,10 @@ describe("RabbitMQEventProcessor", () => {
         } as unknown as BaseModuleEventHandler,
       }
 
-      vi.mocked(mockModuleRegistry.getHandlersForEvent).mockReturnValue([mockHandler1, mockHandler2])
+      vi.mocked(mockModuleRegistry.getHandlersForEvent).mockReturnValue([
+        mockHandler1,
+        mockHandler2,
+      ])
 
       await processor.processEvent(event)
 
@@ -225,7 +225,7 @@ describe("RabbitMQEventProcessor", () => {
         {
           eventId: "test-event-123",
           handlers: ["PlayerHandler", "StatsHandler"],
-        }
+        },
       )
 
       expect(mockHandler1Method).toHaveBeenCalledWith(
@@ -234,7 +234,7 @@ describe("RabbitMQEventProcessor", () => {
           eventId: "test-event-123",
           serverId: 1,
           correlationId: expect.any(String),
-        })
+        }),
       )
       expect(mockHandler2Method).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -242,7 +242,7 @@ describe("RabbitMQEventProcessor", () => {
           eventId: "test-event-123",
           serverId: 1,
           correlationId: expect.any(String),
-        })
+        }),
       )
     })
 
@@ -266,7 +266,7 @@ describe("RabbitMQEventProcessor", () => {
       await processor.processEvent(event)
 
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        "No handler method handlePlayerKill found in IncompleteHandler for event PLAYER_KILL"
+        "No handler method handlePlayerKill found in IncompleteHandler for event PLAYER_KILL",
       )
     })
 
@@ -299,7 +299,7 @@ describe("RabbitMQEventProcessor", () => {
           moduleName: "FailingHandler",
           error: "Handler processing failed",
           processingTimeMs: expect.any(Number),
-        })
+        }),
       )
     })
 
@@ -317,7 +317,7 @@ describe("RabbitMQEventProcessor", () => {
       await processor.processEvent(event)
 
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        "No module handlers found for event type PLAYER_KILL"
+        "No module handlers found for event type PLAYER_KILL",
       )
     })
 
@@ -350,7 +350,7 @@ describe("RabbitMQEventProcessor", () => {
           serverId: 1,
           data: { message: "Hello world", playerId: 123 },
           correlationId: expect.any(String),
-        })
+        }),
       )
     })
   })
@@ -369,11 +369,9 @@ describe("RabbitMQEventProcessor", () => {
         coordinateEvent: vi.fn().mockResolvedValue(undefined),
       } as unknown as EventCoordinator
 
-      const processorWithCoordinators = new RabbitMQEventProcessor(
-        mockLogger,
-        mockModuleRegistry,
-        [mockCoordinator]
-      )
+      const processorWithCoordinators = new RabbitMQEventProcessor(mockLogger, mockModuleRegistry, [
+        mockCoordinator,
+      ])
 
       await processorWithCoordinators.processEvent(event)
 
@@ -382,7 +380,7 @@ describe("RabbitMQEventProcessor", () => {
         {
           eventId: "test-event-123",
           coordinators: [expect.any(String)],
-        }
+        },
       )
 
       expect(mockCoordinator.coordinateEvent).toHaveBeenCalledWith(
@@ -391,10 +389,10 @@ describe("RabbitMQEventProcessor", () => {
           eventId: "test-event-123",
           serverId: 1,
           correlationId: expect.any(String),
-        })
+        }),
       )
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        expect.stringContaining("processed event PLAYER_KILL successfully")
+        expect.stringContaining("processed event PLAYER_KILL successfully"),
       )
     })
 
@@ -415,11 +413,10 @@ describe("RabbitMQEventProcessor", () => {
         coordinateEvent: vi.fn().mockResolvedValue(undefined),
       } as unknown as EventCoordinator
 
-      const processorWithCoordinators = new RabbitMQEventProcessor(
-        mockLogger,
-        mockModuleRegistry,
-        [mockCoordinator1, mockCoordinator2]
-      )
+      const processorWithCoordinators = new RabbitMQEventProcessor(mockLogger, mockModuleRegistry, [
+        mockCoordinator1,
+        mockCoordinator2,
+      ])
 
       await processorWithCoordinators.processEvent(event)
 
@@ -429,7 +426,7 @@ describe("RabbitMQEventProcessor", () => {
           eventId: "test-event-123",
           serverId: 1,
           correlationId: expect.any(String),
-        })
+        }),
       )
       expect(mockCoordinator2.coordinateEvent).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -437,7 +434,7 @@ describe("RabbitMQEventProcessor", () => {
           eventId: "test-event-123",
           serverId: 1,
           correlationId: expect.any(String),
-        })
+        }),
       )
     })
 
@@ -455,13 +452,13 @@ describe("RabbitMQEventProcessor", () => {
         coordinateEvent: vi.fn().mockRejectedValue(coordinatorError),
       } as unknown as EventCoordinator
 
-      const processorWithCoordinators = new RabbitMQEventProcessor(
-        mockLogger,
-        mockModuleRegistry,
-        [mockCoordinator]
-      )
+      const processorWithCoordinators = new RabbitMQEventProcessor(mockLogger, mockModuleRegistry, [
+        mockCoordinator,
+      ])
 
-      await expect(processorWithCoordinators.processEvent(event)).rejects.toThrow("Coordinator failed")
+      await expect(processorWithCoordinators.processEvent(event)).rejects.toThrow(
+        "Coordinator failed",
+      )
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining("failed for event PLAYER_KILL"),
@@ -469,7 +466,7 @@ describe("RabbitMQEventProcessor", () => {
           eventId: "test-event-123",
           coordinatorName: expect.any(String),
           error: "Coordinator failed",
-        })
+        }),
       )
     })
 
@@ -485,9 +482,7 @@ describe("RabbitMQEventProcessor", () => {
       await processor.processEvent(event)
 
       // Should not log any coordinator processing debug messages
-      expect(mockLogger.debug).not.toHaveBeenCalledWith(
-        expect.stringContaining("coordinators")
-      )
+      expect(mockLogger.debug).not.toHaveBeenCalledWith(expect.stringContaining("coordinators"))
     })
   })
 
@@ -507,7 +502,7 @@ describe("RabbitMQEventProcessor", () => {
         "Event processed: PLAYER_KILL",
         expect.objectContaining({
           processingTimeMs: expect.any(Number),
-        })
+        }),
       )
     })
 
@@ -536,7 +531,7 @@ describe("RabbitMQEventProcessor", () => {
         "Event processing failed: PLAYER_KILL",
         expect.objectContaining({
           processingTimeMs: expect.any(Number),
-        })
+        }),
       )
     })
   })
@@ -566,13 +561,16 @@ describe("RabbitMQEventProcessor", () => {
 
       await processor.processEvent(event)
 
-      expect((mockHandler.handler as unknown as Record<string, ReturnType<typeof vi.fn>>).handlePlayerChangeTeam).toHaveBeenCalledWith(
+      expect(
+        (mockHandler.handler as unknown as Record<string, ReturnType<typeof vi.fn>>)
+          .handlePlayerChangeTeam,
+      ).toHaveBeenCalledWith(
         expect.objectContaining({
           eventType: EventType.PLAYER_CHANGE_TEAM,
           eventId: "test-event-123",
           serverId: 1,
           correlationId: expect.any(String),
-        })
+        }),
       )
     })
 
@@ -600,13 +598,16 @@ describe("RabbitMQEventProcessor", () => {
 
       await processor.processEvent(event)
 
-      expect((mockHandler.handler as unknown as Record<string, ReturnType<typeof vi.fn>>).handleActionPlayerPlayer).toHaveBeenCalledWith(
+      expect(
+        (mockHandler.handler as unknown as Record<string, ReturnType<typeof vi.fn>>)
+          .handleActionPlayerPlayer,
+      ).toHaveBeenCalledWith(
         expect.objectContaining({
           eventType: EventType.ACTION_PLAYER_PLAYER,
           eventId: "test-event-123",
           serverId: 1,
           correlationId: expect.any(String),
-        })
+        }),
       )
     })
   })

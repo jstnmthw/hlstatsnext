@@ -3,8 +3,20 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import { EventConsumer, defaultConsumerConfig, defaultMessageValidator, type ConsumerConfig, type IEventProcessor } from "./consumer"
-import type { IQueueClient, QueueChannel, ConsumeMessage, EventMessage, MessageValidator } from "./types"
+import {
+  EventConsumer,
+  defaultConsumerConfig,
+  defaultMessageValidator,
+  type ConsumerConfig,
+  type IEventProcessor,
+} from "./consumer"
+import type {
+  IQueueClient,
+  QueueChannel,
+  ConsumeMessage,
+  EventMessage,
+  MessageValidator,
+} from "./types"
 import { QueueConsumeError } from "./types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import { EventType } from "@/shared/types/events"
@@ -59,16 +71,12 @@ describe("EventConsumer", () => {
       await consumer.start()
 
       expect(mockClient.createChannel).toHaveBeenCalledWith("consumer-test.queue")
-      expect(mockChannel.consume).toHaveBeenCalledWith(
-        "test.queue",
-        expect.any(Function),
-        {
-          noAck: false,
-          consumerTag: expect.stringMatching(/^test\.queue-\d+-\d+$/),
-        }
-      )
+      expect(mockChannel.consume).toHaveBeenCalledWith("test.queue", expect.any(Function), {
+        noAck: false,
+        consumerTag: expect.stringMatching(/^test\.queue-\d+-\d+$/),
+      })
       expect(mockLogger.info).toHaveBeenCalledWith(
-        "Event consumer started successfully for queues: test.queue with concurrency: 5"
+        "Event consumer started successfully for queues: test.queue with concurrency: 5",
       )
 
       const stats = consumer.getConsumerStats()
@@ -79,7 +87,7 @@ describe("EventConsumer", () => {
       await consumer.start()
 
       await expect(consumer.start()).rejects.toThrow(
-        new QueueConsumeError("Consumer is already running")
+        new QueueConsumeError("Consumer is already running"),
       )
     })
 
@@ -88,7 +96,9 @@ describe("EventConsumer", () => {
       vi.mocked(mockClient.createChannel).mockRejectedValueOnce(error)
 
       await expect(consumer.start()).rejects.toThrow("Failed to start consumer")
-      expect(mockLogger.error).toHaveBeenCalledWith("Failed to start event consumer: Error: Channel creation failed")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        "Failed to start event consumer: Error: Channel creation failed",
+      )
     })
 
     it("should stop consumer successfully", async () => {
@@ -109,12 +119,14 @@ describe("EventConsumer", () => {
 
     it("should handle stop errors", async () => {
       await consumer.start()
-      
+
       const error = new Error("Channel close failed")
       vi.mocked(mockChannel.close).mockRejectedValueOnce(error)
 
       await expect(consumer.stop()).rejects.toThrow("Failed to stop consumer")
-      expect(mockLogger.error).toHaveBeenCalledWith("Error stopping consumer: Error: Channel close failed")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        "Error stopping consumer: Error: Channel close failed",
+      )
     })
   })
 
@@ -140,7 +152,7 @@ describe("EventConsumer", () => {
 
     beforeEach(async () => {
       await consumer.start()
-      
+
       // Extract the message handler
       const consumeCall = vi.mocked(mockChannel.consume).mock.calls[0]
       messageHandler = consumeCall?.[1] as (msg: ConsumeMessage) => Promise<void>
@@ -177,7 +189,7 @@ describe("EventConsumer", () => {
           eventType: EventType.PLAYER_KILL,
           serverId: 1,
           data: { killerId: 1, victimId: 2 },
-        })
+        }),
       )
       expect(mockChannel.ack).toHaveBeenCalledWith(mockMessage)
       expect(mockLogger.queue).toHaveBeenCalledWith(
@@ -187,7 +199,7 @@ describe("EventConsumer", () => {
           eventType: EventType.PLAYER_KILL,
           queueName: "test.queue",
           retryCount: 0,
-        })
+        }),
       )
 
       const stats = consumer.getConsumerStats()
@@ -227,7 +239,7 @@ describe("EventConsumer", () => {
       await messageHandler(mockMessage)
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to parse message from test.queue")
+        expect.stringContaining("Failed to parse message from test.queue"),
       )
       expect(mockChannel.nack).toHaveBeenCalledWith(mockMessage, false, false)
 
@@ -250,7 +262,7 @@ describe("EventConsumer", () => {
       await messageHandler(mockMessage)
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("Error processing message")
+        expect.stringContaining("Error processing message"),
       )
       expect(mockChannel.nack).toHaveBeenCalledWith(mockMessage, false, false)
     })
@@ -285,7 +297,7 @@ describe("EventConsumer", () => {
       await messageHandler(mockMessage)
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("Error processing message msg-123 from test.queue")
+        expect.stringContaining("Error processing message msg-123 from test.queue"),
       )
       expect(mockChannel.nack).toHaveBeenCalledWith(mockMessage, false, false)
 
@@ -323,7 +335,7 @@ describe("EventConsumer", () => {
       await messageHandler(mockMessage)
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("Message msg-123 exceeded retry limit")
+        expect.stringContaining("Message msg-123 exceeded retry limit"),
       )
       expect(mockChannel.nack).toHaveBeenCalledWith(mockMessage, false, false)
 
@@ -343,7 +355,7 @@ describe("EventConsumer", () => {
         mockClient,
         mockProcessor,
         mockLogger,
-        multiQueueConfig
+        multiQueueConfig,
       )
 
       await multiQueueConsumer.start()
@@ -372,13 +384,13 @@ describe("EventConsumer", () => {
 
     it("should calculate average processing time", async () => {
       await consumer.start()
-      
+
       const consumeCall = vi.mocked(mockChannel.consume).mock.calls[0]
       const messageHandler = consumeCall?.[1] as (msg: ConsumeMessage) => Promise<void>
 
       // Mock processing time by controlling the process duration
       vi.mocked(mockProcessor.processEvent).mockImplementation(
-        () => new Promise(resolve => setTimeout(resolve, 100))
+        () => new Promise((resolve) => setTimeout(resolve, 100)),
       )
 
       const eventMessage: EventMessage = {
@@ -413,18 +425,20 @@ describe("EventConsumer", () => {
 
   describe("Custom Message Validator", () => {
     it("should use custom message validator", async () => {
-      const customValidator: MessageValidator = vi.fn().mockRejectedValue(new Error("Custom validation failed"))
-      
+      const customValidator: MessageValidator = vi
+        .fn()
+        .mockRejectedValue(new Error("Custom validation failed"))
+
       const customConsumer = new EventConsumer(
         mockClient,
         mockProcessor,
         mockLogger,
         config,
-        customValidator
+        customValidator,
       )
 
       await customConsumer.start()
-      
+
       const consumeCall = vi.mocked(mockChannel.consume).mock.calls[0]
       const messageHandler = consumeCall?.[1] as (msg: ConsumeMessage) => Promise<void>
 
@@ -461,10 +475,10 @@ describe("EventConsumer", () => {
             eventType: EventType.PLAYER_KILL,
             serverId: 1,
           }),
-        })
+        }),
       )
       expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("Custom validation failed")
+        expect.stringContaining("Custom validation failed"),
       )
     })
   })
@@ -517,7 +531,9 @@ describe("Default Message Validator", () => {
       metadata: { source: { serverId: 1 } },
     } as EventMessage
 
-    await expect(defaultMessageValidator(invalidMessage)).rejects.toThrow("Message payload missing eventType")
+    await expect(defaultMessageValidator(invalidMessage)).rejects.toThrow(
+      "Message payload missing eventType",
+    )
   })
 
   it("should reject message without metadata", async () => {
@@ -526,7 +542,9 @@ describe("Default Message Validator", () => {
       payload: { eventType: EventType.PLAYER_KILL },
     } as EventMessage
 
-    await expect(defaultMessageValidator(invalidMessage)).rejects.toThrow("Message missing metadata")
+    await expect(defaultMessageValidator(invalidMessage)).rejects.toThrow(
+      "Message missing metadata",
+    )
   })
 
   it("should reject message with invalid serverId", async () => {
@@ -534,15 +552,21 @@ describe("Default Message Validator", () => {
       id: "msg-123",
       correlationId: "corr-123",
       payload: { eventType: EventType.PLAYER_KILL },
-      metadata: { 
-        source: { serverId: "invalid" as unknown as number, serverAddress: "127.0.0.1", serverPort: 27015 },
+      metadata: {
+        source: {
+          serverId: "invalid" as unknown as number,
+          serverAddress: "127.0.0.1",
+          serverPort: 27015,
+        },
         routing: { key: "player.kill", priority: 1, retryCount: 0 },
       },
       version: "1.0",
       timestamp: "2023-01-01T00:00:00.000Z",
     } as EventMessage
 
-    await expect(defaultMessageValidator(invalidMessage)).rejects.toThrow("Message metadata missing or invalid serverId")
+    await expect(defaultMessageValidator(invalidMessage)).rejects.toThrow(
+      "Message metadata missing or invalid serverId",
+    )
   })
 })
 

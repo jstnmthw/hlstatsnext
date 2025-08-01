@@ -266,7 +266,7 @@ describe("RabbitMQEventProcessor", () => {
       await processor.processEvent(event)
 
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        "No handler method handlePlayerKill found in IncompleteHandler for event PLAYER_KILL",
+        "No handler method found in IncompleteHandler for event PLAYER_KILL",
       )
     })
 

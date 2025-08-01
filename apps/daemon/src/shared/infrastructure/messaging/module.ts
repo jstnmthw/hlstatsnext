@@ -5,6 +5,12 @@
  * Provides factory methods for creating and configuring queue services.
  */
 
+import type { ILogger } from "@/shared/utils/logger.types"
+import { RabbitMQClient } from "./queue/rabbitmq/client"
+import { EventPublisher } from "./queue/core/publisher"
+import { EventConsumer, type IEventProcessor } from "./queue/core/consumer"
+import type { ConnectionStats, ConsumerStats } from "./queue/core/types"
+import type { ShadowConsumerStats } from "./migration/shadow-consumer"
 import type {
   IQueueClient,
   IEventPublisher,
@@ -12,12 +18,6 @@ import type {
   RabbitMQConfig,
   QueueModuleDependencies,
 } from "./queue/core/types"
-// IEventBus import removed - no longer used post-migration
-import type { ILogger } from "@/shared/utils/logger.types"
-import { RabbitMQClient } from "./queue/rabbitmq/client"
-import { EventPublisher } from "./queue/core/publisher"
-import { EventConsumer, type IEventProcessor } from "./queue/core/consumer"
-// DualEventPublisher removed - migration complete
 import {
   ShadowConsumer,
   defaultShadowConsumerConfig,
@@ -30,7 +30,6 @@ import {
 export interface QueueModuleConfig {
   /** RabbitMQ connection configuration */
   readonly rabbitmq: RabbitMQConfig
-  // Dual publisher removed - migration complete
   /** Shadow consumer configuration for validation */
   readonly shadowConsumer?: Partial<ShadowConsumerConfig>
   /** Whether to start consumers automatically */
@@ -48,7 +47,6 @@ export class QueueModule {
   private client: IQueueClient | null = null
   private publisher: IEventPublisher | null = null
   private consumer: IEventConsumer | null = null
-  // Dual publisher removed - migration complete
   private shadowConsumer: ShadowConsumer | null = null
 
   constructor(
@@ -100,8 +98,6 @@ export class QueueModule {
       throw error
     }
   }
-
-  // Dual publisher methods removed - migration complete
 
   /**
    * Get the queue client
@@ -176,11 +172,9 @@ export class QueueModule {
     return {
       initialized: this.isInitialized(),
       connected: this.client?.isConnected() ?? false,
-      // hasDualPublisher removed - migration complete
       hasShadowConsumer: this.shadowConsumer !== null,
       connectionStats: this.client?.getConnectionStats(),
       consumerStats: this.consumer?.getConsumerStats(),
-      // dualPublisherStats removed - migration complete
       shadowConsumerStats: this.shadowConsumer?.getStats(),
     }
   }
@@ -212,7 +206,6 @@ export class QueueModule {
 
       // Reset other services
       this.publisher = null
-      // this.dualPublisher = null // removed - migration complete
 
       this.logger.info("Queue module shutdown complete")
     } catch (error) {
@@ -228,12 +221,10 @@ export class QueueModule {
 export interface QueueModuleStatus {
   readonly initialized: boolean
   readonly connected: boolean
-  // hasDualPublisher removed - migration complete
   readonly hasShadowConsumer: boolean
-  readonly connectionStats?: import("./queue/core/types").ConnectionStats
-  readonly consumerStats?: import("./queue/core/types").ConsumerStats
-  // dualPublisherStats removed - migration complete
-  readonly shadowConsumerStats?: import("./migration/shadow-consumer").ShadowConsumerStats
+  readonly connectionStats?: ConnectionStats
+  readonly consumerStats?: ConsumerStats
+  readonly shadowConsumerStats?: ShadowConsumerStats
 }
 
 /**
@@ -243,7 +234,6 @@ export const defaultQueueModuleConfig: Omit<QueueModuleConfig, "rabbitmq"> = {
   autoStartConsumers: false,
   autoStartShadowConsumer: true,
   autoSetupTopology: true,
-  // dualPublisher config removed - migration complete
   shadowConsumer: {
     queues: ["hlstats.events.priority", "hlstats.events.standard", "hlstats.events.bulk"],
     metricsInterval: 30000,

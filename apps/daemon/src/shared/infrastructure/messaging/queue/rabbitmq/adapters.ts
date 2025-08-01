@@ -55,6 +55,13 @@ export class AmqpChannelAdapter implements QueueChannel {
               replyTo: msg.properties.replyTo,
               expiration: msg.properties.expiration,
               priority: msg.properties.priority,
+              contentType: msg.properties.contentType,
+              contentEncoding: msg.properties.contentEncoding,
+              deliveryMode: msg.properties.deliveryMode,
+              type: msg.properties.type,
+              userId: msg.properties.userId,
+              appId: msg.properties.appId,
+              clusterId: msg.properties.clusterId,
             },
           }
           onMessage(adaptedMsg)

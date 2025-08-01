@@ -244,6 +244,13 @@ export interface ConsumeMessage {
     replyTo?: string
     expiration?: string
     priority?: number
+    contentType?: string
+    contentEncoding?: string
+    deliveryMode?: number
+    type?: string
+    userId?: string
+    appId?: string
+    clusterId?: string
   }
 }
 

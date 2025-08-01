@@ -29,7 +29,7 @@ export function generateCorrelationId(): string {
  * Validates a message ID format
  */
 export function isValidMessageId(messageId: string): boolean {
-  return /^msg_[a-z0-9]+_[a-f0-9]{16}$/.test(messageId)
+  return /^msg_[a-z0-9]{6,12}_[a-f0-9]{16}$/.test(messageId)
 }
 
 /**
@@ -43,11 +43,20 @@ export function isValidCorrelationId(correlationId: string): boolean {
  * Extracts timestamp from message ID
  */
 export function extractTimestampFromMessageId(messageId: string): number | null {
-  const match = messageId.match(/^msg_([a-z0-9]+)_[a-f0-9]{16}$/)
+  const match = messageId.match(/^msg_([a-z0-9]{6,12})_[a-f0-9]{16}$/)
   if (!match || !match[1]) return null
 
   try {
-    return parseInt(match[1], 36)
+    const timestamp = parseInt(match[1], 36)
+    // Validate that the timestamp is a reasonable value
+    if (
+      !Number.isFinite(timestamp) ||
+      timestamp < 0 ||
+      timestamp > Date.now() + 365 * 24 * 60 * 60 * 1000
+    ) {
+      return null
+    }
+    return timestamp
   } catch {
     return null
   }
@@ -67,11 +76,19 @@ export function calculateMessageAge(messageId: string): number | null {
  * Sanitizes routing key to ensure valid format
  */
 export function sanitizeRoutingKey(key: string): string {
-  return key
-    .toLowerCase()
-    .replace(/[^a-z0-9.*#]/g, ".")
-    .replace(/\.+/g, ".")
-    .replace(/^\.|\.$/, "")
+  let result = key.toLowerCase()
+
+  // First, replace all non-alphanumeric chars except . and * with dots
+  result = result.replace(/[^a-z0-9.*#]/g, ".")
+
+  // Handle # specially: replace with . unless it's preceded by a dot (wildcard)
+  result = result.replace(/([^.])#/g, "$1.")
+
+  // Clean up multiple dots and leading/trailing dots
+  result = result.replace(/\.+/g, ".")
+  result = result.replace(/^\.+|\.+$/g, "")
+
+  return result
 }
 
 /**
@@ -100,20 +117,25 @@ export function addJitter(delay: number, jitterFactor = 0.1): number {
 export function formatBytes(bytes: number): string {
   if (bytes === 0) return "0 B"
 
-  const k = 1024
-  const sizes = ["B", "KB", "MB", "GB"]
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  const isNegative = bytes < 0
+  const absBytes = Math.abs(bytes)
 
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
+  const k = 1024
+  const sizes = ["B", "KB", "MB", "GB", "TB", "PB"]
+  const i = Math.min(Math.floor(Math.log(absBytes) / Math.log(k)), sizes.length - 1)
+
+  const formatted = `${parseFloat((absBytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
+  return isNegative ? `-${formatted}` : formatted
 }
 
 /**
  * Formats duration in milliseconds to human-readable string
  */
 export function formatDuration(ms: number): string {
+  if (ms < 0) return `${ms}ms`
   if (ms < 1000) return `${ms}ms`
   if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`
-  if (ms < 3600000) return `${(ms / 60000).toFixed(1)}m`
+  if (ms < 7200000) return `${(ms / 60000).toFixed(1)}m` // Show minutes up to 2 hours
   return `${(ms / 3600000).toFixed(1)}h`
 }
 

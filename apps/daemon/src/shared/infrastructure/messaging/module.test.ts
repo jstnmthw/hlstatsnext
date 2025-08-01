@@ -481,6 +481,7 @@ describe("Factory Functions", () => {
         bindings: [
           "player.connect",
           "player.disconnect",
+          "player.entry",
           "player.change.*",
           "chat.*",
           "admin.*",

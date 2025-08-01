@@ -1,7 +1,7 @@
 /**
  * Event Bus Types
  *
- * Type definitions for the event bus system following Domain-Driven Design principles.
+ * Type definitions for the event bus system.
  */
 
 import type { BaseEvent, EventType } from "@/shared/types/events"

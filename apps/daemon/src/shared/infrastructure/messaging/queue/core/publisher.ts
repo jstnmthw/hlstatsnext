@@ -5,6 +5,14 @@
  * priority-based publishing, and metrics integration.
  */
 
+import { EventType } from "@/shared/types/events"
+import { MessagePriority, QueuePublishError } from "./types"
+import type { BaseEvent } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import {
+  generateMessageId,
+  generateCorrelationId,
+} from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 import type {
   IEventPublisher,
   IQueueClient,
@@ -14,14 +22,6 @@ import type {
   RoutingKeyMapper,
   PriorityMapper,
 } from "./types"
-import { MessagePriority, QueuePublishError } from "./types"
-import type { BaseEvent } from "@/shared/types/events"
-import { EventType } from "@/shared/types/events"
-import type { ILogger } from "@/shared/utils/logger.types"
-import {
-  generateMessageId,
-  generateCorrelationId,
-} from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 
 /**
  * Event publisher for RabbitMQ with comprehensive message handling
@@ -113,15 +113,12 @@ export class EventPublisher implements IEventPublisher {
       }
     }
 
-    this.logger.queue(
-      `Batch published: ${events.length} events`,
-      { batchId, eventCount: events.length },
-    )
+    this.logger.queue(`Batch published: ${events.length} events`, {
+      batchId,
+      eventCount: events.length,
+    })
   }
 
-  /**
-   * Get publisher statistics
-   */
   getStats(): { published: number; failed: number } {
     return {
       published: this.publishedCount,

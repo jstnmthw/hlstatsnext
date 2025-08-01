@@ -1,60 +1,59 @@
 # Infrastructure Layer
 
-The infrastructure layer provides the foundational building blocks for the HLStats Daemon's distributed event-driven architecture. This layer implements core patterns and services that support the application layer's business logic.
+The infrastructure layer provides the foundational building blocks for the HLStats Daemon's queue-first event-driven architecture. This layer implements core patterns and services that support the application layer's business logic.
 
 ## Design Patterns
 
-### 1. Event Bus Pattern
+### 1. Queue-First Event Processing
 
-**File**: `event-bus/`
+**File**: `messaging/queue/`
 
-The Event Bus provides a decoupled publish-subscribe messaging system:
+RabbitMQ-based event processing provides reliable message handling:
 
 ```typescript
-// Publishing events
-await eventBus.publish(event)
+// Publishing events to queue
+await queuePublisher.publish(event)
 
-// Subscribing to events
-const handlerId = eventBus.subscribe(EventType.PLAYER_KILL, async (event) => {
-  // Handle event
-})
-
-// Unsubscribing
-eventBus.unsubscribe(handlerId)
+// Queue consumer processes events through module handlers
+const consumer = new RabbitMQConsumer(client, logger, moduleRegistry, coordinators)
+await consumer.start()
 ```
 
 **Key Features:**
 
-- Type-safe event handling
-- Automatic error handling and retry logic
-- Event filtering and routing
-- Performance metrics and monitoring
+- Persistent message storage
+- Automatic retry logic with exponential backoff
+- Dead letter queue handling
+- Comprehensive metrics and monitoring
 
-### 2. Base Module Event Handler Pattern
+### 2. Simplified Module Event Handler Pattern
 
-**File**: `module-event-handler.base.ts`
+**File**: `modules/event-handler.base.ts`
 
-Provides a consistent foundation for all module event handlers:
+Provides a clean foundation for all module event handlers:
 
 ```typescript
 export class PlayerEventHandler extends BaseModuleEventHandler {
-  registerEventHandlers(): void {
-    this.registerHandler(EventType.PLAYER_CONNECT, this.handlePlayerConnect.bind(this))
-    this.registerHandler(EventType.PLAYER_DISCONNECT, this.handlePlayerDisconnect.bind(this))
+  constructor(
+    logger: ILogger,
+    private readonly playerService: IPlayerService,
+    metrics?: EventMetrics,
+  ) {
+    super(logger, metrics)
   }
 
-  private async handlePlayerConnect(event: PlayerConnectEvent): Promise<void> {
-    // Implementation
+  async handleEvent(event: BaseEvent): Promise<void> {
+    await this.playerService.handlePlayerEvent(event)
   }
 }
 ```
 
 **Benefits:**
 
-- Consistent event handler lifecycle
-- Automatic registration/cleanup
+- Simple, focused design without unnecessary abstractions
 - Built-in error handling and metrics
 - Standardized logging patterns
+- Type-safe event processing
 
 ### 3. Repository Base Pattern
 
@@ -65,11 +64,25 @@ Provides common database operations and connection management:
 ```typescript
 export class PlayerRepository extends BaseRepository {
   async findById(playerId: number): Promise<Player | null> {
-    return this.queryOne<Player>("SELECT * FROM players WHERE id = ?", [playerId])
+    return client.player.findUnique({
+      where: { playerId: data.playerId },
+    })
   }
 
   async create(data: PlayerCreateData): Promise<Player> {
-    return this.insert<Player>("players", data)
+    return client.player.create({
+      data: {
+        lastName: data.lastName,
+        game: data.game,
+        skill: data.skill || 1000,
+        uniqueIds: {
+          create: {
+            uniqueId: data.steamId,
+            game: data.game,
+          },
+        },
+      },
+    })
   }
 }
 ```
@@ -132,25 +145,28 @@ const summary = metrics.getMetrics()
 - Module-specific performance
 - Event type statistics
 
-### 6. Dual Event Publisher Pattern
+### 6. Shadow Consumer Pattern
 
-**File**: `queue/`
+**File**: `messaging/migration/shadow-consumer.ts`
 
-Enables publishing to both EventBus and RabbitMQ simultaneously:
+Validates queue processing without interfering with production:
 
 ```typescript
-const dualPublisher = queueModule.createDualPublisher(eventBus)
+const shadowConsumer = new ShadowConsumer({
+  queues: ["hlstats.events.priority", "hlstats.events.standard"],
+  logEvents: true,
+  logParsingErrors: true,
+})
 
-// Publishes to both EventBus and RabbitMQ
-await dualPublisher.publish(event)
+await shadowConsumer.start()
 ```
 
 **Features:**
 
-- Graceful fallback on queue failures
-- Configurable timeouts
-- Message routing and priorities
-- Shadow consumer for validation
+- Non-destructive message inspection
+- Event parsing validation
+- Performance metrics collection
+- Development and debugging support
 
 ## Architecture
 
@@ -158,22 +174,27 @@ await dualPublisher.publish(event)
 
 ```
 Infrastructure Layer
-├── event-bus/           # Core event messaging
-├── queue/              # RabbitMQ integration
-├── module-registry.ts  # Module lifecycle management
-├── event-metrics.ts    # Performance monitoring
-├── repository.base.ts  # Database abstraction
-└── module-event-handler.base.ts  # Handler foundation
+├── messaging/
+│   ├── queue/              # RabbitMQ integration
+│   ├── migration/          # Shadow consumer for validation
+│   └── module.ts          # Queue module configuration
+├── modules/
+│   ├── registry.ts        # Module lifecycle management
+│   └── event-handler.base.ts  # Handler foundation
+├── observability/
+│   └── event-metrics.ts   # Performance monitoring
+└── persistence/
+    └── repository.base.ts # Database abstraction
 ```
 
 ### Event Flow
 
 1. **Event Ingestion**: Events enter through the ingress service
-2. **Dual Publishing**: Events are published to both EventBus and RabbitMQ
-3. **Module Distribution**: Event Bus routes events to registered module handlers
-4. **Processing**: Each module processes relevant events independently
-5. **Metrics Collection**: Performance and error metrics are recorded
-6. **Queue Validation**: Shadow consumer validates queue processing
+2. **Queue Publishing**: Events are published directly to RabbitMQ queues
+3. **Queue Processing**: RabbitMQ consumer processes events through module handlers
+4. **Module Processing**: Each module processes relevant events independently
+5. **Coordinator Processing**: Cross-module concerns handled by coordinators (minimal)
+6. **Metrics Collection**: Performance and error metrics are recorded
 
 ### Database Layer
 

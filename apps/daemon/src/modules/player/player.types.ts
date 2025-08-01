@@ -224,9 +224,6 @@ export interface IPlayerService {
   // Event handling
   handlePlayerEvent(event: PlayerEvent): Promise<HandlerResult>
   handleKillEvent(event: PlayerKillEvent): Promise<HandlerResult>
-
-  // Saga compensation methods
-  compensateKillEvent?(killerId: number, victimId: number): Promise<void>
 }
 
 export interface IPlayerRepository {

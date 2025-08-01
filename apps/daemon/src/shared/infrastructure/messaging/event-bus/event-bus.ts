@@ -1,7 +1,7 @@
 /**
  * Event Bus Implementation
  *
- * Implements a decoupled event handling system following SOLID principles.
+ * Implements a decoupled event handling system.
  */
 
 import type {

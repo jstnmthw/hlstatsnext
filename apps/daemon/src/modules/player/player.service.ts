@@ -28,6 +28,7 @@ import type { HandlerResult } from "@/shared/types/common"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import { EventType } from "@/shared/types/events"
+import type { BaseEvent } from "@/shared/types/events"
 import { validateSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
 import { GameConfig } from "@/config/game.config"
 
@@ -269,7 +270,10 @@ export class PlayerService implements IPlayerService {
           return await this.handlePlayerTeamkill(event)
         case EventType.CHAT_MESSAGE:
           return await this.handleChatMessage(event)
+        case EventType.PLAYER_KILL:
+          return await this.handleKillEvent(event as PlayerKillEvent)
         default:
+          this.logger.debug(`PlayerService: Unhandled event type: ${(event as BaseEvent).eventType}`)
           return { success: true } // Event not handled by this service
       }
     } catch (error) {

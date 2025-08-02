@@ -80,6 +80,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
             lastName: data.lastName,
             game: data.game,
             skill: data.skill || 1000,
+            created_at: new Date(),
             uniqueIds: {
               create: {
                 uniqueId: data.steamId,
@@ -167,6 +168,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
               lastName: `Player${playerId}`,
               game: GameConfig.getDefaultGame(),
               skill: 1000,
+              created_at: new Date(),
             }
 
             for (const [key, value] of Object.entries(cleanData)) {

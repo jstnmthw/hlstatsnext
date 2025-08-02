@@ -1,7 +1,5 @@
 # Event Lifecycle Documentation
 
-## Overview
-
 This document explains the complete event lifecycle in the HLStats daemon, from raw log parsing to final business logic completion. Understanding these stages is crucial for debugging, monitoring, and performance optimization.
 
 ## Event Lifecycle Stages

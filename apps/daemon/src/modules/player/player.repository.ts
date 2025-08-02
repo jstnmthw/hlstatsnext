@@ -346,7 +346,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
             suicides: true,
             teamkills: true,
             headshots: true,
-            kill_streak: true,
+            killStreak: true,
             death_streak: true,
           },
         }) as Promise<Player | null>

@@ -261,7 +261,7 @@ export interface PlayerHistoryData {
   headshots?: number
   teamkills?: number
   connectionTime?: number
-  kill_streak?: number
+  killStreak?: number
   death_streak?: number
   skill_change?: number
 }

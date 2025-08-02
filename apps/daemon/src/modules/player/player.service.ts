@@ -131,8 +131,8 @@ export class PlayerService implements IPlayerService {
       }
 
       // Direct value updates
-      if (updates.kill_streak !== undefined) {
-        updateData.kill_streak = updates.kill_streak
+      if (updates.killStreak !== undefined) {
+        updateData.killStreak = updates.killStreak
       }
       if (updates.death_streak !== undefined) {
         updateData.death_streak = updates.death_streak
@@ -334,14 +334,14 @@ export class PlayerService implements IPlayerService {
       )
 
       // Calculate streaks
-      const newKillerKillStreak = (killerStats.kill_streak || 0) + 1
+      const newKillerKillStreak = (killerStats.killStreak || 0) + 1
       const newVictimDeathStreak = (victimStats.death_streak || 0) + 1
 
       // Update killer stats
       const killerUpdates: PlayerStatsUpdate = {
         kills: 1,
         skill: skillAdjustment.killerChange,
-        kill_streak: newKillerKillStreak,
+        killStreak: newKillerKillStreak,
         death_streak: 0, // Reset death streak on kill
         lastEvent: new Date(),
       }
@@ -361,7 +361,7 @@ export class PlayerService implements IPlayerService {
         deaths: 1,
         skill: skillAdjustment.victimChange,
         death_streak: newVictimDeathStreak,
-        kill_streak: 0, // Reset kill streak on death
+        killStreak: 0, // Reset kill streak on death
         lastEvent: new Date(),
       }
 
@@ -546,7 +546,7 @@ export class PlayerService implements IPlayerService {
         deaths: 1, // Suicide also counts as death
         skill: skillPenalty,
         death_streak: newDeathStreak,
-        kill_streak: 0, // Reset kill streak on death
+        killStreak: 0, // Reset kill streak on death
         lastEvent: new Date(),
       }
 

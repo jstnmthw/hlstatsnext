@@ -31,7 +31,6 @@ model GeoLiteCityBlock {
   location GeoLiteCityLocation @relation(fields: [locId], references: [locId])
 
   @@id([startIpNum, endIpNum])
-  @@map("geoLiteCity_Blocks")
 }
 
 model GeoLiteCityLocation {
@@ -44,8 +43,6 @@ model GeoLiteCityLocation {
   longitude  Decimal? @db.Decimal(14, 4)
 
   blocks GeoLiteCityBlock[]
-
-  @@map("geoLiteCity_Location")
 }
 
 // Core Tables
@@ -131,7 +128,7 @@ model Player {
   headshots Int @default(0) @db.UnsignedInt
 
   // Streaks and activity
-  kill_streak  Int @default(0) @db.Int
+  killStreak   Int @default(0) @db.Int
   death_streak Int @default(0) @db.Int
   activity     Int @default(100) @db.Int
 
@@ -677,7 +674,7 @@ model PlayerHistory {
   game           String   @default("") @db.VarChar(32)
   headshots      Int      @default(0) @db.UnsignedInt
   teamkills      Int      @default(0) @db.UnsignedInt
-  kill_streak    Int      @default(0)
+  killStreak     Int      @default(0)
   death_streak   Int      @default(0)
   skill_change   Int      @default(0)
 

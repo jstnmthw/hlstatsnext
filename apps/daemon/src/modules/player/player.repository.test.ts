@@ -43,7 +43,7 @@ function createMockPlayer(overrides: Partial<Player> = {}): Player {
     displayEvents: 1,
     blockavatar: 0,
     mmrank: null,
-    created_at: new Date(),
+    createdAt: new Date(),
     ...overrides,
   }
 }
@@ -227,7 +227,7 @@ describe("PlayerRepository", () => {
           lastName: playerData.lastName,
           game: playerData.game,
           skill: playerData.skill,
-          created_at: expect.any(Date),
+          createdAt: expect.any(Date),
           uniqueIds: {
             create: {
               uniqueId: playerData.steamId,

@@ -95,9 +95,9 @@ model Player {
   playerId Int @id @default(autoincrement()) @db.UnsignedInt
 
   // Event tracking
-  last_event        Int @default(0) @db.Int
-  connection_time   Int @default(0) @db.UnsignedInt
-  last_skill_change Int @default(0) @db.Int
+  last_event        DateTime? @db.DateTime(0)
+  connection_time   Int       @default(0) @db.UnsignedInt
+  last_skill_change DateTime? @db.DateTime(0)
 
   // Identity
   lastName    String  @default("") @db.VarChar(64) // Current display name
@@ -147,8 +147,8 @@ model Player {
   blockavatar   Int @default(0) @db.UnsignedInt // int(1) unsigned
 
   // Additional fields
-  mmrank     Int? @db.TinyInt // Matchmaking rank
-  createdate Int  @default(0) @db.Int
+  mmrank     Int?      @db.TinyInt // Matchmaking rank
+  created_at DateTime? @db.DateTime(0)
 
   // Relationships
   uniqueIds                   PlayerUniqueId[]
@@ -922,9 +922,9 @@ model Server {
   map_ts_hits   Int     @default(0)
   lat           Float?
   lng           Float?
-  city          String  @default("") @db.VarChar(64)
-  country       String  @default("") @db.VarChar(64)
-  last_event    Int     @default(0) @db.UnsignedInt
+  city          String    @default("") @db.VarChar(64)
+  country       String    @default("") @db.VarChar(64)
+  last_event    DateTime? @db.DateTime(0)
 
   eventsAdmin              EventAdmin[]
   eventsChangeName         EventChangeName[]

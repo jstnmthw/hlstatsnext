@@ -22,7 +22,7 @@ export const testPlayers = [
     death_streak: 0,
     connection_time: 0,
     hideranking: 0,
-    last_event: Math.floor(Date.now() / 1000),
+    last_event: new Date(),
   },
   {
     playerId: 2,
@@ -40,7 +40,7 @@ export const testPlayers = [
     death_streak: 0,
     connection_time: 3600,
     hideranking: 0,
-    last_event: Math.floor(Date.now() / 1000),
+    last_event: new Date(),
   },
 ]
 

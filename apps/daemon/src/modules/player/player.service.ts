@@ -37,7 +37,7 @@ export class PlayerService implements IPlayerService {
   private readonly DEFAULT_CONFIDENCE = 350
   private readonly DEFAULT_VOLATILITY = 0.06
   private readonly MAX_CONFIDENCE_REDUCTION = 300
-  private readonly UNIX_TIMESTAMP_DIVISOR = 1000
+  // Removed UNIX_TIMESTAMP_DIVISOR as we're using DateTime now
 
   constructor(
     private readonly repository: IPlayerRepository,
@@ -114,7 +114,7 @@ export class PlayerService implements IPlayerService {
       if (updates.skill !== undefined) {
         updateData.skill = { increment: updates.skill }
         // Update last skill change timestamp when skill is modified
-        updateData.last_skill_change = Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR)
+        updateData.last_skill_change = new Date()
       }
       if (updates.shots !== undefined) {
         updateData.shots = { increment: updates.shots }
@@ -209,7 +209,7 @@ export class PlayerService implements IPlayerService {
         updates.map((update) =>
           this.repository.update(update.playerId, {
             skill: update.newRating,
-            last_skill_change: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
+            last_skill_change: new Date(),
           }),
         ),
       )
@@ -236,7 +236,7 @@ export class PlayerService implements IPlayerService {
 
   async getRoundParticipants(serverId: number, duration: number): Promise<unknown[]> {
     try {
-      const durationMs = duration * this.UNIX_TIMESTAMP_DIVISOR
+      const durationMs = duration * 1000
       const roundStartTime = new Date(Date.now() - durationMs)
 
       return await this.repository.findRoundParticipants(serverId, roundStartTime)
@@ -283,7 +283,6 @@ export class PlayerService implements IPlayerService {
   async handleKillEvent(event: PlayerKillEvent): Promise<HandlerResult> {
     try {
       const { killerId, victimId, headshot, weapon, killerTeam, victimTeam } = event.data
-      const timestamp = Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR)
 
       // Get current player stats for streak tracking
       const [killerStats, victimStats] = await Promise.all([
@@ -338,7 +337,7 @@ export class PlayerService implements IPlayerService {
         skill: skillAdjustment.killerChange,
         kill_streak: newKillerKillStreak,
         death_streak: 0, // Reset death streak on kill
-        last_event: timestamp,
+        last_event: new Date(),
       }
 
       if (headshot) {
@@ -357,7 +356,7 @@ export class PlayerService implements IPlayerService {
         skill: skillAdjustment.victimChange,
         death_streak: newVictimDeathStreak,
         kill_streak: 0, // Reset kill streak on death
-        last_event: timestamp,
+        last_event: new Date(),
       }
 
       // Apply stat updates and log EventFrag
@@ -426,7 +425,7 @@ export class PlayerService implements IPlayerService {
       const { playerId } = connectEvent.data
 
       await this.updatePlayerStats(playerId, {
-        last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
+        last_event: new Date(),
       })
 
       this.logger.debug(`Player connected: ${playerId}`)
@@ -449,7 +448,7 @@ export class PlayerService implements IPlayerService {
       const { playerId, sessionDuration } = disconnectEvent.data
 
       const updates: PlayerStatsUpdate = {
-        last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
+        last_event: new Date(),
       }
 
       if (sessionDuration) {
@@ -494,7 +493,7 @@ export class PlayerService implements IPlayerService {
 
       await this.updatePlayerStats(playerId, {
         lastName: newName,
-        last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
+        last_event: new Date(),
       })
 
       return { success: true, affected: 1 }
@@ -513,7 +512,6 @@ export class PlayerService implements IPlayerService {
       }
       const suicideEvent = event as PlayerSuicideEvent
       const { playerId } = suicideEvent.data
-      const timestamp = Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR)
 
       // Get current player stats for streak tracking
       const playerStats = await this.repository.getPlayerStats(playerId)
@@ -537,7 +535,7 @@ export class PlayerService implements IPlayerService {
         skill: skillPenalty,
         death_streak: newDeathStreak,
         kill_streak: 0, // Reset kill streak on death
-        last_event: timestamp,
+        last_event: new Date(),
       }
 
       await this.updatePlayerStats(playerId, updates)
@@ -560,13 +558,12 @@ export class PlayerService implements IPlayerService {
       }
       const damageEvent = event as PlayerDamageEvent
       const { attackerId, victimId, weapon, damage, hitgroup } = damageEvent.data
-      const timestamp = Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR)
 
       // Update attacker's shots and hits statistics
       const attackerUpdates: PlayerStatsUpdate = {
         shots: 1, // Each damage event counts as a hit
         hits: 1,
-        last_event: timestamp,
+        last_event: new Date(),
       }
 
       // If it's a headshot, update headshot count
@@ -601,7 +598,7 @@ export class PlayerService implements IPlayerService {
       // Update killer stats (teamkill)
       const killerUpdates: PlayerStatsUpdate = {
         teamkills: 1,
-        last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
+        last_event: new Date(),
       }
 
       if (headshot) {
@@ -611,7 +608,7 @@ export class PlayerService implements IPlayerService {
       // Update victim stats (death)
       const victimUpdates: PlayerStatsUpdate = {
         deaths: 1,
-        last_event: Math.floor(Date.now() / this.UNIX_TIMESTAMP_DIVISOR),
+        last_event: new Date(),
       }
 
       await Promise.all([

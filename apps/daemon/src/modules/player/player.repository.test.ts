@@ -13,9 +13,9 @@ import type { DatabaseClient } from "@/database/client"
 function createMockPlayer(overrides: Partial<Player> = {}): Player {
   return {
     playerId: 1,
-    last_event: Math.floor(Date.now() / 1000),
+    last_event: new Date(),
     connection_time: 0,
-    last_skill_change: Math.floor(Date.now() / 1000),
+    last_skill_change: new Date(),
     lastName: "TestPlayer",
     lastAddress: "127.0.0.1",
     fullName: "",
@@ -45,7 +45,7 @@ function createMockPlayer(overrides: Partial<Player> = {}): Player {
     displayEvents: 1,
     blockavatar: 0,
     mmrank: null,
-    createdate: Math.floor(Date.now() / 1000),
+    created_at: new Date(),
     ...overrides,
   }
 }
@@ -216,7 +216,7 @@ describe("PlayerRepository", () => {
       const mockCreatedPlayer = createMockPlayer({
         playerId: 1,
         ...playerData,
-        last_event: Math.floor(Date.now() / 1000),
+        last_event: new Date(),
       })
 
       mockDatabase.mockPrisma.player.create.mockResolvedValue(mockCreatedPlayer)

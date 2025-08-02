@@ -129,7 +129,7 @@ type PlayerData = Pick<
   | "lat"
   | "lng"
   | "last_event"
-  | "createdate"
+  | "created_at"
 >
 
 /**
@@ -146,18 +146,14 @@ export function generatePlayerData(): PlayerData {
   const lat = faker.location.latitude()
   const lng = faker.location.longitude()
 
-  // Player creation date (within last 2 years) - as timestamp
-  const createdate = Math.floor(faker.date.past({ years: 2 }).getTime() / 1000)
+  // Player creation date (within last 2 years)
+  const created_at = faker.date.past({ years: 2 })
 
-  // Last event (between creation and now) - as timestamp
-  const last_event = Math.floor(
-    faker.date
-      .between({
-        from: new Date(createdate * 1000),
-        to: new Date(),
-      })
-      .getTime() / 1000,
-  )
+  // Last event (between creation and now)
+  const last_event = faker.date.between({
+    from: created_at,
+    to: new Date(),
+  })
 
   return {
     lastName,
@@ -169,7 +165,7 @@ export function generatePlayerData(): PlayerData {
     lat,
     lng,
     last_event,
-    createdate,
+    created_at,
   }
 }
 

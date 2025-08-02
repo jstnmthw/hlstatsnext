@@ -13,7 +13,7 @@ import type { DatabaseClient } from "@/database/client"
 function createMockPlayer(overrides: Partial<Player> = {}): Player {
   return {
     playerId: 1,
-    last_event: new Date(),
+    lastEvent: new Date(),
     connection_time: 0,
     lastSkillChange: new Date(),
     lastName: "TestPlayer",
@@ -214,7 +214,7 @@ describe("PlayerRepository", () => {
       const mockCreatedPlayer = createMockPlayer({
         playerId: 1,
         ...playerData,
-        last_event: new Date(),
+        lastEvent: new Date(),
       })
 
       mockDatabase.mockPrisma.player.create.mockResolvedValue(mockCreatedPlayer)

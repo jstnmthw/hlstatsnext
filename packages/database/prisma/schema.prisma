@@ -198,7 +198,7 @@ model Action {
   id                      Int     @id @default(autoincrement()) @db.UnsignedInt
   game                    String  @default("valve") @db.VarChar(32)
   code                    String  @default("") @db.VarChar(64)
-  reward_player           Int     @default(10)
+  rewardPlayer            Int     @default(10)
   reward_team             Int     @default(0)
   team                    String  @default("") @db.VarChar(64)
   description             String? @db.VarChar(128)

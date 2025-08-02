@@ -17,7 +17,7 @@ export async function seedActions() {
       const action: Prisma.ActionCreateManyInput = {
         game: game.code,
         code: faker.lorem.slug(2),
-        reward_player: faker.number.int({ min: -10, max: 25 }),
+        rewardPlayer: faker.number.int({ min: -10, max: 25 }),
         reward_team: faker.number.int({ min: 0, max: 10 }),
         team: "",
       }

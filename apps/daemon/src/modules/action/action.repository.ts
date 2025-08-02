@@ -47,7 +47,7 @@ export class ActionRepository implements IActionRepository {
         id: action.id,
         game: action.game,
         code: action.code,
-        rewardPlayer: action.reward_player,
+        rewardPlayer: action.rewardPlayer,
         rewardTeam: action.reward_team,
         team: action.team,
         description: action.description,

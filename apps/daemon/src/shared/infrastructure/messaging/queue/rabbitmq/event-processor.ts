@@ -104,9 +104,9 @@ export class RabbitMQEventProcessor implements IEventProcessor {
         // Try to call handler methods in order of preference:
         // 1. Generic handleEvent method (cleanest approach)
         // 2. Specific handler method based on event type (legacy support)
-        
+
         let methodCalled = false
-        
+
         if (handler.handleEvent && typeof handler.handleEvent === "function") {
           await handler.handleEvent(event)
           methodCalled = true

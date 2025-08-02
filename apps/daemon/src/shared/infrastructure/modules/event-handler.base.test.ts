@@ -56,7 +56,7 @@ describe("BaseModuleEventHandler", () => {
       handler.destroy()
 
       expect(logger.debug).toHaveBeenCalledWith(
-        "TestModuleEventHandler cleanup completed (queue-only processing)"
+        "TestModuleEventHandler cleanup completed (queue-only processing)",
       )
     })
 
@@ -116,7 +116,7 @@ describe("BaseModuleEventHandler", () => {
       expect(metrics.recordProcessingTime).toHaveBeenCalledWith(
         EventType.PLAYER_KILL,
         100,
-        "TestModule"
+        "TestModule",
       )
     })
   })
@@ -158,7 +158,7 @@ describe("BaseModuleEventHandler", () => {
       expect(metrics.recordProcessingTime).toHaveBeenCalledWith(
         EventType.PLAYER_CONNECT,
         50,
-        "TestModule"
+        "TestModule",
       )
     })
   })

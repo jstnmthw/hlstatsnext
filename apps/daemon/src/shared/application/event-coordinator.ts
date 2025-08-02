@@ -59,7 +59,6 @@ export class KillEventCoordinator implements EventCoordinator {
   }
 }
 
-
 /**
  * Composite Event Coordinator
  *

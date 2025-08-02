@@ -73,7 +73,7 @@ describe("PlayerEventHandler", () => {
     it("should provide proper cleanup", () => {
       // Should not throw when destroyed
       expect(() => handler.destroy()).not.toThrow()
-      
+
       expect(logger.debug).toHaveBeenCalledWith(
         "PlayerEventHandler cleanup completed (queue-only processing)",
       )
@@ -90,8 +90,8 @@ describe("PlayerEventHandler", () => {
         data: {},
         meta: {
           steamId: "STEAM_1:0:123456",
-          playerName: "TestPlayer"
-        }
+          playerName: "TestPlayer",
+        },
       }
 
       await handler.handleEvent(event)
@@ -99,15 +99,15 @@ describe("PlayerEventHandler", () => {
       expect(playerService.getOrCreatePlayer).toHaveBeenCalledWith(
         "STEAM_1:0:123456",
         "TestPlayer",
-        "csgo"
+        "csgo",
       )
       expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           eventType: EventType.CHAT_MESSAGE,
           data: expect.objectContaining({
-            playerId: 123
-          })
-        })
+            playerId: 123,
+          }),
+        }),
       )
     })
 
@@ -127,35 +127,37 @@ describe("PlayerEventHandler", () => {
           weapon: "ak47",
           headshot: false,
           killerTeam: "TERRORIST",
-          victimTeam: "CT"
+          victimTeam: "CT",
         },
         meta: {
           killer: {
             steamId: "STEAM_1:0:111111",
             playerName: "KillerPlayer",
-            isBot: false
+            isBot: false,
           },
           victim: {
-            steamId: "STEAM_1:0:222222", 
+            steamId: "STEAM_1:0:222222",
             playerName: "VictimPlayer",
-            isBot: false
-          }
-        }
+            isBot: false,
+          },
+        },
       }
 
       await handler.handleEvent(event)
 
       // Should resolve both killer and victim
       expect(playerService.getOrCreatePlayer).toHaveBeenCalledTimes(2)
-      expect(playerService.getOrCreatePlayer).toHaveBeenNthCalledWith(1,
+      expect(playerService.getOrCreatePlayer).toHaveBeenNthCalledWith(
+        1,
         "STEAM_1:0:111111",
-        "KillerPlayer", 
-        "csgo"
+        "KillerPlayer",
+        "csgo",
       )
-      expect(playerService.getOrCreatePlayer).toHaveBeenNthCalledWith(2,
+      expect(playerService.getOrCreatePlayer).toHaveBeenNthCalledWith(
+        2,
         "STEAM_1:0:222222",
         "VictimPlayer",
-        "csgo"
+        "csgo",
       )
 
       // Should call handlePlayerEvent with resolved database IDs
@@ -166,9 +168,9 @@ describe("PlayerEventHandler", () => {
             killerId: 456, // resolved DB ID
             victimId: 789, // resolved DB ID
             weapon: "ak47",
-            headshot: false
-          })
-        })
+            headshot: false,
+          }),
+        }),
       )
     })
 
@@ -188,20 +190,20 @@ describe("PlayerEventHandler", () => {
           weapon: "m4a1",
           headshot: true,
           killerTeam: "CT",
-          victimTeam: "TERRORIST"
+          victimTeam: "TERRORIST",
         },
         meta: {
           killer: {
             steamId: "BOT",
             playerName: "Bot Mike",
-            isBot: true
+            isBot: true,
           },
           victim: {
             steamId: "BOT",
-            playerName: "Bot Alice", 
-            isBot: true
-          }
-        }
+            playerName: "Bot Alice",
+            isBot: true,
+          },
+        },
       }
 
       await handler.handleEvent(event)
@@ -213,9 +215,9 @@ describe("PlayerEventHandler", () => {
           data: expect.objectContaining({
             killerId: 100,
             victimId: 200,
-            headshot: true
-          })
-        })
+            headshot: true,
+          }),
+        }),
       )
     })
 
@@ -229,8 +231,8 @@ describe("PlayerEventHandler", () => {
           killerId: 10,
           victimId: 20,
           weapon: "ak47",
-          headshot: false
-        }
+          headshot: false,
+        },
         // missing meta
       }
 
@@ -238,21 +240,21 @@ describe("PlayerEventHandler", () => {
 
       // Should not try to resolve players
       expect(playerService.getOrCreatePlayer).not.toHaveBeenCalled()
-      
+
       // Should still call handlePlayerEvent with original data
       expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           eventType: EventType.PLAYER_KILL,
           data: expect.objectContaining({
             killerId: 10, // unchanged raw ID
-            victimId: 20  // unchanged raw ID
-          })
-        })
+            victimId: 20, // unchanged raw ID
+          }),
+        }),
       )
 
       expect(logger.error).toHaveBeenCalledWith(
         "Missing meta data for PLAYER_KILL event",
-        expect.objectContaining({ eventId: "test-missing-meta" })
+        expect.objectContaining({ eventId: "test-missing-meta" }),
       )
     })
 
@@ -262,7 +264,7 @@ describe("PlayerEventHandler", () => {
         timestamp: new Date(),
         serverId: 1,
         eventId: "test-no-meta",
-        data: {}
+        data: {},
         // no meta
       }
 
@@ -271,9 +273,9 @@ describe("PlayerEventHandler", () => {
       expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            playerId: 0
-          })
-        })
+            playerId: 0,
+          }),
+        }),
       )
     })
   })

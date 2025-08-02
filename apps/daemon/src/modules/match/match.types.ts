@@ -237,7 +237,6 @@ export interface IMatchService {
   // MVP calculations
   calculateMatchMVP(serverId: number): Promise<number | undefined>
   calculatePlayerScore(stats: PlayerRoundStats): number
-
 }
 
 // Type for server record from database

@@ -135,7 +135,9 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
         },
       } as PlayerEvent
 
-      this.logger.debug(`Resolved PLAYER_KILL player IDs: killer ${meta.killer.steamId} -> ${killerId}, victim ${meta.victim.steamId} -> ${victimId}`)
+      this.logger.debug(
+        `Resolved PLAYER_KILL player IDs: killer ${meta.killer.steamId} -> ${killerId}, victim ${meta.victim.steamId} -> ${victimId}`,
+      )
 
       return resolvedEvent
     } catch (error) {

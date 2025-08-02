@@ -89,7 +89,6 @@ describe("Event Coordinators", () => {
     })
   })
 
-
   describe("CompositeEventCoordinator", () => {
     let coordinator: CompositeEventCoordinator
     let mockCoordinator1: EventCoordinator

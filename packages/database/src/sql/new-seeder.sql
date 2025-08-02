@@ -2,7 +2,7 @@
 -- Dumping data for table `Actions`
 --
 
-INSERT INTO `Actions` (`game`, `code`, `reward_player`, `reward_team`, `team`, `description`, `for_PlayerActions`, `for_PlayerPlayerActions`, `for_TeamActions`, `for_WorldActions`) VALUES
+INSERT INTO `Actions` (`game`, `code`, `rewardPlayer`, `reward_team`, `team`, `description`, `for_PlayerActions`, `for_PlayerPlayerActions`, `for_TeamActions`, `for_WorldActions`) VALUES
 ('tf', 'flagevent_defended', 1, 0, '', 'Defended the flag', '1', '0', '0', '0'),
 ('tf', 'flagevent_captured', 5, 1, '', 'Captured the flag', '1', '0', '0', '0'),
 ('tf', 'flagevent_dropped', -2, 0, '', 'Dropped the flag (while alive)', '1', '0', '0', '0'),

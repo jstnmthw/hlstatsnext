@@ -160,7 +160,7 @@ export interface PlayerStats {
   kill_streak: number
   death_streak: number
   connection_time: number
-  last_event: number
+  last_event: Date | null
 }
 
 export interface PlayerStatsUpdate {
@@ -175,7 +175,7 @@ export interface PlayerStatsUpdate {
   kill_streak?: number
   death_streak?: number
   connection_time?: number
-  last_event?: number
+  last_event?: Date
   lastName?: string
 }
 

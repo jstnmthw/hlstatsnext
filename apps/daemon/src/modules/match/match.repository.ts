@@ -92,7 +92,7 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
             teamkills: data.teamkills || 0,
             connectionTime: data.connectionTime || 0,
             killStreak: data.killStreak || 0,
-            death_streak: data.death_streak || 0,
+            deathStreak: data.deathStreak || 0,
             skill_change: data.skill_change || 0,
           },
         })

@@ -134,8 +134,8 @@ export class PlayerService implements IPlayerService {
       if (updates.killStreak !== undefined) {
         updateData.killStreak = updates.killStreak
       }
-      if (updates.death_streak !== undefined) {
-        updateData.death_streak = updates.death_streak
+      if (updates.deathStreak !== undefined) {
+        updateData.deathStreak = updates.deathStreak
       }
       if (updates.lastEvent !== undefined) {
         updateData.lastEvent = updates.lastEvent
@@ -335,14 +335,14 @@ export class PlayerService implements IPlayerService {
 
       // Calculate streaks
       const newKillerKillStreak = (killerStats.killStreak || 0) + 1
-      const newVictimDeathStreak = (victimStats.death_streak || 0) + 1
+      const newVictimDeathStreak = (victimStats.deathStreak || 0) + 1
 
       // Update killer stats
       const killerUpdates: PlayerStatsUpdate = {
         kills: 1,
         skill: skillAdjustment.killerChange,
         killStreak: newKillerKillStreak,
-        death_streak: 0, // Reset death streak on kill
+        deathStreak: 0, // Reset death streak on kill
         lastEvent: new Date(),
       }
 
@@ -360,7 +360,7 @@ export class PlayerService implements IPlayerService {
       const victimUpdates: PlayerStatsUpdate = {
         deaths: 1,
         skill: skillAdjustment.victimChange,
-        death_streak: newVictimDeathStreak,
+        deathStreak: newVictimDeathStreak,
         killStreak: 0, // Reset kill streak on death
         lastEvent: new Date(),
       }
@@ -539,13 +539,13 @@ export class PlayerService implements IPlayerService {
       const skillPenalty = this.rankingService.calculateSuicidePenalty()
 
       // Update death streak, reset kill streak
-      const newDeathStreak = (playerStats.death_streak || 0) + 1
+      const newDeathStreak = (playerStats.deathStreak || 0) + 1
 
       const updates: PlayerStatsUpdate = {
         suicides: 1,
         deaths: 1, // Suicide also counts as death
         skill: skillPenalty,
-        death_streak: newDeathStreak,
+        deathStreak: newDeathStreak,
         killStreak: 0, // Reset kill streak on death
         lastEvent: new Date(),
       }

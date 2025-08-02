@@ -108,7 +108,7 @@ describe("PlayerService", () => {
         kills: 5,
         deaths: 3,
         killStreak: 2,
-        death_streak: 0,
+        deathStreak: 0,
       } as Player
 
       const victimStats = {
@@ -117,7 +117,7 @@ describe("PlayerService", () => {
         kills: 3,
         deaths: 5,
         killStreak: 0,
-        death_streak: 1,
+        deathStreak: 1,
       } as Player
 
       // Mock repository methods
@@ -184,7 +184,7 @@ describe("PlayerService", () => {
         kills: 0,
         deaths: 0,
         killStreak: 0,
-        death_streak: 0,
+        deathStreak: 0,
       } as Player
       const victimStats = {
         playerId: 2,
@@ -192,7 +192,7 @@ describe("PlayerService", () => {
         kills: 0,
         deaths: 0,
         killStreak: 0,
-        death_streak: 0,
+        deathStreak: 0,
       } as Player
 
       vi.spyOn(mockRepository, "getPlayerStats")
@@ -234,7 +234,7 @@ describe("PlayerService", () => {
         kills: 0,
         deaths: 0,
         killStreak: 0,
-        death_streak: 0,
+        deathStreak: 0,
       } as Player
       const victimStats = {
         playerId: 2,
@@ -242,7 +242,7 @@ describe("PlayerService", () => {
         kills: 0,
         deaths: 0,
         killStreak: 0,
-        death_streak: 0,
+        deathStreak: 0,
       } as Player
 
       vi.spyOn(mockRepository, "getPlayerStats")
@@ -310,7 +310,7 @@ describe("PlayerService", () => {
         kills: 0,
         deaths: 0,
         killStreak: 0,
-        death_streak: 0,
+        deathStreak: 0,
       } as Player
       const victimStats = {
         playerId: 2,
@@ -318,7 +318,7 @@ describe("PlayerService", () => {
         kills: 0,
         deaths: 0,
         killStreak: 0,
-        death_streak: 0,
+        deathStreak: 0,
       } as Player
 
       vi.spyOn(mockRepository, "getPlayerStats")
@@ -376,7 +376,7 @@ describe("PlayerService", () => {
         kills: 0,
         deaths: 0,
         killStreak: 0,
-        death_streak: 0,
+        deathStreak: 0,
       } as Player
       const victimStats = {
         playerId: 2,
@@ -384,7 +384,7 @@ describe("PlayerService", () => {
         kills: 0,
         deaths: 0,
         killStreak: 0,
-        death_streak: 0,
+        deathStreak: 0,
       } as Player
 
       vi.spyOn(mockRepository, "getPlayerStats")
@@ -447,7 +447,7 @@ describe("PlayerService", () => {
         kills: 0,
         deaths: 0,
         killStreak: 0,
-        death_streak: 0,
+        deathStreak: 0,
       } as Player
       const victimStats = {
         playerId: 2,
@@ -455,7 +455,7 @@ describe("PlayerService", () => {
         kills: 0,
         deaths: 0,
         killStreak: 0,
-        death_streak: 0,
+        deathStreak: 0,
       } as Player
 
       vi.spyOn(mockRepository, "getPlayerStats")

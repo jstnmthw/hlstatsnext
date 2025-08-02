@@ -262,7 +262,7 @@ export interface PlayerHistoryData {
   teamkills?: number
   connectionTime?: number
   killStreak?: number
-  death_streak?: number
+  deathStreak?: number
   skill_change?: number
 }
 

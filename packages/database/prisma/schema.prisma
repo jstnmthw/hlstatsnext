@@ -128,9 +128,9 @@ model Player {
   headshots Int @default(0) @db.UnsignedInt
 
   // Streaks and activity
-  killStreak   Int @default(0) @db.Int
-  death_streak Int @default(0) @db.Int
-  activity     Int @default(100) @db.Int
+  killStreak  Int @default(0) @db.Int
+  deathStreak Int @default(0) @db.Int
+  activity    Int @default(100) @db.Int
 
   // Game relationship
   game     String @db.VarChar(32)
@@ -675,7 +675,7 @@ model PlayerHistory {
   headshots      Int      @default(0) @db.UnsignedInt
   teamkills      Int      @default(0) @db.UnsignedInt
   killStreak     Int      @default(0)
-  death_streak   Int      @default(0)
+  deathStreak    Int      @default(0)
   skill_change   Int      @default(0)
 
   player Player @relation(fields: [playerId], references: [playerId])

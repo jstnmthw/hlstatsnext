@@ -36,7 +36,7 @@ function createMockPlayer(overrides: Partial<Player> = {}): Player {
     teamkills: 0,
     headshots: 0,
     killStreak: 0,
-    death_streak: 0,
+    deathStreak: 0,
     activity: 0,
     game: "csgo",
     hideranking: 0,

@@ -212,6 +212,10 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
       EventType.PLAYER_DISCONNECT,
       EventType.PLAYER_CHANGE_NAME,
       EventType.CHAT_MESSAGE,
+      EventType.PLAYER_KILL,
+      EventType.PLAYER_SUICIDE,
+      EventType.PLAYER_DAMAGE,
+      EventType.PLAYER_TEAMKILL,
     ],
   })
 

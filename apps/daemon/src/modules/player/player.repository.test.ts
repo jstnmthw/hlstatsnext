@@ -229,6 +229,7 @@ describe("PlayerRepository", () => {
           lastName: playerData.lastName,
           game: playerData.game,
           skill: playerData.skill,
+          created_at: expect.any(Date),
           uniqueIds: {
             create: {
               uniqueId: playerData.steamId,

@@ -5,8 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { PlayerEventHandler } from "./player.events"
 import { createMockLogger } from "../../tests/mocks/logger"
-import { createMockEventBus } from "../../tests/mocks/event-bus"
-import type { BaseEvent, PlayerMeta } from "@/shared/types/events"
+import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import type { IPlayerService } from "./player.types"
 import type { IServerService } from "@/modules/server/server.types"
@@ -36,13 +35,11 @@ const createMockServerService = (): IServerService => ({
 describe("PlayerEventHandler", () => {
   let handler: PlayerEventHandler
   let logger: ReturnType<typeof createMockLogger>
-  let eventBus: ReturnType<typeof createMockEventBus>
   let playerService: IPlayerService
   let serverService: IServerService
 
   beforeEach(() => {
     logger = createMockLogger()
-    eventBus = createMockEventBus()
     playerService = createMockPlayerService()
     serverService = createMockServerService()
 
@@ -53,90 +50,231 @@ describe("PlayerEventHandler", () => {
     handler.destroy()
   })
 
-  describe("Event Registration", () => {
-    it("should not register EventBus handlers for queue-only player events", () => {
-      // All player events have been migrated to queue-only processing
-      // No EventBus handlers should be registered
-      const eventTypes = [
-        EventType.PLAYER_CONNECT,
-        EventType.PLAYER_DISCONNECT,
-        EventType.PLAYER_CHANGE_NAME,
-        EventType.CHAT_MESSAGE,
-      ]
-
-      for (const eventType of eventTypes) {
-        expect(logger.debug).not.toHaveBeenCalledWith(
-          expect.stringContaining(`Registered PlayerEventHandler handler for ${eventType}`),
-        )
-      }
-    })
-
-    it("should not register handlers for complex player events", () => {
-      const complexEvents = [
-        EventType.PLAYER_KILL,
-        EventType.PLAYER_SUICIDE,
-        EventType.PLAYER_TEAMKILL,
-      ]
-
-      for (const eventType of complexEvents) {
-        expect(logger.debug).not.toHaveBeenCalledWith(
-          expect.stringContaining(`Registered PlayerEventHandler handler for ${eventType}`),
-        )
-      }
-    })
-  })
-
-  describe("Queue-Only Event Processing", () => {
-    // Since all player events are now queue-only, they don't have EventBus handlers
-    // The PlayerEventHandler now only provides utility methods for player ID resolution
-
-    it("should not handle queue-only events via EventBus", async () => {
-      const event: BaseEvent = {
-        eventType: EventType.PLAYER_CONNECT,
-        timestamp: new Date(),
-        serverId: 1,
-        data: {},
-      }
-
-      await eventBus.emit(event)
-
-      // No handlers should be called since all player events are queue-only
-      expect(serverService.getServerGame).not.toHaveBeenCalled()
-      expect(playerService.getOrCreatePlayer).not.toHaveBeenCalled()
-      expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
-    })
-
-    it("should provide utility methods for player ID resolution", () => {
-      // The handler provides utility methods that can be used by queue consumers
+  describe("Handler Instantiation", () => {
+    it("should create handler instance successfully", () => {
       expect(handler).toBeDefined()
-      expect(typeof handler).toBe("object")
+      expect(handler).toBeInstanceOf(PlayerEventHandler)
+    })
+
+    it("should extend BaseModuleEventHandler", () => {
+      expect(handler).toBeDefined()
+      expect(typeof handler.handleEvent).toBe("function")
+      expect(typeof handler.destroy).toBe("function")
     })
   })
 
-  describe("Cleanup", () => {
-    it("should unregister all handlers on destroy", () => {
-      handler.destroy()
+  describe("Queue Infrastructure Compatibility", () => {
+    it("should be compatible with the new queue infrastructure", () => {
+      // The handler should have the handleEvent method required by queue processors
+      expect(typeof handler.handleEvent).toBe("function")
+      expect(handler.handleEvent).toBeDefined()
+    })
 
+    it("should provide proper cleanup", () => {
+      // Should not throw when destroyed
+      expect(() => handler.destroy()).not.toThrow()
+      
       expect(logger.debug).toHaveBeenCalledWith(
         "PlayerEventHandler cleanup completed (queue-only processing)",
       )
+    })
+  })
 
-      // Verify handlers are actually removed by emitting an event
+  describe("handleEvent method", () => {
+    it("should handle CHAT_MESSAGE events", async () => {
+      const event: BaseEvent = {
+        eventType: EventType.CHAT_MESSAGE,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "test-event-id",
+        data: {},
+        meta: {
+          steamId: "STEAM_1:0:123456",
+          playerName: "TestPlayer"
+        }
+      }
+
+      await handler.handleEvent(event)
+
+      expect(playerService.getOrCreatePlayer).toHaveBeenCalledWith(
+        "STEAM_1:0:123456",
+        "TestPlayer",
+        "csgo"
+      )
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: EventType.CHAT_MESSAGE,
+          data: expect.objectContaining({
+            playerId: 123
+          })
+        })
+      )
+    })
+
+    it("should handle PLAYER_KILL events with dual player resolution", async () => {
+      const mockGetOrCreatePlayer = vi.mocked(playerService.getOrCreatePlayer)
+      mockGetOrCreatePlayer.mockResolvedValueOnce(456) // killer
+      mockGetOrCreatePlayer.mockResolvedValueOnce(789) // victim
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "test-kill-event",
+        data: {
+          killerId: 10, // raw slot ID
+          victimId: 20, // raw slot ID
+          weapon: "ak47",
+          headshot: false,
+          killerTeam: "TERRORIST",
+          victimTeam: "CT"
+        },
+        meta: {
+          killer: {
+            steamId: "STEAM_1:0:111111",
+            playerName: "KillerPlayer",
+            isBot: false
+          },
+          victim: {
+            steamId: "STEAM_1:0:222222", 
+            playerName: "VictimPlayer",
+            isBot: false
+          }
+        }
+      }
+
+      await handler.handleEvent(event)
+
+      // Should resolve both killer and victim
+      expect(playerService.getOrCreatePlayer).toHaveBeenCalledTimes(2)
+      expect(playerService.getOrCreatePlayer).toHaveBeenNthCalledWith(1,
+        "STEAM_1:0:111111",
+        "KillerPlayer", 
+        "csgo"
+      )
+      expect(playerService.getOrCreatePlayer).toHaveBeenNthCalledWith(2,
+        "STEAM_1:0:222222",
+        "VictimPlayer",
+        "csgo"
+      )
+
+      // Should call handlePlayerEvent with resolved database IDs
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: EventType.PLAYER_KILL,
+          data: expect.objectContaining({
+            killerId: 456, // resolved DB ID
+            victimId: 789, // resolved DB ID
+            weapon: "ak47",
+            headshot: false
+          })
+        })
+      )
+    })
+
+    it("should handle BOT players in PLAYER_KILL events", async () => {
+      const mockGetOrCreatePlayer = vi.mocked(playerService.getOrCreatePlayer)
+      mockGetOrCreatePlayer.mockResolvedValueOnce(100) // bot killer
+      mockGetOrCreatePlayer.mockResolvedValueOnce(200) // bot victim
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "test-bot-kill",
+        data: {
+          killerId: 5,
+          victimId: 15,
+          weapon: "m4a1",
+          headshot: true,
+          killerTeam: "CT",
+          victimTeam: "TERRORIST"
+        },
+        meta: {
+          killer: {
+            steamId: "BOT",
+            playerName: "Bot Mike",
+            isBot: true
+          },
+          victim: {
+            steamId: "BOT",
+            playerName: "Bot Alice", 
+            isBot: true
+          }
+        }
+      }
+
+      await handler.handleEvent(event)
+
+      expect(playerService.getOrCreatePlayer).toHaveBeenCalledWith("BOT", "Bot Mike", "csgo")
+      expect(playerService.getOrCreatePlayer).toHaveBeenCalledWith("BOT", "Bot Alice", "csgo")
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            killerId: 100,
+            victimId: 200,
+            headshot: true
+          })
+        })
+      )
+    })
+
+    it("should handle PLAYER_KILL events with missing meta gracefully", async () => {
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "test-missing-meta",
+        data: {
+          killerId: 10,
+          victimId: 20,
+          weapon: "ak47",
+          headshot: false
+        }
+        // missing meta
+      }
+
+      await handler.handleEvent(event)
+
+      // Should not try to resolve players
+      expect(playerService.getOrCreatePlayer).not.toHaveBeenCalled()
+      
+      // Should still call handlePlayerEvent with original data
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: EventType.PLAYER_KILL,
+          data: expect.objectContaining({
+            killerId: 10, // unchanged raw ID
+            victimId: 20  // unchanged raw ID
+          })
+        })
+      )
+
+      expect(logger.error).toHaveBeenCalledWith(
+        "Missing meta data for PLAYER_KILL event",
+        expect.objectContaining({ eventId: "test-missing-meta" })
+      )
+    })
+
+    it("should handle events without meta gracefully", async () => {
       const event: BaseEvent = {
         eventType: EventType.PLAYER_CONNECT,
         timestamp: new Date(),
         serverId: 1,
-        meta: {
-          steamId: "STEAM_1:0:12345",
-          playerName: "TestPlayer",
-          isBot: false,
-        } as PlayerMeta,
+        eventId: "test-no-meta",
+        data: {}
+        // no meta
       }
 
-      vi.clearAllMocks()
-      eventBus.emit(event)
+      await handler.handleEvent(event)
 
-      expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            playerId: 0
+          })
+        })
+      )
     })
   })
 })

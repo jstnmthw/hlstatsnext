@@ -550,8 +550,8 @@ describe("PlayerService", () => {
     })
   })
 
-  describe("player creation with created_at", () => {
-    it("should set created_at when creating players", async () => {
+  describe("player creation with createdAt", () => {
+    it("should set createdAt when creating players", async () => {
       vi.spyOn(mockRepository, "findByUniqueId").mockResolvedValue(null)
 
       const createSpy = vi

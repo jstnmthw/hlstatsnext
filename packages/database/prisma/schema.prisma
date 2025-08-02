@@ -142,8 +142,8 @@ model Player {
   blockavatar   Int @default(0) @db.UnsignedInt // int(1) unsigned
 
   // Additional fields
-  mmrank     Int?      @db.TinyInt // Matchmaking rank
-  created_at DateTime? @db.DateTime(0)
+  mmrank    Int?      @db.TinyInt // Matchmaking rank
+  createdAt DateTime? @db.DateTime(0)
 
   // Relationships
   uniqueIds                   PlayerUniqueId[]

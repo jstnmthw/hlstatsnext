@@ -120,7 +120,7 @@ export function generateClanData(): ClanData {
 // Type for player data
 type PlayerData = Pick<
   Prisma.PlayerCreateInput,
-  "lastName" | "fullName" | "email" | "city" | "state" | "lat" | "lng" | "lastEvent" | "created_at"
+  "lastName" | "fullName" | "email" | "city" | "state" | "lat" | "lng" | "lastEvent" | "createdAt"
 >
 
 /**
@@ -138,11 +138,11 @@ export function generatePlayerData(): PlayerData {
   const lng = faker.location.longitude()
 
   // Player creation date (within last 2 years)
-  const created_at = faker.date.past({ years: 2 })
+  const createdAt = faker.date.past({ years: 2 })
 
   // Last event (between creation and now)
   const lastEvent = faker.date.between({
-    from: created_at,
+    from: createdAt,
     to: new Date(),
   })
 
@@ -155,7 +155,7 @@ export function generatePlayerData(): PlayerData {
     lat,
     lng,
     lastEvent,
-    created_at,
+    createdAt,
   }
 }
 

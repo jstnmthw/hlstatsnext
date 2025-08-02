@@ -126,8 +126,8 @@ export class PlayerService implements IPlayerService {
       if (updates.headshots !== undefined) {
         updateData.headshots = { increment: updates.headshots }
       }
-      if (updates.connection_time !== undefined) {
-        updateData.connection_time = { increment: updates.connection_time }
+      if (updates.connectionTime !== undefined) {
+        updateData.connectionTime = { increment: updates.connectionTime }
       }
 
       // Direct value updates
@@ -464,7 +464,7 @@ export class PlayerService implements IPlayerService {
       }
 
       if (sessionDuration) {
-        updates.connection_time = sessionDuration
+        updates.connectionTime = sessionDuration
       }
 
       await this.updatePlayerStats(playerId, updates)

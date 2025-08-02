@@ -14,7 +14,7 @@ function createMockPlayer(overrides: Partial<Player> = {}): Player {
   return {
     playerId: 1,
     lastEvent: new Date(),
-    connection_time: 0,
+    connectionTime: 0,
     lastSkillChange: new Date(),
     lastName: "TestPlayer",
     lastAddress: "127.0.0.1",

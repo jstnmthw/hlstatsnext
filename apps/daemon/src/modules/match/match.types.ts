@@ -260,7 +260,7 @@ export interface PlayerHistoryData {
   hits?: number
   headshots?: number
   teamkills?: number
-  connection_time?: number
+  connectionTime?: number
   kill_streak?: number
   death_streak?: number
   skill_change?: number

@@ -4,7 +4,7 @@ import type { Prisma } from "../../client"
 // Type for game statistics
 export type GameStats = Pick<
   Prisma.PlayerCreateInput,
-  "skill" | "kills" | "deaths" | "headshots" | "shots" | "hits" | "connection_time"
+  "skill" | "kills" | "deaths" | "headshots" | "shots" | "hits" | "connectionTime"
 >
 
 /**
@@ -38,9 +38,9 @@ function generateCSSourceStats(): GameStats {
   const shots = Math.round((kills / accuracy) * 2)
   const hits = Math.round(shots * accuracy)
 
-  const connection_time = faker.number.int({ min: 3600, max: 500000 })
+  const connectionTime = faker.number.int({ min: 3600, max: 500000 })
 
-  return { skill, kills, deaths, headshots, shots, hits, connection_time }
+  return { skill, kills, deaths, headshots, shots, hits, connectionTime }
 }
 
 function generateTF2Stats(): GameStats {
@@ -57,9 +57,9 @@ function generateTF2Stats(): GameStats {
   const shots = Math.round((kills / accuracy) * 1.8)
   const hits = Math.round(shots * accuracy)
 
-  const connection_time = faker.number.int({ min: 2400, max: 400000 })
+  const connectionTime = faker.number.int({ min: 2400, max: 400000 })
 
-  return { skill, kills, deaths, headshots, shots, hits, connection_time }
+  return { skill, kills, deaths, headshots, shots, hits, connectionTime }
 }
 
 function generateTFCStats(): GameStats {
@@ -75,9 +75,9 @@ function generateTFCStats(): GameStats {
   const shots = Math.round((kills / accuracy) * 1.9)
   const hits = Math.round(shots * accuracy)
 
-  const connection_time = faker.number.int({ min: 1800, max: 350000 })
+  const connectionTime = faker.number.int({ min: 1800, max: 350000 })
 
-  return { skill, kills, deaths, headshots, shots, hits, connection_time }
+  return { skill, kills, deaths, headshots, shots, hits, connectionTime }
 }
 
 function generateDefaultStats(): GameStats {
@@ -93,9 +93,9 @@ function generateDefaultStats(): GameStats {
   const shots = Math.round((kills / accuracy) * 2.2)
   const hits = Math.round(shots * accuracy)
 
-  const connection_time = faker.number.int({ min: 1200, max: 300000 })
+  const connectionTime = faker.number.int({ min: 1200, max: 300000 })
 
-  return { skill, kills, deaths, headshots, shots, hits, connection_time }
+  return { skill, kills, deaths, headshots, shots, hits, connectionTime }
 }
 
 // Type for clan data
@@ -120,16 +120,7 @@ export function generateClanData(): ClanData {
 // Type for player data
 type PlayerData = Pick<
   Prisma.PlayerCreateInput,
-  | "lastName"
-  | "fullName"
-  | "email"
-  | "homepage"
-  | "city"
-  | "state"
-  | "lat"
-  | "lng"
-  | "lastEvent"
-  | "created_at"
+  "lastName" | "fullName" | "email" | "city" | "state" | "lat" | "lng" | "lastEvent" | "created_at"
 >
 
 /**
@@ -159,7 +150,6 @@ export function generatePlayerData(): PlayerData {
     lastName,
     fullName,
     email,
-    homepage,
     city,
     state,
     lat,

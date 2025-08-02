@@ -103,7 +103,7 @@ model Player {
   // Event tracking
   lastEvent       DateTime? @db.DateTime(0)
   lastSkillChange DateTime? @db.DateTime(0)
-  connection_time Int       @default(0) @db.UnsignedInt
+  connectionTime  Int       @default(0) @db.UnsignedInt
 
   // Location data
   city    String  @default("") @db.VarChar(64)
@@ -631,17 +631,17 @@ model OptionChoice {
 }
 
 model PlayerName {
-  playerId        Int       @db.UnsignedInt
-  name            String    @db.VarChar(64)
-  lastuse         DateTime? @db.DateTime(0)
-  connection_time Int       @default(0) @db.UnsignedInt
-  numuses         Int       @default(0) @db.UnsignedInt
-  kills           Int       @default(0) @db.UnsignedInt
-  deaths          Int       @default(0) @db.UnsignedInt
-  suicides        Int       @default(0) @db.UnsignedInt
-  headshots       Int       @default(0) @db.UnsignedInt
-  shots           Int       @default(0) @db.UnsignedInt
-  hits            Int       @default(0) @db.UnsignedInt
+  playerId       Int       @db.UnsignedInt
+  name           String    @db.VarChar(64)
+  lastuse        DateTime? @db.DateTime(0)
+  connectionTime Int       @default(0) @db.UnsignedInt
+  numuses        Int       @default(0) @db.UnsignedInt
+  kills          Int       @default(0) @db.UnsignedInt
+  deaths         Int       @default(0) @db.UnsignedInt
+  suicides       Int       @default(0) @db.UnsignedInt
+  headshots      Int       @default(0) @db.UnsignedInt
+  shots          Int       @default(0) @db.UnsignedInt
+  hits           Int       @default(0) @db.UnsignedInt
 
   player Player @relation(fields: [playerId], references: [playerId])
 
@@ -665,21 +665,21 @@ model PlayerAward {
 }
 
 model PlayerHistory {
-  playerId        Int      @db.UnsignedInt
-  eventTime       DateTime @db.Date
-  connection_time Int      @default(0) @db.UnsignedInt
-  kills           Int      @default(0) @db.UnsignedInt
-  deaths          Int      @default(0) @db.UnsignedInt
-  suicides        Int      @default(0) @db.UnsignedInt
-  skill           Int      @default(1000) @db.UnsignedInt
-  shots           Int      @default(0) @db.UnsignedInt
-  hits            Int      @default(0) @db.UnsignedInt
-  game            String   @default("") @db.VarChar(32)
-  headshots       Int      @default(0) @db.UnsignedInt
-  teamkills       Int      @default(0) @db.UnsignedInt
-  kill_streak     Int      @default(0)
-  death_streak    Int      @default(0)
-  skill_change    Int      @default(0)
+  playerId       Int      @db.UnsignedInt
+  eventTime      DateTime @db.Date
+  connectionTime Int      @default(0) @db.UnsignedInt
+  kills          Int      @default(0) @db.UnsignedInt
+  deaths         Int      @default(0) @db.UnsignedInt
+  suicides       Int      @default(0) @db.UnsignedInt
+  skill          Int      @default(1000) @db.UnsignedInt
+  shots          Int      @default(0) @db.UnsignedInt
+  hits           Int      @default(0) @db.UnsignedInt
+  game           String   @default("") @db.VarChar(32)
+  headshots      Int      @default(0) @db.UnsignedInt
+  teamkills      Int      @default(0) @db.UnsignedInt
+  kill_streak    Int      @default(0)
+  death_streak   Int      @default(0)
+  skill_change   Int      @default(0)
 
   player Player @relation(fields: [playerId], references: [playerId])
 

@@ -107,7 +107,7 @@ describe("PlayerService", () => {
         skill: 1000,
         kills: 5,
         deaths: 3,
-        kill_streak: 2,
+        killStreak: 2,
         death_streak: 0,
       } as Player
 
@@ -116,7 +116,7 @@ describe("PlayerService", () => {
         skill: 950,
         kills: 3,
         deaths: 5,
-        kill_streak: 0,
+        killStreak: 0,
         death_streak: 1,
       } as Player
 
@@ -183,7 +183,7 @@ describe("PlayerService", () => {
         skill: 1000,
         kills: 0,
         deaths: 0,
-        kill_streak: 0,
+        killStreak: 0,
         death_streak: 0,
       } as Player
       const victimStats = {
@@ -191,7 +191,7 @@ describe("PlayerService", () => {
         skill: 1000,
         kills: 0,
         deaths: 0,
-        kill_streak: 0,
+        killStreak: 0,
         death_streak: 0,
       } as Player
 
@@ -233,7 +233,7 @@ describe("PlayerService", () => {
         skill: 1000,
         kills: 0,
         deaths: 0,
-        kill_streak: 0,
+        killStreak: 0,
         death_streak: 0,
       } as Player
       const victimStats = {
@@ -241,7 +241,7 @@ describe("PlayerService", () => {
         skill: 1000,
         kills: 0,
         deaths: 0,
-        kill_streak: 0,
+        killStreak: 0,
         death_streak: 0,
       } as Player
 
@@ -309,7 +309,7 @@ describe("PlayerService", () => {
         skill: 1000,
         kills: 0,
         deaths: 0,
-        kill_streak: 0,
+        killStreak: 0,
         death_streak: 0,
       } as Player
       const victimStats = {
@@ -317,7 +317,7 @@ describe("PlayerService", () => {
         skill: 1000,
         kills: 0,
         deaths: 0,
-        kill_streak: 0,
+        killStreak: 0,
         death_streak: 0,
       } as Player
 
@@ -375,7 +375,7 @@ describe("PlayerService", () => {
         skill: 1000,
         kills: 0,
         deaths: 0,
-        kill_streak: 0,
+        killStreak: 0,
         death_streak: 0,
       } as Player
       const victimStats = {
@@ -383,7 +383,7 @@ describe("PlayerService", () => {
         skill: 1000,
         kills: 0,
         deaths: 0,
-        kill_streak: 0,
+        killStreak: 0,
         death_streak: 0,
       } as Player
 
@@ -446,7 +446,7 @@ describe("PlayerService", () => {
         skill: 1000,
         kills: 0,
         deaths: 0,
-        kill_streak: 0,
+        killStreak: 0,
         death_streak: 0,
       } as Player
       const victimStats = {
@@ -454,7 +454,7 @@ describe("PlayerService", () => {
         skill: 1000,
         kills: 0,
         deaths: 0,
-        kill_streak: 0,
+        killStreak: 0,
         death_streak: 0,
       } as Player
 

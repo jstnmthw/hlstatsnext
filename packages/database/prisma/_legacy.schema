@@ -167,6 +167,10 @@ model Player {
   playerActions               EventPlayerAction[]
   playerPlayerActionsAsActor  EventPlayerPlayerAction[] @relation("PPA_Actor")
   playerPlayerActionsAsVictim EventPlayerPlayerAction[] @relation("PPA_Victim")
+  statsmeEvents               EventStatsme[]
+  statsme2Events              EventStatsme2[]
+  statsmeLatencyEvents        EventStatsmeLatency[]
+  statsmeTimeEvents           EventStatsmeTime[]
   suicideEvents               EventSuicide[]
   teamBonuses                 EventTeamBonus[]
   teamkillsAsKiller           EventTeamkill[]           @relation("TK_Killer")
@@ -491,6 +495,81 @@ model EventRcon {
   @@map("Events_Rcon")
 }
 
+model EventStatsme {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  weapon    String    @default("") @db.VarChar(64)
+  shots     Int       @default(0) @db.UnsignedInt
+  hits      Int       @default(0) @db.UnsignedInt
+  headshots Int       @default(0) @db.UnsignedInt
+  damage    Int       @default(0) @db.UnsignedInt
+  kills     Int       @default(0) @db.UnsignedInt
+  deaths    Int       @default(0) @db.UnsignedInt
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@index([weapon])
+  @@map("Events_Statsme")
+}
+
+model EventStatsme2 {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  weapon    String    @default("") @db.VarChar(64)
+  head      Int       @default(0) @db.UnsignedInt
+  chest     Int       @default(0) @db.UnsignedInt
+  stomach   Int       @default(0) @db.UnsignedInt
+  leftarm   Int       @default(0) @db.UnsignedInt
+  rightarm  Int       @default(0) @db.UnsignedInt
+  leftleg   Int       @default(0) @db.UnsignedInt
+  rightleg  Int       @default(0) @db.UnsignedInt
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@index([weapon])
+  @@map("Events_Statsme2")
+}
+
+model EventStatsmeLatency {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  ping      Int       @default(0) @db.UnsignedInt
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@map("Events_StatsmeLatency")
+}
+
+model EventStatsmeTime {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime DateTime? @db.DateTime(0)
+  serverId  Int       @default(0) @db.UnsignedInt
+  map       String    @default("") @db.VarChar(64)
+  playerId  Int       @default(0) @db.UnsignedInt
+  time      DateTime  @db.Time(0)
+
+  player Player @relation(fields: [playerId], references: [playerId])
+  server Server @relation(fields: [serverId], references: [serverId])
+
+  @@index([playerId])
+  @@map("Events_StatsmeTime")
+}
+
 model EventSuicide {
   id        Int       @id @default(autoincrement()) @db.UnsignedInt
   eventTime DateTime? @db.DateTime(0)
@@ -579,6 +658,68 @@ model GameSupported {
   name String @db.VarChar(128)
 
   @@map("Games_Supported")
+}
+
+model HeatmapConfig {
+  id      Int    @id @default(autoincrement())
+  map     String @db.VarChar(64)
+  game    String @db.VarChar(32)
+  xoffset Float
+  yoffset Float
+  flipx   Int    @default(0) @db.TinyInt
+  flipy   Int    @default(1) @db.TinyInt
+  rotate  Int    @default(0) @db.TinyInt
+  days    Int    @default(30) @db.TinyInt
+  brush   String @default("small") @db.VarChar(5)
+  scale   Float
+  font    Int    @default(10) @db.TinyInt
+  thumbw  Float  @default(0.170312)
+  thumbh  Float  @default(0.170312)
+  cropx1  Int    @default(0)
+  cropy1  Int    @default(0)
+  cropx2  Int    @default(0)
+  cropy2  Int    @default(0)
+
+  @@unique([map, game], name: "gamemap")
+  @@map("Heatmap_Config")
+}
+
+model HostGroup {
+  id      Int    @id @default(autoincrement())
+  pattern String @default("") @db.VarChar(255)
+  name    String @default("") @db.VarChar(255)
+
+  @@map("HostGroups")
+}
+
+// Live Stats (Memory Table)
+model Livestat {
+  player_id    Int    @id
+  server_id    Int    @default(0)
+  cli_address  String @default("") @db.VarChar(32)
+  cli_city     String @default("") @db.VarChar(64)
+  cli_country  String @default("") @db.VarChar(64)
+  cli_flag     String @default("") @db.VarChar(16)
+  cli_state    String @default("") @db.VarChar(64)
+  cli_lat      Float?
+  cli_lng      Float?
+  steam_id     String @default("") @db.VarChar(64)
+  name         String @db.VarChar(64)
+  team         String @default("") @db.VarChar(64)
+  kills        Int    @default(0)
+  deaths       Int    @default(0)
+  suicides     Int    @default(0)
+  headshots    Int    @default(0)
+  shots        Int    @default(0)
+  hits         Int    @default(0)
+  is_dead      Int    @default(0) @db.TinyInt
+  has_bomb     Int    @default(0)
+  ping         Int    @default(0)
+  connected    Int    @default(0)
+  skill_change Int    @default(0)
+  skill        Int    @default(0)
+
+  @@map("Livestats")
 }
 
 model MapCount {
@@ -745,40 +886,40 @@ model Role {
 }
 
 model Server {
-  serverId      Int       @id @default(autoincrement()) @db.UnsignedInt
-  address       String    @default("") @db.VarChar(32)
-  port          Int       @default(0) @db.UnsignedInt
-  name          String    @default("") @db.VarChar(255)
-  sortorder     Int       @default(0) @db.TinyInt
-  game          String    @default("valve") @db.VarChar(32)
-  publicaddress String    @default("") @db.VarChar(128)
-  statusurl     String?   @db.VarChar(255)
-  rcon_password String    @default("") @db.VarChar(128)
-  kills         Int       @default(0)
-  players       Int       @default(0)
-  rounds        Int       @default(0)
-  suicides      Int       @default(0)
-  headshots     Int       @default(0)
-  bombs_planted Int       @default(0)
-  bombs_defused Int       @default(0)
-  ct_wins       Int       @default(0)
-  ts_wins       Int       @default(0)
-  act_players   Int       @default(0) @db.SmallInt
-  max_players   Int       @default(0) @db.SmallInt
-  act_map       String    @default("") @db.VarChar(64)
-  map_rounds    Int       @default(0)
-  map_ct_wins   Int       @default(0)
-  map_ts_wins   Int       @default(0)
-  map_started   Int       @default(0)
-  map_changes   Int       @default(0)
-  ct_shots      Int       @default(0)
-  ct_hits       Int       @default(0)
-  ts_shots      Int       @default(0)
-  ts_hits       Int       @default(0)
-  map_ct_shots  Int       @default(0)
-  map_ct_hits   Int       @default(0)
-  map_ts_shots  Int       @default(0)
-  map_ts_hits   Int       @default(0)
+  serverId      Int     @id @default(autoincrement()) @db.UnsignedInt
+  address       String  @default("") @db.VarChar(32)
+  port          Int     @default(0) @db.UnsignedInt
+  name          String  @default("") @db.VarChar(255)
+  sortorder     Int     @default(0) @db.TinyInt
+  game          String  @default("valve") @db.VarChar(32)
+  publicaddress String  @default("") @db.VarChar(128)
+  statusurl     String? @db.VarChar(255)
+  rcon_password String  @default("") @db.VarChar(128)
+  kills         Int     @default(0)
+  players       Int     @default(0)
+  rounds        Int     @default(0)
+  suicides      Int     @default(0)
+  headshots     Int     @default(0)
+  bombs_planted Int     @default(0)
+  bombs_defused Int     @default(0)
+  ct_wins       Int     @default(0)
+  ts_wins       Int     @default(0)
+  act_players   Int     @default(0) @db.SmallInt
+  max_players   Int     @default(0) @db.SmallInt
+  act_map       String  @default("") @db.VarChar(64)
+  map_rounds    Int     @default(0)
+  map_ct_wins   Int     @default(0)
+  map_ts_wins   Int     @default(0)
+  map_started   Int     @default(0)
+  map_changes   Int     @default(0)
+  ct_shots      Int     @default(0)
+  ct_hits       Int     @default(0)
+  ts_shots      Int     @default(0)
+  ts_hits       Int     @default(0)
+  map_ct_shots  Int     @default(0)
+  map_ct_hits   Int     @default(0)
+  map_ts_shots  Int     @default(0)
+  map_ts_hits   Int     @default(0)
   lat           Float?
   lng           Float?
   city          String    @default("") @db.VarChar(64)
@@ -798,6 +939,10 @@ model Server {
   eventsPlayerAction       EventPlayerAction[]
   eventsPlayerPlayerAction EventPlayerPlayerAction[]
   eventsRcon               EventRcon[]
+  eventsStatsme            EventStatsme[]
+  eventsStatsme2           EventStatsme2[]
+  eventsStatsmeLatency     EventStatsmeLatency[]
+  eventsStatsmeTime        EventStatsmeTime[]
   eventsSuicide            EventSuicide[]
   eventsTeamBonus          EventTeamBonus[]
   eventsTeamkill           EventTeamkill[]
@@ -826,6 +971,20 @@ model ServerConfigDefault {
   description String? @db.MediumText
 
   @@map("Servers_Config_Default")
+}
+
+model ServerVoiceComm {
+  serverId   Int     @id @default(autoincrement()) @db.UnsignedInt
+  name       String  @db.VarChar(128)
+  addr       String  @db.VarChar(128)
+  password   String? @db.VarChar(128)
+  descr      String? @db.VarChar(255)
+  queryPort  Int     @default(51234) @db.UnsignedInt
+  UDPPort    Int     @default(8767) @db.UnsignedInt
+  serverType Int     @default(0) @db.TinyInt
+
+  @@unique([addr, UDPPort, queryPort], name: "address")
+  @@map("Servers_VoiceComm")
 }
 
 model ServerLoad {
@@ -858,6 +1017,22 @@ model Team {
 
   @@unique([game, code], name: "gamecode")
   @@map("Teams")
+}
+
+model Trend {
+  timestamp Int    @default(0)
+  game      String @default("") @db.VarChar(32)
+  players   Int    @default(0)
+  kills     Int    @default(0)
+  headshots Int    @default(0)
+  servers   Int    @default(0)
+  act_slots Int    @default(0)
+  max_slots Int    @default(0)
+
+  @@id([timestamp, game])
+  @@index([game])
+  @@index([timestamp])
+  @@map("Trend")
 }
 
 model User {

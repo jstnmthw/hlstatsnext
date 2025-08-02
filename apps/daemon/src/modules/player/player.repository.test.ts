@@ -20,8 +20,6 @@ function createMockPlayer(overrides: Partial<Player> = {}): Player {
     lastAddress: "127.0.0.1",
     fullName: "",
     email: "",
-    homepage: "",
-    icq: 0,
     city: "",
     state: "",
     country: "",

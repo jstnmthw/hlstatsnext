@@ -48,7 +48,12 @@ describe("PlayerService", () => {
       calculatePlayerScore: vi.fn().mockReturnValue(100),
     }
 
-    playerService = new PlayerService(mockRepository, mockLogger, mockRankingService, mockMatchService)
+    playerService = new PlayerService(
+      mockRepository,
+      mockLogger,
+      mockRankingService,
+      mockMatchService,
+    )
   })
 
   describe("getOrCreatePlayer", () => {
@@ -103,7 +108,7 @@ describe("PlayerService", () => {
         kills: 5,
         deaths: 3,
         kill_streak: 2,
-        death_streak: 0
+        death_streak: 0,
       } as Player
 
       const victimStats = {
@@ -112,7 +117,7 @@ describe("PlayerService", () => {
         kills: 3,
         deaths: 5,
         kill_streak: 0,
-        death_streak: 1
+        death_streak: 1,
       } as Player
 
       // Mock repository methods
@@ -133,8 +138,8 @@ describe("PlayerService", () => {
           weapon: "ak47",
           headshot: false,
           killerTeam: "TERRORIST",
-          victimTeam: "CT"
-        }
+          victimTeam: "CT",
+        },
       }
 
       const result = await playerService.handleKillEvent(killEvent)
@@ -146,23 +151,49 @@ describe("PlayerService", () => {
       expect(mockRankingService.calculateSkillAdjustment).toHaveBeenCalledWith(
         expect.objectContaining({ playerId: 1, rating: 1000 }),
         expect.objectContaining({ playerId: 2, rating: 950 }),
-        expect.objectContaining({ weapon: "ak47", headshot: false })
+        expect.objectContaining({ weapon: "ak47", headshot: false }),
       )
 
       // Verify player stats were updated
       expect(mockRepository.update).toHaveBeenCalledTimes(2)
       expect(mockRepository.logEventFrag).toHaveBeenCalledWith(
-        1, 2, 1, "de_dust2", "ak47", false,
-        undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined
+        1,
+        2,
+        1,
+        "de_dust2",
+        "ak47",
+        false,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
       )
-      
+
       // Verify match service was called for map resolution
       expect(mockMatchService.getCurrentMap).toHaveBeenCalledWith(1)
     })
 
     it("should handle headshot kills", async () => {
-      const killerStats = { playerId: 1, skill: 1000, kills: 0, deaths: 0, kill_streak: 0, death_streak: 0 } as Player
-      const victimStats = { playerId: 2, skill: 1000, kills: 0, deaths: 0, kill_streak: 0, death_streak: 0 } as Player
+      const killerStats = {
+        playerId: 1,
+        skill: 1000,
+        kills: 0,
+        deaths: 0,
+        kill_streak: 0,
+        death_streak: 0,
+      } as Player
+      const victimStats = {
+        playerId: 2,
+        skill: 1000,
+        kills: 0,
+        deaths: 0,
+        kill_streak: 0,
+        death_streak: 0,
+      } as Player
 
       vi.spyOn(mockRepository, "getPlayerStats")
         .mockResolvedValueOnce(killerStats)
@@ -181,8 +212,8 @@ describe("PlayerService", () => {
           weapon: "deagle",
           headshot: true,
           killerTeam: "CT",
-          victimTeam: "TERRORIST"
-        }
+          victimTeam: "TERRORIST",
+        },
       }
 
       await playerService.handleKillEvent(headshotEvent)
@@ -191,14 +222,28 @@ describe("PlayerService", () => {
       expect(mockRepository.update).toHaveBeenCalledWith(
         1,
         expect.objectContaining({
-          headshots: { increment: 1 }
-        })
+          headshots: { increment: 1 },
+        }),
       )
     })
 
     it("should handle team kills", async () => {
-      const killerStats = { playerId: 1, skill: 1000, kills: 0, deaths: 0, kill_streak: 0, death_streak: 0 } as Player
-      const victimStats = { playerId: 2, skill: 1000, kills: 0, deaths: 0, kill_streak: 0, death_streak: 0 } as Player
+      const killerStats = {
+        playerId: 1,
+        skill: 1000,
+        kills: 0,
+        deaths: 0,
+        kill_streak: 0,
+        death_streak: 0,
+      } as Player
+      const victimStats = {
+        playerId: 2,
+        skill: 1000,
+        kills: 0,
+        deaths: 0,
+        kill_streak: 0,
+        death_streak: 0,
+      } as Player
 
       vi.spyOn(mockRepository, "getPlayerStats")
         .mockResolvedValueOnce(killerStats)
@@ -217,8 +262,8 @@ describe("PlayerService", () => {
           weapon: "ak47",
           headshot: false,
           killerTeam: "TERRORIST",
-          victimTeam: "TERRORIST" // Same team
-        }
+          victimTeam: "TERRORIST", // Same team
+        },
       }
 
       await playerService.handleKillEvent(teamkillEvent)
@@ -227,8 +272,8 @@ describe("PlayerService", () => {
       expect(mockRepository.update).toHaveBeenCalledWith(
         1,
         expect.objectContaining({
-          teamkills: { increment: 1 }
-        })
+          teamkills: { increment: 1 },
+        }),
       )
     })
 
@@ -248,8 +293,8 @@ describe("PlayerService", () => {
           weapon: "ak47",
           headshot: false,
           killerTeam: "TERRORIST",
-          victimTeam: "CT"
-        }
+          victimTeam: "CT",
+        },
       }
 
       const result = await playerService.handleKillEvent(killEvent)
@@ -259,8 +304,22 @@ describe("PlayerService", () => {
     })
 
     it("should use current map from MatchService in EventFrag", async () => {
-      const killerStats = { playerId: 1, skill: 1000, kills: 0, deaths: 0, kill_streak: 0, death_streak: 0 } as Player
-      const victimStats = { playerId: 2, skill: 1000, kills: 0, deaths: 0, kill_streak: 0, death_streak: 0 } as Player
+      const killerStats = {
+        playerId: 1,
+        skill: 1000,
+        kills: 0,
+        deaths: 0,
+        kill_streak: 0,
+        death_streak: 0,
+      } as Player
+      const victimStats = {
+        playerId: 2,
+        skill: 1000,
+        kills: 0,
+        deaths: 0,
+        kill_streak: 0,
+        death_streak: 0,
+      } as Player
 
       vi.spyOn(mockRepository, "getPlayerStats")
         .mockResolvedValueOnce(killerStats)
@@ -282,25 +341,51 @@ describe("PlayerService", () => {
           weapon: "m4a1",
           headshot: false,
           killerTeam: "CT",
-          victimTeam: "TERRORIST"
-        }
+          victimTeam: "TERRORIST",
+        },
       }
 
       await playerService.handleKillEvent(killEvent)
 
       // Verify MatchService was called with correct serverId
       expect(mockMatchService.getCurrentMap).toHaveBeenCalledWith(5)
-      
+
       // Verify EventFrag was created with correct map
       expect(mockRepository.logEventFrag).toHaveBeenCalledWith(
-        1, 2, 5, "cs_office", "m4a1", false,
-        undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined
+        1,
+        2,
+        5,
+        "cs_office",
+        "m4a1",
+        false,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
       )
     })
 
     it("should fallback to initializeMapForServer when current map is unknown", async () => {
-      const killerStats = { playerId: 1, skill: 1000, kills: 0, deaths: 0, kill_streak: 0, death_streak: 0 } as Player
-      const victimStats = { playerId: 2, skill: 1000, kills: 0, deaths: 0, kill_streak: 0, death_streak: 0 } as Player
+      const killerStats = {
+        playerId: 1,
+        skill: 1000,
+        kills: 0,
+        deaths: 0,
+        kill_streak: 0,
+        death_streak: 0,
+      } as Player
+      const victimStats = {
+        playerId: 2,
+        skill: 1000,
+        kills: 0,
+        deaths: 0,
+        kill_streak: 0,
+        death_streak: 0,
+      } as Player
 
       vi.spyOn(mockRepository, "getPlayerStats")
         .mockResolvedValueOnce(killerStats)
@@ -323,8 +408,8 @@ describe("PlayerService", () => {
           weapon: "awp",
           headshot: true,
           killerTeam: "TERRORIST",
-          victimTeam: "CT"
-        }
+          victimTeam: "CT",
+        },
       }
 
       await playerService.handleKillEvent(killEvent)
@@ -332,20 +417,46 @@ describe("PlayerService", () => {
       // Verify both methods were called
       expect(mockMatchService.getCurrentMap).toHaveBeenCalledWith(3)
       expect(mockMatchService.initializeMapForServer).toHaveBeenCalledWith(3)
-      
+
       // Verify EventFrag was created with resolved map
       expect(mockRepository.logEventFrag).toHaveBeenCalledWith(
-        1, 2, 3, "de_mirage", "awp", true,
-        undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined
+        1,
+        2,
+        3,
+        "de_mirage",
+        "awp",
+        true,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
       )
     })
 
     it("should handle missing MatchService gracefully", async () => {
       // Create PlayerService without MatchService
       const playerServiceNoMatch = new PlayerService(mockRepository, mockLogger, mockRankingService)
-      
-      const killerStats = { playerId: 1, skill: 1000, kills: 0, deaths: 0, kill_streak: 0, death_streak: 0 } as Player
-      const victimStats = { playerId: 2, skill: 1000, kills: 0, deaths: 0, kill_streak: 0, death_streak: 0 } as Player
+
+      const killerStats = {
+        playerId: 1,
+        skill: 1000,
+        kills: 0,
+        deaths: 0,
+        kill_streak: 0,
+        death_streak: 0,
+      } as Player
+      const victimStats = {
+        playerId: 2,
+        skill: 1000,
+        kills: 0,
+        deaths: 0,
+        kill_streak: 0,
+        death_streak: 0,
+      } as Player
 
       vi.spyOn(mockRepository, "getPlayerStats")
         .mockResolvedValueOnce(killerStats)
@@ -364,16 +475,28 @@ describe("PlayerService", () => {
           weapon: "glock",
           headshot: false,
           killerTeam: "TERRORIST",
-          victimTeam: "CT"
-        }
+          victimTeam: "CT",
+        },
       }
 
       await playerServiceNoMatch.handleKillEvent(killEvent)
 
       // Should fallback to empty string when MatchService is not available
       expect(mockRepository.logEventFrag).toHaveBeenCalledWith(
-        1, 2, 1, "", "glock", false,
-        undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined
+        1,
+        2,
+        1,
+        "",
+        "glock",
+        false,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
       )
     })
   })
@@ -391,12 +514,13 @@ describe("PlayerService", () => {
           weapon: "ak47",
           headshot: false,
           killerTeam: "TERRORIST",
-          victimTeam: "CT"
-        }
+          victimTeam: "CT",
+        },
       }
 
       // Mock the handleKillEvent method
-      const handleKillEventSpy = vi.spyOn(playerService, "handleKillEvent")
+      const handleKillEventSpy = vi
+        .spyOn(playerService, "handleKillEvent")
         .mockResolvedValue({ success: true, affected: 2 })
 
       const result = await playerService.handlePlayerEvent(killEvent)
@@ -407,7 +531,8 @@ describe("PlayerService", () => {
 
     it("should handle unknown event types gracefully", async () => {
       const unknownEvent: PlayerEvent = {
-        eventType: "UNKNOWN_EVENT" as EventType,
+        // @ts-expect-error - This is purposely testing an unknown event type
+        eventType: "UNKNOWN_EVENT",
         timestamp: new Date(),
         serverId: 1,
         eventId: "test-unknown",
@@ -415,8 +540,8 @@ describe("PlayerService", () => {
           playerId: 123,
           message: "test",
           team: "CT",
-          isDead: false
-        }
+          isDead: false,
+        },
       }
 
       const result = await playerService.handlePlayerEvent(unknownEvent)
@@ -428,8 +553,10 @@ describe("PlayerService", () => {
   describe("player creation with created_at", () => {
     it("should set created_at when creating players", async () => {
       vi.spyOn(mockRepository, "findByUniqueId").mockResolvedValue(null)
-      
-      const createSpy = vi.spyOn(mockRepository, "create").mockResolvedValue({ playerId: 1 } as Player)
+
+      const createSpy = vi
+        .spyOn(mockRepository, "create")
+        .mockResolvedValue({ playerId: 1 } as Player)
 
       await playerService.getOrCreatePlayer("76561198000123456", "TestPlayer", "csgo")
 
@@ -438,8 +565,8 @@ describe("PlayerService", () => {
           lastName: "TestPlayer",
           game: "csgo",
           skill: 1000,
-          steamId: "76561198000123456"
-        })
+          steamId: "76561198000123456",
+        }),
       )
     })
   })

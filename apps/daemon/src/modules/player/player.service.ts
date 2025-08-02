@@ -115,7 +115,7 @@ export class PlayerService implements IPlayerService {
       if (updates.skill !== undefined) {
         updateData.skill = { increment: updates.skill }
         // Update last skill change timestamp when skill is modified
-        updateData.last_skill_change = new Date()
+        updateData.lastSkillChange = new Date()
       }
       if (updates.shots !== undefined) {
         updateData.shots = { increment: updates.shots }
@@ -210,7 +210,7 @@ export class PlayerService implements IPlayerService {
         updates.map((update) =>
           this.repository.update(update.playerId, {
             skill: update.newRating,
-            last_skill_change: new Date(),
+            lastSkillChange: new Date(),
           }),
         ),
       )
@@ -273,7 +273,9 @@ export class PlayerService implements IPlayerService {
         case EventType.PLAYER_KILL:
           return await this.handleKillEvent(event as PlayerKillEvent)
         default:
-          this.logger.debug(`PlayerService: Unhandled event type: ${(event as BaseEvent).eventType}`)
+          this.logger.debug(
+            `PlayerService: Unhandled event type: ${(event as BaseEvent).eventType}`,
+          )
           return { success: true } // Event not handled by this service
       }
     } catch (error) {

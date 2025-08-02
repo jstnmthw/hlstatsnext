@@ -94,18 +94,16 @@ model Clan {
 model Player {
   playerId Int @id @default(autoincrement()) @db.UnsignedInt
 
-  // Event tracking
-  last_event        DateTime? @db.DateTime(0)
-  connection_time   Int       @default(0) @db.UnsignedInt
-  last_skill_change DateTime? @db.DateTime(0)
-
   // Identity
   lastName    String  @default("") @db.VarChar(64) // Current display name
   lastAddress String  @default("") @db.VarChar(32) // Last known IP address
   fullName    String? @db.VarChar(128) // Optional full/real name
   email       String? @db.VarChar(64) // Optional email
-  homepage    String? @db.VarChar(64) // Optional homepage
-  icq         Int?    @db.UnsignedInt // Legacy ICQ number
+
+  // Event tracking
+  last_event      DateTime? @db.DateTime(0)
+  connection_time Int       @default(0) @db.UnsignedInt
+  lastSkillChange DateTime? @db.DateTime(0)
 
   // Location data
   city    String  @default("") @db.VarChar(64)

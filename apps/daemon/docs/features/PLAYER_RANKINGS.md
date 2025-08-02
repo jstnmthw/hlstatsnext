@@ -299,7 +299,7 @@ The rating system integrates with the legacy HLStatsX schema:
 UPDATE hlstats_Players
 SET skill = new_rating,
     skill_change = rating_delta,
-    last_skill_change = UNIX_TIMESTAMP()
+    lastSkillChange = GETDATE()
 WHERE playerId = ?
 ```
 

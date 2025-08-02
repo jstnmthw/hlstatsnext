@@ -30,7 +30,7 @@ export class KillEventCoordinator implements EventCoordinator {
 
 **Key Benefits:**
 
-- **Simplicity**: Direct coordination without complex transaction management  
+- **Simplicity**: Direct coordination without complex transaction management
 - **Performance**: No overhead from saga state management
 - **Maintainability**: Easy to understand and debug
 - **Reliability**: Module handlers are responsible for their own consistency
@@ -152,7 +152,7 @@ export class CustomEventCoordinator implements EventCoordinator {
 
     // Handle cross-module concerns
     await this.customService.handleCrossModuleConcern(event)
-    
+
     this.logger.debug("Custom event coordinated", {
       eventId: event.eventId,
       eventType: event.eventType,
@@ -165,9 +165,7 @@ export class CustomEventCoordinator implements EventCoordinator {
 
 ```typescript
 // In context.ts initialization
-const coordinators: EventCoordinator[] = [
-  new CustomEventCoordinator(logger, customService),
-]
+const coordinators: EventCoordinator[] = [new CustomEventCoordinator(logger, customService)]
 
 const rabbitmqConsumer = new RabbitMQConsumer(
   queueClient,
@@ -223,7 +221,7 @@ const handlerMetrics = eventMetrics.getHandlerMetrics()
 handlerMetrics.forEach((metric) => {
   if (metric.averageProcessingTime > THRESHOLD) {
     logger.warn(`Slow handler: ${metric.handlerName}`, {
-      averageTime: metric.averageProcessingTime
+      averageTime: metric.averageProcessingTime,
     })
   }
 })
@@ -245,7 +243,7 @@ eventMetrics.onProcessingError = (eventType, error) => {
 ```typescript
 // Set LOG_LEVEL=debug in environment
 const logger = new Logger({
-  level: process.env.LOG_LEVEL || 'info',
+  level: process.env.LOG_LEVEL || "info",
   enableQueueLogging: true, // Enable queue-specific logs
 })
 ```
@@ -281,12 +279,12 @@ export class OptimizedHandler extends BaseModuleEventHandler {
   async handleEvent(event: BaseEvent): Promise<void> {
     // Use bulk operations where possible
     await this.service.processBatch([event])
-    
+
     // Avoid unnecessary database queries
     if (this.shouldSkipProcessing(event)) {
       return
     }
-    
+
     await this.service.processEvent(event)
   }
 }
@@ -326,7 +324,7 @@ describe("KillEventCoordinator", () => {
     mockRankingService = {
       handleRatingUpdate: vi.fn().mockResolvedValue({ success: true }),
     } as unknown as IRankingService
-    
+
     coordinator = new KillEventCoordinator(mockLogger, mockRankingService)
   })
 
@@ -382,7 +380,7 @@ describe("Event Processing Integration", () => {
     await eventPublisher.publish(killEvent)
 
     // Wait for processing
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, 100))
 
     // Verify processing occurred
     const playerStats = await context.playerService.getPlayerStats(123)
@@ -428,13 +426,3 @@ describe("Event Processing Integration", () => {
    - Implement comprehensive metrics collection
    - Set up alerting for critical failures
    - Create dashboards for system health monitoring
-
-## Migration Notes
-
-The daemon has been simplified from a complex saga-based architecture to a queue-only approach:
-
-- **Removed**: Saga pattern, compensation logic, complex transaction management
-- **Kept**: Event coordination for cross-module concerns, module handlers for business logic
-- **Added**: Direct RabbitMQ queue processing, simplified error handling
-
-This change reduces complexity while maintaining reliability through queue persistence and retry mechanisms.

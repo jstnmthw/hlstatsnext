@@ -159,7 +159,7 @@ export interface PlayerStats {
   skill: number
   kill_streak: number
   death_streak: number
-  connection_time: number
+  connectionTime: number
   lastEvent: Date | null
 }
 
@@ -174,7 +174,7 @@ export interface PlayerStatsUpdate {
   headshots?: number
   kill_streak?: number
   death_streak?: number
-  connection_time?: number
+  connectionTime?: number
   lastEvent?: Date
   lastName?: string
 }

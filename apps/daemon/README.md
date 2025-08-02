@@ -2,8 +2,6 @@
 
 The **HLStatsNext Daemon** is a high-performance, real-time game statistics engine for Half-Life engine games. This modern TypeScript implementation replaces the legacy Perl daemon with a scalable, maintainable, and production-ready microservice architecture.
 
----
-
 ## Key Features
 
 - **Queue-First Architecture**: RabbitMQ-based event processing for reliability and horizontal scaling
@@ -12,8 +10,6 @@ The **HLStatsNext Daemon** is a high-performance, real-time game statistics engi
 - **Production-Ready**: Comprehensive error handling, metrics, health checks, and observability
 - **Type-Safe**: 100% TypeScript with strict mode, zero `any` types
 - **Battle-Tested**: 800+ tests with extensive coverage of critical paths
-
----
 
 ## Architecture Overview
 
@@ -40,8 +36,6 @@ Game Servers → UDP Ingress → Event Parser → RabbitMQ → Event Processor �
 - **Repository Pattern**: Consistent database access with transaction support
 - **Event Coordinator Pattern**: Cross-module orchestration for complex workflows
 - **Module Registry**: Dynamic handler registration and lifecycle management
-
----
 
 ## Development
 
@@ -92,8 +86,6 @@ apps/daemon/
 └── scripts/              # Development and testing scripts
 ```
 
----
-
 ## Event Processing
 
 ### Event Lifecycle
@@ -129,8 +121,6 @@ See [`docs/EVENT_LIFECYCLE.md`](./docs/EVENT_LIFECYCLE.md) for detailed tracing 
 - Weapon usage statistics
 - Player streak tracking
 
----
-
 ## Ranking System
 
 The daemon implements a sophisticated ELO-based rating system:
@@ -141,8 +131,6 @@ The daemon implements a sophisticated ELO-based rating system:
 - **Skill Bounds**: 100 (floor) to 3000 (ceiling)
 
 See [`docs/features/PLAYER_RANKINGS.md`](./docs/features/PLAYER_RANKINGS.md) for the complete mathematical model.
-
----
 
 ## Configuration
 
@@ -171,8 +159,6 @@ Games are configured in `src/config/game.config.ts`:
 }
 ```
 
----
-
 ## Testing
 
 ### Test Suite Overview
@@ -200,8 +186,6 @@ pnpm test tests/integration
 - Mock factories for all domain objects
 - Test fixtures for common scenarios
 - Shadow consumer for queue inspection
-
----
 
 ## Monitoring & Operations
 
@@ -244,8 +228,6 @@ Structured logging with correlation IDs:
 }
 ```
 
----
-
 ## Production Deployment
 
 ### Docker Support
@@ -266,8 +248,6 @@ CMD ["pnpm", "start"]
 - **Queue Prefetch**: Tunable message consumption rate
 - **Memory Management**: ~200MB per instance under load
 
----
-
 ## Documentation
 
 - [`docs/MIGRATION.md`](./docs/MIGRATION.md) - Migration progress from Perl daemon
@@ -277,16 +257,12 @@ CMD ["pnpm", "start"]
 - [`src/shared/application/README.md`](./src/shared/application/README.md) - Application layer patterns
 - [`src/shared/infrastructure/README.md`](./src/shared/infrastructure/README.md) - Infrastructure patterns
 
----
-
 ## Contributing
 
 1. Follow TypeScript best practices (strict mode, no `any`)
 2. Write tests for new features
 3. Update documentation as needed
 4. Ensure all tests pass before submitting PRs
-
----
 
 ## License
 

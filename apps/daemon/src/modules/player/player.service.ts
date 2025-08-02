@@ -363,6 +363,12 @@ export class PlayerService implements IPlayerService {
         last_event: new Date(),
       }
 
+      // Get current map from the match service, initialize if needed
+      let map = this.matchService?.getCurrentMap(event.serverId) || ""
+      if (map === "unknown" && this.matchService) {
+        map = await this.matchService.initializeMapForServer(event.serverId)
+      }
+
       // Apply stat updates and log EventFrag
       await Promise.all([
         this.updatePlayerStats(killerId, killerUpdates),
@@ -372,7 +378,7 @@ export class PlayerService implements IPlayerService {
           killerId,
           victimId,
           event.serverId,
-          "", // TODO: Get current map from MatchService
+          map,
           weapon || "unknown",
           headshot || false,
           undefined, // killerRole - TODO: Get from player roles

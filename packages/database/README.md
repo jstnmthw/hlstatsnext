@@ -111,7 +111,7 @@ const playerStats = await db.player.findUnique({
 const activeServers = await db.server.findMany({
   where: {
     hidden: 0,
-    last_event: { gt: Math.floor(Date.now() / 1000) - 3600 }, // Last hour
+    lastEvent: { gt: Math.floor(Date.now() / 1000) - 3600 }, // Last hour
   },
   include: {
     gameData: true,
@@ -153,7 +153,7 @@ await db.player.update({
   data: {
     kills: { increment: 1 },
     skill: { increment: 25 },
-    last_event: Math.floor(Date.now() / 1000),
+    lastEvent: Math.floor(Date.now() / 1000),
   },
 })
 ```

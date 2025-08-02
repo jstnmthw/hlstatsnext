@@ -21,7 +21,7 @@ describe("ServerRepository", () => {
     port: 27015,
     country: "US",
     city: "Test City",
-    last_event: null,
+    lastEvent: null,
     lat: null,
     lng: null,
     kills: 0,

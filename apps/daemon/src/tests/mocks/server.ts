@@ -41,7 +41,7 @@ export function createMockServerRecord(overrides: Partial<Server> = {}): Server 
     lng: null,
     city: "",
     country: "",
-    last_event: null,
+    lastEvent: null,
     ...overrides,
   }
 }

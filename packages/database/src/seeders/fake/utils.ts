@@ -128,7 +128,7 @@ type PlayerData = Pick<
   | "state"
   | "lat"
   | "lng"
-  | "last_event"
+  | "lastEvent"
   | "created_at"
 >
 
@@ -150,7 +150,7 @@ export function generatePlayerData(): PlayerData {
   const created_at = faker.date.past({ years: 2 })
 
   // Last event (between creation and now)
-  const last_event = faker.date.between({
+  const lastEvent = faker.date.between({
     from: created_at,
     to: new Date(),
   })
@@ -164,7 +164,7 @@ export function generatePlayerData(): PlayerData {
     state,
     lat,
     lng,
-    last_event,
+    lastEvent,
     created_at,
   }
 }

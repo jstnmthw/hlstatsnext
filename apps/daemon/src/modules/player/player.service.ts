@@ -137,8 +137,8 @@ export class PlayerService implements IPlayerService {
       if (updates.death_streak !== undefined) {
         updateData.death_streak = updates.death_streak
       }
-      if (updates.last_event !== undefined) {
-        updateData.last_event = updates.last_event
+      if (updates.lastEvent !== undefined) {
+        updateData.lastEvent = updates.lastEvent
       }
       if (updates.lastName !== undefined) {
         updateData.lastName = updates.lastName
@@ -343,7 +343,7 @@ export class PlayerService implements IPlayerService {
         skill: skillAdjustment.killerChange,
         kill_streak: newKillerKillStreak,
         death_streak: 0, // Reset death streak on kill
-        last_event: new Date(),
+        lastEvent: new Date(),
       }
 
       if (headshot) {
@@ -362,7 +362,7 @@ export class PlayerService implements IPlayerService {
         skill: skillAdjustment.victimChange,
         death_streak: newVictimDeathStreak,
         kill_streak: 0, // Reset kill streak on death
-        last_event: new Date(),
+        lastEvent: new Date(),
       }
 
       // Get current map from the match service, initialize if needed
@@ -437,7 +437,7 @@ export class PlayerService implements IPlayerService {
       const { playerId } = connectEvent.data
 
       await this.updatePlayerStats(playerId, {
-        last_event: new Date(),
+        lastEvent: new Date(),
       })
 
       this.logger.debug(`Player connected: ${playerId}`)
@@ -460,7 +460,7 @@ export class PlayerService implements IPlayerService {
       const { playerId, sessionDuration } = disconnectEvent.data
 
       const updates: PlayerStatsUpdate = {
-        last_event: new Date(),
+        lastEvent: new Date(),
       }
 
       if (sessionDuration) {
@@ -505,7 +505,7 @@ export class PlayerService implements IPlayerService {
 
       await this.updatePlayerStats(playerId, {
         lastName: newName,
-        last_event: new Date(),
+        lastEvent: new Date(),
       })
 
       return { success: true, affected: 1 }
@@ -547,7 +547,7 @@ export class PlayerService implements IPlayerService {
         skill: skillPenalty,
         death_streak: newDeathStreak,
         kill_streak: 0, // Reset kill streak on death
-        last_event: new Date(),
+        lastEvent: new Date(),
       }
 
       await this.updatePlayerStats(playerId, updates)
@@ -575,7 +575,7 @@ export class PlayerService implements IPlayerService {
       const attackerUpdates: PlayerStatsUpdate = {
         shots: 1, // Each damage event counts as a hit
         hits: 1,
-        last_event: new Date(),
+        lastEvent: new Date(),
       }
 
       // If it's a headshot, update headshot count
@@ -610,7 +610,7 @@ export class PlayerService implements IPlayerService {
       // Update killer stats (teamkill)
       const killerUpdates: PlayerStatsUpdate = {
         teamkills: 1,
-        last_event: new Date(),
+        lastEvent: new Date(),
       }
 
       if (headshot) {
@@ -620,7 +620,7 @@ export class PlayerService implements IPlayerService {
       // Update victim stats (death)
       const victimUpdates: PlayerStatsUpdate = {
         deaths: 1,
-        last_event: new Date(),
+        lastEvent: new Date(),
       }
 
       await Promise.all([

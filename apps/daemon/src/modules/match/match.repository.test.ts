@@ -40,7 +40,7 @@ describe("MatchRepository", () => {
       const updates = {
         rounds: { increment: 1 },
         players: 10,
-        act_map: "de_dust2",
+        activeMap: "de_dust2",
       }
 
       await matchRepository.updateServerStats(serverId, updates)
@@ -184,7 +184,7 @@ describe("MatchRepository", () => {
 
       // Test using updateServerStats for team wins
       const teamWinUpdate =
-        team === "ct" ? { ct_wins: { increment: 1 } } : { t_wins: { increment: 1 } }
+        team === "ct" ? { ctWins: { increment: 1 } } : { t_wins: { increment: 1 } }
 
       await matchRepository.updateServerStats(serverId, teamWinUpdate)
 
@@ -221,7 +221,7 @@ describe("MatchRepository", () => {
       // Test using updateServerStats for map reset
       const resetUpdate = {
         rounds: 0,
-        ct_wins: 0,
+        ctWins: 0,
         t_wins: 0,
         bomb_planted: 0,
         bomb_defused: 0,
@@ -284,7 +284,7 @@ describe("MatchRepository", () => {
       const serverId = 1
       const complexUpdates = {
         rounds: { increment: 1 },
-        act_map: "de_inferno",
+        activeMap: "de_inferno",
         players: 20,
         status: "active",
         lastUpdate: new Date(),
@@ -303,7 +303,7 @@ describe("MatchRepository", () => {
     it("should handle null and undefined values in updates", async () => {
       const serverId = 1
       const updatesWithNulls = {
-        act_map: null,
+        activeMap: null,
         description: undefined,
         players: 0,
       }

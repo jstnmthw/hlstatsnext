@@ -52,7 +52,7 @@ export const testServers = [
     port: 27015,
     game: "csgo",
     players: 0,
-    max_players: 32,
+    maxPlayers: 32,
     status: 1,
   },
 ]

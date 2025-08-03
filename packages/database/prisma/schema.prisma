@@ -744,36 +744,36 @@ model Server {
   address       String    @default("") @db.VarChar(32)
   port          Int       @default(0) @db.UnsignedInt
   name          String    @default("") @db.VarChar(255)
-  sortorder     Int       @default(0) @db.TinyInt
+  sortOrder     Int       @default(0) @db.TinyInt
   game          String    @default("valve") @db.VarChar(32)
-  publicaddress String    @default("") @db.VarChar(128)
-  statusurl     String?   @db.VarChar(255)
-  rcon_password String    @default("") @db.VarChar(128)
+  publicAddress String    @default("") @db.VarChar(128)
+  statusUrl     String?   @db.VarChar(255)
+  rconPassword  String    @default("") @db.VarChar(128)
   kills         Int       @default(0)
   players       Int       @default(0)
   rounds        Int       @default(0)
   suicides      Int       @default(0)
   headshots     Int       @default(0)
-  bombs_planted Int       @default(0)
-  bombs_defused Int       @default(0)
-  ct_wins       Int       @default(0)
-  ts_wins       Int       @default(0)
-  act_players   Int       @default(0) @db.SmallInt
-  max_players   Int       @default(0) @db.SmallInt
-  act_map       String    @default("") @db.VarChar(64)
-  map_rounds    Int       @default(0)
-  map_ct_wins   Int       @default(0)
-  map_ts_wins   Int       @default(0)
-  map_started   Int       @default(0)
-  map_changes   Int       @default(0)
-  ct_shots      Int       @default(0)
-  ct_hits       Int       @default(0)
-  ts_shots      Int       @default(0)
-  ts_hits       Int       @default(0)
-  map_ct_shots  Int       @default(0)
-  map_ct_hits   Int       @default(0)
-  map_ts_shots  Int       @default(0)
-  map_ts_hits   Int       @default(0)
+  bombsPlanted  Int       @default(0)
+  bombsDefused  Int       @default(0)
+  ctWins        Int       @default(0)
+  tsWins        Int       @default(0)
+  maxPlayers    Int       @default(0) @db.SmallInt
+  activePlayers Int       @default(0) @db.SmallInt
+  activeMap     String    @default("") @db.VarChar(64)
+  mapRounds     Int       @default(0)
+  mapCtWins     Int       @default(0)
+  mapTsWins     Int       @default(0)
+  mapStarted    Int       @default(0)
+  mapChanges    Int       @default(0)
+  ctShots       Int       @default(0)
+  ctHits        Int       @default(0)
+  tsShots       Int       @default(0)
+  tsHits        Int       @default(0)
+  mapCtShots    Int       @default(0)
+  mapCtHits     Int       @default(0)
+  mapTsShots    Int       @default(0)
+  mapTsHits     Int       @default(0)
   lat           Float?
   lng           Float?
   city          String    @default("") @db.VarChar(64)
@@ -824,14 +824,14 @@ model ServerConfigDefault {
 }
 
 model ServerLoad {
-  server_id   Int     @default(0) @db.UnsignedInt
-  timestamp   Int     @default(0)
-  act_players Int     @default(0) @db.TinyInt
-  min_players Int     @default(0) @db.TinyInt
-  max_players Int     @default(0) @db.TinyInt
-  map         String? @db.VarChar(64)
-  uptime      String  @default("0") @db.VarChar(10)
-  fps         String  @default("0") @db.VarChar(10)
+  server_id     Int     @default(0) @db.UnsignedInt
+  timestamp     Int     @default(0)
+  activePlayers Int     @default(0) @db.TinyInt
+  min_players   Int     @default(0) @db.TinyInt
+  maxPlayers    Int     @default(0) @db.TinyInt
+  map           String? @db.VarChar(64)
+  uptime        String  @default("0") @db.VarChar(10)
+  fps           String  @default("0") @db.VarChar(10)
 
   server Server @relation(fields: [server_id], references: [serverId])
 

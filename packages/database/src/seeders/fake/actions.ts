@@ -18,7 +18,7 @@ export async function seedActions() {
         game: game.code,
         code: faker.lorem.slug(2),
         rewardPlayer: faker.number.int({ min: -10, max: 25 }),
-        reward_team: faker.number.int({ min: 0, max: 10 }),
+        rewardTeam: faker.number.int({ min: 0, max: 10 }),
         team: "",
       }
       actions.push(action)

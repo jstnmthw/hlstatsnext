@@ -319,7 +319,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
             serverId,
             map,
             message,
-            message_mode: messageMode,
+            messageMode: messageMode,
             eventTime: new Date(),
           },
         })
@@ -391,12 +391,12 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
             headshot: headshot ? 1 : 0,
             killerRole: killerRole || "",
             victimRole: victimRole || "",
-            pos_x: killerX || null,
-            pos_y: killerY || null,
-            pos_z: killerZ || null,
-            pos_victim_x: victimX || null,
-            pos_victim_y: victimY || null,
-            pos_victim_z: victimZ || null,
+            posX: killerX || null,
+            posY: killerY || null,
+            posZ: killerZ || null,
+            posVictimX: victimX || null,
+            posVictimY: victimY || null,
+            posVictimZ: victimZ || null,
           },
         })
       }, options)

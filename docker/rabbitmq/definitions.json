@@ -1,7 +1,7 @@
 {
   "rabbit_version": "4.1.2",
   "rabbitmq_version": "4.1.2",
-  "product_name": "HlStatsNext",
+  "product_name": "HlStatsNext RabbitMQ",
   "product_version": "1.0.0",
   "users": [
     {

@@ -491,9 +491,9 @@ export interface ServerStatsUpdateEvent extends BaseEvent {
     bombsDefused?: number
     ctWins?: number
     tsWins?: number
-    actPlayers?: number
+    activePlayers?: number
     maxPlayers?: number
-    actMap?: string
+    activeMap?: string
     mapRounds?: number
     mapCtWins?: number
     mapTsWins?: number

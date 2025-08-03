@@ -58,7 +58,7 @@ describe("ServerRepository", () => {
     map_cs_act_cs_militia: 0,
     map_cs_act_cs_office: 0,
     map_as_act_as_oilrig: 0,
-    map_ts_hits: 0,
+    mapTsHits: 0,
   }
 
   beforeEach(() => {

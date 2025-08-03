@@ -143,7 +143,7 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
       await this.updateServerStats(
         serverId,
         {
-          map_rounds: { increment: 1 },
+          mapRounds: { increment: 1 },
           rounds: { increment: 1 },
         },
         options,
@@ -162,11 +162,11 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
       const updates: Record<string, unknown> = {}
 
       if (winningTeam === "TERRORIST") {
-        updates.ts_wins = { increment: 1 }
-        updates.map_ts_wins = { increment: 1 }
+        updates.tsWins = { increment: 1 }
+        updates.mapTsWins = { increment: 1 }
       } else if (winningTeam === "CT") {
-        updates.ct_wins = { increment: 1 }
-        updates.map_ct_wins = { increment: 1 }
+        updates.ctWins = { increment: 1 }
+        updates.mapCtWins = { increment: 1 }
       }
 
       if (Object.keys(updates).length > 0) {
@@ -186,9 +186,9 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
       const updates: Record<string, unknown> = {}
 
       if (eventType === "plant") {
-        updates.bombs_planted = { increment: 1 }
+        updates.bombsPlanted = { increment: 1 }
       } else if (eventType === "defuse") {
-        updates.bombs_defused = { increment: 1 }
+        updates.bombsDefused = { increment: 1 }
       }
 
       await this.updateServerStats(serverId, updates, options)
@@ -202,16 +202,16 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
       await this.updateServerStats(
         serverId,
         {
-          act_map: newMap,
-          map_changes: { increment: 1 },
-          map_started: Math.floor(Date.now() / 1000),
-          map_rounds: 0,
-          map_ct_wins: 0,
-          map_ts_wins: 0,
-          map_ct_shots: 0,
-          map_ct_hits: 0,
-          map_ts_shots: 0,
-          map_ts_hits: 0,
+          activeMap: newMap,
+          mapChanges: { increment: 1 },
+          mapStarted: Math.floor(Date.now() / 1000),
+          mapRounds: 0,
+          mapCtWins: 0,
+          mapTsWins: 0,
+          mapCtShots: 0,
+          mapCtHits: 0,
+          mapTsShots: 0,
+          mapTsHits: 0,
         },
         options,
       )

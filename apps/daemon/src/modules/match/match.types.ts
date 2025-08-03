@@ -243,7 +243,7 @@ export interface IMatchService {
 export interface ServerRecord {
   serverId: number
   game: string
-  act_map?: string
+  activeMap?: string
   [key: string]: unknown
 }
 

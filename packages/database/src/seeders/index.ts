@@ -1,4 +1,3 @@
-export { seedActions } from "./default/actions"
 export { seedClans } from "./fake/clans"
 export { seedPlayers } from "./fake/players"
 export { seedPlayerUniqueIds } from "./fake/player-unique-ids"

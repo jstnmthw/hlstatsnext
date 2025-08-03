@@ -1,6 +1,9 @@
+"use client"
+
 import { Button } from "@repo/ui/button"
 import { BellIcon, BoltIcon, PaperclipIcon } from "lucide-react"
 import { redirect } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function KitchenSinkPage() {
   // Prevent access to this page in production
@@ -8,805 +11,973 @@ export default function KitchenSinkPage() {
     redirect("/")
   }
 
+  const [activeSection, setActiveSection] = useState("")
+
+  // Table of contents structure
+  const tableOfContents = [
+    {
+      id: "typography",
+      title: "Typography",
+      subsections: [],
+    },
+    {
+      id: "color-palette",
+      title: "Color Palette",
+      subsections: [],
+    },
+    {
+      id: "buttons",
+      title: "Buttons",
+      subsections: [
+        { id: "button-variants", title: "Button Variants" },
+        { id: "button-sizes", title: "Button Sizes" },
+        { id: "button-colors-solid", title: "Solid Buttons - Colors" },
+        { id: "button-colors-outline", title: "Outline Buttons - Colors" },
+        { id: "button-colors-plain", title: "Plain Buttons - Colors" },
+        { id: "button-icons", title: "Buttons with Icons" },
+      ],
+    },
+    {
+      id: "form-elements",
+      title: "Form Elements",
+      subsections: [
+        { id: "input-fields", title: "Input Fields" },
+        { id: "textarea", title: "Textarea" },
+        { id: "select", title: "Select" },
+        { id: "checkboxes", title: "Checkboxes" },
+        { id: "radio-buttons", title: "Radio Buttons" },
+      ],
+    },
+    {
+      id: "layout-components",
+      title: "Layout Components",
+      subsections: [
+        { id: "cards", title: "Cards" },
+        { id: "border-radius", title: "Border Radius" },
+      ],
+    },
+    {
+      id: "spacing",
+      title: "Spacing",
+      subsections: [{ id: "padding-examples", title: "Padding Examples" }],
+    },
+    {
+      id: "interactive-elements",
+      title: "Interactive Elements",
+      subsections: [
+        { id: "links", title: "Links" },
+        { id: "code-blocks", title: "Code Blocks" },
+      ],
+    },
+    {
+      id: "tables",
+      title: "Tables",
+      subsections: [],
+    },
+    {
+      id: "lists",
+      title: "Lists",
+      subsections: [
+        { id: "unordered-list", title: "Unordered List" },
+        { id: "ordered-list", title: "Ordered List" },
+      ],
+    },
+  ]
+
+  // Handle smooth scrolling
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId)
+    if (element) {
+      const offset = 100 // Account for sticky header
+      const elementPosition = element.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - offset
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      })
+    }
+  }
+
+  // Track active section on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = tableOfContents.flatMap((section) => [
+        section.id,
+        ...section.subsections.map((sub) => sub.id),
+      ])
+
+      for (const sectionId of sections) {
+        const element = document.getElementById(sectionId)
+        if (element) {
+          const rect = element.getBoundingClientRect()
+          if (rect.top <= 150 && rect.bottom > 150) {
+            setActiveSection(sectionId)
+            break
+          }
+        }
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    handleScroll() // Call once to set initial state
+
+    return () => window.removeEventListener("scroll", handleScroll)
+  })
+
   return (
-    <div className="min-h-screen p-8">
-      <div className="mx-auto max-w-7xl space-y-12">
-        {/* Header */}
-        <header className="space-y-4">
-          <h1 className="text-5xl font-bold text-foreground">UI Kitchen Sink</h1>
-          <p className="text-lg text-muted-foreground">
-            A comprehensive showcase of all UI components and design elements
-          </p>
-        </header>
-
-        {/* Typography Section */}
-        <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
-            Typography
-          </h2>
-          <div className="space-y-4">
-            <h1 className="text-5xl font-bold">Heading 1 - text-5xl</h1>
-            <h2 className="text-4xl font-bold">Heading 2 - text-4xl</h2>
-            <h3 className="text-3xl font-semibold">Heading 3 - text-3xl</h3>
-            <h4 className="text-2xl font-semibold">Heading 4 - text-2xl</h4>
-            <h5 className="text-xl font-medium">Heading 5 - text-xl</h5>
-            <h6 className="text-lg font-medium">Heading 6 - text-lg</h6>
-            <p className="text-base">Regular paragraph text - text-base</p>
-            <p className="text-sm text-muted-foreground">Small muted text - text-sm</p>
-            <p className="text-xs text-muted-foreground">Extra small text - text-xs</p>
-            <p className="font-light">Light font weight</p>
-            <p className="font-normal">Normal font weight</p>
-            <p className="font-medium">Medium font weight</p>
-            <p className="font-semibold">Semibold font weight</p>
-            <p className="font-bold">Bold font weight</p>
-            <p className="italic">Italic text style</p>
-            <p className="underline">Underlined text</p>
-            <p className="line-through">Strikethrough text</p>
-          </div>
-        </section>
-
-        {/* Color Palette Section */}
-        <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
-            Color Palette
-          </h2>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            {/* Background Colors */}
-            <div className="space-y-2">
-              <div className="h-20 rounded-md bg-background border border-border flex items-center justify-center">
-                <span className="text-sm font-medium">background</span>
-              </div>
-              <p className="text-xs text-center text-muted-foreground">bg-background</p>
+    <div className="min-h-screen">
+      <div className="flex">
+        {/* Sidebar Navigation */}
+        <aside className="fixed left-0 top-0 h-full w-64 overflow-y-auto border-r border-border bg-background p-6">
+          <nav className="space-y-6">
+            <div>
+              <h2 className="mb-4 text-lg font-semibold">Table of Contents</h2>
+              <ul className="space-y-3">
+                {tableOfContents.map((section) => (
+                  <li key={section.id}>
+                    <button
+                      onClick={() => scrollToSection(section.id)}
+                      className={`block w-full text-left text-sm font-medium transition-colors hover:text-primary ${
+                        activeSection === section.id ||
+                        section.subsections.some((sub) => sub.id === activeSection)
+                          ? "text-primary"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {section.title}
+                    </button>
+                    {section.subsections.length > 0 && (
+                      <ul className="mt-2 ml-4 space-y-2">
+                        {section.subsections.map((subsection) => (
+                          <li key={subsection.id}>
+                            <button
+                              onClick={() => scrollToSection(subsection.id)}
+                              className={`block w-full text-left text-sm transition-colors hover:text-primary ${
+                                activeSection === subsection.id
+                                  ? "text-primary"
+                                  : "text-muted-foreground"
+                              }`}
+                            >
+                              {subsection.title}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
+          </nav>
+        </aside>
 
-            <div className="space-y-2">
-              <div className="h-20 rounded-md bg-foreground flex items-center justify-center">
-                <span className="text-sm font-medium text-background">foreground</span>
-              </div>
-              <p className="text-xs text-center text-muted-foreground">bg-foreground</p>
-            </div>
+        {/* Main Content */}
+        <main className="ml-64 flex-1 p-8">
+          <div className="mx-auto max-w-7xl space-y-12">
+            {/* Header */}
+            <header className="space-y-4">
+              <h1 className="text-5xl font-bold text-foreground">UI Kitchen Sink</h1>
+              <p className="text-lg text-muted-foreground">
+                A comprehensive showcase of all UI components and design elements
+              </p>
+            </header>
 
-            <div className="space-y-2">
-              <div className="h-20 rounded-md bg-card border border-border flex items-center justify-center">
-                <span className="text-sm font-medium">card</span>
+            {/* Typography Section */}
+            <section id="typography" className="space-y-6">
+              <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+                Typography
+              </h2>
+              <div className="space-y-4">
+                <h1 className="text-5xl font-bold">Heading 1 - text-5xl</h1>
+                <h2 className="text-4xl font-bold">Heading 2 - text-4xl</h2>
+                <h3 className="text-3xl font-semibold">Heading 3 - text-3xl</h3>
+                <h4 className="text-2xl font-semibold">Heading 4 - text-2xl</h4>
+                <h5 className="text-xl font-medium">Heading 5 - text-xl</h5>
+                <h6 className="text-lg font-medium">Heading 6 - text-lg</h6>
+                <p className="text-base">Regular paragraph text - text-base</p>
+                <p className="text-sm text-muted-foreground">Small muted text - text-sm</p>
+                <p className="text-xs text-muted-foreground">Extra small text - text-xs</p>
+                <p className="font-light">Light font weight</p>
+                <p className="font-normal">Normal font weight</p>
+                <p className="font-medium">Medium font weight</p>
+                <p className="font-semibold">Semibold font weight</p>
+                <p className="font-bold">Bold font weight</p>
+                <p className="italic">Italic text style</p>
+                <p className="underline">Underlined text</p>
+                <p className="line-through">Strikethrough text</p>
               </div>
-              <p className="text-xs text-center text-muted-foreground">bg-card</p>
-            </div>
+            </section>
 
-            <div className="space-y-2">
-              <div className="h-20 rounded-md bg-primary flex items-center justify-center">
-                <span className="text-sm font-medium text-primary-foreground">primary</span>
-              </div>
-              <p className="text-xs text-center text-muted-foreground">bg-primary</p>
-            </div>
+            {/* Color Palette Section */}
+            <section id="color-palette" className="space-y-6">
+              <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+                Color Palette
+              </h2>
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                {/* Background Colors */}
+                <div className="space-y-2">
+                  <div className="h-20 rounded-md bg-background border border-border flex items-center justify-center">
+                    <span className="text-sm font-medium">background</span>
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground">bg-background</p>
+                </div>
 
-            <div className="space-y-2">
-              <div className="h-20 rounded-md bg-secondary flex items-center justify-center">
-                <span className="text-sm font-medium text-secondary-foreground">secondary</span>
-              </div>
-              <p className="text-xs text-center text-muted-foreground">bg-secondary</p>
-            </div>
+                <div className="space-y-2">
+                  <div className="h-20 rounded-md bg-foreground flex items-center justify-center">
+                    <span className="text-sm font-medium text-background">foreground</span>
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground">bg-foreground</p>
+                </div>
 
-            <div className="space-y-2">
-              <div className="h-20 rounded-md bg-muted flex items-center justify-center">
-                <span className="text-sm font-medium text-muted-foreground">muted</span>
-              </div>
-              <p className="text-xs text-center text-muted-foreground">bg-muted</p>
-            </div>
+                <div className="space-y-2">
+                  <div className="h-20 rounded-md bg-card border border-border flex items-center justify-center">
+                    <span className="text-sm font-medium">card</span>
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground">bg-card</p>
+                </div>
 
-            <div className="space-y-2">
-              <div className="h-20 rounded-md bg-accent flex items-center justify-center">
-                <span className="text-sm font-medium text-accent-foreground">accent</span>
-              </div>
-              <p className="text-xs text-center text-muted-foreground">bg-accent</p>
-            </div>
+                <div className="space-y-2">
+                  <div className="h-20 rounded-md bg-primary flex items-center justify-center">
+                    <span className="text-sm font-medium text-primary-foreground">primary</span>
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground">bg-primary</p>
+                </div>
 
-            <div className="space-y-2">
-              <div className="h-20 rounded-md bg-destructive flex items-center justify-center">
-                <span className="text-sm font-medium text-destructive-foreground">destructive</span>
-              </div>
-              <p className="text-xs text-center text-muted-foreground">bg-destructive</p>
-            </div>
-          </div>
-        </section>
+                <div className="space-y-2">
+                  <div className="h-20 rounded-md bg-secondary flex items-center justify-center">
+                    <span className="text-sm font-medium text-secondary-foreground">secondary</span>
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground">bg-secondary</p>
+                </div>
 
-        {/* Buttons Section */}
-        <section className="space-y-6">
-          {/* Button Component Section */}
-          <div>
-            <h2 className="mb-6 text-2xl font-semibold text-foreground border-b border-border pb-4">
-              Buttons
-            </h2>
+                <div className="space-y-2">
+                  <div className="h-20 rounded-md bg-muted flex items-center justify-center">
+                    <span className="text-sm font-medium text-muted-foreground">muted</span>
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground">bg-muted</p>
+                </div>
 
-            {/* Variants */}
-            <div className="mb-8">
-              <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
-                Button Variants
-              </h3>
-              <div className="flex flex-wrap gap-4">
-                <Button variant="solid">Solid Button</Button>
-                <Button variant="outline">Outline Button</Button>
-                <Button variant="plain">Plain Button</Button>
-              </div>
-            </div>
+                <div className="space-y-2">
+                  <div className="h-20 rounded-md bg-accent flex items-center justify-center">
+                    <span className="text-sm font-medium text-accent-foreground">accent</span>
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground">bg-accent</p>
+                </div>
 
-            {/* Sizes */}
-            <div className="mb-8">
-              <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
-                Button Sizes
-              </h3>
-              <div className="flex flex-wrap items-center gap-4">
-                <Button variant="solid" colorScheme="blue" size="xs">
-                  Extra Small Button
-                </Button>
-                <Button variant="solid" colorScheme="blue" size="sm">
-                  Small Button
-                </Button>
-                <Button variant="solid" colorScheme="blue" size="default">
-                  Default Button
-                </Button>
-                <Button variant="solid" colorScheme="blue" size="lg">
-                  Large Button
-                </Button>
-                <Button variant="solid" colorScheme="blue" size="xl">
-                  Extra Large Button
-                </Button>
-              </div>
-              <div className="mt-4 flex flex-wrap items-center gap-4">
-                <Button variant="solid" colorScheme="blue" size="xs">
-                  <BellIcon data-slot="icon" />
-                  <span>Extra Small Button</span>
-                </Button>
-                <Button variant="solid" colorScheme="blue" size="sm">
-                  <BellIcon data-slot="icon" />
-                  <span>Small Button</span>
-                </Button>
-                <Button variant="solid" colorScheme="blue" size="default">
-                  <BellIcon data-slot="icon" />
-                  <span>Default Button</span>
-                </Button>
-                <Button variant="solid" colorScheme="blue" size="lg">
-                  <BellIcon data-slot="icon" />
-                  <span>Large Button</span>
-                </Button>
-                <Button variant="solid" colorScheme="blue" size="xl">
-                  <BellIcon data-slot="icon" />
-                  <span>Extra Large Button</span>
-                </Button>
-              </div>
-              <div className="mt-4 flex flex-wrap items-center gap-4">
-                <Button variant="solid" colorScheme="blue" size="xs">
-                  <BellIcon data-slot="icon" />
-                </Button>
-                <Button variant="solid" colorScheme="blue" size="sm">
-                  <BellIcon data-slot="icon" />
-                </Button>
-                <Button variant="solid" colorScheme="blue" size="default">
-                  <BellIcon data-slot="icon" />
-                </Button>
-                <Button variant="solid" colorScheme="blue" size="lg">
-                  <BellIcon data-slot="icon" />
-                </Button>
-                <Button variant="solid" colorScheme="blue" size="xl">
-                  <BellIcon data-slot="icon" />
-                </Button>
-              </div>
-
-              {/* Colors - Solid */}
-              <div className="mb-8">
-                <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
-                  Solid Buttons - Colors
-                </h3>
-                <div className="flex flex-wrap gap-4">
-                  <Button variant="solid" colorScheme="dark">
-                    Dark
-                  </Button>
-                  <Button variant="solid" colorScheme="light">
-                    Light
-                  </Button>
-                  <Button variant="solid" colorScheme="dark/white">
-                    Dark/White
-                  </Button>
-                  <Button variant="solid" colorScheme="zinc">
-                    Zinc
-                  </Button>
-                  <Button variant="solid" colorScheme="red">
-                    Red
-                  </Button>
-                  <Button variant="solid" colorScheme="orange">
-                    Orange
-                  </Button>
-                  <Button variant="solid" colorScheme="amber">
-                    Amber
-                  </Button>
-                  <Button variant="solid" colorScheme="yellow">
-                    Yellow
-                  </Button>
-                  <Button variant="solid" colorScheme="lime">
-                    Lime
-                  </Button>
-                  <Button variant="solid" colorScheme="green">
-                    Green
-                  </Button>
-                  <Button variant="solid" colorScheme="emerald">
-                    Emerald
-                  </Button>
-                  <Button variant="solid" colorScheme="teal">
-                    Teal
-                  </Button>
-                  <Button variant="solid" colorScheme="cyan">
-                    Cyan
-                  </Button>
-                  <Button variant="solid" colorScheme="sky">
-                    Sky
-                  </Button>
-                  <Button variant="solid" colorScheme="blue">
-                    Blue
-                  </Button>
-                  <Button variant="solid" colorScheme="indigo">
-                    Indigo
-                  </Button>
-                  <Button variant="solid" colorScheme="violet">
-                    Violet
-                  </Button>
-                  <Button variant="solid" colorScheme="purple">
-                    Purple
-                  </Button>
-                  <Button variant="solid" colorScheme="fuchsia">
-                    Fuchsia
-                  </Button>
-                  <Button variant="solid" colorScheme="pink">
-                    Pink
-                  </Button>
-                  <Button variant="solid" colorScheme="rose">
-                    Rose
-                  </Button>
+                <div className="space-y-2">
+                  <div className="h-20 rounded-md bg-destructive flex items-center justify-center">
+                    <span className="text-sm font-medium text-destructive-foreground">
+                      destructive
+                    </span>
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground">bg-destructive</p>
                 </div>
               </div>
+            </section>
 
-              {/* Colors - Outline */}
-              <div className="mb-8">
-                <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
-                  Outline Buttons - Colors
-                </h3>
-                <div className="flex flex-wrap gap-4">
-                  <Button variant="outline" colorScheme="dark">
-                    Dark
-                  </Button>
-                  <Button variant="outline" colorScheme="light">
-                    Light
-                  </Button>
-                  <Button variant="outline" colorScheme="dark/white">
-                    Dark/White
-                  </Button>
-                  <Button variant="outline" colorScheme="zinc">
-                    Zinc
-                  </Button>
-                  <Button variant="outline" colorScheme="red">
-                    Red
-                  </Button>
-                  <Button variant="outline" colorScheme="orange">
-                    Orange
-                  </Button>
-                  <Button variant="outline" colorScheme="amber">
-                    Amber
-                  </Button>
-                  <Button variant="outline" colorScheme="yellow">
-                    Yellow
-                  </Button>
-                  <Button variant="outline" colorScheme="lime">
-                    Lime
-                  </Button>
-                  <Button variant="outline" colorScheme="green">
-                    Green
-                  </Button>
-                  <Button variant="outline" colorScheme="emerald">
-                    Emerald
-                  </Button>
-                  <Button variant="outline" colorScheme="teal">
-                    Teal
-                  </Button>
-                  <Button variant="outline" colorScheme="cyan">
-                    Cyan
-                  </Button>
-                  <Button variant="outline" colorScheme="sky">
-                    Sky
-                  </Button>
-                  <Button variant="outline" colorScheme="blue">
-                    Blue
-                  </Button>
-                  <Button variant="outline" colorScheme="indigo">
-                    Indigo
-                  </Button>
-                  <Button variant="outline" colorScheme="violet">
-                    Violet
-                  </Button>
-                  <Button variant="outline" colorScheme="purple">
-                    Purple
-                  </Button>
-                  <Button variant="outline" colorScheme="fuchsia">
-                    Fuchsia
-                  </Button>
-                  <Button variant="outline" colorScheme="pink">
-                    Pink
-                  </Button>
-                  <Button variant="outline" colorScheme="rose">
-                    Rose
-                  </Button>
-                </div>
-                <div className="mt-4 flex flex-wrap items-center gap-4">
-                  <Button variant="outline" colorScheme="indigo" size="xs">
-                    <BellIcon data-slot="icon" />
-                    <span>Extra Small Button</span>
-                  </Button>
-                  <Button variant="outline" colorScheme="indigo" size="sm">
-                    <BellIcon data-slot="icon" />
-                    <span>Small Button</span>
-                  </Button>
-                  <Button variant="outline" colorScheme="indigo" size="default">
-                    <BellIcon data-slot="icon" />
-                    <span>Default Button</span>
-                  </Button>
-                  <Button variant="outline" colorScheme="indigo" size="lg">
-                    <BellIcon data-slot="icon" />
-                    <span>Large Button</span>
-                  </Button>
-                  <Button variant="outline" colorScheme="indigo" size="xl">
-                    <BellIcon data-slot="icon" />
-                    <span>Extra Large Button</span>
-                  </Button>
-                </div>
-                <div className="mt-4 flex flex-wrap items-center gap-4">
-                  <Button variant="outline" colorScheme="blue" size="icon-xs">
-                    <BellIcon data-slot="icon" />
-                  </Button>
-                  <Button variant="outline" colorScheme="indigo" size="icon-sm">
-                    <BellIcon data-slot="icon" />
-                  </Button>
-                  <Button variant="outline" colorScheme="purple" size="icon">
-                    <BellIcon data-slot="icon" />
-                  </Button>
-                  <Button variant="outline" colorScheme="fuchsia" size="icon-lg">
-                    <BellIcon data-slot="icon" />
-                  </Button>
-                  <Button variant="outline" colorScheme="pink" size="icon-xl">
-                    <BellIcon data-slot="icon" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Colors - Plain */}
-              <div className="mb-8">
-                <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
-                  Plain Buttons - Colors
-                </h3>
-                <div className="flex flex-wrap gap-4">
-                  <Button variant="plain" colorScheme="dark">
-                    Dark
-                  </Button>
-                  <Button variant="plain" colorScheme="light">
-                    Light
-                  </Button>
-                  <Button variant="plain" colorScheme="dark/white">
-                    Dark/White
-                  </Button>
-                  <Button variant="plain" colorScheme="zinc">
-                    Zinc
-                  </Button>
-                  <Button variant="plain" colorScheme="red">
-                    Red
-                  </Button>
-                  <Button variant="plain" colorScheme="orange">
-                    Orange
-                  </Button>
-                  <Button variant="plain" colorScheme="amber">
-                    Amber
-                  </Button>
-                  <Button variant="plain" colorScheme="yellow">
-                    Yellow
-                  </Button>
-                  <Button variant="plain" colorScheme="lime">
-                    Lime
-                  </Button>
-                  <Button variant="plain" colorScheme="green">
-                    Green
-                  </Button>
-                  <Button variant="plain" colorScheme="emerald">
-                    Emerald
-                  </Button>
-                  <Button variant="plain" colorScheme="teal">
-                    Teal
-                  </Button>
-                  <Button variant="plain" colorScheme="cyan">
-                    Cyan
-                  </Button>
-                  <Button variant="plain" colorScheme="sky">
-                    Sky
-                  </Button>
-                  <Button variant="plain" colorScheme="blue">
-                    Blue
-                  </Button>
-                  <Button variant="plain" colorScheme="indigo">
-                    Indigo
-                  </Button>
-                  <Button variant="plain" colorScheme="violet">
-                    Violet
-                  </Button>
-                  <Button variant="plain" colorScheme="purple">
-                    Purple
-                  </Button>
-                  <Button variant="plain" colorScheme="fuchsia">
-                    Fuchsia
-                  </Button>
-                  <Button variant="plain" colorScheme="pink">
-                    Pink
-                  </Button>
-                  <Button variant="plain" colorScheme="rose">
-                    Rose
-                  </Button>
-                </div>
-                <div className="mt-4 flex flex-wrap items-center gap-4">
-                  <Button variant="plain" colorScheme="blue" size="icon-xs">
-                    <BellIcon data-slot="icon" />
-                  </Button>
-                  <Button variant="plain" colorScheme="indigo" size="icon-sm">
-                    <BellIcon data-slot="icon" />
-                  </Button>
-                  <Button variant="plain" colorScheme="purple" size="icon">
-                    <BellIcon data-slot="icon" />
-                  </Button>
-                  <Button variant="plain" colorScheme="fuchsia" size="icon-lg">
-                    <BellIcon data-slot="icon" />
-                  </Button>
-                  <Button variant="plain" colorScheme="pink" size="icon-xl">
-                    <BellIcon data-slot="icon" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* With Icons */}
+            {/* Buttons Section */}
+            <section id="buttons" className="space-y-6">
+              {/* Button Component Section */}
               <div>
-                <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
-                  Buttons with Icons
-                </h3>
-                <div className="flex flex-wrap items-center gap-4">
-                  <Button variant="solid" colorScheme="blue">
-                    <BellIcon data-slot="icon" />
-                    Button with Icon
-                  </Button>
-                  <Button variant="outline" colorScheme="blue">
-                    <PaperclipIcon data-slot="icon" />
-                    Button with Icon
-                  </Button>
-                  <Button variant="plain" colorScheme="blue">
-                    <BoltIcon data-slot="icon" />
-                    Button with Icon
-                  </Button>
+                <h2 className="mb-6 text-2xl font-semibold text-foreground border-b border-border pb-4">
+                  Buttons
+                </h2>
+
+                {/* Variants */}
+                <div id="button-variants" className="mb-8">
+                  <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                    Button Variants
+                  </h3>
+                  <div className="flex flex-wrap gap-4">
+                    <Button variant="solid">Solid Button</Button>
+                    <Button variant="outline">Outline Button</Button>
+                    <Button variant="plain">Plain Button</Button>
+                  </div>
+                </div>
+
+                {/* Sizes */}
+                <div id="button-sizes" className="mb-8">
+                  <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                    Button Sizes
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <Button variant="solid" colorScheme="blue" size="xs">
+                      Extra Small Button
+                    </Button>
+                    <Button variant="solid" colorScheme="blue" size="sm">
+                      Small Button
+                    </Button>
+                    <Button variant="solid" colorScheme="blue" size="default">
+                      Default Button
+                    </Button>
+                    <Button variant="solid" colorScheme="blue" size="lg">
+                      Large Button
+                    </Button>
+                    <Button variant="solid" colorScheme="blue" size="xl">
+                      Extra Large Button
+                    </Button>
+                  </div>
+                  <div className="mt-4 flex flex-wrap items-center gap-4">
+                    <Button variant="solid" colorScheme="blue" size="xs">
+                      <BellIcon data-slot="icon" />
+                      <span>Extra Small Button</span>
+                    </Button>
+                    <Button variant="solid" colorScheme="blue" size="sm">
+                      <BellIcon data-slot="icon" />
+                      <span>Small Button</span>
+                    </Button>
+                    <Button variant="solid" colorScheme="blue" size="default">
+                      <BellIcon data-slot="icon" />
+                      <span>Default Button</span>
+                    </Button>
+                    <Button variant="solid" colorScheme="blue" size="lg">
+                      <BellIcon data-slot="icon" />
+                      <span>Large Button</span>
+                    </Button>
+                    <Button variant="solid" colorScheme="blue" size="xl">
+                      <BellIcon data-slot="icon" />
+                      <span>Extra Large Button</span>
+                    </Button>
+                  </div>
+                  <div className="mt-4 flex flex-wrap items-center gap-4">
+                    <Button variant="solid" colorScheme="blue" size="xs">
+                      <BellIcon data-slot="icon" />
+                    </Button>
+                    <Button variant="solid" colorScheme="blue" size="sm">
+                      <BellIcon data-slot="icon" />
+                    </Button>
+                    <Button variant="solid" colorScheme="blue" size="default">
+                      <BellIcon data-slot="icon" />
+                    </Button>
+                    <Button variant="solid" colorScheme="blue" size="lg">
+                      <BellIcon data-slot="icon" />
+                    </Button>
+                    <Button variant="solid" colorScheme="blue" size="xl">
+                      <BellIcon data-slot="icon" />
+                    </Button>
+                  </div>
+
+                  {/* Colors - Solid */}
+                  <div id="button-colors-solid" className="mb-8 mt-8">
+                    <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                      Solid Buttons - Colors
+                    </h3>
+                    <div className="flex flex-wrap gap-4">
+                      <Button variant="solid" colorScheme="dark">
+                        Dark
+                      </Button>
+                      <Button variant="solid" colorScheme="light">
+                        Light
+                      </Button>
+                      <Button variant="solid" colorScheme="dark/white">
+                        Dark/White
+                      </Button>
+                      <Button variant="solid" colorScheme="zinc">
+                        Zinc
+                      </Button>
+                      <Button variant="solid" colorScheme="red">
+                        Red
+                      </Button>
+                      <Button variant="solid" colorScheme="orange">
+                        Orange
+                      </Button>
+                      <Button variant="solid" colorScheme="amber">
+                        Amber
+                      </Button>
+                      <Button variant="solid" colorScheme="yellow">
+                        Yellow
+                      </Button>
+                      <Button variant="solid" colorScheme="lime">
+                        Lime
+                      </Button>
+                      <Button variant="solid" colorScheme="green">
+                        Green
+                      </Button>
+                      <Button variant="solid" colorScheme="emerald">
+                        Emerald
+                      </Button>
+                      <Button variant="solid" colorScheme="teal">
+                        Teal
+                      </Button>
+                      <Button variant="solid" colorScheme="cyan">
+                        Cyan
+                      </Button>
+                      <Button variant="solid" colorScheme="sky">
+                        Sky
+                      </Button>
+                      <Button variant="solid" colorScheme="blue">
+                        Blue
+                      </Button>
+                      <Button variant="solid" colorScheme="indigo">
+                        Indigo
+                      </Button>
+                      <Button variant="solid" colorScheme="violet">
+                        Violet
+                      </Button>
+                      <Button variant="solid" colorScheme="purple">
+                        Purple
+                      </Button>
+                      <Button variant="solid" colorScheme="fuchsia">
+                        Fuchsia
+                      </Button>
+                      <Button variant="solid" colorScheme="pink">
+                        Pink
+                      </Button>
+                      <Button variant="solid" colorScheme="rose">
+                        Rose
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Colors - Outline */}
+                  <div id="button-colors-outline" className="mb-8">
+                    <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                      Outline Buttons - Colors
+                    </h3>
+                    <div className="flex flex-wrap gap-4">
+                      <Button variant="outline" colorScheme="dark">
+                        Dark
+                      </Button>
+                      <Button variant="outline" colorScheme="light">
+                        Light
+                      </Button>
+                      <Button variant="outline" colorScheme="dark/white">
+                        Dark/White
+                      </Button>
+                      <Button variant="outline" colorScheme="zinc">
+                        Zinc
+                      </Button>
+                      <Button variant="outline" colorScheme="red">
+                        Red
+                      </Button>
+                      <Button variant="outline" colorScheme="orange">
+                        Orange
+                      </Button>
+                      <Button variant="outline" colorScheme="amber">
+                        Amber
+                      </Button>
+                      <Button variant="outline" colorScheme="yellow">
+                        Yellow
+                      </Button>
+                      <Button variant="outline" colorScheme="lime">
+                        Lime
+                      </Button>
+                      <Button variant="outline" colorScheme="green">
+                        Green
+                      </Button>
+                      <Button variant="outline" colorScheme="emerald">
+                        Emerald
+                      </Button>
+                      <Button variant="outline" colorScheme="teal">
+                        Teal
+                      </Button>
+                      <Button variant="outline" colorScheme="cyan">
+                        Cyan
+                      </Button>
+                      <Button variant="outline" colorScheme="sky">
+                        Sky
+                      </Button>
+                      <Button variant="outline" colorScheme="blue">
+                        Blue
+                      </Button>
+                      <Button variant="outline" colorScheme="indigo">
+                        Indigo
+                      </Button>
+                      <Button variant="outline" colorScheme="violet">
+                        Violet
+                      </Button>
+                      <Button variant="outline" colorScheme="purple">
+                        Purple
+                      </Button>
+                      <Button variant="outline" colorScheme="fuchsia">
+                        Fuchsia
+                      </Button>
+                      <Button variant="outline" colorScheme="pink">
+                        Pink
+                      </Button>
+                      <Button variant="outline" colorScheme="rose">
+                        Rose
+                      </Button>
+                    </div>
+                    <div className="mt-4 flex flex-wrap items-center gap-4">
+                      <Button variant="outline" colorScheme="indigo" size="xs">
+                        <BellIcon data-slot="icon" />
+                        <span>Extra Small Button</span>
+                      </Button>
+                      <Button variant="outline" colorScheme="indigo" size="sm">
+                        <BellIcon data-slot="icon" />
+                        <span>Small Button</span>
+                      </Button>
+                      <Button variant="outline" colorScheme="indigo" size="default">
+                        <BellIcon data-slot="icon" />
+                        <span>Default Button</span>
+                      </Button>
+                      <Button variant="outline" colorScheme="indigo" size="lg">
+                        <BellIcon data-slot="icon" />
+                        <span>Large Button</span>
+                      </Button>
+                      <Button variant="outline" colorScheme="indigo" size="xl">
+                        <BellIcon data-slot="icon" />
+                        <span>Extra Large Button</span>
+                      </Button>
+                    </div>
+                    <div className="mt-4 flex flex-wrap items-center gap-4">
+                      <Button variant="outline" colorScheme="blue" size="icon-xs">
+                        <BellIcon data-slot="icon" />
+                      </Button>
+                      <Button variant="outline" colorScheme="indigo" size="icon-sm">
+                        <BellIcon data-slot="icon" />
+                      </Button>
+                      <Button variant="outline" colorScheme="purple" size="icon">
+                        <BellIcon data-slot="icon" />
+                      </Button>
+                      <Button variant="outline" colorScheme="fuchsia" size="icon-lg">
+                        <BellIcon data-slot="icon" />
+                      </Button>
+                      <Button variant="outline" colorScheme="pink" size="icon-xl">
+                        <BellIcon data-slot="icon" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Colors - Plain */}
+                  <div id="button-colors-plain" className="mb-8">
+                    <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                      Plain Buttons - Colors
+                    </h3>
+                    <div className="flex flex-wrap gap-4">
+                      <Button variant="plain" colorScheme="dark">
+                        Dark
+                      </Button>
+                      <Button variant="plain" colorScheme="light">
+                        Light
+                      </Button>
+                      <Button variant="plain" colorScheme="dark/white">
+                        Dark/White
+                      </Button>
+                      <Button variant="plain" colorScheme="zinc">
+                        Zinc
+                      </Button>
+                      <Button variant="plain" colorScheme="red">
+                        Red
+                      </Button>
+                      <Button variant="plain" colorScheme="orange">
+                        Orange
+                      </Button>
+                      <Button variant="plain" colorScheme="amber">
+                        Amber
+                      </Button>
+                      <Button variant="plain" colorScheme="yellow">
+                        Yellow
+                      </Button>
+                      <Button variant="plain" colorScheme="lime">
+                        Lime
+                      </Button>
+                      <Button variant="plain" colorScheme="green">
+                        Green
+                      </Button>
+                      <Button variant="plain" colorScheme="emerald">
+                        Emerald
+                      </Button>
+                      <Button variant="plain" colorScheme="teal">
+                        Teal
+                      </Button>
+                      <Button variant="plain" colorScheme="cyan">
+                        Cyan
+                      </Button>
+                      <Button variant="plain" colorScheme="sky">
+                        Sky
+                      </Button>
+                      <Button variant="plain" colorScheme="blue">
+                        Blue
+                      </Button>
+                      <Button variant="plain" colorScheme="indigo">
+                        Indigo
+                      </Button>
+                      <Button variant="plain" colorScheme="violet">
+                        Violet
+                      </Button>
+                      <Button variant="plain" colorScheme="purple">
+                        Purple
+                      </Button>
+                      <Button variant="plain" colorScheme="fuchsia">
+                        Fuchsia
+                      </Button>
+                      <Button variant="plain" colorScheme="pink">
+                        Pink
+                      </Button>
+                      <Button variant="plain" colorScheme="rose">
+                        Rose
+                      </Button>
+                    </div>
+                    <div className="mt-4 flex flex-wrap items-center gap-4">
+                      <Button variant="plain" colorScheme="blue" size="icon-xs">
+                        <BellIcon data-slot="icon" />
+                      </Button>
+                      <Button variant="plain" colorScheme="indigo" size="icon-sm">
+                        <BellIcon data-slot="icon" />
+                      </Button>
+                      <Button variant="plain" colorScheme="purple" size="icon">
+                        <BellIcon data-slot="icon" />
+                      </Button>
+                      <Button variant="plain" colorScheme="fuchsia" size="icon-lg">
+                        <BellIcon data-slot="icon" />
+                      </Button>
+                      <Button variant="plain" colorScheme="pink" size="icon-xl">
+                        <BellIcon data-slot="icon" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* With Icons */}
+                  <div id="button-icons">
+                    <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                      Buttons with Icons
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-4">
+                      <Button variant="solid" colorScheme="blue">
+                        <BellIcon data-slot="icon" />
+                        Button with Icon
+                      </Button>
+                      <Button variant="outline" colorScheme="blue">
+                        <PaperclipIcon data-slot="icon" />
+                        Button with Icon
+                      </Button>
+                      <Button variant="plain" colorScheme="blue">
+                        <BoltIcon data-slot="icon" />
+                        Button with Icon
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
+            </section>
 
-        {/* Form Elements Section */}
-        <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
-            Form Elements
-          </h2>
-          <div className="space-y-6 rounded-lg border border-border bg-card p-6">
-            {/* Text Inputs */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-medium">Input Fields</h3>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label htmlFor="text-input" className="text-sm font-medium">
-                    Text Input
+            {/* Form Elements Section */}
+            <section id="form-elements" className="space-y-6">
+              <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+                Form Elements
+              </h2>
+              <div className="space-y-6 rounded-lg border border-border bg-card p-6">
+                {/* Text Inputs */}
+                <div id="input-fields" className="space-y-4">
+                  <h3 className="text-xl font-medium">Input Fields</h3>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <label htmlFor="text-input" className="text-sm font-medium">
+                        Text Input
+                      </label>
+                      <input
+                        id="text-input"
+                        type="text"
+                        placeholder="Enter text..."
+                        className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="email-input" className="text-sm font-medium">
+                        Email Input
+                      </label>
+                      <input
+                        id="email-input"
+                        type="email"
+                        placeholder="email@example.com"
+                        className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="password-input" className="text-sm font-medium">
+                        Password Input
+                      </label>
+                      <input
+                        id="password-input"
+                        type="password"
+                        placeholder="••••••••"
+                        className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="disabled-input" className="text-sm font-medium">
+                        Disabled Input
+                      </label>
+                      <input
+                        id="disabled-input"
+                        type="text"
+                        placeholder="Disabled"
+                        disabled
+                        className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Textarea */}
+                <div id="textarea" className="space-y-2">
+                  <label htmlFor="textarea-field" className="text-sm font-medium">
+                    Textarea
                   </label>
-                  <input
-                    id="text-input"
-                    type="text"
-                    placeholder="Enter text..."
-                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  <textarea
+                    id="textarea-field"
+                    placeholder="Enter your message..."
+                    rows={4}
+                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="email-input" className="text-sm font-medium">
-                    Email Input
+                {/* Select */}
+                <div id="select" className="space-y-2">
+                  <label htmlFor="select-field" className="text-sm font-medium">
+                    Select
                   </label>
-                  <input
-                    id="email-input"
-                    type="email"
-                    placeholder="email@example.com"
-                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                  />
+                  <select
+                    id="select-field"
+                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Choose an option...</option>
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <option value="option3">Option 3</option>
+                  </select>
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="password-input" className="text-sm font-medium">
-                    Password Input
-                  </label>
-                  <input
-                    id="password-input"
-                    type="password"
-                    placeholder="••••••••"
-                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                  />
-                </div>
+                {/* Checkboxes and Radio */}
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div id="checkboxes" className="space-y-2">
+                    <h4 className="text-sm font-medium">Checkboxes</h4>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2">
+                        <input type="checkbox" className="h-4 w-4 rounded border-input" />
+                        <span className="text-sm">Option 1</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-input"
+                          defaultChecked
+                        />
+                        <span className="text-sm">Option 2 (checked)</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input type="checkbox" className="h-4 w-4 rounded border-input" disabled />
+                        <span className="text-sm">Option 3 (disabled)</span>
+                      </label>
+                    </div>
+                  </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="disabled-input" className="text-sm font-medium">
-                    Disabled Input
-                  </label>
-                  <input
-                    id="disabled-input"
-                    type="text"
-                    placeholder="Disabled"
-                    disabled
-                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Textarea */}
-            <div className="space-y-2">
-              <label htmlFor="textarea" className="text-sm font-medium">
-                Textarea
-              </label>
-              <textarea
-                id="textarea"
-                placeholder="Enter your message..."
-                rows={4}
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              />
-            </div>
-
-            {/* Select */}
-            <div className="space-y-2">
-              <label htmlFor="select" className="text-sm font-medium">
-                Select
-              </label>
-              <select
-                id="select"
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="">Choose an option...</option>
-                <option value="option1">Option 1</option>
-                <option value="option2">Option 2</option>
-                <option value="option3">Option 3</option>
-              </select>
-            </div>
-
-            {/* Checkboxes and Radio */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Checkboxes</h4>
-                <div className="space-y-2">
-                  <label className="flex items-center space-x-2">
-                    <input type="checkbox" className="h-4 w-4 rounded border-input" />
-                    <span className="text-sm">Option 1</span>
-                  </label>
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-input"
-                      defaultChecked
-                    />
-                    <span className="text-sm">Option 2 (checked)</span>
-                  </label>
-                  <label className="flex items-center space-x-2">
-                    <input type="checkbox" className="h-4 w-4 rounded border-input" disabled />
-                    <span className="text-sm">Option 3 (disabled)</span>
-                  </label>
+                  <div id="radio-buttons" className="space-y-2">
+                    <h4 className="text-sm font-medium">Radio Buttons</h4>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2">
+                        <input type="radio" name="radio-group" className="h-4 w-4 border-input" />
+                        <span className="text-sm">Option A</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="radio-group"
+                          className="h-4 w-4 border-input"
+                          defaultChecked
+                        />
+                        <span className="text-sm">Option B (selected)</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="radio-group"
+                          className="h-4 w-4 border-input"
+                          disabled
+                        />
+                        <span className="text-sm">Option C (disabled)</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </section>
 
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Radio Buttons</h4>
-                <div className="space-y-2">
-                  <label className="flex items-center space-x-2">
-                    <input type="radio" name="radio-group" className="h-4 w-4 border-input" />
-                    <span className="text-sm">Option A</span>
-                  </label>
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name="radio-group"
-                      className="h-4 w-4 border-input"
-                      defaultChecked
-                    />
-                    <span className="text-sm">Option B (selected)</span>
-                  </label>
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name="radio-group"
-                      className="h-4 w-4 border-input"
-                      disabled
-                    />
-                    <span className="text-sm">Option C (disabled)</span>
-                  </label>
+            {/* Layout Components */}
+            <section id="layout-components" className="space-y-6">
+              <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+                Layout Components
+              </h2>
+
+              {/* Cards */}
+              <div id="cards" className="space-y-4">
+                <h3 className="text-xl font-medium">Cards</h3>
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
+                    <h4 className="mb-2 text-lg font-semibold">Card Title</h4>
+                    <p className="text-sm text-muted-foreground">
+                      This is a basic card component with border and shadow.
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg bg-secondary p-6">
+                    <h4 className="mb-2 text-lg font-semibold text-secondary-foreground">
+                      Secondary Card
+                    </h4>
+                    <p className="text-sm text-secondary-foreground">
+                      This card uses the secondary background color.
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg bg-muted p-6">
+                    <h4 className="mb-2 text-lg font-semibold text-muted-foreground">Muted Card</h4>
+                    <p className="text-sm text-muted-foreground">
+                      This card uses the muted background color.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Layout Components */}
-        <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
-            Layout Components
-          </h2>
-
-          {/* Cards */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-medium">Cards</h3>
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
-                <h4 className="mb-2 text-lg font-semibold">Card Title</h4>
-                <p className="text-sm text-muted-foreground">
-                  This is a basic card component with border and shadow.
-                </p>
+              {/* Borders and Radius */}
+              <div id="border-radius" className="space-y-4">
+                <h3 className="text-xl font-medium">Border Radius</h3>
+                <div className="flex flex-wrap gap-4">
+                  <div className="h-20 w-20 rounded-sm bg-primary" title="rounded-sm" />
+                  <div className="h-20 w-20 rounded-md bg-primary" title="rounded-md" />
+                  <div className="h-20 w-20 rounded-lg bg-primary" title="rounded-lg" />
+                  <div className="h-20 w-20 rounded-xl bg-primary" title="rounded-xl" />
+                  <div className="h-20 w-20 rounded-full bg-primary" title="rounded-full" />
+                </div>
               </div>
+            </section>
 
-              <div className="rounded-lg bg-secondary p-6">
-                <h4 className="mb-2 text-lg font-semibold text-secondary-foreground">
-                  Secondary Card
-                </h4>
-                <p className="text-sm text-secondary-foreground">
-                  This card uses the secondary background color.
-                </p>
+            {/* Spacing */}
+            <section id="spacing" className="space-y-6">
+              <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+                Spacing
+              </h2>
+              <div id="padding-examples" className="space-y-4">
+                <h3 className="text-xl font-medium">Padding Examples</h3>
+                <div className="space-y-2">
+                  <div className="bg-muted p-1 text-sm rounded-md">p-1 (0.25rem)</div>
+                  <div className="bg-muted p-2 text-sm rounded-md">p-2 (0.5rem)</div>
+                  <div className="bg-muted p-4 text-sm rounded-md">p-4 (1rem)</div>
+                  <div className="bg-muted p-6 text-sm rounded-md">p-6 (1.5rem)</div>
+                  <div className="bg-muted p-8 text-sm rounded-md">p-8 (2rem)</div>
+                </div>
               </div>
+            </section>
 
-              <div className="rounded-lg bg-muted p-6">
-                <h4 className="mb-2 text-lg font-semibold text-muted-foreground">Muted Card</h4>
-                <p className="text-sm text-muted-foreground">
-                  This card uses the muted background color.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Borders and Radius */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-medium">Border Radius</h3>
-            <div className="flex flex-wrap gap-4">
-              <div className="h-20 w-20 rounded-sm bg-primary" title="rounded-sm" />
-              <div className="h-20 w-20 rounded-md bg-primary" title="rounded-md" />
-              <div className="h-20 w-20 rounded-lg bg-primary" title="rounded-lg" />
-              <div className="h-20 w-20 rounded-xl bg-primary" title="rounded-xl" />
-              <div className="h-20 w-20 rounded-full bg-primary" title="rounded-full" />
-            </div>
-          </div>
-        </section>
-
-        {/* Spacing */}
-        <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
-            Spacing
-          </h2>
-          <div className="space-y-4">
-            <h3 className="text-xl font-medium">Padding Examples</h3>
-            <div className="space-y-2">
-              <div className="bg-muted p-1 text-sm rounded-md">p-1 (0.25rem)</div>
-              <div className="bg-muted p-2 text-sm rounded-md">p-2 (0.5rem)</div>
-              <div className="bg-muted p-4 text-sm rounded-md">p-4 (1rem)</div>
-              <div className="bg-muted p-6 text-sm rounded-md">p-6 (1.5rem)</div>
-              <div className="bg-muted p-8 text-sm rounded-md">p-8 (2rem)</div>
-            </div>
-          </div>
-        </section>
-
-        {/* Interactive Elements */}
-        <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
-            Interactive Elements
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <h3 className="mb-4 text-xl font-medium">Links</h3>
-              <div className="space-x-4">
-                <a href="#" className="text-primary hover:underline">
-                  Primary Link
-                </a>
-                <a href="#" className="text-muted-foreground hover:text-foreground hover:underline">
-                  Muted Link
-                </a>
-                <a href="#" className="text-destructive hover:underline">
-                  Destructive Link
-                </a>
-              </div>
-            </div>
-            <div>
-              <h3 className="mb-4 text-xl font-medium">Code Blocks</h3>
-              <pre className="rounded-md bg-muted p-4 text-sm border border-border">
-                <code>{`const example = {
+            {/* Interactive Elements */}
+            <section id="interactive-elements" className="space-y-6">
+              <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+                Interactive Elements
+              </h2>
+              <div className="space-y-4">
+                <div id="links">
+                  <h3 className="mb-4 text-xl font-medium">Links</h3>
+                  <div className="space-x-4">
+                    <a href="#" className="text-primary hover:underline">
+                      Primary Link
+                    </a>
+                    <a
+                      href="#"
+                      className="text-muted-foreground hover:text-foreground hover:underline"
+                    >
+                      Muted Link
+                    </a>
+                    <a href="#" className="text-destructive hover:underline">
+                      Destructive Link
+                    </a>
+                  </div>
+                </div>
+                <div id="code-blocks">
+                  <h3 className="mb-4 text-xl font-medium">Code Blocks</h3>
+                  <pre className="rounded-md bg-muted p-4 text-sm border border-border">
+                    <code>{`const example = {
   theme: "dark",
   variant: "default",
   size: "medium"
 };`}</code>
-              </pre>
-            </div>
-          </div>
-        </section>
+                  </pre>
+                </div>
+              </div>
+            </section>
 
-        {/* Tables */}
-        <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground">Tables</h2>
-          <div className="overflow-x-auto rounded-lg border border-border">
-            <table className="w-full">
-              <thead className="border-b border-border bg-muted/50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Name</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Role</th>
-                  <th className="px-4 py-3 text-right text-sm font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-border">
-                  <td className="px-4 py-3 text-sm">John Doe</td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className="inline-flex rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                      Active
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground">Admin</td>
-                  <td className="px-4 py-3 text-right">
-                    <Button size="sm" variant="outline">
-                      Edit
-                    </Button>
-                  </td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="px-4 py-3 text-sm">Jane Smith</td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className="inline-flex rounded-full bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
-                      Inactive
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground">User</td>
-                  <td className="px-4 py-3 text-right">
-                    <Button size="sm" variant="outline">
-                      Edit
-                    </Button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
+            {/* Tables */}
+            <section id="tables" className="space-y-6">
+              <h2 className="text-3xl font-semibold text-foreground">Tables</h2>
+              <div className="overflow-x-auto rounded-lg border border-border">
+                <table className="w-full">
+                  <thead className="border-b border-border bg-muted/50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Name</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Role</th>
+                      <th className="px-4 py-3 text-right text-sm font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-border">
+                      <td className="px-4 py-3 text-sm">John Doe</td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className="inline-flex rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                          Active
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">Admin</td>
+                      <td className="px-4 py-3 text-right">
+                        <Button size="sm" variant="outline">
+                          Edit
+                        </Button>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="px-4 py-3 text-sm">Jane Smith</td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className="inline-flex rounded-full bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
+                          Inactive
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">User</td>
+                      <td className="px-4 py-3 text-right">
+                        <Button size="sm" variant="outline">
+                          Edit
+                        </Button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
 
-        {/* Lists */}
-        <section className="space-y-6 pb-12">
-          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
-            Lists
-          </h2>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-4">
-              <h3 className="text-xl font-medium">Unordered List</h3>
-              <ul className="list-disc space-y-2 pl-6 text-sm">
-                <li>First item in the list</li>
-                <li>Second item with more text</li>
-                <li>Third item</li>
-                <li>
-                  Fourth item with <span className="font-semibold">emphasis</span>
-                </li>
-              </ul>
-            </div>
+            {/* Lists */}
+            <section id="lists" className="space-y-6 pb-12">
+              <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+                Lists
+              </h2>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div id="unordered-list" className="space-y-4">
+                  <h3 className="text-xl font-medium">Unordered List</h3>
+                  <ul className="list-disc space-y-2 pl-6 text-sm">
+                    <li>First item in the list</li>
+                    <li>Second item with more text</li>
+                    <li>Third item</li>
+                    <li>
+                      Fourth item with <span className="font-semibold">emphasis</span>
+                    </li>
+                  </ul>
+                </div>
 
-            <div className="space-y-4">
-              <h3 className="text-xl font-medium">Ordered List</h3>
-              <ol className="list-decimal space-y-2 pl-6 text-sm">
-                <li>First step in the process</li>
-                <li>Second step with details</li>
-                <li>Third step</li>
-                <li>Final step to complete</li>
-              </ol>
-            </div>
+                <div id="ordered-list" className="space-y-4">
+                  <h3 className="text-xl font-medium">Ordered List</h3>
+                  <ol className="list-decimal space-y-2 pl-6 text-sm">
+                    <li>First step in the process</li>
+                    <li>Second step with details</li>
+                    <li>Third step</li>
+                    <li>Final step to complete</li>
+                  </ol>
+                </div>
+              </div>
+            </section>
           </div>
-        </section>
+        </main>
       </div>
     </div>
   )

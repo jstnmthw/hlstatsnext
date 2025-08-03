@@ -195,18 +195,18 @@ model PlayerUniqueId {
 }
 
 model Action {
-  id                      Int     @id @default(autoincrement()) @db.UnsignedInt
-  game                    String  @default("valve") @db.VarChar(32)
-  code                    String  @default("") @db.VarChar(64)
-  rewardPlayer            Int     @default(10)
-  reward_team             Int     @default(0)
-  team                    String  @default("") @db.VarChar(64)
-  description             String? @db.VarChar(128)
-  for_PlayerActions       String  @default("0") @db.VarChar(1) // ENUM('0','1')
-  for_PlayerPlayerActions String  @default("0") @db.VarChar(1) // ENUM('0','1')
-  for_TeamActions         String  @default("0") @db.VarChar(1) // ENUM('0','1')
-  for_WorldActions        String  @default("0") @db.VarChar(1) // ENUM('0','1')
-  count                   Int     @default(0) @db.UnsignedInt
+  id                     Int     @id @default(autoincrement()) @db.UnsignedInt
+  game                   String  @default("valve") @db.VarChar(32)
+  code                   String  @default("") @db.VarChar(64)
+  rewardPlayer           Int     @default(10)
+  rewardTeam             Int     @default(0)
+  team                   String  @default("") @db.VarChar(64)
+  description            String? @db.VarChar(128)
+  forPlayerActions       String  @default("0") @db.VarChar(1) // ENUM('0','1')
+  forPlayerPlayerActions String  @default("0") @db.VarChar(1) // ENUM('0','1')
+  forTeamActions         String  @default("0") @db.VarChar(1) // ENUM('0','1')
+  forWorldActions        String  @default("0") @db.VarChar(1) // ENUM('0','1')
+  count                  Int     @default(0) @db.UnsignedInt
 
   eventPlayerActions       EventPlayerAction[]
   eventPlayerPlayerActions EventPlayerPlayerAction[]
@@ -219,19 +219,19 @@ model Action {
 }
 
 model Award {
-  awardId        Int    @id @default(autoincrement()) @db.UnsignedInt
-  awardType      String @default("W") @db.Char(1)
-  game           String @default("valve") @db.VarChar(32)
-  code           String @default("") @db.VarChar(128)
-  name           String @default("") @db.VarChar(128)
-  verb           String @default("") @db.VarChar(128)
-  d_winner_id    Int?   @db.UnsignedInt
-  d_winner_count Int?   @db.UnsignedInt
-  g_winner_id    Int?   @db.UnsignedInt
-  g_winner_count Int?   @db.UnsignedInt
+  awardId      Int    @id @default(autoincrement()) @db.UnsignedInt
+  awardType    String @default("W") @db.Char(1)
+  game         String @default("valve") @db.VarChar(32)
+  code         String @default("") @db.VarChar(128)
+  name         String @default("") @db.VarChar(128)
+  verb         String @default("") @db.VarChar(128)
+  dWinnerId    Int?   @db.UnsignedInt
+  dWinnerCount Int?   @db.UnsignedInt
+  gWinnerId    Int?   @db.UnsignedInt
+  gWinnerCount Int?   @db.UnsignedInt
 
-  d_winner     Player?       @relation("AwardDWinner", fields: [d_winner_id], references: [playerId])
-  g_winner     Player?       @relation("AwardGWinner", fields: [g_winner_id], references: [playerId])
+  dWinner      Player?       @relation("AwardDWinner", fields: [dWinnerId], references: [playerId])
+  gWinner      Player?       @relation("AwardGWinner", fields: [gWinnerId], references: [playerId])
   playerAwards PlayerAward[]
 
   @@unique([game, awardType, code], name: "game_awardType_code")
@@ -314,13 +314,13 @@ model EventChangeTeam {
 }
 
 model EventChat {
-  id           Int       @id @default(autoincrement()) @db.UnsignedInt
-  eventTime    DateTime? @db.DateTime(0)
-  serverId     Int       @default(0) @db.UnsignedInt
-  map          String    @default("") @db.VarChar(64)
-  playerId     Int       @default(0) @db.UnsignedInt
-  message_mode Int       @default(0) @db.TinyInt
-  message      String    @default("") @db.VarChar(128)
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime   DateTime? @db.DateTime(0)
+  serverId    Int       @default(0) @db.UnsignedInt
+  map         String    @default("") @db.VarChar(64)
+  playerId    Int       @default(0) @db.UnsignedInt
+  messageMode Int       @default(0) @db.TinyInt
+  message     String    @default("") @db.VarChar(128)
 
   player Player @relation(fields: [playerId], references: [playerId])
   server Server @relation(fields: [serverId], references: [serverId])
@@ -332,15 +332,15 @@ model EventChat {
 }
 
 model EventConnect {
-  id                   Int       @id @default(autoincrement()) @db.UnsignedInt
-  eventTime            DateTime? @db.DateTime(0)
-  serverId             Int       @default(0) @db.UnsignedInt
-  map                  String    @default("") @db.VarChar(64)
-  playerId             Int       @default(0) @db.UnsignedInt
-  ipAddress            String    @default("") @db.VarChar(32)
-  hostname             String    @default("") @db.VarChar(255)
-  hostgroup            String    @default("") @db.VarChar(255)
-  eventTime_Disconnect DateTime? @db.DateTime(0)
+  id                  Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime           DateTime? @db.DateTime(0)
+  serverId            Int       @default(0) @db.UnsignedInt
+  map                 String    @default("") @db.VarChar(64)
+  playerId            Int       @default(0) @db.UnsignedInt
+  ipAddress           String    @default("") @db.VarChar(32)
+  hostname            String    @default("") @db.VarChar(255)
+  hostgroup           String    @default("") @db.VarChar(255)
+  eventTimeDisconnect DateTime? @db.DateTime(0)
 
   player Player @relation(fields: [playerId], references: [playerId])
   server Server @relation(fields: [serverId], references: [serverId])
@@ -377,22 +377,22 @@ model EventEntry {
 }
 
 model EventFrag {
-  id           Int       @id @default(autoincrement()) @db.UnsignedInt
-  eventTime    DateTime? @db.DateTime(0)
-  serverId     Int       @default(0) @db.UnsignedInt
-  map          String    @default("") @db.VarChar(64)
-  killerId     Int       @default(0) @db.UnsignedInt
-  victimId     Int       @default(0) @db.UnsignedInt
-  weapon       String    @default("") @db.VarChar(64)
-  headshot     Int       @default(0) @db.TinyInt
-  killerRole   String    @default("") @db.VarChar(64)
-  victimRole   String    @default("") @db.VarChar(64)
-  pos_x        Int?      @db.MediumInt
-  pos_y        Int?      @db.MediumInt
-  pos_z        Int?      @db.MediumInt
-  pos_victim_x Int?      @db.MediumInt
-  pos_victim_y Int?      @db.MediumInt
-  pos_victim_z Int?      @db.MediumInt
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime  DateTime? @db.DateTime(0)
+  serverId   Int       @default(0) @db.UnsignedInt
+  map        String    @default("") @db.VarChar(64)
+  killerId   Int       @default(0) @db.UnsignedInt
+  victimId   Int       @default(0) @db.UnsignedInt
+  weapon     String    @default("") @db.VarChar(64)
+  headshot   Int       @default(0) @db.TinyInt
+  killerRole String    @default("") @db.VarChar(64)
+  victimRole String    @default("") @db.VarChar(64)
+  posX       Int?      @db.MediumInt
+  posY       Int?      @db.MediumInt
+  posZ       Int?      @db.MediumInt
+  posVictimX Int?      @db.MediumInt
+  posVictimY Int?      @db.MediumInt
+  posVictimZ Int?      @db.MediumInt
 
   killer Player @relation("FragsAsKiller", fields: [killerId], references: [playerId])
   victim Player @relation("FragsAsVictim", fields: [victimId], references: [playerId])
@@ -431,9 +431,9 @@ model EventPlayerAction {
   playerId  Int       @default(0) @db.UnsignedInt
   actionId  Int       @default(0) @db.UnsignedInt
   bonus     Int       @default(0)
-  pos_x     Int?      @db.MediumInt
-  pos_y     Int?      @db.MediumInt
-  pos_z     Int?      @db.MediumInt
+  posX      Int?      @db.MediumInt
+  posY      Int?      @db.MediumInt
+  posZ      Int?      @db.MediumInt
 
   action Action @relation(fields: [actionId], references: [id])
   player Player @relation(fields: [playerId], references: [playerId])
@@ -445,20 +445,20 @@ model EventPlayerAction {
 }
 
 model EventPlayerPlayerAction {
-  id           Int       @id @default(autoincrement()) @db.UnsignedInt
-  eventTime    DateTime? @db.DateTime(0)
-  serverId     Int       @default(0) @db.UnsignedInt
-  map          String    @default("") @db.VarChar(64)
-  playerId     Int       @default(0) @db.UnsignedInt
-  victimId     Int       @default(0) @db.UnsignedInt
-  actionId     Int       @default(0) @db.UnsignedInt
-  bonus        Int       @default(0)
-  pos_x        Int?      @db.MediumInt
-  pos_y        Int?      @db.MediumInt
-  pos_z        Int?      @db.MediumInt
-  pos_victim_x Int?      @db.MediumInt
-  pos_victim_y Int?      @db.MediumInt
-  pos_victim_z Int?      @db.MediumInt
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime  DateTime? @db.DateTime(0)
+  serverId   Int       @default(0) @db.UnsignedInt
+  map        String    @default("") @db.VarChar(64)
+  playerId   Int       @default(0) @db.UnsignedInt
+  victimId   Int       @default(0) @db.UnsignedInt
+  actionId   Int       @default(0) @db.UnsignedInt
+  bonus      Int       @default(0)
+  posX       Int?      @db.MediumInt
+  posY       Int?      @db.MediumInt
+  posZ       Int?      @db.MediumInt
+  posVictimX Int?      @db.MediumInt
+  posVictimY Int?      @db.MediumInt
+  posVictimZ Int?      @db.MediumInt
 
   action Action @relation(fields: [actionId], references: [id])
   player Player @relation("PPA_Actor", fields: [playerId], references: [playerId])
@@ -493,9 +493,9 @@ model EventSuicide {
   map       String    @default("") @db.VarChar(64)
   playerId  Int       @default(0) @db.UnsignedInt
   weapon    String    @default("") @db.VarChar(64)
-  pos_x     Int?      @db.MediumInt
-  pos_y     Int?      @db.MediumInt
-  pos_z     Int?      @db.MediumInt
+  posX      Int?      @db.MediumInt
+  posY      Int?      @db.MediumInt
+  posZ      Int?      @db.MediumInt
 
   player Player @relation(fields: [playerId], references: [playerId])
   server Server @relation(fields: [serverId], references: [serverId])
@@ -523,19 +523,19 @@ model EventTeamBonus {
 }
 
 model EventTeamkill {
-  id           Int       @id @default(autoincrement()) @db.UnsignedInt
-  eventTime    DateTime? @db.DateTime(0)
-  serverId     Int       @default(0) @db.UnsignedInt
-  map          String    @default("") @db.VarChar(64)
-  killerId     Int       @default(0) @db.UnsignedInt
-  victimId     Int       @default(0) @db.UnsignedInt
-  weapon       String    @default("") @db.VarChar(64)
-  pos_x        Int?      @db.MediumInt
-  pos_y        Int?      @db.MediumInt
-  pos_z        Int?      @db.MediumInt
-  pos_victim_x Int?      @db.MediumInt
-  pos_victim_y Int?      @db.MediumInt
-  pos_victim_z Int?      @db.MediumInt
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  eventTime  DateTime? @db.DateTime(0)
+  serverId   Int       @default(0) @db.UnsignedInt
+  map        String    @default("") @db.VarChar(64)
+  killerId   Int       @default(0) @db.UnsignedInt
+  victimId   Int       @default(0) @db.UnsignedInt
+  weapon     String    @default("") @db.VarChar(64)
+  posX       Int?      @db.MediumInt
+  posY       Int?      @db.MediumInt
+  posZ       Int?      @db.MediumInt
+  posVictimX Int?      @db.MediumInt
+  posVictimY Int?      @db.MediumInt
+  posVictimZ Int?      @db.MediumInt
 
   killer Player @relation("TK_Killer", fields: [killerId], references: [playerId])
   victim Player @relation("TK_Victim", fields: [victimId], references: [playerId])

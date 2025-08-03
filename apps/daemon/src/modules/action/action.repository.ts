@@ -48,13 +48,13 @@ export class ActionRepository implements IActionRepository {
         game: action.game,
         code: action.code,
         rewardPlayer: action.rewardPlayer,
-        rewardTeam: action.reward_team,
+        rewardTeam: action.rewardTeam,
         team: action.team,
         description: action.description,
-        forPlayerActions: action.for_PlayerActions === "1",
-        forPlayerPlayerActions: action.for_PlayerPlayerActions === "1",
-        forTeamActions: action.for_TeamActions === "1",
-        forWorldActions: action.for_WorldActions === "1",
+        forPlayerActions: action.forPlayerActions === "1",
+        forPlayerPlayerActions: action.forPlayerPlayerActions === "1",
+        forTeamActions: action.forTeamActions === "1",
+        forWorldActions: action.forWorldActions === "1",
       }
     } catch (error) {
       throw new Error(`Failed to find action by code: ${error}`)

@@ -298,7 +298,7 @@ The rating system integrates with the legacy HLStatsX schema:
 -- Core player rating stored in existing skill column
 UPDATE hlstats_Players
 SET skill = new_rating,
-    skill_change = rating_delta,
+    skillChange = rating_delta,
     lastSkillChange = GETDATE()
 WHERE playerId = ?
 ```

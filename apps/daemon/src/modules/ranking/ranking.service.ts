@@ -23,7 +23,7 @@ export class RankingService implements IRankingService {
   // Rating system constants
   private readonly MIN_RATING = 100
   private readonly MAX_RATING = 3000
-  private readonly MAX_SKILL_CHANGE = 50
+  private readonly MAX_skillChange = 50
   private readonly DEFAULT_STARTING_RATING = 1000
   private readonly BASE_K_FACTOR = 32
   private readonly VOLATILITY_DIVISOR = 400
@@ -86,8 +86,8 @@ export class RankingService implements IRankingService {
     }
 
     // Cap gains at maximum
-    if (baseChange > this.MAX_SKILL_CHANGE) {
-      baseChange = this.MAX_SKILL_CHANGE
+    if (baseChange > this.MAX_skillChange) {
+      baseChange = this.MAX_skillChange
     }
 
     // Calculate final changes

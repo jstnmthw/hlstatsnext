@@ -1,7 +1,13 @@
 import { Button } from "@repo/ui/button"
 import { BellIcon, BoltIcon, PaperclipIcon } from "lucide-react"
+import { redirect } from "next/navigation"
 
 export default function KitchenSinkPage() {
+  // Prevent access to this page in production
+  if (process.env.NODE_ENV === "production") {
+    redirect("/")
+  }
+
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-7xl space-y-12">

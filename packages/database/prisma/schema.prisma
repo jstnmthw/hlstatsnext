@@ -676,7 +676,7 @@ model PlayerHistory {
   teamkills      Int      @default(0) @db.UnsignedInt
   killStreak     Int      @default(0)
   deathStreak    Int      @default(0)
-  skill_change   Int      @default(0)
+  skillChange    Int      @default(0)
 
   player Player @relation(fields: [playerId], references: [playerId])
 

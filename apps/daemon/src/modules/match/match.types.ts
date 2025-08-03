@@ -263,7 +263,7 @@ export interface PlayerHistoryData {
   connectionTime?: number
   killStreak?: number
   deathStreak?: number
-  skill_change?: number
+  skillChange?: number
 }
 
 export interface IMatchRepository {

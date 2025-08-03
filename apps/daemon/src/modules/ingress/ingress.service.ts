@@ -31,7 +31,7 @@ export class IngressService implements IIngressService {
     options: IngressOptions = {},
   ) {
     this.options = {
-      port: 27500,
+      port: process.env.INGRESS_PORT ? parseInt(process.env.INGRESS_PORT, 10) : 27500,
       host: "0.0.0.0",
       skipAuth: process.env.NODE_ENV === "development",
       logBots: process.env.NODE_ENV === "development",

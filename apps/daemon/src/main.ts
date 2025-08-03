@@ -22,6 +22,7 @@ export class HLStatsDaemon {
     const appEnv = process.env.NODE_ENV ?? "development"
     const ingressOptions = {
       skipAuth: appEnv === "development",
+      port: process.env.INGRESS_PORT ? parseInt(process.env.INGRESS_PORT, 10) : undefined,
     }
 
     this.context = getAppContext(ingressOptions)

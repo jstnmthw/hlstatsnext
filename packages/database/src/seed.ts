@@ -6,7 +6,6 @@ import {
   getSeedConfig,
   seedServers,
   logDatabaseStats,
-  seedActions,
 } from "./seeders"
 import { log, logError, logStep, logSuccess, logInfo } from "./seeders/fake/logger"
 
@@ -36,7 +35,7 @@ async function main() {
     await seedServers()
     // await seedTeams();
     // await seedWeapons();
-    await seedActions()
+    // await seedActions()
     // await seedRanks();
     // await seedAwards();
 

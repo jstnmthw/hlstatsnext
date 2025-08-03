@@ -9,7 +9,7 @@ export default function KitchenSinkPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div className="min-h-screen p-8">
       <div className="mx-auto max-w-7xl space-y-12">
         {/* Header */}
         <header className="space-y-4">
@@ -21,8 +21,10 @@ export default function KitchenSinkPage() {
 
         {/* Typography Section */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground">Typography</h2>
-          <div className="space-y-4 rounded-lg border border-border bg-card p-6">
+          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+            Typography
+          </h2>
+          <div className="space-y-4">
             <h1 className="text-5xl font-bold">Heading 1 - text-5xl</h1>
             <h2 className="text-4xl font-bold">Heading 2 - text-4xl</h2>
             <h3 className="text-3xl font-semibold">Heading 3 - text-3xl</h3>
@@ -45,7 +47,9 @@ export default function KitchenSinkPage() {
 
         {/* Color Palette Section */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground">Color Palette</h2>
+          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+            Color Palette
+          </h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {/* Background Colors */}
             <div className="space-y-2">
@@ -110,7 +114,9 @@ export default function KitchenSinkPage() {
         <section className="space-y-6">
           {/* Button Component Section */}
           <div>
-            <h2 className="mb-6 text-2xl font-semibold text-gray-800 dark:text-white">Buttons</h2>
+            <h2 className="mb-6 text-2xl font-semibold text-foreground border-b border-border pb-4">
+              Buttons
+            </h2>
 
             {/* Variants */}
             <div className="mb-8">
@@ -484,7 +490,9 @@ export default function KitchenSinkPage() {
 
         {/* Form Elements Section */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground">Form Elements</h2>
+          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+            Form Elements
+          </h2>
           <div className="space-y-6 rounded-lg border border-border bg-card p-6">
             {/* Text Inputs */}
             <div className="space-y-4">
@@ -627,7 +635,9 @@ export default function KitchenSinkPage() {
 
         {/* Layout Components */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground">Layout Components</h2>
+          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+            Layout Components
+          </h2>
 
           {/* Cards */}
           <div className="space-y-4">
@@ -673,24 +683,28 @@ export default function KitchenSinkPage() {
 
         {/* Spacing */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground">Spacing</h2>
+          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+            Spacing
+          </h2>
           <div className="space-y-4">
             <h3 className="text-xl font-medium">Padding Examples</h3>
             <div className="space-y-2">
-              <div className="bg-muted p-1 text-sm">p-1 (0.25rem)</div>
-              <div className="bg-muted p-2 text-sm">p-2 (0.5rem)</div>
-              <div className="bg-muted p-4 text-sm">p-4 (1rem)</div>
-              <div className="bg-muted p-6 text-sm">p-6 (1.5rem)</div>
-              <div className="bg-muted p-8 text-sm">p-8 (2rem)</div>
+              <div className="bg-muted p-1 text-sm rounded-md">p-1 (0.25rem)</div>
+              <div className="bg-muted p-2 text-sm rounded-md">p-2 (0.5rem)</div>
+              <div className="bg-muted p-4 text-sm rounded-md">p-4 (1rem)</div>
+              <div className="bg-muted p-6 text-sm rounded-md">p-6 (1.5rem)</div>
+              <div className="bg-muted p-8 text-sm rounded-md">p-8 (2rem)</div>
             </div>
           </div>
         </section>
 
         {/* Interactive Elements */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-semibold text-foreground">Interactive Elements</h2>
+          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+            Interactive Elements
+          </h2>
           <div className="space-y-4">
-            <div className="rounded-lg border border-border bg-card p-6">
+            <div>
               <h3 className="mb-4 text-xl font-medium">Links</h3>
               <div className="space-x-4">
                 <a href="#" className="text-primary hover:underline">
@@ -704,10 +718,9 @@ export default function KitchenSinkPage() {
                 </a>
               </div>
             </div>
-
-            <div className="rounded-lg border border-border bg-card p-6">
+            <div>
               <h3 className="mb-4 text-xl font-medium">Code Blocks</h3>
-              <pre className="rounded-md bg-muted p-4 text-sm">
+              <pre className="rounded-md bg-muted p-4 text-sm border border-border">
                 <code>{`const example = {
   theme: "dark",
   variant: "default",
@@ -723,7 +736,7 @@ export default function KitchenSinkPage() {
           <h2 className="text-3xl font-semibold text-foreground">Tables</h2>
           <div className="overflow-x-auto rounded-lg border border-border">
             <table className="w-full">
-              <thead className="border-b bg-muted/50">
+              <thead className="border-b border-border bg-muted/50">
                 <tr>
                   <th className="px-4 py-3 text-left text-sm font-medium">Name</th>
                   <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
@@ -732,7 +745,7 @@ export default function KitchenSinkPage() {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b">
+                <tr className="border-b border-border">
                   <td className="px-4 py-3 text-sm">John Doe</td>
                   <td className="px-4 py-3 text-sm">
                     <span className="inline-flex rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
@@ -746,7 +759,7 @@ export default function KitchenSinkPage() {
                     </Button>
                   </td>
                 </tr>
-                <tr className="border-b">
+                <tr className="border-b border-border">
                   <td className="px-4 py-3 text-sm">Jane Smith</td>
                   <td className="px-4 py-3 text-sm">
                     <span className="inline-flex rounded-full bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
@@ -767,7 +780,9 @@ export default function KitchenSinkPage() {
 
         {/* Lists */}
         <section className="space-y-6 pb-12">
-          <h2 className="text-3xl font-semibold text-foreground">Lists</h2>
+          <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
+            Lists
+          </h2>
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-4">
               <h3 className="text-xl font-medium">Unordered List</h3>

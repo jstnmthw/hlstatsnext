@@ -22,7 +22,6 @@ export interface IIngressService {
   start(): Promise<void>
   stop(): void
   isRunning(): boolean
-  processLogLine(logLine: string): Promise<void>
   getStats(): IngressStats
   processRawEvent(
     rawData: string,

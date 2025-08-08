@@ -58,7 +58,7 @@ describe("HLStatsDaemon", () => {
 
       new HLStatsDaemon()
 
-      expect(mockedGetAppContext).toHaveBeenCalledWith({ skipAuth: true })
+      expect(mockedGetAppContext).toHaveBeenCalledWith(expect.objectContaining({ skipAuth: true }))
       expect(mockContext.logger.info).toHaveBeenCalledWith("Initializing HLStatsNext Daemon...")
     })
 
@@ -69,7 +69,7 @@ describe("HLStatsDaemon", () => {
 
       new HLStatsDaemon()
 
-      expect(mockedGetAppContext).toHaveBeenCalledWith({ skipAuth: false })
+      expect(mockedGetAppContext).toHaveBeenCalledWith(expect.objectContaining({ skipAuth: false }))
     })
 
     it("should default to development when NODE_ENV is not set", async () => {
@@ -79,7 +79,7 @@ describe("HLStatsDaemon", () => {
 
       new HLStatsDaemon()
 
-      expect(mockedGetAppContext).toHaveBeenCalledWith({ skipAuth: true })
+      expect(mockedGetAppContext).toHaveBeenCalledWith(expect.objectContaining({ skipAuth: true }))
     })
   })
 

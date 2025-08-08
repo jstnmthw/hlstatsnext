@@ -37,12 +37,12 @@ describe("IngressService", () => {
         }),
       },
       serverInfoProvider: {
-        getServerGame: vi.fn().mockResolvedValue("csgo"),
+        getServerGame: vi.fn().mockResolvedValue("cstrike"),
         findOrCreateServer: vi.fn().mockResolvedValue({
           serverId: 1,
           address: "127.0.0.1",
           port: 27015,
-          game: "csgo",
+          game: "cstrike",
           name: "Test Server",
         }),
       },
@@ -96,7 +96,7 @@ describe("IngressService", () => {
   })
 
   describe("Event processing", () => {
-    it("should process raw events and emit through event bus", async () => {
+    it("should process raw events using server's game parser", async () => {
       const event = await ingressService.processRawEvent(
         'L 03/15/2023 - 12:30:45: "Player<1><STEAM_1:1:12345><CT>" connected',
         "127.0.0.1",
@@ -108,6 +108,7 @@ describe("IngressService", () => {
         "127.0.0.1",
         27015,
       )
+      expect(mockDependencies.serverInfoProvider.getServerGame).toHaveBeenCalledWith(1)
     })
 
     it("should handle server authentication", async () => {
@@ -129,6 +130,21 @@ describe("IngressService", () => {
       expect(serverId).toBe(1)
       expect(mockDependencies.gameDetector.detectGame).toHaveBeenCalled()
       expect(mockDependencies.serverInfoProvider.findOrCreateServer).toHaveBeenCalled()
+    })
+
+    it("should not emit events for unsupported games (noop parser)", async () => {
+      // Change game for this server to an unsupported one
+      ;(
+        mockDependencies.serverInfoProvider.getServerGame as ReturnType<typeof vi.fn>
+      ).mockResolvedValueOnce("unknown-game")
+
+      const event = await ingressService.processRawEvent(
+        'L 03/15/2023 - 12:30:45: "Player<1><STEAM_1:1:12345><CT>" connected',
+        "127.0.0.1",
+        27015,
+      )
+
+      expect(event).toBeNull()
     })
   })
 })

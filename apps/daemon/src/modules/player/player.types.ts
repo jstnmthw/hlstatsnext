@@ -286,4 +286,11 @@ export interface IPlayerRepository {
     victimZ?: number,
     options?: CreateOptions,
   ): Promise<void>
+
+  // Optional: update server stats in response to player connect/disconnect
+  updateServerForPlayerEvent?(
+    serverId: number,
+    updates: Record<string, unknown>,
+    options?: UpdateOptions,
+  ): Promise<void>
 }

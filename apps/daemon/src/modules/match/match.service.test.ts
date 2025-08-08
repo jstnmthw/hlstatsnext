@@ -138,7 +138,7 @@ describe("MatchService", () => {
       const result = await matchService.handleMatchEvent(event)
 
       expect(result.success).toBe(true)
-      expect(mockRepository.resetMapStats).toHaveBeenCalledWith(1, "de_mirage")
+      expect(mockRepository.resetMapStats).toHaveBeenCalledWith(1, "de_mirage", 16)
     })
 
     it("should handle unknown event types", async () => {

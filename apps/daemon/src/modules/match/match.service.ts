@@ -132,7 +132,7 @@ export class MatchService implements IMatchService {
         headshot: boolean
       }
 
-      // Update killer stats
+      // Update killer stats and server aggregated kills
       const killerStats =
         matchStats.playerStats.get(killerId) ?? this.createEmptyPlayerStats(killerId)
       killerStats.kills += 1
@@ -146,6 +146,16 @@ export class MatchService implements IMatchService {
         matchStats.playerStats.get(victimId) ?? this.createEmptyPlayerStats(victimId)
       victimStats.deaths += 1
       matchStats.playerStats.set(victimId, victimStats)
+
+      // Best-effort: update server aggregated kills and lastEvent
+      try {
+        await this.repository.updateServerStats(serverId, {
+          kills: { increment: 1 },
+          lastEvent: new Date(),
+        })
+      } catch {
+        // ignore
+      }
 
       this.logger.debug(
         `Kill event processed in match: player ${killerId} killed player ${victimId}${headshot ? " (headshot)" : ""}`,
@@ -460,7 +470,11 @@ export class MatchService implements IMatchService {
       this.currentMatches.set(serverId, newMatchStats)
 
       // Update server record for the new map
-      await this.repository.resetMapStats(serverId, newMap)
+      if (typeof playerCount === "number") {
+        await this.repository.resetMapStats(serverId, newMap, playerCount)
+      } else {
+        await this.repository.resetMapStats(serverId, newMap)
+      }
 
       this.logger.debug(
         `Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`,

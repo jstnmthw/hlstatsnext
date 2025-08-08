@@ -94,7 +94,7 @@ export class ServerInfoProviderAdapter implements IServerInfoProvider {
   async getServerGame(serverId: number): Promise<string> {
     // Handle development mode special ID
     if (serverId === -1) {
-      return "css" // Default game for development
+      return "cstrike" // Default game for development
     }
 
     return this.serverService.getServerGame(serverId)

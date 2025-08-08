@@ -10,12 +10,12 @@ import type { BaseEvent } from "@/shared/types/events"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { IngressDependencies } from "./ingress.dependencies"
 import { UdpServer } from "./udp-server"
-import { CsParser } from "./parsers/cs.parser"
-import { GameConfig } from "@/config/game.config"
+import type { BaseParser } from "./parsers/base.parser"
+import { ParserFactory } from "./parsers/parser-factory"
 
 export class IngressService implements IIngressService {
   private readonly udpServer: UdpServer
-  private readonly parser: CsParser
+  private readonly parserCache: Map<number, BaseParser> = new Map()
   private readonly options: Required<IngressOptions>
   private readonly stats: IngressStats = {
     totalLogsProcessed: 0,
@@ -42,8 +42,6 @@ export class IngressService implements IIngressService {
       { port: this.options.port, host: this.options.host },
       this.logger,
     )
-
-    this.parser = new CsParser(GameConfig.getDefaultGame())
   }
 
   async start(): Promise<void> {
@@ -89,30 +87,6 @@ export class IngressService implements IIngressService {
     }
   }
 
-  async processLogLine(logLine: string): Promise<void> {
-    try {
-      this.stats.totalLogsProcessed++
-
-      // Check for bot events if they should be ignored
-      if (!this.options.logBots && this.isBotEvent(logLine)) {
-        this.logger.debug(`Ignoring bot event: ${logLine.split('"')[1] || logLine}`)
-        return
-      }
-
-      // This method now just processes the log line directly
-      // The actual parsing and event processing happens in handleLogLine
-    } catch (error) {
-      this.stats.totalErrors++
-      this.logger.error(
-        `Error processing log line: ${error instanceof Error ? error.message : String(error)}`,
-      )
-    }
-  }
-
-  private isBotEvent(logLine: string): boolean {
-    return logLine.includes("<BOT>")
-  }
-
   async processRawEvent(
     rawData: string,
     serverAddress: string,
@@ -125,8 +99,11 @@ export class IngressService implements IIngressService {
       return null
     }
 
+    // Select parser for this server based on its game
+    const parser = await this.getOrCreateParserForServer(serverId)
+
     // Parse the raw event
-    const parseResult = this.parser.parseLine(rawData, serverId)
+    const parseResult = parser.parseLine(rawData, serverId)
 
     if (!parseResult.success) {
       this.logger.debug(`Failed to parse log line: ${parseResult.error}`)
@@ -190,5 +167,16 @@ export class IngressService implements IIngressService {
     } catch (error) {
       this.logger.error(`Error processing log line: ${error}`)
     }
+  }
+
+  private async getOrCreateParserForServer(serverId: number): Promise<BaseParser> {
+    const cached = this.parserCache.get(serverId)
+    if (cached) return cached
+
+    // Fetch game for server and create appropriate parser
+    const gameCode = await this.dependencies.serverInfoProvider.getServerGame(serverId)
+    const parser = ParserFactory.create(gameCode)
+    this.parserCache.set(serverId, parser)
+    return parser
   }
 }

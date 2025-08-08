@@ -6,8 +6,8 @@ This document explains the complete event lifecycle in the HLStats daemon, from 
 
 ### 1. 🌐 **EMIT** (Event Creation)
 
-**Location**: `IngressService.processLogLine()`  
-**Log Level**: `QUEUE`  
+**Location**: `IngressService.handleLogLine()`
+**Log Level**: `QUEUE`
 **Log Message**: `Event emitted: PLAYER_KILL`
 
 ```typescript

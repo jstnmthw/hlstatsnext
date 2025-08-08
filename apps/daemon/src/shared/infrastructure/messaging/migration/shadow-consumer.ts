@@ -265,7 +265,7 @@ export class ShadowConsumer {
 
       if (this.config.logEvents) {
         this.logger.debug(
-          `Shadow consumer received event: ${event.eventType} (server: ${event.serverId}, timestamp: ${event.timestamp.toISOString()})`,
+          `Shadow consumer received event: ${event.eventType} (server: ${event.serverId})`,
         )
       }
 

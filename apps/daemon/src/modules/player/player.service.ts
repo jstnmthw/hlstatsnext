@@ -436,9 +436,17 @@ export class PlayerService implements IPlayerService {
       const connectEvent = event as PlayerConnectEvent
       const { playerId } = connectEvent.data
 
-      await this.updatePlayerStats(playerId, {
-        lastEvent: new Date(),
-      })
+      await this.updatePlayerStats(playerId, { lastEvent: new Date() })
+
+      // Update server activePlayers and lastEvent
+      try {
+        await this.repository.updateServerForPlayerEvent?.(event.serverId, {
+          activePlayers: { increment: 1 },
+          lastEvent: new Date(),
+        })
+      } catch {
+        // Optional repository hook may not exist; ignore if unavailable
+      }
 
       this.logger.debug(`Player connected: ${playerId}`)
 
@@ -468,6 +476,16 @@ export class PlayerService implements IPlayerService {
       }
 
       await this.updatePlayerStats(playerId, updates)
+
+      // Update server activePlayers and lastEvent
+      try {
+        await this.repository.updateServerForPlayerEvent?.(event.serverId, {
+          activePlayers: { decrement: 1 },
+          lastEvent: new Date(),
+        })
+      } catch {
+        // Optional repository hook may not exist; ignore if unavailable
+      }
 
       this.logger.debug(`Player disconnected: ${playerId}`)
 
@@ -551,6 +569,16 @@ export class PlayerService implements IPlayerService {
       }
 
       await this.updatePlayerStats(playerId, updates)
+
+      // Best-effort: update server suicide aggregate and lastEvent
+      try {
+        await this.repository.updateServerForPlayerEvent?.(event.serverId, {
+          suicides: { increment: 1 },
+          lastEvent: new Date(),
+        })
+      } catch {
+        // ignore optional hook
+      }
 
       this.logger.debug(`Player suicide: ${playerId} (penalty: ${skillPenalty})`)
 

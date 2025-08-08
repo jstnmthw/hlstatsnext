@@ -406,4 +406,25 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
       this.handleError("logEventFrag", error)
     }
   }
+
+  async updateServerForPlayerEvent(
+    serverId: number,
+    updates: Record<string, unknown>,
+    options?: UpdateOptions,
+  ): Promise<void> {
+    try {
+      this.validateId(serverId, "updateServerForPlayerEvent")
+
+      await this.executeWithTransaction(async (client) => {
+        await client.server.update({
+          where: { serverId },
+          data: updates,
+        })
+      }, options)
+
+      this.logger.debug(`Updated server ${serverId} for player event`)
+    } catch (error) {
+      this.handleError("updateServerForPlayerEvent", error)
+    }
+  }
 }

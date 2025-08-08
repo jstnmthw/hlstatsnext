@@ -145,6 +145,7 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
         {
           mapRounds: { increment: 1 },
           rounds: { increment: 1 },
+          lastEvent: new Date(),
         },
         options,
       )
@@ -170,6 +171,7 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
       }
 
       if (Object.keys(updates).length > 0) {
+        updates.lastEvent = new Date()
         await this.updateServerStats(serverId, updates, options)
       }
     } catch (error) {
@@ -191,13 +193,18 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
         updates.bombsDefused = { increment: 1 }
       }
 
-      await this.updateServerStats(serverId, updates, options)
+      await this.updateServerStats(serverId, { ...updates, lastEvent: new Date() }, options)
     } catch (error) {
       this.handleError("updateBombStats", error)
     }
   }
 
-  async resetMapStats(serverId: number, newMap: string, options?: UpdateOptions): Promise<void> {
+  async resetMapStats(
+    serverId: number,
+    newMap: string,
+    playerCount?: number,
+    options?: UpdateOptions,
+  ): Promise<void> {
     try {
       await this.updateServerStats(
         serverId,
@@ -212,6 +219,10 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
           mapCtHits: 0,
           mapTsShots: 0,
           mapTsHits: 0,
+          ...(typeof playerCount === "number"
+            ? { players: playerCount, activePlayers: playerCount }
+            : {}),
+          lastEvent: new Date(),
         },
         options,
       )

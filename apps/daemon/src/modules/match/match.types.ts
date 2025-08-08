@@ -298,5 +298,10 @@ export interface IMatchRepository {
     eventType: "plant" | "defuse",
     options?: UpdateOptions,
   ): Promise<void>
-  resetMapStats(serverId: number, newMap: string, options?: UpdateOptions): Promise<void>
+  resetMapStats(
+    serverId: number,
+    newMap: string,
+    playerCount?: number,
+    options?: UpdateOptions,
+  ): Promise<void>
 }

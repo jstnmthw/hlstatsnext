@@ -70,7 +70,7 @@ export class EventPublisher implements IEventPublisher {
 
       this.publishedCount++
 
-      this.logger.queue(`Event published: ${event.eventType}`, {
+      this.logger.queue(`Event published: ${event.eventType} (Server ID: ${event.serverId})`, {
         messageId: message.id,
         eventType: event.eventType,
         routingKey,

@@ -53,23 +53,29 @@ export class RabbitMQEventProcessor implements IEventProcessor {
       await this.processCoordinators(processedEvent)
 
       const processingTime = Date.now() - startTime
-      this.logger.info(`Event processed: ${processedEvent.eventType}`, {
-        eventId: processedEvent.eventId,
-        correlationId: processedEvent.correlationId,
-        serverId: processedEvent.serverId,
-        processingTimeMs: processingTime,
-        status: "success",
-      })
+      this.logger.info(
+        `Event processed: ${processedEvent.eventType} (Server ID: ${processedEvent.serverId})`,
+        {
+          eventId: processedEvent.eventId,
+          correlationId: processedEvent.correlationId,
+          serverId: processedEvent.serverId,
+          processingTimeMs: processingTime,
+          status: "success",
+        },
+      )
     } catch (error) {
       const processingTime = Date.now() - startTime
-      this.logger.error(`Event processing failed: ${processedEvent.eventType}`, {
-        eventId: processedEvent.eventId,
-        correlationId: processedEvent.correlationId,
-        serverId: processedEvent.serverId,
-        processingTimeMs: processingTime,
-        status: "failed",
-        error: error instanceof Error ? error.message : String(error),
-      })
+      this.logger.error(
+        `Event processing failed: ${processedEvent.eventType} (Server ID: ${processedEvent.serverId})`,
+        {
+          eventId: processedEvent.eventId,
+          correlationId: processedEvent.correlationId,
+          serverId: processedEvent.serverId,
+          processingTimeMs: processingTime,
+          status: "failed",
+          error: error instanceof Error ? error.message : String(error),
+        },
+      )
       throw error
     }
   }

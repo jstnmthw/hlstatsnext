@@ -158,7 +158,7 @@ export class IngressService implements IIngressService {
       if (event) {
         // Publish event to queue
         await this.eventPublisher.publish(event)
-        this.logger.queue(`Event emitted: ${event.eventType}`, {
+        this.logger.queue(`Event emitted: ${event.eventType} (Server ID: ${event.serverId})`, {
           eventType: event.eventType,
           serverId: event.serverId,
           eventId: event.eventId,

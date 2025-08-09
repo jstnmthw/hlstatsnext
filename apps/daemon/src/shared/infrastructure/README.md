@@ -145,28 +145,9 @@ const summary = metrics.getMetrics()
 - Module-specific performance
 - Event type statistics
 
-### 6. Shadow Consumer Pattern
+### 6. Real Consumer Metrics
 
-**File**: `messaging/migration/shadow-consumer.ts`
-
-Validates queue processing without interfering with production:
-
-```typescript
-const shadowConsumer = new ShadowConsumer({
-  queues: ["hlstats.events.priority", "hlstats.events.standard"],
-  logEvents: true,
-  logParsingErrors: true,
-})
-
-await shadowConsumer.start()
-```
-
-**Features:**
-
-- Non-destructive message inspection
-- Event parsing validation
-- Performance metrics collection
-- Development and debugging support
+The real RabbitMQ consumer provides periodic INFO-level metrics for throughput and health.
 
 ## Architecture
 
@@ -176,7 +157,7 @@ await shadowConsumer.start()
 Infrastructure Layer
 ├── messaging/
 │   ├── queue/              # RabbitMQ integration
-│   ├── migration/          # Shadow consumer for validation
+│   ├── (migration/)        # Shadow consumer removed
 │   └── module.ts          # Queue module configuration
 ├── modules/
 │   ├── registry.ts        # Module lifecycle management
@@ -195,6 +176,25 @@ Infrastructure Layer
 4. **Module Processing**: Each module processes relevant events independently
 5. **Coordinator Processing**: Cross-module concerns handled by coordinators (minimal)
 6. **Metrics Collection**: Performance and error metrics are recorded
+
+### Real Queue Consumer Metrics
+
+The real RabbitMQ consumer now logs periodic metrics similar to the Shadow Consumer. This helps monitor live processing throughput and health.
+
+Example output (every 30s by default):
+
+```
+[2025-08-09 17:27:39] [ INFO ] Queue Consumer Metrics:
+[2025-08-09 17:27:39] [ INFO ]   Events Received: 14
+[2025-08-09 17:27:39] [ INFO ]   Events Processed: 14
+[2025-08-09 17:27:39] [ INFO ]   Validation Errors: 0
+[2025-08-09 17:27:39] [ INFO ]   Events/sec: 0.21
+[2025-08-09 17:27:39] [ INFO ]   Queue hlstats.events.priority: 4 received, 4 processed, 0 errors
+[2025-08-09 17:27:39] [ INFO ]   Queue hlstats.events.standard: 9 received, 9 processed, 0 errors
+[2025-08-09 17:27:39] [ INFO ]   Queue hlstats.events.bulk: 1 received, 1 processed, 0 errors
+```
+
+Configuration is controlled via the consumer config (`logMetrics`, `metricsInterval` ms). Defaults: enabled, 30000ms.
 
 ### Database Layer
 

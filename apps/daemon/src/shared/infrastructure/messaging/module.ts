@@ -10,7 +10,6 @@ import { RabbitMQClient } from "./queue/rabbitmq/client"
 import { EventPublisher } from "./queue/core/publisher"
 import { EventConsumer, type IEventProcessor } from "./queue/core/consumer"
 import type { ConnectionStats, ConsumerStats } from "./queue/core/types"
-import type { ShadowConsumerStats } from "./migration/shadow-consumer"
 import type {
   IQueueClient,
   IEventPublisher,
@@ -18,11 +17,6 @@ import type {
   RabbitMQConfig,
   QueueModuleDependencies,
 } from "./queue/core/types"
-import {
-  ShadowConsumer,
-  defaultShadowConsumerConfig,
-  type ShadowConsumerConfig,
-} from "./migration/shadow-consumer"
 
 /**
  * Configuration for the queue module
@@ -30,12 +24,8 @@ import {
 export interface QueueModuleConfig {
   /** RabbitMQ connection configuration */
   readonly rabbitmq: RabbitMQConfig
-  /** Shadow consumer configuration for validation */
-  readonly shadowConsumer?: Partial<ShadowConsumerConfig>
   /** Whether to start consumers automatically */
   readonly autoStartConsumers: boolean
-  /** Whether to start shadow consumer automatically */
-  readonly autoStartShadowConsumer: boolean
   /** Whether to setup topology automatically */
   readonly autoSetupTopology: boolean
 }
@@ -47,7 +37,6 @@ export class QueueModule {
   private client: IQueueClient | null = null
   private publisher: IEventPublisher | null = null
   private consumer: IEventConsumer | null = null
-  private shadowConsumer: ShadowConsumer | null = null
 
   constructor(
     private readonly config: QueueModuleConfig,
@@ -73,17 +62,6 @@ export class QueueModule {
         if (this.config.autoStartConsumers) {
           await this.consumer.start()
         }
-      }
-
-      // Create shadow consumer for migration validation
-      this.shadowConsumer = new ShadowConsumer(
-        this.client,
-        { ...defaultShadowConsumerConfig, ...this.config.shadowConsumer },
-        this.logger,
-      )
-
-      if (this.config.autoStartShadowConsumer) {
-        await this.shadowConsumer.start()
       }
 
       this.logger.info("Queue module initialized successfully")
@@ -130,33 +108,6 @@ export class QueueModule {
   }
 
   /**
-   * Get the shadow consumer
-   */
-  getShadowConsumer(): ShadowConsumer {
-    if (!this.shadowConsumer) {
-      throw new Error("Shadow consumer not available")
-    }
-    return this.shadowConsumer
-  }
-
-  /**
-   * Start shadow consumer if not already started
-   */
-  async startShadowConsumer(): Promise<void> {
-    if (!this.shadowConsumer) {
-      throw new Error("Shadow consumer not available")
-    }
-    await this.shadowConsumer.start()
-  }
-
-  /**
-   * Stop shadow consumer
-   */
-  async stopShadowConsumer(): Promise<void> {
-    if (this.shadowConsumer) {
-      await this.shadowConsumer.stop()
-    }
-  }
 
   /**
    * Check if the module is initialized
@@ -172,10 +123,8 @@ export class QueueModule {
     return {
       initialized: this.isInitialized(),
       connected: this.client?.isConnected() ?? false,
-      hasShadowConsumer: this.shadowConsumer !== null,
       connectionStats: this.client?.getConnectionStats(),
       consumerStats: this.consumer?.getConsumerStats(),
-      shadowConsumerStats: this.shadowConsumer?.getStats(),
     }
   }
 
@@ -186,12 +135,6 @@ export class QueueModule {
     this.logger.info("Shutting down queue module...")
 
     try {
-      // Stop shadow consumer first
-      if (this.shadowConsumer) {
-        await this.shadowConsumer.stop()
-        this.shadowConsumer = null
-      }
-
       // Stop consumer
       if (this.consumer) {
         await this.consumer.stop()
@@ -221,10 +164,8 @@ export class QueueModule {
 export interface QueueModuleStatus {
   readonly initialized: boolean
   readonly connected: boolean
-  readonly hasShadowConsumer: boolean
   readonly connectionStats?: ConnectionStats
   readonly consumerStats?: ConsumerStats
-  readonly shadowConsumerStats?: ShadowConsumerStats
 }
 
 /**
@@ -232,16 +173,7 @@ export interface QueueModuleStatus {
  */
 export const defaultQueueModuleConfig: Omit<QueueModuleConfig, "rabbitmq"> = {
   autoStartConsumers: false,
-  autoStartShadowConsumer: true,
   autoSetupTopology: true,
-  shadowConsumer: {
-    queues: ["hlstats.events.priority", "hlstats.events.standard", "hlstats.events.bulk"],
-    metricsInterval: 30000,
-    logEvents: false,
-    logParsingErrors: true,
-    logRawMessages: false,
-    maxBufferSize: 10000,
-  },
 }
 
 /**

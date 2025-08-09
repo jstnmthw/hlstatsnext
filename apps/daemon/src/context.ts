@@ -102,7 +102,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const actionRepository = new ActionRepository(database, logger)
   const serverRepository = new ServerRepository(database, logger)
 
-  // Create queue module for RabbitMQ integration (optional)
+  // Queue Module
   let queueModule: QueueModule | undefined
 
   try {
@@ -110,18 +110,8 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     queueModule = new QueueModule(
       {
         rabbitmq: rabbitmqConfig,
-        autoStartConsumers: false, // We'll start consumers manually
-        autoStartShadowConsumer: true, // Start shadow consumer for validation
+        autoStartConsumers: false,
         autoSetupTopology: true,
-        // dualPublisher config removed - migration complete
-        shadowConsumer: {
-          queues: ["hlstats.events.priority", "hlstats.events.standard", "hlstats.events.bulk"],
-          metricsInterval: 30000, // Log metrics every 30 seconds
-          logEvents: process.env.LOG_LEVEL === "debug",
-          logParsingErrors: true, // Always log parsing errors
-          logRawMessages: process.env.LOG_LEVEL === "debug",
-          maxBufferSize: 10000,
-        },
       },
       logger,
     )

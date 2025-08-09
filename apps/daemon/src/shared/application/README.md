@@ -122,13 +122,13 @@ Application Layer
 │                    Queue Event Processing                   │
 ├─────────────────────────────────────────────────────────────┤
 │ Step 1: Module Handler Processing                           │
-│   - PlayerService handles player-related logic             │
+│   - PlayerService handles player-related logic              │
 │   - WeaponService handles weapon statistics                 │
 │   - MatchService handles match/round statistics             │
 ├─────────────────────────────────────────────────────────────┤
 │ Step 2: Coordinator Processing (if needed)                  │
-│   - KillEventCoordinator handles cross-module concerns     │
-│   - Currently only rating updates                          │
+│   - KillEventCoordinator handles cross-module concerns      │
+│   - Currently only rating updates                           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -261,13 +261,7 @@ this.logger.info("Processing event", {
 
 3. **Queue Message Inspection**:
 
-```typescript
-// Use shadow consumer for non-destructive message inspection
-const shadowConsumer = new ShadowConsumer({
-  logEvents: true, // Log all messages
-  logParsingErrors: true, // Log parsing failures
-})
-```
+- Consumer periodic metrics and RabbitMQ management UI for inspection.
 
 ### Performance Optimization
 

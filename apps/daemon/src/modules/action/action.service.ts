@@ -51,10 +51,8 @@ export class ActionService implements IActionService {
     try {
       const { playerId, actionCode, game, team, bonus } = event.data
 
-      // Look up action definition from database
-      // Map objective style events to action codes if needed
-      const mappedCode = this.mapObjectiveToAction(actionCode)
-      const actionDef = await this.repository.findActionByCode(game, mappedCode, team)
+      // Look up action definition from database using canonical actionCode
+      const actionDef = await this.repository.findActionByCode(game, actionCode, team)
 
       if (!actionDef) {
         this.logger.warn(`Unknown action code: ${actionCode} for game ${game}`)
@@ -101,7 +99,7 @@ export class ActionService implements IActionService {
 
       // Log the event with point information
       this.logger.info(
-        `Player action processed: ${mappedCode} by player ${playerId} ` +
+        `Player action processed: ${actionCode} by player ${playerId} ` +
           `(${totalPoints > 0 ? "+" : ""}${totalPoints} points)`,
       )
 
@@ -114,24 +112,7 @@ export class ActionService implements IActionService {
     }
   }
 
-  private mapObjectiveToAction(code: string): string {
-    // Minimal mapping to reuse Actions catalog for objective events
-    // Based on base-seeder.sql codes
-    const map: Record<string, string> = {
-      // CS/CSGO variants
-      BOMB_PLANT: "Bomb_Planted",
-      BOMB_DEFUSE: "Bomb_Defused",
-      BOMB_EXPLODE: "Target_Bombed",
-      HOSTAGE_RESCUE: "All_Hostages_Rescued",
-      FLAG_CAPTURE: "flagevent_captured",
-      FLAG_DEFEND: "flagevent_defended",
-      FLAG_PICKUP: "flagevent_picked_up",
-      FLAG_DROP: "flagevent_dropped",
-      CONTROL_POINT_CAPTURE: "dod_control_point",
-      CONTROL_POINT_DEFEND: "dod_capture_area",
-    }
-    return map[code] ?? code
-  }
+  // Deleted mapObjectiveToAction: actionCode is used as-is from parsers
 
   private async handlePlayerPlayerAction(event: ActionPlayerPlayerEvent): Promise<HandlerResult> {
     try {

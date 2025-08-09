@@ -197,7 +197,12 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
 
   const matchEventHandler = new MatchEventHandler(logger, matchService, eventMetrics)
 
-  const actionEventHandler = new ActionEventHandler(logger, actionService, eventMetrics)
+  const actionEventHandler = new ActionEventHandler(
+    logger,
+    actionService,
+    matchService,
+    eventMetrics,
+  )
 
   const serverEventHandler = new ServerEventHandler(logger, serverService, eventMetrics)
 
@@ -237,17 +242,6 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
       EventType.ROUND_END,
       EventType.TEAM_WIN,
       EventType.MAP_CHANGE,
-      EventType.BOMB_PLANT,
-      EventType.BOMB_DEFUSE,
-      EventType.BOMB_EXPLODE,
-      EventType.HOSTAGE_RESCUE,
-      EventType.HOSTAGE_TOUCH,
-      EventType.FLAG_CAPTURE,
-      EventType.FLAG_DEFEND,
-      EventType.FLAG_PICKUP,
-      EventType.FLAG_DROP,
-      EventType.CONTROL_POINT_CAPTURE,
-      EventType.CONTROL_POINT_DEFEND,
       EventType.PLAYER_KILL, // For match statistics
     ],
   })

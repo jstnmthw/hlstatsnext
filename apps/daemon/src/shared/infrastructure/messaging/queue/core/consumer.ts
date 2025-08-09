@@ -326,7 +326,7 @@ export class EventConsumer implements IEventConsumer {
     reason: string,
   ): Promise<void> {
     this.logger.warn(`Rejecting message: ${reason}`)
-    await channel.nack(msg, false, false)
+    channel.nack(msg, false, false)
     this.stats.messagesRejected++
   }
 

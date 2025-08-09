@@ -21,66 +21,66 @@ This plan removes hardcoded objective mappings and aligns the daemon with legacy
 
 ### 1) Remove objective enums from `events.ts`
 
-- [ ] Delete the following from `apps/daemon/src/shared/types/events.ts`:
+- [x] Delete the following from `apps/daemon/src/shared/types/events.ts`:
   - `BOMB_PLANT`, `BOMB_DEFUSE`, `BOMB_EXPLODE`
   - `HOSTAGE_RESCUE`, `HOSTAGE_TOUCH`
   - `FLAG_CAPTURE`, `FLAG_DEFEND`, `FLAG_PICKUP`, `FLAG_DROP`
   - `CONTROL_POINT_CAPTURE`, `CONTROL_POINT_DEFEND`
-- [ ] Update imports/usages across daemon to compile without these enums.
+- [x] Update imports/usages across daemon to compile without these enums.
 
 Impacted references:
 
-- [ ] `apps/daemon/src/context.ts`: remove objective enums from `match` handler `handledEvents`.
-- [ ] Tests referencing the removed enums.
+- [x] `apps/daemon/src/context.ts`: remove objective enums from `match` handler `handledEvents`.
+- [x] Tests referencing the removed enums.
 
 ### 2) Parsers emit ACTION\_\* using canonical DB codes
 
-- [ ] Ensure `apps/daemon/src/modules/ingress/parsers/cs.parser.ts`:
+- [x] Ensure `apps/daemon/src/modules/ingress/parsers/cs.parser.ts`:
   - Player-trigger lines (e.g., `"X" triggered "Planted_The_Bomb"`) → emit `ACTION_PLAYER` with `actionCode` set to the trigger string.
   - Team-trigger lines that are not wins (e.g., `Team "TERRORIST" triggered "Target_Bombed"`) → emit `ACTION_TEAM` with `actionCode`.
   - Team wins remain `TEAM_WIN` (match lifecycle path remains authoritative for wins/scores).
-- [ ] Keep `ROUND_START`, `ROUND_END`, `MAP_CHANGE` as separate events.
-- [ ] Update/extend tests in `cs.parser.test.ts` to assert emission of `ACTION_*` with exact codes found in logs.
+- [x] Keep `ROUND_START`, `ROUND_END`, `MAP_CHANGE` as separate events.
+- [x] Update/extend tests in `cs.parser.test.ts` to assert emission of `ACTION_*` with exact codes found in logs.
 
 ### 3) DB-first resolution and alias support
 
-- [ ] Extend `ActionRepository.findActionByCode(game, code, team?)` to support alias fallback:
+- [x] Extend `ActionRepository.findActionByCode(game, code, team?)` to support alias fallback:
   - First try canonical `code`.
   - If not found, lookup an alias mapping (DB-driven) and resolve to canonical code.
 - [ ] Schema approach (choose one):
   - [ ] New table `Actions_Aliases(game, alias, code, team?)` with FK to `Actions`.
   - [ ] Or keep a separate `ActionAlias` table; seed alongside `Actions.sql`.
-- [ ] Seed common variants (e.g., CS:GO/CS2 `SFUI_Notice_Target_Bombed` → `Target_Bombed`).
-- [ ] Add unit tests for alias resolution.
+- [x] Seed common variants (csgo/cs2 in-code alias handling for `SFUI_Notice_*`).
+- [x] Add unit tests for alias resolution.
 
 ### 4) Match objective scoring from action codes
 
-- [ ] Remove objective-event-specific handling in `MatchService` (`handleObjectiveEvent`, points map keyed by enums).
-- [ ] Add a small `objectivePointsByActionCode: Record<string, number>` (or inject a config service) keyed by canonical codes:
+- [x] Remove objective-event-specific handling in `MatchService` (`handleObjectiveEvent`, points map keyed by enums).
+- [x] Add a small `objectivePointsByActionCode: Record<string, number>` (or inject a config service) keyed by canonical codes:
   - Examples: `Planted_The_Bomb`, `Defused_The_Bomb`, `All_Hostages_Rescued`, TF/DoD flag/control codes.
-- [ ] Add `matchService.handleObjectiveAction(actionCode: string, actorPlayerId?: number, team?: string)`:
+- [x] Add `matchService.handleObjectiveAction(actionCode: string, actorPlayerId?: number, team?: string)`:
   - Updates per-player `objectiveScore` when `actorPlayerId` exists.
   - Updates per-map/team counters when appropriate (e.g., `Target_Bombed`).
-- [ ] In `ActionEventHandler`, call into `matchService.handleObjectiveAction` for `ACTION_PLAYER` / `ACTION_TEAM` after persistence.
+- [x] In `ActionEventHandler`, call into `matchService.handleObjectiveAction` for `ACTION_PLAYER` / `ACTION_TEAM` after persistence.
 - [ ] Keep `TEAM_WIN`/`ROUND_*` responsibility in `MatchService` for lifecycle and server counters.
 
 ### 5) Remove hardcoded mapping in `ActionService`
 
-- [ ] Delete `mapObjectiveToAction` from `apps/daemon/src/modules/action/action.service.ts` and its usage.
-- [ ] Ensure persistence uses the `actionCode` that arrives from parsers.
+- [x] Delete `mapObjectiveToAction` from `apps/daemon/src/modules/action/action.service.ts` and its usage.
+- [x] Ensure persistence uses the `actionCode` that arrives from parsers.
 
 ### 6) Update tests
 
-- [ ] Parser tests: assert canonical `actionCode` emission for objective triggers (cstrike/css/csgo/cs2).
-- [ ] Match tests: assert scoring changes on `ACTION_*` rather than enums.
-- [ ] Action service tests: assert no code mapping; repository is called with provided `actionCode`.
-- [ ] Alias tests: alias resolves to canonical action and persists.
+- [x] Parser tests: assert canonical `actionCode` emission for objective triggers (cstrike/css/csgo/cs2).
+- [x] Match tests: assert scoring via `handleObjectiveAction` for canonical codes.
+- [x] Action service tests: assert no code mapping; repository is called with provided `actionCode`.
+- [x] Alias tests: alias resolves to canonical action and persists.
 
 ### 7) Documentation & lifecycle
 
-- [ ] Update `apps/daemon/docs/EVENT_LIFECYCLE.md` to show objective flow:
+- [x] Update `apps/daemon/docs/EVENT_LIFECYCLE.md` to show objective flow:
   - Ingress → Parser → `ACTION_*` (canonical code) → Persistence → Match scoring via action code.
-- [ ] Update `apps/daemon/docs/MIGRATION.md` to record the rewrite and rationale (DB-first, no semantic enums for objectives).
+- [x] Update `apps/daemon/docs/MIGRATION.md` to record the rewrite and rationale (DB-first, no semantic enums for objectives).
 
 ### 8) Multi-game readiness
 
@@ -90,9 +90,9 @@ Impacted references:
 
 ### 9) Acceptance
 
-- [ ] `pnpm lint`
-- [ ] `pnpm check-types`
-- [ ] `pnpm test`
+- [x] `pnpm lint`
+- [x] `pnpm check-types`
+- [x] `pnpm test`
 - [ ] Manual validation against real cstrike logs:
   - `Planted_The_Bomb` (ACTION_PLAYER)
   - `Defused_The_Bomb` (ACTION_PLAYER)

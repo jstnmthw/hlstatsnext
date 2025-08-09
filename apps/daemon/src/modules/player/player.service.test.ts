@@ -37,8 +37,8 @@ describe("PlayerService", () => {
     // Create mock match service
     mockMatchService = {
       handleMatchEvent: vi.fn().mockResolvedValue({ success: true }),
-      handleObjectiveEvent: vi.fn().mockResolvedValue({ success: true }),
       handleKillInMatch: vi.fn().mockResolvedValue({ success: true }),
+      handleObjectiveAction: vi.fn().mockResolvedValue({ success: true }),
       getCurrentMap: vi.fn().mockReturnValue("de_dust2"),
       initializeMapForServer: vi.fn().mockResolvedValue("de_dust2"),
       getMatchStats: vi.fn().mockReturnValue(undefined),

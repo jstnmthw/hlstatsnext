@@ -55,9 +55,16 @@ export class CsParser extends BaseParser {
 
       // Player action triggers (exclude world events)
       if (cleanLine.includes('triggered "') && !cleanLine.includes("World triggered")) {
+        // Player-triggered ACTION_PLAYER
         const actionResult = this.parseActionEvent(cleanLine, serverId)
         if (actionResult.success && actionResult.event) {
           return actionResult
+        }
+
+        // Team-triggered non-win ACTION_TEAM
+        const teamActionResult = this.parseTeamActionEvent(cleanLine, serverId)
+        if (teamActionResult.success && teamActionResult.event) {
+          return teamActionResult
         }
         // Fall through to other event parsing if not an action
       }
@@ -436,6 +443,37 @@ export class CsParser extends BaseParser {
 
     // Not an action event we handle
     return { event: null, success: false }
+  }
+
+  private parseTeamActionEvent(logLine: string, serverId: number): ParseResult {
+    // Team "TERRORIST" triggered "Target_Bombed" (CT "4") (T "5")
+    const teamTriggerMatch = logLine.match(/Team "([^"]+)" triggered "([^"]+)"/i)
+    if (!teamTriggerMatch) {
+      return { event: null, success: false }
+    }
+
+    const [, team, triggerName] = teamTriggerMatch
+
+    // If it's a team win, this is handled elsewhere
+    if (triggerName === "Terrorists_Win" || triggerName === "CTs_Win") {
+      return { event: null, success: false }
+    }
+
+    const event: BaseEvent = {
+      eventType: EventType.ACTION_TEAM,
+      timestamp: this.createTimestamp(),
+      serverId,
+      raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
+      data: {
+        team,
+        actionCode: triggerName,
+        game: this.game,
+      },
+    }
+
+    return { event, success: true }
   }
 
   private parseRoundStartEvent(logLine: string, serverId: number): ParseResult {

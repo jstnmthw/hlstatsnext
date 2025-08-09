@@ -2,7 +2,7 @@
  * Match Module Types
  */
 
-import type { BaseEvent, EventType, PlayerMeta } from "@/shared/types/events"
+import type { BaseEvent, EventType } from "@/shared/types/events"
 import type { HandlerResult } from "@/shared/types/common"
 import type { FindOptions, UpdateOptions, CreateOptions } from "@/shared/types/database"
 
@@ -49,137 +49,8 @@ export interface MapChangeEvent extends BaseEvent {
   }
 }
 
-// Objective event types
-export interface BombPlantEvent extends BaseEvent {
-  eventType: EventType.BOMB_PLANT
-  data: {
-    playerId: number
-    bombsite?: string
-    team: string
-  }
-  meta?: PlayerMeta
-}
-
-export interface BombDefuseEvent extends BaseEvent {
-  eventType: EventType.BOMB_DEFUSE
-  data: {
-    playerId: number
-    bombsite?: string
-    team: string
-    timeRemaining?: number
-  }
-  meta?: PlayerMeta
-}
-
-export interface BombExplodeEvent extends BaseEvent {
-  eventType: EventType.BOMB_EXPLODE
-  data: {
-    bombsite?: string
-    planterPlayerId?: number
-  }
-}
-
-export interface HostageRescueEvent extends BaseEvent {
-  eventType: EventType.HOSTAGE_RESCUE
-  data: {
-    playerId: number
-    hostageId?: number
-    team: string
-  }
-  meta?: PlayerMeta
-}
-
-export interface HostageTouchEvent extends BaseEvent {
-  eventType: EventType.HOSTAGE_TOUCH
-  data: {
-    playerId: number
-    hostageId?: number
-    team: string
-  }
-  meta?: PlayerMeta
-}
-
-export interface FlagCaptureEvent extends BaseEvent {
-  eventType: EventType.FLAG_CAPTURE
-  data: {
-    playerId: number
-    flagTeam: string
-    captureTeam: string
-  }
-  meta?: PlayerMeta
-}
-
-export interface FlagDefendEvent extends BaseEvent {
-  eventType: EventType.FLAG_DEFEND
-  data: {
-    playerId: number
-    flagTeam: string
-    team: string
-  }
-  meta?: PlayerMeta
-}
-
-export interface FlagPickupEvent extends BaseEvent {
-  eventType: EventType.FLAG_PICKUP
-  data: {
-    playerId: number
-    flagTeam: string
-    team: string
-  }
-  meta?: PlayerMeta
-}
-
-export interface FlagDropEvent extends BaseEvent {
-  eventType: EventType.FLAG_DROP
-  data: {
-    playerId: number
-    flagTeam: string
-    team: string
-    reason?: string
-  }
-  meta?: PlayerMeta
-}
-
-export interface ControlPointCaptureEvent extends BaseEvent {
-  eventType: EventType.CONTROL_POINT_CAPTURE
-  data: {
-    playerId: number
-    pointName: string
-    pointId?: number
-    capturingTeam: string
-    previousOwner?: string
-    captureTime?: number
-  }
-  meta?: PlayerMeta
-}
-
-export interface ControlPointDefendEvent extends BaseEvent {
-  eventType: EventType.CONTROL_POINT_DEFEND
-  data: {
-    playerId: number
-    pointName: string
-    pointId?: number
-    defendingTeam: string
-    team: string
-  }
-  meta?: PlayerMeta
-}
-
 // Union types
 export type MatchEvent = RoundStartEvent | RoundEndEvent | TeamWinEvent | MapChangeEvent
-
-export type ObjectiveEvent =
-  | BombPlantEvent
-  | BombDefuseEvent
-  | BombExplodeEvent
-  | HostageRescueEvent
-  | HostageTouchEvent
-  | FlagCaptureEvent
-  | FlagDefendEvent
-  | FlagPickupEvent
-  | FlagDropEvent
-  | ControlPointCaptureEvent
-  | ControlPointDefendEvent
 
 // Match data types
 export interface MatchStats {
@@ -220,8 +91,15 @@ export interface MatchResult {
 export interface IMatchService {
   // Match management
   handleMatchEvent(event: MatchEvent): Promise<HandlerResult>
-  handleObjectiveEvent(event: ObjectiveEvent): Promise<HandlerResult>
   handleKillInMatch(event: BaseEvent): Promise<HandlerResult>
+
+  // Objective scoring from canonical action codes
+  handleObjectiveAction(
+    actionCode: string,
+    serverId: number,
+    actorPlayerId?: number,
+    team?: string,
+  ): Promise<HandlerResult>
 
   // Match state
   getMatchStats(serverId: number): MatchStats | undefined

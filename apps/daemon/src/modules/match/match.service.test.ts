@@ -11,7 +11,6 @@ import type {
   RoundEndEvent,
   TeamWinEvent,
   MapChangeEvent,
-  ObjectiveEvent,
 } from "./match.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
@@ -175,100 +174,7 @@ describe("MatchService", () => {
     })
   })
 
-  describe("handleObjectiveEvent", () => {
-    it("should handle BOMB_PLANT events", async () => {
-      const event: ObjectiveEvent = {
-        eventType: EventType.BOMB_PLANT,
-        serverId: 1,
-        timestamp: new Date(),
-        data: {
-          playerId: 123,
-          bombsite: "A",
-          team: "terrorist",
-        },
-      }
-
-      const result = await matchService.handleObjectiveEvent(event)
-
-      expect(result.success).toBe(true)
-      expect(mockRepository.updateBombStats).toHaveBeenCalledWith(1, "plant")
-      expect(mockLogger.debug).toHaveBeenCalledWith(
-        expect.stringContaining("Objective event processed: BOMB_PLANT by player 123 (+3 points)"),
-      )
-    })
-
-    it("should handle BOMB_DEFUSE events", async () => {
-      const event: ObjectiveEvent = {
-        eventType: EventType.BOMB_DEFUSE,
-        serverId: 1,
-        timestamp: new Date(),
-        data: {
-          playerId: 456,
-          team: "ct",
-        },
-      }
-
-      const result = await matchService.handleObjectiveEvent(event)
-
-      expect(result.success).toBe(true)
-      expect(mockRepository.updateBombStats).toHaveBeenCalledWith(1, "defuse")
-    })
-
-    it("should handle events without player ID", async () => {
-      const event: ObjectiveEvent = {
-        eventType: EventType.BOMB_EXPLODE,
-        serverId: 1,
-        timestamp: new Date(),
-        data: {
-          bombsite: "B",
-        },
-      }
-
-      const result = await matchService.handleObjectiveEvent(event)
-
-      expect(result.success).toBe(true)
-      expect(mockLogger.debug).toHaveBeenCalledWith(
-        expect.stringContaining("Objective event processed: BOMB_EXPLODE"),
-      )
-    })
-
-    it("should auto-initialize match context", async () => {
-      const event: ObjectiveEvent = {
-        eventType: EventType.FLAG_CAPTURE,
-        serverId: 2,
-        timestamp: new Date(),
-        data: {
-          playerId: 789,
-          flagTeam: "blue",
-          captureTeam: "red",
-        },
-      }
-
-      const result = await matchService.handleObjectiveEvent(event)
-
-      expect(result.success).toBe(true)
-      expect(mockLogger.info).toHaveBeenCalledWith("Auto-initializing match context for server 2")
-    })
-
-    it("should handle errors in objective event processing", async () => {
-      vi.mocked(mockRepository.updateBombStats).mockRejectedValue(new Error("Database error"))
-
-      const event: ObjectiveEvent = {
-        eventType: EventType.BOMB_PLANT,
-        serverId: 1,
-        timestamp: new Date(),
-        data: {
-          playerId: 123,
-          team: "terrorist",
-        },
-      }
-
-      const result = await matchService.handleObjectiveEvent(event)
-
-      expect(result.success).toBe(false)
-      expect(result.error).toBe("Database error")
-    })
-  })
+  // Objective events are now handled via ACTION_* flows; legacy tests removed
 
   describe("handleKillInMatch", () => {
     it("should handle kill events and update player stats", async () => {
@@ -559,6 +465,54 @@ describe("MatchService", () => {
 
       const score = matchService.calculatePlayerScore(stats)
       expect(score).toBe(0)
+    })
+  })
+
+  describe("handleObjectiveAction", () => {
+    it("should award points for Planted_The_Bomb and update bomb stats", async () => {
+      const serverId = 10
+      // Ensure no match exists to test auto-initialize
+      const result = await matchService.handleObjectiveAction(
+        "Planted_The_Bomb",
+        serverId,
+        123,
+        "TERRORIST",
+      )
+
+      expect(result.success).toBe(true)
+      // Points map awards +3
+      const stats = matchService.getMatchStats(serverId)!
+      expect(stats.playerStats.get(123)?.objectiveScore).toBe(3)
+      expect(mockRepository.updateBombStats).toHaveBeenCalledWith(serverId, "plant")
+    })
+
+    it("should award points for Defused_The_Bomb and update bomb stats", async () => {
+      const serverId = 11
+      await matchService.handleMatchEvent({
+        eventType: EventType.ROUND_START,
+        serverId,
+        timestamp: new Date(),
+        data: { map: "de_dust2", roundNumber: 1, maxPlayers: 10 },
+      })
+
+      const result = await matchService.handleObjectiveAction(
+        "Defused_The_Bomb",
+        serverId,
+        456,
+        "CT",
+      )
+      expect(result.success).toBe(true)
+      const stats = matchService.getMatchStats(serverId)!
+      expect(stats.playerStats.get(456)?.objectiveScore).toBe(3)
+      expect(mockRepository.updateBombStats).toHaveBeenCalledWith(serverId, "defuse")
+    })
+
+    it("should default to +1 for unknown action codes", async () => {
+      const serverId = 12
+      const result = await matchService.handleObjectiveAction("Some_Custom_Action", serverId, 999)
+      expect(result.success).toBe(true)
+      const stats = matchService.getMatchStats(serverId)!
+      expect(stats.playerStats.get(999)?.objectiveScore).toBe(1)
     })
   })
 })

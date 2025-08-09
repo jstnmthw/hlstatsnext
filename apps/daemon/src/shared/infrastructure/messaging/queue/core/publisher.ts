@@ -195,19 +195,6 @@ export function defaultRoutingKeyMapper(event: BaseEvent): string {
     [EventType.TEAM_WIN]: "team.win",
     [EventType.MAP_CHANGE]: "map.change",
 
-    // Objective events
-    [EventType.BOMB_PLANT]: "bomb.plant",
-    [EventType.BOMB_DEFUSE]: "bomb.defuse",
-    [EventType.BOMB_EXPLODE]: "bomb.explode",
-    [EventType.HOSTAGE_RESCUE]: "hostage.rescue",
-    [EventType.HOSTAGE_TOUCH]: "hostage.touch",
-    [EventType.FLAG_CAPTURE]: "flag.capture",
-    [EventType.FLAG_DEFEND]: "flag.defend",
-    [EventType.FLAG_PICKUP]: "flag.pickup",
-    [EventType.FLAG_DROP]: "flag.drop",
-    [EventType.CONTROL_POINT_CAPTURE]: "control.capture",
-    [EventType.CONTROL_POINT_DEFEND]: "control.defend",
-
     // Weapon events
     [EventType.WEAPON_FIRE]: "weapon.fire",
     [EventType.WEAPON_HIT]: "weapon.hit",
@@ -233,9 +220,6 @@ export function defaultPriorityMapper(event: BaseEvent): MessagePriority {
     EventType.PLAYER_TEAMKILL,
     EventType.ROUND_START,
     EventType.ROUND_END,
-    EventType.BOMB_PLANT,
-    EventType.BOMB_DEFUSE,
-    EventType.BOMB_EXPLODE,
     EventType.SERVER_SHUTDOWN,
   ])
 

@@ -60,7 +60,6 @@ Gaps vs. legacy parity
 4. Server map and load tracking
 
 - Persist server map transitions (`ServerRepository.resetMapStats`) on `MAP_CHANGE` events and fill per-map counters (rounds, wins, shots/hits) from `MatchService` state.
-- Add optional `ServerLoad` sampling with a periodic job to store activePlayers/uptime/fps.
 
 5. Options and server config
 

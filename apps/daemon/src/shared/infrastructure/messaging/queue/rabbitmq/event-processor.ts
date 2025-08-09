@@ -38,12 +38,15 @@ export class RabbitMQEventProcessor implements IEventProcessor {
       correlationId: event.correlationId || generateCorrelationId(),
     }
 
-    this.logger.queue(`Processing event: ${processedEvent.eventType}`, {
-      eventId: processedEvent.eventId,
-      correlationId: processedEvent.correlationId,
-      eventType: processedEvent.eventType,
-      serverId: processedEvent.serverId,
-    })
+    this.logger.queue(
+      `Processing event: ${processedEvent.eventType} (Server ID: ${processedEvent.serverId})`,
+      {
+        eventId: processedEvent.eventId,
+        correlationId: processedEvent.correlationId,
+        eventType: processedEvent.eventType,
+        serverId: processedEvent.serverId,
+      },
+    )
 
     try {
       // Process through module handlers first (for business logic like chat persistence)
@@ -92,7 +95,7 @@ export class RabbitMQEventProcessor implements IEventProcessor {
     }
 
     this.logger.info(
-      `Processing event ${event.eventType} through ${handlers.length} module handlers`,
+      `Processing event ${event.eventType} through [${handlers.map((h) => h.name).join(", ")}] module handlers`,
       {
         eventId: event.eventId,
         handlers: handlers.map((h) => h.name),

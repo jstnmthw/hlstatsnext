@@ -56,12 +56,15 @@ describe("RabbitMQEventProcessor", () => {
 
       await processor.processEvent(event)
 
-      expect(mockLogger.queue).toHaveBeenCalledWith("Processing event: PLAYER_KILL", {
-        eventId: "existing-event-123",
-        correlationId: "existing-corr-456",
-        eventType: EventType.PLAYER_KILL,
-        serverId: 1,
-      })
+      expect(mockLogger.queue).toHaveBeenCalledWith(
+        "Processing event: PLAYER_KILL (Server ID: 1)",
+        {
+          eventId: "existing-event-123",
+          correlationId: "existing-corr-456",
+          eventType: EventType.PLAYER_KILL,
+          serverId: 1,
+        },
+      )
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         "Event processed: PLAYER_KILL (Server ID: 1)",
@@ -86,7 +89,7 @@ describe("RabbitMQEventProcessor", () => {
       await processor.processEvent(event)
 
       expect(mockLogger.queue).toHaveBeenCalledWith(
-        "Processing event: PLAYER_CONNECT",
+        "Processing event: PLAYER_CONNECT (Server ID: 1)",
         expect.objectContaining({
           eventId: expect.any(String),
           correlationId: expect.any(String),
@@ -164,7 +167,7 @@ describe("RabbitMQEventProcessor", () => {
       await processor.processEvent(event)
 
       expect(mockLogger.info).toHaveBeenCalledWith(
-        "Processing event PLAYER_KILL through 1 module handlers",
+        "Processing event PLAYER_KILL through [PlayerHandler] module handlers",
         {
           eventId: "test-event-123",
           handlers: ["PlayerHandler"],
@@ -221,7 +224,7 @@ describe("RabbitMQEventProcessor", () => {
       await processor.processEvent(event)
 
       expect(mockLogger.info).toHaveBeenCalledWith(
-        "Processing event PLAYER_KILL through 2 module handlers",
+        "Processing event PLAYER_KILL through [PlayerHandler, StatsHandler] module handlers",
         {
           eventId: "test-event-123",
           handlers: ["PlayerHandler", "StatsHandler"],

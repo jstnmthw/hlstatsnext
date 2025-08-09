@@ -99,8 +99,8 @@ export class ActionService implements IActionService {
 
       // Log the event with point information
       this.logger.info(
-        `Player action processed: ${actionCode} by player ${playerId} ` +
-          `(${totalPoints > 0 ? "+" : ""}${totalPoints} points)`,
+        `Player action processed: ${actionCode} by player ${playerId} on map ${currentMap} ` +
+          `(${totalPoints > 0 ? "+" : ""}${totalPoints} points) (Server ID: ${event.serverId})`,
       )
 
       return { success: true, affected: 1 }

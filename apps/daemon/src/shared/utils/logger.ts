@@ -155,8 +155,9 @@ export class Logger implements ILogger {
 
     const timestamp = this.formatTimestamp()
     const formattedStatus = this.formatStatus(status)
+    const shouldPrintContext = Boolean(context) && this.logLevel === LogLevel.DEBUG
 
-    if (context) {
+    if (shouldPrintContext) {
       console.log(`${timestamp}${formattedStatus} ${message}`, context)
     } else {
       console.log(`${timestamp}${formattedStatus} ${message}`)

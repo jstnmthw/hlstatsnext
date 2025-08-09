@@ -10,16 +10,17 @@ import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import type { IActionService, ActionEvent } from "@/modules/action/action.types"
+import type { IMatchService } from "@/modules/match/match.types"
 import { EventType } from "@/shared/types/events"
 
 export class ActionEventHandler extends BaseModuleEventHandler {
   constructor(
     logger: ILogger,
     private readonly actionService: IActionService,
+    private readonly matchService?: IMatchService,
     metrics?: EventMetrics,
   ) {
     super(logger, metrics)
-    // No event registration needed - all events handled via RabbitMQ queue
   }
 
   // Queue-compatible handler methods (called by RabbitMQConsumer)
@@ -30,6 +31,23 @@ export class ActionEventHandler extends BaseModuleEventHandler {
     this.logPlayerInfo(actionEvent)
 
     await this.actionService.handleActionEvent(actionEvent)
+    // Inform match service for objective scoring when applicable
+    try {
+      if (actionEvent.eventType === EventType.ACTION_PLAYER) {
+        const { actionCode } = actionEvent.data as {
+          actionCode: string
+        }
+        // Bomb-related or key objective actions
+        await this.matchService?.handleObjectiveAction(
+          actionCode,
+          actionEvent.serverId,
+          (actionEvent.data as { playerId?: number }).playerId,
+          (actionEvent.data as { team?: string }).team,
+        )
+      }
+    } catch {
+      // non-fatal
+    }
   }
 
   async handleActionPlayerPlayer(event: BaseEvent): Promise<void> {
@@ -44,7 +62,21 @@ export class ActionEventHandler extends BaseModuleEventHandler {
   async handleActionTeam(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_TEAM for server ${event.serverId}`)
 
-    await this.actionService.handleActionEvent(event as ActionEvent)
+    const actionEvent = event as ActionEvent
+    await this.actionService.handleActionEvent(actionEvent)
+    try {
+      if (actionEvent.eventType === EventType.ACTION_TEAM) {
+        const { actionCode } = actionEvent.data as { actionCode: string }
+        await this.matchService?.handleObjectiveAction(
+          actionCode,
+          actionEvent.serverId,
+          undefined,
+          (actionEvent.data as { team: string }).team,
+        )
+      }
+    } catch {
+      // non-fatal
+    }
   }
 
   async handleActionWorld(event: BaseEvent): Promise<void> {

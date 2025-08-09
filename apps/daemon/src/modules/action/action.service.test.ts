@@ -47,6 +47,46 @@ describe("ActionService", () => {
   })
 
   describe("handleActionEvent", () => {
+    it("should resolve SFUI alias to canonical action code for csgo/cs2", async () => {
+      const repo = createMockActionRepository()
+      const svc = new ActionService(repo, mockLogger)
+
+      const canonicalDef: ActionDefinition = {
+        id: 42,
+        game: "csgo",
+        code: "Target_Bombed",
+        rewardPlayer: 0,
+        rewardTeam: 5,
+        team: "TERRORIST",
+        description: "Terrorists bombed the target",
+        forPlayerActions: false,
+        forPlayerPlayerActions: false,
+        forTeamActions: true,
+        forWorldActions: false,
+      }
+
+      vi.mocked(repo.findActionByCode).mockResolvedValue(canonicalDef)
+      vi.mocked(repo.logTeamAction).mockResolvedValue()
+
+      const event: ActionTeamEvent = {
+        timestamp: new Date(),
+        serverId: 7,
+        eventType: EventType.ACTION_TEAM,
+        data: {
+          team: "TERRORIST",
+          actionCode: "SFUI_Notice_Target_Bombed",
+          game: "csgo",
+        },
+      }
+
+      const result = await svc.handleActionEvent(event)
+      expect(result.success).toBe(true)
+      expect(repo.findActionByCode).toHaveBeenCalledWith(
+        "csgo",
+        "SFUI_Notice_Target_Bombed",
+        "TERRORIST",
+      )
+    })
     it("should handle ACTION_PLAYER events", async () => {
       // Mock action definition
       const mockActionDef: ActionDefinition = {

@@ -8,7 +8,6 @@ import type {
   IMatchService,
   IMatchRepository,
   MatchEvent,
-  ObjectiveEvent,
   MatchStats,
   PlayerRoundStats,
   RoundStartEvent,
@@ -52,61 +51,7 @@ export class MatchService implements IMatchService {
     }
   }
 
-  async handleObjectiveEvent(event: ObjectiveEvent): Promise<HandlerResult> {
-    const serverId = event.serverId
-
-    try {
-      let matchStats = this.currentMatches.get(serverId)
-      if (!matchStats) {
-        this.logger.info(`Auto-initializing match context for server ${serverId}`)
-        matchStats = {
-          duration: 0,
-          totalRounds: 0,
-          teamScores: {},
-          startTime: new Date(),
-          playerStats: new Map(),
-          currentMap: "",
-        }
-        this.currentMatches.set(serverId, matchStats)
-      }
-
-      // Some events like BOMB_EXPLODE don't have a player ID
-      const playerId = "playerId" in event.data ? event.data.playerId : null
-
-      // Update player objective score (only for player-based events)
-      if (playerId) {
-        const playerStats =
-          matchStats.playerStats.get(playerId) ?? this.createEmptyPlayerStats(playerId)
-
-        // Award objective points based on event type
-        const objectivePoints = this.getObjectivePoints(event.eventType)
-        playerStats.objectiveScore += objectivePoints
-        matchStats.playerStats.set(playerId, playerStats)
-      }
-
-      // Update server statistics for specific events
-      if (event.eventType === EventType.BOMB_PLANT) {
-        await this.repository.updateBombStats(serverId, "plant")
-      } else if (event.eventType === EventType.BOMB_DEFUSE) {
-        await this.repository.updateBombStats(serverId, "defuse")
-      }
-
-      this.logger.debug(
-        `Objective event processed: ${event.eventType}${
-          playerId
-            ? ` by player ${playerId} (+${this.getObjectivePoints(event.eventType)} points)`
-            : ""
-        }`,
-      )
-
-      return { success: true }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
+  // Objective events are now handled via ACTION_* paths and DB codes
 
   async handleKillInMatch(event: BaseEvent): Promise<HandlerResult> {
     const serverId = event.serverId
@@ -236,6 +181,62 @@ export class MatchService implements IMatchService {
     return mvpPlayerId
   }
 
+  async handleObjectiveAction(
+    actionCode: string,
+    serverId: number,
+    actorPlayerId?: number,
+    team?: string,
+  ): Promise<HandlerResult> {
+    try {
+      let matchStats = this.currentMatches.get(serverId)
+      if (!matchStats) {
+        this.logger.info(`Auto-initializing match context for server ${serverId}`)
+        matchStats = {
+          duration: 0,
+          totalRounds: 0,
+          teamScores: {},
+          startTime: new Date(),
+          playerStats: new Map(),
+          currentMap: "",
+        }
+        this.currentMatches.set(serverId, matchStats)
+      }
+
+      // Award points per canonical action code (can be externalized to config later)
+      const pointsByActionCode: Record<string, number> = {
+        Planted_The_Bomb: 3,
+        Defused_The_Bomb: 3,
+        All_Hostages_Rescued: 2,
+      }
+      const awardedPoints = pointsByActionCode[actionCode] ?? 1
+
+      if (typeof actorPlayerId === "number") {
+        const playerStats =
+          matchStats.playerStats.get(actorPlayerId) ?? this.createEmptyPlayerStats(actorPlayerId)
+        playerStats.objectiveScore += awardedPoints
+        matchStats.playerStats.set(actorPlayerId, playerStats)
+      }
+
+      // Update server bomb stats for common codes
+      if (actionCode === "Planted_The_Bomb") {
+        await this.repository.updateBombStats(serverId, "plant")
+      } else if (actionCode === "Defused_The_Bomb") {
+        await this.repository.updateBombStats(serverId, "defuse")
+      }
+
+      this.logger.debug(
+        `Objective action processed: ${actionCode}${actorPlayerId ? ` by player ${actorPlayerId}` : team ? ` by team ${team}` : ""}`,
+      )
+
+      return { success: true }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      }
+    }
+  }
+
   getMatchStats(serverId: number): MatchStats | undefined {
     return this.currentMatches.get(serverId)
   }
@@ -291,22 +292,7 @@ export class MatchService implements IMatchService {
     )
   }
 
-  private getObjectivePoints(eventType: string): number {
-    const objectivePointsMap: Record<string, number> = {
-      BOMB_PLANT: 3,
-      BOMB_DEFUSE: 3,
-      BOMB_EXPLODE: 0,
-      HOSTAGE_RESCUE: 2,
-      HOSTAGE_TOUCH: 1,
-      FLAG_CAPTURE: 5,
-      FLAG_DEFEND: 3,
-      FLAG_PICKUP: 1,
-      FLAG_DROP: 0,
-      CONTROL_POINT_CAPTURE: 4,
-      CONTROL_POINT_DEFEND: 2,
-    }
-    return objectivePointsMap[eventType] || 1
-  }
+  // getObjectivePoints removed; scoring to be based on action codes in later phase
 
   private createEmptyPlayerStats(playerId: number): PlayerRoundStats {
     return {

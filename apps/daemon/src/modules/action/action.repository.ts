@@ -28,13 +28,9 @@ export class ActionRepository implements IActionRepository {
         where: {
           game,
           code: actionCode,
-          // If team is provided, match it exactly, otherwise allow empty team
           team: team || "",
         },
-        orderBy: [
-          // Prefer exact team matches over generic ones
-          { team: team ? "desc" : "asc" },
-        ],
+        orderBy: [{ team: team ? "desc" : "asc" }],
       })
 
       this.logger.debug(`Action lookup result: ${action ? `Found ID ${action.id}` : "Not found"}`)

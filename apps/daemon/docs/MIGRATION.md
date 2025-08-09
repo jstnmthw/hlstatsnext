@@ -240,10 +240,10 @@ Implement round and match event handling with proper event routing.
 
 #### **Advanced Event Types**
 
-- [ ] Objective-based events
-  - [ ] Bomb plant/defuse (CS)
-  - [ ] Hostage rescue (CS)
-  - [ ] Flag capture (TF2)
+- [x] Objective-based events (DB-first, canonical ACTION\_\* flow)
+  - [x] Bomb plant/defuse (CS) via ACTION_PLAYER, matched by `Actions` table
+  - [x] Hostage rescue (CS) via ACTION_PLAYER
+  - [ ] Flag capture (TF/TF2)
   - [ ] Control point capture
 - [ ] Server-based events
   - [ ] lills

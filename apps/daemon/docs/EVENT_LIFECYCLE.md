@@ -1,3 +1,68 @@
+# Event Lifecycle (Queue-First)
+
+This document outlines the end-to-end flow for game events in the HLStatsNext daemon, focused on the objective events rewrite (DB-first, canonical action codes).
+
+## High-level Flow
+
+1. Ingress (UDP) receives raw server log lines
+2. Parser converts lines → structured events
+3. Events are published to RabbitMQ with routing keys
+4. RabbitMQ consumer dispatches to module handlers via `ModuleRegistry`
+5. Handlers persist events and execute business logic
+6. Services update in-memory match state and database counters
+
+## Objective Events Flow (DB-first)
+
+- Canonical objective signals (e.g., `Planted_The_Bomb`, `Defused_The_Bomb`, `Target_Bombed`) are forwarded directly by parsers as ACTION\_\* events without enum mapping.
+
+### Parsing
+
+- Player-triggered objective lines:
+  - Example: `"X" triggered "Planted_The_Bomb"`
+  - Emits: `ACTION_PLAYER`, `data.actionCode = "Planted_The_Bomb"`
+
+- Team-triggered non-win lines:
+  - Example: `Team "TERRORIST" triggered "Target_Bombed"`
+  - Emits: `ACTION_TEAM`, `data.actionCode = "Target_Bombed"`
+
+- Team wins remain lifecycle events:
+  - Example: `Team "CT" triggered "CTs_Win"`
+  - Emits: `TEAM_WIN`
+
+### Publishing
+
+- All events are queue-first. ACTION\_\* events use routing keys:
+  - `action.player`, `action.player.player`, `action.team`, `action.world`
+
+### Processing
+
+- Action module persists ACTION\_\* to legacy tables via `ActionRepository`.
+- Repository resolves `Action` records by `game`+`code` (with in-code alias fallback for csgo/cs2 `SFUI_Notice_*`).
+- After persistence, `ActionEventHandler` informs `MatchService`:
+  - `matchService.handleObjectiveAction(actionCode, serverId, playerId?, team?)`
+
+### Match Scoring & Counters
+
+- `MatchService` maintains in-memory state per server.
+- Objective scoring uses a canonical points map (initial minimal set):
+  - `Planted_The_Bomb`: +3
+  - `Defused_The_Bomb`: +3
+  - `All_Hostages_Rescued`: +2
+  - Default: +1
+- Bomb statistics updated on server record:
+  - `Planted_The_Bomb` → `updateBombStats(serverId, "plant")`
+  - `Defused_The_Bomb` → `updateBombStats(serverId, "defuse")`
+
+### Lifecycle
+
+- `ROUND_START/END`, `TEAM_WIN`, `MAP_CHANGE` remain separate events managed by the match module for state and scoreboard updates.
+
+## Rationale
+
+- Removes semantic objective enums from code (prevents drift).
+- Database is the single source of truth for actions and rewards.
+- Parsers are thin, forwarding canonical trigger strings.
+
 # Event Lifecycle Documentation
 
 This document explains the complete event lifecycle in the HLStats daemon, from raw log parsing to final business logic completion. Understanding these stages is crucial for debugging, monitoring, and performance optimization.

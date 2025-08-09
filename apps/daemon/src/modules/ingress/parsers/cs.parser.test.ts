@@ -216,6 +216,49 @@ describe("CsParser", () => {
         isBot: false,
       })
     })
+
+    it("should emit ACTION_PLAYER with canonical code for Planted_The_Bomb", () => {
+      const logLine = '"Planter<7><STEAM_0:1:999><TERRORIST>" triggered "Planted_The_Bomb"'
+      const result = parser.parseLine(logLine, serverId)
+
+      expect(result.success).toBe(true)
+      expect(result.event?.eventType).toBe(EventType.ACTION_PLAYER)
+      expect(result.event?.data).toEqual({
+        playerId: 7,
+        actionCode: "Planted_The_Bomb",
+        game: "cstrike",
+        team: "TERRORIST",
+      })
+    })
+
+    it("should emit ACTION_PLAYER with canonical code for Defused_The_Bomb", () => {
+      const logLine = '"Defuser<12><STEAM_0:0:111><CT>" triggered "Defused_The_Bomb"'
+      const result = parser.parseLine(logLine, serverId)
+
+      expect(result.success).toBe(true)
+      expect(result.event?.eventType).toBe(EventType.ACTION_PLAYER)
+      expect(result.event?.data).toEqual({
+        playerId: 12,
+        actionCode: "Defused_The_Bomb",
+        game: "cstrike",
+        team: "CT",
+      })
+    })
+  })
+
+  describe("parseTeamActionEvent (non-win)", () => {
+    it("should emit ACTION_TEAM with canonical code for Target_Bombed", () => {
+      const logLine = 'Team "TERRORIST" triggered "Target_Bombed" (CT "4") (T "5")'
+      const result = parser.parseLine(logLine, serverId)
+
+      expect(result.success).toBe(true)
+      expect(result.event?.eventType).toBe(EventType.ACTION_TEAM)
+      expect(result.event?.data).toEqual({
+        team: "TERRORIST",
+        actionCode: "Target_Bombed",
+        game: "cstrike",
+      })
+    })
   })
 
   describe("parseRoundStartEvent", () => {

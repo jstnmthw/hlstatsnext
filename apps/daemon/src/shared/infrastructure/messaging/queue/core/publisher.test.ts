@@ -457,14 +457,7 @@ describe("Default Routing Key Mapper", () => {
     expect(defaultRoutingKeyMapper({ eventType: EventType.TEAM_WIN } as BaseEvent)).toBe("team.win")
   })
 
-  it("should map objective events correctly", () => {
-    expect(defaultRoutingKeyMapper({ eventType: EventType.BOMB_PLANT } as BaseEvent)).toBe(
-      "bomb.plant",
-    )
-    expect(defaultRoutingKeyMapper({ eventType: EventType.FLAG_CAPTURE } as BaseEvent)).toBe(
-      "flag.capture",
-    )
-  })
+  // Objective events removed; objective flows are handled via ACTION_* events
 
   it("should map weapon events correctly", () => {
     expect(defaultRoutingKeyMapper({ eventType: EventType.WEAPON_FIRE } as BaseEvent)).toBe(
@@ -490,9 +483,6 @@ describe("Default Priority Mapper", () => {
       EventType.PLAYER_TEAMKILL,
       EventType.ROUND_START,
       EventType.ROUND_END,
-      EventType.BOMB_PLANT,
-      EventType.BOMB_DEFUSE,
-      EventType.BOMB_EXPLODE,
       EventType.SERVER_SHUTDOWN,
     ]
 

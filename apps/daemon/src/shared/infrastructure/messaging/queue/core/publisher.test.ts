@@ -481,8 +481,11 @@ describe("Default Priority Mapper", () => {
       EventType.PLAYER_KILL,
       EventType.PLAYER_SUICIDE,
       EventType.PLAYER_TEAMKILL,
-      EventType.ROUND_START,
-      EventType.ROUND_END,
+      // Actions are critical for ranking adjustments
+      EventType.ACTION_PLAYER,
+      EventType.ACTION_PLAYER_PLAYER,
+      EventType.ACTION_TEAM,
+      EventType.ACTION_WORLD,
       EventType.SERVER_SHUTDOWN,
     ]
 
@@ -509,7 +512,9 @@ describe("Default Priority Mapper", () => {
       EventType.PLAYER_CONNECT,
       EventType.PLAYER_DISCONNECT,
       EventType.PLAYER_CHANGE_TEAM,
-      EventType.ACTION_PLAYER,
+      // Rounds and objectives are normal priority
+      EventType.ROUND_START,
+      EventType.ROUND_END,
     ]
 
     normalPriorityEvents.forEach((eventType) => {

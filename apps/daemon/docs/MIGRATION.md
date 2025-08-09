@@ -238,6 +238,17 @@ Implement round and match event handling with proper event routing.
 - **Code Quality**: Zero ESLint warnings, strict TypeScript compliance
 - **Event Flow**: Clean, non-conflicting event processing pipeline
 
+#### **Queue Priority Reclassification** ✅
+
+- ✅ Reprioritized RabbitMQ bindings to align with live ranking updates and future RCON feedback loops
+  - High priority (`hlstats.events.priority`): `player.kill`, `player.suicide`, `player.teamkill`, `action.*`
+  - Standard (`hlstats.events.standard`): `player.connect`, `player.disconnect`, `player.entry`, `player.change.*`, `admin.*`, `team.*`, `map.*`, `round.*`, `bomb.*`, `hostage.*`, `flag.*`, `control.*`
+  - Bulk (`hlstats.events.bulk`): `weapon.*`, `stats.*`, `chat.*`
+- ✅ Updated in-code topology (`queue/rabbitmq/client.ts`) and development config (`messaging/module.ts`)
+- ✅ Synchronized Docker RabbitMQ `definitions.json`
+- ✅ Adjusted tests to reflect new default priority mapping and bindings
+- ✅ All quality gates green: lint, type-check, and tests
+
 #### **Game-Specific Parsers**
 
 - [ ] Team Fortress Classic parser

@@ -375,16 +375,7 @@ describe("Factory Functions", () => {
 
       expect(config.queues.priority).toEqual({
         name: "hlstats.events.priority",
-        bindings: [
-          "player.kill",
-          "player.suicide",
-          "player.teamkill",
-          "round.*",
-          "bomb.*",
-          "hostage.*",
-          "flag.*",
-          "control.*",
-        ],
+        bindings: ["player.kill", "player.suicide", "player.teamkill", "action.*"],
         options: {
           durable: true,
           autoDelete: false,
@@ -401,10 +392,14 @@ describe("Factory Functions", () => {
           "player.disconnect",
           "player.entry",
           "player.change.*",
-          "chat.*",
           "admin.*",
           "team.*",
           "map.*",
+          "round.*",
+          "bomb.*",
+          "hostage.*",
+          "flag.*",
+          "control.*",
         ],
         options: {
           durable: true,
@@ -417,7 +412,7 @@ describe("Factory Functions", () => {
 
       expect(config.queues.bulk).toEqual({
         name: "hlstats.events.bulk",
-        bindings: ["weapon.*", "action.*", "stats.*"],
+        bindings: ["weapon.*", "stats.*", "chat.*"],
         options: {
           durable: true,
           autoDelete: false,

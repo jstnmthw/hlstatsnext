@@ -48,11 +48,12 @@ describe("IngressService", () => {
       },
     }
 
-    ingressService = new IngressService(mockLogger, mockEventPublisher, mockDependencies, {
+    ingressService = new IngressService(mockLogger, mockDependencies, {
       port: 27501,
       skipAuth: true,
       logBots: false,
     })
+    ingressService.setPublisher(mockEventPublisher)
   })
 
   afterEach(() => {

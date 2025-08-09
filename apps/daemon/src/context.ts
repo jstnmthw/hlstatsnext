@@ -141,7 +141,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     { skipAuth: ingressOptions?.skipAuth },
   )
 
-  // Initialize queue module and create dual publisher if available
+  // Initialize queue module if available (will be started later)
   if (queueModule) {
     try {
       // Initialize queue module asynchronously - we'll handle this in an async wrapper
@@ -152,24 +152,17 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     }
   }
 
-  // Temporary: Create minimal event emitter for ingress (will be replaced with queue publisher)
-  // Temporary placeholder - will be replaced with actual queue publisher
-  const eventPublisher: IEventPublisher = {
-    publish: async () => {
-      throw new Error("EventBus removed - ingress service will use queue publisher")
-    },
-    publishBatch: async () => {
-      throw new Error("EventBus removed - ingress service will use queue publisher")
-    },
+  // Create ingress service
+  const resolvedIngressOptions: IngressOptions = {
+    port:
+      ingressOptions?.port ??
+      (process.env.INGRESS_PORT ? parseInt(process.env.INGRESS_PORT, 10) : 27500),
+    host: ingressOptions?.host ?? "0.0.0.0",
+    skipAuth: ingressOptions?.skipAuth ?? process.env.NODE_ENV === "development",
+    logBots: ingressOptions?.logBots ?? process.env.NODE_ENV === "development",
   }
 
-  // Create ingress service
-  const ingressService = new IngressService(
-    logger,
-    eventPublisher,
-    ingressDependencies,
-    ingressOptions,
-  )
+  const ingressService = new IngressService(logger, ingressDependencies, resolvedIngressOptions)
 
   // Create event metrics
   const eventMetrics = new EventMetrics(logger)
@@ -306,36 +299,22 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
     // Get the queue publisher directly (all events now queue-only)
     context.eventPublisher = context.queueModule.getPublisher()
 
-    // No coordinators needed - module handlers handle all logic
+    // Provide publisher to ingress explicitly
+    context.ingressService.setPublisher(context.eventPublisher)
+
+    // Start RabbitMQ consumer via queue module
     const coordinators: EventCoordinator[] = []
+    await context.queueModule.startRabbitMQConsumer(context.moduleRegistry, coordinators)
 
-    context.rabbitmqConsumer = new RabbitMQConsumer(
-      context.queueModule.getClient(),
-      context.logger,
-      context.moduleRegistry,
-      coordinators,
-    )
-
-    // Start the RabbitMQ consumer
-    await context.rabbitmqConsumer.start()
-
-    // Replace the ingress service's event publisher with the actual queue publisher
-    const ingressService = context.ingressService as unknown as {
-      eventPublisher: IEventPublisher
-    }
-
-    // Replace the event publisher with the actual queue publisher
-    Object.defineProperty(ingressService, "eventPublisher", {
-      value: context.eventPublisher,
-      writable: false,
-    })
+    // Keep a reference for shutdown if needed
+    context.rabbitmqConsumer = context.queueModule.getRabbitMQConsumer()
 
     context.logger.info(
       "Queue infrastructure initialized - queue-first publishing and RabbitMQ consumer enabled",
     )
   } catch (error) {
     context.logger.error(`Failed to initialize queue infrastructure: ${error}`)
-    context.logger.warn("Continuing with EventBus only")
+    context.logger.warn("Queue unavailable; ingress will not publish until queue is available")
 
     // Clean up failed queue module
     if (context.rabbitmqConsumer) {

@@ -3,6 +3,7 @@
  */
 
 import type { BaseEvent } from "@/shared/types/events"
+import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 
 export interface IngressOptions {
   port?: number
@@ -23,6 +24,7 @@ export interface IIngressService {
   stop(): void
   isRunning(): boolean
   getStats(): IngressStats
+  setPublisher(publisher: IEventPublisher): void
   processRawEvent(
     rawData: string,
     serverAddress: string,

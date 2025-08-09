@@ -432,3 +432,8 @@ Comprehensive testing, bug fixes, and RC preparation.
 ### Current Status
 
 The daemon has a solid foundation with complete player lifecycle tracking. The next priority is expanding game support and building the API layer for integration with the web frontend.
+
+### Roadmap and documentation updates
+
+- Added `apps/daemon/docs/ROADMAP.md` with an up-to-date plan covering immediate next steps (history/activity, GeoIP, objective persistence, server load), short-/medium-term items (awards/ribbons, admin/bans, multi-game parsers, caching, distributed processing), and RC readiness criteria.
+- Added legacy mapping document `docs/legacy/hlstatsx-data-models.md` that details how the legacy daemon populated every table we model with Prisma. This serves as a reference for parity and for designing migration tests.

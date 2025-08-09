@@ -17,6 +17,9 @@ import type {
   RabbitMQConfig,
   QueueModuleDependencies,
 } from "./queue/core/types"
+import { RabbitMQConsumer } from "./queue/rabbitmq/consumer"
+import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
+import type { EventCoordinator } from "@/shared/application/event-coordinator"
 
 /**
  * Configuration for the queue module
@@ -37,6 +40,7 @@ export class QueueModule {
   private client: IQueueClient | null = null
   private publisher: IEventPublisher | null = null
   private consumer: IEventConsumer | null = null
+  private rabbitmqConsumer: RabbitMQConsumer | null = null
 
   constructor(
     private readonly config: QueueModuleConfig,
@@ -108,6 +112,31 @@ export class QueueModule {
   }
 
   /**
+   * Start RabbitMQ consumer integrated with the module registry
+   */
+  async startRabbitMQConsumer(
+    moduleRegistry: ModuleRegistry,
+    coordinators: EventCoordinator[] = [],
+  ): Promise<RabbitMQConsumer> {
+    if (!this.client) {
+      throw new Error("Queue module not initialized - client not available")
+    }
+
+    const consumer = new RabbitMQConsumer(this.client, this.logger, moduleRegistry, coordinators)
+    await consumer.start()
+    this.rabbitmqConsumer = consumer
+    return consumer
+  }
+
+  /**
+   * Get the started RabbitMQ consumer instance
+   */
+  getRabbitMQConsumer(): RabbitMQConsumer {
+    if (!this.rabbitmqConsumer) {
+      throw new Error("RabbitMQ consumer not started")
+    }
+    return this.rabbitmqConsumer
+  }
 
   /**
    * Check if the module is initialized
@@ -135,6 +164,12 @@ export class QueueModule {
     this.logger.info("Shutting down queue module...")
 
     try {
+      // Stop rabbitmq consumer wrapper if running
+      if (this.rabbitmqConsumer) {
+        await this.rabbitmqConsumer.stop()
+        this.rabbitmqConsumer = null
+      }
+
       // Stop consumer
       if (this.consumer) {
         await this.consumer.stop()

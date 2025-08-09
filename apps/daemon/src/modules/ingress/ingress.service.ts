@@ -23,18 +23,18 @@ export class IngressService implements IIngressService {
     startTime: undefined,
   }
   private running: boolean = false
+  private eventPublisher: IEventPublisher | null = null
 
   constructor(
     private readonly logger: ILogger,
-    private readonly eventPublisher: IEventPublisher,
     private readonly dependencies: IngressDependencies,
     options: IngressOptions = {},
   ) {
     this.options = {
-      port: process.env.INGRESS_PORT ? parseInt(process.env.INGRESS_PORT, 10) : 27500,
+      port: 27500,
       host: "0.0.0.0",
-      skipAuth: process.env.NODE_ENV === "development",
-      logBots: process.env.NODE_ENV === "development",
+      skipAuth: false,
+      logBots: false,
       ...options,
     }
 
@@ -44,9 +44,17 @@ export class IngressService implements IIngressService {
     )
   }
 
+  setPublisher(publisher: IEventPublisher): void {
+    this.eventPublisher = publisher
+  }
+
   async start(): Promise<void> {
     if (this.running) {
       throw new Error("IngressService is already running")
+    }
+
+    if (!this.eventPublisher) {
+      throw new Error("IngressService requires an event publisher before start()")
     }
 
     // Wire up UDP server events
@@ -156,6 +164,12 @@ export class IngressService implements IIngressService {
       const event = await this.processRawEvent(logLine.trim(), serverAddress, serverPort)
 
       if (event) {
+        if (!this.eventPublisher) {
+          this.logger.warn("Event publisher not set; dropping ingress event", {
+            eventType: event.eventType,
+          })
+          return
+        }
         // Publish event to queue
         await this.eventPublisher.publish(event)
         this.logger.queue(`Event emitted: ${event.eventType} (Server ID: ${event.serverId})`, {

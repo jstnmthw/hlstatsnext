@@ -302,17 +302,7 @@ export class RabbitMQClient implements IQueueClient {
 
   private async createBindings(channel: QueueChannel): Promise<void> {
     // Priority queue bindings (high-priority events)
-    const priorityBindings = [
-      "player.kill",
-      "player.suicide",
-      "player.teamkill",
-      "round.start",
-      "round.end",
-      "bomb.*",
-      "hostage.*",
-      "flag.*",
-      "control.*",
-    ]
+    const priorityBindings = ["player.kill", "player.suicide", "player.teamkill", "action.*"]
 
     for (const binding of priorityBindings) {
       await channel.bindQueue("hlstats.events.priority", "hlstats.events", binding)
@@ -323,10 +313,14 @@ export class RabbitMQClient implements IQueueClient {
       "player.connect",
       "player.disconnect",
       "player.change.*",
-      "chat.*",
       "admin.*",
       "team.*",
       "map.*",
+      "round.*",
+      "bomb.*",
+      "hostage.*",
+      "flag.*",
+      "control.*",
     ]
 
     for (const binding of standardBindings) {
@@ -334,7 +328,7 @@ export class RabbitMQClient implements IQueueClient {
     }
 
     // Bulk queue bindings (high-volume events)
-    const bulkBindings = ["weapon.*", "action.*", "stats.*"]
+    const bulkBindings = ["weapon.*", "stats.*", "chat.*"]
 
     for (const binding of bulkBindings) {
       await channel.bindQueue("hlstats.events.bulk", "hlstats.events", binding)

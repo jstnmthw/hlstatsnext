@@ -156,13 +156,21 @@
       "vhost": "hlstats",
       "destination": "hlstats.events.priority",
       "destination_type": "queue",
+      "routing_key": "action.*",
+      "arguments": {}
+    },
+    {
+      "source": "hlstats.events",
+      "vhost": "hlstats",
+      "destination": "hlstats.events.standard",
+      "destination_type": "queue",
       "routing_key": "round.*",
       "arguments": {}
     },
     {
       "source": "hlstats.events",
       "vhost": "hlstats",
-      "destination": "hlstats.events.priority",
+      "destination": "hlstats.events.standard",
       "destination_type": "queue",
       "routing_key": "bomb.*",
       "arguments": {}
@@ -170,7 +178,7 @@
     {
       "source": "hlstats.events",
       "vhost": "hlstats",
-      "destination": "hlstats.events.priority",
+      "destination": "hlstats.events.standard",
       "destination_type": "queue",
       "routing_key": "hostage.*",
       "arguments": {}
@@ -178,7 +186,7 @@
     {
       "source": "hlstats.events",
       "vhost": "hlstats",
-      "destination": "hlstats.events.priority",
+      "destination": "hlstats.events.standard",
       "destination_type": "queue",
       "routing_key": "flag.*",
       "arguments": {}
@@ -186,7 +194,7 @@
     {
       "source": "hlstats.events",
       "vhost": "hlstats",
-      "destination": "hlstats.events.priority",
+      "destination": "hlstats.events.standard",
       "destination_type": "queue",
       "routing_key": "control.*",
       "arguments": {}
@@ -218,7 +226,7 @@
     {
       "source": "hlstats.events",
       "vhost": "hlstats",
-      "destination": "hlstats.events.standard",
+      "destination": "hlstats.events.bulk",
       "destination_type": "queue",
       "routing_key": "chat.*",
       "arguments": {}
@@ -260,7 +268,7 @@
       "vhost": "hlstats",
       "destination": "hlstats.events.bulk",
       "destination_type": "queue",
-      "routing_key": "action.*",
+      "routing_key": "stats.*",
       "arguments": {}
     },
     {
@@ -268,7 +276,7 @@
       "vhost": "hlstats",
       "destination": "hlstats.events.bulk",
       "destination_type": "queue",
-      "routing_key": "stats.*",
+      "routing_key": "weapon.*",
       "arguments": {}
     },
     {

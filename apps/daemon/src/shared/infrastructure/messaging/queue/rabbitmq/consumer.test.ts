@@ -427,6 +427,8 @@ describe("defaultRabbitMQConsumerConfig", () => {
       maxRetryDelay: 30000,
       concurrency: 10,
       queues: ["hlstats.events.priority", "hlstats.events.standard", "hlstats.events.bulk"],
+      logMetrics: true,
+      metricsInterval: 30000,
     })
   })
 })

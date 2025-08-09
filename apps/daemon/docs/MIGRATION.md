@@ -224,6 +224,13 @@ Implement round and match event handling with proper event routing.
 - ✅ **MatchHandler**: Manages round state, match statistics, and player round participation
 - ✅ **Clean separation**: Database persistence vs. in-memory state management properly separated
 
+#### **Queue-First Visibility Improvements** ✅
+
+- ✅ Added periodic INFO-level metrics for the real RabbitMQ consumer mirroring Shadow Consumer output
+  - Logs every 30 seconds by default (configurable via `metricsInterval`)
+  - Includes: Events Received, Events Processed, Validation Errors, Events/sec, per-queue received/processed/errors
+  - Controlled via consumer config flags: `logMetrics` (default: true), `metricsInterval` (default: 30000)
+
 ### Phase 4 Metrics
 
 - **Bug Fixes**: 1 critical event routing issue resolved

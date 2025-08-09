@@ -24,7 +24,7 @@ This document updates and supersedes parts of `apps/daemon/docs/MIGRATION.md`, c
   - Weapon multiplier cache + repository-backed lookup.
   - Elo-like rating adjustments with bounds, victim loss ratio, suicide/TK penalties, per-weapon modifiers.
 - Messaging (RabbitMQ module)
-  - Pluggable client with publisher/consumer, topology setup, shadow consumer for migration validation.
+  - Pluggable client with publisher/consumer and topology setup. Shadow consumer removed; rely on real consumer metrics.
   - Message schema (routing key, priority, correlation IDs), retry, and metrics.
 - Observability
   - Structured logger with levels and service lifecycle helpers.

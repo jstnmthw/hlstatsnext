@@ -81,7 +81,7 @@ describe("EventPublisher", () => {
       )
 
       expect(mockLogger.queue).toHaveBeenCalledWith(
-        "Event published: PLAYER_KILL",
+        "Event published: PLAYER_KILL (Server ID: 1)",
         expect.objectContaining({
           messageId: expect.any(String),
           eventType: EventType.PLAYER_KILL,

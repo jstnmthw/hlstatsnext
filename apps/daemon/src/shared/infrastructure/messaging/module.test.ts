@@ -17,7 +17,6 @@ import type {
   RabbitMQConfig,
 } from "./queue/core/types"
 import type { IEventProcessor } from "./queue/core/consumer"
-import type { ShadowConsumer } from "./migration/shadow-consumer"
 
 // Mock the imported modules
 vi.mock("./queue/rabbitmq/client", () => ({
@@ -29,10 +28,6 @@ vi.mock("./queue/core/publisher", () => ({
 vi.mock("./queue/core/consumer", () => ({
   EventConsumer: vi.fn(),
 }))
-vi.mock("./migration/shadow-consumer", () => ({
-  ShadowConsumer: vi.fn(),
-  defaultShadowConsumerConfig: {},
-}))
 
 describe.skip("QueueModule", () => {
   let queueModule: QueueModule
@@ -41,7 +36,6 @@ describe.skip("QueueModule", () => {
   let mockClient: IQueueClient
   let mockPublisher: IEventPublisher
   let mockConsumer: IEventConsumer
-  let mockShadowConsumer: ShadowConsumer
   let mockEventProcessor: IEventProcessor
 
   beforeEach(async () => {
@@ -69,12 +63,6 @@ describe.skip("QueueModule", () => {
       stop: vi.fn().mockResolvedValue(undefined),
       getConsumerStats: vi.fn().mockReturnValue({ processed: 0, errors: 0 }),
     } as unknown as IEventConsumer
-
-    mockShadowConsumer = {
-      start: vi.fn().mockResolvedValue(undefined),
-      stop: vi.fn().mockResolvedValue(undefined),
-      getStats: vi.fn().mockReturnValue({ messages: 0, errors: 0 }),
-    } as unknown as ShadowConsumer
 
     mockEventProcessor = {
       processEvent: vi.fn().mockResolvedValue(undefined),
@@ -105,7 +93,6 @@ describe.skip("QueueModule", () => {
         },
       },
       autoStartConsumers: false,
-      autoStartShadowConsumer: false,
       autoSetupTopology: true,
     }
 
@@ -113,7 +100,6 @@ describe.skip("QueueModule", () => {
     const { RabbitMQClient } = await import("./queue/rabbitmq/client.js")
     const { EventPublisher } = await import("./queue/core/publisher.js")
     const { EventConsumer } = await import("./queue/core/consumer.js")
-    const { ShadowConsumer } = await import("./migration/shadow-consumer.js")
 
     vi.mocked(RabbitMQClient).mockImplementation(
       () => mockClient as unknown as typeof RabbitMQClient.prototype,
@@ -123,9 +109,6 @@ describe.skip("QueueModule", () => {
     )
     vi.mocked(EventConsumer).mockImplementation(
       () => mockConsumer as unknown as typeof EventConsumer.prototype,
-    )
-    vi.mocked(ShadowConsumer).mockImplementation(
-      () => mockShadowConsumer as unknown as typeof ShadowConsumer.prototype,
     )
 
     queueModule = new QueueModule(config, logger)
@@ -161,14 +144,7 @@ describe.skip("QueueModule", () => {
       expect(mockConsumer.start).toHaveBeenCalledTimes(1)
     })
 
-    it("should auto-start shadow consumer when configured", async () => {
-      const autoStartConfig = { ...config, autoStartShadowConsumer: true }
-      const autoStartModule = new QueueModule(autoStartConfig, logger)
-
-      await autoStartModule.initialize(mockEventProcessor)
-
-      expect(mockShadowConsumer.start).toHaveBeenCalledTimes(1)
-    })
+    // Shadow consumer removed
 
     it("should handle initialization errors", async () => {
       const error = new Error("Connection failed")
@@ -201,10 +177,7 @@ describe.skip("QueueModule", () => {
       expect(consumer).toBe(mockConsumer)
     })
 
-    it("should return shadow consumer when initialized", () => {
-      const shadowConsumer = queueModule.getShadowConsumer()
-      expect(shadowConsumer).toBe(mockShadowConsumer)
-    })
+    // Shadow consumer removed
 
     it("should throw error when getting client before initialization", () => {
       const uninitializedModule = new QueueModule(config, logger)
@@ -227,39 +200,10 @@ describe.skip("QueueModule", () => {
       )
     })
 
-    it("should throw error when getting shadow consumer before initialization", () => {
-      const uninitializedModule = new QueueModule(config, logger)
-      expect(() => uninitializedModule.getShadowConsumer()).toThrow("Shadow consumer not available")
-    })
+    // Shadow consumer removed
   })
 
-  describe("Shadow Consumer Management", () => {
-    beforeEach(async () => {
-      await queueModule.initialize()
-    })
-
-    it("should start shadow consumer", async () => {
-      await queueModule.startShadowConsumer()
-      expect(mockShadowConsumer.start).toHaveBeenCalledTimes(1)
-    })
-
-    it("should stop shadow consumer", async () => {
-      await queueModule.stopShadowConsumer()
-      expect(mockShadowConsumer.stop).toHaveBeenCalledTimes(1)
-    })
-
-    it("should handle stop shadow consumer when not available", async () => {
-      const uninitializedModule = new QueueModule(config, logger)
-      await expect(uninitializedModule.stopShadowConsumer()).resolves.toBeUndefined()
-    })
-
-    it("should throw error when starting shadow consumer before initialization", async () => {
-      const uninitializedModule = new QueueModule(config, logger)
-      await expect(uninitializedModule.startShadowConsumer()).rejects.toThrow(
-        "Shadow consumer not available",
-      )
-    })
-  })
+  // Shadow consumer removed
 
   describe("Status and Monitoring", () => {
     it("should return correct status when uninitialized", () => {
@@ -267,7 +211,7 @@ describe.skip("QueueModule", () => {
 
       expect(status.initialized).toBe(false)
       expect(status.connected).toBe(false)
-      expect(status.hasShadowConsumer).toBe(false)
+      // Shadow consumer removed
     })
 
     it("should return correct status when initialized", async () => {
@@ -276,10 +220,10 @@ describe.skip("QueueModule", () => {
 
       expect(status.initialized).toBe(true)
       expect(status.connected).toBe(true)
-      expect(status.hasShadowConsumer).toBe(true)
+      // Shadow consumer removed
       expect(status.connectionStats).toEqual({ connected: true, messages: 0 })
       expect(status.consumerStats).toEqual({ processed: 0, errors: 0 })
-      expect(status.shadowConsumerStats).toEqual({ messages: 0, errors: 0 })
+      // Shadow consumer removed
     })
 
     it("should report not initialized correctly", () => {
@@ -300,7 +244,7 @@ describe.skip("QueueModule", () => {
     it("should shutdown gracefully", async () => {
       await queueModule.shutdown()
 
-      expect(mockShadowConsumer.stop).toHaveBeenCalledTimes(1)
+      // Shadow consumer removed
       expect(mockConsumer.stop).toHaveBeenCalledTimes(1)
       expect(mockClient.disconnect).toHaveBeenCalledTimes(1)
       expect(logger.info).toHaveBeenCalledWith("Shutting down queue module...")
@@ -325,32 +269,7 @@ describe.skip("QueueModule", () => {
     })
   })
 
-  describe("Configuration", () => {
-    it("should use shadow consumer config when provided", async () => {
-      const customShadowConfig = {
-        queues: ["custom.queue"],
-        metricsInterval: 5000,
-      }
-
-      const configWithShadow = {
-        ...config,
-        shadowConsumer: customShadowConfig,
-      }
-
-      // Reset mocks for this specific test
-      vi.clearAllMocks()
-
-      const moduleWithCustomShadow = new QueueModule(configWithShadow, logger)
-      await moduleWithCustomShadow.initialize()
-
-      const { ShadowConsumer } = await import("./migration/shadow-consumer.js")
-      expect(ShadowConsumer).toHaveBeenCalledWith(
-        mockClient,
-        expect.objectContaining(customShadowConfig),
-        logger,
-      )
-    })
-  })
+  // Shadow consumer removed
 })
 
 describe("Factory Functions", () => {
@@ -423,7 +342,6 @@ describe("Factory Functions", () => {
 
       const overrides = {
         autoStartConsumers: true,
-        autoStartShadowConsumer: false,
       }
 
       const module = createQueueModule(rabbitmqConfig, logger, overrides)

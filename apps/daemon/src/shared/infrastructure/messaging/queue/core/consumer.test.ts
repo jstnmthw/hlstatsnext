@@ -2,7 +2,7 @@
  * Event Consumer Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import {
   EventConsumer,
   defaultConsumerConfig,
@@ -30,6 +30,7 @@ describe("EventConsumer", () => {
   let config: ConsumerConfig
 
   beforeEach(() => {
+    vi.useFakeTimers()
     mockChannel = {
       consume: vi.fn().mockResolvedValue("test.queue-123-456"),
       cancel: vi.fn().mockResolvedValue(undefined),
@@ -64,6 +65,10 @@ describe("EventConsumer", () => {
     }
 
     consumer = new EventConsumer(mockClient, mockProcessor, mockLogger, config)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   describe("Lifecycle Management", () => {
@@ -193,7 +198,7 @@ describe("EventConsumer", () => {
       )
       expect(mockChannel.ack).toHaveBeenCalledWith(mockMessage)
       expect(mockLogger.queue).toHaveBeenCalledWith(
-        "Event received: PLAYER_KILL",
+        "Event received: PLAYER_KILL (Server ID: 1)",
         expect.objectContaining({
           messageId: "msg-123",
           eventType: EventType.PLAYER_KILL,
@@ -383,14 +388,16 @@ describe("EventConsumer", () => {
     })
 
     it("should calculate average processing time", async () => {
+      // Use real timers for this test to avoid fake timer pitfalls
+      vi.useRealTimers()
       await consumer.start()
 
       const consumeCall = vi.mocked(mockChannel.consume).mock.calls[0]
       const messageHandler = consumeCall?.[1] as (msg: ConsumeMessage) => Promise<void>
 
-      // Mock processing time by controlling the process duration
+      // Introduce a real delay to ensure a measurable processing time
       vi.mocked(mockProcessor.processEvent).mockImplementation(
-        () => new Promise((resolve) => setTimeout(resolve, 100)),
+        () => new Promise((resolve) => setTimeout(resolve, 15)),
       )
 
       const eventMessage: EventMessage = {
@@ -420,6 +427,70 @@ describe("EventConsumer", () => {
 
       const stats = consumer.getConsumerStats()
       expect(stats.averageProcessingTime).toBeGreaterThan(0)
+
+      // Restore fake timers for subsequent tests
+      vi.useFakeTimers()
+    })
+  })
+
+  describe("Periodic Metrics Logging", () => {
+    it("should log metrics at the configured interval", async () => {
+      const metricsConfig: ConsumerConfig = {
+        ...config,
+        metricsInterval: 100,
+        logMetrics: true,
+      }
+
+      consumer = new EventConsumer(mockClient, mockProcessor, mockLogger, metricsConfig)
+
+      await consumer.start()
+
+      // Extract the message handler
+      const consumeCall = vi.mocked(mockChannel.consume).mock.calls[0]
+      const messageHandler = consumeCall?.[1] as (msg: ConsumeMessage) => Promise<void>
+
+      const eventMessage: EventMessage = {
+        id: "msg-123",
+        version: "1.0",
+        timestamp: "2023-01-01T00:00:00.000Z",
+        correlationId: "corr-456",
+        payload: {
+          eventType: EventType.PLAYER_KILL,
+          serverId: 1,
+          timestamp: new Date(),
+          data: {},
+        },
+        metadata: {
+          source: { serverId: 1, serverAddress: "127.0.0.1", serverPort: 27015 },
+          routing: { key: "player.kill", priority: 1, retryCount: 0 },
+        },
+      }
+
+      const mockMessage: ConsumeMessage = {
+        content: Buffer.from(JSON.stringify(eventMessage)),
+        properties: {},
+        fields: {},
+      } as ConsumeMessage
+
+      await messageHandler(mockMessage)
+
+      // Advance timers to trigger metrics log
+      vi.advanceTimersByTime(100)
+
+      expect(mockLogger.info).toHaveBeenCalledWith("Queue Consumer Metrics:")
+      expect(mockLogger.info).toHaveBeenCalledWith(expect.stringMatching(/^\s{2}Events Received: /))
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringMatching(/^\s{2}Events Processed: /),
+      )
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringMatching(/^\s{2}Validation Errors: /),
+      )
+      expect(mockLogger.info).toHaveBeenCalledWith(expect.stringMatching(/^\s{2}Events\/sec: /))
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringMatching(/^\s{2}Queue test\.queue: \d+ received, \d+ processed, \d+ errors$/),
+      )
+
+      await consumer.stop()
     })
   })
 
@@ -578,6 +649,8 @@ describe("Default Consumer Config", () => {
       maxRetryDelay: 30000,
       concurrency: 10,
       queues: ["hlstats.events.priority", "hlstats.events.standard", "hlstats.events.bulk"],
+      logMetrics: true,
+      metricsInterval: 30000,
     })
   })
 })

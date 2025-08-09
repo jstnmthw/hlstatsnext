@@ -40,6 +40,10 @@ export interface ConsumerConfig {
   readonly maxRetryDelay: number
   readonly concurrency: number
   readonly queues: readonly string[]
+  /** Enable periodic metrics logging */
+  readonly logMetrics?: boolean
+  /** Interval for periodic metrics logging (ms) */
+  readonly metricsInterval?: number
 }
 
 /**
@@ -64,6 +68,21 @@ export class EventConsumer implements IEventConsumer {
   private processingTimes: number[] = []
   private readonly maxProcessingTimesSamples = 1000
 
+  // Metrics reporting
+  private metricsTimer: NodeJS.Timeout | null = null
+  private startTime: Date = new Date()
+  private eventsReceived = 0
+  private validationErrors = 0
+  private queueStats: Record<
+    string,
+    {
+      received: number
+      processed: number
+      errors: number
+      lastProcessedAt?: Date
+    }
+  > = {}
+
   constructor(
     private readonly client: IQueueClient,
     private readonly processor: IEventProcessor,
@@ -78,6 +97,16 @@ export class EventConsumer implements IEventConsumer {
     }
 
     try {
+      // Initialize metrics state
+      this.startTime = new Date()
+      this.eventsReceived = 0
+      this.validationErrors = 0
+      this.queueStats = {}
+
+      for (const queueName of this.config.queues) {
+        this.queueStats[queueName] = { received: 0, processed: 0, errors: 0 }
+      }
+
       // Start consuming from all configured queues
       await Promise.all(this.config.queues.map((queueName) => this.consumeQueue(queueName)))
 
@@ -88,6 +117,14 @@ export class EventConsumer implements IEventConsumer {
       this.logger.info(
         `Event consumer started successfully for queues: ${this.config.queues.join(", ")} with concurrency: ${this.config.concurrency}`,
       )
+
+      // Start periodic metrics logging if enabled
+      if (this.config.logMetrics !== false) {
+        const interval = this.config.metricsInterval ?? 30000
+        this.metricsTimer = setInterval(() => {
+          this.logMetrics()
+        }, interval)
+      }
     } catch (error) {
       this.logger.error(`Failed to start event consumer: ${error}`)
       throw new QueueConsumeError("Failed to start consumer", error as Error)
@@ -100,6 +137,12 @@ export class EventConsumer implements IEventConsumer {
     }
 
     try {
+      // Stop metrics timer
+      if (this.metricsTimer) {
+        clearInterval(this.metricsTimer)
+        this.metricsTimer = null
+      }
+
       // Cancel all consumers
       for (const [queueName, channel] of this.channels) {
         const consumerTag = this.consumerTags.find((tag) => tag.startsWith(queueName))
@@ -157,6 +200,10 @@ export class EventConsumer implements IEventConsumer {
           return
         }
 
+        // Increment received counters
+        this.eventsReceived++
+        this.queueStats[queueName]!.received++
+
         await this.handleMessage(msg, channel, queueName)
       },
       {
@@ -186,6 +233,9 @@ export class EventConsumer implements IEventConsumer {
         )
 
         await this.rejectMessage(msg, channel, "Invalid message format")
+        // Count parse/validation error against metrics
+        this.validationErrors++
+        this.queueStats[queueName]!.errors++
         return
       }
 
@@ -193,14 +243,22 @@ export class EventConsumer implements IEventConsumer {
       messageId = message.id
 
       // Validate message
-      await this.messageValidator(message)
+      try {
+        await this.messageValidator(message)
+      } catch (validationError) {
+        this.validationErrors++
+        throw validationError
+      }
 
-      this.logger.queue(`Event received: ${message.payload.eventType}`, {
-        messageId,
-        eventType: message.payload.eventType,
-        queueName,
-        retryCount: message.metadata.routing.retryCount,
-      })
+      this.logger.queue(
+        `Event received: ${message.payload.eventType} (Server ID: ${message.metadata.source.serverId})`,
+        {
+          messageId,
+          eventType: message.payload.eventType,
+          queueName,
+          retryCount: message.metadata.routing.retryCount,
+        },
+      )
 
       // Process the event
       await this.processor.processEvent(message.payload)
@@ -209,6 +267,8 @@ export class EventConsumer implements IEventConsumer {
       await channel.ack(msg)
       this.stats.messagesAcked++
       this.stats.messagesProcessed++
+      this.queueStats[queueName]!.processed++
+      this.queueStats[queueName]!.lastProcessedAt = new Date()
 
       const processingTime = Date.now() - startTime
       this.recordProcessingTime(processingTime)
@@ -222,6 +282,9 @@ export class EventConsumer implements IEventConsumer {
       this.logger.error(
         `Error processing message ${messageId} from ${queueName} in ${formatDuration(processingTime)}: ${error instanceof Error ? error.message : String(error)}`,
       )
+
+      // Track per-queue errors
+      this.queueStats[queueName]!.errors++
 
       await this.handleProcessingError(msg, channel, error as Error)
     }
@@ -361,6 +424,27 @@ export class EventConsumer implements IEventConsumer {
     const sum = this.processingTimes.reduce((acc, time) => acc + time, 0)
     return sum / this.processingTimes.length
   }
+
+  /**
+   * Periodic metrics logger to mirror Shadow Consumer metrics for real processing
+   */
+  private logMetrics(): void {
+    const uptimeMs = Date.now() - this.startTime.getTime()
+    const eventsPerSecond = uptimeMs > 0 ? this.eventsReceived / (uptimeMs / 1000) : 0
+
+    this.logger.info(`Queue Consumer Metrics:`)
+    this.logger.info(`  Events Received: ${this.eventsReceived}`)
+    this.logger.info(`  Events Processed: ${this.stats.messagesProcessed}`)
+    this.logger.info(`  Validation Errors: ${this.validationErrors}`)
+    this.logger.info(`  Events/sec: ${eventsPerSecond.toFixed(2)}`)
+
+    // Per-queue stats
+    for (const [queueName, q] of Object.entries(this.queueStats)) {
+      this.logger.info(
+        `  Queue ${queueName}: ${q.received} received, ${q.processed} processed, ${q.errors} errors`,
+      )
+    }
+  }
 }
 
 /**
@@ -372,6 +456,8 @@ export const defaultConsumerConfig: ConsumerConfig = {
   maxRetryDelay: 30000,
   concurrency: 10,
   queues: ["hlstats.events.priority", "hlstats.events.standard", "hlstats.events.bulk"],
+  logMetrics: true,
+  metricsInterval: 30000,
 }
 
 /**

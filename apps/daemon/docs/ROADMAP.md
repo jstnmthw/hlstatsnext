@@ -116,7 +116,7 @@ Gaps vs. legacy parity
 ## Long-term (RC readiness)
 
 - Parity checklist
-  - Model coverage matches legacy tables documented in `docs/legacy/hlstatsx-data-models.md`.
+  - Model coverage matches legacy tables documented in `docs/HLSTATSX_MODELS.md`.
   - Awards/ribbons reproducible vs. legacy for a sample dataset.
   - Multi-game parsing validated with fixtures.
   - Daemon operates queue-first with idempotent processing, retries, and DLQ.

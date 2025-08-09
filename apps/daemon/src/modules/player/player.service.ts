@@ -45,6 +45,8 @@ export class PlayerService implements IPlayerService {
     private readonly logger: ILogger,
     private readonly rankingService: IRankingService,
     private readonly matchService?: IMatchService,
+    // Optional injected services for enrichment and config (added for roadmap tasks)
+    private readonly geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
   ) {}
 
   async getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number> {
@@ -434,9 +436,38 @@ export class PlayerService implements IPlayerService {
         return { success: false, error: "Invalid event type for handlePlayerConnect" }
       }
       const connectEvent = event as PlayerConnectEvent
-      const { playerId } = connectEvent.data
+      const { playerId, ipAddress } = connectEvent.data
 
-      await this.updatePlayerStats(playerId, { lastEvent: new Date() })
+      // GeoIP enrichment (best-effort)
+      let geoUpdates: Record<string, unknown> | undefined
+      if (this.geoipService && ipAddress) {
+        try {
+          const geo = (await this.geoipService.lookup(ipAddress)) as {
+            city?: string
+            country?: string
+            latitude?: number
+            longitude?: number
+            flag?: string
+          } | null
+          if (geo) {
+            geoUpdates = {
+              city: geo.city ?? undefined,
+              country: geo.country ?? undefined,
+              flag: geo.flag ?? undefined,
+              lat: geo.latitude ?? undefined,
+              lng: geo.longitude ?? undefined,
+              lastAddress: ipAddress.split(":")[0],
+            }
+          }
+        } catch {
+          // ignore geo failures
+        }
+      }
+
+      await this.updatePlayerStats(playerId, {
+        lastEvent: new Date(),
+        ...(geoUpdates ?? {}),
+      } as PlayerStatsUpdate)
 
       // Update server activePlayers and lastEvent
       try {

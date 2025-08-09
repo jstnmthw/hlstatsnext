@@ -36,7 +36,6 @@ import {
   createDevelopmentRabbitMQConfig,
 } from "@/shared/infrastructure/messaging/module"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
-// Remove unused import - BaseEvent not needed in context
 import { EventType } from "@/shared/types/events"
 
 import { GameDetectionService } from "@/modules/game/game-detection.service"
@@ -164,7 +163,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     },
   }
 
-  // Create ingress service without circular dependency
+  // Create ingress service
   const ingressService = new IngressService(
     logger,
     eventPublisher,
@@ -250,12 +249,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   moduleRegistry.register({
     name: "server",
     handler: serverEventHandler,
-    handledEvents: [
-      // All server events migrated to queue-only processing (Phase 4):
-      // - SERVER_SHUTDOWN: Now queue-only
-      // - ADMIN_ACTION: Now queue-only
-      // - SERVER_STATS_UPDATE: Already queue-only
-    ],
+    handledEvents: [],
   })
 
   // Return complete context

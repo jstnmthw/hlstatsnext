@@ -42,6 +42,25 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
    * This is much cleaner than having multiple methods that do the same thing
    */
   async handleEvent(event: BaseEvent): Promise<void> {
+    // Apply per-server IgnoreBots for lifecycle events
+    if (
+      (event.eventType === EventType.PLAYER_CONNECT ||
+        event.eventType === EventType.PLAYER_DISCONNECT) &&
+      event.meta &&
+      typeof event.meta === "object" &&
+      (event.meta as PlayerMeta).isBot
+    ) {
+      const ignoreBots = await this.serverService.getServerConfigBoolean(
+        event.serverId,
+        "IgnoreBots",
+        true,
+      )
+      if (ignoreBots) {
+        this.logger.debug(`Ignoring bot ${event.eventType} due to server IgnoreBots=on`)
+        return
+      }
+    }
+
     const resolvedEvent = await this.resolvePlayerIds(event)
     await this.playerService.handlePlayerEvent(resolvedEvent)
   }

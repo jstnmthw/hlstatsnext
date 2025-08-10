@@ -265,6 +265,82 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
     }
   }
 
+  async createConnectEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    ipAddress: string,
+    options?: CreateOptions,
+  ): Promise<void> {
+    try {
+      this.validateId(serverId, "createConnectEvent")
+
+      await this.executeWithTransaction(async (client) => {
+        await client.eventConnect.create({
+          data: {
+            eventTime: new Date(),
+            serverId,
+            map: map || "",
+            playerId: playerId > 0 ? playerId : 0,
+            ipAddress: ipAddress || "",
+            hostname: "",
+            hostgroup: "",
+          },
+        })
+      }, options)
+
+      this.logger.debug(`Created connect event for player ${playerId} on server ${serverId}`)
+    } catch (error) {
+      this.handleError("createConnectEvent", error)
+    }
+  }
+
+  async createDisconnectEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    options?: CreateOptions,
+  ): Promise<void> {
+    try {
+      this.validateId(serverId, "createDisconnectEvent")
+
+      await this.executeWithTransaction(async (client) => {
+        // Insert a row to events_disconnect for immediate visibility
+        await client.eventDisconnect.create({
+          data: {
+            eventTime: new Date(),
+            serverId,
+            map: map || "",
+            playerId: playerId > 0 ? playerId : 0,
+          },
+        })
+
+        // Best-effort: also backfill disconnect time on the most recent connect row
+        try {
+          if (playerId > 0) {
+            const lastConnect = await client.eventConnect.findFirst({
+              where: { serverId, playerId },
+              orderBy: { id: "desc" },
+              select: { id: true },
+            })
+            if (lastConnect) {
+              await client.eventConnect.update({
+                where: { id: lastConnect.id },
+                data: { eventTimeDisconnect: new Date() },
+              })
+            }
+          }
+        } catch {
+          // ignore enrichment failure
+        }
+      }, options)
+
+      this.logger.debug(`Created disconnect event for player ${playerId} on server ${serverId}`)
+    } catch (error) {
+      this.handleError("createDisconnectEvent", error)
+    }
+  }
+
   async getPlayerStats(playerId: number, options?: FindOptions): Promise<Player | null> {
     try {
       this.validateId(playerId, "getPlayerStats")

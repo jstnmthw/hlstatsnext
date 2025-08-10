@@ -10,6 +10,7 @@ import type { IServerRepository, ServerInfo } from "./server.types"
 const createMockServerRepository = () => ({
   findById: vi.fn(),
   findByAddress: vi.fn(),
+  getServerConfig: vi.fn(),
 })
 
 describe("ServerService", () => {

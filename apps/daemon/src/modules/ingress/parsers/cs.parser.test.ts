@@ -165,6 +165,19 @@ describe("CsParser", () => {
         reason: "Disconnect",
       })
     })
+
+    it("should parse legacy disconnect without reason and slot -1", () => {
+      const logLine = '"Flying Martini<-1><><CT>" disconnected'
+      const result = parser.parseLine(logLine, serverId)
+
+      expect(result.success).toBe(true)
+      expect(result.event).not.toBeNull()
+      expect(result.event?.eventType).toBe(EventType.PLAYER_DISCONNECT)
+      expect(result.event?.data).toEqual({
+        playerId: -1,
+        reason: "",
+      })
+    })
   })
 
   describe("parseChatEvent", () => {

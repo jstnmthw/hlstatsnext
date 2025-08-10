@@ -454,3 +454,13 @@ The daemon has a solid foundation with complete player lifecycle tracking. The n
 ### Roadmap and documentation updates
 
 - Added `apps/daemon/docs/ROADMAP.md` with an up-to-date plan covering immediate next steps (history/activity, GeoIP, objective persistence, server load), short-/medium-term items (awards/ribbons, admin/bans, multi-game parsers, caching, distributed processing), and RC readiness criteria.
+
+---
+
+## Change Log
+
+- 2025-08-10
+  - Parser: Added support for legacy/GoldSrc-style connect lines ("entered the game") in `CsParser`.
+  - Persistence: Implemented connect/disconnect logging to `events_connect` and `events_disconnect` via `PlayerRepository.createConnectEvent`/`createDisconnectEvent`; on disconnect, backfills `event_time_disconnect` on the last connect row.
+  - Server Config: `ServerRepository.getServerConfig` + `ServerService.getServerConfigBoolean` added; `PlayerEventHandler` now honors per-server `IgnoreBots` to skip bot connect/disconnect lifecycle events when enabled.
+  - Validation: Lint, type-check, and full test suite green.

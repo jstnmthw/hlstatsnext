@@ -159,6 +159,78 @@ export class ServerInfoProviderAdapter implements IServerInfoProvider {
           this.logger.info(
             `Auto-created development server ${address}:${port} with ID ${server.serverId} (game: ${gameCode})`,
           )
+
+          // Seed per-server config from servers_config_default
+          try {
+            const defaults = await this.database.prisma.serverConfigDefault.findMany()
+            if (defaults.length > 0) {
+              await this.database.prisma.serverConfig.createMany({
+                data: defaults.map((d) => ({
+                  serverId: server!.serverId,
+                  parameter: d.parameter,
+                  value: d.value,
+                })),
+                skipDuplicates: true,
+              })
+              this.logger.debug(
+                `Seeded ${defaults.length} server config defaults for server ${server.serverId}`,
+              )
+            }
+          } catch (seedError) {
+            this.logger.warn(
+              `Failed to seed server config defaults for ${address}:${port}: ${seedError}`,
+            )
+          }
+
+          // Also seed game-scoped defaults from games_defaults for this server's gameCode
+          try {
+            const gameDefaults = await this.database.prisma.gameDefault.findMany({
+              where: { code: gameCode },
+              select: { parameter: true, value: true },
+            })
+            if (gameDefaults.length > 0) {
+              await this.database.prisma.serverConfig.createMany({
+                data: gameDefaults.map((gd) => ({
+                  serverId: server!.serverId,
+                  parameter: gd.parameter,
+                  value: gd.value,
+                })),
+                skipDuplicates: true,
+              })
+              this.logger.debug(
+                `Seeded ${gameDefaults.length} game defaults (${gameCode}) for server ${server.serverId}`,
+              )
+            }
+          } catch (seedGameError) {
+            this.logger.warn(
+              `Failed to seed game defaults (${gameCode}) for ${address}:${port}: ${seedGameError}`,
+            )
+          }
+
+          // Seed mod-scoped defaults from mods_defaults as a best-effort using gameCode as mod code
+          try {
+            const modDefaults = await this.database.prisma.modDefault.findMany({
+              where: { code: gameCode },
+              select: { parameter: true, value: true },
+            })
+            if (modDefaults.length > 0) {
+              await this.database.prisma.serverConfig.createMany({
+                data: modDefaults.map((md) => ({
+                  serverId: server!.serverId,
+                  parameter: md.parameter,
+                  value: md.value,
+                })),
+                skipDuplicates: true,
+              })
+              this.logger.debug(
+                `Seeded ${modDefaults.length} mod defaults (${gameCode}) for server ${server.serverId}`,
+              )
+            }
+          } catch (seedModError) {
+            this.logger.warn(
+              `Failed to seed mod defaults (${gameCode}) for ${address}:${port}: ${seedModError}`,
+            )
+          }
         } catch (createError) {
           // Handle race condition - another process might have created the server
           if (

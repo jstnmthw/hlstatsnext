@@ -173,7 +173,7 @@ model Player {
   history                     PlayerHistory[]
   ribbons                     PlayerRibbon[]
   names                       PlayerName[]
-  users                       User[]
+  user                        User?
 
   // Indexes for performance
   @@index([clanId], name: "playerclan")
@@ -714,7 +714,7 @@ model Rank {
 }
 
 model Ribbon {
-  ribbonId   Int    @id @default(autoincrement()) @db.UnsignedInt
+  ribbonId   Int    @id @default(autoincrement()) @map("ribbon_id") @db.UnsignedInt
   awardCode  String @map("award_code") @db.VarChar(50)
   awardCount Int    @default(0) @map("award_count")
   special    Int    @default(0) @map("special") @db.TinyInt
@@ -729,7 +729,7 @@ model Ribbon {
 }
 
 model Role {
-  roleId Int    @id @default(autoincrement()) @db.UnsignedInt
+  roleId Int    @id @default(autoincrement()) @map("role_id") @db.UnsignedInt
   game   String @default("valve") @db.VarChar(32)
   code   String @default("") @db.VarChar(64)
   name   String @default("") @db.VarChar(64)
@@ -743,45 +743,45 @@ model Role {
 }
 
 model Server {
-  serverId      Int       @id @default(autoincrement()) @db.UnsignedInt
+  serverId      Int       @id @default(autoincrement()) @map("server_id") @db.UnsignedInt
   address       String    @default("") @db.VarChar(32)
   port          Int       @default(0) @db.UnsignedInt
   name          String    @default("") @db.VarChar(255)
-  sortOrder     Int       @default(0) @db.TinyInt
+  sortOrder     Int       @default(0) @map("sort_order") @db.TinyInt
   game          String    @default("valve") @db.VarChar(32)
-  publicAddress String    @default("") @db.VarChar(128)
-  statusUrl     String?   @db.VarChar(255)
-  rconPassword  String    @default("") @db.VarChar(128)
+  publicAddress String    @default("") @map("public_address") @db.VarChar(128)
+  statusUrl     String?   @map("status_url") @db.VarChar(255)
+  rconPassword  String    @default("") @map("rcon_password") @db.VarChar(128)
   kills         Int       @default(0)
   players       Int       @default(0)
   rounds        Int       @default(0)
   suicides      Int       @default(0)
   headshots     Int       @default(0)
-  bombsPlanted  Int       @default(0)
-  bombsDefused  Int       @default(0)
-  ctWins        Int       @default(0)
-  tsWins        Int       @default(0)
-  maxPlayers    Int       @default(0) @db.SmallInt
-  activePlayers Int       @default(0) @db.SmallInt
-  activeMap     String    @default("") @db.VarChar(64)
-  mapRounds     Int       @default(0)
-  mapCtWins     Int       @default(0)
-  mapTsWins     Int       @default(0)
-  mapStarted    Int       @default(0)
-  mapChanges    Int       @default(0)
-  ctShots       Int       @default(0)
-  ctHits        Int       @default(0)
-  tsShots       Int       @default(0)
-  tsHits        Int       @default(0)
-  mapCtShots    Int       @default(0)
-  mapCtHits     Int       @default(0)
-  mapTsShots    Int       @default(0)
-  mapTsHits     Int       @default(0)
+  bombsPlanted  Int       @default(0) @map("bombs_planted")
+  bombsDefused  Int       @default(0) @map("bombs_defused")
+  ctWins        Int       @default(0) @map("ct_wins")
+  tsWins        Int       @default(0) @map("ts_wins")
+  maxPlayers    Int       @default(0) @map("max_players") @db.SmallInt
+  activePlayers Int       @default(0) @map("active_players") @db.SmallInt
+  activeMap     String    @default("") @map("active_map") @db.VarChar(64)
+  mapRounds     Int       @default(0) @map("map_rounds")
+  mapCtWins     Int       @default(0) @map("map_ct_wins")
+  mapTsWins     Int       @default(0) @map("map_ts_wins")
+  mapStarted    Int       @default(0) @map("map_started")
+  mapChanges    Int       @default(0) @map("map_changes")
+  ctShots       Int       @default(0) @map("ct_shots")
+  ctHits        Int       @default(0) @map("ct_hits")
+  tsShots       Int       @default(0) @map("ts_shots")
+  tsHits        Int       @default(0) @map("ts_hits")
+  mapCtShots    Int       @default(0) @map("map_ct_shots")
+  mapCtHits     Int       @default(0) @map("map_ct_hits")
+  mapTsShots    Int       @default(0) @map("map_ts_shots")
+  mapTsHits     Int       @default(0) @map("map_ts_hits")
   lat           Float?
   lng           Float?
   city          String    @default("") @db.VarChar(64)
   country       String    @default("") @db.VarChar(64)
-  lastEvent     DateTime? @db.DateTime(0)
+  lastEvent     DateTime? @map("last_event") @db.DateTime(0)
 
   eventsAdmin              EventAdmin[]
   eventsChangeName         EventChangeName[]
@@ -807,8 +807,8 @@ model Server {
 }
 
 model ServerConfig {
-  serverConfigId Int    @unique @default(autoincrement()) @db.UnsignedInt
-  serverId       Int    @db.UnsignedInt
+  serverConfigId Int    @unique @default(autoincrement()) @map("server_config_id") @db.UnsignedInt
+  serverId       Int    @map("server_id") @db.UnsignedInt
   parameter      String @db.VarChar(50)
   value          String @db.VarChar(128)
 
@@ -862,9 +862,9 @@ model User {
   username String @id @db.VarChar(16)
   password String @db.VarChar(32)
   acclevel Int    @default(0)
-  playerId Int    @default(0) @db.UnsignedInt
+  playerId Int    @unique @default(0) @map("player_id") @db.UnsignedInt
 
-  player Player? @relation(fields: [playerId], references: [playerId])
+  player Player @relation(fields: [playerId], references: [playerId], onDelete: Cascade)
 
   @@map("users")
 }

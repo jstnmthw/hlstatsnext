@@ -70,7 +70,6 @@ describe("PlayerRepository", () => {
       expect(playerRepository.findByUniqueId).toBeDefined()
       expect(playerRepository.create).toBeDefined()
       expect(playerRepository.update).toBeDefined()
-      expect(playerRepository.findTopPlayers).toBeDefined()
       expect(typeof playerRepository.findById).toBe("function")
       expect(typeof playerRepository.findByUniqueId).toBe("function")
     })
@@ -310,53 +309,6 @@ describe("PlayerRepository", () => {
 
       // Verify the method was called without throwing
       expect(mockDatabase.mockPrisma.player.update).toHaveBeenCalled()
-    })
-  })
-
-  describe("findTopPlayers", () => {
-    it("should find top players by skill", async () => {
-      const limit = 10
-      const game = "csgo"
-      const includeHidden = false
-
-      const mockTopPlayers: Player[] = [
-        createMockPlayer({ playerId: 1, lastName: "Player1", skill: 2000 }),
-        createMockPlayer({ playerId: 2, lastName: "Player2", skill: 1800 }),
-        createMockPlayer({ playerId: 3, lastName: "Player3", skill: 1600 }),
-      ]
-
-      mockDatabase.mockPrisma.player.findMany.mockResolvedValue(mockTopPlayers)
-
-      const result = await playerRepository.findTopPlayers(limit, game, includeHidden)
-
-      expect(result).toEqual(mockTopPlayers)
-      expect(mockDatabase.mockPrisma.player.findMany).toHaveBeenCalledWith({
-        where: {
-          game,
-          hideranking: includeHidden ? undefined : 0,
-        },
-        orderBy: { skill: "desc" },
-        take: limit,
-      })
-    })
-
-    it("should include hidden players when specified", async () => {
-      const limit = 5
-      const game = "csgo"
-      const includeHidden = true
-
-      mockDatabase.mockPrisma.player.findMany.mockResolvedValue([])
-
-      await playerRepository.findTopPlayers(limit, game, includeHidden)
-
-      expect(mockDatabase.mockPrisma.player.findMany).toHaveBeenCalledWith({
-        where: {
-          game,
-          hideranking: undefined,
-        },
-        orderBy: { skill: "desc" },
-        take: limit,
-      })
     })
   })
 

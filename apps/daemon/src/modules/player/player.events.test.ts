@@ -17,8 +17,6 @@ const createMockPlayerService = (): IPlayerService => ({
   updatePlayerStats: vi.fn(),
   getPlayerRating: vi.fn(),
   updatePlayerRatings: vi.fn(),
-  getTopPlayers: vi.fn(),
-  getRoundParticipants: vi.fn(),
   handlePlayerEvent: vi.fn(),
   handleKillEvent: vi.fn(),
 })

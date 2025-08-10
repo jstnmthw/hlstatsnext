@@ -217,10 +217,6 @@ export interface IPlayerService {
   getPlayerRating(playerId: number): Promise<SkillRating>
   updatePlayerRatings(updates: RatingUpdate[]): Promise<void>
 
-  // Queries
-  getTopPlayers(limit?: number, game?: string, includeHidden?: boolean): Promise<Player[]>
-  getRoundParticipants(serverId: number, duration: number): Promise<unknown[]>
-
   // Event handling
   handlePlayerEvent(event: PlayerEvent): Promise<HandlerResult>
   handleKillEvent(event: PlayerKillEvent): Promise<HandlerResult>
@@ -232,19 +228,6 @@ export interface IPlayerRepository {
   findByUniqueId(uniqueId: string, game: string, options?: FindOptions): Promise<Player | null>
   create(data: PlayerCreateData, options?: CreateOptions): Promise<Player>
   update(playerId: number, data: Partial<Player>, options?: UpdateOptions): Promise<Player>
-
-  // Specialized queries
-  findTopPlayers(
-    limit: number,
-    game: string,
-    includeHidden: boolean,
-    options?: FindOptions,
-  ): Promise<Player[]>
-  findRoundParticipants(
-    serverId: number,
-    startTime: Date,
-    options?: FindOptions,
-  ): Promise<unknown[]>
 
   // Unique ID management
   createUniqueId(

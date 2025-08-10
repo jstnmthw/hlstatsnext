@@ -39,6 +39,11 @@ export class CsParser extends BaseParser {
         return this.parseDamageEvent(cleanLine, serverId)
       }
 
+      // Suicide events
+      if (cleanLine.includes(" committed suicide with ") || cleanLine.includes(" killed self ")) {
+        return this.parseSuicideEvent(cleanLine, serverId)
+      }
+
       // Player connect/disconnect
       if (cleanLine.includes(" connected, address ")) {
         return this.parseConnectEvent(cleanLine, serverId)
@@ -59,6 +64,16 @@ export class CsParser extends BaseParser {
       // Team change events
       if (cleanLine.includes(" joined team ") || cleanLine.includes(" changed team to ")) {
         return this.parseChangeTeamEvent(cleanLine, serverId)
+      }
+
+      // Role change events (if present in mod logs)
+      if (cleanLine.includes(" changed role to ") || cleanLine.includes(" changed role ")) {
+        return this.parseChangeRoleEvent(cleanLine, serverId)
+      }
+
+      // Name change events
+      if (cleanLine.includes(" changed name to ")) {
+        return this.parseChangeNameEvent(cleanLine, serverId)
       }
 
       // Chat messages
@@ -285,6 +300,39 @@ export class CsParser extends BaseParser {
     return { event, success: true }
   }
 
+  private parseSuicideEvent(logLine: string, serverId: number): ParseResult {
+    // Example: "Player<2><STEAM_ID><CT>" committed suicide with "worldspawn"
+    const regex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" committed suicide with "([^"]+)"/i
+    const match = logLine.match(regex)
+    if (!match) {
+      return { event: null, success: false }
+    }
+    const [, playerName, playerIdStr, steamId, team, weapon] = match
+    const playerId = parseInt(playerIdStr || "")
+    if (!playerName || !playerIdStr || !steamId || Number.isNaN(playerId)) {
+      return { event: null, success: false, error: "Missing required fields in suicide event" }
+    }
+    const event: BaseEvent = {
+      eventType: EventType.PLAYER_SUICIDE,
+      timestamp: this.createTimestamp(),
+      serverId,
+      raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
+      data: {
+        playerId,
+        team: team || "UNKNOWN",
+        weapon: weapon || "world",
+      },
+      meta: {
+        steamId: steamId || "",
+        playerName,
+        isBot: (steamId || "") === "BOT",
+      },
+    }
+    return { event, success: true }
+  }
+
   private parseConnectEvent(logLine: string, serverId: number): ParseResult {
     // Example: "Player<2><STEAM_ID><>" connected, address "192.168.1.1:27005"
     const connectRegex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" connected, address "([^"]+)"/
@@ -300,7 +348,7 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Missing required fields in connect event" }
     }
 
-    const playerId = parseInt(playerIdStr)
+    const playerId = parseInt(playerIdStr || "")
     if (isNaN(playerId)) {
       return { event: null, success: false, error: "Invalid player ID in connect event" }
     }
@@ -347,7 +395,7 @@ export class CsParser extends BaseParser {
       }
     }
 
-    const playerId = parseInt(playerIdStr)
+    const playerId = parseInt(playerIdStr || "")
     if (isNaN(playerId)) {
       return { event: null, success: false, error: "Invalid player ID in enter/connect event" }
     }
@@ -414,6 +462,75 @@ export class CsParser extends BaseParser {
       },
     }
 
+    return { event, success: true }
+  }
+
+  private parseChangeRoleEvent(logLine: string, serverId: number): ParseResult {
+    // Example variants are mod dependent; attempt a tolerant parse if present
+    const regex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" changed role to "([^"]+)"/i
+    const match = logLine.match(regex)
+    if (!match) {
+      return { event: null, success: false }
+    }
+    const [, playerName, playerIdStr, steamId, , roleRaw] = match
+    const safePlayerIdStr = playerIdStr || "-1"
+    const playerId = parseInt(safePlayerIdStr)
+    const role = roleRaw || ""
+    if (!playerName || !playerIdStr || !steamId || Number.isNaN(playerId) || role === undefined) {
+      return { event: null, success: false, error: "Missing required fields in role change" }
+    }
+    const event: BaseEvent = {
+      eventType: EventType.PLAYER_CHANGE_ROLE,
+      timestamp: this.createTimestamp(),
+      serverId,
+      raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
+      data: {
+        playerId,
+        role,
+      },
+      meta: {
+        steamId: steamId || "",
+        playerName,
+        isBot: (steamId || "") === "BOT",
+      },
+    }
+    return { event, success: true }
+  }
+
+  private parseChangeNameEvent(logLine: string, serverId: number): ParseResult {
+    // Example: "OldName<2><STEAM_ID><CT>" changed name to "NewName"
+    const regex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" changed name to "([^"]+)"/i
+    const match = logLine.match(regex)
+    if (!match) {
+      return { event: null, success: false }
+    }
+    const [, oldName, playerIdStr, steamId, , newNameRaw] = match
+    const safePlayerIdStr2 = playerIdStr || "-1"
+    const playerId = parseInt(safePlayerIdStr2)
+    const newName = newNameRaw || ""
+    if (!oldName || !playerIdStr || !steamId || Number.isNaN(playerId) || newName === undefined) {
+      return { event: null, success: false, error: "Missing required fields in name change" }
+    }
+    const event: BaseEvent = {
+      eventType: EventType.PLAYER_CHANGE_NAME,
+      timestamp: this.createTimestamp(),
+      serverId,
+      raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
+      data: {
+        playerId,
+        oldName,
+        newName,
+      },
+      meta: {
+        steamId: steamId || "",
+        playerName: newName,
+        isBot: (steamId || "") === "BOT",
+      },
+    }
     return { event, success: true }
   }
 

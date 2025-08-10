@@ -265,6 +265,142 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
     }
   }
 
+  async createChangeNameEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    oldName: string,
+    newName: string,
+    options?: CreateOptions,
+  ): Promise<void> {
+    try {
+      this.validateId(serverId, "createChangeNameEvent")
+      await this.executeWithTransaction(async (client) => {
+        await client.eventChangeName.create({
+          data: {
+            eventTime: new Date(),
+            serverId,
+            map: map || "",
+            playerId: playerId > 0 ? playerId : 0,
+            oldName,
+            newName,
+          },
+        })
+      }, options)
+      this.logger.debug(`Created change-name event for player ${playerId} on server ${serverId}`)
+    } catch (error) {
+      this.handleError("createChangeNameEvent", error)
+    }
+  }
+
+  async createChangeTeamEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    team: string,
+    options?: CreateOptions,
+  ): Promise<void> {
+    try {
+      this.validateId(serverId, "createChangeTeamEvent")
+      await this.executeWithTransaction(async (client) => {
+        await client.eventChangeTeam.create({
+          data: {
+            eventTime: new Date(),
+            serverId,
+            map: map || "",
+            playerId: playerId > 0 ? playerId : 0,
+            team,
+          },
+        })
+      }, options)
+      this.logger.debug(`Created change-team event for player ${playerId} on server ${serverId}`)
+    } catch (error) {
+      this.handleError("createChangeTeamEvent", error)
+    }
+  }
+
+  async createChangeRoleEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    role: string,
+    options?: CreateOptions,
+  ): Promise<void> {
+    try {
+      this.validateId(serverId, "createChangeRoleEvent")
+      await this.executeWithTransaction(async (client) => {
+        await client.eventChangeRole.create({
+          data: {
+            eventTime: new Date(),
+            serverId,
+            map: map || "",
+            playerId: playerId > 0 ? playerId : 0,
+            role,
+          },
+        })
+      }, options)
+      this.logger.debug(`Created change-role event for player ${playerId} on server ${serverId}`)
+    } catch (error) {
+      this.handleError("createChangeRoleEvent", error)
+    }
+  }
+
+  async createSuicideEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    weapon?: string,
+    options?: CreateOptions,
+  ): Promise<void> {
+    try {
+      this.validateId(serverId, "createSuicideEvent")
+      await this.executeWithTransaction(async (client) => {
+        await client.eventSuicide.create({
+          data: {
+            eventTime: new Date(),
+            serverId,
+            map: map || "",
+            playerId: playerId > 0 ? playerId : 0,
+            weapon: weapon || "",
+          },
+        })
+      }, options)
+      this.logger.debug(`Created suicide event for player ${playerId} on server ${serverId}`)
+    } catch (error) {
+      this.handleError("createSuicideEvent", error)
+    }
+  }
+
+  async createTeamkillEvent(
+    killerId: number,
+    victimId: number,
+    serverId: number,
+    map: string,
+    weapon: string,
+    options?: CreateOptions,
+  ): Promise<void> {
+    try {
+      this.validateId(serverId, "createTeamkillEvent")
+      await this.executeWithTransaction(async (client) => {
+        await client.eventTeamkill.create({
+          data: {
+            eventTime: new Date(),
+            serverId,
+            map: map || "",
+            killerId: killerId > 0 ? killerId : 0,
+            victimId: victimId > 0 ? victimId : 0,
+            weapon: weapon || "",
+          },
+        })
+      }, options)
+      this.logger.debug(
+        `Created teamkill event: ${killerId} -> ${victimId} (${weapon}) on server ${serverId}`,
+      )
+    } catch (error) {
+      this.handleError("createTeamkillEvent", error)
+    }
+  }
+
   async createEntryEvent(
     playerId: number,
     serverId: number,

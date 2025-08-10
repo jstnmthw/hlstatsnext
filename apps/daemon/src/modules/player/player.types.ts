@@ -248,6 +248,50 @@ export interface IPlayerRepository {
     options?: CreateOptions,
   ): Promise<void>
 
+  // Change events
+  createChangeNameEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    oldName: string,
+    newName: string,
+    options?: CreateOptions,
+  ): Promise<void>
+
+  createChangeTeamEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    team: string,
+    options?: CreateOptions,
+  ): Promise<void>
+
+  createChangeRoleEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    role: string,
+    options?: CreateOptions,
+  ): Promise<void>
+
+  // Suicide / Teamkill events
+  createSuicideEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    weapon?: string,
+    options?: CreateOptions,
+  ): Promise<void>
+
+  createTeamkillEvent(
+    killerId: number,
+    victimId: number,
+    serverId: number,
+    map: string,
+    weapon: string,
+    options?: CreateOptions,
+  ): Promise<void>
+
   // Entry lifecycle event
   createEntryEvent?(
     playerId: number,

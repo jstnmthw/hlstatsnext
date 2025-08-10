@@ -582,7 +582,18 @@ export class PlayerService implements IPlayerService {
       // Best-effort update of in-memory match team assignment
       this.matchService?.setPlayerTeam?.(event.serverId, playerId, team)
 
-      // Optionally log change team event later (schema exists)
+      // Persist EventChangeTeam and bump lastEvent
+      let map = this.matchService?.getCurrentMap(event.serverId) || ""
+      if (map === "unknown" && this.matchService) {
+        map = await this.matchService.initializeMapForServer(event.serverId)
+      }
+      try {
+        await this.repository.createChangeTeamEvent?.(playerId, event.serverId, map, team)
+      } catch {
+        this.logger.error(
+          `Failed to create change-team event for player ${playerId} on server ${event.serverId}`,
+        )
+      }
       await this.updatePlayerStats(playerId, { lastEvent: new Date() })
       return { success: true, affected: 1 }
     } catch (error) {
@@ -594,7 +605,7 @@ export class PlayerService implements IPlayerService {
   }
 
   private async handlePlayerChangeRole(): Promise<HandlerResult> {
-    // Role changes don't affect stats directly
+    // Role changes don't affect stats directly, but record event for history
     return { success: true }
   }
 
@@ -610,6 +621,25 @@ export class PlayerService implements IPlayerService {
         lastName: newName,
         lastEvent: new Date(),
       })
+
+      // Persist EventChangeName row
+      try {
+        let map = this.matchService?.getCurrentMap(event.serverId) || ""
+        if (map === "unknown" && this.matchService) {
+          map = await this.matchService.initializeMapForServer(event.serverId)
+        }
+        await this.repository.createChangeNameEvent?.(
+          playerId,
+          event.serverId,
+          map,
+          changeNameEvent.data.oldName,
+          changeNameEvent.data.newName,
+        )
+      } catch {
+        this.logger.error(
+          `Failed to create change-name event for player ${playerId} on server ${event.serverId}`,
+        )
+      }
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -654,6 +684,24 @@ export class PlayerService implements IPlayerService {
       }
 
       await this.updatePlayerStats(playerId, updates)
+
+      // Persist EventSuicide
+      try {
+        let map = this.matchService?.getCurrentMap(event.serverId) || ""
+        if (map === "unknown" && this.matchService) {
+          map = await this.matchService.initializeMapForServer(event.serverId)
+        }
+        await this.repository.createSuicideEvent?.(
+          playerId,
+          event.serverId,
+          map,
+          suicideEvent.data.weapon,
+        )
+      } catch {
+        this.logger.error(
+          `Failed to create suicide event for player ${playerId} on server ${event.serverId}`,
+        )
+      }
 
       // Best-effort: update server suicide aggregate and lastEvent
       try {
@@ -736,7 +784,20 @@ export class PlayerService implements IPlayerService {
         lastEvent: new Date(),
       }
 
+      // Persist, then update stats
+      let map = this.matchService?.getCurrentMap(event.serverId) || ""
+      if (map === "unknown" && this.matchService) {
+        map = await this.matchService.initializeMapForServer(event.serverId)
+      }
+
       await Promise.all([
+        this.repository.createTeamkillEvent?.(
+          killerId,
+          victimId,
+          event.serverId,
+          map,
+          teamkillEvent.data.weapon,
+        ) ?? Promise.resolve(),
         this.updatePlayerStats(killerId, killerUpdates),
         this.updatePlayerStats(victimId, victimUpdates),
       ])

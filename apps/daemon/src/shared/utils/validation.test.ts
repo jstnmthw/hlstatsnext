@@ -35,14 +35,14 @@ describe("Validation Utilities", () => {
       expect(validateSteamId("bOt")).toBe(true)
     })
 
-    it("should reject invalid Steam ID formats", () => {
+    it("should reject invalid Steam ID formats (after normalization)", () => {
       const invalidSteamIds = [
         "1234567890123456", // 16 digits
         "123456789012345678", // 18 digits
         "7656119800000000a", // Contains letter
         "765611980000000-0", // Contains dash
-        "STEAM_1:0:12345", // Old format
-        "[U:1:12345]", // Steam3 format
+        "STEAM_X:0:12345", // Bad X
+        "[Z:1:12345]", // Unsupported type
         "", // Empty string
         "12345", // Too short
         "765611980000000000000", // Too long
@@ -51,6 +51,12 @@ describe("Validation Utilities", () => {
       invalidSteamIds.forEach((steamId) => {
         expect(validateSteamId(steamId)).toBe(false)
       })
+    })
+
+    it("should accept Steam2 and Steam3 formats via normalization", () => {
+      expect(validateSteamId("STEAM_0:1:470900")).toBe(true)
+      expect(validateSteamId("STEAM_1:0:12345")).toBe(true)
+      expect(validateSteamId("[U:1:12345]")).toBe(true)
     })
 
     it("should handle null and undefined inputs", () => {
@@ -66,16 +72,19 @@ describe("Validation Utilities", () => {
     })
 
     it("should handle whitespace in Steam IDs", () => {
-      expect(validateSteamId(" 76561198000000000")).toBe(false)
-      expect(validateSteamId("76561198000000000 ")).toBe(false)
-      expect(validateSteamId(" 76561198000000000 ")).toBe(false)
+      // Leading/trailing whitespace should be trimmed and accepted
+      expect(validateSteamId(" 76561198000000000")).toBe(true)
+      expect(validateSteamId("76561198000000000 ")).toBe(true)
+      expect(validateSteamId(" 76561198000000000 ")).toBe(true)
+      // Internal whitespace remains invalid
       expect(validateSteamId("76561198 000000000")).toBe(false)
     })
 
     it("should handle special characters", () => {
-      expect(validateSteamId("76561198000000000\n")).toBe(false)
-      expect(validateSteamId("76561198000000000\t")).toBe(false)
-      expect(validateSteamId("76561198000000000\r")).toBe(false)
+      // Trailing control characters should be trimmed and accepted
+      expect(validateSteamId("76561198000000000\n")).toBe(true)
+      expect(validateSteamId("76561198000000000\t")).toBe(true)
+      expect(validateSteamId("76561198000000000\r")).toBe(true)
     })
   })
 

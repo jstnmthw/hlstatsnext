@@ -24,7 +24,8 @@ export class ActionRepository implements IActionRepository {
         `Looking up action: game=${game}, code=${actionCode}, team=${team || "undefined"}`,
       )
 
-      const action = await this.database.prisma.action.findFirst({
+      // Try exact match including team first
+      let action = await this.database.prisma.action.findFirst({
         where: {
           game,
           code: actionCode,
@@ -32,6 +33,17 @@ export class ActionRepository implements IActionRepository {
         },
         orderBy: [{ team: team ? "desc" : "asc" }],
       })
+
+      // Fallback: lookup without team constraint
+      if (!action) {
+        action = await this.database.prisma.action.findFirst({
+          where: {
+            game,
+            code: actionCode,
+          },
+          orderBy: [{ team: "asc" }],
+        })
+      }
 
       this.logger.debug(`Action lookup result: ${action ? `Found ID ${action.id}` : "Not found"}`)
 
@@ -112,7 +124,8 @@ export class ActionRepository implements IActionRepository {
     }
   }
 
-  async logTeamAction(
+  async logTeamActionForPlayer(
+    playerId: number,
     serverId: number,
     actionId: number,
     map: string,
@@ -122,6 +135,7 @@ export class ActionRepository implements IActionRepository {
       await this.database.prisma.eventTeamBonus.create({
         data: {
           eventTime: new Date(),
+          playerId: playerId > 0 ? playerId : 0,
           serverId,
           actionId,
           map: map || "",

@@ -265,6 +265,32 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
     }
   }
 
+  async createEntryEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    options?: CreateOptions,
+  ): Promise<void> {
+    try {
+      this.validateId(serverId, "createEntryEvent")
+
+      await this.executeWithTransaction(async (client) => {
+        await client.eventEntry.create({
+          data: {
+            eventTime: new Date(),
+            serverId,
+            map: map || "",
+            playerId: playerId > 0 ? playerId : 0,
+          },
+        })
+      }, options)
+
+      this.logger.debug(`Created entry event for player ${playerId} on server ${serverId}`)
+    } catch (error) {
+      this.handleError("createEntryEvent", error)
+    }
+  }
+
   async createConnectEvent(
     playerId: number,
     serverId: number,
@@ -305,15 +331,17 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
       this.validateId(serverId, "createDisconnectEvent")
 
       await this.executeWithTransaction(async (client) => {
-        // Insert a row to events_disconnect for immediate visibility
-        await client.eventDisconnect.create({
-          data: {
-            eventTime: new Date(),
-            serverId,
-            map: map || "",
-            playerId: playerId > 0 ? playerId : 0,
-          },
-        })
+        // Insert a row to events_disconnect for immediate visibility (skip invalid playerId)
+        if (playerId > 0) {
+          await client.eventDisconnect.create({
+            data: {
+              eventTime: new Date(),
+              serverId,
+              map: map || "",
+              playerId,
+            },
+          })
+        }
 
         // Best-effort: also backfill disconnect time on the most recent connect row
         try {

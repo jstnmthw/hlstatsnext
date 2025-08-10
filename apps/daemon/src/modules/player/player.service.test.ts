@@ -46,6 +46,9 @@ describe("PlayerService", () => {
       resetMatchStats: vi.fn(),
       updatePlayerWeaponStats: vi.fn(),
       calculatePlayerScore: vi.fn().mockReturnValue(100),
+      setPlayerTeam: vi.fn(),
+      getPlayersByTeam: vi.fn().mockReturnValue([]),
+      getServerGame: vi.fn().mockResolvedValue("cstrike"),
     }
 
     playerService = new PlayerService(
@@ -547,6 +550,78 @@ describe("PlayerService", () => {
       const result = await playerService.handlePlayerEvent(unknownEvent)
 
       expect(result.success).toBe(true)
+    })
+
+    it("should persist EventEntry on PLAYER_ENTRY", async () => {
+      const entryEvent: PlayerEvent = {
+        eventType: EventType.PLAYER_ENTRY,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "entry-1",
+        data: {
+          playerId: 99,
+        },
+        meta: { isBot: false },
+      } as unknown as PlayerEvent
+
+      const repoSpy = vi.spyOn(mockRepository, "createEntryEvent").mockResolvedValue()
+      const result = await playerService.handlePlayerEvent(entryEvent)
+      expect(result.success).toBe(true)
+      expect(repoSpy).toHaveBeenCalledWith(99, 1, expect.any(String))
+    })
+
+    it("should ignore invalid playerId on disconnect (bots)", async () => {
+      const disconnectEvent: PlayerEvent = {
+        eventType: EventType.PLAYER_DISCONNECT,
+        timestamp: new Date(),
+        serverId: 2,
+        eventId: "disc-1",
+        data: {
+          playerId: -1,
+        },
+      } as unknown as PlayerEvent
+
+      const repoSpy = vi.spyOn(mockRepository, "createDisconnectEvent")
+      const result = await playerService.handlePlayerEvent(disconnectEvent)
+      expect(result.success).toBe(true)
+      expect(repoSpy).not.toHaveBeenCalled()
+    })
+
+    it("should skip connect and entry rows for bots but keep lastEvent", async () => {
+      // Connect event for bot
+      const connectEvent: PlayerEvent = {
+        eventType: EventType.PLAYER_CONNECT,
+        timestamp: new Date(),
+        serverId: 3,
+        eventId: "conn-bot",
+        data: {
+          playerId: 50,
+          steamId: "BOT",
+          playerName: "Bot01",
+          ipAddress: "",
+        },
+        meta: { isBot: true },
+      } as unknown as PlayerEvent
+
+      const connSpy = vi.spyOn(mockRepository, "createConnectEvent")
+      await playerService.handlePlayerEvent(connectEvent)
+      expect(connSpy).not.toHaveBeenCalled()
+
+      // Entry event for bot
+      const entryEvent: PlayerEvent = {
+        eventType: EventType.PLAYER_ENTRY,
+        timestamp: new Date(),
+        serverId: 3,
+        eventId: "entry-bot",
+        data: {
+          playerId: 50,
+        },
+        meta: { isBot: true },
+      } as unknown as PlayerEvent
+
+      const entrySpy = vi.spyOn(mockRepository, "createEntryEvent")
+      await playerService.handlePlayerEvent(entryEvent)
+      expect(entrySpy).not.toHaveBeenCalled()
     })
   })
 

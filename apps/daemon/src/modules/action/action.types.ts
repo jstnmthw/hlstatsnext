@@ -95,6 +95,12 @@ export interface IActionRepository {
     map: string,
     bonus?: number,
   ): Promise<void>
-  logTeamAction(serverId: number, actionId: number, map: string, bonus?: number): Promise<void>
+  logTeamActionForPlayer(
+    playerId: number,
+    serverId: number,
+    actionId: number,
+    map: string,
+    bonus?: number,
+  ): Promise<void>
   logWorldAction(serverId: number, actionId: number, map: string, bonus?: number): Promise<void>
 }

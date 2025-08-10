@@ -49,7 +49,8 @@ export class ActionService implements IActionService {
 
   private async handlePlayerAction(event: ActionPlayerEvent): Promise<HandlerResult> {
     try {
-      const { playerId, actionCode, game, team, bonus } = event.data
+      let { playerId } = event.data
+      const { actionCode, game, team, bonus } = event.data
 
       // Look up action definition from database using canonical actionCode
       const actionDef = await this.repository.findActionByCode(game, actionCode, team)
@@ -63,12 +64,29 @@ export class ActionService implements IActionService {
         return { success: true }
       }
 
-      // Verify player exists before logging action
+      // Verify player exists; try to resolve via meta if missing
       if (this.playerService) {
-        const playerStats = await this.playerService.getPlayerStats(playerId)
-        if (!playerStats) {
-          this.logger.warn(`Player ${playerId} not found, skipping action: ${actionCode}`)
-          return { success: true } // Don't fail, but skip the action
+        const existing = await this.playerService.getPlayerStats(playerId)
+        if (!existing) {
+          const meta = event.meta as { steamId?: string; playerName?: string } | undefined
+          if (meta?.steamId && meta.playerName) {
+            try {
+              const resolvedId = await this.playerService.getOrCreatePlayer(
+                meta.steamId,
+                meta.playerName,
+                game,
+              )
+              playerId = resolvedId
+            } catch {
+              this.logger.warn(
+                `Player ${playerId} not found and could not be resolved, skipping action: ${actionCode}`,
+              )
+              return { success: true }
+            }
+          } else {
+            this.logger.warn(`Player ${playerId} not found, skipping action: ${actionCode}`)
+            return { success: true }
+          }
         }
       }
 
@@ -214,8 +232,34 @@ export class ActionService implements IActionService {
         currentMap = await this.matchService.initializeMapForServer(event.serverId)
       }
 
-      // Log the action event to database
-      await this.repository.logTeamAction(event.serverId, actionDef.id, currentMap, bonus || 0)
+      // Log team bonus rows per teammate and grant rewardTeam
+      if (this.matchService) {
+        const teamPlayers = this.matchService.getPlayersByTeam(event.serverId, team)
+        const validPlayerIds = teamPlayers.filter((pid) => typeof pid === "number" && pid > 0)
+        if (validPlayerIds.length > 0) {
+          await Promise.all(
+            validPlayerIds.map((pid) =>
+              this.repository.logTeamActionForPlayer(
+                pid,
+                event.serverId,
+                actionDef.id,
+                currentMap,
+                bonus || 0,
+              ),
+            ),
+          )
+
+          if (this.playerService && actionDef.rewardTeam !== 0) {
+            await Promise.all(
+              validPlayerIds.map((pid) =>
+                this.playerService!.updatePlayerStats(pid, {
+                  skill: actionDef.rewardTeam + (bonus || 0),
+                }),
+              ),
+            )
+          }
+        }
+      }
 
       // Log the event with point information
       this.logger.debug(

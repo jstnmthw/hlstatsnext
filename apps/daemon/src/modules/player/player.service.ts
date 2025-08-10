@@ -228,9 +228,9 @@ export class PlayerService implements IPlayerService {
         case EventType.PLAYER_DISCONNECT:
           return await this.handlePlayerDisconnect(event)
         case EventType.PLAYER_ENTRY:
-          return await this.handlePlayerEntry()
+          return await this.handlePlayerEntry(event)
         case EventType.PLAYER_CHANGE_TEAM:
-          return await this.handlePlayerChangeTeam()
+          return await this.handlePlayerChangeTeam(event)
         case EventType.PLAYER_CHANGE_ROLE:
           return await this.handlePlayerChangeRole()
         case EventType.PLAYER_CHANGE_NAME:
@@ -262,6 +262,10 @@ export class PlayerService implements IPlayerService {
   async handleKillEvent(event: PlayerKillEvent): Promise<HandlerResult> {
     try {
       const { killerId, victimId, headshot, weapon, killerTeam, victimTeam } = event.data
+
+      // Keep match teams in sync when known
+      if (killerTeam) this.matchService?.setPlayerTeam?.(event.serverId, killerId, killerTeam)
+      if (victimTeam) this.matchService?.setPlayerTeam?.(event.serverId, victimId, victimTeam)
 
       // Get current player stats for streak tracking
       const [killerStats, victimStats] = await Promise.all([
@@ -408,6 +412,7 @@ export class PlayerService implements IPlayerService {
       }
       const connectEvent = event as PlayerConnectEvent
       const { playerId, ipAddress } = connectEvent.data
+      const isBot = Boolean((event.meta as { isBot?: boolean } | undefined)?.isBot)
 
       // GeoIP enrichment (best-effort)
       let geoUpdates: Record<string, unknown> | undefined
@@ -441,24 +446,28 @@ export class PlayerService implements IPlayerService {
       } as PlayerStatsUpdate)
 
       // Update server activePlayers and lastEvent
-      try {
-        await this.repository.updateServerForPlayerEvent?.(event.serverId, {
-          activePlayers: { increment: 1 },
-          lastEvent: new Date(),
-        })
-      } catch {
-        // Optional repository hook may not exist; ignore if unavailable
+      if (!isBot) {
+        try {
+          await this.repository.updateServerForPlayerEvent?.(event.serverId, {
+            activePlayers: { increment: 1 },
+            lastEvent: new Date(),
+          })
+        } catch {
+          // Optional repository hook may not exist; ignore if unavailable
+        }
       }
 
       // Log connect lifecycle event
-      try {
-        let map = this.matchService?.getCurrentMap(event.serverId) || ""
-        if (map === "unknown" && this.matchService) {
-          map = await this.matchService.initializeMapForServer(event.serverId)
+      if (!isBot) {
+        try {
+          let map = this.matchService?.getCurrentMap(event.serverId) || ""
+          if (map === "unknown" && this.matchService) {
+            map = await this.matchService.initializeMapForServer(event.serverId)
+          }
+          await this.repository.createConnectEvent(playerId, event.serverId, map, ipAddress || "")
+        } catch {
+          // ignore best-effort connect logging errors
         }
-        await this.repository.createConnectEvent(playerId, event.serverId, map, ipAddress || "")
-      } catch {
-        // ignore best-effort connect logging errors
       }
 
       this.logger.debug(`Player connected: ${playerId}`)
@@ -479,6 +488,12 @@ export class PlayerService implements IPlayerService {
       }
       const disconnectEvent = event as PlayerDisconnectEvent
       const { playerId, sessionDuration } = disconnectEvent.data
+
+      // Ignore invalid/bot-only slots where parser could not resolve playerId
+      if (playerId == null || playerId <= 0) {
+        this.logger.warn(`Ignoring disconnect for invalid playerId: ${playerId}`)
+        return { success: true }
+      }
 
       const updates: PlayerStatsUpdate = {
         lastEvent: new Date(),
@@ -522,14 +537,60 @@ export class PlayerService implements IPlayerService {
     }
   }
 
-  private async handlePlayerEntry(): Promise<HandlerResult> {
-    // Player entry is typically just logging, no stats update needed
-    return { success: true }
+  private async handlePlayerEntry(event: PlayerEvent): Promise<HandlerResult> {
+    try {
+      if (event.eventType !== EventType.PLAYER_ENTRY) {
+        return { success: false, error: "Invalid event type for handlePlayerEntry" }
+      }
+      const entry = event as { data: { playerId: number } }
+      const { playerId } = entry.data
+      const isBot = Boolean((event.meta as { isBot?: boolean } | undefined)?.isBot)
+
+      // Get current map from the match service, initialize if needed
+      let map = this.matchService?.getCurrentMap(event.serverId) || ""
+      if (map === "unknown" && this.matchService) {
+        map = await this.matchService.initializeMapForServer(event.serverId)
+      }
+
+      // Log EventEntry and refresh lastEvent; omit entry rows for bots
+      const ops: Array<Promise<unknown>> = []
+      if (!isBot) {
+        ops.push(
+          this.repository.createEntryEvent?.(playerId, event.serverId, map) ?? Promise.resolve(),
+        )
+      }
+      ops.push(this.updatePlayerStats(playerId, { lastEvent: new Date() }))
+      await Promise.all(ops)
+
+      return { success: true, affected: 1 }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      }
+    }
   }
 
-  private async handlePlayerChangeTeam(): Promise<HandlerResult> {
-    // Team changes don't affect stats directly
-    return { success: true }
+  private async handlePlayerChangeTeam(event: PlayerEvent): Promise<HandlerResult> {
+    try {
+      if (event.eventType !== EventType.PLAYER_CHANGE_TEAM) {
+        return { success: false, error: "Invalid event type for handlePlayerChangeTeam" }
+      }
+      const changeTeamEvent = event as { data: { playerId: number; team: string } }
+      const { playerId, team } = changeTeamEvent.data
+
+      // Best-effort update of in-memory match team assignment
+      this.matchService?.setPlayerTeam?.(event.serverId, playerId, team)
+
+      // Optionally log change team event later (schema exists)
+      await this.updatePlayerStats(playerId, { lastEvent: new Date() })
+      return { success: true, affected: 1 }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      }
+    }
   }
 
   private async handlePlayerChangeRole(): Promise<HandlerResult> {

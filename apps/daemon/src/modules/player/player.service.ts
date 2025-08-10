@@ -27,25 +27,21 @@ import type { KillContext } from "@/modules/ranking/ranking.service"
 import type { HandlerResult } from "@/shared/types/common"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
-import { EventType } from "@/shared/types/events"
 import type { BaseEvent } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
 import { validateSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
-import { GameConfig } from "@/config/game.config"
 
 export class PlayerService implements IPlayerService {
-  // Rating system constants
   private readonly DEFAULT_RATING = 1000
   private readonly DEFAULT_CONFIDENCE = 350
   private readonly DEFAULT_VOLATILITY = 0.06
   private readonly MAX_CONFIDENCE_REDUCTION = 300
-  // Removed UNIX_TIMESTAMP_DIVISOR as we're using DateTime now
 
   constructor(
     private readonly repository: IPlayerRepository,
     private readonly logger: ILogger,
     private readonly rankingService: IRankingService,
     private readonly matchService?: IMatchService,
-    // Optional injected services for enrichment and config (added for roadmap tasks)
     private readonly geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
   ) {}
 
@@ -116,7 +112,6 @@ export class PlayerService implements IPlayerService {
       }
       if (updates.skill !== undefined) {
         updateData.skill = { increment: updates.skill }
-        // Update last skill change timestamp when skill is modified
         updateData.lastSkillChange = new Date()
       }
       if (updates.shots !== undefined) {
@@ -220,31 +215,6 @@ export class PlayerService implements IPlayerService {
       this.logger.debug(`Updated ratings for ${updates.length} players`)
     } catch (error) {
       this.logger.error(`Failed to update player ratings: ${error}`)
-      throw error
-    }
-  }
-
-  async getTopPlayers(
-    limit: number = 50,
-    game: string = GameConfig.getDefaultGame(),
-    includeHidden: boolean = false,
-  ): Promise<Player[]> {
-    try {
-      return await this.repository.findTopPlayers(limit, game, includeHidden)
-    } catch (error) {
-      this.logger.error(`Failed to get top players: ${error}`)
-      return []
-    }
-  }
-
-  async getRoundParticipants(serverId: number, duration: number): Promise<unknown[]> {
-    try {
-      const durationMs = duration * 1000
-      const roundStartTime = new Date(Date.now() - durationMs)
-
-      return await this.repository.findRoundParticipants(serverId, roundStartTime)
-    } catch (error) {
-      this.logger.error(`Failed to get round participants: ${error}`)
       throw error
     }
   }

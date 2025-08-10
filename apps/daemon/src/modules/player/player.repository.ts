@@ -4,12 +4,12 @@
  * Data access layer for player operations.
  */
 
-import { BaseRepository } from "@/shared/infrastructure/persistence/repository.base"
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository, PlayerCreateData } from "./player.types"
 import type { FindOptions, CreateOptions, UpdateOptions } from "@/shared/types/database"
 import type { Player, Prisma } from "@repo/database/client"
+import { BaseRepository } from "@/shared/infrastructure/persistence/repository.base"
 import { GameConfig } from "@/config/game.config"
 
 export class PlayerRepository extends BaseRepository<Player> implements IPlayerRepository {
@@ -189,38 +189,6 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
       }, options)
     } catch (error) {
       this.handleError("update", error)
-    }
-  }
-
-  async findTopPlayers(
-    limit: number,
-    game: string,
-    includeHidden: boolean,
-    options?: FindOptions,
-  ): Promise<Player[]> {
-    try {
-      const whereClause: Record<string, unknown> = { game }
-
-      if (!includeHidden) {
-        whereClause.hideranking = 0
-      }
-
-      return await this.executeWithTransaction(async (client) => {
-        const query: Prisma.PlayerFindManyArgs = {
-          where: whereClause as Prisma.PlayerWhereInput,
-          orderBy: { skill: "desc" },
-          take: Math.min(limit, 100),
-        }
-        if (options?.include) {
-          query.include = options.include as Prisma.PlayerInclude
-        }
-        if (options?.select) {
-          query.select = options.select as Prisma.PlayerSelect
-        }
-        return client.player.findMany(query)
-      }, options)
-    } catch (error) {
-      this.handleError("findTopPlayers", error)
     }
   }
 

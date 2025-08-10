@@ -29,7 +29,7 @@ import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
-import { validateSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
+import { normalizeSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
 
 export class PlayerService implements IPlayerService {
   private readonly DEFAULT_RATING = 1000
@@ -46,7 +46,8 @@ export class PlayerService implements IPlayerService {
   ) {}
 
   async getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number> {
-    if (!validateSteamId(steamId)) {
+    const normalized = normalizeSteamId(steamId)
+    if (!normalized) {
       throw new Error(`Invalid Steam ID: ${steamId}`)
     }
 
@@ -54,9 +55,9 @@ export class PlayerService implements IPlayerService {
       throw new Error(`Invalid player name: ${playerName}`)
     }
 
-    const isBot = steamId.toUpperCase() === "BOT"
+    const isBot = normalized.toUpperCase() === "BOT"
     const normalizedName = sanitizePlayerName(playerName)
-    const effectiveId = isBot ? `BOT_${normalizedName}` : steamId
+    const effectiveId = isBot ? `BOT_${normalizedName}` : normalized
 
     try {
       // First, try to find existing player by Steam ID

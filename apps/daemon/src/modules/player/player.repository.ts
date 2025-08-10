@@ -192,40 +192,6 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
     }
   }
 
-  async findRoundParticipants(
-    serverId: number,
-    startTime: Date,
-    options?: FindOptions,
-  ): Promise<unknown[]> {
-    try {
-      this.validateId(serverId, "findRoundParticipants")
-
-      return await this.executeWithTransaction(async (client) => {
-        return client.eventEntry.findMany({
-          where: {
-            serverId,
-            eventTime: {
-              gte: startTime,
-            },
-          },
-          select: {
-            playerId: true,
-            player: {
-              select: {
-                skill: true,
-                teamkills: true,
-                kills: true,
-                deaths: true,
-              },
-            },
-          },
-        })
-      }, options)
-    } catch (error) {
-      this.handleError("findRoundParticipants", error)
-    }
-  }
-
   async createUniqueId(
     playerId: number,
     uniqueId: string,

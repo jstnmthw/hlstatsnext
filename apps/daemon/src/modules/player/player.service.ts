@@ -449,6 +449,17 @@ export class PlayerService implements IPlayerService {
         // Optional repository hook may not exist; ignore if unavailable
       }
 
+      // Log connect lifecycle event
+      try {
+        let map = this.matchService?.getCurrentMap(event.serverId) || ""
+        if (map === "unknown" && this.matchService) {
+          map = await this.matchService.initializeMapForServer(event.serverId)
+        }
+        await this.repository.createConnectEvent(playerId, event.serverId, map, ipAddress || "")
+      } catch {
+        // ignore best-effort connect logging errors
+      }
+
       this.logger.debug(`Player connected: ${playerId}`)
 
       return { success: true, affected: 1 }
@@ -486,6 +497,17 @@ export class PlayerService implements IPlayerService {
         })
       } catch {
         // Optional repository hook may not exist; ignore if unavailable
+      }
+
+      // Log disconnect lifecycle event and enrich last connect
+      try {
+        let map = this.matchService?.getCurrentMap(event.serverId) || ""
+        if (map === "unknown" && this.matchService) {
+          map = await this.matchService.initializeMapForServer(event.serverId)
+        }
+        await this.repository.createDisconnectEvent(playerId, event.serverId, map)
+      } catch {
+        // ignore best-effort disconnect logging errors
       }
 
       this.logger.debug(`Player disconnected: ${playerId}`)

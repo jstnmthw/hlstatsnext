@@ -44,7 +44,17 @@ export class CsParser extends BaseParser {
         return this.parseConnectEvent(cleanLine, serverId)
       }
 
+      // Older engines/log formats emit "entered the game" instead of a connect with IP
+      if (cleanLine.includes(" entered the game")) {
+        return this.parseEnterEvent(cleanLine, serverId)
+      }
+
       if (cleanLine.includes(" disconnected (reason ")) {
+        return this.parseDisconnectEvent(cleanLine, serverId)
+      }
+
+      // Legacy/simple disconnect format without explicit reason
+      if (cleanLine.includes(" disconnected")) {
         return this.parseDisconnectEvent(cleanLine, serverId)
       }
 
@@ -308,28 +318,32 @@ export class CsParser extends BaseParser {
     return { event, success: true }
   }
 
-  private parseDisconnectEvent(logLine: string, serverId: number): ParseResult {
-    // Example: "Player<2><STEAM_ID><CT>" disconnected (reason "Disconnect")
-    const disconnectRegex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" disconnected \(reason "([^"]*)"\)/
-    const match = logLine.match(disconnectRegex)
+  private parseEnterEvent(logLine: string, serverId: number): ParseResult {
+    // Example: "Player<2><STEAM_ID><>" entered the game
+    const enterRegex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" entered the game/
+    const match = logLine.match(enterRegex)
 
     if (!match) {
-      return { event: null, success: false, error: "Could not parse disconnect event" }
+      return { event: null, success: false, error: "Could not parse enter/connect event" }
     }
 
-    const [, playerName, playerIdStr, steamId, , reason] = match
+    const [, playerName, playerIdStr, steamId] = match
 
-    if (!playerName || !playerIdStr || !steamId || reason === undefined) {
-      return { event: null, success: false, error: "Missing required fields in disconnect event" }
+    if (!playerName || !playerIdStr || !steamId) {
+      return {
+        event: null,
+        success: false,
+        error: "Missing required fields in enter/connect event",
+      }
     }
 
     const playerId = parseInt(playerIdStr)
     if (isNaN(playerId)) {
-      return { event: null, success: false, error: "Invalid player ID in disconnect event" }
+      return { event: null, success: false, error: "Invalid player ID in enter/connect event" }
     }
 
     const event: BaseEvent = {
-      eventType: EventType.PLAYER_DISCONNECT,
+      eventType: EventType.PLAYER_CONNECT,
       timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
@@ -337,7 +351,10 @@ export class CsParser extends BaseParser {
       correlationId: generateCorrelationId(),
       data: {
         playerId,
-        reason,
+        steamId,
+        playerName,
+        // IP not present in this log form; leave empty for later enrichment
+        ipAddress: "",
       },
       meta: {
         steamId,
@@ -347,6 +364,74 @@ export class CsParser extends BaseParser {
     }
 
     return { event, success: true }
+  }
+
+  private parseDisconnectEvent(logLine: string, serverId: number): ParseResult {
+    // Newer format with explicit reason: "Player<2><STEAM_ID><CT>" disconnected (reason "Disconnect")
+    const disconnectWithReason =
+      /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" disconnected \(reason "([^"]*)"\)/
+    // Legacy/simple format without reason: "Player<-1><><CT>" disconnected
+    const disconnectSimple = /"([^"]+)<(-?\d+)><([^>]*)><([^>]*)>" disconnected/
+
+    let match = logLine.match(disconnectWithReason)
+    if (match) {
+      const [, playerName, playerIdStr, steamId, , reason] = match
+      if (!playerName || !playerIdStr || !steamId) {
+        return { event: null, success: false, error: "Missing required fields in disconnect event" }
+      }
+      const parsedId = parseInt(playerIdStr)
+      const playerId = Number.isNaN(parsedId) ? -1 : parsedId
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_DISCONNECT,
+        timestamp: this.createTimestamp(),
+        serverId,
+        raw: logLine,
+        eventId: generateMessageId(),
+        correlationId: generateCorrelationId(),
+        data: {
+          playerId,
+          reason: reason ?? "",
+        },
+        meta: {
+          steamId,
+          playerName,
+          isBot: steamId === "BOT",
+        },
+      }
+      return { event, success: true }
+    }
+
+    match = logLine.match(disconnectSimple)
+    if (match) {
+      const [, playerName, playerIdStr, steamId] = match
+      if (!playerName || playerIdStr == null) {
+        return { event: null, success: false, error: "Missing required fields in disconnect event" }
+      }
+      const parsedId = parseInt(playerIdStr)
+      const playerId = Number.isNaN(parsedId) ? -1 : parsedId
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_DISCONNECT,
+        timestamp: this.createTimestamp(),
+        serverId,
+        raw: logLine,
+        eventId: generateMessageId(),
+        correlationId: generateCorrelationId(),
+        data: {
+          playerId,
+          reason: "",
+        },
+        meta: {
+          steamId: steamId || "",
+          playerName,
+          isBot: (steamId || "") === "BOT",
+        },
+      }
+      return { event, success: true }
+    }
+
+    return { event: null, success: false, error: "Could not parse disconnect event" }
   }
 
   private parseChatEvent(logLine: string, serverId: number): ParseResult {

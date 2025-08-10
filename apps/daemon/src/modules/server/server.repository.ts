@@ -50,4 +50,24 @@ export class ServerRepository implements IServerRepository {
       return null
     }
   }
+
+  async getServerConfig(serverId: number, parameter: string): Promise<string | null> {
+    try {
+      const row = await this.database.prisma.serverConfig.findUnique({
+        where: { serverId_parameter: { serverId, parameter } },
+        select: { value: true },
+      })
+      if (row) return row.value
+
+      // Fallback to defaults if no per-server value exists
+      const def = await this.database.prisma.serverConfigDefault.findUnique({
+        where: { parameter },
+        select: { value: true },
+      })
+      return def?.value ?? null
+    } catch (error) {
+      this.logger.error(`Failed to read server config ${parameter} for ${serverId}: ${error}`)
+      return null
+    }
+  }
 }

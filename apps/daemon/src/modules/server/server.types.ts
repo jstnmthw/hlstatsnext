@@ -2,6 +2,7 @@ export interface IServerService {
   getServer(serverId: number): Promise<ServerInfo | null>
   getServerByAddress(address: string, port: number): Promise<ServerInfo | null>
   getServerGame(serverId: number): Promise<string>
+  getServerConfigBoolean(serverId: number, parameter: string, fallback: boolean): Promise<boolean>
 
   // Event handlers for server events
   handleServerShutdown?(serverId: number): Promise<void>
@@ -20,4 +21,5 @@ export interface ServerInfo {
 export interface IServerRepository {
   findById(serverId: number): Promise<ServerInfo | null>
   findByAddress(address: string, port: number): Promise<ServerInfo | null>
+  getServerConfig(serverId: number, parameter: string): Promise<string | null>
 }

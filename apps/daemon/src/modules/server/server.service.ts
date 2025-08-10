@@ -26,4 +26,17 @@ export class ServerService implements IServerService {
 
     return server.game
   }
+
+  async getServerConfigBoolean(
+    serverId: number,
+    parameter: string,
+    fallback: boolean,
+  ): Promise<boolean> {
+    const raw = await this.repository.getServerConfig(serverId, parameter)
+    if (raw == null) return fallback
+    const normalized = raw.trim().toLowerCase()
+    if (["1", "true", "yes", "on"].includes(normalized)) return true
+    if (["0", "false", "no", "off"].includes(normalized)) return false
+    return fallback
+  }
 }

@@ -248,6 +248,22 @@ export interface IPlayerRepository {
     options?: CreateOptions,
   ): Promise<void>
 
+  // Connect/disconnect lifecycle events
+  createConnectEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    ipAddress: string,
+    options?: CreateOptions,
+  ): Promise<void>
+
+  createDisconnectEvent(
+    playerId: number,
+    serverId: number,
+    map: string,
+    options?: CreateOptions,
+  ): Promise<void>
+
   // Player stats retrieval for skill calculations
   getPlayerStats(playerId: number, options?: FindOptions): Promise<Player | null>
 

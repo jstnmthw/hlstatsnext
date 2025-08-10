@@ -67,6 +67,7 @@ export class MatchService implements IMatchService {
           startTime: new Date(),
           playerStats: new Map(),
           currentMap: "",
+          playerTeams: new Map(),
         }
         this.currentMatches.set(serverId, matchStats)
       }
@@ -135,6 +136,7 @@ export class MatchService implements IMatchService {
           startTime: new Date(),
           playerStats: new Map(),
           currentMap: lastKnownMap,
+          playerTeams: new Map(),
         }
         this.currentMatches.set(serverId, matchStats)
 
@@ -151,6 +153,7 @@ export class MatchService implements IMatchService {
         startTime: new Date(),
         playerStats: new Map(),
         currentMap: fallbackMap,
+        playerTeams: new Map(),
       }
       this.currentMatches.set(serverId, matchStats)
 
@@ -198,6 +201,7 @@ export class MatchService implements IMatchService {
           startTime: new Date(),
           playerStats: new Map(),
           currentMap: "",
+          playerTeams: new Map(),
         }
         this.currentMatches.set(serverId, matchStats)
       }
@@ -290,6 +294,31 @@ export class MatchService implements IMatchService {
       stats.objectiveScore * 3 +
       stats.clutchWins * 5
     )
+  }
+
+  async getServerGame(serverId: number): Promise<string | null> {
+    try {
+      const server = await this.repository.findServerById(serverId)
+      return server?.game ?? null
+    } catch {
+      return null
+    }
+  }
+
+  setPlayerTeam(serverId: number, playerId: number, team: string): void {
+    const match = this.currentMatches.get(serverId)
+    if (!match) return
+    match.playerTeams?.set(playerId, team)
+  }
+
+  getPlayersByTeam(serverId: number, team: string): number[] {
+    const match = this.currentMatches.get(serverId)
+    if (!match || !match.playerTeams) return []
+    const players: number[] = []
+    for (const [pid, t] of match.playerTeams.entries()) {
+      if (t === team) players.push(pid)
+    }
+    return players
   }
 
   // getObjectivePoints removed; scoring to be based on action codes in later phase
@@ -400,6 +429,7 @@ export class MatchService implements IMatchService {
           startTime: new Date(),
           playerStats: new Map(),
           currentMap: "",
+          playerTeams: new Map(),
         })
       }
 
@@ -416,6 +446,8 @@ export class MatchService implements IMatchService {
       if (triggerName === "Terrorists_Win" || triggerName === "CTs_Win") {
         await this.repository.updateTeamWins(serverId, winningTeam)
       }
+
+      // Team win bonus handled via Actions path if parser emits ACTION_TEAM for these codes.
 
       this.logger.debug(
         `Team win on server ${serverId}: ${winningTeam} won via ${triggerName} (CT: ${score.ct}, T: ${score.t})`,
@@ -452,6 +484,7 @@ export class MatchService implements IMatchService {
         startTime: new Date(),
         playerStats: new Map(),
         currentMap: newMap, // Set the current map
+        playerTeams: new Map(),
       }
       this.currentMatches.set(serverId, newMatchStats)
 

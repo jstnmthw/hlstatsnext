@@ -44,7 +44,6 @@ export class CsParser extends BaseParser {
         return this.parseConnectEvent(cleanLine, serverId)
       }
 
-      // Older engines/log formats emit "entered the game" instead of a connect with IP
       if (cleanLine.includes(" entered the game")) {
         return this.parseEnterEvent(cleanLine, serverId)
       }
@@ -53,9 +52,13 @@ export class CsParser extends BaseParser {
         return this.parseDisconnectEvent(cleanLine, serverId)
       }
 
-      // Legacy/simple disconnect format without explicit reason
       if (cleanLine.includes(" disconnected")) {
         return this.parseDisconnectEvent(cleanLine, serverId)
+      }
+
+      // Team change events
+      if (cleanLine.includes(" joined team ") || cleanLine.includes(" changed team to ")) {
+        return this.parseChangeTeamEvent(cleanLine, serverId)
       }
 
       // Chat messages
@@ -197,7 +200,14 @@ export class CsParser extends BaseParser {
     // Example: "Player1<2><STEAM_ID><CT>" attacked "Player2<3><STEAM_ID><TERRORIST>" with "ak47" (damage "27") (damage_armor "0") (health "73") (armor "100") (hitgroup "chest")
     const damageRegex =
       /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" attacked "([^"]+)<(\d+)><([^>]+)><([^>]*)>" with "([^"]+)" \(damage "(\d+)"\) \(damage_armor "(\d+)"\) \(health "(\d+)"\) \(armor "(\d+)"\)(?:\s+\(hitgroup "([^"]+)"\))?/
-    const match = logLine.match(damageRegex)
+    let match = logLine.match(damageRegex)
+
+    // Fallback tolerant regex for variant spacing/order
+    if (!match) {
+      const tolerant =
+        /"([^"]+)<(\d+)>[^"]*" attacked "([^"]+)<(\d+)>[^"]*" with "([^"]+)" .*?\(damage "(\d+)"\).*?\(damage_armor "(\d+)"\).*?\(health "(\d+)"\).*?\(armor "(\d+)"\)(?:.*?\(hitgroup "([^"]+)"\))?/
+      match = logLine.match(tolerant)
+    }
 
     if (!match) {
       return { event: null, success: false, error: "Could not parse damage event" }
@@ -343,7 +353,7 @@ export class CsParser extends BaseParser {
     }
 
     const event: BaseEvent = {
-      eventType: EventType.PLAYER_CONNECT,
+      eventType: EventType.PLAYER_ENTRY,
       timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
@@ -351,10 +361,51 @@ export class CsParser extends BaseParser {
       correlationId: generateCorrelationId(),
       data: {
         playerId,
+      },
+      meta: {
         steamId,
         playerName,
-        // IP not present in this log form; leave empty for later enrichment
-        ipAddress: "",
+        isBot: steamId === "BOT",
+      },
+    }
+
+    return { event, success: true }
+  }
+
+  private parseChangeTeamEvent(logLine: string, serverId: number): ParseResult {
+    // Examples:
+    // "Player<2><STEAM_ID><>" joined team "CT"
+    // "Player<2><STEAM_ID><TERRORIST>" changed team to "CT"
+    const joinedRegex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" joined team "([^"]+)"/
+    const changedRegex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" changed team to "([^"]+)"/
+    const match = logLine.match(joinedRegex) || logLine.match(changedRegex)
+
+    if (!match) {
+      return { event: null, success: false }
+    }
+
+    const [playerName, playerIdStr, steamId, newTeam] = match as unknown as [
+      string,
+      string,
+      string,
+      string,
+      string,
+    ]
+    const playerId = parseInt(playerIdStr)
+    if (!playerName || !playerIdStr || !steamId || Number.isNaN(playerId) || !newTeam) {
+      return { event: null, success: false, error: "Missing required fields in team change" }
+    }
+
+    const event: BaseEvent = {
+      eventType: EventType.PLAYER_CHANGE_TEAM,
+      timestamp: this.createTimestamp(),
+      serverId,
+      raw: logLine,
+      eventId: generateMessageId(),
+      correlationId: generateCorrelationId(),
+      data: {
+        playerId,
+        team: newTeam,
       },
       meta: {
         steamId,
@@ -374,6 +425,7 @@ export class CsParser extends BaseParser {
     const disconnectSimple = /"([^"]+)<(-?\d+)><([^>]*)><([^>]*)>" disconnected/
 
     let match = logLine.match(disconnectWithReason)
+    console.warn(match)
     if (match) {
       const [, playerName, playerIdStr, steamId, , reason] = match
       if (!playerName || !playerIdStr || !steamId) {

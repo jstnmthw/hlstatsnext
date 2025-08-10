@@ -61,6 +61,7 @@ export interface MatchStats {
   startTime: Date
   playerStats: Map<number, PlayerRoundStats>
   currentMap: string
+  playerTeams?: Map<number, string>
 }
 
 export interface PlayerRoundStats {
@@ -115,6 +116,13 @@ export interface IMatchService {
   // MVP calculations
   calculateMatchMVP(serverId: number): Promise<number | undefined>
   calculatePlayerScore(stats: PlayerRoundStats): number
+
+  // Team tracking
+  setPlayerTeam(serverId: number, playerId: number, team: string): void
+  getPlayersByTeam(serverId: number, team: string): number[]
+
+  // Server helpers
+  getServerGame(serverId: number): Promise<string | null>
 }
 
 // Type for server record from database

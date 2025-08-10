@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { ActionService } from "./action.service"
 import { createMockLogger } from "../../tests/mocks/logger"
-import type { IActionRepository, ActionDefinition } from "./action.types"
+import type { IActionRepository, ActionDefinition, ActionEvent } from "./action.types"
 import type {
   ActionPlayerEvent,
   ActionPlayerPlayerEvent,
@@ -13,13 +13,15 @@ import type {
   WorldActionEvent,
 } from "./action.types"
 import { EventType } from "@/shared/types/events"
+import type { IPlayerService } from "@/modules/player/player.types"
+import type { IMatchService } from "@/modules/match/match.types"
 
 // Create mock repository
 const createMockActionRepository = (): IActionRepository => ({
   findActionByCode: vi.fn(),
   logPlayerAction: vi.fn(),
   logPlayerPlayerAction: vi.fn(),
-  logTeamAction: vi.fn(),
+  logTeamActionForPlayer: vi.fn(),
   logWorldAction: vi.fn(),
 })
 
@@ -27,11 +29,42 @@ describe("ActionService", () => {
   let actionService: ActionService
   let mockLogger: ReturnType<typeof createMockLogger>
   let mockRepository: IActionRepository
+  let mockPlayerService: IPlayerService
+  let mockMatchService: IMatchService
 
   beforeEach(() => {
     mockLogger = createMockLogger()
     mockRepository = createMockActionRepository()
-    actionService = new ActionService(mockRepository, mockLogger)
+    mockPlayerService = {
+      getPlayerStats: vi.fn().mockResolvedValue({ playerId: 1 }),
+      updatePlayerStats: vi.fn().mockResolvedValue(undefined),
+      getOrCreatePlayer: vi.fn(),
+      getPlayerRating: vi.fn(),
+      updatePlayerRatings: vi.fn(),
+      handlePlayerEvent: vi.fn(),
+      handleKillEvent: vi.fn(),
+    }
+    mockMatchService = {
+      getPlayersByTeam: vi.fn().mockReturnValue([]),
+      handleMatchEvent: vi.fn(),
+      handleKillInMatch: vi.fn(),
+      handleObjectiveAction: vi.fn(),
+      getMatchStats: vi.fn(),
+      getCurrentMap: vi.fn().mockReturnValue(""),
+      initializeMapForServer: vi.fn().mockResolvedValue(""),
+      resetMatchStats: vi.fn(),
+      updatePlayerWeaponStats: vi.fn(),
+      calculateMatchMVP: vi.fn(),
+      calculatePlayerScore: vi.fn(),
+      setPlayerTeam: vi.fn(),
+      getServerGame: vi.fn().mockResolvedValue("cstrike"),
+    }
+    actionService = new ActionService(
+      mockRepository,
+      mockLogger,
+      mockPlayerService,
+      mockMatchService,
+    )
   })
 
   describe("Service instantiation", () => {
@@ -66,7 +99,7 @@ describe("ActionService", () => {
       }
 
       vi.mocked(repo.findActionByCode).mockResolvedValue(canonicalDef)
-      vi.mocked(repo.logTeamAction).mockResolvedValue()
+      vi.mocked(repo.logTeamActionForPlayer).mockResolvedValue()
 
       const event: ActionTeamEvent = {
         timestamp: new Date(),
@@ -172,6 +205,57 @@ describe("ActionService", () => {
 
       expect(result.success).toBe(true)
       expect(mockLogger.warn).toHaveBeenCalledWith("Unknown action code: round_win for game csgo")
+    })
+
+    it("should award rewardTeam to teammates and log team bonus rows", async () => {
+      vi.mocked(mockRepository.findActionByCode).mockResolvedValue({
+        id: 10,
+        game: "cstrike",
+        code: "Target_Bombed",
+        rewardPlayer: 0,
+        rewardTeam: 2,
+        team: "TERRORIST",
+        description: null,
+        forPlayerActions: false,
+        forPlayerPlayerActions: false,
+        forTeamActions: true,
+        forWorldActions: false,
+      })
+      vi.mocked(mockRepository.logTeamActionForPlayer).mockResolvedValue(undefined)
+
+      const actionEvent: ActionEvent = {
+        eventType: EventType.ACTION_TEAM,
+        timestamp: new Date(),
+        serverId: 42,
+        data: {
+          team: "TERRORIST",
+          actionCode: "Target_Bombed",
+          game: "cstrike",
+        },
+      } as unknown as ActionEvent
+
+      // Mock team roster
+      vi.mocked(mockMatchService.getPlayersByTeam).mockReturnValue([1, 2, 0, -1])
+      await actionService.handleActionEvent(actionEvent)
+
+      // Team bonus rows persisted for each teammate
+      expect(mockRepository.logTeamActionForPlayer).toHaveBeenCalledWith(
+        1,
+        42,
+        10,
+        expect.any(String),
+        0,
+      )
+      expect(mockRepository.logTeamActionForPlayer).toHaveBeenCalledWith(
+        2,
+        42,
+        10,
+        expect.any(String),
+        0,
+      )
+      // Skill awarded to valid teammates
+      expect(mockPlayerService.updatePlayerStats).toHaveBeenCalledWith(1, { skill: 2 })
+      expect(mockPlayerService.updatePlayerStats).toHaveBeenCalledWith(2, { skill: 2 })
     })
 
     it("should handle ACTION_WORLD events", async () => {

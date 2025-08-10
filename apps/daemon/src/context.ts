@@ -177,7 +177,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
 
   const weaponEventHandler = new WeaponEventHandler(logger, weaponService, eventMetrics)
 
-  const matchEventHandler = new MatchEventHandler(logger, matchService, eventMetrics)
+  const matchEventHandler = new MatchEventHandler(logger, matchService, actionService, eventMetrics)
 
   const actionEventHandler = new ActionEventHandler(
     logger,
@@ -197,6 +197,8 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     handledEvents: [
       EventType.PLAYER_CONNECT,
       EventType.PLAYER_DISCONNECT,
+      EventType.PLAYER_ENTRY,
+      EventType.PLAYER_CHANGE_TEAM,
       EventType.PLAYER_CHANGE_NAME,
       EventType.CHAT_MESSAGE,
       EventType.PLAYER_KILL,

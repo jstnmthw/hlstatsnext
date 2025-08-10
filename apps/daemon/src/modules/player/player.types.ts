@@ -248,6 +248,14 @@ export interface IPlayerRepository {
     options?: CreateOptions,
   ): Promise<void>
 
+  // Entry lifecycle event
+  createEntryEvent?(
+    playerId: number,
+    serverId: number,
+    map: string,
+    options?: CreateOptions,
+  ): Promise<void>
+
   // Connect/disconnect lifecycle events
   createConnectEvent(
     playerId: number,

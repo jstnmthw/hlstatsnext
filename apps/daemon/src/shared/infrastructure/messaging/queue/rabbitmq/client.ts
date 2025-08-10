@@ -312,6 +312,7 @@ export class RabbitMQClient implements IQueueClient {
     const standardBindings = [
       "player.connect",
       "player.disconnect",
+      "player.entry",
       "player.change.*",
       "admin.*",
       "team.*",

@@ -31,7 +31,7 @@ export async function seedPlayers() {
       ...playerData,
       game: game.code,
       flag: country.flag,
-      clan: clan ? clan.clanId : 0,
+      clanId: clan ? clan.clanId : null,
     }
     players.push(player)
   }

@@ -2,7 +2,7 @@
 -- Dumping data for table `Actions`
 --
 
-INSERT INTO `Actions` (`game`, `code`, `rewardPlayer`, `rewardTeam`, `team`, `description`, `forPlayerActions`, `forPlayerPlayerActions`, `forTeamActions`, `forWorldActions`) VALUES
+INSERT INTO `actions` (`game`, `code`, `reward_player`, `reward_team`, `team`, `description`, `for_player_actions`, `for_player_player_actions`, `for_team_actions`, `for_world_actions`) VALUES
 ('tf', 'flagevent_defended', 1, 0, '', 'Defended the flag', '1', '0', '0', '0'),
 ('tf', 'flagevent_captured', 5, 1, '', 'Captured the flag', '1', '0', '0', '0'),
 ('tf', 'flagevent_dropped', -2, 0, '', 'Dropped the flag (while alive)', '1', '0', '0', '0'),
@@ -763,7 +763,7 @@ INSERT INTO `Actions` (`game`, `code`, `rewardPlayer`, `rewardTeam`, `team`, `de
 -- Dumping data for table `Awards`
 --
 
-INSERT INTO `Awards` (`awardType`, `game`, `code`, `name`, `verb`) VALUES
+INSERT INTO `awards` (`award_type`, `game`, `code`, `name`, `verb`) VALUES
 ('P','tf','domination','Dominator','dominations'),
 ('V','tf','domination','Most dominated','times dominated'),
 ('P','tf','revenge','King of vengence','revenges'),
@@ -1767,7 +1767,7 @@ INSERT INTO `Awards` (`awardType`, `game`, `code`, `name`, `verb`) VALUES
 -- Dumping data for table `ClanTags`
 --
 
-INSERT INTO `ClanTags` (`pattern`, `position`) VALUES
+INSERT INTO `clan_tags` (`pattern`, `position`) VALUES
 ('[AXXXXX]', 'EITHER'),
 ('|AXXXXX|', 'EITHER'),
 ('(AXXXXX)', 'EITHER'),
@@ -1802,7 +1802,7 @@ INSERT INTO `ClanTags` (`pattern`, `position`) VALUES
 -- Dumping data for table `Countries`
 --
 
-INSERT INTO `Countries` (`flag`, `name`) VALUES
+INSERT INTO `countries` (`flag`, `name`) VALUES
 ('AD', 'Andorra'),
 ('AE', 'United Arab Emirates'),
 ('AF', 'Afghanistan'),
@@ -2053,7 +2053,7 @@ INSERT INTO `Countries` (`flag`, `name`) VALUES
 -- Dumping data for table `Games`
 --
 
-INSERT INTO `Games` (`code`, `name`, `realgame`, `hidden`) VALUES
+INSERT INTO `games` (`code`, `name`, `realgame`, `hidden`) VALUES
 ('css','Counter-Strike: Source','css','1'),
 ('hl2mp','Half-Life 2 Multiplayer','hl2mp','1'),
 ('tf','Team Fortress 2','tf','0'),
@@ -2089,7 +2089,7 @@ INSERT INTO `Games` (`code`, `name`, `realgame`, `hidden`) VALUES
 -- Dumping data for table `Games_Defaults`
 --
 
-INSERT INTO `Games_Defaults` (`code`, `parameter`, `value`) VALUES
+INSERT INTO `games_defaults` (`code`, `parameter`, `value`) VALUES
 ('aoc', 'Admins', ''),
 ('aoc', 'AutoBanRetry', '0'),
 ('aoc', 'AutoTeamBalance', '0'),
@@ -2787,7 +2787,7 @@ INSERT INTO `Games_Defaults` (`code`, `parameter`, `value`) VALUES
 -- Dumping data for table `Games_Supported`
 --
 
-INSERT INTO `Games_Supported` (`code`, `name`) VALUES
+INSERT INTO `games_supported` (`code`, `name`) VALUES
 ('csp', 'CSPromod'),
 ('css', 'Counter-Strike: Source'),
 ('hl2mp', 'Half-Life 2 Multiplayer'),
@@ -3269,7 +3269,7 @@ INSERT INTO `Games_Supported` (`code`, `name`) VALUES
 -- Dumping data for table `Mods_Defaults`
 --
 
-INSERT INTO `Mods_Defaults` (`code`, `parameter`, `value`) VALUES
+INSERT INTO `mods_defaults` (`code`, `parameter`, `value`) VALUES
 ('', 'BroadCastEventsCommand', ''),
 ('AMXX', 'BroadCastEventsCommand', 'hlx_amx_psay'),
 ('BEETLE', 'BroadCastEventsCommand', 'hlx_psay'),
@@ -3311,7 +3311,7 @@ INSERT INTO `Mods_Defaults` (`code`, `parameter`, `value`) VALUES
 -- Dumping data for table `Mods_Supported`
 --
 
-INSERT INTO `Mods_Supported` (`code`, `name`) VALUES
+INSERT INTO `mods_supported` (`code`, `name`) VALUES
 ('', '(none)'),
 ('SOURCEMOD', 'Sourcemod'),
 ('MANI', 'Mani Admin Mod >= 1.2'),
@@ -3324,7 +3324,7 @@ INSERT INTO `Mods_Supported` (`code`, `name`) VALUES
 -- Dumping data for table `Options`
 --
 
-INSERT INTO `Options` (`keyname`, `value`, `opttype`) VALUES
+INSERT INTO `options` (`keyname`, `value`, `opttype`) VALUES
 ('dbversion', '0.0.0', 2),
 ('version', '0.0.0', 1),
 ('DNSResolveIP', '1',0),
@@ -3337,7 +3337,7 @@ INSERT INTO `Options` (`keyname`, `value`, `opttype`) VALUES
 ('Mode', 'Normal',1),
 ('SkillMaxChange', '25',0),
 ('SkillMinChange', '2',0),
-('PlayerMinKills', '50',0),
+('Playermin_kills', '50',0),
 ('DeleteDays', '28',1),
 ('UseTimestamp', '0',0),
 ('MinActivity', '28',2),
@@ -3396,7 +3396,7 @@ INSERT INTO `Options` (`keyname`, `value`, `opttype`) VALUES
 -- Dumping data for table `Options_Choices`
 --
 
-INSERT INTO `Options_Choices` (`keyname`, `value`, `text`, `isDefault`) VALUES
+INSERT INTO `options_choices` (`keyname`, `value`, `text`, `is_default`) VALUES
 ('rankingtype', 'skill', 'Skill', 1),
 ('rankingtype', 'kills', 'Kills', 0),
 ('bannerdisplay', '0', 'None', 1),
@@ -3500,91 +3500,91 @@ INSERT INTO `Options_Choices` (`keyname`, `value`, `text`, `isDefault`) VALUES
 -- Dumping data for table `Ranks`
 --
 
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'recruit', 0, 49, 'Recruit' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'private', 50, 99, 'Private' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'private-first-class', 100, 199, 'Private First Class' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'lance-corporal', 200, 299, 'Lance Corporal' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'corporal', 300, 399, 'Corporal' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'sergeant', 400, 499, 'Sergeant' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'staff-sergeant', 500, 599, 'Staff Sergeant' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'gunnery-sergeant', 600, 699, 'Gunnery Sergeant' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'master-sergeant', 700, 799, 'Master Sergeant' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'first-sergeant', 800, 899, 'First Sergeant' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'master-chief', 900, 999, 'Master Chief' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'sergeant-major', 1000, 1199, 'Sergeant Major' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'ensign', 1200, 1399, 'Ensign' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'third-lieutenant', 1400, 1599, 'Third Lieutenant' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'second-lieutenant', 1600, 1799, 'Second Lieutenant' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'first-lieutenant', 1800, 1999, 'First Lieutenant' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'captain', 2000, 2249, 'Captain' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'group-captain', 2250, 2499, 'Group Captain' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'senior-captain', 2500, 2749, 'Senior Captain' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'lieutenant-major', 2750, 2999, 'Lieutenant Major' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'major', 3000, 3499, 'Major' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'group-major', 3500, 3999, 'Group Major' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'lieutenant-commander', 4000, 4499, 'Lieutenant Commander' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'commander', 4500, 4999, 'Commander' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'group-commander', 5000, 5749, 'Group Commander' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'lieutenant-colonel', 5750, 6499, 'Lieutenant Colonel' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'colonel', 6500, 7249, 'Colonel' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'brigadier', 7250, 7999, 'Brigadier' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'brigadier-general', 8000, 8999, 'Brigadier General' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'major-general', 9000, 9999, 'Major General' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'lieutenant-general', 10000, 12499, 'Lieutenant General' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'general', 12500, 14999, 'General' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'commander-general', 15000, 17499, 'Commander General' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'field-vice-marshal', 17500, 19999, 'Field Vice Marshal' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'field-marshal', 20000, 22499, 'Field Marshal' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'vice-commander-of-the-army', 22500, 24999, 'Vice Commander of the Army' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'commander-of-the-army', 25000, 27499, 'Commander of the Army' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'high-commander', 27500, 29999, 'High Commander' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'supreme-commander', 30000, 34999, 'Supreme Commander' FROM `Games`);
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`)
-(SELECT `code`, 'terminator', 35000, 9999999, 'Terminator' FROM `Games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'recruit', 0, 49, 'Recruit' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'private', 50, 99, 'Private' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'private-first-class', 100, 199, 'Private First Class' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'lance-corporal', 200, 299, 'Lance Corporal' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'corporal', 300, 399, 'Corporal' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'sergeant', 400, 499, 'Sergeant' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'staff-sergeant', 500, 599, 'Staff Sergeant' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'gunnery-sergeant', 600, 699, 'Gunnery Sergeant' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'master-sergeant', 700, 799, 'Master Sergeant' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'first-sergeant', 800, 899, 'First Sergeant' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'master-chief', 900, 999, 'Master Chief' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'sergeant-major', 1000, 1199, 'Sergeant Major' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'ensign', 1200, 1399, 'Ensign' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'third-lieutenant', 1400, 1599, 'Third Lieutenant' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'second-lieutenant', 1600, 1799, 'Second Lieutenant' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'first-lieutenant', 1800, 1999, 'First Lieutenant' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'captain', 2000, 2249, 'Captain' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'group-captain', 2250, 2499, 'Group Captain' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'senior-captain', 2500, 2749, 'Senior Captain' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'lieutenant-major', 2750, 2999, 'Lieutenant Major' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'major', 3000, 3499, 'Major' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'group-major', 3500, 3999, 'Group Major' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'lieutenant-commander', 4000, 4499, 'Lieutenant Commander' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'commander', 4500, 4999, 'Commander' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'group-commander', 5000, 5749, 'Group Commander' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'lieutenant-colonel', 5750, 6499, 'Lieutenant Colonel' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'colonel', 6500, 7249, 'Colonel' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'brigadier', 7250, 7999, 'Brigadier' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'brigadier-general', 8000, 8999, 'Brigadier General' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'major-general', 9000, 9999, 'Major General' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'lieutenant-general', 10000, 12499, 'Lieutenant General' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'general', 12500, 14999, 'General' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'commander-general', 15000, 17499, 'Commander General' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'field-vice-marshal', 17500, 19999, 'Field Vice Marshal' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'field-marshal', 20000, 22499, 'Field Marshal' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'vice-commander-of-the-army', 22500, 24999, 'Vice Commander of the Army' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'commander-of-the-army', 25000, 27499, 'Commander of the Army' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'high-commander', 27500, 29999, 'High Commander' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'supreme-commander', 30000, 34999, 'Supreme Commander' FROM `games`);
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`)
+(SELECT `code`, 'terminator', 35000, 9999999, 'Terminator' FROM `games`);
 
-DELETE FROM `Ranks` WHERE `game` = 'nd';
-OPTIMIZE TABLE `Ranks`;
+DELETE FROM `ranks` WHERE `game` = 'nd';
+OPTIMIZE TABLE `ranks`;
 
-INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`) VALUES
+INSERT INTO `ranks` (`game`, `image`, `min_kills`, `max_kills`, `rank_name`) VALUES
 ('nd', 'nd_01', 0, 40, 'Survivor'),
 ('nd', 'nd_02', 41, 131, 'Private I'),
 ('nd', 'nd_03', 132, 272, 'Private II'),
@@ -3651,7 +3651,7 @@ INSERT INTO `Ranks` (`game`, `image`, `minKills`, `maxKills`, `rankName`) VALUES
 -- Dumping data for table `Ribbons`
 --
 
-INSERT INTO `Ribbons` (`awardCode`, `awardCount`, `special`, `game`, `image`, `ribbonName`) VALUES
+INSERT INTO `ribbons` (`award_code`, `award_count`, `special`, `game`, `image`, `ribbon_name`) VALUES
 ('*Headshots*',2500,1,'css','ribbon_of_silver_star.gif','Sharpshooter'),
 ('*total connection hours*',25,2,'css','1_connect.png','Connection Time 25 Hours'),
 ('*total connection hours*',50,2,'css','2_connect.png','Connection Time 50 Hours'),
@@ -5700,7 +5700,7 @@ INSERT INTO `Ribbons` (`awardCode`, `awardCount`, `special`, `game`, `image`, `r
 -- Dumping data for table `Roles`
 --
 
-INSERT INTO `Roles` (`game`, `code`, `name`, `hidden`) VALUES
+INSERT INTO `roles` (`game`, `code`, `name`, `hidden`) VALUES
 ('tf','engineer','Engineer','0'),
 ('tf','spy','Spy','0'),
 ('tf','soldier','Soldier','0'),
@@ -5866,7 +5866,7 @@ INSERT INTO `Roles` (`game`, `code`, `name`, `hidden`) VALUES
 -- Dumping data for table `Servers_Config_Default`
 --
 
-INSERT INTO `Servers_Config_Default` (`parameter`, `value`, `description`) VALUES
+INSERT INTO `servers_config_default` (`parameter`, `value`, `description`) VALUES
 ('Admins', '', 'Steamids seperated by "," ("STEAM_0:1:XXX,STEAM_0:0:XXX,STEAM_0:1:XXX").'),
 ('AutoBanRetry', '0', 'Auto-bans player for 5 minutes if the disconnect from the server. Prevent players from reconnecting until the have a good team and won''t loose many points. 1=on 0=off(default)'),
 ('AutoTeamBalance', '0', 'If rcon is enabled hlstats automatically analyzed teams and balance players for fair teams. It will make teams numerical even and also swap players based on there skill to balance teams. 1=on, 0=off(default)'),
@@ -5904,7 +5904,7 @@ INSERT INTO `Servers_Config_Default` (`parameter`, `value`, `description`) VALUE
 -- Dumping data for table `Teams`
 --
 
-INSERT INTO `Teams` (`game`, `code`, `name`, `hidden`, `playerlist_bgcolor`, `playerlist_color`, `playerlist_index`) VALUES
+INSERT INTO `teams` (`game`, `code`, `name`, `hidden`, `playerlist_bgcolor`, `playerlist_color`, `playerlist_index`) VALUES
 ('csp','Terrorists','Terrorists','0','#FFD5D5','#FF2D2D',1),
 ('csp','Counter-Terrorists','Counter-Terrorists','0','#D2E8F7','#0080C0',2),
 ('css','TERRORIST','Terrorist','0','#FFD5D5','#FF2D2D',1),
@@ -5979,7 +5979,7 @@ INSERT INTO `Teams` (`game`, `code`, `name`, `hidden`, `playerlist_bgcolor`, `pl
 -- Dumping data for table `Weapons`
 --
 
-INSERT INTO `Weapons` (`game`, `code`, `name`, `modifier`) VALUES
+INSERT INTO `weapons` (`game`, `code`, `name`, `modifier`) VALUES
 ('tf', 'tf_projectile_rocket', 'Rocket Launcher', 1.00),
 ('tf', 'sniperrifle', 'Sniper Rifle', 1.00),
 ('tf', 'minigun', 'Minigun (Sasha)', 1.00),

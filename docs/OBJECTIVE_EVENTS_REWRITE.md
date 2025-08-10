@@ -47,9 +47,6 @@ Impacted references:
 - [x] Extend `ActionRepository.findActionByCode(game, code, team?)` to support alias fallback:
   - First try canonical `code`.
   - If not found, lookup an alias mapping (DB-driven) and resolve to canonical code.
-- [ ] Schema approach (choose one):
-  - [ ] New table `Actions_Aliases(game, alias, code, team?)` with FK to `Actions`.
-  - [ ] Or keep a separate `ActionAlias` table; seed alongside `Actions.sql`.
 - [x] Seed common variants (csgo/cs2 in-code alias handling for `SFUI_Notice_*`).
 - [x] Add unit tests for alias resolution.
 

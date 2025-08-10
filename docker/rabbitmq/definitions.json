@@ -3,6 +3,8 @@
   "rabbitmq_version": "4.1.2",
   "product_name": "HlStatsNext RabbitMQ",
   "product_version": "1.0.0",
+  "parameters": [],
+  "topic_permissions": [],
   "users": [
     {
       "name": "hlstats",
@@ -25,8 +27,6 @@
       "read": ".*"
     }
   ],
-  "topic_permissions": [],
-  "parameters": [],
   "global_parameters": [
     {
       "name": "cluster_name",
@@ -220,6 +220,14 @@
       "vhost": "hlstats",
       "destination": "hlstats.events.standard",
       "destination_type": "queue",
+      "routing_key": "player.entry",
+      "arguments": {}
+    },
+    {
+      "source": "hlstats.events",
+      "vhost": "hlstats",
+      "destination": "hlstats.events.standard",
+      "destination_type": "queue",
       "routing_key": "player.change.*",
       "arguments": {}
     },
@@ -253,14 +261,6 @@
       "destination": "hlstats.events.standard",
       "destination_type": "queue",
       "routing_key": "map.*",
-      "arguments": {}
-    },
-    {
-      "source": "hlstats.events",
-      "vhost": "hlstats",
-      "destination": "hlstats.events.bulk",
-      "destination_type": "queue",
-      "routing_key": "weapon.*",
       "arguments": {}
     },
     {

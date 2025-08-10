@@ -167,4 +167,26 @@ export class ActionRepository implements IActionRepository {
       throw new Error(`Failed to log world action: ${error}`)
     }
   }
+
+  // Non-interface helper for tests
+  async logPlayerSuicide(
+    serverId: number,
+    playerId: number,
+    map: string,
+    weapon: string = "",
+  ): Promise<void> {
+    try {
+      await this.database.prisma.eventSuicide.create({
+        data: {
+          eventTime: new Date(),
+          serverId,
+          playerId,
+          map: map || "",
+          weapon,
+        },
+      })
+    } catch (error) {
+      this.logger.error(`Failed to log suicide in ActionRepository helper: ${String(error)}`)
+    }
+  }
 }

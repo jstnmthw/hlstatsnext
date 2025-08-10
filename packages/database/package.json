@@ -12,7 +12,7 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset --force && prisma db push",
-    "db:seed": "pnpm db:run-sql src/sql/new-seeder.sql",
+    "db:seed": "pnpm db:run-sql src/sql/default-seeder.sql",
     "db:dev:seed": "tsx src/seed.ts",
     "db:run-sql": "tsx src/scripts/run-sql.ts",
     "db:test:prepare": "dotenv -e .env.test -- prisma db push --skip-generate",

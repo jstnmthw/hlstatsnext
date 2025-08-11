@@ -5,13 +5,13 @@
  * and world actions. This handler manages all action event types independently.
  */
 
+import { EventType } from "@/shared/types/events"
 import { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import type { IActionService, ActionEvent } from "@/modules/action/action.types"
 import type { IMatchService } from "@/modules/match/match.types"
-import { EventType } from "@/shared/types/events"
 
 export class ActionEventHandler extends BaseModuleEventHandler {
   constructor(
@@ -34,9 +34,8 @@ export class ActionEventHandler extends BaseModuleEventHandler {
     // Inform match service for objective scoring when applicable
     try {
       if (actionEvent.eventType === EventType.ACTION_PLAYER) {
-        const { actionCode } = actionEvent.data as {
-          actionCode: string
-        }
+        const { actionCode } = actionEvent.data
+
         // Bomb-related or key objective actions
         await this.matchService?.handleObjectiveAction(
           actionCode,

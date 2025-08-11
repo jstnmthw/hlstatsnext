@@ -222,6 +222,19 @@ export interface IPlayerService {
   handleKillEvent(event: PlayerKillEvent): Promise<HandlerResult>
 }
 
+// Per-alias (players_names) aggregation update shape
+export interface PlayerNameStatsUpdate {
+  numUses?: number
+  connectionTime?: number
+  kills?: number
+  deaths?: number
+  suicides?: number
+  shots?: number
+  hits?: number
+  headshots?: number
+  lastUse?: Date
+}
+
 export interface IPlayerRepository {
   // CRUD operations
   findById(playerId: number, options?: FindOptions): Promise<Player | null>
@@ -342,6 +355,14 @@ export interface IPlayerRepository {
   updateServerForPlayerEvent?(
     serverId: number,
     updates: Record<string, unknown>,
+    options?: UpdateOptions,
+  ): Promise<void>
+
+  // players_names aggregation upsert
+  upsertPlayerName(
+    playerId: number,
+    name: string,
+    updates: PlayerNameStatsUpdate,
     options?: UpdateOptions,
   ): Promise<void>
 }

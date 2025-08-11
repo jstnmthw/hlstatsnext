@@ -18,7 +18,7 @@ The **HLStatsNext Daemon** is a high-performance, real-time game statistics engi
 ```
 Game Servers → UDP Ingress → Event Parser → RabbitMQ → Event Processor → Business Logic → Database
      ↓              ↓             ↓            ↓             ↓                ↓              ↓
-  [Logs]         [Parse]      [Validate]    [Queue]      [Consume]        [Process]      [Persist]
+   [Logs]        [Parse]      [Validate]    [Queue]      [Consume]        [Process]      [Persist]
 ```
 
 ### Core Components

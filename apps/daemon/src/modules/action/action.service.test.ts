@@ -207,7 +207,7 @@ describe("ActionService", () => {
       expect(mockLogger.warn).toHaveBeenCalledWith("Unknown action code: round_win for game csgo")
     })
 
-    it("should award rewardTeam to teammates and log team bonus rows", async () => {
+    it("should award rewardTeam to teammates and log team bonus rows with bonus column set to rewardTeam", async () => {
       vi.mocked(mockRepository.findActionByCode).mockResolvedValue({
         id: 10,
         game: "cstrike",
@@ -238,24 +238,76 @@ describe("ActionService", () => {
       vi.mocked(mockMatchService.getPlayersByTeam).mockReturnValue([1, 2, 0, -1])
       await actionService.handleActionEvent(actionEvent)
 
-      // Team bonus rows persisted for each teammate
+      // Team bonus rows persisted for each teammate; bonus column equals rewardTeam (2)
       expect(mockRepository.logTeamActionForPlayer).toHaveBeenCalledWith(
         1,
         42,
         10,
         expect.any(String),
-        0,
+        2,
       )
       expect(mockRepository.logTeamActionForPlayer).toHaveBeenCalledWith(
         2,
         42,
         10,
         expect.any(String),
-        0,
+        2,
       )
       // Skill awarded to valid teammates
       expect(mockPlayerService.updatePlayerStats).toHaveBeenCalledWith(1, { skill: 2 })
       expect(mockPlayerService.updatePlayerStats).toHaveBeenCalledWith(2, { skill: 2 })
+    })
+
+    it("should add extra event bonus to rewardTeam when logging team bonus rows", async () => {
+      vi.mocked(mockRepository.findActionByCode).mockResolvedValue({
+        id: 11,
+        game: "cstrike",
+        code: "Objective_Captured",
+        rewardPlayer: 0,
+        rewardTeam: 3,
+        team: "CT",
+        description: null,
+        forPlayerActions: false,
+        forPlayerPlayerActions: false,
+        forTeamActions: true,
+        forWorldActions: false,
+      })
+      vi.mocked(mockRepository.logTeamActionForPlayer).mockResolvedValue(undefined)
+
+      const actionEvent: ActionEvent = {
+        eventType: EventType.ACTION_TEAM,
+        timestamp: new Date(),
+        serverId: 100,
+        data: {
+          team: "CT",
+          actionCode: "Objective_Captured",
+          game: "cstrike",
+          bonus: 4,
+        },
+      } as unknown as ActionEvent
+
+      vi.mocked(mockMatchService.getPlayersByTeam).mockReturnValue([5, 9])
+
+      await actionService.handleActionEvent(actionEvent)
+
+      // Expect bonus column to contain rewardTeam + bonus = 3 + 4 = 7
+      expect(mockRepository.logTeamActionForPlayer).toHaveBeenCalledWith(
+        5,
+        100,
+        11,
+        expect.any(String),
+        7,
+      )
+      expect(mockRepository.logTeamActionForPlayer).toHaveBeenCalledWith(
+        9,
+        100,
+        11,
+        expect.any(String),
+        7,
+      )
+      // Skill update uses the same total
+      expect(mockPlayerService.updatePlayerStats).toHaveBeenCalledWith(5, { skill: 7 })
+      expect(mockPlayerService.updatePlayerStats).toHaveBeenCalledWith(9, { skill: 7 })
     })
 
     it("should handle ACTION_WORLD events", async () => {

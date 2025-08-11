@@ -242,7 +242,7 @@ export class ActionService implements IActionService {
                 event.serverId,
                 actionDef.id,
                 currentMap,
-                bonus || 0,
+                actionDef.rewardTeam + (bonus || 0),
               ),
             ),
           )

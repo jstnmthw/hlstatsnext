@@ -95,7 +95,7 @@ export class RabbitMQEventProcessor implements IEventProcessor {
     }
 
     this.logger.info(
-      `Processing event ${event.eventType} through [${handlers.map((h) => h.name).join(", ")}] module handlers`,
+      `Processing event: ${event.eventType} through [${handlers.map((h) => h.name).join(", ")}] module handlers`,
       {
         eventId: event.eventId,
         handlers: handlers.map((h) => h.name),
@@ -169,7 +169,7 @@ export class RabbitMQEventProcessor implements IEventProcessor {
     }
 
     this.logger.debug(
-      `Processing event ${event.eventType} through ${this.coordinators.length} coordinators`,
+      `Processing event: ${event.eventType} through [${this.coordinators.map((c) => c.constructor.name).join(", ")}] coordinators`,
       {
         eventId: event.eventId,
         coordinators: this.coordinators.map((c) => c.constructor.name),

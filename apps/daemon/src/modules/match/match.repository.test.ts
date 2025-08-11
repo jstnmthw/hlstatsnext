@@ -7,6 +7,8 @@ import { MatchRepository } from "./match.repository"
 import { createMockLogger } from "../../tests/mocks/logger"
 import { createMockDatabaseClient, type MockDatabaseClient } from "../../tests/mocks/database"
 import type { DatabaseClient } from "@/database/client"
+import { GameConfig } from "@/config/game.config"
+import type { Player, PlayerHistory } from "@repo/database/client"
 import { createMockServerRecord } from "../../tests/mocks/server"
 
 describe("MatchRepository", () => {
@@ -18,6 +20,170 @@ describe("MatchRepository", () => {
     mockLogger = createMockLogger()
     mockDatabase = createMockDatabaseClient()
     matchRepository = new MatchRepository(mockDatabase, mockLogger)
+  })
+
+  function createMockPlayer(overrides: Partial<Player> = {}): Player {
+    return {
+      playerId: 1,
+      lastEvent: new Date(),
+      connectionTime: 0,
+      lastSkillChange: new Date(),
+      lastName: "TestPlayer",
+      lastAddress: "127.0.0.1",
+      fullName: "",
+      email: "",
+      city: "",
+      state: "",
+      country: "",
+      flag: "",
+      lat: null,
+      lng: null,
+      clanId: null,
+      kills: 0,
+      deaths: 0,
+      suicides: 0,
+      skill: 1000,
+      shots: 0,
+      hits: 0,
+      teamkills: 0,
+      headshots: 0,
+      killStreak: 0,
+      deathStreak: 0,
+      activity: 0,
+      game: "csgo",
+      hideRanking: 0,
+      displayEvents: 1,
+      blockAvatar: 0,
+      mmrank: null,
+      createdAt: new Date(),
+      ...overrides,
+    }
+  }
+
+  function createMockPlayerHistory(overrides: Partial<PlayerHistory> = {}): PlayerHistory {
+    return {
+      playerId: 1,
+      eventTime: new Date(),
+      connectionTime: 0,
+      kills: 0,
+      deaths: 0,
+      suicides: 0,
+      skill: 1000,
+      shots: 0,
+      hits: 0,
+      game: GameConfig.getDefaultGame(),
+      headshots: 0,
+      teamkills: 0,
+      killStreak: 0,
+      deathStreak: 0,
+      skillChange: 0,
+      ...overrides,
+    }
+  }
+
+  describe("createPlayerHistory daily aggregation", () => {
+    it("creates new daily row when none exists", async () => {
+      const playerId = 1
+      const day = new Date(Date.UTC(2025, 7, 11))
+      mockDatabase.mockPrisma.player.findUnique.mockResolvedValue(createMockPlayer({ playerId }))
+      mockDatabase.mockPrisma.playerHistory.findUnique.mockResolvedValue(null)
+      mockDatabase.mockPrisma.playerHistory.create.mockResolvedValue(
+        createMockPlayerHistory({
+          playerId,
+          eventTime: day,
+          kills: 2,
+          deaths: 1,
+          headshots: 1,
+          skill: 1010,
+        }),
+      )
+
+      await matchRepository.createPlayerHistory({
+        playerId,
+        eventTime: day,
+        game: GameConfig.getDefaultGame(),
+        kills: 2,
+        deaths: 1,
+        headshots: 1,
+        skill: 1010,
+      })
+
+      expect(mockDatabase.mockPrisma.playerHistory.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          playerId,
+          eventTime: expect.any(Date),
+          game: expect.any(String),
+          kills: 2,
+          deaths: 1,
+          headshots: 1,
+          skill: 1010,
+        }),
+      })
+    })
+
+    it("updates existing daily row by incrementing sums and maxing streaks", async () => {
+      const playerId = 2
+      const day = new Date(Date.UTC(2025, 7, 11))
+      mockDatabase.mockPrisma.player.findUnique.mockResolvedValue(createMockPlayer({ playerId }))
+      mockDatabase.mockPrisma.playerHistory.findUnique.mockResolvedValue(
+        createMockPlayerHistory({
+          playerId,
+          eventTime: day,
+          skill: 1005,
+          skillChange: 5,
+          killStreak: 3,
+          deathStreak: 2,
+        }),
+      )
+      mockDatabase.mockPrisma.playerHistory.update.mockResolvedValue(
+        createMockPlayerHistory({ playerId, eventTime: day }),
+      )
+
+      await matchRepository.createPlayerHistory({
+        playerId,
+        eventTime: day,
+        game: GameConfig.getDefaultGame(),
+        kills: 1,
+        deaths: 0,
+        suicides: 0,
+        shots: 5,
+        hits: 4,
+        headshots: 1,
+        teamkills: 0,
+        connectionTime: 12,
+        killStreak: 4,
+        deathStreak: 1,
+        skill: 1010,
+      })
+
+      expect(mockDatabase.mockPrisma.playerHistory.update).toHaveBeenCalledWith({
+        where: {
+          eventTime_playerId_game: {
+            eventTime: expect.any(Date),
+            playerId,
+            game: expect.any(String),
+          },
+        },
+        data: expect.objectContaining({
+          kills: { increment: 1 },
+          shots: { increment: 5 },
+          killStreak: 4,
+          deathStreak: 2,
+          skill: 1010,
+          skillChange: { increment: expect.any(Number) },
+        }),
+      })
+    })
+
+    it("skips when player does not exist", async () => {
+      mockDatabase.mockPrisma.player.findUnique.mockResolvedValue(null)
+      await matchRepository.createPlayerHistory({
+        playerId: 999,
+        eventTime: new Date(),
+      })
+      expect(mockDatabase.mockPrisma.playerHistory.create).not.toHaveBeenCalled()
+      expect(mockDatabase.mockPrisma.playerHistory.update).not.toHaveBeenCalled()
+    })
   })
 
   describe("Repository instantiation", () => {

@@ -6,7 +6,7 @@ import { describe, it, expect, beforeEach } from "vitest"
 import { PlayerRepository } from "./player.repository"
 import { createMockLogger } from "../../tests/mocks/logger"
 import { createMockDatabaseClient, type MockDatabaseClient } from "../../tests/mocks/database"
-import type { Player } from "@repo/database/client"
+import type { Player, EventConnect } from "@repo/database/client"
 import type { DatabaseClient } from "@/database/client"
 
 // Helper function to create a complete Player object with defaults
@@ -375,6 +375,56 @@ describe("PlayerRepository", () => {
       await expect(playerRepository.update(playerId, emptyUpdate)).rejects.toThrow(
         "No valid fields to update",
       )
+    })
+  })
+
+  describe("hasRecentConnect", () => {
+    it("returns true when a recent connect exists within window", async () => {
+      const serverId = 10
+      const playerId = 15
+      const now = new Date()
+      mockDatabase.mockPrisma.eventConnect.findFirst.mockResolvedValue({
+        id: 1,
+        eventTime: new Date(now.getTime() - 60_000),
+        serverId: 10,
+        map: "de_dust2",
+        playerId: 15,
+        ipAddress: "",
+        hostname: "",
+        hostgroup: "",
+        eventTimeDisconnect: null,
+      } as EventConnect)
+
+      const result = await playerRepository.hasRecentConnect(serverId, playerId, 120_000)
+      expect(result).toBe(true)
+      expect(mockDatabase.mockPrisma.eventConnect.findFirst).toHaveBeenCalledWith({
+        where: { serverId, playerId },
+        orderBy: { id: "desc" },
+        select: { eventTime: true },
+      })
+    })
+
+    it("returns false when no connect exists or is outside window", async () => {
+      const serverId = 10
+      const playerId = 15
+      const now = new Date()
+      mockDatabase.mockPrisma.eventConnect.findFirst.mockResolvedValueOnce(null)
+      const noRow = await playerRepository.hasRecentConnect(serverId, playerId, 120_000)
+      expect(noRow).toBe(false)
+
+      mockDatabase.mockPrisma.eventConnect.findFirst.mockResolvedValueOnce({
+        id: 2,
+        eventTime: new Date(now.getTime() - 300_000),
+        serverId: 10,
+        map: "de_dust2",
+        playerId: 15,
+        ipAddress: "",
+        hostname: "",
+        hostgroup: "",
+        eventTimeDisconnect: null,
+      } as EventConnect)
+      const oldRow = await playerRepository.hasRecentConnect(serverId, playerId, 120_000)
+      expect(oldRow).toBe(false)
     })
   })
 

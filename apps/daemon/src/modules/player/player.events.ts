@@ -45,7 +45,8 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
     // Apply per-server IgnoreBots for lifecycle events
     if (
       (event.eventType === EventType.PLAYER_CONNECT ||
-        event.eventType === EventType.PLAYER_DISCONNECT) &&
+        event.eventType === EventType.PLAYER_DISCONNECT ||
+        event.eventType === EventType.PLAYER_ENTRY) &&
       event.meta &&
       typeof event.meta === "object" &&
       (event.meta as PlayerMeta).isBot

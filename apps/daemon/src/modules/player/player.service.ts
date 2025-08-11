@@ -27,7 +27,7 @@ import type { KillContext } from "@/modules/ranking/ranking.service"
 import type { HandlerResult } from "@/shared/types/common"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
-import type { BaseEvent } from "@/shared/types/events"
+import type { BaseEvent, DualPlayerMeta, PlayerMeta } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import { normalizeSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
 
@@ -442,31 +442,26 @@ export class PlayerService implements IPlayerService {
       }
       const connectEvent = event as PlayerConnectEvent
       const { playerId, ipAddress } = connectEvent.data
-      const isBot = Boolean((event.meta as { isBot?: boolean } | undefined)?.isBot)
 
       // GeoIP enrichment (best-effort)
       let geoUpdates: Record<string, unknown> | undefined
       if (this.geoipService && ipAddress) {
-        try {
-          const geo = (await this.geoipService.lookup(ipAddress)) as {
-            city?: string
-            country?: string
-            latitude?: number
-            longitude?: number
-            flag?: string
-          } | null
-          if (geo) {
-            geoUpdates = {
-              city: geo.city ?? undefined,
-              country: geo.country ?? undefined,
-              flag: geo.flag ?? undefined,
-              lat: geo.latitude ?? undefined,
-              lng: geo.longitude ?? undefined,
-              lastAddress: ipAddress.split(":")[0],
-            }
+        const geo = (await this.geoipService.lookup(ipAddress)) as {
+          city?: string
+          country?: string
+          latitude?: number
+          longitude?: number
+          flag?: string
+        } | null
+        if (geo) {
+          geoUpdates = {
+            city: geo.city ?? undefined,
+            country: geo.country ?? undefined,
+            flag: geo.flag ?? undefined,
+            lat: geo.latitude ?? undefined,
+            lng: geo.longitude ?? undefined,
+            lastAddress: ipAddress.split(":")[0],
           }
-        } catch {
-          // ignore geo failures
         }
       }
 
@@ -477,7 +472,7 @@ export class PlayerService implements IPlayerService {
 
       // players_names: increment usage for current alias on connect
       try {
-        const currentName = (event.meta as { playerName?: string } | undefined)?.playerName
+        const currentName = (event.meta as PlayerMeta | undefined)?.playerName
         if (currentName) {
           await this.repository.upsertPlayerName(playerId, currentName, {
             numUses: 1,
@@ -489,28 +484,20 @@ export class PlayerService implements IPlayerService {
       }
 
       // Update server activePlayers and lastEvent
-      if (!isBot) {
-        try {
-          await this.repository.updateServerForPlayerEvent?.(event.serverId, {
-            activePlayers: { increment: 1 },
-            lastEvent: new Date(),
-          })
-        } catch {
-          // Optional repository hook may not exist; ignore if unavailable
-        }
-      }
+      await this.repository.updateServerForPlayerEvent?.(event.serverId, {
+        activePlayers: { increment: 1 },
+        lastEvent: new Date(),
+      })
 
       // Log connect lifecycle event
-      if (!isBot) {
-        try {
-          let map = this.matchService?.getCurrentMap(event.serverId) || ""
-          if (map === "unknown" && this.matchService) {
-            map = await this.matchService.initializeMapForServer(event.serverId)
-          }
-          await this.repository.createConnectEvent(playerId, event.serverId, map, ipAddress || "")
-        } catch {
-          // ignore best-effort connect logging errors
-        }
+      let map = this.matchService?.getCurrentMap(event.serverId) || ""
+      if (map === "unknown" && this.matchService) {
+        map = await this.matchService.initializeMapForServer(event.serverId)
+      }
+      // Avoid duplicate connect if a connect was just recorded (e.g., entry then connect)
+      const hasRecent = await this.repository.hasRecentConnect?.(event.serverId, playerId, 120000)
+      if (!hasRecent) {
+        await this.repository.createConnectEvent(playerId, event.serverId, map, ipAddress || "")
       }
 
       this.logger.debug(`Player connected: ${playerId}`)
@@ -532,9 +519,17 @@ export class PlayerService implements IPlayerService {
       const disconnectEvent = event as PlayerDisconnectEvent
       const { playerId, sessionDuration } = disconnectEvent.data
 
-      // Ignore invalid/bot-only slots where parser could not resolve playerId
+      // If we cannot resolve a valid playerId (e.g., bot dropped by engine), still persist a disconnect row with playerId=0
       if (playerId == null || playerId <= 0) {
-        this.logger.warn(`Ignoring disconnect for invalid playerId: ${playerId}`)
+        try {
+          let map = this.matchService?.getCurrentMap(event.serverId) || ""
+          if (map === "unknown" && this.matchService) {
+            map = await this.matchService.initializeMapForServer(event.serverId)
+          }
+          await this.repository.createDisconnectEvent(0, event.serverId, map)
+        } catch {
+          // ignore
+        }
         return { success: true }
       }
 
@@ -550,7 +545,7 @@ export class PlayerService implements IPlayerService {
 
       // Best-effort: attribute sessionDuration to current alias connection_time
       try {
-        const currentName = (event.meta as { playerName?: string } | undefined)?.playerName
+        const currentName = (event.meta as PlayerMeta | undefined)?.playerName
         if (currentName && sessionDuration && sessionDuration > 0) {
           await this.repository.upsertPlayerName(playerId, currentName, {
             connectionTime: sessionDuration,
@@ -573,7 +568,7 @@ export class PlayerService implements IPlayerService {
         // Optional repository hook may not exist; ignore if unavailable
       }
 
-      // Log disconnect lifecycle event and enrich last connect
+      // Log disconnect lifecycle event and enrich last connect (bots included if processed)
       try {
         let map = this.matchService?.getCurrentMap(event.serverId) || ""
         if (map === "unknown" && this.matchService) {
@@ -602,7 +597,6 @@ export class PlayerService implements IPlayerService {
       }
       const entry = event as { data: { playerId: number } }
       const { playerId } = entry.data
-      const isBot = Boolean((event.meta as { isBot?: boolean } | undefined)?.isBot)
 
       // Get current map from the match service, initialize if needed
       let map = this.matchService?.getCurrentMap(event.serverId) || ""
@@ -610,13 +604,25 @@ export class PlayerService implements IPlayerService {
         map = await this.matchService.initializeMapForServer(event.serverId)
       }
 
-      // Log EventEntry and refresh lastEvent; omit entry rows for bots
-      const ops: Array<Promise<unknown>> = []
-      if (!isBot) {
-        ops.push(
-          this.repository.createEntryEvent?.(playerId, event.serverId, map) ?? Promise.resolve(),
-        )
+      // Synthesize connect if needed (bots often have only "entered the game")
+      try {
+        const hasRecent = await this.repository.hasRecentConnect?.(event.serverId, playerId, 120000)
+        if (!hasRecent) {
+          await this.repository.createConnectEvent(playerId, event.serverId, map, "")
+          await this.repository.updateServerForPlayerEvent?.(event.serverId, {
+            activePlayers: { increment: 1 },
+            lastEvent: new Date(),
+          })
+        }
+      } catch {
+        // ignore
       }
+
+      // Log EventEntry and refresh lastEvent
+      const ops: Array<Promise<unknown>> = []
+      ops.push(
+        this.repository.createEntryEvent?.(playerId, event.serverId, map) ?? Promise.resolve(),
+      )
       ops.push(this.updatePlayerStats(playerId, { lastEvent: new Date() }))
       await Promise.all(ops)
 
@@ -757,7 +763,7 @@ export class PlayerService implements IPlayerService {
 
       // players_names: increment suicides for current alias
       try {
-        const currentName = (event.meta as { playerName?: string } | undefined)?.playerName
+        const currentName = (event.meta as PlayerMeta | undefined)?.playerName
         if (currentName) {
           await this.repository.upsertPlayerName(playerId, currentName, {
             suicides: 1,
@@ -832,7 +838,7 @@ export class PlayerService implements IPlayerService {
 
       // players_names: increment shots, hits, and optional headshot per attacker alias
       try {
-        const currentName = (event.meta as { playerName?: string } | undefined)?.playerName
+        const currentName = (event.meta as PlayerMeta | undefined)?.playerName
         if (currentName) {
           await this.repository.upsertPlayerName(attackerId, currentName, {
             shots: 1,
@@ -903,10 +909,7 @@ export class PlayerService implements IPlayerService {
 
       // players_names: update lastUse for killer alias and death for victim alias
       try {
-        const meta = event.meta as unknown as {
-          killer?: { playerName?: string }
-          victim?: { playerName?: string }
-        }
+        const meta = event.meta as DualPlayerMeta
         const now = new Date()
         const ops: Array<Promise<void>> = []
         if (meta?.killer?.playerName) {

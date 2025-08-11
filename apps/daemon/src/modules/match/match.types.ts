@@ -190,4 +190,7 @@ export interface IMatchRepository {
     playerCount?: number,
     options?: UpdateOptions,
   ): Promise<void>
+
+  // Helpers
+  getPlayerSkill(playerId: number): Promise<number | null>
 }

@@ -2,6 +2,38 @@
 
 This document outlines the end-to-end flow for game events in the HLStatsNext daemon, focused on the objective events rewrite (DB-first, canonical action codes).
 
+## Table of Contents
+
+- [High-level Flow](#high-level-flow)
+- [Objective Events Flow (DB-first)](#objective-events-flow-db-first)
+  - [Parsing](#parsing)
+  - [Publishing](#publishing)
+  - [Processing](#processing)
+  - [Match Scoring & Counters](#match-scoring--counters)
+  - [Lifecycle](#lifecycle)
+- [Rationale](#rationale)
+- [Event Lifecycle Documentation](#event-lifecycle-documentation)
+- [Event Lifecycle Stages](#event-lifecycle-stages)
+  - [🌐 EMIT (Event Creation)](#-emit-event-creation)
+  - [📤 PUBLISHED (Queue Publishing)](#-published-queue-publishing)
+  - [📥 RECEIVED (Queue Consumption)](#-received-queue-consumption)
+  - [⚙️ PROCESSING (Business Logic Start)](#️-processing-business-logic-start)
+  - [✅ PROCESSED (Business Logic Complete)](#-processed-business-logic-complete)
+- [Log Level Distinction](#log-level-distinction)
+  - [QUEUE Logs (Magenta)](#queue-logs-magenta)
+  - [INFO Logs (Standard)](#info-logs-standard)
+- [Timeline Example](#timeline-example)
+- [Debugging Guide](#debugging-guide)
+  - [Missing "Emitted" Logs](#missing-emitted-logs)
+  - [Missing "Published" Logs](#missing-published-logs)
+  - [Missing "Received" Logs](#missing-received-logs)
+  - [Missing "Processing" Logs](#missing-processing-logs)
+  - [Missing "Processed" Logs](#missing-processed-logs)
+- [Performance Monitoring](#performance-monitoring)
+  - [Key Metrics](#key-metrics)
+  - [Health Indicators](#health-indicators)
+- [Architecture Flow](#architecture-flow)
+
 ## High-level Flow
 
 1. Ingress (UDP) receives raw server log lines

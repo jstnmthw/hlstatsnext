@@ -30,15 +30,15 @@
     "turbo": "^2.5.5",
     "typescript": "^5.8.3"
   },
-  "packageManager": "pnpm@10.13.1",
+  "packageManager": "pnpm@10.14.0",
   "engines": {
     "node": ">=24.0.0"
   },
   "pnpm": {
     "peerDependencyRules": {
       "allowedVersions": {
-        "@prisma/client": "6.12.0",
-        "prisma": "6.12.0"
+        "@prisma/client": "6.13.0",
+        "prisma": "6.13.0"
       }
     },
     "onlyBuiltDependencies": [

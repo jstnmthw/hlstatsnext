@@ -72,7 +72,7 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
 
         if (!playerExists) {
           this.logger.warn(
-            `Player ${data.playerId} not found when creating player history, skipping`,
+            `Player ${data.playerId} not found when creating player history, skipping (playerId: ${data.playerId})`,
           )
           return
         }

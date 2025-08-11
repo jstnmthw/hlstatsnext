@@ -130,8 +130,6 @@ export class ActionService implements IActionService {
     }
   }
 
-  // Deleted mapObjectiveToAction: actionCode is used as-is from parsers
-
   private async handlePlayerPlayerAction(event: ActionPlayerPlayerEvent): Promise<HandlerResult> {
     try {
       const { playerId, victimId, actionCode, game, team, bonus } = event.data

@@ -235,6 +235,7 @@ export class ActionService implements IActionService {
         const teamPlayers = this.matchService.getPlayersByTeam(event.serverId, team)
         const validPlayerIds = teamPlayers.filter((pid) => typeof pid === "number" && pid > 0)
         if (validPlayerIds.length > 0) {
+          const awardedPerPlayer = actionDef.rewardTeam + (bonus || 0)
           await Promise.all(
             validPlayerIds.map((pid) =>
               this.repository.logTeamActionForPlayer(
@@ -242,7 +243,7 @@ export class ActionService implements IActionService {
                 event.serverId,
                 actionDef.id,
                 currentMap,
-                actionDef.rewardTeam + (bonus || 0),
+                awardedPerPlayer,
               ),
             ),
           )
@@ -251,11 +252,16 @@ export class ActionService implements IActionService {
             await Promise.all(
               validPlayerIds.map((pid) =>
                 this.playerService!.updatePlayerStats(pid, {
-                  skill: actionDef.rewardTeam + (bonus || 0),
+                  skill: awardedPerPlayer,
                 }),
               ),
             )
           }
+
+          // Emit a clear success message for verification at round end/team win flow
+          this.logger.info(
+            `Awarded team bonus: ${actionDef.code} → ${team} (${validPlayerIds.length} recipients × ${awardedPerPlayer} points each) (Server ID: ${event.serverId})`,
+          )
         }
       }
 

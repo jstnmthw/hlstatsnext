@@ -372,6 +372,36 @@ export class PlayerService implements IPlayerService {
         ),
       ])
 
+      // players_names aggregation updates for aliases if meta present
+      try {
+        const meta = event.meta as unknown as {
+          killer?: { playerName?: string }
+          victim?: { playerName?: string }
+        }
+        const now = new Date()
+        const ops: Array<Promise<void>> = []
+        if (meta?.killer?.playerName) {
+          ops.push(
+            this.repository.upsertPlayerName(killerId, meta.killer.playerName, {
+              kills: 1,
+              headshots: headshot ? 1 : 0,
+              lastUse: now,
+            }),
+          )
+        }
+        if (meta?.victim?.playerName) {
+          ops.push(
+            this.repository.upsertPlayerName(victimId, meta.victim.playerName, {
+              deaths: 1,
+              lastUse: now,
+            }),
+          )
+        }
+        if (ops.length) await Promise.all(ops)
+      } catch (err) {
+        this.logger.warn(`Failed to upsert player names on kill: ${String(err)}`)
+      }
+
       // Log kill event details
       this.logger.debug(
         `Kill event: ${killerId} → ${victimId} (${weapon}${headshot ? ", headshot" : ""})`,
@@ -445,6 +475,19 @@ export class PlayerService implements IPlayerService {
         ...(geoUpdates ?? {}),
       } as PlayerStatsUpdate)
 
+      // players_names: increment usage for current alias on connect
+      try {
+        const currentName = (event.meta as { playerName?: string } | undefined)?.playerName
+        if (currentName) {
+          await this.repository.upsertPlayerName(playerId, currentName, {
+            numUses: 1,
+            lastUse: new Date(),
+          })
+        }
+      } catch (err) {
+        this.logger.warn(`Failed to upsert player name on connect for ${playerId}: ${String(err)}`)
+      }
+
       // Update server activePlayers and lastEvent
       if (!isBot) {
         try {
@@ -504,6 +547,21 @@ export class PlayerService implements IPlayerService {
       }
 
       await this.updatePlayerStats(playerId, updates)
+
+      // Best-effort: attribute sessionDuration to current alias connection_time
+      try {
+        const currentName = (event.meta as { playerName?: string } | undefined)?.playerName
+        if (currentName && sessionDuration && sessionDuration > 0) {
+          await this.repository.upsertPlayerName(playerId, currentName, {
+            connectionTime: sessionDuration,
+            lastUse: new Date(),
+          })
+        }
+      } catch (err) {
+        this.logger.warn(
+          `Failed to upsert player name on disconnect for ${playerId}: ${String(err)}`,
+        )
+      }
 
       // Update server activePlayers and lastEvent
       try {
@@ -641,6 +699,18 @@ export class PlayerService implements IPlayerService {
         )
       }
 
+      // players_names: bump usage for the new alias and mark lastUse
+      try {
+        await this.repository.upsertPlayerName(playerId, newName, {
+          numUses: 1,
+          lastUse: new Date(),
+        })
+      } catch (err) {
+        this.logger.warn(
+          `Failed to upsert player name on change-name for ${playerId}: ${String(err)}`,
+        )
+      }
+
       return { success: true, affected: 1 }
     } catch (error) {
       return {
@@ -684,6 +754,20 @@ export class PlayerService implements IPlayerService {
       }
 
       await this.updatePlayerStats(playerId, updates)
+
+      // players_names: increment suicides for current alias
+      try {
+        const currentName = (event.meta as { playerName?: string } | undefined)?.playerName
+        if (currentName) {
+          await this.repository.upsertPlayerName(playerId, currentName, {
+            suicides: 1,
+            deaths: 1,
+            lastUse: new Date(),
+          })
+        }
+      } catch (err) {
+        this.logger.warn(`Failed to upsert player name on suicide for ${playerId}: ${String(err)}`)
+      }
 
       // Persist EventSuicide
       try {
@@ -746,6 +830,21 @@ export class PlayerService implements IPlayerService {
 
       await this.updatePlayerStats(attackerId, attackerUpdates)
 
+      // players_names: increment shots, hits, and optional headshot per attacker alias
+      try {
+        const currentName = (event.meta as { playerName?: string } | undefined)?.playerName
+        if (currentName) {
+          await this.repository.upsertPlayerName(attackerId, currentName, {
+            shots: 1,
+            hits: 1,
+            headshots: hitgroup === "head" ? 1 : 0,
+            lastUse: new Date(),
+          })
+        }
+      } catch (err) {
+        this.logger.warn(`Failed to upsert player name on damage: ${String(err)}`)
+      }
+
       // Log damage event for accuracy tracking
       this.logger.debug(
         `Damage: ${attackerId} -> ${victimId} (${damage} damage with ${weapon}, hitgroup: ${hitgroup})`,
@@ -801,6 +900,34 @@ export class PlayerService implements IPlayerService {
         this.updatePlayerStats(killerId, killerUpdates),
         this.updatePlayerStats(victimId, victimUpdates),
       ])
+
+      // players_names: update lastUse for killer alias and death for victim alias
+      try {
+        const meta = event.meta as unknown as {
+          killer?: { playerName?: string }
+          victim?: { playerName?: string }
+        }
+        const now = new Date()
+        const ops: Array<Promise<void>> = []
+        if (meta?.killer?.playerName) {
+          ops.push(
+            this.repository.upsertPlayerName(killerId, meta.killer.playerName, {
+              lastUse: now,
+            }),
+          )
+        }
+        if (meta?.victim?.playerName) {
+          ops.push(
+            this.repository.upsertPlayerName(victimId, meta.victim.playerName, {
+              deaths: 1,
+              lastUse: now,
+            }),
+          )
+        }
+        if (ops.length) await Promise.all(ops)
+      } catch (err) {
+        this.logger.warn(`Failed to upsert player names on teamkill: ${String(err)}`)
+      }
 
       return { success: true, affected: 2 }
     } catch (error) {

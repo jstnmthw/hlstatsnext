@@ -504,6 +504,70 @@ describe("PlayerService", () => {
     })
   })
 
+  describe("players_names aggregation wiring", () => {
+    it("should upsert alias on connect with numUses", async () => {
+      const connectEvent = {
+        eventType: EventType.PLAYER_CONNECT,
+        timestamp: new Date(),
+        serverId: 10,
+        data: {
+          playerId: 11,
+          steamId: "7656119",
+          playerName: "AliasX",
+          ipAddress: "1.2.3.4:27015",
+        },
+        meta: { playerName: "AliasX" },
+      } as unknown as PlayerEvent
+
+      const upsertSpy = vi.spyOn(mockRepository, "upsertPlayerName").mockResolvedValue()
+      await playerService.handlePlayerEvent(connectEvent)
+      expect(upsertSpy).toHaveBeenCalledWith(
+        11,
+        "AliasX",
+        expect.objectContaining({ numUses: 1, lastUse: expect.any(Date) }),
+      )
+    })
+
+    it("should update alias counters on kill for killer and victim", async () => {
+      vi.spyOn(mockRepository, "getPlayerStats")
+        .mockResolvedValueOnce({ playerId: 1, skill: 1000, kills: 0, deaths: 0 } as Player)
+        .mockResolvedValueOnce({ playerId: 2, skill: 950, kills: 0, deaths: 0 } as Player)
+      vi.spyOn(mockRepository, "update").mockResolvedValue({} as Player)
+      vi.spyOn(mockRepository, "logEventFrag").mockResolvedValue()
+
+      const upsertSpy = vi.spyOn(mockRepository, "upsertPlayerName").mockResolvedValue()
+      const evt: PlayerKillEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 1,
+        data: {
+          killerId: 1,
+          victimId: 2,
+          weapon: "ak47",
+          headshot: true,
+          killerTeam: "TERRORIST",
+          victimTeam: "CT",
+        },
+        meta: {
+          killer: { steamId: "s1", playerName: "KAlias", isBot: false },
+          victim: { steamId: "s2", playerName: "VAlias", isBot: false },
+        },
+      }
+
+      await playerService.handleKillEvent(evt)
+      expect(upsertSpy).toHaveBeenCalledWith(
+        1,
+        "KAlias",
+        expect.objectContaining({ kills: 1, headshots: 1, lastUse: expect.any(Date) }),
+      )
+      expect(upsertSpy).toHaveBeenCalledWith(
+        2,
+        "VAlias",
+        expect.objectContaining({ deaths: 1, lastUse: expect.any(Date) }),
+      )
+    })
+  })
+
   describe("handlePlayerEvent", () => {
     it("should route PLAYER_KILL events to handleKillEvent", async () => {
       const killEvent: PlayerEvent = {

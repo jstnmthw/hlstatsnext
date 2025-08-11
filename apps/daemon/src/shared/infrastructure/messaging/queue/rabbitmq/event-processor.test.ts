@@ -67,7 +67,7 @@ describe("RabbitMQEventProcessor", () => {
       )
 
       expect(mockLogger.info).toHaveBeenCalledWith(
-        "Event processed: PLAYER_KILL (Server ID: 1)",
+        expect.stringContaining("Event processed: PLAYER_KILL (Server ID: 1, Event ID: "),
         expect.objectContaining({
           eventId: "existing-event-123",
           correlationId: "existing-corr-456",
@@ -99,7 +99,7 @@ describe("RabbitMQEventProcessor", () => {
       )
 
       expect(mockLogger.info).toHaveBeenCalledWith(
-        "Event processed: PLAYER_CONNECT (Server ID: 1)",
+        expect.stringContaining("Event processed: PLAYER_CONNECT (Server ID: 1, Event ID: "),
         expect.objectContaining({
           eventId: expect.any(String),
           correlationId: expect.any(String),
@@ -502,7 +502,7 @@ describe("RabbitMQEventProcessor", () => {
       await processor.processEvent(event)
 
       expect(mockLogger.info).toHaveBeenCalledWith(
-        "Event processed: PLAYER_KILL (Server ID: 1)",
+        expect.stringContaining("Event processed: PLAYER_KILL (Server ID: 1, Event ID: "),
         expect.objectContaining({
           processingTimeMs: expect.any(Number),
         }),

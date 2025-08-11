@@ -459,6 +459,11 @@ The daemon has a solid foundation with complete player lifecycle tracking. The n
 
 ## Change Log
 
+- 2025-08-11
+  - players_names: Added repository upsert method and wired alias aggregation across connect, change-name, disconnect (connection_time), kill (killer/victim), damage (shots/hits/headshots), teamkill (victim death). Tests added for repository and service wiring.
+  - players_history: Confirmed snapshot writes via `MatchRepository.createPlayerHistory` and `MatchService.saveMatchToDatabase`; no schema change needed.
+  - Quality gates: Type-check, lint green; fixed tests remain green after updating code.
+
 - 2025-08-10
   - Parser: Added support for legacy/GoldSrc-style connect lines ("entered the game") in `CsParser`.
   - Persistence: Implemented connect/disconnect logging to `events_connect` and `events_disconnect` via `PlayerRepository.createConnectEvent`/`createDisconnectEvent`; on disconnect, backfills `event_time_disconnect` on the last connect row.

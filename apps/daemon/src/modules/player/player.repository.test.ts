@@ -377,4 +377,50 @@ describe("PlayerRepository", () => {
       )
     })
   })
+
+  describe("upsertPlayerName", () => {
+    it("should create PlayerName when missing", async () => {
+      const playerId = 42
+      const name = "AliasOne"
+      await playerRepository.upsertPlayerName(playerId, name, { numUses: 1, lastUse: new Date() })
+
+      expect(mockDatabase.mockPrisma.playerName.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { playerId_name: { playerId, name } },
+          create: expect.objectContaining({ playerId, name }),
+        }),
+      )
+    })
+
+    it("should increment counters on existing alias", async () => {
+      const playerId = 7
+      const name = "AliasTwo"
+      const now = new Date()
+
+      await playerRepository.upsertPlayerName(playerId, name, {
+        kills: 1,
+        headshots: 1,
+        shots: 2,
+        hits: 2,
+        lastUse: now,
+      })
+
+      expect(mockDatabase.mockPrisma.playerName.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { playerId_name: { playerId, name } },
+          update: expect.objectContaining({
+            kills: { increment: 1 },
+            headshots: { increment: 1 },
+            shots: { increment: 2 },
+            hits: { increment: 2 },
+            lastUse: now,
+          }),
+        }),
+      )
+    })
+
+    it("should validate input", async () => {
+      await expect(playerRepository.upsertPlayerName(0, "", {})).rejects.toThrow()
+    })
+  })
 })

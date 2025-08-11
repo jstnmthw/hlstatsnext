@@ -6,7 +6,7 @@
 
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerRepository, PlayerCreateData } from "./player.types"
+import type { IPlayerRepository, PlayerCreateData, PlayerNameStatsUpdate } from "./player.types"
 import type { FindOptions, CreateOptions, UpdateOptions } from "@/shared/types/database"
 import type { Player, Prisma } from "@repo/database/client"
 import { BaseRepository } from "@/shared/infrastructure/persistence/repository.base"
@@ -599,6 +599,70 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
       this.logger.debug(`Updated server ${serverId} for player event`)
     } catch (error) {
       this.handleError("updateServerForPlayerEvent", error)
+    }
+  }
+
+  async upsertPlayerName(
+    playerId: number,
+    name: string,
+    updates: PlayerNameStatsUpdate,
+    options?: UpdateOptions,
+  ): Promise<void> {
+    try {
+      this.validateId(playerId, "upsertPlayerName")
+      if (!name || name.trim().length === 0) {
+        throw new Error("name is required for upsertPlayerName")
+      }
+
+      // Build Prisma update increments from partial updates
+      const incrementData: Record<string, unknown> = {}
+      if (updates.numUses) incrementData.numUses = { increment: updates.numUses }
+      if (updates.connectionTime)
+        incrementData.connectionTime = { increment: updates.connectionTime }
+      if (updates.kills) incrementData.kills = { increment: updates.kills }
+      if (updates.deaths) incrementData.deaths = { increment: updates.deaths }
+      if (updates.suicides) incrementData.suicides = { increment: updates.suicides }
+      if (updates.shots) incrementData.shots = { increment: updates.shots }
+      if (updates.hits) incrementData.hits = { increment: updates.hits }
+      if (updates.headshots) incrementData.headshots = { increment: updates.headshots }
+
+      const lastUseUpdate = updates.lastUse ? { lastUse: updates.lastUse } : {}
+
+      await this.executeWithTransaction(async (client) => {
+        await client.playerName.upsert({
+          where: {
+            playerId_name: {
+              playerId,
+              name,
+            },
+          },
+          create: {
+            playerId,
+            name,
+            lastUse: updates.lastUse ?? new Date(),
+            numUses: updates.numUses ?? 0,
+            connectionTime: updates.connectionTime ?? 0,
+            kills: updates.kills ?? 0,
+            deaths: updates.deaths ?? 0,
+            suicides: updates.suicides ?? 0,
+            headshots: updates.headshots ?? 0,
+            shots: updates.shots ?? 0,
+            hits: updates.hits ?? 0,
+          },
+          update: {
+            ...incrementData,
+            ...lastUseUpdate,
+          },
+        })
+      }, options)
+
+      this.logger.debug(
+        `Upserted PlayerName for player ${playerId} name "${name}" with updates ${JSON.stringify(
+          updates,
+        )}`,
+      )
+    } catch (error) {
+      this.handleError("upsertPlayerName", error)
     }
   }
 }

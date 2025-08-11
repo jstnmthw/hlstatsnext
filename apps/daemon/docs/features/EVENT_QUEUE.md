@@ -28,7 +28,7 @@ This document outlines the integration of RabbitMQ as the message queue system f
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌──────────────────────┐
-│   Game Server   │────▶│  UDP Ingress     │────▶│    RabbitMQ          │
+│   Game Server   │───▶│  UDP Ingress     │────▶│    RabbitMQ          │
 │                 │ UDP │  (Parse & Auth)  │     │   (Topic Exchange)   │
 └─────────────────┘     └──────────────────┘     └──────────┬───────────┘
                                                             │

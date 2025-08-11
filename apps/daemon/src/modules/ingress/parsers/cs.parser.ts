@@ -4,9 +4,9 @@
  * Parses Counter-Strike game server logs into structured events.
  */
 
-import { BaseParser } from "./base.parser"
 import type { ParseResult } from "./base.parser"
 import type { BaseEvent } from "@/shared/types/events"
+import { BaseParser } from "./base.parser"
 import { EventType } from "@/shared/types/events"
 import { GameConfig } from "@/config/game.config"
 import {
@@ -17,6 +17,7 @@ import {
 export class CsParser extends BaseParser {
   // Track the last winning team for Round_End events
   private lastWinningTeam: string | undefined
+
   // Track the current map for Round_Start events
   private currentMap: string = ""
 
@@ -145,7 +146,6 @@ export class CsParser extends BaseParser {
     }
 
     const [
-      ,
       killerName,
       killerIdStr,
       killerSteamId,
@@ -229,7 +229,6 @@ export class CsParser extends BaseParser {
     }
 
     const [
-      ,
       attackerName,
       attackerIdStr,
       attackerSteamId,
@@ -304,14 +303,18 @@ export class CsParser extends BaseParser {
     // Example: "Player<2><STEAM_ID><CT>" committed suicide with "worldspawn"
     const regex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" committed suicide with "([^"]+)"/i
     const match = logLine.match(regex)
+
     if (!match) {
       return { event: null, success: false }
     }
-    const [, playerName, playerIdStr, steamId, team, weapon] = match
+
+    const [playerName, playerIdStr, steamId, team, weapon] = match
     const playerId = parseInt(playerIdStr || "")
+
     if (!playerName || !playerIdStr || !steamId || Number.isNaN(playerId)) {
       return { event: null, success: false, error: "Missing required fields in suicide event" }
     }
+
     const event: BaseEvent = {
       eventType: EventType.PLAYER_SUICIDE,
       timestamp: this.createTimestamp(),
@@ -330,6 +333,7 @@ export class CsParser extends BaseParser {
         isBot: (steamId || "") === "BOT",
       },
     }
+
     return { event, success: true }
   }
 
@@ -468,17 +472,21 @@ export class CsParser extends BaseParser {
   private parseChangeRoleEvent(logLine: string, serverId: number): ParseResult {
     // Example variants are mod dependent; attempt a tolerant parse if present
     const regex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" changed role to "([^"]+)"/i
+
     const match = logLine.match(regex)
     if (!match) {
       return { event: null, success: false }
     }
-    const [, playerName, playerIdStr, steamId, , roleRaw] = match
+
+    const [playerName, playerIdStr, steamId, roleRaw] = match
     const safePlayerIdStr = playerIdStr || "-1"
     const playerId = parseInt(safePlayerIdStr)
     const role = roleRaw || ""
+
     if (!playerName || !playerIdStr || !steamId || Number.isNaN(playerId) || role === undefined) {
       return { event: null, success: false, error: "Missing required fields in role change" }
     }
+
     const event: BaseEvent = {
       eventType: EventType.PLAYER_CHANGE_ROLE,
       timestamp: this.createTimestamp(),
@@ -496,23 +504,28 @@ export class CsParser extends BaseParser {
         isBot: (steamId || "") === "BOT",
       },
     }
+
     return { event, success: true }
   }
 
   private parseChangeNameEvent(logLine: string, serverId: number): ParseResult {
     // Example: "OldName<2><STEAM_ID><CT>" changed name to "NewName"
     const regex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" changed name to "([^"]+)"/i
+
     const match = logLine.match(regex)
     if (!match) {
       return { event: null, success: false }
     }
+
     const [, oldName, playerIdStr, steamId, , newNameRaw] = match
     const safePlayerIdStr2 = playerIdStr || "-1"
     const playerId = parseInt(safePlayerIdStr2)
     const newName = newNameRaw || ""
+
     if (!oldName || !playerIdStr || !steamId || Number.isNaN(playerId) || newName === undefined) {
       return { event: null, success: false, error: "Missing required fields in name change" }
     }
+
     const event: BaseEvent = {
       eventType: EventType.PLAYER_CHANGE_NAME,
       timestamp: this.createTimestamp(),
@@ -531,6 +544,7 @@ export class CsParser extends BaseParser {
         isBot: (steamId || "") === "BOT",
       },
     }
+
     return { event, success: true }
   }
 
@@ -538,19 +552,21 @@ export class CsParser extends BaseParser {
     // Newer format with explicit reason: "Player<2><STEAM_ID><CT>" disconnected (reason "Disconnect")
     const disconnectWithReason =
       /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" disconnected \(reason "([^"]*)"\)/
+
     // Legacy/simple format without reason: "Player<-1><><CT>" disconnected
     const disconnectSimple = /"([^"]+)<(-?\d+)><([^>]*)><([^>]*)>" disconnected/
 
     let match = logLine.match(disconnectWithReason)
-    console.warn(match)
+
     if (match) {
-      const [, playerName, playerIdStr, steamId, , reason] = match
+      const [playerName, playerIdStr, steamId, reason] = match
+
       if (!playerName || !playerIdStr || !steamId) {
         return { event: null, success: false, error: "Missing required fields in disconnect event" }
       }
+
       const parsedId = parseInt(playerIdStr)
       const playerId = Number.isNaN(parsedId) ? -1 : parsedId
-
       const event: BaseEvent = {
         eventType: EventType.PLAYER_DISCONNECT,
         timestamp: this.createTimestamp(),
@@ -568,18 +584,20 @@ export class CsParser extends BaseParser {
           isBot: steamId === "BOT",
         },
       }
+
       return { event, success: true }
     }
 
     match = logLine.match(disconnectSimple)
     if (match) {
-      const [, playerName, playerIdStr, steamId] = match
+      const [playerName, playerIdStr, steamId] = match
+
       if (!playerName || playerIdStr == null) {
         return { event: null, success: false, error: "Missing required fields in disconnect event" }
       }
+
       const parsedId = parseInt(playerIdStr)
       const playerId = Number.isNaN(parsedId) ? -1 : parsedId
-
       const event: BaseEvent = {
         eventType: EventType.PLAYER_DISCONNECT,
         timestamp: this.createTimestamp(),
@@ -597,6 +615,7 @@ export class CsParser extends BaseParser {
           isBot: (steamId || "") === "BOT",
         },
       }
+
       return { event, success: true }
     }
 

@@ -2,6 +2,40 @@
 
 The **HLStatsNext Daemon** is a high-performance, real-time game statistics engine for Half-Life engine games. This modern TypeScript implementation replaces the legacy Perl daemon with a scalable, maintainable, and production-ready microservice architecture.
 
+## Table of Contents
+
+- [Key Features](#key-features)
+- [Architecture Overview](#architecture-overview)
+  - [Event-Driven Processing Pipeline](#event-driven-processing-pipeline)
+  - [Core Components](#core-components)
+  - [Architectural Patterns](#architectural-patterns)
+- [Development](#development)
+  - [Quick Start](#quick-start)
+  - [Project Structure](#project-structure)
+- [Event Processing](#event-processing)
+  - [Event Lifecycle](#event-lifecycle)
+  - [Supported Events](#supported-events)
+    - [Player Events](#player-events)
+    - [Match Events](#match-events)
+    - [Statistics Events](#statistics-events)
+- [Ranking System](#ranking-system)
+- [Configuration](#configuration)
+  - [Environment Variables](#environment-variables)
+  - [Game Configuration](#game-configuration)
+- [Testing](#testing)
+  - [Test Suite Overview](#test-suite-overview)
+  - [Testing Utilities](#testing-utilities)
+- [Monitoring & Operations](#monitoring--operations)
+  - [Health Checks](#health-checks)
+  - [Metrics](#metrics)
+  - [Logging](#logging)
+- [Production Deployment](#production-deployment)
+  - [Docker Support](#docker-support)
+  - [Scaling Considerations](#scaling-considerations)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Key Features
 
 - **Queue-First Architecture**: RabbitMQ-based event processing for reliability and horizontal scaling

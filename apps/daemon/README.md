@@ -66,24 +66,24 @@ pnpm build
 ```
 apps/daemon/
 ├── src/
-│   ├── modules/           # Feature modules (self-contained domains)
-│   │   ├── player/       # Player lifecycle and statistics
-│   │   ├── weapon/       # Weapon statistics and multipliers
-│   │   ├── match/        # Round and match state management
-│   │   ├── ranking/      # ELO-based skill calculations
-│   │   ├── server/       # Game server management
-│   │   ├── action/       # Game actions and achievements
-│   │   └── ingress/      # UDP server and log parsing
-│   ├── shared/           # Shared infrastructure
-│   │   ├── application/  # Business logic patterns
-│   │   ├── infrastructure/ # Technical patterns
-│   │   └── types/        # Shared type definitions
-│   ├── config/           # Game and weapon configurations
-│   ├── database/         # Database client wrapper
-│   └── main.ts           # Application entry point
-├── docs/                 # Architecture and feature documentation
-├── tests/                # Test fixtures and utilities
-└── scripts/              # Development and testing scripts
+│   ├── modules/              # Feature modules (self-contained domains)
+│   │   ├── player/           # Player lifecycle and statistics
+│   │   ├── weapon/           # Weapon statistics and multipliers
+│   │   ├── match/            # Round and match state management
+│   │   ├── ranking/          # ELO-based skill calculations
+│   │   ├── server/           # Game server management
+│   │   ├── action/           # Game actions and achievements
+│   │   └── ingress/          # UDP server and log parsing
+│   ├── shared/               # Shared infrastructure
+│   │   ├── application/      # Business logic patterns
+│   │   ├── infrastructure/   # Technical patterns
+│   │   └── types/            # Shared type definitions
+│   ├── config/               # Game and weapon configurations
+│   ├── database/             # Database client wrapper
+│   └── main.ts               # Application entry point
+├── docs/                     # Architecture and feature documentation
+├── tests/                    # Test fixtures and utilities
+└── scripts/                  # Development and testing scripts
 ```
 
 ## Event Processing

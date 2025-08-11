@@ -146,6 +146,7 @@ export class CsParser extends BaseParser {
     }
 
     const [
+      ,
       killerName,
       killerIdStr,
       killerSteamId,
@@ -229,6 +230,7 @@ export class CsParser extends BaseParser {
     }
 
     const [
+      ,
       attackerName,
       attackerIdStr,
       attackerSteamId,
@@ -308,7 +310,7 @@ export class CsParser extends BaseParser {
       return { event: null, success: false }
     }
 
-    const [playerName, playerIdStr, steamId, team, weapon] = match
+    const [, playerName, playerIdStr, steamId, team, weapon] = match
     const playerId = parseInt(playerIdStr || "")
 
     if (!playerName || !playerIdStr || !steamId || Number.isNaN(playerId)) {
@@ -436,7 +438,8 @@ export class CsParser extends BaseParser {
       return { event: null, success: false }
     }
 
-    const [playerName, playerIdStr, steamId, newTeam] = match as unknown as [
+    const [, playerName, playerIdStr, steamId, , newTeam] = match as unknown as [
+      string,
       string,
       string,
       string,
@@ -478,7 +481,7 @@ export class CsParser extends BaseParser {
       return { event: null, success: false }
     }
 
-    const [playerName, playerIdStr, steamId, roleRaw] = match
+    const [, playerName, playerIdStr, steamId, , roleRaw] = match
     const safePlayerIdStr = playerIdStr || "-1"
     const playerId = parseInt(safePlayerIdStr)
     const role = roleRaw || ""
@@ -559,7 +562,7 @@ export class CsParser extends BaseParser {
     let match = logLine.match(disconnectWithReason)
 
     if (match) {
-      const [playerName, playerIdStr, steamId, reason] = match
+      const [, playerName, playerIdStr, steamId, , reason] = match
 
       if (!playerName || !playerIdStr || !steamId) {
         return { event: null, success: false, error: "Missing required fields in disconnect event" }
@@ -590,7 +593,7 @@ export class CsParser extends BaseParser {
 
     match = logLine.match(disconnectSimple)
     if (match) {
-      const [playerName, playerIdStr, steamId] = match
+      const [, playerName, playerIdStr, steamId] = match
 
       if (!playerName || playerIdStr == null) {
         return { event: null, success: false, error: "Missing required fields in disconnect event" }

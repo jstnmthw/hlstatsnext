@@ -7,17 +7,21 @@
 
 import { EventType } from "@/shared/types/events"
 import { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
-import type { BaseEvent } from "@/shared/types/events"
+import type { BaseEvent, DualPlayerMeta, PlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import type { IActionService, ActionEvent } from "@/modules/action/action.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IPlayerService } from "@/modules/player/player.types"
+import type { IServerService } from "@/modules/server/server.types"
 
 export class ActionEventHandler extends BaseModuleEventHandler {
   constructor(
     logger: ILogger,
     private readonly actionService: IActionService,
     private readonly matchService?: IMatchService,
+    private readonly playerService?: IPlayerService,
+    private readonly serverService?: IServerService,
     metrics?: EventMetrics,
   ) {
     super(logger, metrics)
@@ -27,7 +31,7 @@ export class ActionEventHandler extends BaseModuleEventHandler {
   async handleActionPlayer(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_PLAYER for server ${event.serverId}`)
 
-    const actionEvent = event as ActionEvent
+    const actionEvent = (await this.resolvePlayerIds(event)) as ActionEvent
     this.logPlayerInfo(actionEvent)
 
     await this.actionService.handleActionEvent(actionEvent)
@@ -52,7 +56,7 @@ export class ActionEventHandler extends BaseModuleEventHandler {
   async handleActionPlayerPlayer(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_PLAYER_PLAYER for server ${event.serverId}`)
 
-    const actionEvent = event as ActionEvent
+    const actionEvent = (await this.resolvePlayerIds(event)) as ActionEvent
     this.logPlayerInfo(actionEvent)
 
     await this.actionService.handleActionEvent(actionEvent)
@@ -86,7 +90,6 @@ export class ActionEventHandler extends BaseModuleEventHandler {
 
   /**
    * Add player information to the log based on event type
-   * This logic was moved from EventProcessor to keep action handling self-contained
    */
   private logPlayerInfo(actionEvent: ActionEvent): void {
     let playerInfo = ""
@@ -105,6 +108,52 @@ export class ActionEventHandler extends BaseModuleEventHandler {
       this.logger.debug(
         `Processing action event: ${actionEvent.eventType} for server ${actionEvent.serverId}${playerInfo}`,
       )
+    }
+  }
+
+  /**
+   * Resolve player ids for action events
+   */
+  private async resolvePlayerIds(event: BaseEvent): Promise<BaseEvent> {
+    try {
+      if (!this.playerService || !this.serverService) return event
+
+      if (
+        event.eventType !== EventType.ACTION_PLAYER &&
+        event.eventType !== EventType.ACTION_PLAYER_PLAYER
+      ) {
+        return event
+      }
+
+      const game = await this.serverService.getServerGame(event.serverId)
+      const meta = event.meta as PlayerMeta | DualPlayerMeta | undefined
+      const data = (event.data as Record<string, unknown>) || {}
+      const resolved: Record<string, unknown> = { ...data }
+
+      if (typeof data.playerId === "number" && meta && "steamId" in meta) {
+        const m = meta
+        resolved.playerId = await this.playerService.getOrCreatePlayer(
+          m.steamId || "",
+          m.playerName || "",
+          game,
+        )
+      }
+
+      if (typeof data.victimId === "number" && meta && "victim" in meta) {
+        const m = meta
+
+        if (m.victim?.steamId) {
+          resolved.victimId = await this.playerService.getOrCreatePlayer(
+            m.victim.steamId,
+            m.victim.playerName || "",
+            game,
+          )
+        }
+      }
+      return { ...event, data: resolved }
+    } catch {
+      this.logger.error(`Failed to resolve player ids for event ${event.eventType}`)
+      return event
     }
   }
 }

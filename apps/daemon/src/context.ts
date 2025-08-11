@@ -177,12 +177,20 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
 
   const weaponEventHandler = new WeaponEventHandler(logger, weaponService, eventMetrics)
 
-  const matchEventHandler = new MatchEventHandler(logger, matchService, actionService, eventMetrics)
+  const matchEventHandler = new MatchEventHandler(
+    logger,
+    matchService,
+    actionService,
+    playerService,
+    eventMetrics,
+  )
 
   const actionEventHandler = new ActionEventHandler(
     logger,
     actionService,
     matchService,
+    playerService,
+    serverService,
     eventMetrics,
   )
 

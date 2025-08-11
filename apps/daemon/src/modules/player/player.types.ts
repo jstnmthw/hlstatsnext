@@ -365,4 +365,7 @@ export interface IPlayerRepository {
     updates: PlayerNameStatsUpdate,
     options?: UpdateOptions,
   ): Promise<void>
+
+  // Helpers
+  hasRecentConnect(serverId: number, playerId: number, withinMs?: number): Promise<boolean>
 }

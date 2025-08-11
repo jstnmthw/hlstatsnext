@@ -568,6 +568,54 @@ describe("PlayerService", () => {
     })
   })
 
+  describe("bot lifecycle synthesis", () => {
+    it("synthesizes connect on entry when missing and increments server counters", async () => {
+      const entryEvent: PlayerEvent = {
+        eventType: EventType.PLAYER_ENTRY,
+        timestamp: new Date(),
+        serverId: 7,
+        data: { playerId: 42 },
+      } as unknown as PlayerEvent
+
+      const hasRecentSpy = vi
+        .spyOn(
+          mockRepository as unknown as {
+            hasRecentConnect: (a: number, b: number, c?: number) => Promise<boolean>
+          },
+          "hasRecentConnect",
+        )
+        .mockResolvedValue(false)
+      const createConnectSpy = vi.spyOn(mockRepository, "createConnectEvent").mockResolvedValue()
+      const serverUpdateSpy = vi
+        .spyOn(mockRepository, "updateServerForPlayerEvent")
+        .mockResolvedValue()
+
+      await playerService.handlePlayerEvent(entryEvent)
+
+      expect(hasRecentSpy).toHaveBeenCalled()
+      expect(createConnectSpy).toHaveBeenCalledWith(42, 7, expect.any(String), "")
+      expect(serverUpdateSpy).toHaveBeenCalledWith(
+        7,
+        expect.objectContaining({ activePlayers: { increment: 1 } }),
+      )
+    })
+
+    it("persists disconnect with playerId=0 when invalid", async () => {
+      const disconnectEvent: PlayerEvent = {
+        eventType: EventType.PLAYER_DISCONNECT,
+        timestamp: new Date(),
+        serverId: 9,
+        data: { playerId: -1 },
+      } as unknown as PlayerEvent
+
+      const createDisconnectSpy = vi
+        .spyOn(mockRepository, "createDisconnectEvent")
+        .mockResolvedValue()
+      await playerService.handlePlayerEvent(disconnectEvent)
+      expect(createDisconnectSpy).toHaveBeenCalledWith(0, 9, expect.any(String))
+    })
+  })
+
   describe("handlePlayerEvent", () => {
     it("should route PLAYER_KILL events to handleKillEvent", async () => {
       const killEvent: PlayerEvent = {
@@ -634,7 +682,7 @@ describe("PlayerService", () => {
       expect(repoSpy).toHaveBeenCalledWith(99, 1, expect.any(String))
     })
 
-    it("should ignore invalid playerId on disconnect (bots)", async () => {
+    it("should persist disconnect row with playerId=0 for invalid bot slot", async () => {
       const disconnectEvent: PlayerEvent = {
         eventType: EventType.PLAYER_DISCONNECT,
         timestamp: new Date(),
@@ -645,13 +693,13 @@ describe("PlayerService", () => {
         },
       } as unknown as PlayerEvent
 
-      const repoSpy = vi.spyOn(mockRepository, "createDisconnectEvent")
+      const repoSpy = vi.spyOn(mockRepository, "createDisconnectEvent").mockResolvedValue()
       const result = await playerService.handlePlayerEvent(disconnectEvent)
       expect(result.success).toBe(true)
-      expect(repoSpy).not.toHaveBeenCalled()
+      expect(repoSpy).toHaveBeenCalledWith(0, 2, expect.any(String))
     })
 
-    it("should skip connect and entry rows for bots but keep lastEvent", async () => {
+    it("should log connect and entry rows for bots when processed (IgnoreBots handled in handler)", async () => {
       // Connect event for bot
       const connectEvent: PlayerEvent = {
         eventType: EventType.PLAYER_CONNECT,
@@ -667,9 +715,9 @@ describe("PlayerService", () => {
         meta: { isBot: true },
       } as unknown as PlayerEvent
 
-      const connSpy = vi.spyOn(mockRepository, "createConnectEvent")
+      const connSpy = vi.spyOn(mockRepository, "createConnectEvent").mockResolvedValue()
       await playerService.handlePlayerEvent(connectEvent)
-      expect(connSpy).not.toHaveBeenCalled()
+      expect(connSpy).toHaveBeenCalled()
 
       // Entry event for bot
       const entryEvent: PlayerEvent = {
@@ -683,9 +731,9 @@ describe("PlayerService", () => {
         meta: { isBot: true },
       } as unknown as PlayerEvent
 
-      const entrySpy = vi.spyOn(mockRepository, "createEntryEvent")
+      const entrySpy = vi.spyOn(mockRepository, "createEntryEvent").mockResolvedValue()
       await playerService.handlePlayerEvent(entryEvent)
-      expect(entrySpy).not.toHaveBeenCalled()
+      expect(entrySpy).toHaveBeenCalled()
     })
   })
 

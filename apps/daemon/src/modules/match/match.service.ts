@@ -548,6 +548,8 @@ export class MatchService implements IMatchService {
         totalHeadshots += playerStats.headshots
 
         try {
+          // Use starting/ending rating approximation: current player skill if available, otherwise score
+          const currentSkill = await this.repository.getPlayerSkill(playerStats.playerId)
           await this.repository.createPlayerHistory({
             playerId: playerStats.playerId,
             eventTime: new Date(),
@@ -555,7 +557,10 @@ export class MatchService implements IMatchService {
             kills: playerStats.kills,
             deaths: playerStats.deaths,
             suicides: playerStats.suicides,
-            skill: this.calculatePlayerScore(playerStats),
+            skill:
+              typeof currentSkill === "number"
+                ? currentSkill
+                : this.calculatePlayerScore(playerStats),
             shots: playerStats.shots,
             hits: playerStats.hits,
             headshots: playerStats.headshots,

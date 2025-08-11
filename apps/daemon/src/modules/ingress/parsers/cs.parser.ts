@@ -622,7 +622,8 @@ export class CsParser extends BaseParser {
       return { event, success: true }
     }
 
-    return { event: null, success: false, error: "Could not parse disconnect event" }
+    // Some engines drop fakeclients on level change without a parseable line; ignore silently
+    return { event: null, success: false }
   }
 
   private parseChatEvent(logLine: string, serverId: number): ParseResult {

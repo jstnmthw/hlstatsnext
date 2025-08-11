@@ -467,17 +467,21 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
       this.validateId(serverId, "createDisconnectEvent")
 
       await this.executeWithTransaction(async (client) => {
-        // Insert a row to events_disconnect for immediate visibility (skip invalid playerId)
-        if (playerId > 0) {
-          await client.eventDisconnect.create({
+        await client.eventDisconnect
+          .create({
             data: {
               eventTime: new Date(),
               serverId,
               map: map || "",
-              playerId,
+              playerId: playerId > 0 ? playerId : 0,
             },
           })
-        }
+          .catch((error) => {
+            this.logger.warn(
+              `Failed to create disconnect event for player ${playerId} on server ${serverId}`,
+              error,
+            )
+          })
 
         // Best-effort: also backfill disconnect time on the most recent connect row
         try {
@@ -495,13 +499,40 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
             }
           }
         } catch {
-          // ignore enrichment failure
+          this.logger.warn(
+            `Failed to backfill disconnect time for player ${playerId} on server ${serverId}`,
+          )
         }
       }, options)
 
       this.logger.debug(`Created disconnect event for player ${playerId} on server ${serverId}`)
     } catch (error) {
       this.handleError("createDisconnectEvent", error)
+    }
+  }
+
+  async hasRecentConnect(
+    serverId: number,
+    playerId: number,
+    withinMs: number = 2 * 60 * 1000,
+    options?: FindOptions,
+  ): Promise<boolean> {
+    try {
+      this.validateId(serverId, "hasRecentConnect")
+      if (playerId <= 0) return false
+
+      return await this.executeWithTransaction(async (client) => {
+        const row = await client.eventConnect.findFirst({
+          where: { serverId, playerId },
+          orderBy: { id: "desc" },
+          select: { eventTime: true },
+        })
+        if (!row || !row.eventTime) return false
+        const diff = Date.now() - row.eventTime.getTime()
+        return diff >= 0 && diff <= withinMs
+      }, options)
+    } catch (error) {
+      this.handleError("hasRecentConnect", error)
     }
   }
 

@@ -19,6 +19,22 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
     super(db, logger)
   }
 
+  async getPlayerSkill(playerId: number): Promise<number | null> {
+    try {
+      this.validateId(playerId, "getPlayerSkill")
+      return await this.executeWithTransaction(async (client) => {
+        const row = await client.player.findUnique({
+          where: { playerId },
+          select: { skill: true },
+        })
+        return row?.skill ?? null
+      })
+    } catch (error) {
+      this.handleError("getPlayerSkill", error)
+      return null
+    }
+  }
+
   async updateServerStats(
     serverId: number,
     updates: Record<string, unknown>,
@@ -77,25 +93,88 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
           return
         }
 
-        await client.playerHistory.create({
-          data: {
-            playerId: data.playerId,
-            eventTime: data.eventTime,
-            game: data.game || GameConfig.getDefaultGame(),
-            kills: data.kills || 0,
-            deaths: data.deaths || 0,
-            suicides: data.suicides || 0,
-            skill: data.skill || 0,
-            shots: data.shots || 0,
-            hits: data.hits || 0,
-            headshots: data.headshots || 0,
-            teamkills: data.teamkills || 0,
-            connectionTime: data.connectionTime || 0,
-            killStreak: data.killStreak || 0,
-            deathStreak: data.deathStreak || 0,
-            skillChange: data.skillChange || 0,
-          },
-        })
+        try {
+          const d = data.eventTime
+          const day = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()))
+          const game = data.game || GameConfig.getDefaultGame()
+
+          // Try update first to aggregate increments for the same day
+          const existing = await client.playerHistory.findUnique({
+            where: {
+              eventTime_playerId_game: {
+                eventTime: day,
+                playerId: data.playerId,
+                game,
+              },
+            },
+            select: { skill: true, skillChange: true, killStreak: true, deathStreak: true },
+          })
+
+          if (existing) {
+            const currentSkill = typeof data.skill === "number" ? data.skill : existing.skill
+            const delta = (typeof data.skill === "number" ? data.skill : 0) - existing.skill
+            await client.playerHistory.update({
+              where: {
+                eventTime_playerId_game: {
+                  eventTime: day,
+                  playerId: data.playerId,
+                  game,
+                },
+              },
+              data: {
+                // Aggregate per-day sums
+                kills: { increment: data.kills || 0 },
+                deaths: { increment: data.deaths || 0 },
+                suicides: { increment: data.suicides || 0 },
+                shots: { increment: data.shots || 0 },
+                hits: { increment: data.hits || 0 },
+                headshots: { increment: data.headshots || 0 },
+                teamkills: { increment: data.teamkills || 0 },
+                connectionTime: { increment: data.connectionTime || 0 },
+                // Longest streaks for the day
+                killStreak: Math.max(existing.killStreak ?? 0, data.killStreak || 0),
+                deathStreak: Math.max(existing.deathStreak ?? 0, data.deathStreak || 0),
+                // Skill values reflect end-of-day; keep latest snapshot and accumulate net change
+                skill: currentSkill,
+                skillChange: { increment: delta },
+              },
+            })
+            this.logger.info("PLAYER_HISTORY processed", {
+              playerId: data.playerId,
+              eventDate: day.toISOString().slice(0, 10),
+              game,
+              aggregated: true,
+            })
+          } else {
+            await client.playerHistory.create({
+              data: {
+                playerId: data.playerId,
+                eventTime: day,
+                game,
+                kills: data.kills || 0,
+                deaths: data.deaths || 0,
+                suicides: data.suicides || 0,
+                skill: data.skill || 0,
+                shots: data.shots || 0,
+                hits: data.hits || 0,
+                headshots: data.headshots || 0,
+                teamkills: data.teamkills || 0,
+                connectionTime: data.connectionTime || 0,
+                killStreak: data.killStreak || 0,
+                deathStreak: data.deathStreak || 0,
+                skillChange: data.skillChange || 0,
+              },
+            })
+            this.logger.info("PLAYER_HISTORY processed", {
+              playerId: data.playerId,
+              eventDate: day.toISOString().slice(0, 10),
+              game,
+              aggregated: false,
+            })
+          }
+        } catch (error) {
+          this.handleError("createPlayerHistory", error)
+        }
       }, options)
     } catch (error) {
       this.handleError("createPlayerHistory", error)
@@ -135,8 +214,6 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
       this.handleError("updateMapCount", error)
     }
   }
-
-  // Additional repository methods for match-specific operations
 
   async incrementServerRounds(serverId: number, options?: UpdateOptions): Promise<void> {
     try {

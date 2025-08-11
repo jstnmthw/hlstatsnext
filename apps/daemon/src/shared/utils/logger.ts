@@ -38,7 +38,7 @@ const STATUS_LOG_LEVEL: Record<LogStatus, LogLevel> = {
   OK: LogLevel.INFO, // Treat OK as INFO level
   EVENT: LogLevel.INFO, // Treat EVENT as INFO level
   CHAT: LogLevel.INFO, // Treat CHAT as INFO level
-  QUEUE: LogLevel.INFO, // Treat QUEUE as INFO level
+  QUEUE: LogLevel.DEBUG, // Treat QUEUE as DEBUG level
 }
 
 // Options for the logger

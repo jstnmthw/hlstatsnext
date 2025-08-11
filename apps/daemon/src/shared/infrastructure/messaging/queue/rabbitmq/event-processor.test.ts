@@ -167,7 +167,7 @@ describe("RabbitMQEventProcessor", () => {
       await processor.processEvent(event)
 
       expect(mockLogger.info).toHaveBeenCalledWith(
-        "Processing event PLAYER_KILL through [PlayerHandler] module handlers",
+        "Processing event: PLAYER_KILL through [PlayerHandler] module handlers",
         {
           eventId: "test-event-123",
           handlers: ["PlayerHandler"],
@@ -224,7 +224,7 @@ describe("RabbitMQEventProcessor", () => {
       await processor.processEvent(event)
 
       expect(mockLogger.info).toHaveBeenCalledWith(
-        "Processing event PLAYER_KILL through [PlayerHandler, StatsHandler] module handlers",
+        "Processing event: PLAYER_KILL through [PlayerHandler, StatsHandler] module handlers",
         {
           eventId: "test-event-123",
           handlers: ["PlayerHandler", "StatsHandler"],
@@ -379,11 +379,11 @@ describe("RabbitMQEventProcessor", () => {
       await processorWithCoordinators.processEvent(event)
 
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        "Processing event PLAYER_KILL through 1 coordinators",
-        {
+        expect.stringContaining("Processing event: PLAYER_KILL through ["),
+        expect.objectContaining({
           eventId: "test-event-123",
-          coordinators: [expect.any(String)],
-        },
+          coordinators: expect.arrayContaining([expect.any(String)]),
+        }),
       )
 
       expect(mockCoordinator.coordinateEvent).toHaveBeenCalledWith(

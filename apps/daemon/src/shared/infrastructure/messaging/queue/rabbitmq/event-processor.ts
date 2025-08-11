@@ -57,7 +57,7 @@ export class RabbitMQEventProcessor implements IEventProcessor {
 
       const processingTime = Date.now() - startTime
       this.logger.info(
-        `Event processed: ${processedEvent.eventType} (Server ID: ${processedEvent.serverId})`,
+        `Event processed: ${processedEvent.eventType} (Server ID: ${processedEvent.serverId}, Event ID: ${processedEvent.eventId?.slice(-6)})`,
         {
           eventId: processedEvent.eventId,
           correlationId: processedEvent.correlationId,

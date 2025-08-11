@@ -1,8 +1,46 @@
 # Player Rankings System - HLStats Daemon
 
-## Overview
-
 The HLStats Daemon implements a sophisticated ELO-based rating system for tracking player skill across Half-Life engine games. This system goes beyond simple kill/death ratios to provide dynamic skill assessments that adapt to player performance over time.
+
+## Table of Contents
+
+- [Core Philosophy](#core-philosophy)
+  - [Skill-Based Progression](#skill-based-progression)
+  - [Fairness & Balance](#fairness--balance)
+- [Mathematical Foundation](#mathematical-foundation)
+  - [Base ELO Formula](#base-elo-formula)
+  - [Key Parameters](#key-parameters)
+- [Rating Adjustments](#rating-adjustments)
+  - [Dynamic K-Factor](#dynamic-k-factor)
+  - [Weapon Skill Multipliers](#weapon-skill-multipliers)
+  - [Headshot Bonus](#headshot-bonus)
+- [Event-Based Rating Changes](#event-based-rating-changes)
+  - [Kill Events](#kill-events)
+  - [Suicide Events](#suicide-events)
+  - [Teamkill Events](#teamkill-events)
+  - [Round-Based Adjustments](#round-based-adjustments)
+- [Special Cases & Edge Conditions](#special-cases--edge-conditions)
+  - [Bot Interactions](#bot-interactions)
+  - [New Player Calibration](#new-player-calibration)
+  - [High-Rated Player Protection](#high-rated-player-protection)
+  - [Rating Floor Protection](#rating-floor-protection)
+- [Confidence & Volatility Tracking](#confidence--volatility-tracking)
+  - [Confidence Intervals](#confidence-intervals)
+  - [Confidence Decay](#confidence-decay)
+- [Implementation Examples](#implementation-examples)
+  - [Example 1: Even Match Kill](#example-1-even-match-kill)
+  - [Example 2: Upset Victory](#example-2-upset-victory)
+- [Performance Metrics & Analytics](#performance-metrics--analytics)
+  - [Rating Distribution Goals](#rating-distribution-goals)
+  - [System Health Indicators](#system-health-indicators)
+- [Future Enhancements](#future-enhancements)
+  - [Planned Features](#planned-features)
+  - [Advanced Metrics Under Consideration](#advanced-metrics-under-consideration)
+- [Technical Implementation Notes](#technical-implementation-notes)
+  - [Database Schema](#database-schema)
+  - [Performance Considerations](#performance-considerations)
+  - [Error Handling](#error-handling)
+- [Conclusion](#conclusion)
 
 ## Core Philosophy
 

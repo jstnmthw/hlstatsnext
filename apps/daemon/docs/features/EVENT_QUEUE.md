@@ -1,10 +1,6 @@
 # HLStatsNext Daemon - RabbitMQ Integration Technical Design Document
 
-## Executive Summary
-
 This document outlines the integration of RabbitMQ as the message queue system for the HLStatsNext daemon, replacing the current in-memory EventBus with a robust, scalable, and production-ready message queue infrastructure. The design follows our established architectural patterns and best practices while maintaining backward compatibility during the migration phase.
-
----
 
 ## Table of Contents
 
@@ -19,8 +15,6 @@ This document outlines the integration of RabbitMQ as the message queue system f
 9. [Monitoring & Operations](#monitoring--operations)
 10. [Performance Considerations](#performance-considerations)
 
----
-
 ## 1. Architecture Overview
 
 ### Current State
@@ -33,19 +27,19 @@ This document outlines the integration of RabbitMQ as the message queue system f
 ### Target State
 
 ```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────────┐
-│   Game Server   │────▶│  UDP Ingress     │────▶│    RabbitMQ         │
-│                 │ UDP │  (Parse & Auth)   │     │  (Topic Exchange)   │
+┌─────────────────┐     ┌──────────────────┐     ┌──────────────────────┐
+│   Game Server   │────▶│  UDP Ingress     │────▶│    RabbitMQ          │
+│                 │ UDP │  (Parse & Auth)  │     │   (Topic Exchange)   │
 └─────────────────┘     └──────────────────┘     └──────────┬───────────┘
-                                                             │
-                                ┌────────────────────────────▼────────────┐
+                                                            │
+                                ┌───────────────────────────▼─────────────┐
                                 │         Worker Pool (N instances)       │
-                                │  ┌─────────────┬────────────────────┐  │
+                                │  ┌─────────────┬─────────────────────┐  │
                                 │  │ Worker 1    │    Worker N         │  │
                                 │  │ - Process   │    - Process        │  │
                                 │  │ - Retry     │    - Retry          │  │
                                 │  │ - Route     │    - Route          │  │
-                                │  └─────────────┴────────────────────┘  │
+                                │  └─────────────┴─────────────────────┘  │
                                 └─────────────────────────────────────────┘
 ```
 

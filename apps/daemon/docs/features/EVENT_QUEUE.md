@@ -4,18 +4,17 @@ This document outlines the integration of RabbitMQ as the message queue system f
 
 ## Table of Contents
 
-1. [Architecture Overview](#architecture-overview)
-2. [Design Principles](#design-principles)
-3. [Message Queue Architecture](#message-queue-architecture)
-4. [Implementation Plan](#implementation-plan)
-5. [Type System Design](#type-system-design)
-6. [Service Integration](#service-integration)
-7. [Migration Strategy](#migration-strategy)
-8. [Testing Approach](#testing-approach)
-9. [Monitoring & Operations](#monitoring--operations)
-10. [Performance Considerations](#performance-considerations)
+- [Architecture Overview](#architecture-overview)
+- [Design Principles](#design-principles)
+- [Message Queue Architecture](#message-queue-architecture)
+- [Implementation Plan](#implementation-plan)
+- [Type System Design](#type-system-design)
+- [Service Integration](#service-integration)
+- [Testing Approach](#testing-approach)
+- [Monitoring & Operations](#monitoring--operations)
+- [Performance Considerations](#performance-considerations)
 
-## 1. Architecture Overview
+## Architecture Overview
 
 ### Current State
 
@@ -43,9 +42,7 @@ This document outlines the integration of RabbitMQ as the message queue system f
                                 └─────────────────────────────────────────┘
 ```
 
----
-
-## 2. Design Principles
+## Design Principles
 
 Following our established patterns from `@docs/BEST_PRACTICES.md`:
 
@@ -55,11 +52,9 @@ Following our established patterns from `@docs/BEST_PRACTICES.md`:
 4. **Testability**: Mock-friendly interfaces and comprehensive test coverage
 5. **Observability**: Built-in metrics and tracing
 
----
+## Message Queue Architecture
 
-## 3. Message Queue Architecture
-
-### 3.1 Exchange and Queue Design
+### Exchange and Queue Design
 
 ```typescript
 // src/shared/infrastructure/queue/queue.types.ts
@@ -96,7 +91,7 @@ export interface QueueTopology {
 }
 ```
 
-### 3.2 Message Format
+### Message Format
 
 ```typescript
 // src/shared/infrastructure/queue/message.types.ts
@@ -149,11 +144,9 @@ export enum MessagePriority {
 }
 ```
 
----
+## Implementation Plan
 
-## 4. Implementation Plan
-
-### 4.1 Core Queue Infrastructure
+### Core Queue Infrastructure
 
 ```typescript
 // src/shared/infrastructure/queue/rabbitmq.client.ts
@@ -237,7 +230,7 @@ export class RabbitMQClient implements IQueueClient {
 }
 ```
 
-### 4.2 Event Publisher Service
+### Event Publisher Service
 
 ```typescript
 // src/shared/infrastructure/queue/event-publisher.ts
@@ -337,7 +330,7 @@ export class EventPublisher implements IEventPublisher {
 }
 ```
 
-### 4.3 Event Consumer Worker
+### Event Consumer Worker
 
 ```typescript
 // src/modules/worker/event-consumer.ts
@@ -456,9 +449,7 @@ export class EventConsumer implements IEventConsumer {
 }
 ```
 
----
-
-## 5. Type System Design
+## Type System Design
 
 Following our strict TypeScript standards:
 
@@ -527,11 +518,9 @@ export interface QueueConfig {
 }
 ```
 
----
+## Service Integration
 
-## 6. Service Integration
-
-### 6.1 Modified IngressService
+### Modified IngressService
 
 ```typescript
 // src/modules/ingress/ingress.service.ts
@@ -572,7 +561,7 @@ export class IngressService implements IIngressService {
 }
 ```
 
-### 6.2 Dependency Injection Setup
+### Dependency Injection Setup
 
 ```typescript
 // src/shared/infrastructure/queue/queue.module.ts
@@ -616,56 +605,9 @@ export class ApplicationContext {
 }
 ```
 
----
+## Testing Approach
 
-## 7. Migration Strategy
-
-### Phase 1: Dual-Write (2 weeks)
-
-```typescript
-// Temporary adapter for dual-write
-export class DualEventPublisher implements IEventPublisher {
-  constructor(
-    private readonly eventBus: IEventBus,
-    private readonly queuePublisher: IEventPublisher,
-    private readonly logger: ILogger,
-  ) {}
-
-  async publish<T extends BaseEvent>(event: T): Promise<void> {
-    // Write to both systems
-    await Promise.all([
-      this.eventBus.emit(event),
-      this.queuePublisher.publish(event).catch((err) => {
-        this.logger.error("Queue publish failed, falling back to EventBus", { err })
-      }),
-    ])
-  }
-}
-```
-
-### Phase 2: Shadow Mode (1 week)
-
-- Workers consume from RabbitMQ but don't process
-- Compare queue messages with EventBus events
-- Validate message integrity and ordering
-
-### Phase 3: Gradual Cutover (2 weeks)
-
-- Route specific event types to RabbitMQ
-- Monitor performance and error rates
-- Rollback capability per event type
-
-### Phase 4: Complete Migration (1 week)
-
-- Remove EventBus dependencies
-- Clean up dual-write code
-- Full production deployment
-
----
-
-## 8. Testing Approach
-
-### 8.1 Unit Tests
+### Unit Tests
 
 ```typescript
 // src/shared/infrastructure/queue/event-publisher.test.ts
@@ -711,7 +653,7 @@ describe("EventPublisher", () => {
 })
 ```
 
-### 8.2 Integration Tests
+### Integration Tests
 
 ```typescript
 // src/tests/integration/queue-integration.test.ts
@@ -763,11 +705,9 @@ describe("RabbitMQ Integration", () => {
 })
 ```
 
----
+## Monitoring & Operations
 
-## 9. Monitoring & Operations
-
-### 9.1 Health Checks
+### Health Checks
 
 ```typescript
 // src/shared/infrastructure/queue/queue-health.ts
@@ -820,7 +760,7 @@ export class QueueHealthCheck implements IHealthCheck {
 }
 ```
 
-### 9.2 Metrics
+### Metrics
 
 ```typescript
 // Prometheus metrics
@@ -852,7 +792,7 @@ export const queueMetrics = {
 }
 ```
 
-### 9.3 Docker Integration
+### Docker Integration
 
 ```yaml
 # docker-compose.yml addition
@@ -885,11 +825,9 @@ volumes:
   rabbitmq-data:
 ```
 
----
+## Performance Considerations
 
-## 10. Performance Considerations
-
-### 10.1 Configuration Tuning
+### Configuration Tuning
 
 ```typescript
 // Optimal settings for game event processing
@@ -918,7 +856,7 @@ export const RABBITMQ_CONFIG: RabbitMQConfig = {
 }
 ```
 
-### 10.2 Performance Benchmarks
+### Performance Benchmarks
 
 Expected performance targets:
 
@@ -927,8 +865,6 @@ Expected performance targets:
 - **Queue depth**: < 1,000 messages during peak
 - **Worker CPU**: < 70% utilization
 - **Memory usage**: < 512MB per worker
-
----
 
 ## Conclusion
 

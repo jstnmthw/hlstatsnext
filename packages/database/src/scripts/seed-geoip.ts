@@ -310,7 +310,7 @@ async function seedGeoLite(): Promise<void> {
   })
   await flushBlocks()
 
-  console.log("GeoLite2 CSV seeding completed successfully.")
+  console.log("✅ GeoLite2 CSV seeding completed successfully.")
 }
 
 async function main(): Promise<void> {

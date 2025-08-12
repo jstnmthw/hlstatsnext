@@ -29,13 +29,13 @@ export class ActionService implements IActionService {
     try {
       switch (event.eventType) {
         case EventType.ACTION_PLAYER:
-          return await this.handlePlayerAction(event as ActionPlayerEvent)
+          return await this.handlePlayerAction(event)
         case EventType.ACTION_PLAYER_PLAYER:
-          return await this.handlePlayerPlayerAction(event as ActionPlayerPlayerEvent)
+          return await this.handlePlayerPlayerAction(event)
         case EventType.ACTION_TEAM:
-          return await this.handleTeamAction(event as ActionTeamEvent)
+          return await this.handleTeamAction(event)
         case EventType.ACTION_WORLD:
-          return await this.handleWorldAction(event as WorldActionEvent)
+          return await this.handleWorldAction(event)
         default:
           return { success: true }
       }

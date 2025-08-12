@@ -9,8 +9,8 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { IngressDependencies } from "./ingress.dependencies"
-import { UdpServer } from "./udp-server"
 import type { BaseParser } from "./parsers/base.parser"
+import { UdpServer } from "./udp-server"
 import { ParserFactory } from "./parsers/parser-factory"
 
 export class IngressService implements IIngressService {

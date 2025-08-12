@@ -2,7 +2,7 @@
  * RabbitMQ Event Processor
  *
  * Processes events consumed from RabbitMQ queues by routing them through
- * the existing saga coordinators and module handlers. Uses "QUEUE" prefix
+ * module handlers and optional coordinators. Uses "QUEUE" prefix
  * logging to distinguish from EventBus processing.
  */
 
@@ -20,6 +20,14 @@ import {
 /**
  * RabbitMQ Event Processor implementation that routes events through
  * the existing application infrastructure
+ *
+ * This class is responsible for processing events consumed from RabbitMQ queues.
+ * It routes events through module handlers and optional coordinators.
+ *
+ * @param logger - The logger to use for logging
+ * @param moduleRegistry - The module registry to use for routing events
+ * @param coordinators - The coordinators to use for processing events
+ * @returns void
  */
 export class RabbitMQEventProcessor implements IEventProcessor {
   constructor(
@@ -52,7 +60,7 @@ export class RabbitMQEventProcessor implements IEventProcessor {
       // Process through module handlers first (for business logic like chat persistence)
       await this.processModuleHandlers(processedEvent)
 
-      // Then process through coordinators (including sagas)
+      // Then process through coordinators (optional extension point)
       await this.processCoordinators(processedEvent)
 
       const processingTime = Date.now() - startTime
@@ -85,6 +93,12 @@ export class RabbitMQEventProcessor implements IEventProcessor {
 
   /**
    * Process event through registered module handlers (business logic)
+   *
+   * This method processes events through registered module handlers.
+   * Module handlers are responsible for handling events and performing
+   * business logic.
+   *
+   * @param event - The event to process
    */
   private async processModuleHandlers(event: BaseEvent): Promise<void> {
     const handlers = this.moduleRegistry.getHandlersForEvent(event.eventType)
@@ -161,7 +175,14 @@ export class RabbitMQEventProcessor implements IEventProcessor {
   }
 
   /**
-   * Process event through registered coordinators (including sagas)
+   * Process event through registered coordinators (optional)
+   *
+   * This method processes events through registered coordinators.
+   * Coordinators are optional and can be used to coordinate events
+   * across multiple modules.
+   *
+   * @param event - The event to process
+   * @returns void
    */
   private async processCoordinators(event: BaseEvent): Promise<void> {
     if (this.coordinators.length === 0) {

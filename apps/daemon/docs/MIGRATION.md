@@ -464,6 +464,9 @@ The daemon has a solid foundation with complete player lifecycle tracking. The n
   - players_history: Confirmed snapshot writes via `MatchRepository.createPlayerHistory` and `MatchService.saveMatchToDatabase`; no schema change needed.
   - Quality gates: Type-check, lint green; fixed tests remain green after updating code.
 
+- 2025-08-12
+  - GeoIP seeding: Updated `packages/database/src/scripts/seed-geoip.ts` to use MaxMind download permalinks with Basic Auth (Account ID + License Key). Switched CSV download format to `.zip` and added system `unzip`-based extraction with fallback helper. Env example updated to include `MAXMIND_ACCOUNT_ID` and `MAXMIND_LICENSE_KEY`. This resolves 404s from deprecated unauthenticated URLs and aligns with MaxMind's current documentation.
+
 - 2025-08-10
   - Parser: Added support for legacy/GoldSrc-style connect lines ("entered the game") in `CsParser`.
   - Persistence: Implemented connect/disconnect logging to `events_connect` and `events_disconnect` via `PlayerRepository.createConnectEvent`/`createDisconnectEvent`; on disconnect, backfills `event_time_disconnect` on the last connect row.

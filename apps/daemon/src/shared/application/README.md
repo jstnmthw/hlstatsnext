@@ -4,29 +4,11 @@ The application layer contains the business logic and orchestration patterns for
 
 ## Design Patterns
 
-### 1. Simple Event Coordination
+### 1. Simple Event Coordination (Extension Point)
 
 **File**: `event-coordinator.ts`
 
-Event coordinators handle cross-module concerns that require orchestration beyond individual module handlers:
-
-```typescript
-export class KillEventCoordinator implements EventCoordinator {
-  constructor(
-    private readonly logger: ILogger,
-    private readonly rankingService: IRankingService,
-  ) {}
-
-  async coordinateEvent(event: BaseEvent): Promise<void> {
-    if (event.eventType !== EventType.PLAYER_KILL) {
-      return
-    }
-
-    // Handle cross-module concerns like ranking updates
-    await this.rankingService.handleRatingUpdate()
-  }
-}
-```
+Coordinators are an optional extension point for cross-module concerns that may be added later. During early development, no concrete coordinators are shipped. The interface remains available if you need to introduce orchestration beyond individual module handlers.
 
 **Key Benefits:**
 
@@ -38,9 +20,9 @@ export class KillEventCoordinator implements EventCoordinator {
 **Current Architecture:**
 
 - **Module Handlers**: Handle core business logic for their domain
-- **Event Coordinators**: Handle cross-module concerns (currently minimal)
+- **Coordinator Hook**: Retained as an extension point (no default implementations)
 - **Queue Processing**: All events processed through RabbitMQ queues
-- **No Compensation**: Simplified approach relying on module-level consistency
+- **No Compensation/Sagas**: Simplified approach relying on module-level consistency
 
 ### 2. Module Handler Pattern
 
@@ -105,7 +87,7 @@ export class RabbitMQEventProcessor implements IEventProcessor {
 ```
 Application Layer
 ├── event-coordinator.ts          # Simple event coordination
-└── event-coordinator.test.ts     # Coordinator tests
+└── event-coordinator.test.ts     # Interface sanity test
 ```
 
 ### Event Processing Flow
@@ -126,15 +108,13 @@ Application Layer
 │   - WeaponService handles weapon statistics                 │
 │   - MatchService handles match/round statistics             │
 ├─────────────────────────────────────────────────────────────┤
-│ Step 2: Coordinator Processing (if needed)                  │
-│   - KillEventCoordinator handles cross-module concerns      │
-│   - Currently only rating updates                           │
+│ Step 2: Coordinator Processing (optional, none by default)  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## Usage Guidelines
 
-### Creating a New Coordinator
+### Creating a New Coordinator (when needed)
 
 1. **Define Coordinator Class**:
 

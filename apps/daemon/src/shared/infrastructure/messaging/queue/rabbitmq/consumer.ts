@@ -2,7 +2,7 @@
  * RabbitMQ Consumer Implementation
  *
  * Specialized consumer for processing events from RabbitMQ queues through
- * the existing application infrastructure (sagas, coordinators, modules).
+ * the existing application infrastructure (modules, optional coordinators).
  * Uses "QUEUE" prefix logging to distinguish from EventBus processing.
  */
 

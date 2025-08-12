@@ -251,7 +251,7 @@ try {
   // Process through module handlers first (for business logic like chat persistence)
   await this.processModuleHandlers(processedEvent)
 
-  // Then process through coordinators (including sagas)
+  // Then process through coordinators (optional)
   await this.processCoordinators(processedEvent)
 
   const processingTime = Date.now() - startTime
@@ -270,8 +270,7 @@ try {
 **What Happens**:
 
 - **Module Handlers**: Business logic like chat message persistence, player updates
-- **Coordinators**: Complex workflows like kill tracking, ranking updates
-- **Sagas**: Multi-step business processes like weapon statistics
+- **Coordinators** (optional): Cross-module orchestration hooks, e.g., batch ranking updates
 - All database writes and external API calls complete
 - Message is acknowledged to RabbitMQ
 

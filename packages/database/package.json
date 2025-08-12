@@ -11,7 +11,8 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:reset": "prisma migrate reset --force && prisma db push && prisma db seed",
+    "db:reset": "prisma migrate reset --force && prisma db push && prisma db seed && pnpm db:seed:geo",
+    "db:seed:geo": "tsx src/scripts/seed-geoip.ts",
     "db:seed": "pnpm db:run-sql src/sql/default-seeder.sql",
     "db:dev:seed": "tsx src/seed.ts",
     "db:run-sql": "tsx src/scripts/run-sql.ts",
@@ -24,7 +25,8 @@
   "dependencies": {
     "@prisma/client": "^6.13.0",
     "dbgate-query-splitter": "^4.11.5",
-    "prisma": "^6.13.0"
+    "prisma": "^6.13.0",
+    "unzipper": "^0.12.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.8.0",
@@ -34,6 +36,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^24.0.0",
+    "@types/unzipper": "^0.10.11",
     "dotenv-cli": "^8.0.0",
     "eslint": "^9.30.0",
     "glob": "^11.0.0",

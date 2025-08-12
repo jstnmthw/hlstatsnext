@@ -1,7 +1,16 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
-  "globalEnv": ["NODE_ENV", "FRONTEND_URL", "PORT", "VITEST", "LOG_LEVEL", "INGRESS_PORT"],
+  "globalEnv": [
+    "NODE_ENV",
+    "FRONTEND_URL",
+    "PORT",
+    "VITEST",
+    "LOG_LEVEL",
+    "INGRESS_PORT",
+    "MAXMIND_ACCOUNT_ID",
+    "MAXMIND_LICENSE_KEY"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -46,6 +55,9 @@
       "persistent": true
     },
     "db:seed": {
+      "cache": false
+    },
+    "db:seed:geo": {
       "cache": false
     },
     "db:reset": {

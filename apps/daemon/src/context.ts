@@ -45,6 +45,8 @@ import { ServerService } from "@/modules/server/server.service"
 import type { IServerService } from "@/modules/server/server.types"
 import { IGameDetectionService } from "./modules/game/game-detection.types"
 
+import { GeoIPService } from "@/modules/geoip/geoip.service"
+
 import { PlayerEventHandler } from "@/modules/player/player.events"
 import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
 import { MatchEventHandler } from "@/modules/match/match.events"
@@ -126,7 +128,14 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   // Services (order matters for dependencies)
   const rankingService = new RankingService(logger, weaponRepository)
   const matchService = new MatchService(matchRepository, logger)
-  const playerService = new PlayerService(playerRepository, logger, rankingService, matchService)
+  const geoipService = new GeoIPService(database, logger)
+  const playerService = new PlayerService(
+    playerRepository,
+    logger,
+    rankingService,
+    matchService,
+    geoipService,
+  )
   const weaponService = new WeaponService(weaponRepository, logger)
   const actionService = new ActionService(actionRepository, logger, playerService, matchService)
   const gameDetectionService = new GameDetectionService(logger)

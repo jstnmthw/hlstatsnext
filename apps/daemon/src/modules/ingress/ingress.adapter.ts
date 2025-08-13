@@ -134,9 +134,16 @@ export class ServerInfoProviderAdapter implements IServerInfoProvider {
     gameCode: string,
   ): Promise<{ serverId: number }> {
     try {
+      const serverSelect = {
+        serverId: true,
+        city: true,
+        country: true,
+        lat: true,
+        lng: true,
+      } as const
       let server = await this.database.prisma.server.findFirst({
         where: { address, port },
-        select: { serverId: true },
+        select: serverSelect,
       })
 
       if (!server) {
@@ -153,7 +160,7 @@ export class ServerInfoProviderAdapter implements IServerInfoProvider {
               activePlayers: 0,
               maxPlayers: 0,
             },
-            select: { serverId: true },
+            select: serverSelect,
           })
 
           this.logger.info(
@@ -179,6 +186,54 @@ export class ServerInfoProviderAdapter implements IServerInfoProvider {
           } catch (seedError) {
             this.logger.warn(
               `Failed to seed server config defaults for ${address}:${port}: ${seedError}`,
+            )
+          }
+
+          // Best-effort GeoIP enrichment for server location if not already set
+          try {
+            const [ipOnly] = address.split(":")
+            if (
+              ipOnly &&
+              (!server.city || !server.country || server.lat == null || server.lng == null)
+            ) {
+              // Lightweight inline lookup against GeoLite tables
+              const ipParts = ipOnly.split(".")
+              if (ipParts.length === 4) {
+                const [a, b, c, d] = ipParts.map((p) => Number(p)) as [
+                  number,
+                  number,
+                  number,
+                  number,
+                ]
+                if ([a, b, c, d].every((n) => Number.isInteger(n) && n >= 0 && n <= 255)) {
+                  const ipNum = (a << 24) + (b << 16) + (c << 8) + d
+                  const block = await this.database.prisma.geoLiteCityBlock.findFirst({
+                    where: { startIpNum: { lte: BigInt(ipNum) }, endIpNum: { gte: BigInt(ipNum) } },
+                    select: { locId: true },
+                  })
+                  if (block) {
+                    const location = await this.database.prisma.geoLiteCityLocation.findUnique({
+                      where: { locId: block.locId },
+                      select: { city: true, country: true, latitude: true, longitude: true },
+                    })
+                    if (location) {
+                      await this.database.prisma.server.update({
+                        where: { serverId: server.serverId },
+                        data: {
+                          city: location.city ?? undefined,
+                          country: location.country ?? undefined,
+                          lat: location.latitude ? Number(location.latitude) : undefined,
+                          lng: location.longitude ? Number(location.longitude) : undefined,
+                        },
+                      })
+                    }
+                  }
+                }
+              }
+            }
+          } catch (geoErr) {
+            this.logger.warn(
+              `Failed to enrich server geo for ${address}:${port}: ${String(geoErr)}`,
             )
           }
 
@@ -244,7 +299,7 @@ export class ServerInfoProviderAdapter implements IServerInfoProvider {
             // Try to find the server that was created by another process
             server = await this.database.prisma.server.findFirst({
               where: { address, port },
-              select: { serverId: true },
+              select: serverSelect,
             })
 
             if (!server) {

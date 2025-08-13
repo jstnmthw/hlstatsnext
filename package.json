@@ -38,8 +38,8 @@
   "pnpm": {
     "peerDependencyRules": {
       "allowedVersions": {
-        "@prisma/client": "6.13.0",
-        "prisma": "6.13.0"
+        "@prisma/client": "6.14.0",
+        "prisma": "6.14.0"
       }
     },
     "onlyBuiltDependencies": [

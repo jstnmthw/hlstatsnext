@@ -7,8 +7,14 @@
 import { DatabaseClient } from "@/database/client"
 import Logger from "@/shared/utils/logger"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { EventCoordinator } from "@/shared/application/event-coordinator"
 
 // Module imports
+import {
+  QueueModule,
+  createDevelopmentRabbitMQConfig,
+} from "@/shared/infrastructure/messaging/module"
+
 import { PlayerRepository } from "@/modules/player/player.repository"
 import { PlayerService } from "@/modules/player/player.service"
 import type { IPlayerService } from "@/modules/player/player.types"
@@ -29,24 +35,20 @@ import { ActionService } from "@/modules/action/action.service"
 import type { IActionService } from "@/modules/action/action.types"
 
 import { IngressService } from "@/modules/ingress/ingress.service"
+import { createIngressDependencies } from "@/modules/ingress/factories/ingress-dependencies"
 import type { IIngressService, IngressOptions } from "@/modules/ingress/ingress.types"
-import { createIngressDependencies } from "@/modules/ingress/ingress.adapter"
-import {
-  QueueModule,
-  createDevelopmentRabbitMQConfig,
-} from "@/shared/infrastructure/messaging/module"
-import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
+
 import { EventType } from "@/shared/types/events"
+import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 
 import { GameDetectionService } from "@/modules/game/game-detection.service"
+import type { IGameDetectionService } from "@/modules/game/game-detection.types"
 
 import { ServerRepository } from "@/modules/server/server.repository"
 import { ServerService } from "@/modules/server/server.service"
 import type { IServerService } from "@/modules/server/server.types"
-import { IGameDetectionService } from "./modules/game/game-detection.types"
 
 import { GeoIPService } from "@/modules/geoip/geoip.service"
-
 import { PlayerEventHandler } from "@/modules/player/player.events"
 import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
 import { MatchEventHandler } from "@/modules/match/match.events"
@@ -54,7 +56,6 @@ import { ActionEventHandler } from "@/modules/action/action.events"
 import { ServerEventHandler } from "@/modules/server/server.events"
 import { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
-import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import { RabbitMQConsumer } from "@/shared/infrastructure/messaging/queue/rabbitmq/consumer"
 
 export interface AppContext {

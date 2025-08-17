@@ -28,7 +28,6 @@ describe("PlayerService", () => {
 
     // Create mock ranking service
     mockRankingService = {
-      handleRatingUpdate: vi.fn().mockResolvedValue({ success: true }),
       calculateRatingAdjustment: vi.fn().mockResolvedValue({ winner: 10, loser: -8 }),
       calculateSkillAdjustment: vi.fn().mockResolvedValue({ killerChange: 10, victimChange: -8 }),
       calculateSuicidePenalty: vi.fn().mockReturnValue(-5),

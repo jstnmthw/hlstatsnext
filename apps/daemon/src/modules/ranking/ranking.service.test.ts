@@ -27,46 +27,15 @@ describe("RankingService", () => {
     })
 
     it("should have required methods", () => {
-      expect(rankingService.handleRatingUpdate).toBeDefined()
       expect(rankingService.calculateRatingAdjustment).toBeDefined()
       expect(rankingService.calculateSkillAdjustment).toBeDefined()
       expect(rankingService.calculateSuicidePenalty).toBeDefined()
-      expect(typeof rankingService.handleRatingUpdate).toBe("function")
       expect(typeof rankingService.calculateRatingAdjustment).toBe("function")
       expect(typeof rankingService.calculateSkillAdjustment).toBe("function")
       expect(typeof rankingService.calculateSuicidePenalty).toBe("function")
     })
   })
 
-  describe("handleRatingUpdate", () => {
-    it("should return success result", async () => {
-      const result = await rankingService.handleRatingUpdate()
-
-      expect(result.success).toBe(true)
-      expect(result.error).toBeUndefined()
-    })
-
-    it("should handle errors gracefully", async () => {
-      // Create a service that throws an error internally
-      const errorService = new RankingService(mockLogger, mockWeaponRepository)
-      vi.spyOn(
-        errorService as unknown as { calculateRatingAdjustment: () => SkillRating },
-        "calculateRatingAdjustment",
-      ).mockImplementation(() => {
-        throw new Error("Rating calculation failed")
-      })
-
-      // Since handleRatingUpdate doesn't use calculateRatingAdjustment, just test error handling
-      const result = await errorService.handleRatingUpdate()
-      expect(result.success).toBe(true) // The actual method doesn't throw
-    })
-
-    it("should handle non-Error exceptions", async () => {
-      // Similar to above - the method doesn't actually throw, so test the mechanism
-      const result = await rankingService.handleRatingUpdate()
-      expect(result.success).toBe(true) // The actual method doesn't throw
-    })
-  })
 
   describe("calculateRatingAdjustment", () => {
     it("should calculate rating adjustments for evenly matched players", async () => {

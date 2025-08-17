@@ -2,7 +2,6 @@
  * Ranking Module Types
  */
 
-import type { HandlerResult } from "@/shared/types/common"
 import type { KillContext } from "./ranking.service"
 
 export interface SkillRating {
@@ -14,7 +13,6 @@ export interface SkillRating {
 }
 
 export interface IRankingService {
-  handleRatingUpdate(): Promise<HandlerResult>
   calculateRatingAdjustment(
     winnerRating: SkillRating,
     loserRating: SkillRating,

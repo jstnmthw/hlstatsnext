@@ -5,10 +5,17 @@
 
 import type { IRankingService, SkillRating } from "./ranking.types"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { HandlerResult } from "@/shared/types/common"
 import type { IWeaponRepository } from "../weapon/weapon.types"
 import type { Weapon } from "@repo/database/client"
 import { GameConfig } from "@/config/game.config"
+import {
+  calculateKillSkillAdjustment,
+  calculateStandardRatingAdjustment,
+  calculateSuicidePenalty as calculateSuicidePenaltyPure,
+  type SkillRatingInput,
+  type KillContextInput,
+  type SkillCalculationConfig,
+} from "@/shared/application/utils/skill-calculator"
 
 export interface KillContext {
   weapon: string
@@ -20,15 +27,22 @@ export interface KillContext {
 }
 
 export class RankingService implements IRankingService {
-  // Rating system constants
-  private readonly MIN_RATING = 100
-  private readonly MAX_RATING = 3000
-  private readonly MAX_skillChange = 50
-  private readonly DEFAULT_STARTING_RATING = 1000
-  private readonly BASE_K_FACTOR = 32
-  private readonly VOLATILITY_DIVISOR = 400
-  private readonly VICTIM_LOSS_RATIO = 0.8 // Victim loses 80% of killer's gain
+  // Default weapon modifier for unknown weapons
   private readonly DEFAULT_WEAPON_MODIFIER = 1.0
+
+  // Skill calculation configuration
+  private readonly skillConfig: Partial<SkillCalculationConfig> = {
+    minRating: 100,
+    maxRating: 3000,
+    maxSkillChange: 50,
+    baseKFactor: 32,
+    volatilityDivisor: 400,
+    victimLossRatio: 0.8,
+    headshotBonus: 1.2,
+    teamKillPenalty: -10,
+    teamKillVictimCompensation: 2,
+    suicidePenalty: -5,
+  }
 
   // Cache for weapon modifiers to avoid repeated DB lookups
   private weaponModifierCache: Map<string, number> = new Map()
@@ -40,108 +54,77 @@ export class RankingService implements IRankingService {
     private readonly weaponRepository: IWeaponRepository,
   ) {}
 
-  async handleRatingUpdate(): Promise<HandlerResult> {
-    try {
-      // This method is called by the event processor
-      // Actual rating calculations are done in calculateSkillAdjustment
-      return { success: true }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
 
   /**
    * Calculate skill rating adjustment for a kill event
-   * Based on modified ELO rating system from PLAYER_RANKINGS.md
+   *
+   * Uses a modified ELO rating system where:
+   * - Expected outcome is calculated based on rating difference
+   * - K-factor is dynamic based on player experience (higher for new players)
+   * - Weapon modifiers affect the reward (e.g., knife kills worth more)
+   * - Headshots provide a 20% bonus
+   * - Team kills result in penalties for the killer and compensation for victim
+   * - Victim loses 80% of what the killer gains to prevent rating inflation
    */
   async calculateSkillAdjustment(
     killerRating: SkillRating,
     victimRating: SkillRating,
     context: KillContext,
   ): Promise<{ killerChange: number; victimChange: number }> {
-    // Handle team kills with penalties
-    if (context.killerTeam === context.victimTeam) {
-      return this.calculateTeamKillPenalty()
-    }
-
-    // Calculate expected score using ELO formula
-    const expectedScore = this.calculateExpectedScore(killerRating.rating, victimRating.rating)
-
-    // Get dynamic K-factor based on killer's experience
-    const kFactor = this.getKFactor(killerRating.gamesPlayed, killerRating.rating)
-
-    // Calculate base rating change
-    let baseChange = kFactor * (1 - expectedScore)
-
-    // Apply weapon multiplier
     const weaponMultiplier = await this.getWeaponMultiplier(context.weapon, context.game)
-    baseChange *= weaponMultiplier
 
-    // Apply headshot bonus
-    if (context.headshot) {
-      baseChange *= 1.2
+    const killerInput: SkillRatingInput = {
+      rating: killerRating.rating,
+      gamesPlayed: killerRating.gamesPlayed,
     }
 
-    // Cap gains at maximum
-    if (baseChange > this.MAX_skillChange) {
-      baseChange = this.MAX_skillChange
+    const victimInput: SkillRatingInput = {
+      rating: victimRating.rating,
+      gamesPlayed: victimRating.gamesPlayed,
     }
 
-    // Calculate final changes
-    const killerGain = Math.round(baseChange)
-    const victimLoss = -Math.round(baseChange * this.VICTIM_LOSS_RATIO)
+    const killContext: KillContextInput = {
+      weapon: context.weapon,
+      weaponModifier: weaponMultiplier,
+      headshot: context.headshot,
+      isTeamKill: context.killerTeam === context.victimTeam,
+    }
 
-    // Apply rating bounds
-    const finalKillerChange = this.applyRatingBounds(killerRating.rating, killerGain)
-    const finalVictimChange = this.applyRatingBounds(victimRating.rating, victimLoss)
+    const adjustment = calculateKillSkillAdjustment(
+      killerInput,
+      victimInput,
+      killContext,
+      this.skillConfig,
+    )
 
     this.logger.debug(
       `Skill calculation: ${context.weapon} kill, ` +
         `${context.headshot ? "headshot, " : ""}` +
-        `expected: ${expectedScore.toFixed(3)}, k-factor: ${kFactor}, ` +
         `weapon multiplier: ${weaponMultiplier}, ` +
-        `killer: ${killerRating.rating} → ${killerRating.rating + finalKillerChange} (${finalKillerChange > 0 ? "+" : ""}${finalKillerChange}), ` +
-        `victim: ${victimRating.rating} → ${victimRating.rating + finalVictimChange} (${finalVictimChange})`,
+        `killer: ${killerRating.rating} → ${killerRating.rating + adjustment.killerChange} (${adjustment.killerChange > 0 ? "+" : ""}${adjustment.killerChange}), ` +
+        `victim: ${victimRating.rating} → ${victimRating.rating + adjustment.victimChange} (${adjustment.victimChange})`,
     )
 
-    return {
-      killerChange: finalKillerChange,
-      victimChange: finalVictimChange,
-    }
+    return adjustment
   }
 
   /**
    * Calculate suicide penalty
+   *
+   * Returns a fixed negative rating adjustment applied when a player
+   * kills themselves (falling, grenades, console kill, etc.)
+   * Default: -5 rating points
    */
   calculateSuicidePenalty(): number {
-    return -5 // Fixed penalty for suicides
+    return calculateSuicidePenaltyPure(this.skillConfig)
   }
 
-  /**
-   * Calculate team kill penalties
-   */
-  private calculateTeamKillPenalty(): { killerChange: number; victimChange: number } {
-    return {
-      killerChange: -10, // Penalty for team killer
-      victimChange: +2, // Compensation for team kill victim
-    }
-  }
-
-  /**
-   * Calculate expected score using ELO formula
-   * E = 1 / (1 + 10^((OpponentRating - PlayerRating) / 400))
-   */
-  private calculateExpectedScore(playerRating: number, opponentRating: number): number {
-    const ratingDiff = opponentRating - playerRating
-    const exponent = ratingDiff / this.VOLATILITY_DIVISOR
-    return 1 / (1 + Math.pow(10, exponent))
-  }
 
   /**
    * Get weapon multiplier for skill calculations
+   *
+   * Weapon modifiers are stored in the database and are used to adjust the skill rating for a kill.
+   * The modifier is a multiplier that is applied to the skill rating of the killer and victim.
    */
   private async getWeaponMultiplier(
     weapon: string,
@@ -191,66 +174,33 @@ export class RankingService implements IRankingService {
   }
 
   /**
-   * Apply rating bounds to prevent ratings going below/above limits
-   */
-  private applyRatingBounds(currentRating: number, change: number): number {
-    const newRating = currentRating + change
-
-    if (newRating < this.MIN_RATING) {
-      return this.MIN_RATING - currentRating
-    }
-
-    if (newRating > this.MAX_RATING) {
-      return this.MAX_RATING - currentRating
-    }
-
-    return change
-  }
-
-  /**
-   * Get dynamic K-factor based on player experience and rating
-   * From PLAYER_RANKINGS.md spec
-   */
-  private getKFactor(gamesPlayed: number, rating: number): number {
-    // New players (0-10 games): K × 1.5 = 48
-    if (gamesPlayed < 10) return this.BASE_K_FACTOR * 1.5
-
-    // Learning players (10-50 games): K × 1.2 = 38.4
-    if (gamesPlayed < 50) return this.BASE_K_FACTOR * 1.2
-
-    // Elite players (2000+ rating): K × 0.8 = 25.6
-    if (rating >= 2000) return this.BASE_K_FACTOR * 0.8
-
-    // Experienced players (50+ games): K × 1.0 = 32
-    return this.BASE_K_FACTOR
-  }
-
-  /**
-   * Calculate rating adjustment using standard ELO formula
-   * This is a simplified version without weapon/headshot modifiers
+   * Calculate rating adjustment for win/loss scenarios
+   *
+   * Standard ELO calculation without kill-specific modifiers.
+   * Used for round wins, objective completions, or other binary outcomes.
+   *
+   * The winner gains points based on:
+   * - Expected probability of winning (lower rated players gain more)
+   * - K-factor (new players have more volatile ratings)
+   * The loser loses 80% of what the winner gains.
    */
   async calculateRatingAdjustment(
     winnerRating: SkillRating,
     loserRating: SkillRating,
   ): Promise<{ winner: number; loser: number }> {
-    // Calculate expected score for winner
-    const expectedScore = this.calculateExpectedScore(winnerRating.rating, loserRating.rating)
-
-    // Get K-factor for winner
-    const kFactor = this.getKFactor(winnerRating.gamesPlayed, winnerRating.rating)
-
-    // Calculate rating change (actual score = 1 for winner)
-    const winnerGain = Math.round(kFactor * (1 - expectedScore))
-
-    // Apply bounds and calculate loser's loss
-    const boundedWinnerGain = this.applyRatingBounds(winnerRating.rating, winnerGain)
-    const loserLoss = -Math.round(boundedWinnerGain * this.VICTIM_LOSS_RATIO)
-    const boundedLoserLoss = this.applyRatingBounds(loserRating.rating, loserLoss)
-
-    return {
-      winner: boundedWinnerGain,
-      loser: boundedLoserLoss,
+    // Convert to skill calculator input format
+    const winnerInput: SkillRatingInput = {
+      rating: winnerRating.rating,
+      gamesPlayed: winnerRating.gamesPlayed,
     }
+
+    const loserInput: SkillRatingInput = {
+      rating: loserRating.rating,
+      gamesPlayed: loserRating.gamesPlayed,
+    }
+
+    // Use pure function for calculation
+    return calculateStandardRatingAdjustment(winnerInput, loserInput, this.skillConfig)
   }
 
   /**

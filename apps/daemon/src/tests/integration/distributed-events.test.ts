@@ -57,7 +57,9 @@ describe.skip("Distributed Event Processing", () => {
     } as unknown as IWeaponService
 
     rankingService = {
-      handleRatingUpdate: vi.fn(),
+      calculateRatingAdjustment: vi.fn(),
+      calculateSkillAdjustment: vi.fn(),
+      calculateSuicidePenalty: vi.fn(),
     } as unknown as IRankingService
 
     serverService = {
@@ -182,8 +184,8 @@ describe.skip("Distributed Event Processing", () => {
       expect(weaponService.handleWeaponEvent).toHaveBeenCalledTimes(0)
       // MatchEventHandler should not handle kill events via EventBus anymore
       expect(matchService.handleKillInMatch).toHaveBeenCalledTimes(0)
-      // Coordinator should not handle kill events via EventBus anymore
-      expect(rankingService.handleRatingUpdate).toHaveBeenCalledTimes(0)
+      // RankingService should not handle kill events via EventBus anymore
+      expect(rankingService.calculateSkillAdjustment).toHaveBeenCalledTimes(0)
 
       // No player ID resolution should occur via EventBus path
       expect(playerService.getOrCreatePlayer).toHaveBeenCalledTimes(0)

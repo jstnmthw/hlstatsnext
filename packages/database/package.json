@@ -13,6 +13,7 @@
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset --force && prisma db push && pnpm db:seed && pnpm db:seed:geo",
     "db:seed:geo": "tsx src/scripts/seed-geoip.ts",
+    "db:geo:update": "tsx src/scripts/seed-geoip.ts update",
     "db:seed": "pnpm db:run-sql src/sql/default-seeder.sql",
     "db:dev:seed": "tsx src/seed.ts",
     "db:run-sql": "tsx src/scripts/run-sql.ts",

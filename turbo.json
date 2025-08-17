@@ -60,6 +60,9 @@
     "db:seed:geo": {
       "cache": false
     },
+    "db:geo:update": {
+      "cache": false
+    },
     "db:reset": {
       "cache": false
     },

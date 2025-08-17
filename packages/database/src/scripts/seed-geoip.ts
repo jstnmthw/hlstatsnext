@@ -11,6 +11,17 @@ import unzipper from "unzipper"
 // - For .zip: uses `unzip`
 // - For .tar.gz: uses `tar`
 
+// GeoIP data cache configuration
+const GEOIP_CACHE_DIR = path.join(process.cwd(), "data", "geoip")
+const METADATA_FILE = path.join(GEOIP_CACHE_DIR, "metadata.json")
+
+type CacheMetadata = {
+  lastModified?: string
+  downloadDate: number
+  filePath: string
+  edition: string
+}
+
 type LocationRecord = {
   locId: bigint
   country: string
@@ -134,6 +145,113 @@ async function findFileRecursive(
   return null
 }
 
+async function ensureCacheDir(): Promise<void> {
+  await fs.promises.mkdir(GEOIP_CACHE_DIR, { recursive: true })
+}
+
+async function loadCacheMetadata(): Promise<CacheMetadata | null> {
+  try {
+    const data = await fs.promises.readFile(METADATA_FILE, "utf8")
+    return JSON.parse(data) as CacheMetadata
+  } catch {
+    return null
+  }
+}
+
+async function saveCacheMetadata(metadata: CacheMetadata): Promise<void> {
+  await ensureCacheDir()
+  await fs.promises.writeFile(METADATA_FILE, JSON.stringify(metadata, null, 2))
+}
+
+async function checkRemoteFileModified(
+  url: string,
+  headers: Record<string, string> = {},
+): Promise<string | null> {
+  try {
+    const response = await fetch(url, {
+      method: "HEAD",
+      headers,
+      redirect: "follow",
+    })
+    if (!response.ok) {
+      console.warn(`Failed to check remote file: ${response.status} ${response.statusText}`)
+      return null
+    }
+    return response.headers.get("last-modified")
+  } catch (error) {
+    console.warn("Failed to check remote file modification time:", error)
+    return null
+  }
+}
+
+async function shouldDownloadFile(
+  url: string,
+  edition: string,
+  headers: Record<string, string> = {},
+): Promise<{ shouldDownload: boolean; cachedFilePath?: string }> {
+  const metadata = await loadCacheMetadata()
+  
+  // If no cache or different edition, download
+  if (!metadata || metadata.edition !== edition) {
+    return { shouldDownload: true }
+  }
+  
+  // Check if cached file still exists
+  const cachedExists = await fs.promises.access(metadata.filePath).then(() => true).catch(() => false)
+  if (!cachedExists) {
+    return { shouldDownload: true }
+  }
+  
+  // Check remote file modification time
+  const remoteLastModified = await checkRemoteFileModified(url, headers)
+  if (!remoteLastModified) {
+    // If we can't check remote, use cached file if it exists
+    console.log("Using cached file (unable to check remote modification time)")
+    return { shouldDownload: false, cachedFilePath: metadata.filePath }
+  }
+  
+  // Compare modification times
+  if (metadata.lastModified && metadata.lastModified === remoteLastModified) {
+    console.log("Using cached file (up to date)")
+    return { shouldDownload: false, cachedFilePath: metadata.filePath }
+  }
+  
+  console.log("Remote file has been updated, downloading new version")
+  return { shouldDownload: true }
+}
+
+async function downloadWithCache(
+  url: string,
+  edition: string,
+  headers: Record<string, string> = {},
+): Promise<string> {
+  await ensureCacheDir()
+  
+  const cachedFilePath = path.join(GEOIP_CACHE_DIR, `${edition}.zip`)
+  const { shouldDownload, cachedFilePath: existingFile } = await shouldDownloadFile(url, edition, headers)
+  
+  if (!shouldDownload && existingFile) {
+    return existingFile
+  }
+  
+  console.log(`Downloading ${edition} from MaxMind...`)
+  await download(url, cachedFilePath, headers)
+  
+  // Get the last-modified header after successful download
+  const remoteLastModified = await checkRemoteFileModified(url, headers)
+  
+  // Save metadata
+  const metadata: CacheMetadata = {
+    lastModified: remoteLastModified || undefined,
+    downloadDate: Date.now(),
+    filePath: cachedFilePath,
+    edition,
+  }
+  await saveCacheMetadata(metadata)
+  
+  return cachedFilePath
+}
+
 function parseCsvLine(line: string): string[] {
   const result: string[] = []
   let current = ""
@@ -208,12 +326,10 @@ async function seedGeoLite(): Promise<void> {
   const SUFFIX = "zip"
   const url = `https://download.maxmind.com/geoip/databases/${EDITION}/download?suffix=${SUFFIX}`
 
-  const tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "geolite2-"))
-  const archivePath = path.join(tmpDir, `${EDITION}.zip`)
-
-  console.log(`Downloading ${EDITION} from MaxMind...`)
   const basic = Buffer.from(`${accountId}:${licenseKey}`).toString("base64")
-  await download(url, archivePath, { Authorization: `Basic ${basic}` })
+  const archivePath = await downloadWithCache(url, EDITION, { Authorization: `Basic ${basic}` })
+  
+  const tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "geolite2-extract-"))
 
   console.log("Extracting archive...")
   await extractArchive(archivePath, tmpDir)
@@ -313,14 +429,58 @@ async function seedGeoLite(): Promise<void> {
   console.log("✅ GeoLite2 CSV seeding completed successfully.")
 }
 
-async function main(): Promise<void> {
+async function forceUpdate(): Promise<void> {
+  console.log("🔄 Force updating GeoIP data...")
   try {
+    // Remove existing cache to force download
+    const metadata = await loadCacheMetadata()
+    if (metadata?.filePath) {
+      try {
+        await fs.promises.unlink(metadata.filePath)
+        await fs.promises.unlink(METADATA_FILE)
+        console.log("Cleared existing cache")
+      } catch {
+        // Ignore errors if files don't exist
+      }
+    }
     await seedGeoLite()
   } catch (err) {
-    console.error("GeoIP seeding failed:", err)
+    console.error("GeoIP force update failed:", err)
     process.exit(1)
   } finally {
     await db.$disconnect()
+  }
+}
+
+async function updateIfNeeded(): Promise<void> {
+  console.log("🔍 Checking for GeoIP data updates...")
+  try {
+    await seedGeoLite()
+  } catch (err) {
+    console.error("GeoIP update check failed:", err)
+    process.exit(1)
+  } finally {
+    await db.$disconnect()
+  }
+}
+
+async function main(): Promise<void> {
+  const args = process.argv.slice(2)
+  const command = args[0]
+
+  switch (command) {
+    case "force":
+    case "--force":
+      await forceUpdate()
+      break
+    case "update":
+    case "--update":
+      await updateIfNeeded()
+      break
+    default:
+      // Default behavior (backward compatibility)
+      await updateIfNeeded()
+      break
   }
 }
 

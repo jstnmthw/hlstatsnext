@@ -41,6 +41,9 @@ yarn-error.log*
 generated/
 ref/
 
+# GeoIP cache data
+packages/database/data/
+
 # Servers
 servers/
 

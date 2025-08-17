@@ -13,6 +13,7 @@
     "db:reset": "turbo run db:reset",
     "db:seed": "turbo run db:seed",
     "db:seed:geo": "turbo run db:seed:geo",
+    "db:geo:update": "turbo run db:geo:update",
     "db:studio": "turbo run db:studio",
     "db:test:prepare": "turbo run db:test:prepare",
     "db:test:reset": "turbo run db:test:reset",

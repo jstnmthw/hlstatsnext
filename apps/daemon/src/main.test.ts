@@ -32,6 +32,9 @@ const mockContext = {
     start: vi.fn(),
     stop: vi.fn(),
   },
+  rconService: {
+    disconnectAll: vi.fn(),
+  },
   eventPublisher: mockEventPublisher,
 } as unknown as AppContext
 
@@ -155,12 +158,14 @@ describe("HLStatsDaemon", () => {
   describe("stop", () => {
     it("should stop successfully", async () => {
       vi.mocked(mockContext.ingressService.stop).mockResolvedValue(undefined)
+      vi.mocked(mockContext.rconService.disconnectAll).mockResolvedValue(undefined)
       vi.mocked(mockContext.database.disconnect).mockResolvedValue(undefined)
 
       await daemon.stop()
 
       expect(mockContext.logger.shutdown).toHaveBeenCalled()
       expect(mockContext.ingressService.stop).toHaveBeenCalled()
+      expect(mockContext.rconService.disconnectAll).toHaveBeenCalled()
       expect(mockContext.database.disconnect).toHaveBeenCalled()
       expect(mockContext.logger.info).toHaveBeenCalledWith("Database connection closed")
       expect(mockContext.logger.shutdownComplete).toHaveBeenCalled()
@@ -168,6 +173,7 @@ describe("HLStatsDaemon", () => {
 
     it("should handle service stop errors", async () => {
       vi.mocked(mockContext.ingressService.stop).mockRejectedValue(new Error("Stop error"))
+      vi.mocked(mockContext.rconService.disconnectAll).mockResolvedValue(undefined)
       vi.mocked(mockContext.database.disconnect).mockResolvedValue(undefined)
 
       await daemon.stop()
@@ -177,6 +183,7 @@ describe("HLStatsDaemon", () => {
 
     it("should handle database disconnect errors", async () => {
       vi.mocked(mockContext.ingressService.stop).mockResolvedValue(undefined)
+      vi.mocked(mockContext.rconService.disconnectAll).mockResolvedValue(undefined)
       vi.mocked(mockContext.database.disconnect).mockRejectedValue(new Error("Disconnect error"))
 
       await daemon.stop()

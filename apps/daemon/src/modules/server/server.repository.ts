@@ -70,4 +70,18 @@ export class ServerRepository implements IServerRepository {
       return null
     }
   }
+
+  async hasRconCredentials(serverId: number): Promise<boolean> {
+    try {
+      const server = await this.database.prisma.server.findUnique({
+        where: { serverId },
+        select: { rconPassword: true },
+      })
+      
+      return server?.rconPassword !== null && server?.rconPassword !== ""
+    } catch (error) {
+      this.logger.error(`Failed to check RCON credentials for server ${serverId}: ${error}`)
+      return false
+    }
+  }
 }

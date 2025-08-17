@@ -48,6 +48,10 @@ import { ServerRepository } from "@/modules/server/server.repository"
 import { ServerService } from "@/modules/server/server.service"
 import type { IServerService } from "@/modules/server/server.types"
 
+import { RconRepository } from "@/modules/rcon/rcon.repository"
+import { RconService } from "@/modules/rcon/rcon.service"
+import type { IRconService } from "@/modules/rcon/rcon.types"
+
 import { GeoIPService } from "@/modules/geoip/geoip.service"
 import { PlayerEventHandler } from "@/modules/player/player.events"
 import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
@@ -77,6 +81,7 @@ export interface AppContext {
   ingressService: IIngressService
   gameDetectionService: IGameDetectionService
   serverService: IServerService
+  rconService: IRconService
 
   // Module Event Handlers
   playerEventHandler: PlayerEventHandler
@@ -103,6 +108,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const weaponRepository = new WeaponRepository(database, logger)
   const actionRepository = new ActionRepository(database, logger)
   const serverRepository = new ServerRepository(database, logger)
+  const rconRepository = new RconRepository(database, logger)
 
   // Queue Module
   let queueModule: QueueModule | undefined
@@ -142,6 +148,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const actionService = new ActionService(actionRepository, logger, playerService, matchService)
   const gameDetectionService = new GameDetectionService(logger)
   const serverService = new ServerService(serverRepository, logger)
+  const rconService = new RconService(rconRepository, logger)
 
   // Create ingress dependencies adapter
   const ingressDependencies = createIngressDependencies(
@@ -281,6 +288,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     ingressService,
     gameDetectionService,
     serverService,
+    rconService,
     playerEventHandler,
     weaponEventHandler,
     matchEventHandler,

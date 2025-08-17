@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest"
 import type { DatabaseClient } from "@/database/client"
-import type { ILogger } from "@/shared/utils/logger.types"
+import { createMockLogger } from "@/tests/mocks/logger"
 import { GeoIPService } from "./geoip.service"
 
 type BlockRow = { locId: bigint }
@@ -31,12 +31,7 @@ const mockDb: MockDb = {
   },
 }
 
-const mockLogger = {
-  error: vi.fn(),
-  warn: vi.fn(),
-  info: vi.fn(),
-  debug: vi.fn(),
-}
+const mockLogger = createMockLogger()
 
 describe("GeoIPService", () => {
   let service: GeoIPService
@@ -45,7 +40,7 @@ describe("GeoIPService", () => {
     vi.clearAllMocks()
     service = new GeoIPService(
       mockDb as unknown as DatabaseClient,
-      mockLogger as unknown as ILogger,
+      mockLogger,
     )
   })
 

@@ -54,6 +54,7 @@ describe("PlayerService", () => {
       findById: vi.fn().mockResolvedValue({ game: "cstrike" }),
       findByAddress: vi.fn(),
       getServerConfig: vi.fn(),
+      hasRconCredentials: vi.fn().mockResolvedValue(false),
     }
 
     playerService = new PlayerService(
@@ -449,6 +450,7 @@ describe("PlayerService", () => {
         findById: vi.fn().mockResolvedValue({ game: "cstrike" }),
         findByAddress: vi.fn(),
         getServerConfig: vi.fn(),
+        hasRconCredentials: vi.fn().mockResolvedValue(false),
       }
       
       // Create PlayerService without MatchService

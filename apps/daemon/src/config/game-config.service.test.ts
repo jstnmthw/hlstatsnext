@@ -6,7 +6,7 @@ import {
   getUnknownMap,
 } from "./game-config.service"
 import type { DatabaseClient } from "@/database/client"
-import type { ILogger } from "@/shared/utils/logger.types"
+import { createMockLogger } from "@/tests/mocks/logger"
 
 const mockDb = {
   prisma: {
@@ -19,12 +19,7 @@ const mockDb = {
   },
 } as unknown as DatabaseClient
 
-const mockLogger = {
-  info: vi.fn(),
-  error: vi.fn(),
-  debug: vi.fn(),
-  warn: vi.fn(),
-} as unknown as ILogger
+const mockLogger = createMockLogger()
 
 describe("GameConfigService", () => {
   beforeEach(() => {

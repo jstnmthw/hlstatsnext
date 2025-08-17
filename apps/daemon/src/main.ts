@@ -50,6 +50,7 @@ export class HLStatsDaemon {
       this.logger.info("Starting services")
       await Promise.all([
         this.context.ingressService.start(),
+        this.startRconStatusMonitoring(),
         // Other services can be started here as needed
       ])
 
@@ -70,6 +71,7 @@ export class HLStatsDaemon {
     try {
       await Promise.all([
         this.context.ingressService.stop(),
+        this.context.rconService.disconnectAll(),
         // Shutdown queue module if available
         this.context.queueModule?.shutdown() || Promise.resolve(),
         // Other cleanup as needed
@@ -126,6 +128,62 @@ export class HLStatsDaemon {
         "Error closing database connection",
         error instanceof Error ? error.message : String(error),
       )
+    }
+  }
+
+  private async startRconStatusMonitoring(): Promise<void> {
+    this.logger.info("Starting RCON status monitoring")
+    
+    // Start periodic status monitoring for servers with RCON configured
+    setInterval(async () => {
+      try {
+        await this.monitorServerStatus()
+      } catch (error) {
+        this.logger.error(`Error in RCON status monitoring: ${error}`)
+      }
+    }, 30000) // Monitor every 30 seconds
+  }
+
+  private async monitorServerStatus(): Promise<void> {
+    // Get all servers that have RCON configured
+    // For now, we'll start with a simple implementation that checks server 1
+    // This can be enhanced to discover servers from database
+    
+    const testServerId = 1
+    
+    try {
+      // Check if server has RCON credentials
+      const hasRcon = await this.context.serverService.hasRconCredentials(testServerId)
+      if (!hasRcon) {
+        this.logger.debug(`Server ${testServerId} has no RCON configured, skipping`)
+        return
+      }
+
+      // Connect if not already connected
+      if (!this.context.rconService.isConnected(testServerId)) {
+        this.logger.info(`Connecting to server ${testServerId} via RCON`)
+        await this.context.rconService.connect(testServerId)
+      }
+
+      // Get status and log it
+      const status = await this.context.rconService.getStatus(testServerId)
+      
+      this.logger.info(`Server ${testServerId} status:`, {
+        map: status.map,
+        players: `${status.players}/${status.maxPlayers}`,
+        fps: status.fps,
+        hostname: status.hostname,
+      })
+
+    } catch (error) {
+      this.logger.warn(`Failed to get status for server ${testServerId}: ${error}`)
+      
+      // Disconnect on error to force reconnection next time
+      try {
+        await this.context.rconService.disconnect(testServerId)
+      } catch (disconnectError) {
+        this.logger.debug(`Error disconnecting from server ${testServerId}: ${disconnectError}`)
+      }
     }
   }
 }

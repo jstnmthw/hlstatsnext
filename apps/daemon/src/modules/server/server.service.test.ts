@@ -11,6 +11,7 @@ const createMockServerRepository = () => ({
   findById: vi.fn(),
   findByAddress: vi.fn(),
   getServerConfig: vi.fn(),
+  hasRconCredentials: vi.fn().mockResolvedValue(false),
 })
 
 describe("ServerService", () => {

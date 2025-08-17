@@ -25,6 +25,7 @@ const createMockServerService = (): IServerService => ({
   getServerByAddress: vi.fn(),
   getServerGame: vi.fn().mockResolvedValue("csgo"),
   getServerConfigBoolean: vi.fn().mockResolvedValue(false),
+  hasRconCredentials: vi.fn().mockResolvedValue(false),
   handleServerShutdown: vi.fn(),
   handleStatsUpdate: vi.fn(),
   handleAdminAction: vi.fn(),

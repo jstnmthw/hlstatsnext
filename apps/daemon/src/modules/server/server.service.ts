@@ -39,4 +39,8 @@ export class ServerService implements IServerService {
     if (["0", "false", "no", "off"].includes(normalized)) return false
     return fallback
   }
+
+  async hasRconCredentials(serverId: number): Promise<boolean> {
+    return await this.repository.hasRconCredentials(serverId)
+  }
 }

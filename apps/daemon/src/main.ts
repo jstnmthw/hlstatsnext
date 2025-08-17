@@ -27,7 +27,6 @@ export class HLStatsDaemon {
 
     this.context = getAppContext(ingressOptions)
     this.logger = this.context.logger
-
     this.logger.info("Initializing HLStatsNext Daemon...")
   }
 
@@ -65,6 +64,9 @@ export class HLStatsDaemon {
     }
   }
 
+  /**
+   * Stop the daemon
+   */
   async stop(): Promise<void> {
     this.logger.shutdown()
 
@@ -107,6 +109,9 @@ export class HLStatsDaemon {
     return this.context
   }
 
+  /**
+   * Test the database connection
+   */
   private async testDatabaseConnection(): Promise<boolean> {
     try {
       return await this.context.database.testConnection()
@@ -119,6 +124,9 @@ export class HLStatsDaemon {
     }
   }
 
+  /**
+   * Disconnect from the database
+   */
   private async disconnectDatabase(): Promise<void> {
     try {
       await this.context.database.disconnect()
@@ -131,9 +139,20 @@ export class HLStatsDaemon {
     }
   }
 
+  /**
+   * Start RCON status monitoring
+   */
   private async startRconStatusMonitoring(): Promise<void> {
-    this.logger.info("Starting RCON status monitoring")
-    
+    const statusInterval = parseInt(process.env.RCON_STATUS_INTERVAL || "30000", 10)
+    const rconEnabled = process.env.RCON_ENABLED === "true"
+
+    if (!rconEnabled) {
+      this.logger.warn("RCON monitoring disabled by configuration")
+      return
+    }
+
+    this.logger.ok(`Starting RCON status monitoring (interval: ${statusInterval}ms)`)
+
     // Start periodic status monitoring for servers with RCON configured
     setInterval(async () => {
       try {
@@ -141,43 +160,51 @@ export class HLStatsDaemon {
       } catch (error) {
         this.logger.error(`Error in RCON status monitoring: ${error}`)
       }
-    }, 30000) // Monitor every 30 seconds
+    }, statusInterval)
   }
 
+  /**
+   * Monitor server status
+   */
   private async monitorServerStatus(): Promise<void> {
     // Get all servers that have RCON configured
     // For now, we'll start with a simple implementation that checks server 1
     // This can be enhanced to discover servers from database
-    
+
     const testServerId = 1
-    
+
     try {
       // Check if server has RCON credentials
       const hasRcon = await this.context.serverService.hasRconCredentials(testServerId)
       if (!hasRcon) {
-        this.logger.debug(`Server ${testServerId} has no RCON configured, skipping`)
+        this.logger.warn(`Server ${testServerId} has no RCON configured, skipping status check`)
         return
       }
 
       // Connect if not already connected
       if (!this.context.rconService.isConnected(testServerId)) {
-        this.logger.info(`Connecting to server ${testServerId} via RCON`)
+        this.logger.info(`🔌 Attempting RCON connection to server ${testServerId}...`)
         await this.context.rconService.connect(testServerId)
+        this.logger.ok(`✅ RCON connected to server ${testServerId}`)
+      } else {
+        this.logger.debug(`📡 RCON already connected to server ${testServerId}, getting status...`)
       }
 
       // Get status and log it
       const status = await this.context.rconService.getStatus(testServerId)
-      
-      this.logger.info(`Server ${testServerId} status:`, {
-        map: status.map,
-        players: `${status.players}/${status.maxPlayers}`,
-        fps: status.fps,
-        hostname: status.hostname,
-      })
 
+      this.logger.info(
+        `📊 Server ${testServerId} status - Map: ${status.map} | Players: ${status.players}/${status.maxPlayers} | FPS: ${status.fps}`,
+      )
+
+      if (status.hostname) {
+        this.logger.debug(`🏷️ Server ${testServerId} hostname: ${status.hostname}`)
+      }
     } catch (error) {
-      this.logger.warn(`Failed to get status for server ${testServerId}: ${error}`)
-      
+      this.logger.error(
+        `❌ RCON failed for server ${testServerId}: ${error instanceof Error ? error.message : String(error)}`,
+      )
+
       // Disconnect on error to force reconnection next time
       try {
         await this.context.rconService.disconnect(testServerId)
@@ -188,6 +215,9 @@ export class HLStatsDaemon {
   }
 }
 
+/**
+ * Main function
+ */
 function main() {
   // Handle graceful shutdown
   const daemon = new HLStatsDaemon()

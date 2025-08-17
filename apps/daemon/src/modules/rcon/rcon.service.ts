@@ -69,7 +69,8 @@ export class RconService implements IRconService {
     while (attempts < this.config.maxRetries) {
       try {
         attempts++
-        this.logger.debug(`Connecting to server ${serverId} (attempt ${attempts}/${this.config.maxRetries})`)
+        const engineName = this.getEngineDisplayName(credentials.gameEngine)
+        this.logger.info(`🔄 RCON connecting to ${credentials.address}:${credentials.port} (${engineName}) - attempt ${attempts}/${this.config.maxRetries}`)
 
         await protocol.connect(credentials.address, credentials.port, credentials.rconPassword)
 
@@ -84,7 +85,7 @@ export class RconService implements IRconService {
 
         this.connections.set(serverId, connection)
         
-        this.logger.info(`Successfully connected to server ${serverId} via RCON`)
+        this.logger.ok(`✅ RCON connected to server ${serverId} (${credentials.address}:${credentials.port}) using ${engineName} protocol`)
         return
 
       } catch (error) {
@@ -92,15 +93,15 @@ export class RconService implements IRconService {
         
         if (attempts < this.config.maxRetries) {
           const delay = Math.min(1000 * Math.pow(2, attempts - 1), 5000) // Exponential backoff, max 5s
-          this.logger.warn(`Connection attempt ${attempts} failed for server ${serverId}, retrying in ${delay}ms`)
+          this.logger.warn(`⚠️ RCON connection attempt ${attempts} failed for server ${serverId}: ${lastError.message}. Retrying in ${delay}ms...`)
           await this.delay(delay)
         }
       }
     }
 
     // All attempts failed
-    const errorMessage = `Failed to connect to server ${serverId} after ${attempts} attempts`
-    this.logger.error(errorMessage, { lastError: lastError?.message })
+    const errorMessage = `❌ RCON connection failed to server ${serverId} after ${attempts} attempts`
+    this.logger.error(`${errorMessage}: ${lastError?.message}`)
     
     throw new RconError(
       `${errorMessage}: ${lastError?.message}`,
@@ -118,9 +119,9 @@ export class RconService implements IRconService {
 
     try {
       await connection.protocol.disconnect()
-      this.logger.info(`Disconnected from server ${serverId}`)
+      this.logger.info(`🔌 RCON disconnected from server ${serverId}`)
     } catch (error) {
-      this.logger.warn(`Error disconnecting from server ${serverId}: ${error}`)
+      this.logger.warn(`⚠️ Error disconnecting RCON from server ${serverId}: ${error}`)
     } finally {
       this.connections.delete(serverId)
     }
@@ -166,14 +167,23 @@ export class RconService implements IRconService {
   }
 
   async disconnectAll(): Promise<void> {
-    const disconnectPromises = Array.from(this.connections.keys()).map(serverId =>
+    const serverIds = Array.from(this.connections.keys())
+    
+    if (serverIds.length === 0) {
+      this.logger.debug("No RCON connections to close")
+      return
+    }
+    
+    this.logger.info(`🔌 Closing ${serverIds.length} RCON connection(s)...`)
+    
+    const disconnectPromises = serverIds.map(serverId =>
       this.disconnect(serverId)
     )
 
     await Promise.allSettled(disconnectPromises)
     this.connections.clear()
     
-    this.logger.info("All RCON connections closed")
+    this.logger.info("✅ All RCON connections closed")
   }
 
   /**
@@ -283,5 +293,18 @@ export class RconService implements IRconService {
 
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  private getEngineDisplayName(gameEngine: GameEngine): string {
+    switch (gameEngine) {
+      case GameEngine.GOLDSRC:
+        return "GoldSource"
+      case GameEngine.SOURCE:
+        return "Source"
+      case GameEngine.SOURCE_2009:
+        return "Source 2009"
+      default:
+        return "Unknown"
+    }
   }
 }

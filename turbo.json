@@ -9,7 +9,11 @@
     "LOG_LEVEL",
     "INGRESS_PORT",
     "MAXMIND_ACCOUNT_ID",
-    "MAXMIND_LICENSE_KEY"
+    "MAXMIND_LICENSE_KEY",
+    "RCON_ENABLED",
+    "RCON_TIMEOUT",
+    "RCON_MAX_RETRIES",
+    "RCON_STATUS_INTERVAL"
   ],
   "tasks": {
     "build": {

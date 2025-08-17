@@ -27,7 +27,15 @@ describe("RconService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    rconService = new RconService(mockRepository, mockLogger)
+    // Use shorter timeouts for testing
+    const testConfig = {
+      enabled: true,
+      timeout: 100, // Very short timeout for tests
+      maxRetries: 1, // Only retry once for tests
+      statusInterval: 1000,
+      maxConnectionsPerServer: 1,
+    }
+    rconService = new RconService(mockRepository, mockLogger, testConfig)
   })
 
   afterEach(async () => {
@@ -101,7 +109,7 @@ describe("RconService", () => {
   describe("disconnectAll", () => {
     it("should complete successfully with no connections", async () => {
       await expect(rconService.disconnectAll()).resolves.not.toThrow()
-      expect(mockLogger.info).toHaveBeenCalledWith("All RCON connections closed")
+      expect(mockLogger.debug).toHaveBeenCalledWith("No RCON connections to close")
     })
   })
 

@@ -148,7 +148,16 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const actionService = new ActionService(actionRepository, logger, playerService, matchService)
   const gameDetectionService = new GameDetectionService(logger)
   const serverService = new ServerService(serverRepository, logger)
-  const rconService = new RconService(rconRepository, logger)
+  
+  // Configure RCON service with environment variables
+  const rconConfig = {
+    enabled: process.env.RCON_ENABLED === "true",
+    timeout: parseInt(process.env.RCON_TIMEOUT || "5000", 10),
+    maxRetries: parseInt(process.env.RCON_MAX_RETRIES || "3", 10),
+    statusInterval: parseInt(process.env.RCON_STATUS_INTERVAL || "30000", 10),
+    maxConnectionsPerServer: 1,
+  }
+  const rconService = new RconService(rconRepository, logger, rconConfig)
 
   // Create ingress dependencies adapter
   const ingressDependencies = createIngressDependencies(

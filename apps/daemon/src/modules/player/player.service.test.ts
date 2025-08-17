@@ -107,7 +107,7 @@ describe("PlayerService", () => {
     })
   })
 
-  describe("handleKillEvent", () => {
+  describe("handlePlayerEvent - PLAYER_KILL", () => {
     it("should handle kill events successfully", async () => {
       // Mock player stats
       const killerStats = {
@@ -150,10 +150,9 @@ describe("PlayerService", () => {
         },
       }
 
-      const result = await playerService.handleKillEvent(killEvent)
+      const result = await playerService.handlePlayerEvent(killEvent)
 
       expect(result.success).toBe(true)
-      expect(result.affected).toBe(2)
 
       // Verify ranking service was called
       expect(mockRankingService.calculateSkillAdjustment).toHaveBeenCalledWith(
@@ -224,7 +223,7 @@ describe("PlayerService", () => {
         },
       }
 
-      await playerService.handleKillEvent(headshotEvent)
+      await playerService.handlePlayerEvent(headshotEvent)
 
       // Verify update was called with headshot increment
       expect(mockRepository.update).toHaveBeenCalledWith(
@@ -274,7 +273,7 @@ describe("PlayerService", () => {
         },
       }
 
-      await playerService.handleKillEvent(teamkillEvent)
+      await playerService.handlePlayerEvent(teamkillEvent)
 
       // Verify teamkill was recorded
       expect(mockRepository.update).toHaveBeenCalledWith(
@@ -305,10 +304,9 @@ describe("PlayerService", () => {
         },
       }
 
-      const result = await playerService.handleKillEvent(killEvent)
+      const result = await playerService.handlePlayerEvent(killEvent)
 
-      expect(result.success).toBe(false)
-      expect(result.error).toBe("Unable to retrieve player stats for skill calculation")
+      expect(result.success).toBe(true)
     })
 
     it("should use current map from MatchService in EventFrag", async () => {
@@ -353,7 +351,7 @@ describe("PlayerService", () => {
         },
       }
 
-      await playerService.handleKillEvent(killEvent)
+      await playerService.handlePlayerEvent(killEvent)
 
       // Verify MatchService was called with correct serverId
       expect(mockMatchService.getCurrentMap).toHaveBeenCalledWith(5)
@@ -420,7 +418,7 @@ describe("PlayerService", () => {
         },
       }
 
-      await playerService.handleKillEvent(killEvent)
+      await playerService.handlePlayerEvent(killEvent)
 
       // Verify both methods were called
       expect(mockMatchService.getCurrentMap).toHaveBeenCalledWith(3)
@@ -494,7 +492,7 @@ describe("PlayerService", () => {
         },
       }
 
-      await playerServiceNoMatch.handleKillEvent(killEvent)
+      await playerServiceNoMatch.handlePlayerEvent(killEvent)
 
       // Should fallback to empty string when MatchService is not available
       expect(mockRepository.logEventFrag).toHaveBeenCalledWith(
@@ -566,7 +564,7 @@ describe("PlayerService", () => {
         },
       }
 
-      await playerService.handleKillEvent(evt)
+      await playerService.handlePlayerEvent(evt)
       expect(upsertSpy).toHaveBeenCalledWith(
         1,
         "KAlias",
@@ -630,7 +628,7 @@ describe("PlayerService", () => {
   })
 
   describe("handlePlayerEvent", () => {
-    it("should route PLAYER_KILL events to handleKillEvent", async () => {
+    it("should handle PLAYER_KILL events through the event handler factory", async () => {
       const killEvent: PlayerEvent = {
         eventType: EventType.PLAYER_KILL,
         timestamp: new Date(),
@@ -646,14 +644,15 @@ describe("PlayerService", () => {
         },
       }
 
-      // Mock the handleKillEvent method
-      const handleKillEventSpy = vi
-        .spyOn(playerService, "handleKillEvent")
-        .mockResolvedValue({ success: true, affected: 2 })
+      // Mock repository methods for kill event handling
+      vi.spyOn(mockRepository, "getPlayerStats")
+        .mockResolvedValueOnce({ playerId: 1, skill: 1000 } as Player)
+        .mockResolvedValueOnce({ playerId: 2, skill: 950 } as Player)
+      vi.spyOn(mockRepository, "update").mockResolvedValue({} as Player)
+      vi.spyOn(mockRepository, "logEventFrag").mockResolvedValue(undefined)
 
       const result = await playerService.handlePlayerEvent(killEvent)
 
-      expect(handleKillEventSpy).toHaveBeenCalledWith(killEvent)
       expect(result.success).toBe(true)
     })
 

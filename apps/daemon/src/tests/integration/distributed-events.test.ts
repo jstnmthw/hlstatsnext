@@ -42,7 +42,6 @@ describe.skip("Distributed Event Processing", () => {
 
     playerService = {
       handlePlayerEvent: vi.fn(),
-      handleKillEvent: vi.fn(),
       getOrCreatePlayer: vi.fn().mockResolvedValue(123),
     } as unknown as IPlayerService
 
@@ -179,7 +178,7 @@ describe.skip("Distributed Event Processing", () => {
       await eventBus.emit(killEvent)
 
       // EventProcessor no longer handles kill events (migrated to RabbitMQ)
-      expect(playerService.handleKillEvent).toHaveBeenCalledTimes(0)
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledTimes(0)
       // WeaponEventHandler should not handle kill events via EventBus anymore
       expect(weaponService.handleWeaponEvent).toHaveBeenCalledTimes(0)
       // MatchEventHandler should not handle kill events via EventBus anymore

@@ -74,7 +74,7 @@ hlstatsnext/
 
 ### 4.2 Project Organization Rules
 
-1.  **Module-Based Architecture**: Backend apps (`api`, `daemon`) will group code into `src/modules` (e.g., `modules/player`). Each module must expose a public API via an `index.ts` file. Code shared between modules lives in `src/shared`. For a detailed explanation, see @/docs/architecture-decision-log/ADR-001-modular-architecture.md.
+1.  **Module-Based Architecture**: Backend apps (`api`, `daemon`) will group code into `src/modules` (e.g., `modules/player`). Code shared between modules lives in `src/shared`. For a detailed explanation, see @/docs/architecture-decision-log/ADR-001-modular-architecture.md.
 2.  **Frontend Feature Folders**: The `web` app will use a `features/` directory to co-locate components, hooks, and actions, keeping Next.js `app/` routes as thin as possible.
 3.  Cross-cutting helpers that are used by multiple applications live in `packages/` (e.g. `packages/ui`, `packages/config`, `package/database`).
 4.  No circular dependencies - enforced via ESLint plugin.

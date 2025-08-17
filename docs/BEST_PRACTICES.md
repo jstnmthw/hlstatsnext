@@ -162,12 +162,6 @@ pnpm --filter @repo/database db:generate
 **Type-Safe Package Development**:
 
 ```typescript
-// When developing shared packages, ensure type exports
-// packages/database/src/index.ts
-export type * from './types/player';
-export type * from './types/game';
-export type * from '@prisma/client';
-
 // Always export both types and runtime values separately
 export { PlayerService } from './services/player.service';
 export { GameEventProcessor } from './services/game.service';

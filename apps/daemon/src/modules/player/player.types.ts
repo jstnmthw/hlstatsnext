@@ -219,7 +219,6 @@ export interface IPlayerService {
 
   // Event handling
   handlePlayerEvent(event: PlayerEvent): Promise<HandlerResult>
-  handleKillEvent(event: PlayerKillEvent): Promise<HandlerResult>
 }
 
 // Per-alias (players_names) aggregation update shape

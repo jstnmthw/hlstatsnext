@@ -11,6 +11,7 @@ import type { FindOptions, CreateOptions, UpdateOptions } from "@/shared/types/d
 import type { Player, Prisma } from "@repo/database/client"
 import { BaseRepository } from "@/shared/infrastructure/persistence/repository.base"
 import { GameConfig } from "@/config/game.config"
+import { PlayerNameUpdateBuilder } from "@/shared/application/utils/player-name-update.builder"
 
 export class PlayerRepository extends BaseRepository<Player> implements IPlayerRepository {
   protected tableName = "player"
@@ -690,19 +691,23 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
         throw new Error("name is required for upsertPlayerName")
       }
 
-      // Build Prisma update increments from partial updates
-      const incrementData: Record<string, unknown> = {}
-      if (updates.numUses) incrementData.numUses = { increment: updates.numUses }
-      if (updates.connectionTime)
-        incrementData.connectionTime = { increment: updates.connectionTime }
-      if (updates.kills) incrementData.kills = { increment: updates.kills }
-      if (updates.deaths) incrementData.deaths = { increment: updates.deaths }
-      if (updates.suicides) incrementData.suicides = { increment: updates.suicides }
-      if (updates.shots) incrementData.shots = { increment: updates.shots }
-      if (updates.hits) incrementData.hits = { increment: updates.hits }
-      if (updates.headshots) incrementData.headshots = { increment: updates.headshots }
+      // Use PlayerNameUpdateBuilder to build the update data
+      const builder = PlayerNameUpdateBuilder.create()
+      
+      // Add all updates to the builder
+      if (updates.numUses) builder.addUsage(updates.numUses)
+      if (updates.connectionTime) builder.addConnectionTime(updates.connectionTime)
+      if (updates.kills) builder.addKills(updates.kills)
+      if (updates.deaths) builder.addDeaths(updates.deaths)
+      if (updates.suicides) builder.addSuicides(updates.suicides)
+      if (updates.shots) builder.addShots(updates.shots)
+      if (updates.hits) builder.addHits(updates.hits)
+      if (updates.headshots) builder.addHeadshots(updates.headshots)
+      if (updates.lastUse) builder.updateLastUse(updates.lastUse)
 
-      const lastUseUpdate = updates.lastUse ? { lastUse: updates.lastUse } : {}
+      // Build the data for Prisma upsert
+      const { incrementData, directData } = builder.buildForPrismaUpsert()
+      const createData = builder.buildForCreate(playerId, name)
 
       await this.executeWithTransaction(async (client) => {
         await client.playerName.upsert({
@@ -712,22 +717,10 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
               name,
             },
           },
-          create: {
-            playerId,
-            name,
-            lastUse: updates.lastUse ?? new Date(),
-            numUses: updates.numUses ?? 0,
-            connectionTime: updates.connectionTime ?? 0,
-            kills: updates.kills ?? 0,
-            deaths: updates.deaths ?? 0,
-            suicides: updates.suicides ?? 0,
-            headshots: updates.headshots ?? 0,
-            shots: updates.shots ?? 0,
-            hits: updates.hits ?? 0,
-          },
+          create: createData,
           update: {
             ...incrementData,
-            ...lastUseUpdate,
+            ...directData,
           },
         })
       }, options)

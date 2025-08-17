@@ -42,7 +42,6 @@ describe("ActionService", () => {
       getPlayerRating: vi.fn(),
       updatePlayerRatings: vi.fn(),
       handlePlayerEvent: vi.fn(),
-      handleKillEvent: vi.fn(),
     }
     mockMatchService = {
       getPlayersByTeam: vi.fn().mockReturnValue([]),
@@ -452,7 +451,6 @@ describe("ActionService", () => {
         getTopPlayers: vi.fn().mockResolvedValue([]),
         getRoundParticipants: vi.fn().mockResolvedValue([]),
         handlePlayerEvent: vi.fn().mockResolvedValue({ success: true }),
-        handleKillEvent: vi.fn().mockResolvedValue({ success: true }),
       }
 
       // Create service with player service

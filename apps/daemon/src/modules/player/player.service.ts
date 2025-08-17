@@ -11,26 +11,17 @@ import type {
   SkillRating,
   RatingUpdate,
   PlayerEvent,
-  PlayerKillEvent,
-  PlayerConnectEvent,
-  PlayerDisconnectEvent,
-  PlayerChangeNameEvent,
-  PlayerSuicideEvent,
-  PlayerDamageEvent,
-  PlayerTeamkillEvent,
-  PlayerChatEvent,
   PlayerWithCounts,
 } from "./player.types"
 import type { Player } from "@repo/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { KillContext } from "@/modules/ranking/ranking.service"
 import type { HandlerResult } from "@/shared/types/common"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IServerRepository } from "@/modules/server/server.types"
-import type { BaseEvent, DualPlayerMeta, PlayerMeta } from "@/shared/types/events"
-import { EventType } from "@/shared/types/events"
 import { normalizeSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
+import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builder"
+import { PlayerEventHandlerFactory } from "./handlers/player-event-handler.factory"
 
 export class PlayerService implements IPlayerService {
   private readonly DEFAULT_RATING = 1000
@@ -40,6 +31,9 @@ export class PlayerService implements IPlayerService {
 
   // Request-level cache for player resolution to prevent race conditions
   private readonly playerResolutionCache = new Map<string, Promise<number>>()
+  
+  // Event handler factory for delegating to specific handlers
+  private readonly eventHandlerFactory: PlayerEventHandlerFactory
 
   constructor(
     private readonly repository: IPlayerRepository,
@@ -48,7 +42,17 @@ export class PlayerService implements IPlayerService {
     private readonly serverRepository: IServerRepository,
     private readonly matchService?: IMatchService,
     private readonly geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
-  ) {}
+  ) {
+    // Initialize the event handler factory
+    this.eventHandlerFactory = new PlayerEventHandlerFactory(
+      repository,
+      logger,
+      rankingService,
+      serverRepository,
+      matchService,
+      geoipService,
+    )
+  }
 
   async getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number> {
     const normalized = normalizeSteamId(steamId)
@@ -125,53 +129,32 @@ export class PlayerService implements IPlayerService {
 
   async updatePlayerStats(playerId: number, updates: PlayerStatsUpdate): Promise<void> {
     try {
-      const updateData: Record<string, unknown> = {}
+      // Use StatUpdateBuilder to create the update data
+      const builder = StatUpdateBuilder.create()
 
-      // Build increment operations for numeric fields
-      if (updates.kills !== undefined) {
-        updateData.kills = { increment: updates.kills }
-      }
-      if (updates.deaths !== undefined) {
-        updateData.deaths = { increment: updates.deaths }
-      }
-      if (updates.suicides !== undefined) {
-        updateData.suicides = { increment: updates.suicides }
-      }
-      if (updates.teamkills !== undefined) {
-        updateData.teamkills = { increment: updates.teamkills }
-      }
-      if (updates.skill !== undefined) {
-        updateData.skill = { increment: updates.skill }
-        updateData.lastSkillChange = new Date()
-      }
-      if (updates.shots !== undefined) {
-        updateData.shots = { increment: updates.shots }
-      }
-      if (updates.hits !== undefined) {
-        updateData.hits = { increment: updates.hits }
-      }
-      if (updates.headshots !== undefined) {
-        updateData.headshots = { increment: updates.headshots }
-      }
-      if (updates.connectionTime !== undefined) {
-        updateData.connectionTime = { increment: updates.connectionTime }
+      // Add incremental updates
+      if (updates.kills !== undefined) builder.addKills(updates.kills)
+      if (updates.deaths !== undefined) builder.addDeaths(updates.deaths)
+      if (updates.suicides !== undefined) builder.addSuicides(updates.suicides)
+      if (updates.teamkills !== undefined) builder.addTeamkills(updates.teamkills)
+      if (updates.skill !== undefined) builder.addSkillChange(updates.skill)
+      if (updates.shots !== undefined) builder.addShots(updates.shots)
+      if (updates.hits !== undefined) builder.addHits(updates.hits)
+      if (updates.headshots !== undefined) builder.addHeadshots(updates.headshots)
+      if (updates.connectionTime !== undefined) builder.addConnectionTime(updates.connectionTime)
+
+      // Add direct value updates
+      if (updates.killStreak !== undefined) builder.setKillStreak(updates.killStreak)
+      if (updates.deathStreak !== undefined) builder.setDeathStreak(updates.deathStreak)
+      if (updates.lastEvent !== undefined) builder.updateLastEvent(updates.lastEvent)
+      if (updates.lastName !== undefined) builder.updateLastName(updates.lastName)
+
+      if (!builder.hasUpdates()) {
+        this.logger.debug(`No valid updates provided for player ${playerId}`)
+        return
       }
 
-      // Direct value updates
-      if (updates.killStreak !== undefined) {
-        updateData.killStreak = updates.killStreak
-      }
-      if (updates.deathStreak !== undefined) {
-        updateData.deathStreak = updates.deathStreak
-      }
-      if (updates.lastEvent !== undefined) {
-        updateData.lastEvent = updates.lastEvent
-      }
-      if (updates.lastName !== undefined) {
-        updateData.lastName = updates.lastName
-      }
-
-      await this.repository.update(playerId, updateData as Partial<Player>)
+      await this.repository.update(playerId, builder.build())
       this.logger.debug(`Updated player stats for ${playerId}`)
     } catch (error) {
       this.logger.error(`Failed to update player stats for ${playerId}: ${error}`)
@@ -251,35 +234,15 @@ export class PlayerService implements IPlayerService {
 
   async handlePlayerEvent(event: PlayerEvent): Promise<HandlerResult> {
     try {
-      switch (event.eventType) {
-        case EventType.PLAYER_CONNECT:
-          return await this.handlePlayerConnect(event)
-        case EventType.PLAYER_DISCONNECT:
-          return await this.handlePlayerDisconnect(event)
-        case EventType.PLAYER_ENTRY:
-          return await this.handlePlayerEntry(event)
-        case EventType.PLAYER_CHANGE_TEAM:
-          return await this.handlePlayerChangeTeam(event)
-        case EventType.PLAYER_CHANGE_ROLE:
-          return await this.handlePlayerChangeRole()
-        case EventType.PLAYER_CHANGE_NAME:
-          return await this.handlePlayerChangeName(event)
-        case EventType.PLAYER_SUICIDE:
-          return await this.handlePlayerSuicide(event)
-        case EventType.PLAYER_DAMAGE:
-          return await this.handlePlayerDamage(event)
-        case EventType.PLAYER_TEAMKILL:
-          return await this.handlePlayerTeamkill(event)
-        case EventType.CHAT_MESSAGE:
-          return await this.handleChatMessage(event)
-        case EventType.PLAYER_KILL:
-          return await this.handleKillEvent(event as PlayerKillEvent)
-        default:
-          this.logger.debug(
-            `PlayerService: Unhandled event type: ${(event as BaseEvent).eventType}`,
-          )
-          return { success: true } // Event not handled by this service
+      // Use the event handler factory to get the appropriate handler
+      const handler = this.eventHandlerFactory.getHandler(event.eventType)
+      
+      if (!handler) {
+        this.logger.debug(`PlayerService: Unhandled event type: ${event.eventType}`)
+        return { success: true } // Event not handled by this service
       }
+
+      return await handler.handle(event)
     } catch (error) {
       return {
         success: false,
@@ -288,762 +251,4 @@ export class PlayerService implements IPlayerService {
     }
   }
 
-  async handleKillEvent(event: PlayerKillEvent): Promise<HandlerResult> {
-    try {
-      const { killerId, victimId, headshot, weapon, killerTeam, victimTeam } = event.data
-
-      // Keep match teams in sync when known
-      if (killerTeam) this.matchService?.setPlayerTeam?.(event.serverId, killerId, killerTeam)
-      if (victimTeam) this.matchService?.setPlayerTeam?.(event.serverId, victimId, victimTeam)
-
-      // Get current player stats for streak tracking
-      const [killerStats, victimStats] = await Promise.all([
-        this.repository.getPlayerStats(killerId),
-        this.repository.getPlayerStats(victimId),
-      ])
-
-      if (!killerStats || !victimStats) {
-        return {
-          success: false,
-          error: "Unable to retrieve player stats for skill calculation",
-        }
-      }
-
-      // Calculate skill changes using the enhanced ranking system
-      const killContext: KillContext = {
-        weapon: weapon || "unknown",
-        headshot: headshot || false,
-        killerTeam: killerTeam || "UNKNOWN",
-        victimTeam: victimTeam || "UNKNOWN",
-      }
-
-      const killerRating: SkillRating = {
-        playerId: killerId,
-        rating: killerStats.skill || this.DEFAULT_RATING,
-        confidence: 1.0, // TODO: Implement confidence tracking
-        volatility: this.DEFAULT_VOLATILITY,
-        gamesPlayed: killerStats.kills + killerStats.deaths,
-      }
-
-      const victimRating: SkillRating = {
-        playerId: victimId,
-        rating: victimStats.skill || this.DEFAULT_RATING,
-        confidence: 1.0,
-        volatility: this.DEFAULT_VOLATILITY,
-        gamesPlayed: victimStats.kills + victimStats.deaths,
-      }
-
-      const skillAdjustment = await this.rankingService.calculateSkillAdjustment(
-        killerRating,
-        victimRating,
-        killContext,
-      )
-
-      // Calculate streaks
-      const newKillerKillStreak = (killerStats.killStreak || 0) + 1
-      const newVictimDeathStreak = (victimStats.deathStreak || 0) + 1
-
-      // Update killer stats
-      const killerUpdates: PlayerStatsUpdate = {
-        kills: 1,
-        skill: skillAdjustment.killerChange,
-        killStreak: newKillerKillStreak,
-        deathStreak: 0, // Reset death streak on kill
-        lastEvent: new Date(),
-      }
-
-      if (headshot) {
-        killerUpdates.headshots = 1
-      }
-
-      // Handle team kills
-      if (killerTeam === victimTeam) {
-        killerUpdates.teamkills = 1
-        this.logger.warn(`Team kill: ${killerId} -> ${victimId}`)
-      }
-
-      // Update victim stats
-      const victimUpdates: PlayerStatsUpdate = {
-        deaths: 1,
-        skill: skillAdjustment.victimChange,
-        deathStreak: newVictimDeathStreak,
-        killStreak: 0, // Reset kill streak on death
-        lastEvent: new Date(),
-      }
-
-      // Get current map from the match service, initialize if needed
-      let map = this.matchService?.getCurrentMap(event.serverId) || ""
-      if (map === "unknown" && this.matchService) {
-        map = await this.matchService.initializeMapForServer(event.serverId)
-      }
-
-      // Apply stat updates and log EventFrag
-      await Promise.all([
-        this.updatePlayerStats(killerId, killerUpdates),
-        this.updatePlayerStats(victimId, victimUpdates),
-        // Log EventFrag for historical tracking
-        this.repository.logEventFrag(
-          killerId,
-          victimId,
-          event.serverId,
-          map,
-          weapon || "unknown",
-          headshot || false,
-          undefined, // killerRole - TODO: Get from player roles
-          undefined, // victimRole - TODO: Get from player roles
-          // Position data from event if available
-          undefined, // killerX - TODO: Extract from event.data positions
-          undefined, // killerY
-          undefined, // killerZ
-          undefined, // victimX
-          undefined, // victimY
-          undefined, // victimZ
-        ),
-      ])
-
-      // players_names aggregation updates for aliases if meta present
-      try {
-        const meta = event.meta as unknown as {
-          killer?: { playerName?: string }
-          victim?: { playerName?: string }
-        }
-        const now = new Date()
-        const ops: Array<Promise<void>> = []
-        if (meta?.killer?.playerName) {
-          ops.push(
-            this.repository.upsertPlayerName(killerId, meta.killer.playerName, {
-              kills: 1,
-              headshots: headshot ? 1 : 0,
-              lastUse: now,
-            }),
-          )
-        }
-        if (meta?.victim?.playerName) {
-          ops.push(
-            this.repository.upsertPlayerName(victimId, meta.victim.playerName, {
-              deaths: 1,
-              lastUse: now,
-            }),
-          )
-        }
-        if (ops.length) await Promise.all(ops)
-      } catch (err) {
-        this.logger.warn(`Failed to upsert player names on kill: ${String(err)}`)
-      }
-
-      // Log kill event details
-      this.logger.debug(
-        `Kill event: ${killerId} → ${victimId} (${weapon}${headshot ? ", headshot" : ""})`,
-      )
-
-      // Log skill calculation results at INFO level for visibility
-      this.logger.info(
-        `Skill calculated: killer ${killerId} (${skillAdjustment.killerChange > 0 ? "+" : ""}${skillAdjustment.killerChange}) -> victim ${victimId} (${skillAdjustment.victimChange})`,
-        {
-          eventType: "PLAYER_KILL",
-          serverId: event.serverId,
-          killerId,
-          victimId,
-          killerOldRating: killerRating.rating,
-          killerNewRating: killerRating.rating + skillAdjustment.killerChange,
-          victimOldRating: victimRating.rating,
-          victimNewRating: victimRating.rating + skillAdjustment.victimChange,
-        },
-      )
-
-      return {
-        success: true,
-        affected: 2,
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
-
-  private async handlePlayerConnect(event: PlayerEvent): Promise<HandlerResult> {
-    try {
-      // Player ID should already be resolved by event processor
-      if (event.eventType !== EventType.PLAYER_CONNECT) {
-        return { success: false, error: "Invalid event type for handlePlayerConnect" }
-      }
-      const connectEvent = event as PlayerConnectEvent
-      const { playerId, ipAddress } = connectEvent.data
-
-      // GeoIP enrichment (best-effort)
-      let geoUpdates: Record<string, unknown> | undefined
-      if (this.geoipService && ipAddress) {
-        const geo = (await this.geoipService.lookup(ipAddress)) as {
-          city?: string
-          country?: string
-          latitude?: number
-          longitude?: number
-          flag?: string
-        } | null
-        if (geo) {
-          geoUpdates = {
-            city: geo.city ?? undefined,
-            country: geo.country ?? undefined,
-            flag: geo.flag ?? undefined,
-            lat: geo.latitude ?? undefined,
-            lng: geo.longitude ?? undefined,
-            lastAddress: ipAddress.split(":")[0],
-          }
-        }
-      }
-
-      await this.updatePlayerStats(playerId, {
-        lastEvent: new Date(),
-        ...(geoUpdates ?? {}),
-      } as PlayerStatsUpdate)
-
-      // players_names: increment usage for current alias on connect
-      try {
-        const currentName = (event.meta as PlayerMeta | undefined)?.playerName
-        if (currentName) {
-          await this.repository.upsertPlayerName(playerId, currentName, {
-            numUses: 1,
-            lastUse: new Date(),
-          })
-        }
-      } catch (err) {
-        this.logger.warn(`Failed to upsert player name on connect for ${playerId}: ${String(err)}`)
-      }
-
-      // Update server activePlayers and lastEvent
-      await this.repository.updateServerForPlayerEvent?.(event.serverId, {
-        activePlayers: { increment: 1 },
-        lastEvent: new Date(),
-      })
-
-      // Log connect lifecycle event
-      let map = this.matchService?.getCurrentMap(event.serverId) || ""
-      if (map === "unknown" && this.matchService) {
-        map = await this.matchService.initializeMapForServer(event.serverId)
-      }
-      // Avoid duplicate connect if a connect was just recorded (e.g., entry then connect)
-      const hasRecent = await this.repository.hasRecentConnect?.(event.serverId, playerId, 120000)
-      if (!hasRecent) {
-        await this.repository.createConnectEvent(playerId, event.serverId, map, ipAddress || "")
-      }
-
-      this.logger.debug(`Player connected: ${playerId}`)
-
-      return { success: true, affected: 1 }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
-
-  private async handlePlayerDisconnect(event: PlayerEvent): Promise<HandlerResult> {
-    try {
-      if (event.eventType !== EventType.PLAYER_DISCONNECT) {
-        return { success: false, error: "Invalid event type for handlePlayerDisconnect" }
-      }
-      const disconnectEvent = event as PlayerDisconnectEvent
-      const { sessionDuration } = disconnectEvent.data
-      let playerId = disconnectEvent.data.playerId
-
-      // If we cannot resolve a valid playerId, attempt resolution strategies
-      if (playerId == null || playerId <= 0) {
-        const meta = (disconnectEvent as PlayerDisconnectEvent).meta
-
-        this.logger.debug(`Disconnect event with invalid playerId ${playerId}:`, {
-          playerName: meta?.playerName,
-          steamId: meta?.steamId,
-          isBot: meta?.isBot,
-          rawEvent: event.raw?.substring(0, 100) + "...",
-        })
-
-        // When playerId is -1, try to resolve the player by name
-        // This handles both bots and edge cases where real players get -1 as ID
-        if (meta?.playerName) {
-          try {
-            // Get server game for player lookup
-            const server = await this.serverRepository.findById(event.serverId)
-            const game = server?.game || "csgo" // fallback to default game
-
-            // First try to find a bot with the BOT_ prefix
-            const normalizedName = sanitizePlayerName(meta.playerName)
-            const botUniqueId = `BOT_${normalizedName}`
-
-            const existingBot = await this.repository.findByUniqueId(botUniqueId, game)
-            if (existingBot) {
-              playerId = existingBot.playerId
-              this.logger.info(
-                `Resolved bot ${meta.playerName} to playerId ${playerId} for disconnect on server ${event.serverId}`,
-              )
-            } else {
-              this.logger.debug(
-                `Player ${meta.playerName} with invalid playerId ${playerId} not found as bot, skipping disconnect event`,
-              )
-              return { success: true }
-            }
-          } catch (error) {
-            this.logger.debug(
-              `Failed to resolve player ${meta.playerName} for disconnect: ${error}`,
-            )
-            return { success: true }
-          }
-        } else {
-          // No player name to resolve with
-          this.logger.warn(
-            `Invalid playerId ${playerId} with no player name - cannot resolve disconnect event`,
-          )
-          return { success: true }
-        }
-      }
-
-      const updates: PlayerStatsUpdate = {
-        lastEvent: new Date(),
-      }
-
-      if (sessionDuration) {
-        updates.connectionTime = sessionDuration
-      }
-
-      await this.updatePlayerStats(playerId, updates)
-
-      // Best-effort: attribute sessionDuration to current alias connection_time
-      try {
-        const currentName = (event.meta as PlayerMeta | undefined)?.playerName
-        if (currentName && sessionDuration && sessionDuration > 0) {
-          await this.repository.upsertPlayerName(playerId, currentName, {
-            connectionTime: sessionDuration,
-            lastUse: new Date(),
-          })
-        }
-      } catch (err) {
-        this.logger.warn(
-          `Failed to upsert player name on disconnect for ${playerId}: ${String(err)}`,
-        )
-      }
-
-      // Update server activePlayers and lastEvent
-      try {
-        await this.repository.updateServerForPlayerEvent?.(event.serverId, {
-          activePlayers: { decrement: 1 },
-          lastEvent: new Date(),
-        })
-      } catch {
-        // Optional repository hook may not exist; ignore if unavailable
-      }
-
-      // Log disconnect lifecycle event and enrich last connect (bots included if processed)
-      try {
-        let map = this.matchService?.getCurrentMap(event.serverId) || ""
-        if (map === "unknown" && this.matchService) {
-          map = await this.matchService.initializeMapForServer(event.serverId)
-        }
-        await this.repository.createDisconnectEvent(playerId, event.serverId, map)
-        this.logger.debug(
-          `Created disconnect event for player ${playerId} on server ${event.serverId}`,
-        )
-      } catch (error) {
-        this.logger.warn(
-          `Failed to create disconnect event for player ${playerId} on server ${event.serverId}: ${error}`,
-        )
-      }
-
-      this.logger.debug(`Player disconnected: ${playerId}`)
-
-      return { success: true, affected: 1 }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
-
-  private async handlePlayerEntry(event: PlayerEvent): Promise<HandlerResult> {
-    try {
-      if (event.eventType !== EventType.PLAYER_ENTRY) {
-        return { success: false, error: "Invalid event type for handlePlayerEntry" }
-      }
-      const entry = event as { data: { playerId: number } }
-      const { playerId } = entry.data
-
-      // Get current map from the match service, initialize if needed
-      let map = this.matchService?.getCurrentMap(event.serverId) || ""
-      if (map === "unknown" && this.matchService) {
-        map = await this.matchService.initializeMapForServer(event.serverId)
-      }
-
-      // Synthesize connect if needed (bots often have only "entered the game")
-      try {
-        const hasRecent = await this.repository.hasRecentConnect?.(event.serverId, playerId, 120000)
-        if (!hasRecent) {
-          await this.repository.createConnectEvent(playerId, event.serverId, map, "")
-          await this.repository.updateServerForPlayerEvent?.(event.serverId, {
-            activePlayers: { increment: 1 },
-            lastEvent: new Date(),
-          })
-        }
-      } catch {
-        // ignore
-      }
-
-      // Log EventEntry and refresh lastEvent
-      const ops: Array<Promise<unknown>> = []
-      ops.push(
-        this.repository.createEntryEvent?.(playerId, event.serverId, map) ?? Promise.resolve(),
-      )
-      ops.push(this.updatePlayerStats(playerId, { lastEvent: new Date() }))
-      await Promise.all(ops)
-
-      return { success: true, affected: 1 }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
-
-  private async handlePlayerChangeTeam(event: PlayerEvent): Promise<HandlerResult> {
-    try {
-      if (event.eventType !== EventType.PLAYER_CHANGE_TEAM) {
-        return { success: false, error: "Invalid event type for handlePlayerChangeTeam" }
-      }
-      const changeTeamEvent = event as { data: { playerId: number; team: string } }
-      const { playerId, team } = changeTeamEvent.data
-
-      // Best-effort update of in-memory match team assignment
-      this.matchService?.setPlayerTeam?.(event.serverId, playerId, team)
-
-      // Persist EventChangeTeam and bump lastEvent
-      let map = this.matchService?.getCurrentMap(event.serverId) || ""
-      if (map === "unknown" && this.matchService) {
-        map = await this.matchService.initializeMapForServer(event.serverId)
-      }
-      try {
-        await this.repository.createChangeTeamEvent?.(playerId, event.serverId, map, team)
-      } catch {
-        this.logger.error(
-          `Failed to create change-team event for player ${playerId} on server ${event.serverId}`,
-        )
-      }
-      await this.updatePlayerStats(playerId, { lastEvent: new Date() })
-      return { success: true, affected: 1 }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
-
-  private async handlePlayerChangeRole(): Promise<HandlerResult> {
-    // Role changes don't affect stats directly, but record event for history
-    return { success: true }
-  }
-
-  private async handlePlayerChangeName(event: PlayerEvent): Promise<HandlerResult> {
-    try {
-      if (event.eventType !== EventType.PLAYER_CHANGE_NAME) {
-        return { success: false, error: "Invalid event type for handlePlayerChangeName" }
-      }
-      const changeNameEvent = event as PlayerChangeNameEvent
-      const { playerId, newName } = changeNameEvent.data
-
-      await this.updatePlayerStats(playerId, {
-        lastName: newName,
-        lastEvent: new Date(),
-      })
-
-      // Persist EventChangeName row
-      try {
-        let map = this.matchService?.getCurrentMap(event.serverId) || ""
-        if (map === "unknown" && this.matchService) {
-          map = await this.matchService.initializeMapForServer(event.serverId)
-        }
-        await this.repository.createChangeNameEvent?.(
-          playerId,
-          event.serverId,
-          map,
-          changeNameEvent.data.oldName,
-          changeNameEvent.data.newName,
-        )
-      } catch {
-        this.logger.error(
-          `Failed to create change-name event for player ${playerId} on server ${event.serverId}`,
-        )
-      }
-
-      // players_names: bump usage for the new alias and mark lastUse
-      try {
-        await this.repository.upsertPlayerName(playerId, newName, {
-          numUses: 1,
-          lastUse: new Date(),
-        })
-      } catch (err) {
-        this.logger.warn(
-          `Failed to upsert player name on change-name for ${playerId}: ${String(err)}`,
-        )
-      }
-
-      return { success: true, affected: 1 }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
-
-  private async handlePlayerSuicide(event: PlayerEvent): Promise<HandlerResult> {
-    try {
-      if (event.eventType !== EventType.PLAYER_SUICIDE) {
-        return { success: false, error: "Invalid event type for handlePlayerSuicide" }
-      }
-      const suicideEvent = event as PlayerSuicideEvent
-      const { playerId } = suicideEvent.data
-
-      // Get current player stats for streak tracking
-      const playerStats = await this.repository.getPlayerStats(playerId)
-
-      if (!playerStats) {
-        return {
-          success: false,
-          error: "Unable to retrieve player stats for suicide processing",
-        }
-      }
-
-      // Calculate skill penalty for suicide
-      const skillPenalty = this.rankingService.calculateSuicidePenalty()
-
-      // Update death streak, reset kill streak
-      const newDeathStreak = (playerStats.deathStreak || 0) + 1
-
-      const updates: PlayerStatsUpdate = {
-        suicides: 1,
-        deaths: 1, // Suicide also counts as death
-        skill: skillPenalty,
-        deathStreak: newDeathStreak,
-        killStreak: 0, // Reset kill streak on death
-        lastEvent: new Date(),
-      }
-
-      await this.updatePlayerStats(playerId, updates)
-
-      // players_names: increment suicides for current alias
-      try {
-        const currentName = (event.meta as PlayerMeta | undefined)?.playerName
-        if (currentName) {
-          await this.repository.upsertPlayerName(playerId, currentName, {
-            suicides: 1,
-            deaths: 1,
-            lastUse: new Date(),
-          })
-        }
-      } catch (err) {
-        this.logger.warn(`Failed to upsert player name on suicide for ${playerId}: ${String(err)}`)
-      }
-
-      // Persist EventSuicide
-      try {
-        let map = this.matchService?.getCurrentMap(event.serverId) || ""
-        if (map === "unknown" && this.matchService) {
-          map = await this.matchService.initializeMapForServer(event.serverId)
-        }
-        await this.repository.createSuicideEvent?.(
-          playerId,
-          event.serverId,
-          map,
-          suicideEvent.data.weapon,
-        )
-      } catch {
-        this.logger.error(
-          `Failed to create suicide event for player ${playerId} on server ${event.serverId}`,
-        )
-      }
-
-      // Best-effort: update server suicide aggregate and lastEvent
-      try {
-        await this.repository.updateServerForPlayerEvent?.(event.serverId, {
-          suicides: { increment: 1 },
-          lastEvent: new Date(),
-        })
-      } catch {
-        // ignore optional hook
-      }
-
-      this.logger.debug(`Player suicide: ${playerId} (penalty: ${skillPenalty})`)
-
-      return { success: true, affected: 1 }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
-
-  private async handlePlayerDamage(event: PlayerEvent): Promise<HandlerResult> {
-    try {
-      if (event.eventType !== EventType.PLAYER_DAMAGE) {
-        return { success: false, error: "Invalid event type for handlePlayerDamage" }
-      }
-      const damageEvent = event as PlayerDamageEvent
-      const { attackerId, victimId, weapon, damage, hitgroup } = damageEvent.data
-
-      // Update attacker's shots and hits statistics
-      const attackerUpdates: PlayerStatsUpdate = {
-        shots: 1, // Each damage event counts as a hit
-        hits: 1,
-        lastEvent: new Date(),
-      }
-
-      // If it's a headshot, update headshot count
-      if (hitgroup === "head") {
-        attackerUpdates.headshots = 1
-      }
-
-      await this.updatePlayerStats(attackerId, attackerUpdates)
-
-      // players_names: increment shots, hits, and optional headshot per attacker alias
-      try {
-        const currentName = (event.meta as PlayerMeta | undefined)?.playerName
-        if (currentName) {
-          await this.repository.upsertPlayerName(attackerId, currentName, {
-            shots: 1,
-            hits: 1,
-            headshots: hitgroup === "head" ? 1 : 0,
-            lastUse: new Date(),
-          })
-        }
-      } catch (err) {
-        this.logger.warn(`Failed to upsert player name on damage: ${String(err)}`)
-      }
-
-      // Log damage event for accuracy tracking
-      this.logger.debug(
-        `Damage: ${attackerId} -> ${victimId} (${damage} damage with ${weapon}, hitgroup: ${hitgroup})`,
-      )
-
-      return { success: true, affected: 1 }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
-
-  private async handlePlayerTeamkill(event: PlayerEvent): Promise<HandlerResult> {
-    try {
-      if (event.eventType !== EventType.PLAYER_TEAMKILL) {
-        return { success: false, error: "Invalid event type for handlePlayerTeamkill" }
-      }
-      const teamkillEvent = event as PlayerTeamkillEvent
-      const { killerId, victimId, headshot } = teamkillEvent.data
-
-      // Update killer stats (teamkill)
-      const killerUpdates: PlayerStatsUpdate = {
-        teamkills: 1,
-        lastEvent: new Date(),
-      }
-
-      if (headshot) {
-        killerUpdates.headshots = 1
-      }
-
-      // Update victim stats (death)
-      const victimUpdates: PlayerStatsUpdate = {
-        deaths: 1,
-        lastEvent: new Date(),
-      }
-
-      // Persist, then update stats
-      let map = this.matchService?.getCurrentMap(event.serverId) || ""
-      if (map === "unknown" && this.matchService) {
-        map = await this.matchService.initializeMapForServer(event.serverId)
-      }
-
-      await Promise.all([
-        this.repository.createTeamkillEvent?.(
-          killerId,
-          victimId,
-          event.serverId,
-          map,
-          teamkillEvent.data.weapon,
-        ) ?? Promise.resolve(),
-        this.updatePlayerStats(killerId, killerUpdates),
-        this.updatePlayerStats(victimId, victimUpdates),
-      ])
-
-      // players_names: update lastUse for killer alias and death for victim alias
-      try {
-        const meta = event.meta as DualPlayerMeta
-        const now = new Date()
-        const ops: Array<Promise<void>> = []
-        if (meta?.killer?.playerName) {
-          ops.push(
-            this.repository.upsertPlayerName(killerId, meta.killer.playerName, {
-              lastUse: now,
-            }),
-          )
-        }
-        if (meta?.victim?.playerName) {
-          ops.push(
-            this.repository.upsertPlayerName(victimId, meta.victim.playerName, {
-              deaths: 1,
-              lastUse: now,
-            }),
-          )
-        }
-        if (ops.length) await Promise.all(ops)
-      } catch (err) {
-        this.logger.warn(`Failed to upsert player names on teamkill: ${String(err)}`)
-      }
-
-      return { success: true, affected: 2 }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
-
-  private async handleChatMessage(event: PlayerEvent): Promise<HandlerResult> {
-    try {
-      // Type guard to ensure we have the correct event type
-      if (event.eventType !== EventType.CHAT_MESSAGE) {
-        return { success: false, error: "Invalid event type for handleChatMessage" }
-      }
-      const chatEvent = event as PlayerChatEvent
-      const { playerId, message, messageMode } = chatEvent.data
-
-      // Get current map from the match service, initialize if needed
-      let map = this.matchService?.getCurrentMap(event.serverId) || ""
-      if (map === "unknown" && this.matchService) {
-        map = await this.matchService.initializeMapForServer(event.serverId)
-      }
-
-      // Store chat message in database
-      await this.repository.createChatEvent(
-        playerId,
-        event.serverId,
-        map,
-        message,
-        messageMode || 0,
-      )
-
-      this.logger.debug(`Player ${playerId} says: "${message}"`)
-
-      return { success: true, affected: 1 }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
 }

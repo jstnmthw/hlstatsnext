@@ -6,6 +6,8 @@ import { getAppContext } from "@/context"
 import { getEnvironmentConfig } from "@/config/environment.config"
 import { RconMonitorService } from "@/modules/rcon/rcon-monitor.service"
 import { DatabaseConnectionService } from "@/database/connection.service"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { createMockDatabaseClient } from "@/tests/mocks/database"
 
 vi.mock("@/context")
 vi.mock("@/config/environment.config")
@@ -28,22 +30,8 @@ const mockDatabaseConnection = {
 }
 
 const mockContext = {
-  logger: {
-    info: vi.fn(),
-    connecting: vi.fn(),
-    connected: vi.fn(),
-    ok: vi.fn(),
-    ready: vi.fn(),
-    failed: vi.fn(),
-    shutdown: vi.fn(),
-    shutdownComplete: vi.fn(),
-    received: vi.fn(),
-    fatal: vi.fn(),
-  },
-  database: {
-    testConnection: vi.fn(),
-    disconnect: vi.fn(),
-  },
+  logger: createMockLogger(),
+  database: createMockDatabaseClient(),
   ingressService: {
     start: vi.fn(),
     stop: vi.fn(),

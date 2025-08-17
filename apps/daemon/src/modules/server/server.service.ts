@@ -43,4 +43,8 @@ export class ServerService implements IServerService {
   async hasRconCredentials(serverId: number): Promise<boolean> {
     return await this.repository.hasRconCredentials(serverId)
   }
+
+  async findActiveServersWithRcon(maxAgeMinutes?: number): Promise<ServerInfo[]> {
+    return await this.repository.findActiveServersWithRcon(maxAgeMinutes)
+  }
 }

@@ -12,6 +12,7 @@ const createMockServerRepository = () => ({
   findByAddress: vi.fn(),
   getServerConfig: vi.fn(),
   hasRconCredentials: vi.fn().mockResolvedValue(false),
+  findActiveServersWithRcon: vi.fn().mockResolvedValue([]),
 })
 
 describe("ServerService", () => {
@@ -258,6 +259,61 @@ describe("ServerService", () => {
       expect(results[0]).toEqual({ ...mockServerInfo, serverId: 1 })
       expect(results[1]).toBeNull()
       expect(results[2]).toEqual({ ...mockServerInfo, serverId: 3 })
+    })
+  })
+
+  describe("findActiveServersWithRcon", () => {
+    it("should return active servers with RCON", async () => {
+      const mockActiveServers = [
+        {
+          serverId: 1,
+          game: "cstrike",
+          name: "Test CS Server 1",
+          address: "192.168.1.100",
+          port: 27015,
+          lastEvent: new Date(),
+        },
+        {
+          serverId: 2,
+          game: "csgo",
+          name: "Test CS:GO Server",
+          address: "192.168.1.101",
+          port: 27015,
+          lastEvent: new Date(),
+        },
+      ]
+      
+      mockRepository.findActiveServersWithRcon.mockResolvedValue(mockActiveServers)
+
+      const result = await serverService.findActiveServersWithRcon()
+
+      expect(result).toEqual(mockActiveServers)
+      expect(mockRepository.findActiveServersWithRcon).toHaveBeenCalledWith(undefined)
+    })
+
+    it("should pass maxAgeMinutes parameter to repository", async () => {
+      const maxAgeMinutes = 30
+      mockRepository.findActiveServersWithRcon.mockResolvedValue([])
+
+      await serverService.findActiveServersWithRcon(maxAgeMinutes)
+
+      expect(mockRepository.findActiveServersWithRcon).toHaveBeenCalledWith(maxAgeMinutes)
+    })
+
+    it("should return empty array when no active servers found", async () => {
+      mockRepository.findActiveServersWithRcon.mockResolvedValue([])
+
+      const result = await serverService.findActiveServersWithRcon()
+
+      expect(result).toEqual([])
+      expect(mockRepository.findActiveServersWithRcon).toHaveBeenCalledWith(undefined)
+    })
+
+    it("should handle repository errors", async () => {
+      mockRepository.findActiveServersWithRcon.mockRejectedValue(new Error("Database error"))
+
+      await expect(serverService.findActiveServersWithRcon()).rejects.toThrow("Database error")
+      expect(mockRepository.findActiveServersWithRcon).toHaveBeenCalledWith(undefined)
     })
   })
 })

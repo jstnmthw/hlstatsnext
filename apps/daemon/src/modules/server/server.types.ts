@@ -4,6 +4,7 @@ export interface IServerService {
   getServerGame(serverId: number): Promise<string>
   getServerConfigBoolean(serverId: number, parameter: string, fallback: boolean): Promise<boolean>
   hasRconCredentials(serverId: number): Promise<boolean>
+  findActiveServersWithRcon(maxAgeMinutes?: number): Promise<ServerInfo[]>
 
   // Event handlers for server events
   handleServerShutdown?(serverId: number): Promise<void>
@@ -17,6 +18,7 @@ export interface ServerInfo {
   name: string
   address: string
   port: number
+  lastEvent?: Date
 }
 
 export interface IServerRepository {
@@ -24,4 +26,5 @@ export interface IServerRepository {
   findByAddress(address: string, port: number): Promise<ServerInfo | null>
   getServerConfig(serverId: number, parameter: string): Promise<string | null>
   hasRconCredentials(serverId: number): Promise<boolean>
+  findActiveServersWithRcon(maxAgeMinutes?: number): Promise<ServerInfo[]>
 }

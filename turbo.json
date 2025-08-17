@@ -13,7 +13,8 @@
     "RCON_ENABLED",
     "RCON_TIMEOUT",
     "RCON_MAX_RETRIES",
-    "RCON_STATUS_INTERVAL"
+    "RCON_STATUS_INTERVAL",
+    "RCON_ACTIVE_SERVER_MAX_AGE_MINUTES"
   ],
   "tasks": {
     "build": {

@@ -1,7 +1,19 @@
 /**
- * HLStatsNext Daemon - Main Application
- *
- * Refactored to use modular architecture with dependency injection.
+ * @fileoverview HLStatsNext Daemon - Main Application Entry Point
+ * 
+ * This module contains the main daemon class that orchestrates the entire HLStatsNext
+ * statistics collection system. It manages service lifecycle, handles graceful shutdown,
+ * and coordinates data flow between game servers and the statistics database.
+ * 
+ * The daemon is responsible for:
+ * - Receiving UDP packets from Half-Life game servers
+ * - Processing game events and statistics
+ * - Managing RCON connections for server monitoring
+ * - Publishing events to message queues for processing
+ * 
+ * @author HLStatsNext Team
+ * @since 1.0.0
+ * @version 1.0.0
  */
 
 // Load environment variables from .env file
@@ -12,46 +24,109 @@ import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import type { AppContext } from "@/context"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
+import { getEnvironmentConfig } from "@/config/environment.config"
+import { RconMonitorService } from "@/modules/rcon/rcon-monitor.service"
+import { DatabaseConnectionService } from "@/database/connection.service"
 
+/**
+ * Main daemon class for the HLStatsNext statistics collection system.
+ * 
+ * This class orchestrates all components of the daemon including:
+ * - Database connectivity management
+ * - RCON monitoring for game servers
+ * - UDP ingress service for receiving game events
+ * - Event publishing to message queues
+ * 
+ * The daemon follows a clean architecture pattern with dependency injection
+ * and proper separation of concerns for maintainability and testability.
+ * 
+ * @example
+ * ```typescript
+ * const daemon = new HLStatsDaemon();
+ * await daemon.start();
+ * 
+ * // Graceful shutdown
+ * await daemon.stop();
+ * ```
+ * 
+ * @public
+ */
 export class HLStatsDaemon {
+  /** Application context containing all injected dependencies */
   private context: AppContext
+  
+  /** Structured logger instance for daemon operations */
   private logger: ILogger
+  
+  /** RCON monitoring service for server status checks */
+  private rconMonitor: RconMonitorService
+  
+  /** Database connection management service */
+  private databaseConnection: DatabaseConnectionService
 
+  /**
+   * Creates a new HLStatsDaemon instance.
+   * 
+   * Initializes all required services and dependencies based on environment
+   * configuration. The constructor handles:
+   * - Environment configuration parsing
+   * - Application context creation with dependency injection
+   * - Service instantiation (RCON monitor, database connection)
+   * 
+   * @throws {Error} When environment configuration is invalid
+   * @throws {Error} When required services cannot be initialized
+   */
   constructor() {
-    // Determine environment and skip auth in development
-    const appEnv = process.env.NODE_ENV ?? "development"
-    const ingressOptions = {
-      skipAuth: appEnv === "development",
-      port: process.env.INGRESS_PORT ? parseInt(process.env.INGRESS_PORT, 10) : undefined,
-    }
+    const config = getEnvironmentConfig()
 
-    this.context = getAppContext(ingressOptions)
+    this.context = getAppContext(config.ingressOptions)
     this.logger = this.context.logger
+    this.rconMonitor = new RconMonitorService(this.context, config.rconConfig)
+    this.databaseConnection = new DatabaseConnectionService(this.context)
+
     this.logger.info("Initializing HLStatsNext Daemon...")
   }
 
+  /**
+   * Starts the HLStatsNext daemon and all its services.
+   * 
+   * This method performs the complete startup sequence:
+   * 1. Tests database connectivity
+   * 2. Initializes message queue infrastructure
+   * 3. Starts all core services (ingress, RCON monitoring)
+   * 4. Signals ready state
+   * 
+   * The startup process is designed to fail fast if any critical component
+   * cannot be initialized, ensuring the daemon only runs in a healthy state.
+   * 
+   * @returns Promise that resolves when all services are started successfully
+   * @throws {Error} When database connection fails
+   * @throws {Error} When queue infrastructure initialization fails
+   * @throws {Error} When service startup fails
+   * 
+   * @example
+   * ```typescript
+   * const daemon = new HLStatsDaemon();
+   * try {
+   *   await daemon.start();
+   *   console.log('Daemon started successfully');
+   * } catch (error) {
+   *   console.error('Failed to start daemon:', error);
+   *   process.exit(1);
+   * }
+   * ```
+   */
   async start(): Promise<void> {
     try {
-      // Test database connectivity first
-      this.logger.connecting("database")
-      const dbConnected = await this.testDatabaseConnection()
-
+      const dbConnected = await this.databaseConnection.testConnection()
       if (!dbConnected) {
         throw new Error("Failed to connect to database")
       }
 
-      this.logger.connected("database")
-
-      // Initialize queue infrastructure (dual publishing)
       await initializeQueueInfrastructure(this.context)
 
-      // Start all services through the context
       this.logger.info("Starting services")
-      await Promise.all([
-        this.context.ingressService.start(),
-        this.startRconStatusMonitoring(),
-        // Other services can be started here as needed
-      ])
+      await this.startServices()
 
       this.logger.ok("All services started successfully")
       this.logger.ready("HLStatsNext Daemon is ready to receive game server data")
@@ -65,21 +140,60 @@ export class HLStatsDaemon {
   }
 
   /**
-   * Stop the daemon
+   * Starts all daemon services in the correct order.
+   * 
+   * This private method handles the orchestrated startup of:
+   * - Ingress service (UDP packet reception)
+   * - RCON monitoring service (server status checks)
+   * 
+   * Services are started with proper dependency ordering to ensure
+   * the system comes online in a stable state.
+   * 
+   * @private
+   * @returns Promise that resolves when all services are started
+   */
+  private async startServices(): Promise<void> {
+    await Promise.all([this.context.ingressService.start()])
+
+    this.rconMonitor.start()
+  }
+
+  /**
+   * Gracefully shuts down the daemon and all its services.
+   * 
+   * This method performs a clean shutdown sequence:
+   * 1. Stops RCON monitoring
+   * 2. Stops ingress service and disconnects RCON connections
+   * 3. Shuts down message queue infrastructure
+   * 4. Closes database connections
+   * 
+   * The shutdown process is designed to be graceful, allowing ongoing
+   * operations to complete where possible while preventing new work.
+   * 
+   * @returns Promise that resolves when shutdown is complete
+   * 
+   * @example
+   * ```typescript
+   * // Graceful shutdown on SIGTERM
+   * process.on('SIGTERM', async () => {
+   *   await daemon.stop();
+   *   process.exit(0);
+   * });
+   * ```
    */
   async stop(): Promise<void> {
     this.logger.shutdown()
 
     try {
+      this.rconMonitor.stop()
+
       await Promise.all([
         this.context.ingressService.stop(),
         this.context.rconService.disconnectAll(),
-        // Shutdown queue module if available
         this.context.queueModule?.shutdown() || Promise.resolve(),
-        // Other cleanup as needed
       ])
-      await this.disconnectDatabase()
 
+      await this.databaseConnection.disconnect()
       this.logger.shutdownComplete()
     } catch (error) {
       this.logger.failed(
@@ -90,7 +204,29 @@ export class HLStatsDaemon {
   }
 
   /**
-   * Emit events through the queue publisher (EventProcessor removed)
+   * Publishes game events to the message queue system.
+   * 
+   * This method takes an array of game events and publishes each one
+   * individually to the configured event publisher. Events are processed
+   * sequentially to maintain order and ensure reliable delivery.
+   * 
+   * @param events - Array of game events to publish
+   * @returns Promise that resolves when all events are published
+   * @throws {Error} When event publisher is not initialized
+   * @throws {Error} When event publishing fails
+   * 
+   * @example
+   * ```typescript
+   * const events = [
+   *   {
+   *     eventType: 'PLAYER_KILL',
+   *     timestamp: new Date(),
+   *     serverId: 1,
+   *     data: { killerId: 123, victimId: 456 }
+   *   }
+   * ];
+   * await daemon.emitEvents(events);
+   * ```
    */
   async emitEvents(events: BaseEvent[]): Promise<void> {
     if (!this.context.eventPublisher) {
@@ -103,149 +239,90 @@ export class HLStatsDaemon {
   }
 
   /**
-   * Get access to the application context for testing or advanced usage
+   * Retrieves the application context for testing or advanced usage.
+   * 
+   * This method provides access to the internal application context,
+   * primarily used for testing scenarios where direct access to
+   * services and dependencies is required.
+   * 
+   * @returns The application context containing all service dependencies
+   * 
+   * @example
+   * ```typescript
+   * const daemon = new HLStatsDaemon();
+   * const context = daemon.getContext();
+   * const logger = context.logger;
+   * ```
    */
   getContext(): AppContext {
     return this.context
   }
+}
 
-  /**
-   * Test the database connection
-   */
-  private async testDatabaseConnection(): Promise<boolean> {
-    try {
-      return await this.context.database.testConnection()
-    } catch (error) {
-      this.logger.failed(
-        "Database connection test failed",
-        error instanceof Error ? error.message : String(error),
-      )
-      return false
-    }
-  }
-
-  /**
-   * Disconnect from the database
-   */
-  private async disconnectDatabase(): Promise<void> {
-    try {
-      await this.context.database.disconnect()
-      this.logger.info("Database connection closed")
-    } catch (error) {
-      this.logger.failed(
-        "Error closing database connection",
-        error instanceof Error ? error.message : String(error),
-      )
-    }
-  }
-
-  /**
-   * Start RCON status monitoring
-   */
-  private async startRconStatusMonitoring(): Promise<void> {
-    const statusInterval = parseInt(process.env.RCON_STATUS_INTERVAL || "30000", 10)
-    const rconEnabled = process.env.RCON_ENABLED === "true"
-
-    if (!rconEnabled) {
-      this.logger.warn("RCON monitoring disabled by configuration")
-      return
-    }
-
-    this.logger.ok(`Starting RCON status monitoring (interval: ${statusInterval}ms)`)
-
-    // Start periodic status monitoring for servers with RCON configured
-    setInterval(async () => {
-      try {
-        await this.monitorServerStatus()
-      } catch (error) {
-        this.logger.error(`Error in RCON status monitoring: ${error}`)
-      }
-    }, statusInterval)
-  }
-
-  /**
-   * Monitor server status
-   */
-  private async monitorServerStatus(): Promise<void> {
-    try {
-      // Discover all active servers with RCON configured
-      const activeServers = await this.context.serverService.findActiveServersWithRcon()
-      
-      if (activeServers.length === 0) {
-        this.logger.warn("No active servers with RCON found for monitoring")
-        return
-      }
-
-      this.logger.debug(`Found ${activeServers.length} active server(s) with RCON for monitoring`)
-
-      // Monitor each active server
-      for (const server of activeServers) {
-        try {
-          // Connect if not already connected
-          if (!this.context.rconService.isConnected(server.serverId)) {
-            this.logger.info(`🔌 Attempting RCON connection to server ${server.serverId} (${server.address}:${server.port})...`)
-            await this.context.rconService.connect(server.serverId)
-            this.logger.ok(`✅ RCON connected to server ${server.serverId} (${server.name})`)
-          } else {
-            this.logger.debug(`📡 RCON already connected to server ${server.serverId}, getting status...`)
-          }
-
-          // Get status and log it
-          const status = await this.context.rconService.getStatus(server.serverId)
-
-          this.logger.info(
-            `📊 Server ${server.serverId} (${server.name}) - Map: ${status.map} | Players: ${status.players}/${status.maxPlayers} | FPS: ${status.fps}`,
-          )
-
-          if (status.hostname) {
-            this.logger.debug(`🏷️ Server ${server.serverId} hostname: ${status.hostname}`)
-          }
-        } catch (error) {
-          this.logger.error(
-            `❌ RCON failed for server ${server.serverId} (${server.name}): ${error instanceof Error ? error.message : String(error)}`,
-          )
-
-          // Disconnect on error to force reconnection next time
-          try {
-            await this.context.rconService.disconnect(server.serverId)
-          } catch (disconnectError) {
-            this.logger.debug(`Error disconnecting from server ${server.serverId}: ${disconnectError}`)
-          }
-        }
-      }
-    } catch (error) {
-      this.logger.error(`Error discovering active servers for RCON monitoring: ${error}`)
-    }
+/**
+ * Creates a signal handler function for graceful daemon shutdown.
+ * 
+ * This factory function creates a signal handler that performs a graceful
+ * shutdown of the daemon when system signals (SIGINT, SIGTERM) are received.
+ * The handler logs the signal receipt and ensures clean shutdown.
+ * 
+ * @param daemon - The daemon instance to shut down
+ * @param signal - The signal name for logging purposes
+ * @returns An async function that handles the shutdown process
+ * 
+ * @example
+ * ```typescript
+ * const daemon = new HLStatsDaemon();
+ * process.on('SIGINT', createSignalHandler(daemon, 'SIGINT'));
+ * process.on('SIGTERM', createSignalHandler(daemon, 'SIGTERM'));
+ * ```
+ */
+function createSignalHandler(daemon: HLStatsDaemon, signal: string) {
+  return async () => {
+    daemon.getContext().logger.received(signal)
+    await daemon.stop()
+    process.exit(0)
   }
 }
 
 /**
- * Main function
+ * Main entry point function for the HLStatsNext daemon.
+ * 
+ * This function initializes the daemon, sets up signal handlers for
+ * graceful shutdown, and starts the main service loop. It handles:
+ * - Daemon instantiation
+ * - Signal handler registration (SIGINT, SIGTERM)
+ * - Startup error handling with appropriate exit codes
+ * 
+ * The function implements the standard Node.js daemon pattern with
+ * proper signal handling and error reporting.
+ * 
+ * @example
+ * ```typescript
+ * // Called automatically when module is executed
+ * main();
+ * ```
  */
 function main() {
-  // Handle graceful shutdown
   const daemon = new HLStatsDaemon()
 
-  process.on("SIGINT", async () => {
-    daemon.getContext().logger.received("SIGINT")
-    await daemon.stop()
-    process.exit(0)
-  })
+  process.on("SIGINT", createSignalHandler(daemon, "SIGINT"))
+  process.on("SIGTERM", createSignalHandler(daemon, "SIGTERM"))
 
-  process.on("SIGTERM", async () => {
-    daemon.getContext().logger.received("SIGTERM")
-    await daemon.stop()
-    process.exit(0)
-  })
-
-  // Start the daemon
   daemon.start().catch((error) => {
     daemon.getContext().logger.fatal(error instanceof Error ? error.message : String(error))
     process.exit(1)
   })
 }
 
-// This allows the file to be imported for testing without executing the startup logic.
+/**
+ * Conditional execution guard for testing compatibility.
+ * 
+ * This conditional check prevents the main() function from executing
+ * when the module is imported during testing (when VITEST is defined).
+ * This pattern allows the module to be imported for testing without
+ * side effects while still functioning as an executable daemon.
+ */
 if (process.env.VITEST === undefined) {
   main()
 }

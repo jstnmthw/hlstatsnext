@@ -3,12 +3,28 @@ import { HLStatsDaemon } from "./main"
 import type { AppContext } from "@/context"
 import type { BaseEvent, EventType } from "@/shared/types/events"
 import { getAppContext } from "@/context"
+import { getEnvironmentConfig } from "@/config/environment.config"
+import { RconMonitorService } from "@/modules/rcon/rcon-monitor.service"
+import { DatabaseConnectionService } from "@/database/connection.service"
 
 vi.mock("@/context")
+vi.mock("@/config/environment.config")
+vi.mock("@/modules/rcon/rcon-monitor.service")
+vi.mock("@/database/connection.service")
 
 const mockEventPublisher = {
   publish: vi.fn(),
   publishBatch: vi.fn(),
+}
+
+const mockRconMonitor = {
+  start: vi.fn(),
+  stop: vi.fn(),
+}
+
+const mockDatabaseConnection = {
+  testConnection: vi.fn(),
+  disconnect: vi.fn(),
 }
 
 const mockContext = {
@@ -41,10 +57,24 @@ const mockContext = {
 describe("HLStatsDaemon", () => {
   let daemon: HLStatsDaemon
 
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.clearAllMocks()
 
     vi.mocked(getAppContext).mockReturnValue(mockContext)
+
+    vi.mocked(getEnvironmentConfig).mockReturnValue({
+      nodeEnv: "test",
+      ingressOptions: { skipAuth: true },
+      rconConfig: { enabled: true, statusInterval: 30000 },
+    })
+
+    vi.mocked(RconMonitorService).mockImplementation(
+      () => mockRconMonitor as unknown as InstanceType<typeof RconMonitorService>,
+    )
+
+    vi.mocked(DatabaseConnectionService).mockImplementation(
+      () => mockDatabaseConnection as unknown as InstanceType<typeof DatabaseConnectionService>,
+    )
 
     daemon = new HLStatsDaemon()
   })
@@ -54,50 +84,25 @@ describe("HLStatsDaemon", () => {
   })
 
   describe("constructor", () => {
-    it("should initialize with development environment", async () => {
-      process.env.NODE_ENV = "development"
-
+    it("should initialize with proper configuration", async () => {
       const mockedGetAppContext = vi.mocked(getAppContext)
 
-      new HLStatsDaemon()
-
-      expect(mockedGetAppContext).toHaveBeenCalledWith(expect.objectContaining({ skipAuth: true }))
+      expect(mockedGetAppContext).toHaveBeenCalledWith({ skipAuth: true })
       expect(mockContext.logger.info).toHaveBeenCalledWith("Initializing HLStatsNext Daemon...")
-    })
-
-    it("should initialize with production environment", async () => {
-      process.env.NODE_ENV = "production"
-
-      const mockedGetAppContext = vi.mocked(getAppContext)
-
-      new HLStatsDaemon()
-
-      expect(mockedGetAppContext).toHaveBeenCalledWith(expect.objectContaining({ skipAuth: false }))
-    })
-
-    it("should default to development when NODE_ENV is not set", async () => {
-      delete process.env.NODE_ENV
-
-      const mockedGetAppContext = vi.mocked(getAppContext)
-
-      new HLStatsDaemon()
-
-      expect(mockedGetAppContext).toHaveBeenCalledWith(expect.objectContaining({ skipAuth: true }))
     })
   })
 
   describe("start", () => {
     it("should start successfully when database connection succeeds", async () => {
-      vi.mocked(mockContext.database.testConnection).mockResolvedValue(true)
+      vi.mocked(mockDatabaseConnection.testConnection).mockResolvedValue(true)
       vi.mocked(mockContext.ingressService.start).mockResolvedValue(undefined)
 
       await daemon.start()
 
-      expect(mockContext.logger.connecting).toHaveBeenCalledWith("database")
-      expect(mockContext.database.testConnection).toHaveBeenCalled()
-      expect(mockContext.logger.connected).toHaveBeenCalledWith("database")
+      expect(mockDatabaseConnection.testConnection).toHaveBeenCalled()
       expect(mockContext.logger.info).toHaveBeenCalledWith("Starting services")
       expect(mockContext.ingressService.start).toHaveBeenCalled()
+      expect(mockRconMonitor.start).toHaveBeenCalled()
       expect(mockContext.logger.ok).toHaveBeenCalledWith("All services started successfully")
       expect(mockContext.logger.ready).toHaveBeenCalledWith(
         "HLStatsNext Daemon is ready to receive game server data",
@@ -105,7 +110,7 @@ describe("HLStatsDaemon", () => {
     })
 
     it("should exit when database connection fails", async () => {
-      vi.mocked(mockContext.database.testConnection).mockResolvedValue(false)
+      vi.mocked(mockDatabaseConnection.testConnection).mockResolvedValue(false)
       const mockExit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never)
 
       await daemon.start()
@@ -120,7 +125,7 @@ describe("HLStatsDaemon", () => {
     })
 
     it("should handle service start errors", async () => {
-      vi.mocked(mockContext.database.testConnection).mockResolvedValue(true)
+      vi.mocked(mockDatabaseConnection.testConnection).mockResolvedValue(true)
       vi.mocked(mockContext.ingressService.start).mockRejectedValue(new Error("Service error"))
       const mockExit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never)
 
@@ -134,64 +139,32 @@ describe("HLStatsDaemon", () => {
 
       mockExit.mockRestore()
     })
-
-    it("should handle database test connection errors", async () => {
-      vi.mocked(mockContext.database.testConnection).mockRejectedValue(new Error("DB Error"))
-      const mockExit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never)
-
-      await daemon.start()
-
-      expect(mockContext.logger.failed).toHaveBeenCalledWith(
-        "Database connection test failed",
-        "DB Error",
-      )
-      expect(mockContext.logger.failed).toHaveBeenCalledWith(
-        "Failed to start daemon",
-        "Failed to connect to database",
-      )
-      expect(mockExit).toHaveBeenCalledWith(1)
-
-      mockExit.mockRestore()
-    })
   })
 
   describe("stop", () => {
     it("should stop successfully", async () => {
       vi.mocked(mockContext.ingressService.stop).mockResolvedValue(undefined)
       vi.mocked(mockContext.rconService.disconnectAll).mockResolvedValue(undefined)
-      vi.mocked(mockContext.database.disconnect).mockResolvedValue(undefined)
+      vi.mocked(mockDatabaseConnection.disconnect).mockResolvedValue(undefined)
 
       await daemon.stop()
 
       expect(mockContext.logger.shutdown).toHaveBeenCalled()
+      expect(mockRconMonitor.stop).toHaveBeenCalled()
       expect(mockContext.ingressService.stop).toHaveBeenCalled()
       expect(mockContext.rconService.disconnectAll).toHaveBeenCalled()
-      expect(mockContext.database.disconnect).toHaveBeenCalled()
-      expect(mockContext.logger.info).toHaveBeenCalledWith("Database connection closed")
+      expect(mockDatabaseConnection.disconnect).toHaveBeenCalled()
       expect(mockContext.logger.shutdownComplete).toHaveBeenCalled()
     })
 
     it("should handle service stop errors", async () => {
       vi.mocked(mockContext.ingressService.stop).mockRejectedValue(new Error("Stop error"))
       vi.mocked(mockContext.rconService.disconnectAll).mockResolvedValue(undefined)
-      vi.mocked(mockContext.database.disconnect).mockResolvedValue(undefined)
+      vi.mocked(mockDatabaseConnection.disconnect).mockResolvedValue(undefined)
 
       await daemon.stop()
 
       expect(mockContext.logger.failed).toHaveBeenCalledWith("Error during shutdown", "Stop error")
-    })
-
-    it("should handle database disconnect errors", async () => {
-      vi.mocked(mockContext.ingressService.stop).mockResolvedValue(undefined)
-      vi.mocked(mockContext.rconService.disconnectAll).mockResolvedValue(undefined)
-      vi.mocked(mockContext.database.disconnect).mockRejectedValue(new Error("Disconnect error"))
-
-      await daemon.stop()
-
-      expect(mockContext.logger.failed).toHaveBeenCalledWith(
-        "Error closing database connection",
-        "Disconnect error",
-      )
     })
   })
 

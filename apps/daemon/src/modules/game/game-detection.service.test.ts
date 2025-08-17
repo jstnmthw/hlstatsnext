@@ -1,14 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { GameDetectionService } from "./game-detection.service"
 import { GAMES } from "@/config/game.config"
-import type { ILogger } from "@/shared/utils/logger.types"
+import { createMockLogger } from "@/tests/mocks/logger"
 
-const mockLogger = {
-  debug: vi.fn(),
-  warn: vi.fn(),
-  info: vi.fn(),
-  error: vi.fn(),
-} as unknown as ILogger
+const mockLogger = createMockLogger()
 
 vi.mock("@/config/game.config", () => ({
   GAMES: {

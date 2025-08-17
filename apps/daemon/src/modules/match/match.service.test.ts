@@ -12,8 +12,8 @@ import type {
   TeamWinEvent,
   MapChangeEvent,
 } from "./match.types"
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
+import { createMockLogger } from "@/tests/mocks/logger"
 
 const mockRepository: IMatchRepository = {
   updateBombStats: vi.fn(),
@@ -26,15 +26,7 @@ const mockRepository: IMatchRepository = {
   updateMapCount: vi.fn(),
 } as unknown as IMatchRepository
 
-const mockLogger: ILogger = {
-  info: vi.fn(),
-  debug: vi.fn(),
-  event: vi.fn(),
-  queue: vi.fn(),
-  error: vi.fn(),
-  warn: vi.fn(),
-  failed: vi.fn(),
-} as unknown as ILogger
+const mockLogger = createMockLogger()
 
 vi.mock("@/config/game.config", () => ({
   GameConfig: {

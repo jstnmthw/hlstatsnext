@@ -50,10 +50,17 @@ describe("PlayerService", () => {
       getServerGame: vi.fn().mockResolvedValue("cstrike"),
     }
 
+    const mockServerRepository = {
+      findById: vi.fn().mockResolvedValue({ game: "cstrike" }),
+      findByAddress: vi.fn(),
+      getServerConfig: vi.fn(),
+    }
+
     playerService = new PlayerService(
       mockRepository,
       mockLogger,
       mockRankingService,
+      mockServerRepository,
       mockMatchService,
     )
   })
@@ -69,9 +76,8 @@ describe("PlayerService", () => {
       const playerName = "TestPlayer"
       const game = "csgo"
 
-      // Mock repository method
-      vi.spyOn(mockRepository, "findByUniqueId").mockResolvedValue(null)
-      vi.spyOn(mockRepository, "create").mockResolvedValue({ playerId: 1 } as Player)
+      // Mock repository upsert method
+      vi.spyOn(mockRepository, "upsertPlayer").mockResolvedValue({ playerId: 1 } as Player)
 
       const result = await playerService.getOrCreatePlayer(steamId, playerName, game)
 
@@ -440,8 +446,15 @@ describe("PlayerService", () => {
     })
 
     it("should handle missing MatchService gracefully", async () => {
+      // Create local mock server repository
+      const localMockServerRepository = {
+        findById: vi.fn().mockResolvedValue({ game: "cstrike" }),
+        findByAddress: vi.fn(),
+        getServerConfig: vi.fn(),
+      }
+      
       // Create PlayerService without MatchService
-      const playerServiceNoMatch = new PlayerService(mockRepository, mockLogger, mockRankingService)
+      const playerServiceNoMatch = new PlayerService(mockRepository, mockLogger, mockRankingService, localMockServerRepository)
 
       const killerStats = {
         playerId: 1,
@@ -599,7 +612,7 @@ describe("PlayerService", () => {
       )
     })
 
-    it("persists disconnect with playerId=0 when invalid", async () => {
+    it("skips disconnect event when playerId is invalid and no bot metadata", async () => {
       const disconnectEvent: PlayerEvent = {
         eventType: EventType.PLAYER_DISCONNECT,
         timestamp: new Date(),
@@ -610,8 +623,9 @@ describe("PlayerService", () => {
       const createDisconnectSpy = vi
         .spyOn(mockRepository, "createDisconnectEvent")
         .mockResolvedValue()
-      await playerService.handlePlayerEvent(disconnectEvent)
-      expect(createDisconnectSpy).toHaveBeenCalledWith(0, 9, expect.any(String))
+      const result = await playerService.handlePlayerEvent(disconnectEvent)
+      expect(result.success).toBe(true)
+      expect(createDisconnectSpy).not.toHaveBeenCalled()
     })
   })
 
@@ -681,7 +695,7 @@ describe("PlayerService", () => {
       expect(repoSpy).toHaveBeenCalledWith(99, 1, expect.any(String))
     })
 
-    it("should persist disconnect row with playerId=0 for invalid bot slot", async () => {
+    it("should skip disconnect event for invalid playerId without bot metadata", async () => {
       const disconnectEvent: PlayerEvent = {
         eventType: EventType.PLAYER_DISCONNECT,
         timestamp: new Date(),
@@ -695,7 +709,33 @@ describe("PlayerService", () => {
       const repoSpy = vi.spyOn(mockRepository, "createDisconnectEvent").mockResolvedValue()
       const result = await playerService.handlePlayerEvent(disconnectEvent)
       expect(result.success).toBe(true)
-      expect(repoSpy).toHaveBeenCalledWith(0, 2, expect.any(String))
+      expect(repoSpy).not.toHaveBeenCalled()
+    })
+
+    it("should resolve bot playerId from metadata and create disconnect event", async () => {
+      const disconnectEvent: PlayerEvent = {
+        eventType: EventType.PLAYER_DISCONNECT,
+        timestamp: new Date(),
+        serverId: 2,
+        eventId: "disc-bot-1",
+        data: {
+          playerId: -1,
+        },
+        meta: {
+          steamId: "BOT",
+          playerName: "TestBot",
+          isBot: true,
+        },
+      } as unknown as PlayerEvent
+
+      // Mock bot resolution
+      vi.spyOn(mockRepository, "findByUniqueId").mockResolvedValue({ playerId: 123 } as Player)
+      const repoSpy = vi.spyOn(mockRepository, "createDisconnectEvent").mockResolvedValue()
+      
+      const result = await playerService.handlePlayerEvent(disconnectEvent)
+      expect(result.success).toBe(true)
+      expect(mockRepository.findByUniqueId).toHaveBeenCalledWith("BOT_TestBot", "cstrike")
+      expect(repoSpy).toHaveBeenCalledWith(123, 2, expect.any(String))
     })
 
     it("should log connect and entry rows for bots when processed (IgnoreBots handled in handler)", async () => {
@@ -737,16 +777,14 @@ describe("PlayerService", () => {
   })
 
   describe("player creation with createdAt", () => {
-    it("should set createdAt when creating players", async () => {
-      vi.spyOn(mockRepository, "findByUniqueId").mockResolvedValue(null)
-
-      const createSpy = vi
-        .spyOn(mockRepository, "create")
+    it("should call upsertPlayer when creating players", async () => {
+      const upsertSpy = vi
+        .spyOn(mockRepository, "upsertPlayer")
         .mockResolvedValue({ playerId: 1 } as Player)
 
       await playerService.getOrCreatePlayer("76561198000123456", "TestPlayer", "csgo")
 
-      expect(createSpy).toHaveBeenCalledWith(
+      expect(upsertSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           lastName: "TestPlayer",
           game: "csgo",
@@ -754,6 +792,56 @@ describe("PlayerService", () => {
           steamId: "76561198000123456",
         }),
       )
+    })
+
+    it("should use upsert to eliminate race conditions", async () => {
+      const steamId = "76561198000123456"
+      const playerName = "UpsertPlayer"
+      const game = "csgo"
+      
+      // Mock the upsert method to return a player
+      const upsertSpy = vi.spyOn(mockRepository, "upsertPlayer")
+        .mockResolvedValue({ playerId: 42 } as Player)
+
+      const result = await playerService.getOrCreatePlayer(steamId, playerName, game)
+
+      expect(result).toBe(42)
+      expect(upsertSpy).toHaveBeenCalledTimes(1)
+      expect(upsertSpy).toHaveBeenCalledWith({
+        lastName: playerName,
+        game,
+        skill: 1000, // DEFAULT_RATING
+        steamId,
+      })
+    })
+
+    it("should cache concurrent player resolution calls", async () => {
+      const steamId = "76561198000987654"
+      const playerName = "CachedPlayer"
+      const game = "csgo"
+      
+      // Mock the upsert method to return a player with some delay
+      const upsertSpy = vi.spyOn(mockRepository, "upsertPlayer")
+        .mockImplementation(() => 
+          new Promise(resolve => 
+            setTimeout(() => resolve({ playerId: 99 } as Player), 50)
+          )
+        )
+
+      // Make multiple concurrent calls
+      const [result1, result2, result3] = await Promise.all([
+        playerService.getOrCreatePlayer(steamId, playerName, game),
+        playerService.getOrCreatePlayer(steamId, playerName, game),
+        playerService.getOrCreatePlayer(steamId, playerName, game),
+      ])
+
+      // All should return the same ID
+      expect(result1).toBe(99)
+      expect(result2).toBe(99)
+      expect(result3).toBe(99)
+      
+      // But upsert should only be called once due to caching
+      expect(upsertSpy).toHaveBeenCalledTimes(1)
     })
   })
 })

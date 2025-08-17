@@ -98,6 +98,52 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
     }
   }
 
+  async upsertPlayer(data: PlayerCreateData, options?: CreateOptions): Promise<Player> {
+    try {
+      if (!data.lastName || !data.game || !data.steamId) {
+        throw new Error("lastName, game, and steamId are required")
+      }
+
+      return await this.executeWithTransaction(async (client) => {
+        // Use standard Prisma upsert - race conditions now handled at service level
+        const result = await client.playerUniqueId.upsert({
+          where: {
+            uniqueId_game: {
+              uniqueId: data.steamId,
+              game: data.game,
+            },
+          },
+          update: {
+            player: {
+              update: {
+                lastName: data.lastName,
+              },
+            },
+          },
+          create: {
+            uniqueId: data.steamId,
+            game: data.game,
+            player: {
+              create: {
+                lastName: data.lastName,
+                game: data.game,
+                skill: data.skill || 1000,
+                createdAt: new Date(),
+              },
+            },
+          },
+          include: {
+            player: true,
+          },
+        })
+
+        return result.player
+      }, options)
+    } catch (error) {
+      this.handleError("upsertPlayer", error)
+    }
+  }
+
   async update(playerId: number, data: Partial<Player>, options?: UpdateOptions): Promise<Player> {
     try {
       this.validateId(playerId, "update")
@@ -558,7 +604,6 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
       }, options)
     } catch (error) {
       this.handleError("getPlayerStats", error)
-      return null
     }
   }
 

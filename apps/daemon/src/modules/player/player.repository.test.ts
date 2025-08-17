@@ -254,6 +254,113 @@ describe("PlayerRepository", () => {
     })
   })
 
+  describe("upsertPlayer", () => {
+    it("should create new player when none exists", async () => {
+      const playerData = {
+        lastName: "UpsertPlayer",
+        game: "csgo",
+        steamId: "76561198000000003",
+        skill: 1200,
+      }
+
+      const mockCreatedPlayer = createMockPlayer({
+        playerId: 42,
+        ...playerData,
+      })
+
+      const mockUpsertResult = {
+        player: mockCreatedPlayer,
+        uniqueId: playerData.steamId,
+        game: playerData.game,
+        playerId: mockCreatedPlayer.playerId,
+        merge: null,
+      }
+
+      mockDatabase.mockPrisma.playerUniqueId.upsert.mockResolvedValue(mockUpsertResult)
+
+      const result = await playerRepository.upsertPlayer(playerData)
+
+      expect(result).toEqual(mockCreatedPlayer)
+      expect(mockDatabase.mockPrisma.playerUniqueId.upsert).toHaveBeenCalledWith({
+        where: {
+          uniqueId_game: {
+            uniqueId: playerData.steamId,
+            game: playerData.game,
+          },
+        },
+        update: {
+          player: {
+            update: {
+              lastName: playerData.lastName,
+            },
+          },
+        },
+        create: {
+          uniqueId: playerData.steamId,
+          game: playerData.game,
+          player: {
+            create: {
+              lastName: playerData.lastName,
+              game: playerData.game,
+              skill: playerData.skill,
+              createdAt: expect.any(Date),
+            },
+          },
+        },
+        include: {
+          player: true,
+        },
+      })
+    })
+
+    it("should return existing player when one exists", async () => {
+      const playerData = {
+        lastName: "ExistingPlayer",
+        game: "csgo", 
+        steamId: "76561198000000004",
+        skill: 1000,
+      }
+
+      const existingPlayer = createMockPlayer({
+        playerId: 99,
+        lastName: "OldName",
+        game: playerData.game,
+      })
+
+      const updatedPlayer = { ...existingPlayer, lastName: playerData.lastName }
+
+      const mockUpsertResult = {
+        player: updatedPlayer,
+        uniqueId: playerData.steamId,
+        game: playerData.game,
+        playerId: existingPlayer.playerId,
+        merge: null,
+      }
+
+      mockDatabase.mockPrisma.playerUniqueId.upsert.mockResolvedValue(mockUpsertResult)
+
+      const result = await playerRepository.upsertPlayer(playerData)
+
+      expect(result.playerId).toBe(99)
+      expect(result.lastName).toBe(playerData.lastName) // Should be updated
+      expect(mockDatabase.mockPrisma.playerUniqueId.upsert).toHaveBeenCalled()
+    })
+
+
+    it("should validate required parameters", async () => {
+      const invalidData = {
+        lastName: "",
+        game: "csgo",
+        steamId: "76561198000000005",
+      }
+
+      await expect(playerRepository.upsertPlayer(invalidData)).rejects.toThrow(
+        "lastName, game, and steamId are required"
+      )
+    })
+
+  })
+
   describe("update", () => {
     it("should update player data", async () => {
       const playerId = 1

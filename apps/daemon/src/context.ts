@@ -134,6 +134,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     playerRepository,
     logger,
     rankingService,
+    serverRepository,
     matchService,
     geoipService,
   )

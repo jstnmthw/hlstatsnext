@@ -27,6 +27,7 @@ import type { KillContext } from "@/modules/ranking/ranking.service"
 import type { HandlerResult } from "@/shared/types/common"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IServerRepository } from "@/modules/server/server.types"
 import type { BaseEvent, DualPlayerMeta, PlayerMeta } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import { normalizeSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
@@ -37,10 +38,14 @@ export class PlayerService implements IPlayerService {
   private readonly DEFAULT_VOLATILITY = 0.06
   private readonly MAX_CONFIDENCE_REDUCTION = 300
 
+  // Request-level cache for player resolution to prevent race conditions
+  private readonly playerResolutionCache = new Map<string, Promise<number>>()
+
   constructor(
     private readonly repository: IPlayerRepository,
     private readonly logger: ILogger,
     private readonly rankingService: IRankingService,
+    private readonly serverRepository: IServerRepository,
     private readonly matchService?: IMatchService,
     private readonly geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
   ) {}
@@ -59,28 +64,52 @@ export class PlayerService implements IPlayerService {
     const normalizedName = sanitizePlayerName(playerName)
     const effectiveId = isBot ? `BOT_${normalizedName}` : normalized
 
+    // Create cache key to prevent concurrent calls for the same player
+    const cacheKey = `${effectiveId}:${game}`
+
+    // Check if there's already a pending resolution for this player
+    const existingPromise = this.playerResolutionCache.get(cacheKey)
+    if (existingPromise) {
+      this.logger.debug(`Using cached player resolution for ${effectiveId}`)
+      return existingPromise
+    }
+
+    // Create new resolution promise and cache it
+    const resolutionPromise = this._performPlayerResolution(effectiveId, playerName, game)
+    this.playerResolutionCache.set(cacheKey, resolutionPromise)
+
     try {
-      // First, try to find existing player by Steam ID
-      const existingPlayer = await this.repository.findByUniqueId(effectiveId, game)
+      const playerId = await resolutionPromise
+      // Clean up cache after successful resolution (optional: could keep for short time)
+      setTimeout(() => this.playerResolutionCache.delete(cacheKey), 1000)
+      return playerId
+    } catch (error) {
+      // Remove failed promise from cache so it can be retried
+      this.playerResolutionCache.delete(cacheKey)
+      throw error
+    }
+  }
 
-      if (existingPlayer) {
-        return existingPlayer.playerId
-      }
-
-      // Create new player
-      const player = await this.repository.create({
+  private async _performPlayerResolution(
+    effectiveId: string,
+    playerName: string,
+    game: string,
+  ): Promise<number> {
+    try {
+      // Use database-level upsert to eliminate race conditions
+      const player = await this.repository.upsertPlayer({
         lastName: playerName,
         game,
         skill: this.DEFAULT_RATING,
         steamId: effectiveId,
       })
 
-      this.logger.info(
-        `Created new player: ${playerName} (${effectiveId}) with ID ${player.playerId}`,
+      this.logger.debug(
+        `Player resolved: ${playerName} (${effectiveId}) with ID ${player.playerId}`,
       )
       return player.playerId
     } catch (error) {
-      this.logger.error(`Failed to get or create player ${playerName}: ${error}`)
+      this.logger.error(`Failed to upsert player ${playerName}: ${error}`)
       throw error
     }
   }
@@ -517,20 +546,57 @@ export class PlayerService implements IPlayerService {
         return { success: false, error: "Invalid event type for handlePlayerDisconnect" }
       }
       const disconnectEvent = event as PlayerDisconnectEvent
-      const { playerId, sessionDuration } = disconnectEvent.data
+      const { sessionDuration } = disconnectEvent.data
+      let playerId = disconnectEvent.data.playerId
 
-      // If we cannot resolve a valid playerId (e.g., bot dropped by engine), still persist a disconnect row with playerId=0
+      // If we cannot resolve a valid playerId, attempt resolution strategies
       if (playerId == null || playerId <= 0) {
-        try {
-          let map = this.matchService?.getCurrentMap(event.serverId) || ""
-          if (map === "unknown" && this.matchService) {
-            map = await this.matchService.initializeMapForServer(event.serverId)
+        const meta = (disconnectEvent as PlayerDisconnectEvent).meta
+
+        this.logger.debug(`Disconnect event with invalid playerId ${playerId}:`, {
+          playerName: meta?.playerName,
+          steamId: meta?.steamId,
+          isBot: meta?.isBot,
+          rawEvent: event.raw?.substring(0, 100) + "...",
+        })
+
+        // When playerId is -1, try to resolve the player by name
+        // This handles both bots and edge cases where real players get -1 as ID
+        if (meta?.playerName) {
+          try {
+            // Get server game for player lookup
+            const server = await this.serverRepository.findById(event.serverId)
+            const game = server?.game || "csgo" // fallback to default game
+
+            // First try to find a bot with the BOT_ prefix
+            const normalizedName = sanitizePlayerName(meta.playerName)
+            const botUniqueId = `BOT_${normalizedName}`
+
+            const existingBot = await this.repository.findByUniqueId(botUniqueId, game)
+            if (existingBot) {
+              playerId = existingBot.playerId
+              this.logger.info(
+                `Resolved bot ${meta.playerName} to playerId ${playerId} for disconnect on server ${event.serverId}`,
+              )
+            } else {
+              this.logger.debug(
+                `Player ${meta.playerName} with invalid playerId ${playerId} not found as bot, skipping disconnect event`,
+              )
+              return { success: true }
+            }
+          } catch (error) {
+            this.logger.debug(
+              `Failed to resolve player ${meta.playerName} for disconnect: ${error}`,
+            )
+            return { success: true }
           }
-          await this.repository.createDisconnectEvent(0, event.serverId, map)
-        } catch {
-          // ignore
+        } else {
+          // No player name to resolve with
+          this.logger.warn(
+            `Invalid playerId ${playerId} with no player name - cannot resolve disconnect event`,
+          )
+          return { success: true }
         }
-        return { success: true }
       }
 
       const updates: PlayerStatsUpdate = {
@@ -575,8 +641,13 @@ export class PlayerService implements IPlayerService {
           map = await this.matchService.initializeMapForServer(event.serverId)
         }
         await this.repository.createDisconnectEvent(playerId, event.serverId, map)
-      } catch {
-        // ignore best-effort disconnect logging errors
+        this.logger.debug(
+          `Created disconnect event for player ${playerId} on server ${event.serverId}`,
+        )
+      } catch (error) {
+        this.logger.warn(
+          `Failed to create disconnect event for player ${playerId} on server ${event.serverId}: ${error}`,
+        )
       }
 
       this.logger.debug(`Player disconnected: ${playerId}`)

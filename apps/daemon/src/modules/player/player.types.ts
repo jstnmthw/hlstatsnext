@@ -240,6 +240,7 @@ export interface IPlayerRepository {
   findById(playerId: number, options?: FindOptions): Promise<Player | null>
   findByUniqueId(uniqueId: string, game: string, options?: FindOptions): Promise<Player | null>
   create(data: PlayerCreateData, options?: CreateOptions): Promise<Player>
+  upsertPlayer(data: PlayerCreateData, options?: CreateOptions): Promise<Player>
   update(playerId: number, data: Partial<Player>, options?: UpdateOptions): Promise<Player>
 
   // Unique ID management

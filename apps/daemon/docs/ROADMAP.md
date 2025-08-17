@@ -139,6 +139,6 @@ Gaps vs. legacy parity
 ## Test plan additions
 
 - Parser fixtures per game: golden log lines → expected events.
-- Repository integration tests with SQLite memory for all write paths (Frags, Actions, Chat, Connects, Teamkills, Suicides, Map counts, History snapshots).
+- Repository integration tests with test database for all write paths (Frags, Actions, Chat, Connects, Teamkills, Suicides, Map counts, History snapshots).
 - Awards service integration with seeded events; verify winners and ribbons.
 - Queue consumer end-to-end: publish → consume → persist → metrics.

@@ -10,12 +10,12 @@ import type { ILogger } from "@/shared/utils/logger.types"
 
 // Minimal hardcoded configuration for bootstrapping/fallback
 export const BOOTSTRAP_CONFIG = {
-  DEFAULT_GAME: "cstrike" as const,
+  DEFAULT_GAME: "cstrike",
   MAP: {
     UNKNOWN: "unknown",
     FALLBACK: "",
-  } as const,
-} as const
+  },
+}
 
 export interface GameRecord {
   code: string

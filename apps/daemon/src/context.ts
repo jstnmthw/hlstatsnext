@@ -4,55 +4,23 @@
  * Central location for all service instantiation and dependency wiring.
  */
 
-import { DatabaseClient } from "@/database/client"
-import Logger from "@/shared/utils/logger"
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
-
-// Module imports
-import {
-  QueueModule,
-  createDevelopmentRabbitMQConfig,
-} from "@/shared/infrastructure/messaging/module"
-
-import { PlayerRepository } from "@/modules/player/player.repository"
-import { PlayerService } from "@/modules/player/player.service"
-import type { IPlayerService } from "@/modules/player/player.types"
-
-import { MatchRepository } from "@/modules/match/match.repository"
-import { MatchService } from "@/modules/match/match.service"
-import type { IMatchService } from "@/modules/match/match.types"
-
-import { WeaponRepository } from "@/modules/weapon/weapon.repository"
-import { WeaponService } from "@/modules/weapon/weapon.service"
-import type { IWeaponService } from "@/modules/weapon/weapon.types"
-
-import { RankingService } from "@/modules/ranking/ranking.service"
-import type { IRankingService } from "@/modules/ranking/ranking.types"
-
-import { ActionRepository } from "@/modules/action/action.repository"
-import { ActionService } from "@/modules/action/action.service"
-import type { IActionService } from "@/modules/action/action.types"
-
-import { IngressService } from "@/modules/ingress/ingress.service"
-import { createIngressDependencies } from "@/modules/ingress/factories/ingress-dependencies"
-import type { IIngressService, IngressOptions } from "@/modules/ingress/ingress.types"
-
-import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
-
-import { GameDetectionService } from "@/modules/game/game-detection.service"
+import type { IngressOptions } from "@/modules/ingress/ingress.types"
+import type { IPlayerService } from "@/modules/player/player.types"
+import type { IMatchService } from "@/modules/match/match.types"
+import type { IWeaponService } from "@/modules/weapon/weapon.types"
+import type { IRankingService } from "@/modules/ranking/ranking.types"
+import type { IActionService } from "@/modules/action/action.types"
+import type { IIngressService } from "@/modules/ingress/ingress.types"
 import type { IGameDetectionService } from "@/modules/game/game-detection.types"
-
-import { ServerRepository } from "@/modules/server/server.repository"
-import { ServerService } from "@/modules/server/server.service"
 import type { IServerService } from "@/modules/server/server.types"
-
-import { RconRepository } from "@/modules/rcon/rcon.repository"
-import { RconService } from "@/modules/rcon/rcon.service"
 import type { IRconService } from "@/modules/rcon/rcon.types"
 
-import { GeoIPService } from "@/modules/geoip/geoip.service"
+import { DatabaseClient } from "@/database/client"
+import { QueueModule } from "@/shared/infrastructure/messaging/module"
+import { IngressService } from "@/modules/ingress/ingress.service"
 import { PlayerEventHandler } from "@/modules/player/player.events"
 import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
 import { MatchEventHandler } from "@/modules/match/match.events"
@@ -61,7 +29,16 @@ import { ServerEventHandler } from "@/modules/server/server.events"
 import { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import { RabbitMQConsumer } from "@/shared/infrastructure/messaging/queue/rabbitmq/consumer"
+import { createIngressDependencies } from "@/modules/ingress/factories/ingress-dependencies"
+import { createInfrastructureComponents } from "@/shared/application/factories/infrastructure-config.factory"
+import { createRconConfig } from "@/shared/application/factories/rcon-config.factory"
+import { createIngressConfig } from "@/shared/application/factories/ingress-config.factory"
+import { createRepositories } from "@/shared/application/orchestrators/repository.orchestrator"
+import { createBusinessServices } from "@/shared/application/orchestrators/business-service.orchestrator"
+import { createEventHandlers } from "@/shared/application/orchestrators/event-handler.orchestrator"
+import { createQueueModule } from "@/shared/infrastructure/factories/queue-module.factory"
 
+// Types
 export interface AppContext {
   // Infrastructure
   database: DatabaseClient
@@ -97,220 +74,93 @@ export interface AppContext {
   eventMetrics: EventMetrics
 }
 
-export function createAppContext(ingressOptions?: IngressOptions): AppContext {
-  // Infrastructure
-  const database = new DatabaseClient()
-  const logger = new Logger()
-
-  // Repositories
-  const playerRepository = new PlayerRepository(database, logger)
-  const matchRepository = new MatchRepository(database, logger)
-  const weaponRepository = new WeaponRepository(database, logger)
-  const actionRepository = new ActionRepository(database, logger)
-  const serverRepository = new ServerRepository(database, logger)
-  const rconRepository = new RconRepository(database, logger)
-
-  // Queue Module
-  let queueModule: QueueModule | undefined
-
-  try {
-    const rabbitmqConfig = createDevelopmentRabbitMQConfig()
-    queueModule = new QueueModule(
-      {
-        rabbitmq: rabbitmqConfig,
-        autoStartConsumers: false,
-        autoSetupTopology: true,
-      },
-      logger,
-    )
-
-    logger.info("Queue module created - will initialize during ingress service creation")
-  } catch (error) {
-    logger.warn(
-      `Failed to create queue module: ${error instanceof Error ? error.message : String(error)}`,
-    )
-    logger.warn("Continuing with EventBus only")
-  }
-
-  // Services (order matters for dependencies)
-  const rankingService = new RankingService(logger, weaponRepository)
-  const matchService = new MatchService(matchRepository, logger)
-  const geoipService = new GeoIPService(database, logger)
-  const playerService = new PlayerService(
-    playerRepository,
-    logger,
-    rankingService,
-    serverRepository,
-    matchService,
-    geoipService,
-  )
-  const weaponService = new WeaponService(weaponRepository, logger)
-  const actionService = new ActionService(actionRepository, logger, playerService, matchService)
-  const gameDetectionService = new GameDetectionService(logger)
-  const serverService = new ServerService(serverRepository, logger)
-  
-  // Configure RCON service with environment variables
-  const rconConfig = {
-    enabled: process.env.RCON_ENABLED === "true",
-    timeout: parseInt(process.env.RCON_TIMEOUT || "5000", 10),
-    maxRetries: parseInt(process.env.RCON_MAX_RETRIES || "3", 10),
-    statusInterval: parseInt(process.env.RCON_STATUS_INTERVAL || "30000", 10),
-    maxConnectionsPerServer: 1,
-  }
-  const rconService = new RconService(rconRepository, logger, rconConfig)
-
-  // Create ingress dependencies adapter
-  const ingressDependencies = createIngressDependencies(
-    database,
-    serverService,
-    gameDetectionService,
-    logger,
-    { skipAuth: ingressOptions?.skipAuth },
-  )
-
-  // Initialize queue module if available (will be started later)
-  if (queueModule) {
-    try {
-      // Initialize queue module asynchronously - we'll handle this in an async wrapper
-      logger.info("Queue module available - dual publisher will be created asynchronously")
-    } catch (error) {
-      logger.error(`Failed to initialize queue module: ${error}`)
-      queueModule = undefined
-    }
-  }
-
-  // Create ingress service
-  const resolvedIngressOptions: IngressOptions = {
-    port:
-      ingressOptions?.port ??
-      (process.env.INGRESS_PORT ? parseInt(process.env.INGRESS_PORT, 10) : 27500),
-    host: ingressOptions?.host ?? "0.0.0.0",
-    skipAuth: ingressOptions?.skipAuth ?? process.env.NODE_ENV === "development",
-    logBots: ingressOptions?.logBots ?? process.env.NODE_ENV === "development",
-  }
-
-  const ingressService = new IngressService(logger, ingressDependencies, resolvedIngressOptions)
-
-  // Create event metrics
-  const eventMetrics = new EventMetrics(logger)
-
-  // Create module event handlers (queue-only, no EventBus dependencies)
-  const playerEventHandler = new PlayerEventHandler(
-    logger,
-    playerService,
-    serverService,
-    eventMetrics,
-  )
-
-  const weaponEventHandler = new WeaponEventHandler(logger, weaponService, eventMetrics)
-
-  const matchEventHandler = new MatchEventHandler(
-    logger,
-    matchService,
-    actionService,
-    playerService,
-    eventMetrics,
-  )
-
-  const actionEventHandler = new ActionEventHandler(
-    logger,
-    actionService,
-    matchService,
-    playerService,
-    serverService,
-    eventMetrics,
-  )
-
-  const serverEventHandler = new ServerEventHandler(logger, serverService, eventMetrics)
-
-  // Create module registry and register all handlers (queue-only processing)
-  const moduleRegistry = new ModuleRegistry(logger)
-
-  moduleRegistry.register({
-    name: "player",
-    handler: playerEventHandler,
-    handledEvents: [
-      EventType.PLAYER_CONNECT,
-      EventType.PLAYER_DISCONNECT,
-      EventType.PLAYER_ENTRY,
-      EventType.PLAYER_CHANGE_TEAM,
-      EventType.PLAYER_CHANGE_NAME,
-      EventType.CHAT_MESSAGE,
-      EventType.PLAYER_KILL,
-      EventType.PLAYER_SUICIDE,
-      EventType.PLAYER_DAMAGE,
-      EventType.PLAYER_TEAMKILL,
-    ],
-  })
-
-  moduleRegistry.register({
-    name: "weapon",
-    handler: weaponEventHandler,
-    handledEvents: [
-      EventType.WEAPON_FIRE,
-      EventType.WEAPON_HIT,
-      EventType.PLAYER_KILL, // For weapon statistics
-    ],
-  })
-
-  moduleRegistry.register({
-    name: "match",
-    handler: matchEventHandler,
-    handledEvents: [
-      EventType.ROUND_START,
-      EventType.ROUND_END,
-      EventType.TEAM_WIN,
-      EventType.MAP_CHANGE,
-      EventType.PLAYER_KILL, // For match statistics
-    ],
-  })
-
-  moduleRegistry.register({
-    name: "action",
-    handler: actionEventHandler,
-    handledEvents: [
-      EventType.ACTION_PLAYER,
-      EventType.ACTION_PLAYER_PLAYER,
-      EventType.ACTION_TEAM,
-      EventType.ACTION_WORLD,
-    ],
-  })
-
-  moduleRegistry.register({
-    name: "server",
-    handler: serverEventHandler,
-    handledEvents: [],
-  })
-
-  // Return complete context
-  return {
-    database,
-    logger,
-    queueModule,
-    eventPublisher: undefined, // Will be created during queue initialization
-    rabbitmqConsumer: undefined, // Will be created during queue initialization
-    playerService,
-    matchService,
-    weaponService,
-    rankingService,
-    actionService,
-    ingressService,
-    gameDetectionService,
-    serverService,
-    rconService,
-    playerEventHandler,
-    weaponEventHandler,
-    matchEventHandler,
-    actionEventHandler,
-    serverEventHandler,
-    moduleRegistry,
-    eventMetrics,
-  }
-}
-
 // Singleton instance for the application
 let appContext: AppContext | null = null
 
+/**
+ * Create the application context
+ * @param ingressOptions - Optional ingress options
+ * @returns The application context
+ */
+export function createAppContext(ingressOptions?: IngressOptions): AppContext {
+  // Create infrastructure components
+  const infrastructure = createInfrastructureComponents()
+
+  // Create configuration objects
+  const rconConfig = createRconConfig()
+  const resolvedIngressOptions = createIngressConfig(ingressOptions)
+
+  // Create repositories
+  const repositories = createRepositories(infrastructure.database, infrastructure.logger)
+
+  // Create business services
+  const services = createBusinessServices(
+    repositories,
+    infrastructure.database,
+    infrastructure.logger,
+    rconConfig,
+  )
+
+  // Create queue module
+  const queueResult = createQueueModule(infrastructure.logger)
+
+  // Create ingress dependencies and service
+  const ingressDependencies = createIngressDependencies(
+    infrastructure.database,
+    services.serverService,
+    services.gameDetectionService,
+    infrastructure.logger,
+    { skipAuth: resolvedIngressOptions.skipAuth },
+  )
+
+  const ingressService = new IngressService(
+    infrastructure.logger,
+    ingressDependencies,
+    resolvedIngressOptions,
+  )
+
+  // Create event handlers and module registry
+  const eventComponents = createEventHandlers(services, infrastructure.logger)
+
+  return {
+    // Infrastructure
+    database: infrastructure.database,
+    logger: infrastructure.logger,
+
+    // Queue Infrastructure
+    queueModule: queueResult.queueModule,
+    eventPublisher: undefined, // Will be created during queue initialization
+    rabbitmqConsumer: undefined, // Will be created during queue initialization
+
+    // Business Services
+    playerService: services.playerService,
+    matchService: services.matchService,
+    weaponService: services.weaponService,
+    rankingService: services.rankingService,
+    actionService: services.actionService,
+    ingressService,
+    gameDetectionService: services.gameDetectionService,
+    serverService: services.serverService,
+    rconService: services.rconService,
+
+    // Event Handlers
+    playerEventHandler: eventComponents.playerEventHandler,
+    weaponEventHandler: eventComponents.weaponEventHandler,
+    matchEventHandler: eventComponents.matchEventHandler,
+    actionEventHandler: eventComponents.actionEventHandler,
+    serverEventHandler: eventComponents.serverEventHandler,
+
+    // Module Registry and Metrics
+    moduleRegistry: eventComponents.moduleRegistry,
+    eventMetrics: eventComponents.eventMetrics,
+  }
+}
+
+/**
+ * Get the application context
+ * @param ingressOptions - Optional ingress options
+ * @returns The application context
+ */
 export function getAppContext(ingressOptions?: IngressOptions): AppContext {
   if (!appContext) {
     appContext = createAppContext(ingressOptions)
@@ -368,6 +218,9 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
   }
 }
 
+/**
+ * Reset the application context to allow for a fresh start
+ */
 export function resetAppContext(): void {
   appContext = null
 }

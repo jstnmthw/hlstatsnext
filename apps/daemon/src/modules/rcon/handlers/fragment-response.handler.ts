@@ -1,8 +1,7 @@
 /**
  * GoldSrc Fragmented Response Handler
- * 
+ *
  * Handles reassembly of fragmented RCON responses from GoldSrc servers.
- * Follows the project's DDD architecture and cyclomatic complexity guidelines.
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
@@ -21,10 +20,10 @@ export interface FragmentInfo {
 /**
  * Result of fragment processing
  */
-export type FragmentProcessingResult = 
-  | { type: 'incomplete'; fragmentInfo: FragmentInfo }
-  | { type: 'complete'; assembledData: Buffer }
-  | { type: 'invalid'; reason: string }
+export type FragmentProcessingResult =
+  | { type: "incomplete"; fragmentInfo: FragmentInfo }
+  | { type: "complete"; assembledData: Buffer }
+  | { type: "invalid"; reason: string }
 
 /**
  * Handles fragmented response reassembly for GoldSrc RCON protocol
@@ -40,11 +39,13 @@ export class FragmentedResponseHandler {
    * Checks if a buffer is a fragmented response
    */
   isFragmentedResponse(buffer: Buffer): boolean {
-    return buffer.length > 9 && 
-           buffer[0] === 0xFE && 
-           buffer[1] === 0xFF && 
-           buffer[2] === 0xFF && 
-           buffer[3] === 0xFF
+    return (
+      buffer.length > 9 &&
+      buffer[0] === 0xfe &&
+      buffer[1] === 0xff &&
+      buffer[2] === 0xff &&
+      buffer[3] === 0xff
+    )
   }
 
   /**
@@ -57,25 +58,25 @@ export class FragmentedResponseHandler {
 
     const packetId = buffer.readInt32LE(4)
     const fragmentByte = buffer[8]
-    
+
     if (fragmentByte === undefined) {
       this.logger.error("Invalid fragmented response - missing fragment byte")
       return null
     }
-    
+
     // Based on research: lower nibble = total fragments, upper nibble = current fragment number
-    const totalFragments = fragmentByte & 0x0F
-    const currentFragment = (fragmentByte >> 4) & 0x0F
-    
+    const totalFragments = fragmentByte & 0x0f
+    const currentFragment = (fragmentByte >> 4) & 0x0f
+
     // Extract the actual data (skip the 9-byte fragment header)
     const data = buffer.subarray(9)
-    
+
     return {
       packetId,
       totalFragments,
       currentFragment,
       fragmentByte,
-      data
+      data,
     }
   }
 
@@ -84,40 +85,42 @@ export class FragmentedResponseHandler {
    */
   processFragment(buffer: Buffer): FragmentProcessingResult {
     const fragmentInfo = this.parseFragmentInfo(buffer)
-    
+
     if (!fragmentInfo) {
-      return { type: 'invalid', reason: 'Not a valid fragmented response' }
+      return { type: "invalid", reason: "Not a valid fragmented response" }
     }
 
     const { packetId, totalFragments, currentFragment, fragmentByte, data } = fragmentInfo
-    
-    this.logger.debug(`📦 GoldSrc RCON: Processing fragment ${currentFragment}/${totalFragments - 1} of packet ${packetId} (fragmentByte: 0x${fragmentByte.toString(16)})`)
-    
+
+    this.logger.debug(
+      `📦 GoldSrc RCON: Processing fragment ${currentFragment}/${totalFragments - 1} of packet ${packetId} (fragmentByte: 0x${fragmentByte.toString(16)})`,
+    )
+
     // Initialize fragment array if needed
     if (!this.fragmentStore.has(packetId)) {
       this.fragmentStore.set(packetId, [])
       this.setupFragmentTimeout(packetId)
     }
-    
+
     // Store the fragment
     const fragments = this.fragmentStore.get(packetId)!
     fragments[currentFragment] = data
-    
+
     // Check if we have all fragments
-    const receivedCount = fragments.filter(f => f !== undefined).length
-    
+    const receivedCount = fragments.filter((f) => f !== undefined).length
+
     if (receivedCount === totalFragments) {
       // Complete - assemble and cleanup
-      const assembledData = Buffer.concat(fragments.filter(f => f !== undefined))
+      const assembledData = Buffer.concat(fragments.filter((f) => f !== undefined))
       this.cleanup(packetId)
-      
+
       this.logger.debug(`✅ GoldSrc RCON: Fragment reassembly complete for packet ${packetId}`)
-      
-      return { type: 'complete', assembledData }
+
+      return { type: "complete", assembledData }
     }
-    
+
     // Still incomplete
-    return { type: 'incomplete', fragmentInfo }
+    return { type: "incomplete", fragmentInfo }
   }
 
   /**
@@ -128,7 +131,7 @@ export class FragmentedResponseHandler {
       this.logger.warn(`⏰ GoldSrc RCON: Fragment timeout for packet ${packetId}`)
       this.cleanup(packetId)
     }, this.FRAGMENT_TIMEOUT)
-    
+
     this.fragmentTimeouts.set(packetId, timeout)
   }
 
@@ -138,7 +141,7 @@ export class FragmentedResponseHandler {
   private cleanup(packetId: number): void {
     // Clear stored fragments
     this.fragmentStore.delete(packetId)
-    
+
     // Clear timeout
     const timeout = this.fragmentTimeouts.get(packetId)
     if (timeout) {
@@ -155,7 +158,7 @@ export class FragmentedResponseHandler {
     for (const timeout of this.fragmentTimeouts.values()) {
       clearTimeout(timeout)
     }
-    
+
     // Clear all data
     this.fragmentStore.clear()
     this.fragmentTimeouts.clear()

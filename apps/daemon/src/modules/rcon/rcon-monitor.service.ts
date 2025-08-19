@@ -88,7 +88,13 @@ export class RconMonitorService {
     const status = await this.context.rconService.getStatus(server.serverId)
 
     this.logger.ok(
-      `Server ${server.serverId} (${server.name}) - Map: ${status.map} | Players: ${status.players}/${status.maxPlayers} | FPS: ${status.fps}`,
+      `==================================================================================================`,
+    )
+    this.logger.ok(
+      `SERVER STATUS: ${server.name} (${server.serverId}), Map: ${status.map}, Players: ${status.players}/${status.maxPlayers}, FPS: ${status.fps}`,
+    )
+    this.logger.ok(
+      `==================================================================================================`,
     )
 
     if (status.hostname) {

@@ -31,7 +31,6 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
       })
     } catch (error) {
       this.handleError("getPlayerSkill", error)
-      return null
     }
   }
 
@@ -139,7 +138,7 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
                 skillChange: { increment: delta },
               },
             })
-            this.logger.info("PLAYER_HISTORY processed", {
+            this.logger.info(`PLAYER_HISTORY processed (Player ID: ${data.playerId})`, {
               playerId: data.playerId,
               eventDate: day.toISOString().slice(0, 10),
               game,
@@ -165,7 +164,7 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
                 skillChange: data.skillChange || 0,
               },
             })
-            this.logger.info("PLAYER_HISTORY processed", {
+            this.logger.info(`PLAYER_HISTORY processed (Player ID: ${data.playerId})`, {
               playerId: data.playerId,
               eventDate: day.toISOString().slice(0, 10),
               game,

@@ -47,7 +47,7 @@ export class RconMonitorService {
   private async monitorActiveServers(): Promise<void> {
     try {
       const activeServers = await this.context.serverService.findActiveServersWithRcon()
-      
+
       if (activeServers.length === 0) {
         this.logger.warn("No active servers with RCON found for monitoring")
         return
@@ -74,29 +74,31 @@ export class RconMonitorService {
 
   private async ensureServerConnection(server: ServerInfo): Promise<void> {
     if (!this.context.rconService.isConnected(server.serverId)) {
-      this.logger.info(`🔌 Attempting RCON connection to server ${server.serverId} (${server.address}:${server.port})...`)
+      this.logger.info(
+        `Attempting RCON connection to server ${server.serverId} (${server.address}:${server.port})...`,
+      )
       await this.context.rconService.connect(server.serverId)
-      this.logger.ok(`✅ RCON connected to server ${server.serverId} (${server.name})`)
+      this.logger.ok(`RCON connected to server ${server.serverId} (${server.name})`)
     } else {
-      this.logger.debug(`📡 RCON already connected to server ${server.serverId}, getting status...`)
+      this.logger.debug(`RCON already connected to server ${server.serverId}, getting status...`)
     }
   }
 
   private async getAndLogServerStatus(server: ServerInfo): Promise<void> {
     const status = await this.context.rconService.getStatus(server.serverId)
 
-    this.logger.info(
-      `📊 Server ${server.serverId} (${server.name}) - Map: ${status.map} | Players: ${status.players}/${status.maxPlayers} | FPS: ${status.fps}`,
+    this.logger.ok(
+      `Server ${server.serverId} (${server.name}) - Map: ${status.map} | Players: ${status.players}/${status.maxPlayers} | FPS: ${status.fps}`,
     )
 
     if (status.hostname) {
-      this.logger.debug(`🏷️ Server ${server.serverId} hostname: ${status.hostname}`)
+      this.logger.debug(`Server ${server.serverId} hostname: ${status.hostname}`)
     }
   }
 
   private async handleServerError(server: ServerInfo, error: unknown): Promise<void> {
     this.logger.error(
-      `❌ RCON failed for server ${server.serverId} (${server.name}): ${error instanceof Error ? error.message : String(error)}`,
+      `RCON failed for server ${server.serverId} (${server.name}): ${error instanceof Error ? error.message : String(error)}`,
     )
 
     try {

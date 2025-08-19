@@ -1,14 +1,13 @@
 /**
  * RCON Service Implementation
- * 
+ *
  * Manages RCON connections and command execution for game servers.
- * Follows the project's DDD architecture and dependency injection patterns.
  */
 
-import type { 
-  IRconService, 
-  IRconRepository, 
-  RconConnection, 
+import type {
+  IRconService,
+  IRconRepository,
+  RconConnection,
   ServerStatus,
   RconConfig,
   IRconProtocol,
@@ -16,11 +15,13 @@ import type {
 import { RconError, RconErrorCode, GameEngine } from "./rcon.types"
 import { SourceRconProtocol } from "./protocols/source-rcon.protocol"
 import { GoldSrcRconProtocol } from "./protocols/goldsrc-rcon.protocol"
+import { GoldSrcStatusParser } from "./parsers/goldsrc-status.parser"
 import type { ILogger } from "@/shared/utils/logger.types"
 
 export class RconService implements IRconService {
   private readonly connections = new Map<number, RconConnection>()
   private readonly config: RconConfig
+  private readonly statusParser: GoldSrcStatusParser
 
   constructor(
     private readonly repository: IRconRepository,
@@ -29,13 +30,14 @@ export class RconService implements IRconService {
   ) {
     this.config = {
       enabled: true,
-      statusInterval: 30000,  // 30 seconds
-      timeout: 5000,         // 5 seconds
+      statusInterval: 30000, // 30 seconds
+      timeout: 5000, // 5 seconds
       maxRetries: 3,
       maxConnectionsPerServer: 1,
       ...config,
     }
 
+    this.statusParser = new GoldSrcStatusParser(logger)
     this.logger.info("RCON service initialized", { config: this.config })
   }
 
@@ -62,7 +64,7 @@ export class RconService implements IRconService {
 
     // Create protocol instance
     const protocol = this.createProtocol(credentials.gameEngine)
-    
+
     let attempts = 0
     let lastError: Error | undefined
 
@@ -70,7 +72,9 @@ export class RconService implements IRconService {
       try {
         attempts++
         const engineName = this.getEngineDisplayName(credentials.gameEngine)
-        this.logger.info(`🔄 RCON connecting to ${credentials.address}:${credentials.port} (${engineName}) - attempt ${attempts}/${this.config.maxRetries}`)
+        this.logger.info(
+          `RCON connecting to ${credentials.address}:${credentials.port} (${engineName}) - attempt ${attempts}/${this.config.maxRetries}`,
+        )
 
         await protocol.connect(credentials.address, credentials.port, credentials.rconPassword)
 
@@ -84,25 +88,28 @@ export class RconService implements IRconService {
         }
 
         this.connections.set(serverId, connection)
-        
-        this.logger.ok(`✅ RCON connected to server ${serverId} (${credentials.address}:${credentials.port}) using ${engineName} protocol`)
-        return
 
+        this.logger.ok(
+          `RCON connected to server ${serverId} (${credentials.address}:${credentials.port}) using ${engineName} protocol`,
+        )
+        return
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error))
-        
+
         if (attempts < this.config.maxRetries) {
           const delay = Math.min(1000 * Math.pow(2, attempts - 1), 5000) // Exponential backoff, max 5s
-          this.logger.warn(`⚠️ RCON connection attempt ${attempts} failed for server ${serverId}: ${lastError.message}. Retrying in ${delay}ms...`)
+          this.logger.warn(
+            `RCON connection attempt ${attempts} failed for server ${serverId}: ${lastError.message}. Retrying in ${delay}ms...`,
+          )
           await this.delay(delay)
         }
       }
     }
 
     // All attempts failed
-    const errorMessage = `❌ RCON connection failed to server ${serverId} after ${attempts} attempts`
+    const errorMessage = `RCON connection failed to server ${serverId} after ${attempts} attempts`
     this.logger.error(`${errorMessage}: ${lastError?.message}`)
-    
+
     throw new RconError(
       `${errorMessage}: ${lastError?.message}`,
       RconErrorCode.CONNECTION_FAILED,
@@ -119,9 +126,9 @@ export class RconService implements IRconService {
 
     try {
       await connection.protocol.disconnect()
-      this.logger.info(`🔌 RCON disconnected from server ${serverId}`)
+      this.logger.info(`RCON disconnected from server ${serverId}`)
     } catch (error) {
-      this.logger.warn(`⚠️ Error disconnecting RCON from server ${serverId}: ${error}`)
+      this.logger.warn(`Error disconnecting RCON from server ${serverId}: ${error}`)
     } finally {
       this.connections.delete(serverId)
     }
@@ -129,25 +136,24 @@ export class RconService implements IRconService {
 
   async executeCommand(serverId: number, command: string): Promise<string> {
     const connection = this.getActiveConnection(serverId)
-    
+
     try {
       const response = await connection.protocol.execute(command)
       connection.lastActivity = new Date()
-      
+
       this.logger.debug(`Command executed on server ${serverId}: ${command}`)
       return response
-      
     } catch (error) {
       this.logger.error(`Command execution failed on server ${serverId}: ${error}`)
-      
+
       // Mark connection as failed and remove it
       connection.isConnected = false
       this.connections.delete(serverId)
-      
+
       if (error instanceof RconError) {
         throw error
       }
-      
+
       throw new RconError(
         `Command execution failed: ${error instanceof Error ? error.message : String(error)}`,
         RconErrorCode.COMMAND_FAILED,
@@ -168,29 +174,29 @@ export class RconService implements IRconService {
 
   async disconnectAll(): Promise<void> {
     const serverIds = Array.from(this.connections.keys())
-    
+
     if (serverIds.length === 0) {
       this.logger.debug("No RCON connections to close")
       return
     }
-    
-    this.logger.info(`🔌 Closing ${serverIds.length} RCON connection(s)...`)
-    
-    const disconnectPromises = serverIds.map(serverId =>
-      this.disconnect(serverId)
-    )
+
+    this.logger.info(`Closing ${serverIds.length} RCON connection(s)...`)
+
+    const disconnectPromises = serverIds.map((serverId) => this.disconnect(serverId))
 
     await Promise.allSettled(disconnectPromises)
     this.connections.clear()
-    
-    this.logger.info("✅ All RCON connections closed")
+
+    this.logger.info("All RCON connections closed")
   }
 
-  /**
-   * Get connection statistics for monitoring
-   */
-  getConnectionStats(): { serverId: number; isConnected: boolean; lastActivity: Date; attempts: number }[] {
-    return Array.from(this.connections.values()).map(conn => ({
+  getConnectionStats(): {
+    serverId: number
+    isConnected: boolean
+    lastActivity: Date
+    attempts: number
+  }[] {
+    return Array.from(this.connections.values()).map((conn) => ({
       serverId: conn.serverId,
       isConnected: conn.isConnected,
       lastActivity: conn.lastActivity,
@@ -200,7 +206,7 @@ export class RconService implements IRconService {
 
   private getActiveConnection(serverId: number): RconConnection {
     const connection = this.connections.get(serverId)
-    
+
     if (!connection) {
       throw new RconError(
         `No connection found for server ${serverId}`,
@@ -225,10 +231,10 @@ export class RconService implements IRconService {
       case GameEngine.SOURCE:
       case GameEngine.SOURCE_2009:
         return new SourceRconProtocol(this.logger, this.config.timeout)
-      
+
       case GameEngine.GOLDSRC:
         return new GoldSrcRconProtocol(this.logger, this.config.timeout)
-      
+
       default:
         throw new RconError(
           `Unsupported game engine: ${gameEngine}`,
@@ -238,105 +244,12 @@ export class RconService implements IRconService {
   }
 
   private parseStatusResponse(response: string): ServerStatus {
-    // Parse GoldSrc/Source status response
-    // Format example:
-    // hostname:  [DEV] CS1.6 Test Server
-    // version :  48/1.1.2.7/Stdio 10211 secure  (10)
-    // tcp/ip  :  0.0.0.0:27015
-    // map     :  de_cbble at: 0 x, 0 y, 0 z
-    // players :  30 active (32 max)
-    
-    const lines = response.split('\n')
-    
-    // Default status values
-    const status: ServerStatus = {
-      map: "unknown",
-      players: 0,
-      maxPlayers: 0,
-      uptime: 0,
-      fps: 0,
-      timestamp: new Date(),
-    }
-
-    for (const line of lines) {
-      const trimmed = line.trim()
-      
-      if (!trimmed) continue
-      
-      // GoldSrc uses different format with spaces before colon
-      // Split by colon and handle both formats
-      const colonIndex = trimmed.indexOf(':')
-      if (colonIndex === -1) continue
-      
-      const key = trimmed.substring(0, colonIndex).trim().toLowerCase()
-      const value = trimmed.substring(colonIndex + 1).trim()
-      
-      switch (key) {
-        case 'hostname':
-          status.hostname = value
-          break
-          
-        case 'version':
-          status.version = value
-          break
-          
-        case 'map': {
-          // Parse "de_cbble at: 0 x, 0 y, 0 z" or just "de_cbble"
-          const mapMatch = value.match(/^(\S+)/)
-          if (mapMatch && mapMatch[1]) {
-            status.map = mapMatch[1]
-          }
-          break
-        }
-          
-        case 'players': {
-          // Parse "30 active (32 max)" or "30 (32 max)"
-          const playerMatch = value.match(/(\d+)\s*(?:active)?\s*\((\d+)\s*max\)/)
-          if (playerMatch && playerMatch[1] && playerMatch[2]) {
-            status.players = parseInt(playerMatch[1], 10)
-            status.maxPlayers = parseInt(playerMatch[2], 10)
-          } else {
-            // Try simpler format "30/32"
-            const simpleMatch = value.match(/(\d+)\/(\d+)/)
-            if (simpleMatch && simpleMatch[1] && simpleMatch[2]) {
-              status.players = parseInt(simpleMatch[1], 10)
-              status.maxPlayers = parseInt(simpleMatch[2], 10)
-            }
-          }
-          break
-        }
-          
-        case 'fps': {
-          const fpsMatch = value.match(/[\d.]+/)
-          if (fpsMatch && fpsMatch[0]) {
-            status.fps = parseFloat(fpsMatch[0])
-          }
-          break
-        }
-        
-        case 'cpu': {
-          // Some servers report CPU usage
-          const cpuMatch = value.match(/[\d.]+/)
-          if (cpuMatch && cpuMatch[0]) {
-            status.cpu = parseFloat(cpuMatch[0])
-          }
-          break
-        }
-      }
-    }
-    
-    this.logger.debug(`📊 Parsed server status`, {
-      hostname: status.hostname,
-      map: status.map,
-      players: `${status.players}/${status.maxPlayers}`,
-      version: status.version
-    })
-
-    return status
+    // Use the dedicated GoldSrc status parser
+    return this.statusParser.parseStatus(response)
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise((resolve) => setTimeout(resolve, ms))
   }
 
   private getEngineDisplayName(gameEngine: GameEngine): string {

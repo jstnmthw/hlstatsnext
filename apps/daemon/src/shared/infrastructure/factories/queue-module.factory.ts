@@ -22,7 +22,7 @@ export interface QueueModuleResult {
  */
 export function createQueueModule(logger: ILogger): QueueModuleResult {
   try {
-    const rabbitmqConfig = createDevelopmentRabbitMQConfig()
+    const rabbitmqConfig = createDevelopmentRabbitMQConfig(process.env.RABBITMQ_URL)
     const queueModule = new QueueModule(
       {
         rabbitmq: rabbitmqConfig,

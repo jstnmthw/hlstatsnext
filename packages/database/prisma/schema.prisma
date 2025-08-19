@@ -2,8 +2,9 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated"
+  provider      = "prisma-client-js"
+  output        = "../generated"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -743,15 +744,17 @@ model Role {
 }
 
 model Server {
-  serverId      Int       @id @default(autoincrement()) @map("server_id") @db.UnsignedInt
-  address       String    @default("") @db.VarChar(32)
-  port          Int       @default(0) @db.UnsignedInt
-  name          String    @default("") @db.VarChar(255)
-  sortOrder     Int       @default(0) @map("sort_order") @db.TinyInt
-  game          String    @default("valve") @db.VarChar(32)
-  publicAddress String    @default("") @map("public_address") @db.VarChar(128)
-  statusUrl     String?   @map("status_url") @db.VarChar(255)
-  rconPassword  String    @default("") @map("rcon_password") @db.VarChar(128)
+  serverId       Int       @id @default(autoincrement()) @map("server_id") @db.UnsignedInt
+  address        String    @default("") @db.VarChar(32)
+  port           Int       @default(0) @db.UnsignedInt
+  name           String    @default("") @db.VarChar(255)
+  sortOrder      Int       @default(0) @map("sort_order") @db.TinyInt
+  game           String    @default("valve") @db.VarChar(32)
+  publicAddress  String    @default("") @map("public_address") @db.VarChar(128)
+  statusUrl      String?   @map("status_url") @db.VarChar(255)
+  rconPassword   String    @default("") @map("rcon_password") @db.VarChar(128)
+  connectionType String    @default("external") @map("connection_type") @db.VarChar(8) // 'docker' or 'external'
+  dockerHost     String?   @map("docker_host") @db.VarChar(255) // Container hostname or static IP for Docker servers
   kills         Int       @default(0)
   players       Int       @default(0)
   rounds        Int       @default(0)

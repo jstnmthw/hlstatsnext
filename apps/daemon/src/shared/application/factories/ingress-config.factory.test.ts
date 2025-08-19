@@ -1,11 +1,11 @@
 /**
  * Ingress Configuration Factory Tests
- * 
+ *
  * Tests for options resolution and environment variable fallbacks
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest"
-import { createIngressConfig } from "../ingress-config.factory"
+import { createIngressConfig } from "./ingress-config.factory"
 
 describe("createIngressConfig", () => {
   // Store original environment

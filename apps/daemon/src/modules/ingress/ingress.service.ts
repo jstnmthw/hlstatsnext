@@ -103,7 +103,7 @@ export class IngressService implements IIngressService {
     // Get or authenticate server
     const serverId = await this.authenticateServer(serverAddress, serverPort)
     if (serverId === null) {
-      this.logger.warn(`Rejected log from unauthenticated server ${serverAddress}:${serverPort}`)
+      // Server authentication failed - authenticator already logged with rate limiting
       return null
     }
 

@@ -238,7 +238,14 @@ export class RconService implements IRconService {
   }
 
   private parseStatusResponse(response: string): ServerStatus {
-    // Basic status parsing - can be enhanced based on actual server responses
+    // Parse GoldSrc/Source status response
+    // Format example:
+    // hostname:  [DEV] CS1.6 Test Server
+    // version :  48/1.1.2.7/Stdio 10211 secure  (10)
+    // tcp/ip  :  0.0.0.0:27015
+    // map     :  de_cbble at: 0 x, 0 y, 0 z
+    // players :  30 active (32 max)
+    
     const lines = response.split('\n')
     
     // Default status values
@@ -254,39 +261,76 @@ export class RconService implements IRconService {
     for (const line of lines) {
       const trimmed = line.trim()
       
-      // Parse map info: "map: de_dust2"
-      if (trimmed.startsWith("map:")) {
-        const mapValue = trimmed.split(":")[1]?.trim()
-        if (mapValue) {
-          status.map = mapValue
+      if (!trimmed) continue
+      
+      // GoldSrc uses different format with spaces before colon
+      // Split by colon and handle both formats
+      const colonIndex = trimmed.indexOf(':')
+      if (colonIndex === -1) continue
+      
+      const key = trimmed.substring(0, colonIndex).trim().toLowerCase()
+      const value = trimmed.substring(colonIndex + 1).trim()
+      
+      switch (key) {
+        case 'hostname':
+          status.hostname = value
+          break
+          
+        case 'version':
+          status.version = value
+          break
+          
+        case 'map': {
+          // Parse "de_cbble at: 0 x, 0 y, 0 z" or just "de_cbble"
+          const mapMatch = value.match(/^(\S+)/)
+          if (mapMatch && mapMatch[1]) {
+            status.map = mapMatch[1]
+          }
+          break
         }
-      }
-      
-      // Parse player count: "players : 12 (16 max)"
-      const playerMatch = trimmed.match(/players\s*:\s*(\d+)\s*\((\d+)\s*max\)/)
-      if (playerMatch && playerMatch[1] && playerMatch[2]) {
-        status.players = parseInt(playerMatch[1], 10)
-        status.maxPlayers = parseInt(playerMatch[2], 10)
-      }
-      
-      // Parse server FPS: "fps: 128.5"
-      if (trimmed.startsWith("fps:")) {
-        const fpsStr = trimmed.split(":")[1]?.trim()
-        if (fpsStr) {
-          status.fps = parseFloat(fpsStr)
+          
+        case 'players': {
+          // Parse "30 active (32 max)" or "30 (32 max)"
+          const playerMatch = value.match(/(\d+)\s*(?:active)?\s*\((\d+)\s*max\)/)
+          if (playerMatch && playerMatch[1] && playerMatch[2]) {
+            status.players = parseInt(playerMatch[1], 10)
+            status.maxPlayers = parseInt(playerMatch[2], 10)
+          } else {
+            // Try simpler format "30/32"
+            const simpleMatch = value.match(/(\d+)\/(\d+)/)
+            if (simpleMatch && simpleMatch[1] && simpleMatch[2]) {
+              status.players = parseInt(simpleMatch[1], 10)
+              status.maxPlayers = parseInt(simpleMatch[2], 10)
+            }
+          }
+          break
         }
-      }
-      
-      // Parse hostname if available
-      if (trimmed.startsWith("hostname:")) {
-        status.hostname = trimmed.split(":")[1]?.trim()
-      }
-      
-      // Parse version if available
-      if (trimmed.startsWith("version:")) {
-        status.version = trimmed.split(":")[1]?.trim()
+          
+        case 'fps': {
+          const fpsMatch = value.match(/[\d.]+/)
+          if (fpsMatch && fpsMatch[0]) {
+            status.fps = parseFloat(fpsMatch[0])
+          }
+          break
+        }
+        
+        case 'cpu': {
+          // Some servers report CPU usage
+          const cpuMatch = value.match(/[\d.]+/)
+          if (cpuMatch && cpuMatch[0]) {
+            status.cpu = parseFloat(cpuMatch[0])
+          }
+          break
+        }
       }
     }
+    
+    this.logger.debug(`📊 Parsed server status`, {
+      hostname: status.hostname,
+      map: status.map,
+      players: `${status.players}/${status.maxPlayers}`,
+      version: status.version
+    })
 
     return status
   }

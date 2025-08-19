@@ -75,6 +75,7 @@ export interface ServerStatus {
   fps: number
   version?: string
   hostname?: string
+  cpu?: number
   timestamp: Date
 }
 

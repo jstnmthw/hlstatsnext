@@ -12,6 +12,8 @@ export function createMockServerRecord(overrides: Partial<Server> = {}): Server 
     publicAddress: "",
     statusUrl: null,
     rconPassword: "",
+    connectionType: "external",
+    dockerHost: null,
     kills: 0,
     players: 0,
     rounds: 0,

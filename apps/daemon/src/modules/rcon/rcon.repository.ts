@@ -26,6 +26,9 @@ export class RconRepository implements IRconRepository {
           port: true,
           rconPassword: true,
           game: true,
+          connectionType: true,
+          dockerHost: true,
+          name: true,
         },
       })
 
@@ -42,10 +45,26 @@ export class RconRepository implements IRconRepository {
       // Map game string to GameEngine enum
       const gameEngine = this.mapGameToEngine(server.game)
 
+      // Determine the correct connection address based on server type
+      let connectionAddress: string
+      let connectionPort: number
+
+      if (server.connectionType === 'docker' && server.dockerHost) {
+        // For Docker servers, use the static IP or container hostname
+        connectionAddress = server.dockerHost
+        connectionPort = 27015 // Standard game port, not the ephemeral UDP source port
+        this.logger.debug(`Using Docker connection for server ${serverId}: ${connectionAddress}:${connectionPort}`)
+      } else {
+        // For external servers, use the stored address and port
+        connectionAddress = server.address
+        connectionPort = server.port
+        this.logger.debug(`Using external connection for server ${serverId}: ${connectionAddress}:${connectionPort}`)
+      }
+
       return {
         serverId: server.serverId,
-        address: server.address,
-        port: server.port,
+        address: connectionAddress,
+        port: connectionPort,
         rconPassword: server.rconPassword,
         gameEngine,
       }

@@ -1,11 +1,11 @@
 /**
  * RCON Configuration Factory Tests
- * 
+ *
  * Tests for environment variable parsing and validation logic
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest"
-import { createRconConfig } from "../rcon-config.factory"
+import { createRconConfig } from "./rcon-config.factory"
 
 describe("createRconConfig", () => {
   // Store original environment

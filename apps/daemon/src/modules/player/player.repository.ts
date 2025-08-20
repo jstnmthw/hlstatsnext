@@ -693,7 +693,7 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
 
       // Use PlayerNameUpdateBuilder to build the update data
       const builder = PlayerNameUpdateBuilder.create()
-      
+
       // Add all updates to the builder
       if (updates.numUses) builder.addUsage(updates.numUses)
       if (updates.connectionTime) builder.addConnectionTime(updates.connectionTime)

@@ -1,6 +1,6 @@
 /**
  * Ingress Configuration Factory
- * 
+ *
  * Handles resolution of ingress service options with environment variable
  * fallbacks and development defaults.
  */
@@ -25,7 +25,7 @@ const INGRESS_DEFAULTS = {
 
 /**
  * Creates resolved ingress options from provided options and environment variables
- * 
+ *
  * @param ingressOptions - Optional user-provided ingress options
  * @returns Fully resolved ingress options with environment and default fallbacks
  */

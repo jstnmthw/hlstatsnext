@@ -14,11 +14,7 @@ import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 
 export class ChatEventHandler extends BasePlayerEventHandler {
-  constructor(
-    repository: IPlayerRepository,
-    logger: ILogger,
-    matchService?: IMatchService,
-  ) {
+  constructor(repository: IPlayerRepository, logger: ILogger, matchService?: IMatchService) {
     super(repository, logger, matchService)
   }
 

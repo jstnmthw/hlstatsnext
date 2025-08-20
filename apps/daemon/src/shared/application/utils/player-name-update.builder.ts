@@ -117,7 +117,7 @@ export class PlayerNameUpdateBuilder {
 
     // Validate the updates
     validatePlayerNameStatsUpdate(this.updates)
-    
+
     return sanitizePlayerNameStatsUpdate(this.updates)
   }
 
@@ -218,9 +218,7 @@ export class PlayerNameUpdateBuilder {
    * Creates a builder for a kill event (increments kills and headshots if applicable)
    */
   static forKill(headshot: boolean = false): PlayerNameUpdateBuilder {
-    const builder = new PlayerNameUpdateBuilder()
-      .addKills(1)
-      .updateLastUse()
+    const builder = new PlayerNameUpdateBuilder().addKills(1).updateLastUse()
 
     if (headshot) {
       builder.addHeadshots(1)
@@ -233,29 +231,21 @@ export class PlayerNameUpdateBuilder {
    * Creates a builder for a death event
    */
   static forDeath(): PlayerNameUpdateBuilder {
-    return new PlayerNameUpdateBuilder()
-      .addDeaths(1)
-      .updateLastUse()
+    return new PlayerNameUpdateBuilder().addDeaths(1).updateLastUse()
   }
 
   /**
    * Creates a builder for a suicide event
    */
   static forSuicide(): PlayerNameUpdateBuilder {
-    return new PlayerNameUpdateBuilder()
-      .addSuicides(1)
-      .addDeaths(1)
-      .updateLastUse()
+    return new PlayerNameUpdateBuilder().addSuicides(1).addDeaths(1).updateLastUse()
   }
 
   /**
    * Creates a builder for a damage event (shots and hits)
    */
   static forDamage(headshot: boolean = false): PlayerNameUpdateBuilder {
-    const builder = new PlayerNameUpdateBuilder()
-      .addShots(1)
-      .addHits(1)
-      .updateLastUse()
+    const builder = new PlayerNameUpdateBuilder().addShots(1).addHits(1).updateLastUse()
 
     if (headshot) {
       builder.addHeadshots(1)
@@ -268,9 +258,7 @@ export class PlayerNameUpdateBuilder {
    * Creates a builder for a connect event
    */
   static forConnect(): PlayerNameUpdateBuilder {
-    return new PlayerNameUpdateBuilder()
-      .addUsage(1)
-      .updateLastUse()
+    return new PlayerNameUpdateBuilder().addUsage(1).updateLastUse()
   }
 
   /**

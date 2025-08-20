@@ -1,6 +1,6 @@
 /**
  * RCON Repository Implementation
- * 
+ *
  * Handles database access for RCON-related operations.
  * Follows the project's repository pattern and database client usage.
  */
@@ -49,16 +49,20 @@ export class RconRepository implements IRconRepository {
       let connectionAddress: string
       let connectionPort: number
 
-      if (server.connectionType === 'docker' && server.dockerHost) {
+      if (server.connectionType === "docker" && server.dockerHost) {
         // For Docker servers, use the static IP or container hostname
         connectionAddress = server.dockerHost
         connectionPort = 27015 // Standard game port, not the ephemeral UDP source port
-        this.logger.debug(`Using Docker connection for server ${serverId}: ${connectionAddress}:${connectionPort}`)
+        this.logger.debug(
+          `Using Docker connection for server ${serverId}: ${connectionAddress}:${connectionPort}`,
+        )
       } else {
         // For external servers, use the stored address and port
         connectionAddress = server.address
         connectionPort = server.port
-        this.logger.debug(`Using external connection for server ${serverId}: ${connectionAddress}:${connectionPort}`)
+        this.logger.debug(
+          `Using external connection for server ${serverId}: ${connectionAddress}:${connectionPort}`,
+        )
       }
 
       return {

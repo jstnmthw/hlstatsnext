@@ -1,6 +1,6 @@
 /**
  * Skill Calculator Unit Tests
- * 
+ *
  * Comprehensive tests for all skill calculation formulas.
  * These tests ensure mathematical correctness and edge case handling.
  */
@@ -46,7 +46,7 @@ describe("Skill Calculator", () => {
     it("should handle extreme rating differences", () => {
       const veryLow = calculateExpectedScore(100, 3000)
       expect(veryLow).toBeCloseTo(0, 3)
-      
+
       const veryHigh = calculateExpectedScore(3000, 100)
       expect(veryHigh).toBeCloseTo(1, 3)
     })
@@ -54,7 +54,7 @@ describe("Skill Calculator", () => {
     it("should use custom volatility divisor", () => {
       const defaultScore = calculateExpectedScore(1500, 1700, 400)
       const customScore = calculateExpectedScore(1500, 1700, 200)
-      
+
       expect(customScore).toBeLessThan(defaultScore)
     })
   })
@@ -86,7 +86,7 @@ describe("Skill Calculator", () => {
         kFactorNewPlayerMultiplier: 2.0,
         newPlayerGamesThreshold: 20,
       }
-      
+
       const kFactor = getKFactor(15, 1000, config)
       expect(kFactor).toBe(80) // 40 * 2.0
     })
@@ -95,7 +95,7 @@ describe("Skill Calculator", () => {
       // High rated but new player should get new player multiplier
       const newElite = getKFactor(5, 2500)
       expect(newElite).toBe(48) // New player multiplier applies
-      
+
       // Low rated but experienced player should get base K-factor
       const experiencedLow = getKFactor(100, 800)
       expect(experiencedLow).toBe(32) // Base K-factor
@@ -106,7 +106,7 @@ describe("Skill Calculator", () => {
     it("should allow changes within bounds", () => {
       const change = applyRatingBounds(1500, 50)
       expect(change).toBe(50)
-      
+
       const negativeChange = applyRatingBounds(1500, -50)
       expect(negativeChange).toBe(-50)
     })
@@ -114,7 +114,7 @@ describe("Skill Calculator", () => {
     it("should prevent rating from going below minimum", () => {
       const change = applyRatingBounds(150, -100)
       expect(change).toBe(-50) // Should only go down to 100
-      
+
       const atMin = applyRatingBounds(100, -50)
       expect(atMin).toBe(0) // Already at minimum
     })
@@ -122,7 +122,7 @@ describe("Skill Calculator", () => {
     it("should prevent rating from going above maximum", () => {
       const change = applyRatingBounds(2950, 100)
       expect(change).toBe(50) // Should only go up to 3000
-      
+
       const atMax = applyRatingBounds(3000, 50)
       expect(atMax).toBe(0) // Already at maximum
     })
@@ -130,7 +130,7 @@ describe("Skill Calculator", () => {
     it("should respect custom bounds", () => {
       const change = applyRatingBounds(450, -100, 400, 500)
       expect(change).toBe(-50) // Should only go down to 400
-      
+
       const upChange = applyRatingBounds(480, 50, 400, 500)
       expect(upChange).toBe(20) // Should only go up to 500
     })
@@ -166,7 +166,7 @@ describe("Skill Calculator", () => {
         headshot: false,
         isTeamKill: false,
       }
-      
+
       const modified = applyKillModifiers(20, context)
       expect(modified).toBe(28) // 20 * 1.4
     })
@@ -178,7 +178,7 @@ describe("Skill Calculator", () => {
         headshot: true,
         isTeamKill: false,
       }
-      
+
       const modified = applyKillModifiers(20, context)
       expect(modified).toBe(24) // 20 * 1.0 * 1.2
     })
@@ -190,7 +190,7 @@ describe("Skill Calculator", () => {
         headshot: true,
         isTeamKill: false,
       }
-      
+
       const modified = applyKillModifiers(20, context)
       expect(modified).toBe(33.6) // 20 * 1.4 * 1.2
     })
@@ -202,7 +202,7 @@ describe("Skill Calculator", () => {
         headshot: true,
         isTeamKill: false,
       }
-      
+
       const modified = applyKillModifiers(40, context)
       expect(modified).toBe(50) // Capped at max
     })
@@ -214,12 +214,12 @@ describe("Skill Calculator", () => {
         headshot: true,
         isTeamKill: false,
       }
-      
+
       const config: Partial<SkillCalculationConfig> = {
         headshotBonus: 1.5,
         maxSkillChange: 30,
       }
-      
+
       const modified = applyKillModifiers(20, context, config)
       expect(modified).toBe(30) // 20 * 1.5 * 1.5 = 45, capped at 30
     })
@@ -235,7 +235,7 @@ describe("Skill Calculator", () => {
         headshot: false,
         isTeamKill: false,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
       expect(adjustment.killerChange).toBe(16) // Base case
       expect(adjustment.victimChange).toBe(-13) // 80% of killer's gain
@@ -250,7 +250,7 @@ describe("Skill Calculator", () => {
         headshot: false,
         isTeamKill: false,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
       expect(adjustment.killerChange).toBeLessThan(10)
       expect(adjustment.victimChange).toBeGreaterThan(-10)
@@ -265,7 +265,7 @@ describe("Skill Calculator", () => {
         headshot: false,
         isTeamKill: false,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
       expect(adjustment.killerChange).toBeGreaterThan(25)
       expect(adjustment.victimChange).toBeLessThan(-20)
@@ -280,7 +280,7 @@ describe("Skill Calculator", () => {
         headshot: false,
         isTeamKill: false,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
       expect(adjustment.killerChange).toBe(22) // 16 * 1.4
       expect(adjustment.victimChange).toBe(-18) // -22 * 0.8
@@ -295,7 +295,7 @@ describe("Skill Calculator", () => {
         headshot: true,
         isTeamKill: false,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
       expect(adjustment.killerChange).toBe(19) // 16 * 1.2
       expect(adjustment.victimChange).toBe(-15) // -19 * 0.8
@@ -310,7 +310,7 @@ describe("Skill Calculator", () => {
         headshot: false,
         isTeamKill: true,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
       expect(adjustment.killerChange).toBe(-10) // Penalty
       expect(adjustment.victimChange).toBe(2) // Compensation
@@ -325,7 +325,7 @@ describe("Skill Calculator", () => {
         headshot: false,
         isTeamKill: false,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
       expect(adjustment.killerChange).toBe(24) // 48 * 0.5
       expect(adjustment.victimChange).toBe(-19) // -24 * 0.8
@@ -340,7 +340,7 @@ describe("Skill Calculator", () => {
         headshot: false,
         isTeamKill: false,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
       expect(adjustment.killerChange).toBe(50) // Capped
       expect(adjustment.victimChange).toBe(-40) // -50 * 0.8
@@ -355,12 +355,12 @@ describe("Skill Calculator", () => {
         headshot: false,
         isTeamKill: false,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
-      
+
       // Killer shouldn't exceed 3000
       expect(killer.rating + adjustment.killerChange).toBeLessThanOrEqual(3000)
-      
+
       // Victim shouldn't go below 100
       expect(victim.rating + adjustment.victimChange).toBeGreaterThanOrEqual(100)
     })
@@ -370,7 +370,7 @@ describe("Skill Calculator", () => {
     it("should calculate adjustment for equal ratings", () => {
       const winner: SkillRatingInput = { rating: 1500, gamesPlayed: 50 }
       const loser: SkillRatingInput = { rating: 1500, gamesPlayed: 50 }
-      
+
       const adjustment = calculateStandardRatingAdjustment(winner, loser)
       expect(adjustment.winner).toBe(16)
       expect(adjustment.loser).toBe(-13)
@@ -379,7 +379,7 @@ describe("Skill Calculator", () => {
     it("should give smaller adjustment when favorite wins", () => {
       const winner: SkillRatingInput = { rating: 1800, gamesPlayed: 100 }
       const loser: SkillRatingInput = { rating: 1200, gamesPlayed: 50 }
-      
+
       const adjustment = calculateStandardRatingAdjustment(winner, loser)
       expect(adjustment.winner).toBeLessThan(8)
       expect(adjustment.loser).toBeGreaterThan(-7)
@@ -388,7 +388,7 @@ describe("Skill Calculator", () => {
     it("should give larger adjustment when underdog wins", () => {
       const winner: SkillRatingInput = { rating: 1200, gamesPlayed: 50 }
       const loser: SkillRatingInput = { rating: 1800, gamesPlayed: 100 }
-      
+
       const adjustment = calculateStandardRatingAdjustment(winner, loser)
       expect(adjustment.winner).toBeGreaterThan(25)
       expect(adjustment.loser).toBeLessThan(-20)
@@ -397,7 +397,7 @@ describe("Skill Calculator", () => {
     it("should apply experience-based K-factors", () => {
       const newWinner: SkillRatingInput = { rating: 1000, gamesPlayed: 5 }
       const expLoser: SkillRatingInput = { rating: 1000, gamesPlayed: 100 }
-      
+
       const adjustment = calculateStandardRatingAdjustment(newWinner, expLoser)
       expect(adjustment.winner).toBe(24) // 48 * 0.5 for new player
       expect(adjustment.loser).toBe(-19)
@@ -406,12 +406,12 @@ describe("Skill Calculator", () => {
     it("should respect custom configuration", () => {
       const winner: SkillRatingInput = { rating: 1500, gamesPlayed: 50 }
       const loser: SkillRatingInput = { rating: 1500, gamesPlayed: 50 }
-      
+
       const config: Partial<SkillCalculationConfig> = {
         baseKFactor: 40,
         victimLossRatio: 0.5,
       }
-      
+
       const adjustment = calculateStandardRatingAdjustment(winner, loser, config)
       expect(adjustment.winner).toBe(20) // 40 * 0.5
       expect(adjustment.loser).toBe(-10) // -20 * 0.5
@@ -428,7 +428,7 @@ describe("Skill Calculator", () => {
       const config: Partial<SkillCalculationConfig> = {
         suicidePenalty: -10,
       }
-      
+
       const penalty = calculateSuicidePenalty(config)
       expect(penalty).toBe(-10)
     })
@@ -446,7 +446,7 @@ describe("Skill Calculator", () => {
         teamKillPenalty: -15,
         teamKillVictimCompensation: 5,
       }
-      
+
       const penalties = calculateTeamKillPenalty(config)
       expect(penalties.killerChange).toBe(-15)
       expect(penalties.victimChange).toBe(5)
@@ -465,7 +465,7 @@ describe("Skill Calculator", () => {
         baseKFactor: 50,
         victimLossRatio: 0.6,
       }
-      
+
       expect(() => validateSkillConfig(config)).not.toThrow()
     })
 
@@ -474,7 +474,7 @@ describe("Skill Calculator", () => {
         minRating: 2000,
         maxRating: 1000,
       }
-      
+
       expect(() => validateSkillConfig(config)).toThrow("minRating must be less than maxRating")
     })
 
@@ -482,7 +482,7 @@ describe("Skill Calculator", () => {
       const config: Partial<SkillCalculationConfig> = {
         maxSkillChange: -10,
       }
-      
+
       expect(() => validateSkillConfig(config)).toThrow("maxSkillChange must be positive")
     })
 
@@ -490,13 +490,13 @@ describe("Skill Calculator", () => {
       const config1: Partial<SkillCalculationConfig> = {
         victimLossRatio: -0.5,
       }
-      
+
       expect(() => validateSkillConfig(config1)).toThrow("victimLossRatio must be between 0 and 1")
-      
+
       const config2: Partial<SkillCalculationConfig> = {
         victimLossRatio: 1.5,
       }
-      
+
       expect(() => validateSkillConfig(config2)).toThrow("victimLossRatio must be between 0 and 1")
     })
 
@@ -504,7 +504,7 @@ describe("Skill Calculator", () => {
       const config: Partial<SkillCalculationConfig> = {
         headshotBonus: 0.8,
       }
-      
+
       expect(() => validateSkillConfig(config)).toThrow("headshotBonus must be at least 1")
     })
   })
@@ -516,13 +516,13 @@ describe("Skill Calculator", () => {
         { rating: 1500, gamesPlayed: 50 },
         { rating: 2000, gamesPlayed: 50 },
       ]
-      
+
       for (const winner of ratings) {
         for (const loser of ratings) {
           if (winner === loser) continue
-          
+
           const adjustment = calculateStandardRatingAdjustment(winner, loser)
-          
+
           // Total change should be negative due to victimLossRatio < 1
           // or small positive due to rating bounds
           if (adjustment.winner > 0) {
@@ -538,9 +538,9 @@ describe("Skill Calculator", () => {
     it("should be monotonic with respect to rating difference", () => {
       const baseRating = 1500
       const opponent = { rating: baseRating, gamesPlayed: 50 }
-      
+
       let previousGain = Infinity
-      
+
       for (let killerRating = 1000; killerRating <= 2000; killerRating += 100) {
         const killer: SkillRatingInput = { rating: killerRating, gamesPlayed: 50 }
         const context: KillContextInput = {
@@ -549,9 +549,9 @@ describe("Skill Calculator", () => {
           headshot: false,
           isTeamKill: false,
         }
-        
+
         const adjustment = calculateKillSkillAdjustment(killer, opponent, context)
-        
+
         // As killer rating increases, gain should decrease
         expect(adjustment.killerChange).toBeLessThanOrEqual(previousGain)
         previousGain = adjustment.killerChange
@@ -567,9 +567,9 @@ describe("Skill Calculator", () => {
         headshot: true,
         isTeamKill: false,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
-      
+
       expect(Number.isInteger(adjustment.killerChange)).toBe(true)
       expect(Number.isInteger(adjustment.victimChange)).toBe(true)
       expect(Number.isFinite(adjustment.killerChange)).toBe(true)
@@ -587,9 +587,9 @@ describe("Skill Calculator", () => {
         headshot: false,
         isTeamKill: false,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
-      
+
       expect(adjustment.killerChange).toBe(24) // New player multiplier
       expect(adjustment.victimChange).toBe(-19)
     })
@@ -603,9 +603,9 @@ describe("Skill Calculator", () => {
         headshot: true,
         isTeamKill: false,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
-      
+
       expect(adjustment.killerChange).toBe(50) // Should be capped
       expect(adjustment.victimChange).toBe(-40)
     })
@@ -619,9 +619,9 @@ describe("Skill Calculator", () => {
         headshot: false,
         isTeamKill: false,
       }
-      
+
       const adjustment = calculateKillSkillAdjustment(killer, victim, context)
-      
+
       // Should still produce a result, even if negative
       expect(Number.isFinite(adjustment.killerChange)).toBe(true)
       expect(Number.isFinite(adjustment.victimChange)).toBe(true)

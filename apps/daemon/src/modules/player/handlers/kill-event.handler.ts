@@ -47,13 +47,13 @@ export class KillEventHandler extends BasePlayerEventHandler {
       // Get current player stats for both players
       let killerStats: Player
       let victimStats: Player
-      
+
       try {
-        [killerStats, victimStats] = await this.getPlayerStats(killerId, victimId)
+        ;[killerStats, victimStats] = await this.getPlayerStats(killerId, victimId)
       } catch {
         // Handle missing players gracefully - log warning but return success
         this.logger.warn(
-          `Kill event skipped: missing player stats for killer ${killerId} or victim ${victimId}`
+          `Kill event skipped: missing player stats for killer ${killerId} or victim ${victimId}`,
         )
         return this.createSuccessResult()
       }
@@ -94,7 +94,14 @@ export class KillEventHandler extends BasePlayerEventHandler {
       await this.updatePlayerNameStats(killerId, victimId, killEvent.meta, headshot)
 
       // Log skill calculation results
-      this.logSkillCalculation(killerId, victimId, event.serverId, killerStats, victimStats, skillAdjustment)
+      this.logSkillCalculation(
+        killerId,
+        victimId,
+        event.serverId,
+        killerStats,
+        victimStats,
+        skillAdjustment,
+      )
 
       return this.createSuccessResult(2) // Affected both killer and victim
     })
@@ -129,7 +136,7 @@ export class KillEventHandler extends BasePlayerEventHandler {
 
     if (!killerStats || !victimStats) {
       this.logger.warn(
-        `Kill event ignored: missing player stats for killer ${killerId} or victim ${victimId}`
+        `Kill event ignored: missing player stats for killer ${killerId} or victim ${victimId}`,
       )
       throw new Error("Unable to retrieve player stats for skill calculation")
     }
@@ -173,7 +180,11 @@ export class KillEventHandler extends BasePlayerEventHandler {
       gamesPlayed: victimStats.kills + victimStats.deaths,
     }
 
-    return await this.rankingService.calculateSkillAdjustment(killerRating, victimRating, killContext)
+    return await this.rankingService.calculateSkillAdjustment(
+      killerRating,
+      victimRating,
+      killContext,
+    )
   }
 
   /**
@@ -231,8 +242,8 @@ export class KillEventHandler extends BasePlayerEventHandler {
     killerId: number,
     victimId: number,
     serverId: number,
-    killerUpdate: ReturnType<StatUpdateBuilder['build']>,
-    victimUpdate: ReturnType<StatUpdateBuilder['build']>,
+    killerUpdate: ReturnType<StatUpdateBuilder["build"]>,
+    victimUpdate: ReturnType<StatUpdateBuilder["build"]>,
     weapon?: string,
     headshot?: boolean,
   ): Promise<void> {
@@ -280,7 +291,11 @@ export class KillEventHandler extends BasePlayerEventHandler {
       if (meta?.killer?.playerName) {
         const killerNameUpdate = PlayerNameUpdateBuilder.forKill(headshot)
         operations.push(
-          this.repository.upsertPlayerName(killerId, meta.killer.playerName, killerNameUpdate.build())
+          this.repository.upsertPlayerName(
+            killerId,
+            meta.killer.playerName,
+            killerNameUpdate.build(),
+          ),
         )
       }
 
@@ -288,7 +303,11 @@ export class KillEventHandler extends BasePlayerEventHandler {
       if (meta?.victim?.playerName) {
         const victimNameUpdate = PlayerNameUpdateBuilder.forDeath()
         operations.push(
-          this.repository.upsertPlayerName(victimId, meta.victim.playerName, victimNameUpdate.build())
+          this.repository.upsertPlayerName(
+            victimId,
+            meta.victim.playerName,
+            victimNameUpdate.build(),
+          ),
         )
       }
 
@@ -311,9 +330,7 @@ export class KillEventHandler extends BasePlayerEventHandler {
     victimStats: Player,
     skillAdjustment: { killerChange: number; victimChange: number },
   ): void {
-    this.logger.debug(
-      `Kill event: ${killerId} → ${victimId} (weapon: ${skillAdjustment})`,
-    )
+    this.logger.debug(`Kill event: ${killerId} → ${victimId} (weapon: ${skillAdjustment})`)
 
     // Log skill calculation results at INFO level for visibility
     this.logger.info(

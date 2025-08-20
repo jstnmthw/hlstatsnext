@@ -16,11 +16,7 @@ import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 
 export class ChangeNameEventHandler extends BasePlayerEventHandler {
-  constructor(
-    repository: IPlayerRepository,
-    logger: ILogger,
-    matchService?: IMatchService,
-  ) {
+  constructor(repository: IPlayerRepository, logger: ILogger, matchService?: IMatchService) {
     super(repository, logger, matchService)
   }
 
@@ -34,9 +30,7 @@ export class ChangeNameEventHandler extends BasePlayerEventHandler {
       const { playerId, newName, oldName } = changeNameEvent.data
 
       // Update player's last known name
-      const playerUpdate = StatUpdateBuilder.create()
-        .updateLastName(newName)
-        .updateLastEvent()
+      const playerUpdate = StatUpdateBuilder.create().updateLastName(newName).updateLastEvent()
 
       await this.repository.update(playerId, playerUpdate.build())
 
@@ -76,9 +70,7 @@ export class ChangeNameEventHandler extends BasePlayerEventHandler {
    */
   private async updatePlayerNameUsage(playerId: number, newName: string): Promise<void> {
     try {
-      const nameUpdate = PlayerNameUpdateBuilder.create()
-        .addUsage(1)
-        .updateLastUse()
+      const nameUpdate = PlayerNameUpdateBuilder.create().addUsage(1).updateLastUse()
 
       await this.repository.upsertPlayerName(playerId, newName, nameUpdate.build())
     } catch (error) {

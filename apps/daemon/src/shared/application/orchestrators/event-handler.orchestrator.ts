@@ -1,6 +1,6 @@
 /**
  * Event Handler Orchestrator
- * 
+ *
  * Manages the creation of event handlers and module registry setup
  * with proper event type registration.
  */
@@ -29,7 +29,7 @@ export interface EventHandlerCollection {
 
 /**
  * Creates all event handlers and configures module registry
- * 
+ *
  * @param services - Collection of business service instances
  * @param logger - Logger instance
  * @returns Collection of event handlers and configured module registry

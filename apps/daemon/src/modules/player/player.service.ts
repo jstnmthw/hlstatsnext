@@ -31,7 +31,7 @@ export class PlayerService implements IPlayerService {
 
   // Request-level cache for player resolution to prevent race conditions
   private readonly playerResolutionCache = new Map<string, Promise<number>>()
-  
+
   // Event handler factory for delegating to specific handlers
   private readonly eventHandlerFactory: PlayerEventHandlerFactory
 
@@ -236,7 +236,7 @@ export class PlayerService implements IPlayerService {
     try {
       // Use the event handler factory to get the appropriate handler
       const handler = this.eventHandlerFactory.getHandler(event.eventType)
-      
+
       if (!handler) {
         this.logger.debug(`PlayerService: Unhandled event type: ${event.eventType}`)
         return { success: true } // Event not handled by this service
@@ -250,5 +250,4 @@ export class PlayerService implements IPlayerService {
       }
     }
   }
-
 }

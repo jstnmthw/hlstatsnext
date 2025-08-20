@@ -17,11 +17,7 @@ import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 
 export class DamageEventHandler extends BasePlayerEventHandler {
-  constructor(
-    repository: IPlayerRepository,
-    logger: ILogger,
-    matchService?: IMatchService,
-  ) {
+  constructor(repository: IPlayerRepository, logger: ILogger, matchService?: IMatchService) {
     super(repository, logger, matchService)
   }
 
@@ -69,7 +65,7 @@ export class DamageEventHandler extends BasePlayerEventHandler {
   ): Promise<void> {
     try {
       // Handle damage events which use DualPlayerMeta - extract attacker info
-      const attackerMeta = meta && 'killer' in meta ? meta.killer : meta
+      const attackerMeta = meta && "killer" in meta ? meta.killer : meta
       const currentName = attackerMeta?.playerName
       if (currentName) {
         const nameUpdate = PlayerNameUpdateBuilder.forDamage(isHeadshot)

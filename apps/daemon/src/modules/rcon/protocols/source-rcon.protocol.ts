@@ -1,6 +1,6 @@
 /**
  * Source Engine RCON Protocol Implementation
- * 
+ *
  * Implements the Source Engine RCON protocol for games like CS:GO, CS2, TF2, etc.
  * Based on Valve's Source RCON Protocol specification.
  */
@@ -13,7 +13,10 @@ import type { ILogger } from "@/shared/utils/logger.types"
 export class SourceRconProtocol extends BaseRconProtocol {
   private socket: net.Socket | null = null
   private packetId = 1
-  private pendingResponses = new Map<number, { resolve: (value: string) => void; reject: (error: Error) => void }>()
+  private pendingResponses = new Map<
+    number,
+    { resolve: (value: string) => void; reject: (error: Error) => void }
+  >()
 
   constructor(logger: ILogger, timeout?: number) {
     super(logger, timeout)
@@ -38,11 +41,7 @@ export class SourceRconProtocol extends BaseRconProtocol {
         "Connection establishment",
       )
 
-      await this.withTimeout(
-        this.authenticate(password),
-        this.connectionTimeout,
-        "Authentication",
-      )
+      await this.withTimeout(this.authenticate(password), this.connectionTimeout, "Authentication")
 
       this.setConnected(true)
       this.logger.info(`Connected to Source RCON server at ${address}:${port}`)
@@ -137,7 +136,7 @@ export class SourceRconProtocol extends BaseRconProtocol {
   private async authenticate(password: string): Promise<void> {
     const authId = this.getNextPacketId()
     const authPacket = this.createPacket(authId, SourceRconPacketType.SERVERDATA_AUTH, password)
-    
+
     return new Promise((resolve, reject) => {
       this.pendingResponses.set(authId, {
         resolve: (response) => {
@@ -157,7 +156,11 @@ export class SourceRconProtocol extends BaseRconProtocol {
 
   private async sendCommand(command: string): Promise<string> {
     const commandId = this.getNextPacketId()
-    const commandPacket = this.createPacket(commandId, SourceRconPacketType.SERVERDATA_EXECCOMMAND, command)
+    const commandPacket = this.createPacket(
+      commandId,
+      SourceRconPacketType.SERVERDATA_EXECCOMMAND,
+      command,
+    )
 
     return new Promise((resolve, reject) => {
       this.pendingResponses.set(commandId, { resolve, reject })
@@ -168,13 +171,13 @@ export class SourceRconProtocol extends BaseRconProtocol {
   private createPacket(id: number, type: SourceRconPacketType, body: string): Buffer {
     const bodyBuffer = Buffer.from(body, "ascii")
     const size = 4 + 4 + bodyBuffer.length + 2 // id + type + body + 2 null terminators
-    
+
     const packet = Buffer.allocUnsafe(4 + size)
-    packet.writeInt32LE(size, 0)        // Size
-    packet.writeInt32LE(id, 4)          // ID
-    packet.writeInt32LE(type, 8)        // Type
-    bodyBuffer.copy(packet, 12)         // Body
-    packet.writeUInt8(0, 12 + bodyBuffer.length)     // First null terminator
+    packet.writeInt32LE(size, 0) // Size
+    packet.writeInt32LE(id, 4) // ID
+    packet.writeInt32LE(type, 8) // Type
+    bodyBuffer.copy(packet, 12) // Body
+    packet.writeUInt8(0, 12 + bodyBuffer.length) // First null terminator
     packet.writeUInt8(0, 12 + bodyBuffer.length + 1) // Second null terminator
 
     return packet
@@ -207,7 +210,7 @@ export class SourceRconProtocol extends BaseRconProtocol {
 
       const packetData = data.subarray(offset + 4, offset + totalPacketSize)
       this.processPacket(packetData)
-      
+
       offset += totalPacketSize
     }
   }
@@ -237,14 +240,16 @@ export class SourceRconProtocol extends BaseRconProtocol {
       } else if (type === SourceRconPacketType.SERVERDATA_RESPONSE_VALUE) {
         pendingResponse.resolve(body)
       } else {
-        pendingResponse.reject(new RconError("Invalid response type", RconErrorCode.INVALID_RESPONSE))
+        pendingResponse.reject(
+          new RconError("Invalid response type", RconErrorCode.INVALID_RESPONSE),
+        )
       }
     }
   }
 
   private getNextPacketId(): number {
     const id = this.packetId
-    this.packetId = (this.packetId + 1) % 0x7FFFFFFF // Keep within positive int32 range
+    this.packetId = (this.packetId + 1) % 0x7fffffff // Keep within positive int32 range
     return id
   }
 

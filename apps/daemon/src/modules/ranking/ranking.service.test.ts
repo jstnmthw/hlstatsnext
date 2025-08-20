@@ -36,7 +36,6 @@ describe("RankingService", () => {
     })
   })
 
-
   describe("calculateRatingAdjustment", () => {
     it("should calculate rating adjustments for evenly matched players", async () => {
       const winnerRating: SkillRating = {

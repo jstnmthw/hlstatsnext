@@ -316,7 +316,7 @@ describe("PlayerRepository", () => {
     it("should return existing player when one exists", async () => {
       const playerData = {
         lastName: "ExistingPlayer",
-        game: "csgo", 
+        game: "csgo",
         steamId: "76561198000000004",
         skill: 1000,
       }
@@ -346,7 +346,6 @@ describe("PlayerRepository", () => {
       expect(mockDatabase.mockPrisma.playerUniqueId.upsert).toHaveBeenCalled()
     })
 
-
     it("should validate required parameters", async () => {
       const invalidData = {
         lastName: "",
@@ -355,10 +354,9 @@ describe("PlayerRepository", () => {
       }
 
       await expect(playerRepository.upsertPlayer(invalidData)).rejects.toThrow(
-        "lastName, game, and steamId are required"
+        "lastName, game, and steamId are required",
       )
     })
-
   })
 
   describe("update", () => {

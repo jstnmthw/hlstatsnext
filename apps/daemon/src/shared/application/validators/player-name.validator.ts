@@ -151,7 +151,9 @@ export function validatePlayerNameStatsUpdate(updates: PlayerNameStatsUpdate): b
 /**
  * Sanitizes and normalizes a player name stats update object
  */
-export function sanitizePlayerNameStatsUpdate(updates: PlayerNameStatsUpdate): PlayerNameStatsUpdate {
+export function sanitizePlayerNameStatsUpdate(
+  updates: PlayerNameStatsUpdate,
+): PlayerNameStatsUpdate {
   const sanitized: PlayerNameStatsUpdate = {}
 
   // Copy and validate numeric fields
@@ -191,9 +193,11 @@ export function sanitizePlayerName(name: string): string {
     return ""
   }
 
-  return name
-    .trim()
-    // eslint-disable-next-line no-control-regex
-    .replace(/[\x00-\x1f\x7f]/g, "") // Remove control characters
-    .substring(0, 64) // Enforce max length
+  return (
+    name
+      .trim()
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\x00-\x1f\x7f]/g, "") // Remove control characters
+      .substring(0, 64)
+  ) // Enforce max length
 }

@@ -1,6 +1,6 @@
 /**
  * RCON Configuration Factory
- * 
+ *
  * Handles parsing and validation of RCON configuration from environment
  * variables with proper defaults and type safety.
  */
@@ -36,7 +36,7 @@ const RCON_DEFAULTS = {
 
 /**
  * Creates RCON configuration from environment variables with validation
- * 
+ *
  * @returns Validated RCON configuration object
  * @throws Error if environment variables contain invalid values
  */

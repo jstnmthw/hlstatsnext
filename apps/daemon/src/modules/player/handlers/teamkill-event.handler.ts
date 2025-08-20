@@ -17,11 +17,7 @@ import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 
 export class TeamkillEventHandler extends BasePlayerEventHandler {
-  constructor(
-    repository: IPlayerRepository,
-    logger: ILogger,
-    matchService?: IMatchService,
-  ) {
+  constructor(repository: IPlayerRepository, logger: ILogger, matchService?: IMatchService) {
     super(repository, logger, matchService)
   }
 
@@ -35,18 +31,14 @@ export class TeamkillEventHandler extends BasePlayerEventHandler {
       const { killerId, victimId, headshot } = teamkillEvent.data
 
       // Build killer stats update
-      const killerUpdateBuilder = StatUpdateBuilder.create()
-        .addTeamkills(1)
-        .updateLastEvent()
+      const killerUpdateBuilder = StatUpdateBuilder.create().addTeamkills(1).updateLastEvent()
 
       if (headshot) {
         killerUpdateBuilder.addHeadshots(1)
       }
 
       // Build victim stats update
-      const victimUpdateBuilder = StatUpdateBuilder.create()
-        .addDeaths(1)
-        .updateLastEvent()
+      const victimUpdateBuilder = StatUpdateBuilder.create().addDeaths(1).updateLastEvent()
 
       // Get current map and create event log
       const map = await this.getCurrentMap(event.serverId)
@@ -87,10 +79,13 @@ export class TeamkillEventHandler extends BasePlayerEventHandler {
 
       // Update killer name (just mark as used)
       if (meta?.killer?.playerName) {
-        const killerNameUpdate = PlayerNameUpdateBuilder.create()
-          .updateLastUse(now)
+        const killerNameUpdate = PlayerNameUpdateBuilder.create().updateLastUse(now)
         operations.push(
-          this.repository.upsertPlayerName(killerId, meta.killer.playerName, killerNameUpdate.build())
+          this.repository.upsertPlayerName(
+            killerId,
+            meta.killer.playerName,
+            killerNameUpdate.build(),
+          ),
         )
       }
 
@@ -98,7 +93,11 @@ export class TeamkillEventHandler extends BasePlayerEventHandler {
       if (meta?.victim?.playerName) {
         const victimNameUpdate = PlayerNameUpdateBuilder.forDeath()
         operations.push(
-          this.repository.upsertPlayerName(victimId, meta.victim.playerName, victimNameUpdate.build())
+          this.repository.upsertPlayerName(
+            victimId,
+            meta.victim.playerName,
+            victimNameUpdate.build(),
+          ),
         )
       }
 

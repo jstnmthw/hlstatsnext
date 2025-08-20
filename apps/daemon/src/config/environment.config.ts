@@ -13,7 +13,7 @@ export interface EnvironmentConfig {
 export function getEnvironmentConfig(): EnvironmentConfig {
   const nodeEnv = process.env.NODE_ENV ?? "development"
   const isDevelopment = nodeEnv === "development"
-  
+
   return {
     nodeEnv,
     ingressOptions: {

@@ -1,6 +1,6 @@
 /**
  * Status Command Handler
- * 
+ *
  * Implements the "status" RCON command to retrieve server information.
  */
 
@@ -13,8 +13,8 @@ export class StatusCommand extends BaseRconCommand<ServerStatus> {
   }
 
   parse(response: string): ServerStatus {
-    const lines = response.split('\n').map(line => line.trim())
-    
+    const lines = response.split("\n").map((line) => line.trim())
+
     // Initialize with default values
     const status: ServerStatus = {
       map: "unknown",
@@ -60,7 +60,7 @@ export class StatusCommand extends BaseRconCommand<ServerStatus> {
     // "players : 12 (16 max)"
     // "players: 12/16"
     // "# users: 12 max: 16"
-    
+
     const playersMatch = line.match(/players?\s*:\s*(\d+)\s*(?:\((\d+)\s*max\)|\/(\d+))/i)
     if (playersMatch && playersMatch[1]) {
       status.players = parseInt(playersMatch[1], 10)

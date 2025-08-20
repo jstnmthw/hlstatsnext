@@ -1,6 +1,6 @@
 /**
  * Infrastructure Configuration Factory
- * 
+ *
  * Handles creation and configuration of core infrastructure components
  * like database clients and loggers with proper environment setup.
  */
@@ -16,7 +16,7 @@ export interface InfrastructureComponents {
 
 /**
  * Creates core infrastructure components with standardized configuration
- * 
+ *
  * @returns Configured database client and logger instance
  */
 export function createInfrastructureComponents(): InfrastructureComponents {

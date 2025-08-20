@@ -1,12 +1,15 @@
 /**
  * Queue Module Factory
- * 
+ *
  * Handles the creation and configuration of queue infrastructure
  * with proper error handling and fallback behavior.
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
-import { QueueModule, createDevelopmentRabbitMQConfig } from "@/shared/infrastructure/messaging/module"
+import {
+  QueueModule,
+  createDevelopmentRabbitMQConfig,
+} from "@/shared/infrastructure/messaging/module"
 
 export interface QueueModuleResult {
   queueModule?: QueueModule
@@ -16,7 +19,7 @@ export interface QueueModuleResult {
 
 /**
  * Creates queue module with development configuration and error handling
- * 
+ *
  * @param logger - Logger instance for status reporting
  * @returns Result object with queue module or error information
  */
@@ -40,7 +43,7 @@ export function createQueueModule(logger: ILogger): QueueModuleResult {
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    
+
     logger.warn(`Failed to create queue module: ${errorMessage}`)
     logger.warn("Continuing with EventBus only")
 

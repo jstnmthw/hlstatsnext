@@ -21,14 +21,14 @@ describe("CommandResponseHandler", () => {
       // Create buffer: 0xFF 0xFF 0xFF 0xFF 0x6C [response text]
       const responseText = "hostname: Test Server\nplayers: 5 (32 max)"
       const buffer = Buffer.concat([
-        Buffer.from([0xFF, 0xFF, 0xFF, 0xFF, 0x6C]),
-        Buffer.from(responseText)
+        Buffer.from([0xff, 0xff, 0xff, 0xff, 0x6c]),
+        Buffer.from(responseText),
       ])
 
       const result = handler.parseCommandResponse(buffer, "status")
 
-      expect(result.type).toBe('success')
-      if (result.type === 'success') {
+      expect(result.type).toBe("success")
+      if (result.type === "success") {
         expect(result.response).toBe(responseText)
       }
     })
@@ -36,14 +36,14 @@ describe("CommandResponseHandler", () => {
     it("should parse successful response with 'n' type marker", () => {
       const responseText = "Server response"
       const buffer = Buffer.concat([
-        Buffer.from([0xFF, 0xFF, 0xFF, 0xFF, 0x6E]),
-        Buffer.from(responseText)
+        Buffer.from([0xff, 0xff, 0xff, 0xff, 0x6e]),
+        Buffer.from(responseText),
       ])
 
       const result = handler.parseCommandResponse(buffer, "echo test")
 
-      expect(result.type).toBe('success')
-      if (result.type === 'success') {
+      expect(result.type).toBe("success")
+      if (result.type === "success") {
         expect(result.response).toBe(responseText)
       }
     })
@@ -51,14 +51,14 @@ describe("CommandResponseHandler", () => {
     it("should parse response with unknown type marker", () => {
       const responseText = "Some response"
       const buffer = Buffer.concat([
-        Buffer.from([0xFF, 0xFF, 0xFF, 0xFF, 0x99]),
-        Buffer.from(responseText)
+        Buffer.from([0xff, 0xff, 0xff, 0xff, 0x99]),
+        Buffer.from(responseText),
       ])
 
       const result = handler.parseCommandResponse(buffer, "test")
 
-      expect(result.type).toBe('success')
-      if (result.type === 'success') {
+      expect(result.type).toBe("success")
+      if (result.type === "success") {
         // The implementation parses from offset 4 when encountering unknown type
         expect(result.response).toContain(responseText)
         expect(result.response.length).toBeGreaterThan(responseText.length)
@@ -71,11 +71,13 @@ describe("CommandResponseHandler", () => {
 
       const result = handler.parseCommandResponse(buffer, "test")
 
-      expect(result.type).toBe('success')
-      if (result.type === 'success') {
+      expect(result.type).toBe("success")
+      if (result.type === "success") {
         expect(result.response).toBe(responseText)
       }
-      expect(mockLogger.warn).toHaveBeenCalledWith("⚠️ GoldSrc RCON: Non-standard response format detected")
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        "⚠️ GoldSrc RCON: Non-standard response format detected",
+      )
     })
 
     it("should detect 'Bad rcon_password' error", () => {
@@ -84,12 +86,14 @@ describe("CommandResponseHandler", () => {
 
       const result = handler.parseCommandResponse(buffer, "status")
 
-      expect(result.type).toBe('error')
-      if (result.type === 'error') {
+      expect(result.type).toBe("error")
+      if (result.type === "error") {
         expect(result.error.code).toBe(RconErrorCode.AUTH_FAILED)
         expect(result.error.message).toBe("Authentication failed")
       }
-      expect(mockLogger.error).toHaveBeenCalledWith("❌ GoldSrc RCON: Authentication failed - bad password")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        "❌ GoldSrc RCON: Authentication failed - bad password",
+      )
     })
 
     it("should detect 'Bad challenge' error", () => {
@@ -98,12 +102,14 @@ describe("CommandResponseHandler", () => {
 
       const result = handler.parseCommandResponse(buffer, "status")
 
-      expect(result.type).toBe('error')
-      if (result.type === 'error') {
+      expect(result.type).toBe("error")
+      if (result.type === "error") {
         expect(result.error.code).toBe(RconErrorCode.AUTH_FAILED)
         expect(result.error.message).toBe("Bad challenge")
       }
-      expect(mockLogger.error).toHaveBeenCalledWith("❌ GoldSrc RCON: Bad challenge - need to reconnect")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        "❌ GoldSrc RCON: Bad challenge - need to reconnect",
+      )
     })
 
     it("should detect 'Unknown command' error", () => {
@@ -113,8 +119,8 @@ describe("CommandResponseHandler", () => {
 
       const result = handler.parseCommandResponse(buffer, command)
 
-      expect(result.type).toBe('error')
-      if (result.type === 'error') {
+      expect(result.type).toBe("error")
+      if (result.type === "error") {
         expect(result.error.code).toBe(RconErrorCode.COMMAND_FAILED)
         expect(result.error.message).toBe(`Unknown command: ${command}`)
       }
@@ -128,13 +134,13 @@ describe("CommandResponseHandler", () => {
 
       const result = handler.parseCommandResponse(buffer, command)
 
-      expect(result.type).toBe('success')
+      expect(result.type).toBe("success")
       expect(mockLogger.debug).toHaveBeenCalledWith(
         `✅ GoldSrc RCON: Command '${command}' executed successfully`,
-        { 
+        {
           responseLength: responseText.length,
-          responsePreview: responseText
-        }
+          responsePreview: responseText,
+        },
       )
     })
 
@@ -145,13 +151,13 @@ describe("CommandResponseHandler", () => {
 
       const result = handler.parseCommandResponse(buffer, command)
 
-      expect(result.type).toBe('success')
+      expect(result.type).toBe("success")
       expect(mockLogger.debug).toHaveBeenCalledWith(
         `✅ GoldSrc RCON: Command '${command}' executed successfully`,
-        { 
+        {
           responseLength: longResponse.length,
-          responsePreview: longResponse.substring(0, 200)
-        }
+          responsePreview: longResponse.substring(0, 200),
+        },
       )
     })
 
@@ -165,8 +171,8 @@ describe("CommandResponseHandler", () => {
 
       const result = handler.parseCommandResponse(buffer, "test")
 
-      expect(result.type).toBe('error')
-      if (result.type === 'error') {
+      expect(result.type).toBe("error")
+      if (result.type === "error") {
         expect(result.error.code).toBe(RconErrorCode.COMMAND_FAILED)
         expect(result.error.message).toBe("Failed to parse response: Buffer parsing failed")
       }
@@ -176,12 +182,12 @@ describe("CommandResponseHandler", () => {
     })
 
     it("should handle minimal responses with just headers", () => {
-      const buffer = Buffer.from([0xFF, 0xFF, 0xFF, 0xFF, 0x6C])
+      const buffer = Buffer.from([0xff, 0xff, 0xff, 0xff, 0x6c])
 
       const result = handler.parseCommandResponse(buffer, "test")
 
-      expect(result.type).toBe('success')
-      if (result.type === 'success') {
+      expect(result.type).toBe("success")
+      if (result.type === "success") {
         // Buffer is only 5 bytes, so it doesn't have enough data after the 'l' marker
         // The implementation will parse but result in binary characters being displayed as �
         expect(result.response.length).toBeGreaterThan(0)
@@ -194,19 +200,21 @@ describe("CommandResponseHandler", () => {
 
       const result = handler.parseCommandResponse(buffer, "test")
 
-      expect(result.type).toBe('success')
-      if (result.type === 'success') {
+      expect(result.type).toBe("success")
+      if (result.type === "success") {
         expect(result.response).toBe("Test Response")
       }
     })
 
     it("should handle very short buffers", () => {
-      const buffer = Buffer.from([0xFF, 0xFF])
+      const buffer = Buffer.from([0xff, 0xff])
 
       const result = handler.parseCommandResponse(buffer, "test")
 
-      expect(result.type).toBe('success')
-      expect(mockLogger.warn).toHaveBeenCalledWith("⚠️ GoldSrc RCON: Non-standard response format detected")
+      expect(result.type).toBe("success")
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        "⚠️ GoldSrc RCON: Non-standard response format detected",
+      )
     })
 
     it("should handle error patterns case-insensitively", () => {
@@ -215,8 +223,8 @@ describe("CommandResponseHandler", () => {
 
       const result = handler.parseCommandResponse(buffer, "status")
 
-      expect(result.type).toBe('error')
-      if (result.type === 'error') {
+      expect(result.type).toBe("error")
+      if (result.type === "error") {
         expect(result.error.code).toBe(RconErrorCode.AUTH_FAILED)
       }
     })
@@ -224,9 +232,6 @@ describe("CommandResponseHandler", () => {
 
   // Helper function to create standard response buffers
   function createStandardResponseBuffer(text: string): Buffer {
-    return Buffer.concat([
-      Buffer.from([0xFF, 0xFF, 0xFF, 0xFF, 0x6C]),
-      Buffer.from(text)
-    ])
+    return Buffer.concat([Buffer.from([0xff, 0xff, 0xff, 0xff, 0x6c]), Buffer.from(text)])
   }
 })

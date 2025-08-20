@@ -141,7 +141,7 @@ export class ConnectEventHandler extends BasePlayerEventHandler {
   ): Promise<void> {
     try {
       const map = await this.getCurrentMap(serverId)
-      
+
       // Avoid duplicate connect if a connect was just recorded
       const hasRecent = await this.repository.hasRecentConnect?.(serverId, playerId, 120000)
       if (!hasRecent) {

@@ -12,10 +12,10 @@ export class DatabaseConnectionService {
 
   async testConnection(): Promise<boolean> {
     this.logger.connecting("database")
-    
+
     try {
       const isConnected = await this.context.database.testConnection()
-      
+
       if (isConnected) {
         this.logger.connected("database")
         return true

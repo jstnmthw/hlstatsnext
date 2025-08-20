@@ -145,19 +145,19 @@ export class PlayerResolver {
    */
   static getPlayerDescription(playerId: number, meta?: PlayerMeta): string {
     const parts: string[] = [`ID: ${playerId}`]
-    
+
     if (meta?.playerName) {
       parts.push(`Name: "${meta.playerName}"`)
     }
-    
+
     if (meta?.steamId) {
       parts.push(`SteamID: "${meta.steamId}"`)
     }
-    
+
     if (meta?.isBot) {
       parts.push("(Bot)")
     }
-    
+
     return parts.join(", ")
   }
 }

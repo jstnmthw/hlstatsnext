@@ -15,11 +15,7 @@ import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 
 export class EntryEventHandler extends BasePlayerEventHandler {
-  constructor(
-    repository: IPlayerRepository,
-    logger: ILogger,
-    matchService?: IMatchService,
-  ) {
+  constructor(repository: IPlayerRepository, logger: ILogger, matchService?: IMatchService) {
     super(repository, logger, matchService)
   }
 
@@ -40,11 +36,11 @@ export class EntryEventHandler extends BasePlayerEventHandler {
 
       // Log entry event and update player last event
       const operations: Array<Promise<unknown>> = []
-      
+
       operations.push(
         this.repository.createEntryEvent?.(playerId, event.serverId, map) ?? Promise.resolve(),
       )
-      
+
       const playerUpdate = StatUpdateBuilder.create().updateLastEvent()
       operations.push(this.repository.update(playerId, playerUpdate.build()))
 

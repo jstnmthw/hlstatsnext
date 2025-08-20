@@ -18,9 +18,13 @@ describe("FragmentedResponseHandler", () => {
   describe("isFragmentedResponse", () => {
     it("should identify fragmented responses correctly", () => {
       // Fragmented response starts with 0xFE 0xFF 0xFF 0xFF
-      const fragmentedBuffer = Buffer.from([0xFE, 0xFF, 0xFF, 0xFF, 0x01, 0x00, 0x00, 0x00, 0x02, 0x48, 0x65, 0x6C, 0x6C, 0x6F])
-      const nonFragmentedBuffer = Buffer.from([0xFF, 0xFF, 0xFF, 0xFF, 0x6C, 0x48, 0x65, 0x6C, 0x6C, 0x6F])
-      const shortBuffer = Buffer.from([0xFE, 0xFF, 0xFF])
+      const fragmentedBuffer = Buffer.from([
+        0xfe, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x00, 0x02, 0x48, 0x65, 0x6c, 0x6c, 0x6f,
+      ])
+      const nonFragmentedBuffer = Buffer.from([
+        0xff, 0xff, 0xff, 0xff, 0x6c, 0x48, 0x65, 0x6c, 0x6c, 0x6f,
+      ])
+      const shortBuffer = Buffer.from([0xfe, 0xff, 0xff])
 
       expect(handler.isFragmentedResponse(fragmentedBuffer)).toBe(true)
       expect(handler.isFragmentedResponse(nonFragmentedBuffer)).toBe(false)
@@ -34,15 +38,15 @@ describe("FragmentedResponseHandler", () => {
       const packetId = 42
       const fragmentByte = 0x12 // Fragment 1 of 2 (upper nibble = 1, lower nibble = 2)
       const data = Buffer.from("Hello World")
-      
+
       const packetIdBuffer = Buffer.alloc(4)
       packetIdBuffer.writeInt32LE(packetId, 0)
-      
+
       const buffer = Buffer.concat([
-        Buffer.from([0xFE, 0xFF, 0xFF, 0xFF]),
+        Buffer.from([0xfe, 0xff, 0xff, 0xff]),
         packetIdBuffer, // packet ID (little-endian)
         Buffer.from([fragmentByte]),
-        data
+        data,
       ])
 
       const result = handler.parseFragmentInfo(buffer)
@@ -56,7 +60,7 @@ describe("FragmentedResponseHandler", () => {
     })
 
     it("should return null for non-fragmented responses", () => {
-      const buffer = Buffer.from([0xFF, 0xFF, 0xFF, 0xFF, 0x6C, 0x48, 0x65, 0x6C, 0x6C, 0x6F])
+      const buffer = Buffer.from([0xff, 0xff, 0xff, 0xff, 0x6c, 0x48, 0x65, 0x6c, 0x6c, 0x6f])
 
       const result = handler.parseFragmentInfo(buffer)
 
@@ -65,7 +69,7 @@ describe("FragmentedResponseHandler", () => {
 
     it("should handle buffers that are too short", () => {
       // Create buffer that fails the isFragmentedResponse check (too short)
-      const buffer = Buffer.from([0xFE, 0xFF, 0xFF, 0xFF, 0x01, 0x00, 0x00, 0x00]) // Only 8 bytes, needs > 9
+      const buffer = Buffer.from([0xfe, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x00]) // Only 8 bytes, needs > 9
 
       const result = handler.parseFragmentInfo(buffer)
 
@@ -81,8 +85,8 @@ describe("FragmentedResponseHandler", () => {
 
       const result = handler.processFragment(buffer)
 
-      expect(result.type).toBe('complete')
-      if (result.type === 'complete') {
+      expect(result.type).toBe("complete")
+      if (result.type === "complete") {
         expect(result.assembledData.toString()).toBe("Hello World")
       }
     })
@@ -94,25 +98,25 @@ describe("FragmentedResponseHandler", () => {
 
       // Process first fragment
       const result1 = handler.processFragment(fragment1)
-      expect(result1.type).toBe('incomplete')
+      expect(result1.type).toBe("incomplete")
 
       // Process second fragment
       const result2 = handler.processFragment(fragment2)
-      expect(result2.type).toBe('complete')
-      
-      if (result2.type === 'complete') {
+      expect(result2.type).toBe("complete")
+
+      if (result2.type === "complete") {
         expect(result2.assembledData.toString()).toBe("Hello World")
       }
     })
 
     it("should handle invalid fragments", () => {
-      const buffer = Buffer.from([0xFF, 0xFF, 0xFF, 0xFF, 0x6C, 0x48, 0x65, 0x6C, 0x6C, 0x6F])
+      const buffer = Buffer.from([0xff, 0xff, 0xff, 0xff, 0x6c, 0x48, 0x65, 0x6c, 0x6c, 0x6f])
 
       const result = handler.processFragment(buffer)
 
-      expect(result.type).toBe('invalid')
-      if (result.type === 'invalid') {
-        expect(result.reason).toBe('Not a valid fragmented response')
+      expect(result.type).toBe("invalid")
+      if (result.type === "invalid") {
+        expect(result.reason).toBe("Not a valid fragmented response")
       }
     })
 
@@ -122,7 +126,7 @@ describe("FragmentedResponseHandler", () => {
       handler.processFragment(buffer)
 
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        expect.stringContaining("Processing fragment 0/1 of packet 5")
+        expect.stringContaining("Processing fragment 0/1 of packet 5"),
       )
     })
   })
@@ -135,29 +139,34 @@ describe("FragmentedResponseHandler", () => {
 
       // Verify state exists by processing same packet again
       const result1 = handler.processFragment(buffer)
-      expect(result1.type).toBe('incomplete')
+      expect(result1.type).toBe("incomplete")
 
       // Cleanup
       handler.cleanupAll()
 
       // Process same buffer again - should reset state
       const result2 = handler.processFragment(buffer)
-      expect(result2.type).toBe('incomplete')
+      expect(result2.type).toBe("incomplete")
     })
   })
 
   // Helper function to create fragment buffers
-  function createFragmentBuffer(packetId: number, fragmentNum: number, totalFragments: number, data: string): Buffer {
+  function createFragmentBuffer(
+    packetId: number,
+    fragmentNum: number,
+    totalFragments: number,
+    data: string,
+  ): Buffer {
     const fragmentByte = (fragmentNum << 4) | totalFragments
-    
+
     const packetIdBuffer = Buffer.alloc(4)
     packetIdBuffer.writeInt32LE(packetId, 0)
-    
+
     return Buffer.concat([
-      Buffer.from([0xFE, 0xFF, 0xFF, 0xFF]),
+      Buffer.from([0xfe, 0xff, 0xff, 0xff]),
       packetIdBuffer, // packet ID (little-endian)
       Buffer.from([fragmentByte]),
-      Buffer.from(data)
+      Buffer.from(data),
     ])
   }
 })

@@ -14,11 +14,11 @@ class TestStatusParser extends BaseStatusParser {
     const statusLines = this.extractStatusLines(response)
 
     for (const line of statusLines) {
-      if (line.key === 'hostname') {
+      if (line.key === "hostname") {
         status.hostname = line.value
-      } else if (line.key === 'players') {
+      } else if (line.key === "players") {
         status.players = this.parseInt(line.value)
-      } else if (line.key === 'fps') {
+      } else if (line.key === "fps") {
         status.fps = this.parseFloat(line.value)
       }
     }
@@ -72,19 +72,19 @@ players: 15`
 
       expect(result).toHaveLength(3)
       expect(result[0]).toEqual({
-        key: 'hostname',
-        value: 'Test Server',
-        rawLine: 'hostname: Test Server'
+        key: "hostname",
+        value: "Test Server",
+        rawLine: "hostname: Test Server",
       })
       expect(result[1]).toEqual({
-        key: 'map',
-        value: 'de_dust2',
-        rawLine: 'map: de_dust2'
+        key: "map",
+        value: "de_dust2",
+        rawLine: "map: de_dust2",
       })
       expect(result[2]).toEqual({
-        key: 'players',
-        value: '15',
-        rawLine: 'players: 15'
+        key: "players",
+        value: "15",
+        rawLine: "players: 15",
       })
     })
 
@@ -100,7 +100,7 @@ players: 15
       const result = parser.testExtractStatusLines(response)
 
       expect(result).toHaveLength(3)
-      expect(result.map(r => r.key)).toEqual(['hostname', 'map', 'players'])
+      expect(result.map((r) => r.key)).toEqual(["hostname", "map", "players"])
     })
 
     it("should handle lines without colons", () => {
@@ -111,7 +111,7 @@ map: de_dust2`
       const result = parser.testExtractStatusLines(response)
 
       expect(result).toHaveLength(2)
-      expect(result.map(r => r.key)).toEqual(['hostname', 'map'])
+      expect(result.map((r) => r.key)).toEqual(["hostname", "map"])
     })
 
     it("should handle empty response", () => {
@@ -130,9 +130,9 @@ map: de_dust2`
       const result = parser.testParseStatusLine("hostname: Test Server")
 
       expect(result).toEqual({
-        key: 'hostname',
-        value: 'Test Server',
-        rawLine: 'hostname: Test Server'
+        key: "hostname",
+        value: "Test Server",
+        rawLine: "hostname: Test Server",
       })
     })
 
@@ -140,9 +140,9 @@ map: de_dust2`
       const result = parser.testParseStatusLine("description: Server: With: Colons")
 
       expect(result).toEqual({
-        key: 'description',
-        value: 'Server: With: Colons',
-        rawLine: 'description: Server: With: Colons'
+        key: "description",
+        value: "Server: With: Colons",
+        rawLine: "description: Server: With: Colons",
       })
     })
 
@@ -150,16 +150,16 @@ map: de_dust2`
       const result = parser.testParseStatusLine("  hostname  :  Test Server  ")
 
       expect(result).toEqual({
-        key: 'hostname',
-        value: 'Test Server',
-        rawLine: '  hostname  :  Test Server  '
+        key: "hostname",
+        value: "Test Server",
+        rawLine: "  hostname  :  Test Server  ",
       })
     })
 
     it("should convert keys to lowercase", () => {
       const result = parser.testParseStatusLine("HOSTNAME: Test Server")
 
-      expect(result?.key).toBe('hostname')
+      expect(result?.key).toBe("hostname")
     })
 
     it("should return null for lines without colons", () => {
@@ -171,9 +171,9 @@ map: de_dust2`
       const result = parser.testParseStatusLine(": Test Value")
 
       expect(result).toEqual({
-        key: '',
-        value: 'Test Value',
-        rawLine: ': Test Value'
+        key: "",
+        value: "Test Value",
+        rawLine: ": Test Value",
       })
     })
 
@@ -181,9 +181,9 @@ map: de_dust2`
       const result = parser.testParseStatusLine("hostname:")
 
       expect(result).toEqual({
-        key: 'hostname',
-        value: '',
-        rawLine: 'hostname:'
+        key: "hostname",
+        value: "",
+        rawLine: "hostname:",
       })
     })
 
@@ -191,9 +191,9 @@ map: de_dust2`
       const result = parser.testParseStatusLine(":value")
 
       expect(result).toEqual({
-        key: '',
-        value: 'value',
-        rawLine: ':value'
+        key: "",
+        value: "value",
+        rawLine: ":value",
       })
     })
   })
@@ -208,7 +208,7 @@ map: de_dust2`
         maxPlayers: 0,
         uptime: 0,
         fps: 0,
-        timestamp: expect.any(Date)
+        timestamp: expect.any(Date),
       })
     })
 
@@ -299,7 +299,7 @@ map: de_dust2`
         uptime: 3600,
         fps: 100.0,
         version: "1.6",
-        timestamp: new Date()
+        timestamp: new Date(),
       }
 
       parser.testLogParsingResult(status)
@@ -308,7 +308,7 @@ map: de_dust2`
         hostname: "Test Server",
         map: "de_dust2",
         players: "15/32",
-        version: "1.6"
+        version: "1.6",
       })
     })
 
@@ -319,7 +319,7 @@ map: de_dust2`
         maxPlayers: 10,
         uptime: 0,
         fps: 0,
-        timestamp: new Date()
+        timestamp: new Date(),
       }
 
       parser.testLogParsingResult(status)
@@ -328,7 +328,7 @@ map: de_dust2`
         hostname: undefined,
         map: "de_dust2",
         players: "5/10",
-        version: undefined
+        version: undefined,
       })
     })
   })
@@ -348,14 +348,14 @@ fps: 128.5`
         maxPlayers: 0,
         uptime: 0,
         fps: 128.5,
-        timestamp: expect.any(Date)
+        timestamp: expect.any(Date),
       })
 
       expect(mockLogger.debug).toHaveBeenCalledWith("📊 Parsed server status", {
         hostname: "Integration Test Server",
         map: "unknown",
         players: "25/0",
-        version: undefined
+        version: undefined,
       })
     })
   })

@@ -1,6 +1,6 @@
 /**
  * Base RCON Protocol Abstract Class
- * 
+ *
  * Provides common functionality and enforces interface for all RCON protocol implementations.
  */
 
@@ -11,7 +11,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 export abstract class BaseRconProtocol implements IRconProtocol {
   protected isConnectedState = false
   protected connectionTimeout = 5000 // 5 seconds default
-  protected commandTimeout = 3000    // 3 seconds default
+  protected commandTimeout = 3000 // 3 seconds default
 
   constructor(
     protected readonly logger: ILogger,
@@ -38,47 +38,32 @@ export abstract class BaseRconProtocol implements IRconProtocol {
 
   protected validateConnection(): void {
     if (!this.isConnected()) {
-      throw new RconError(
-        "Not connected to server",
-        RconErrorCode.NOT_CONNECTED,
-      )
+      throw new RconError("Not connected to server", RconErrorCode.NOT_CONNECTED)
     }
   }
 
   protected validateAddress(address: string): void {
     if (!address || address.trim() === "") {
-      throw new RconError(
-        "Invalid server address",
-        RconErrorCode.INVALID_CREDENTIALS,
-      )
+      throw new RconError("Invalid server address", RconErrorCode.INVALID_CREDENTIALS)
     }
   }
 
   protected validatePort(port: number): void {
     if (!port || port < 1 || port > 65535) {
-      throw new RconError(
-        "Invalid server port",
-        RconErrorCode.INVALID_CREDENTIALS,
-      )
+      throw new RconError("Invalid server port", RconErrorCode.INVALID_CREDENTIALS)
     }
   }
 
   protected validatePassword(password: string): void {
     if (!password || password.trim() === "") {
-      throw new RconError(
-        "Invalid RCON password",
-        RconErrorCode.INVALID_CREDENTIALS,
-      )
+      throw new RconError("Invalid RCON password", RconErrorCode.INVALID_CREDENTIALS)
     }
   }
 
   protected createTimeoutPromise<T>(timeoutMs: number, operation: string): Promise<T> {
     return new Promise<T>((_, reject) => {
       setTimeout(() => {
-        reject(new RconError(
-          `${operation} timed out after ${timeoutMs}ms`,
-          RconErrorCode.TIMEOUT,
-        ))
+        reject(new RconError(`${operation} timed out after ${timeoutMs}ms`, RconErrorCode.TIMEOUT))
       }, timeoutMs)
     })
   }
@@ -88,9 +73,6 @@ export abstract class BaseRconProtocol implements IRconProtocol {
     timeoutMs: number,
     operation: string,
   ): Promise<T> {
-    return Promise.race([
-      promise,
-      this.createTimeoutPromise<T>(timeoutMs, operation),
-    ])
+    return Promise.race([promise, this.createTimeoutPromise<T>(timeoutMs, operation)])
   }
 }

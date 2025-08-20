@@ -1,6 +1,6 @@
 /**
  * Repository Orchestrator
- * 
+ *
  * Centralizes the instantiation of all repository classes with their
  * required dependencies in a consistent, testable manner.
  */
@@ -26,7 +26,7 @@ export interface RepositoryCollection {
 
 /**
  * Creates all repository instances with standardized dependency injection
- * 
+ *
  * @param database - Database client instance
  * @param logger - Logger instance
  * @returns Collection of all repository instances

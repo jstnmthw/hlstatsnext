@@ -36,14 +36,14 @@ cpu     :  25.5`
         fps: 100.0,
         cpu: 25.5,
         uptime: 0,
-        timestamp: expect.any(Date)
+        timestamp: expect.any(Date),
       })
 
       expect(mockLogger.debug).toHaveBeenCalledWith("📊 Parsed server status", {
         hostname: "[DEV] CS1.6 Test Server",
         map: "de_cbble",
         players: "15/32",
-        version: "48/1.1.2.7/Stdio 10211 secure  (10)"
+        version: "48/1.1.2.7/Stdio 10211 secure  (10)",
       })
     })
 
@@ -61,7 +61,7 @@ cpu     :  25.5`
         fps: 0,
         cpu: undefined,
         version: undefined,
-        timestamp: expect.any(Date)
+        timestamp: expect.any(Date),
       })
     })
 
@@ -112,7 +112,7 @@ cpu     :  25.5`
       const testCases = [
         { input: "fps: 100.0", expected: 100.0 },
         { input: "fps: 66.7 avg", expected: 66.7 },
-        { input: "fps: 100", expected: 100 }
+        { input: "fps: 100", expected: 100 },
       ]
 
       testCases.forEach(({ input, expected }) => {
@@ -125,7 +125,7 @@ cpu     :  25.5`
       const testCases = [
         { input: "cpu: 25.5", expected: 25.5 },
         { input: "cpu: 50.0%", expected: 50.0 },
-        { input: "cpu: 10", expected: 10 }
+        { input: "cpu: 10", expected: 10 },
       ]
 
       testCases.forEach(({ input, expected }) => {
@@ -198,10 +198,10 @@ PLAYERS: 5/32`
         "players: (32 max)",
         "players: 5 active",
         "players: /32",
-        "players: 5/"
+        "players: 5/",
       ]
 
-      testCases.forEach(input => {
+      testCases.forEach((input) => {
         const result = parser.parseStatus(input)
         expect(result.players).toBe(0)
         expect(result.maxPlayers).toBe(0)
@@ -239,7 +239,7 @@ cpu: not a number`
       const testCases = [
         { input: "map: de_dust2_2x2", expected: "de_dust2_2x2" },
         { input: "map: fy_iceworld at: 123 x, 456 y, 789 z", expected: "fy_iceworld" },
-        { input: "map: cs_office", expected: "cs_office" }
+        { input: "map: cs_office", expected: "cs_office" },
       ]
 
       testCases.forEach(({ input, expected }) => {
@@ -267,7 +267,7 @@ cpu: not a number`
         maxPlayers: 0,
         uptime: 0,
         fps: 0,
-        timestamp: expect.any(Date)
+        timestamp: expect.any(Date),
       })
     })
 
@@ -280,7 +280,7 @@ cpu: not a number`
         maxPlayers: 0,
         uptime: 0,
         fps: 0,
-        timestamp: expect.any(Date)
+        timestamp: expect.any(Date),
       })
     })
   })

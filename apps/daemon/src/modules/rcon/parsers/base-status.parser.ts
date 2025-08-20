@@ -1,6 +1,6 @@
 /**
  * Base Status Response Parser
- * 
+ *
  * Abstract base class for parsing server status responses.
  * Follows the project's DDD architecture and extensibility principles.
  */
@@ -32,7 +32,7 @@ export abstract class BaseStatusParser {
    * Extracts key-value pairs from status response lines
    */
   protected extractStatusLines(response: string): StatusLine[] {
-    const lines = response.split('\n')
+    const lines = response.split("\n")
     const statusLines: StatusLine[] = []
 
     for (const line of lines) {
@@ -52,16 +52,16 @@ export abstract class BaseStatusParser {
    * Parses a single status line into key-value pair
    */
   protected parseStatusLine(line: string): StatusLine | null {
-    const colonIndex = line.indexOf(':')
+    const colonIndex = line.indexOf(":")
     if (colonIndex === -1) return null
-    
+
     const key = line.substring(0, colonIndex).trim().toLowerCase()
     const value = line.substring(colonIndex + 1).trim()
-    
+
     return {
       key,
       value,
-      rawLine: line
+      rawLine: line,
     }
   }
 
@@ -103,7 +103,7 @@ export abstract class BaseStatusParser {
       hostname: status.hostname,
       map: status.map,
       players: `${status.players}/${status.maxPlayers}`,
-      version: status.version
+      version: status.version,
     })
   }
 }

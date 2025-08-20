@@ -100,7 +100,9 @@ export class SuicideEventHandler extends BasePlayerEventHandler {
       const map = await this.getCurrentMap(serverId)
       await this.repository.createSuicideEvent?.(playerId, serverId, map, weapon)
     } catch {
-      this.logger.error(`Failed to create suicide event for player ${playerId} on server ${serverId}`)
+      this.logger.error(
+        `Failed to create suicide event for player ${playerId} on server ${serverId}`,
+      )
     }
   }
 

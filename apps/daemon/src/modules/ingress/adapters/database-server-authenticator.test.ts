@@ -25,7 +25,7 @@ describe("DatabaseServerAuthenticator", () => {
     authenticator = new DatabaseServerAuthenticator(
       mockDatabase as unknown as DatabaseClient,
       mockLogger,
-      false
+      false,
     )
   })
 
@@ -64,22 +64,26 @@ describe("DatabaseServerAuthenticator", () => {
 
       expect(result).toBeNull()
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining("Unknown server attempted connection")
+        expect.stringContaining("Unknown server attempted connection"),
       )
     })
   })
 
   describe("Docker Server Authentication", () => {
     it("should authenticate Docker server from Docker network IP", async () => {
-      const mockDockerServers = [{
-        serverId: 2,
-        dockerHost: "hlstatsnext-cstrike",
-        name: "CS 1.6 Docker",
-        game: "cstrike",
-      }]
+      const mockDockerServers = [
+        {
+          serverId: 2,
+          dockerHost: "hlstatsnext-cstrike",
+          name: "CS 1.6 Docker",
+          game: "cstrike",
+        },
+      ]
 
       vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValueOnce(null)
-      vi.mocked(mockDatabase.prisma.server.findMany).mockResolvedValueOnce(mockDockerServers as never)
+      vi.mocked(mockDatabase.prisma.server.findMany).mockResolvedValueOnce(
+        mockDockerServers as never,
+      )
 
       const result = await authenticator.authenticateServer("172.17.0.2", 45678)
 
@@ -96,13 +100,7 @@ describe("DatabaseServerAuthenticator", () => {
     })
 
     it("should detect Docker network IPs correctly", async () => {
-      const dockerIPs = [
-        "172.17.0.2",
-        "172.18.0.5", 
-        "172.31.255.255",
-        "10.0.0.1",
-        "10.255.255.255",
-      ]
+      const dockerIPs = ["172.17.0.2", "172.18.0.5", "172.31.255.255", "10.0.0.1", "10.255.255.255"]
 
       const nonDockerIPs = [
         "192.168.1.1",
@@ -120,7 +118,7 @@ describe("DatabaseServerAuthenticator", () => {
 
         expect(mockDatabase.prisma.server.findMany).toHaveBeenCalled()
         expect(mockLogger.info).toHaveBeenCalledWith(
-          expect.stringContaining("Docker network detected")
+          expect.stringContaining("Docker network detected"),
         )
       }
 
@@ -130,7 +128,7 @@ describe("DatabaseServerAuthenticator", () => {
       authenticator = new DatabaseServerAuthenticator(
         mockDatabase as unknown as DatabaseClient,
         mockLogger,
-        false
+        false,
       )
 
       for (const ip of nonDockerIPs) {
@@ -148,7 +146,7 @@ describe("DatabaseServerAuthenticator", () => {
       authenticator = new DatabaseServerAuthenticator(
         mockDatabase as unknown as DatabaseClient,
         mockLogger,
-        true // skipAuth = true
+        true, // skipAuth = true
       )
 
       const result = await authenticator.authenticateServer("192.168.1.1", 12345)
@@ -164,7 +162,7 @@ describe("DatabaseServerAuthenticator", () => {
 
       expect(result).toBeNull()
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining("Invalid server credentials")
+        expect.stringContaining("Invalid server credentials"),
       )
     })
 
@@ -173,20 +171,20 @@ describe("DatabaseServerAuthenticator", () => {
 
       expect(result).toBeNull()
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining("Invalid server credentials")
+        expect.stringContaining("Invalid server credentials"),
       )
     })
 
     it("should handle database errors gracefully", async () => {
       vi.mocked(mockDatabase.prisma.server.findFirst).mockRejectedValueOnce(
-        new Error("Database connection failed")
+        new Error("Database connection failed"),
       )
 
       const result = await authenticator.authenticateServer("192.168.1.1", 27015)
 
       expect(result).toBeNull()
       expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("Database error during server authentication")
+        expect.stringContaining("Database error during server authentication"),
       )
     })
   })
@@ -196,20 +194,22 @@ describe("DatabaseServerAuthenticator", () => {
       await authenticator.cacheServer("192.168.1.100", 27015, 123)
 
       const result = await authenticator.authenticateServer("192.168.1.100", 27015)
-      
+
       expect(result).toBe(123)
       expect(mockDatabase.prisma.server.findFirst).not.toHaveBeenCalled()
     })
 
     it("should clear cache on clearCache()", async () => {
       await authenticator.cacheServer("192.168.1.100", 27015, 123)
-      
+
       authenticator.clearCache()
 
-      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValueOnce({ serverId: 456 } as never)
-      
+      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValueOnce({
+        serverId: 456,
+      } as never)
+
       const result = await authenticator.authenticateServer("192.168.1.100", 27015)
-      
+
       expect(result).toBe(456)
       expect(mockDatabase.prisma.server.findFirst).toHaveBeenCalled()
     })

@@ -106,7 +106,7 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
         this.logWithRateLimit(
           `docker-detection-${address}:${port}`,
           `Docker network detected for ${address}:${port}, attempting Docker server lookup`,
-          'info'
+          "info",
         )
 
         // For Docker servers, we need a more intelligent matching strategy
@@ -134,7 +134,7 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
             this.logWithRateLimit(
               `docker-auth-${address}:${port}`,
               `Authenticated Docker server from ${address}:${port} as ID ${dockerServer.serverId} (${dockerServer.name})`,
-              'info'
+              "info",
             )
           }
         } else {
@@ -147,14 +147,14 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
         this.logWithRateLimit(
           `auth-success-${serverKey}`,
           `Authenticated server ${serverKey} as ID ${server.serverId}`,
-          'info'
+          "info",
         )
         return { kind: "authenticated", serverId: server.serverId }
       } else {
         this.logWithRateLimit(
           `auth-reject-${serverKey}`,
           `Unknown server attempted connection: ${serverKey}`,
-          'warn'
+          "warn",
         )
         return { kind: "unauthorized" }
       }
@@ -182,7 +182,11 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
    * Log message with rate limiting to prevent spam
    * Only logs the first occurrence and subsequent occurrences after cooldown period
    */
-  private logWithRateLimit(messageKey: string, message: string, level: 'info' | 'warn' | 'debug' = 'info'): void {
+  private logWithRateLimit(
+    messageKey: string,
+    message: string,
+    level: "info" | "warn" | "debug" = "info",
+  ): void {
     const now = Date.now()
     const lastLogTime = this.loggedMessages.get(messageKey)
 

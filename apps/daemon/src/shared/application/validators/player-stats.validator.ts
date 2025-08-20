@@ -164,7 +164,7 @@ export function sanitizePlayerStatsUpdate(updates: PlayerStatsUpdate): PlayerSta
   // Copy and validate numeric fields
   const numericFields = [
     "kills",
-    "deaths", 
+    "deaths",
     "suicides",
     "teamkills",
     "headshots",

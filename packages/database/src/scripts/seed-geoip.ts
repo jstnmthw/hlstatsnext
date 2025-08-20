@@ -190,18 +190,21 @@ async function shouldDownloadFile(
   headers: Record<string, string> = {},
 ): Promise<{ shouldDownload: boolean; cachedFilePath?: string }> {
   const metadata = await loadCacheMetadata()
-  
+
   // If no cache or different edition, download
   if (!metadata || metadata.edition !== edition) {
     return { shouldDownload: true }
   }
-  
+
   // Check if cached file still exists
-  const cachedExists = await fs.promises.access(metadata.filePath).then(() => true).catch(() => false)
+  const cachedExists = await fs.promises
+    .access(metadata.filePath)
+    .then(() => true)
+    .catch(() => false)
   if (!cachedExists) {
     return { shouldDownload: true }
   }
-  
+
   // Check remote file modification time
   const remoteLastModified = await checkRemoteFileModified(url, headers)
   if (!remoteLastModified) {
@@ -209,13 +212,13 @@ async function shouldDownloadFile(
     console.log("Using cached file (unable to check remote modification time)")
     return { shouldDownload: false, cachedFilePath: metadata.filePath }
   }
-  
+
   // Compare modification times
   if (metadata.lastModified && metadata.lastModified === remoteLastModified) {
     console.log("Using cached file (up to date)")
     return { shouldDownload: false, cachedFilePath: metadata.filePath }
   }
-  
+
   console.log("Remote file has been updated, downloading new version")
   return { shouldDownload: true }
 }
@@ -226,20 +229,24 @@ async function downloadWithCache(
   headers: Record<string, string> = {},
 ): Promise<string> {
   await ensureCacheDir()
-  
+
   const cachedFilePath = path.join(GEOIP_CACHE_DIR, `${edition}.zip`)
-  const { shouldDownload, cachedFilePath: existingFile } = await shouldDownloadFile(url, edition, headers)
-  
+  const { shouldDownload, cachedFilePath: existingFile } = await shouldDownloadFile(
+    url,
+    edition,
+    headers,
+  )
+
   if (!shouldDownload && existingFile) {
     return existingFile
   }
-  
+
   console.log(`Downloading ${edition} from MaxMind...`)
   await download(url, cachedFilePath, headers)
-  
+
   // Get the last-modified header after successful download
   const remoteLastModified = await checkRemoteFileModified(url, headers)
-  
+
   // Save metadata
   const metadata: CacheMetadata = {
     lastModified: remoteLastModified || undefined,
@@ -248,7 +255,7 @@ async function downloadWithCache(
     edition,
   }
   await saveCacheMetadata(metadata)
-  
+
   return cachedFilePath
 }
 
@@ -328,7 +335,7 @@ async function seedGeoLite(): Promise<void> {
 
   const basic = Buffer.from(`${accountId}:${licenseKey}`).toString("base64")
   const archivePath = await downloadWithCache(url, EDITION, { Authorization: `Basic ${basic}` })
-  
+
   const tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "geolite2-extract-"))
 
   console.log("Extracting archive...")

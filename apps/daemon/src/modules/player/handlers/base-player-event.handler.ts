@@ -56,7 +56,10 @@ export abstract class BasePlayerEventHandler {
   /**
    * Safely handle async operations with error logging
    */
-  protected async safeHandle(event: PlayerEvent, operation: () => Promise<HandlerResult>): Promise<HandlerResult> {
+  protected async safeHandle(
+    event: PlayerEvent,
+    operation: () => Promise<HandlerResult>,
+  ): Promise<HandlerResult> {
     try {
       return await operation()
     } catch (error) {

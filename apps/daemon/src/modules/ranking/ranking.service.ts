@@ -54,7 +54,6 @@ export class RankingService implements IRankingService {
     private readonly weaponRepository: IWeaponRepository,
   ) {}
 
-
   /**
    * Calculate skill rating adjustment for a kill event
    *
@@ -118,7 +117,6 @@ export class RankingService implements IRankingService {
   calculateSuicidePenalty(): number {
     return calculateSuicidePenaltyPure(this.skillConfig)
   }
-
 
   /**
    * Get weapon multiplier for skill calculations

@@ -208,33 +208,69 @@ export class StatUpdateBuilder {
    */
   buildAsStatsUpdate(): PlayerStatsUpdate {
     const statsUpdate: PlayerStatsUpdate = {}
-    
+
     // Map increment operations to simple numbers for validation
-    if (this.updates.kills && typeof this.updates.kills === "object" && "increment" in this.updates.kills) {
+    if (
+      this.updates.kills &&
+      typeof this.updates.kills === "object" &&
+      "increment" in this.updates.kills
+    ) {
       statsUpdate.kills = (this.updates.kills as { increment: number }).increment
     }
-    if (this.updates.deaths && typeof this.updates.deaths === "object" && "increment" in this.updates.deaths) {
+    if (
+      this.updates.deaths &&
+      typeof this.updates.deaths === "object" &&
+      "increment" in this.updates.deaths
+    ) {
       statsUpdate.deaths = (this.updates.deaths as { increment: number }).increment
     }
-    if (this.updates.suicides && typeof this.updates.suicides === "object" && "increment" in this.updates.suicides) {
+    if (
+      this.updates.suicides &&
+      typeof this.updates.suicides === "object" &&
+      "increment" in this.updates.suicides
+    ) {
       statsUpdate.suicides = (this.updates.suicides as { increment: number }).increment
     }
-    if (this.updates.teamkills && typeof this.updates.teamkills === "object" && "increment" in this.updates.teamkills) {
+    if (
+      this.updates.teamkills &&
+      typeof this.updates.teamkills === "object" &&
+      "increment" in this.updates.teamkills
+    ) {
       statsUpdate.teamkills = (this.updates.teamkills as { increment: number }).increment
     }
-    if (this.updates.skill && typeof this.updates.skill === "object" && "increment" in this.updates.skill) {
+    if (
+      this.updates.skill &&
+      typeof this.updates.skill === "object" &&
+      "increment" in this.updates.skill
+    ) {
       statsUpdate.skill = (this.updates.skill as { increment: number }).increment
     }
-    if (this.updates.shots && typeof this.updates.shots === "object" && "increment" in this.updates.shots) {
+    if (
+      this.updates.shots &&
+      typeof this.updates.shots === "object" &&
+      "increment" in this.updates.shots
+    ) {
       statsUpdate.shots = (this.updates.shots as { increment: number }).increment
     }
-    if (this.updates.hits && typeof this.updates.hits === "object" && "increment" in this.updates.hits) {
+    if (
+      this.updates.hits &&
+      typeof this.updates.hits === "object" &&
+      "increment" in this.updates.hits
+    ) {
       statsUpdate.hits = (this.updates.hits as { increment: number }).increment
     }
-    if (this.updates.headshots && typeof this.updates.headshots === "object" && "increment" in this.updates.headshots) {
+    if (
+      this.updates.headshots &&
+      typeof this.updates.headshots === "object" &&
+      "increment" in this.updates.headshots
+    ) {
       statsUpdate.headshots = (this.updates.headshots as { increment: number }).increment
     }
-    if (this.updates.connectionTime && typeof this.updates.connectionTime === "object" && "increment" in this.updates.connectionTime) {
+    if (
+      this.updates.connectionTime &&
+      typeof this.updates.connectionTime === "object" &&
+      "increment" in this.updates.connectionTime
+    ) {
       statsUpdate.connectionTime = (this.updates.connectionTime as { increment: number }).increment
     }
 
@@ -254,7 +290,7 @@ export class StatUpdateBuilder {
 
     // Validate the stats update
     validatePlayerStatsUpdate(statsUpdate)
-    
+
     return sanitizePlayerStatsUpdate(statsUpdate)
   }
 

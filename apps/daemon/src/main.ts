@@ -1,16 +1,16 @@
 /**
  * @fileoverview HLStatsNext Daemon - Main Application Entry Point
- * 
+ *
  * This module contains the main daemon class that orchestrates the entire HLStatsNext
  * statistics collection system. It manages service lifecycle, handles graceful shutdown,
  * and coordinates data flow between game servers and the statistics database.
- * 
+ *
  * The daemon is responsible for:
  * - Receiving UDP packets from Half-Life game servers
  * - Processing game events and statistics
  * - Managing RCON connections for server monitoring
  * - Publishing events to message queues for processing
- * 
+ *
  * @author HLStatsNext Team
  * @since 1.0.0
  * @version 1.0.0
@@ -30,49 +30,49 @@ import { DatabaseConnectionService } from "@/database/connection.service"
 
 /**
  * Main daemon class for the HLStatsNext statistics collection system.
- * 
+ *
  * This class orchestrates all components of the daemon including:
  * - Database connectivity management
  * - RCON monitoring for game servers
  * - UDP ingress service for receiving game events
  * - Event publishing to message queues
- * 
+ *
  * The daemon follows a clean architecture pattern with dependency injection
  * and proper separation of concerns for maintainability and testability.
- * 
+ *
  * @example
  * ```typescript
  * const daemon = new HLStatsDaemon();
  * await daemon.start();
- * 
+ *
  * // Graceful shutdown
  * await daemon.stop();
  * ```
- * 
+ *
  * @public
  */
 export class HLStatsDaemon {
   /** Application context containing all injected dependencies */
   private context: AppContext
-  
+
   /** Structured logger instance for daemon operations */
   private logger: ILogger
-  
+
   /** RCON monitoring service for server status checks */
   private rconMonitor: RconMonitorService
-  
+
   /** Database connection management service */
   private databaseConnection: DatabaseConnectionService
 
   /**
    * Creates a new HLStatsDaemon instance.
-   * 
+   *
    * Initializes all required services and dependencies based on environment
    * configuration. The constructor handles:
    * - Environment configuration parsing
    * - Application context creation with dependency injection
    * - Service instantiation (RCON monitor, database connection)
-   * 
+   *
    * @throws {Error} When environment configuration is invalid
    * @throws {Error} When required services cannot be initialized
    */
@@ -89,21 +89,21 @@ export class HLStatsDaemon {
 
   /**
    * Starts the HLStatsNext daemon and all its services.
-   * 
+   *
    * This method performs the complete startup sequence:
    * 1. Tests database connectivity
    * 2. Initializes message queue infrastructure
    * 3. Starts all core services (ingress, RCON monitoring)
    * 4. Signals ready state
-   * 
+   *
    * The startup process is designed to fail fast if any critical component
    * cannot be initialized, ensuring the daemon only runs in a healthy state.
-   * 
+   *
    * @returns Promise that resolves when all services are started successfully
    * @throws {Error} When database connection fails
    * @throws {Error} When queue infrastructure initialization fails
    * @throws {Error} When service startup fails
-   * 
+   *
    * @example
    * ```typescript
    * const daemon = new HLStatsDaemon();
@@ -141,14 +141,14 @@ export class HLStatsDaemon {
 
   /**
    * Starts all daemon services in the correct order.
-   * 
+   *
    * This private method handles the orchestrated startup of:
    * - Ingress service (UDP packet reception)
    * - RCON monitoring service (server status checks)
-   * 
+   *
    * Services are started with proper dependency ordering to ensure
    * the system comes online in a stable state.
-   * 
+   *
    * @private
    * @returns Promise that resolves when all services are started
    */
@@ -160,18 +160,18 @@ export class HLStatsDaemon {
 
   /**
    * Gracefully shuts down the daemon and all its services.
-   * 
+   *
    * This method performs a clean shutdown sequence:
    * 1. Stops RCON monitoring
    * 2. Stops ingress service and disconnects RCON connections
    * 3. Shuts down message queue infrastructure
    * 4. Closes database connections
-   * 
+   *
    * The shutdown process is designed to be graceful, allowing ongoing
    * operations to complete where possible while preventing new work.
-   * 
+   *
    * @returns Promise that resolves when shutdown is complete
-   * 
+   *
    * @example
    * ```typescript
    * // Graceful shutdown on SIGTERM
@@ -205,16 +205,16 @@ export class HLStatsDaemon {
 
   /**
    * Publishes game events to the message queue system.
-   * 
+   *
    * This method takes an array of game events and publishes each one
    * individually to the configured event publisher. Events are processed
    * sequentially to maintain order and ensure reliable delivery.
-   * 
+   *
    * @param events - Array of game events to publish
    * @returns Promise that resolves when all events are published
    * @throws {Error} When event publisher is not initialized
    * @throws {Error} When event publishing fails
-   * 
+   *
    * @example
    * ```typescript
    * const events = [
@@ -240,13 +240,13 @@ export class HLStatsDaemon {
 
   /**
    * Retrieves the application context for testing or advanced usage.
-   * 
+   *
    * This method provides access to the internal application context,
    * primarily used for testing scenarios where direct access to
    * services and dependencies is required.
-   * 
+   *
    * @returns The application context containing all service dependencies
-   * 
+   *
    * @example
    * ```typescript
    * const daemon = new HLStatsDaemon();
@@ -261,15 +261,15 @@ export class HLStatsDaemon {
 
 /**
  * Creates a signal handler function for graceful daemon shutdown.
- * 
+ *
  * This factory function creates a signal handler that performs a graceful
  * shutdown of the daemon when system signals (SIGINT, SIGTERM) are received.
  * The handler logs the signal receipt and ensures clean shutdown.
- * 
+ *
  * @param daemon - The daemon instance to shut down
  * @param signal - The signal name for logging purposes
  * @returns An async function that handles the shutdown process
- * 
+ *
  * @example
  * ```typescript
  * const daemon = new HLStatsDaemon();
@@ -287,16 +287,16 @@ function createSignalHandler(daemon: HLStatsDaemon, signal: string) {
 
 /**
  * Main entry point function for the HLStatsNext daemon.
- * 
+ *
  * This function initializes the daemon, sets up signal handlers for
  * graceful shutdown, and starts the main service loop. It handles:
  * - Daemon instantiation
  * - Signal handler registration (SIGINT, SIGTERM)
  * - Startup error handling with appropriate exit codes
- * 
+ *
  * The function implements the standard Node.js daemon pattern with
  * proper signal handling and error reporting.
- * 
+ *
  * @example
  * ```typescript
  * // Called automatically when module is executed
@@ -317,7 +317,7 @@ function main() {
 
 /**
  * Conditional execution guard for testing compatibility.
- * 
+ *
  * This conditional check prevents the main() function from executing
  * when the module is imported during testing (when VITEST is defined).
  * This pattern allows the module to be imported for testing without

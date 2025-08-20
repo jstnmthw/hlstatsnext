@@ -282,7 +282,7 @@ describe("ServerService", () => {
           lastEvent: new Date(),
         },
       ]
-      
+
       mockRepository.findActiveServersWithRcon.mockResolvedValue(mockActiveServers)
 
       const result = await serverService.findActiveServersWithRcon()

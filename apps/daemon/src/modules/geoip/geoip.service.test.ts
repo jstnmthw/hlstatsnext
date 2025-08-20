@@ -38,10 +38,7 @@ describe("GeoIPService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    service = new GeoIPService(
-      mockDb as unknown as DatabaseClient,
-      mockLogger,
-    )
+    service = new GeoIPService(mockDb as unknown as DatabaseClient, mockLogger)
   })
 
   it("returns null for invalid IPs", async () => {

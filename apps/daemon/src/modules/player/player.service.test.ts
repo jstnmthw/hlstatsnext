@@ -454,9 +454,14 @@ describe("PlayerService", () => {
         hasRconCredentials: vi.fn().mockResolvedValue(false),
         findActiveServersWithRcon: vi.fn().mockResolvedValue([]),
       }
-      
+
       // Create PlayerService without MatchService
-      const playerServiceNoMatch = new PlayerService(mockRepository, mockLogger, mockRankingService, localMockServerRepository)
+      const playerServiceNoMatch = new PlayerService(
+        mockRepository,
+        mockLogger,
+        mockRankingService,
+        localMockServerRepository,
+      )
 
       const killerStats = {
         playerId: 1,
@@ -734,7 +739,7 @@ describe("PlayerService", () => {
       // Mock bot resolution
       vi.spyOn(mockRepository, "findByUniqueId").mockResolvedValue({ playerId: 123 } as Player)
       const repoSpy = vi.spyOn(mockRepository, "createDisconnectEvent").mockResolvedValue()
-      
+
       const result = await playerService.handlePlayerEvent(disconnectEvent)
       expect(result.success).toBe(true)
       expect(mockRepository.findByUniqueId).toHaveBeenCalledWith("BOT_TestBot", "cstrike")
@@ -801,9 +806,10 @@ describe("PlayerService", () => {
       const steamId = "76561198000123456"
       const playerName = "UpsertPlayer"
       const game = "csgo"
-      
+
       // Mock the upsert method to return a player
-      const upsertSpy = vi.spyOn(mockRepository, "upsertPlayer")
+      const upsertSpy = vi
+        .spyOn(mockRepository, "upsertPlayer")
         .mockResolvedValue({ playerId: 42 } as Player)
 
       const result = await playerService.getOrCreatePlayer(steamId, playerName, game)
@@ -822,13 +828,12 @@ describe("PlayerService", () => {
       const steamId = "76561198000987654"
       const playerName = "CachedPlayer"
       const game = "csgo"
-      
+
       // Mock the upsert method to return a player with some delay
-      const upsertSpy = vi.spyOn(mockRepository, "upsertPlayer")
-        .mockImplementation(() => 
-          new Promise(resolve => 
-            setTimeout(() => resolve({ playerId: 99 } as Player), 50)
-          )
+      const upsertSpy = vi
+        .spyOn(mockRepository, "upsertPlayer")
+        .mockImplementation(
+          () => new Promise((resolve) => setTimeout(() => resolve({ playerId: 99 } as Player), 50)),
         )
 
       // Make multiple concurrent calls
@@ -842,7 +847,7 @@ describe("PlayerService", () => {
       expect(result1).toBe(99)
       expect(result2).toBe(99)
       expect(result3).toBe(99)
-      
+
       // But upsert should only be called once due to caching
       expect(upsertSpy).toHaveBeenCalledTimes(1)
     })

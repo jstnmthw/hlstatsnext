@@ -77,7 +77,7 @@ export class ServerRepository implements IServerRepository {
         where: { serverId },
         select: { rconPassword: true },
       })
-      
+
       return server?.rconPassword !== null && server?.rconPassword !== ""
     } catch (error) {
       this.logger.error(`Failed to check RCON credentials for server ${serverId}: ${error}`)
@@ -88,11 +88,11 @@ export class ServerRepository implements IServerRepository {
   async findActiveServersWithRcon(maxAgeMinutes?: number): Promise<ServerInfo[]> {
     try {
       // Use provided value, environment variable, or default to 60 minutes
-      const effectiveMaxAge = maxAgeMinutes ?? 
-        parseInt(process.env.RCON_ACTIVE_SERVER_MAX_AGE_MINUTES || "60", 10)
-      
+      const effectiveMaxAge =
+        maxAgeMinutes ?? parseInt(process.env.RCON_ACTIVE_SERVER_MAX_AGE_MINUTES || "60", 10)
+
       const maxAgeDate = new Date(Date.now() - effectiveMaxAge * 60 * 1000)
-      
+
       const servers = await this.database.prisma.server.findMany({
         where: {
           AND: [
@@ -121,7 +121,7 @@ export class ServerRepository implements IServerRepository {
         },
       })
 
-      return servers.map(server => ({
+      return servers.map((server) => ({
         serverId: server.serverId,
         game: server.game,
         name: server.name,
@@ -130,9 +130,11 @@ export class ServerRepository implements IServerRepository {
         lastEvent: server.lastEvent || undefined,
       }))
     } catch (error) {
-      const effectiveMaxAge = maxAgeMinutes ?? 
-        parseInt(process.env.RCON_ACTIVE_SERVER_MAX_AGE_MINUTES || "60", 10)
-      this.logger.error(`Failed to find active servers with RCON (maxAge: ${effectiveMaxAge}min): ${error}`)
+      const effectiveMaxAge =
+        maxAgeMinutes ?? parseInt(process.env.RCON_ACTIVE_SERVER_MAX_AGE_MINUTES || "60", 10)
+      this.logger.error(
+        `Failed to find active servers with RCON (maxAge: ${effectiveMaxAge}min): ${error}`,
+      )
       return []
     }
   }

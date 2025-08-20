@@ -1,6 +1,6 @@
 /**
  * Business Service Orchestrator
- * 
+ *
  * Handles the creation and dependency wiring of all business services
  * with proper dependency order resolution.
  */
@@ -42,10 +42,10 @@ export interface BusinessServiceCollection {
 
 /**
  * Creates all business services with proper dependency wiring
- * 
+ *
  * Services are created in dependency order to ensure all dependencies
  * are available when needed.
- * 
+ *
  * @param repositories - Collection of repository instances
  * @param database - Database client instance
  * @param logger - Logger instance

@@ -9,6 +9,7 @@ HLStatsNext supports both Docker-hosted game servers and external servers throug
 ## Problem Solved
 
 When running game servers in Docker, the UDP source port changes on every container restart due to Docker's NAT, causing:
+
 - Duplicate server records in the database
 - Failed RCON connections (wrong port)
 - Inconsistent server identification
@@ -20,7 +21,7 @@ When running game servers in Docker, the UDP source port changes on every contai
 All Docker services use static IPs within the custom bridge network (10.5.0.0/16):
 
 - **Database**: 10.5.0.5
-- **RabbitMQ**: 10.5.0.6  
+- **RabbitMQ**: 10.5.0.6
 - **Daemon**: 10.5.0.10
 - **CS 1.6 Server**: 10.5.0.20
 - **TFC Server**: 10.5.0.21
@@ -40,12 +41,14 @@ ALTER TABLE servers ADD COLUMN docker_host VARCHAR(255) DEFAULT NULL;
 ### 3. Server Types
 
 #### Docker Servers
+
 - Pre-configured with `connection_type = 'docker'`
 - Use `docker_host` field for RCON connections (e.g., "10.5.0.20" or "hlstatsnext-cstrike")
 - RCON connects to standard game port (27015), not ephemeral UDP source port
 - Identified by Docker network subnet (10.5.0.0/16)
 
 #### External Servers
+
 - Use `connection_type = 'external'` (default)
 - Standard IP:port authentication
 - RCON uses stored `address` and `port` fields
@@ -66,7 +69,7 @@ mysql -u root -p hlstatsnext < packages/database/migrations/001_add_docker_suppo
 INSERT INTO servers (name, address, port, game, rcon_password, connection_type, docker_host)
 VALUES ('CS 1.6 Docker', '172.30.160.1', 56789, 'cstrike', 'changeme123', 'docker', '10.5.0.20');
 
--- Example: Configure TFC Docker server  
+-- Example: Configure TFC Docker server
 INSERT INTO servers (name, address, port, game, rcon_password, connection_type, docker_host)
 VALUES ('TFC Docker', '172.30.160.1', 56789, 'tfc', 'changeme456', 'docker', '10.5.0.21');
 ```
@@ -119,23 +122,25 @@ make up
 1. Choose a static IP in the 10.5.0.0/16 range (e.g., 10.5.0.22)
 
 2. Add to docker-compose.yml:
+
 ```yaml
-  newserver:
-    image: gameservermanagers/gameserver:css
-    container_name: hlstatsnext-css
-    hostname: hlstatsnext-css
-    networks:
-      default:
-        ipv4_address: 10.5.0.22
-    environment:
-      - DAEMON_HOST=10.5.0.10
-      - DAEMON_PORT=27500
-    ports:
-      - "27017:27015/udp"
-      - "27017:27015/tcp"
+newserver:
+  image: gameservermanagers/gameserver:css
+  container_name: hlstatsnext-css
+  hostname: hlstatsnext-css
+  networks:
+    default:
+      ipv4_address: 10.5.0.22
+  environment:
+    - DAEMON_HOST=10.5.0.10
+    - DAEMON_PORT=27500
+  ports:
+    - "27017:27015/udp"
+    - "27017:27015/tcp"
 ```
 
 3. Configure in database:
+
 ```sql
 INSERT INTO servers (name, connection_type, docker_host, rcon_password, game)
 VALUES ('CSS Docker', 'docker', '10.5.0.22', 'password', 'css');
@@ -153,6 +158,7 @@ VALUES ('External CSS', '192.168.1.100', 27015, 'password', 'css');
 ```
 
 Configure the external server to send logs to your daemon's public IP:
+
 ```cfg
 logaddress_add your.public.ip 27500
 ```
@@ -162,16 +168,19 @@ logaddress_add your.public.ip 27500
 ### RCON Connection Failures
 
 1. Check `connection_type` is set correctly:
+
 ```sql
 SELECT serverId, name, connection_type, docker_host FROM servers;
 ```
 
 2. For Docker servers, verify static IP is correct:
+
 ```bash
 docker inspect hlstatsnext-cstrike | grep IPAddress
 ```
 
 3. Test RCON password in-game:
+
 ```
 rcon_password changeme123
 rcon status
@@ -183,25 +192,27 @@ If you see duplicate servers, it's likely due to missing `connection_type` confi
 
 ```sql
 -- Find duplicates
-SELECT address, port, COUNT(*) as count 
-FROM servers 
-GROUP BY address, port 
+SELECT address, port, COUNT(*) as count
+FROM servers
+GROUP BY address, port
 HAVING count > 1;
 
 -- Fix by setting connection_type for Docker servers
-UPDATE servers 
-SET connection_type = 'docker', docker_host = '10.5.0.20' 
+UPDATE servers
+SET connection_type = 'docker', docker_host = '10.5.0.20'
 WHERE name LIKE '%Docker%';
 ```
 
 ### Log Ingestion Issues
 
 1. Verify daemon is receiving logs:
+
 ```bash
 docker logs hlstatsnext-daemon -f
 ```
 
 2. Check game server is sending logs:
+
 ```bash
 # In game console
 log on
@@ -209,6 +220,7 @@ logaddress_list
 ```
 
 3. Ensure static IP is configured:
+
 ```bash
 docker exec hlstatsnext-cstrike cat /data/serverfiles/cstrike/server.cfg | grep logaddress
 ```

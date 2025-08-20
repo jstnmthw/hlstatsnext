@@ -1,6 +1,6 @@
 /**
  * GoldSrc Status Response Parser
- * 
+ *
  * Parses status responses from GoldSrc engine servers (CS 1.6, Half-Life, TFC, etc.)
  * Handles the specific format used by these older engines.
  */
@@ -42,27 +42,27 @@ export class GoldSrcStatusParser extends BaseStatusParser {
    */
   private processStatusLine(line: StatusLine, status: ServerStatus): void {
     switch (line.key) {
-      case 'hostname':
+      case "hostname":
         status.hostname = line.value
         break
-        
-      case 'version':
+
+      case "version":
         status.version = line.value
         break
-        
-      case 'map':
+
+      case "map":
         this.parseMapInfo(line.value, status)
         break
-        
-      case 'players':
+
+      case "players":
         this.parsePlayerInfo(line.value, status)
         break
-        
-      case 'fps':
+
+      case "fps":
         this.parseFpsInfo(line.value, status)
         break
-        
-      case 'cpu':
+
+      case "cpu":
         this.parseCpuInfo(line.value, status)
         break
     }

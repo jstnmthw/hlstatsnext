@@ -11,10 +11,9 @@ services:
     volumes:
       - db-volume:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
-      # - ./packages/database/src/sql/install.sql:/docker-entrypoint-initdb.d/01-install.sql:ro
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     ports:
-      - 3306:3306
+      - 3306:3306 # MySQL port
     networks:
       - default
     restart: unless-stopped
@@ -60,8 +59,6 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  # Daemon service - uncomment to run daemon in Docker
-  # Comment out this service when running daemon locally with pnpm dev
   daemon:
     build:
       context: .
@@ -69,7 +66,7 @@ services:
     container_name: hlstatsnext-daemon
     hostname: hlstatsnext-daemon
     volumes:
-      - ./:/app  # Mount entire project including node_modules
+      - ./:/app
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - DATABASE_URL=mysql://${DB_USER:-hlstatsnext}:${DB_PASS:-hlstatsnext}@db:3306/${DB_NAME:-hlstatsnext}
@@ -103,8 +100,8 @@ services:
     volumes:
       - ./servers/cs1:/data
     ports:
-      - "27015:27015/udp"
-      - "27015:27015/tcp"
+      - "27015:27015/udp" # UDP port for game server logs
+      - "27015:27015/tcp" # TCP port for game server
     restart: unless-stopped
 
   tfc:
@@ -121,8 +118,8 @@ services:
     volumes:
       - ./servers/tfc:/data
     ports:
-      - "27016:27015/udp"
-      - "27016:27015/tcp"
+      - "27016:27015/udp" # UDP port for game server logs
+      - "27016:27015/tcp" # TCP port for game server
     restart: unless-stopped
 
 networks:

@@ -143,15 +143,25 @@ export class EventConsumer implements IEventConsumer {
         this.metricsTimer = null
       }
 
-      // Cancel all consumers
+      // Cancel all consumers but don't close channels
+      // The channels will be closed by RabbitMQClient.disconnect()
       for (const [queueName, channel] of this.channels) {
         const consumerTag = this.consumerTags.find((tag) => tag.startsWith(queueName))
         if (consumerTag) {
-          await channel.cancel(consumerTag)
+          try {
+            await channel.cancel(consumerTag)
+            this.logger.debug(`Cancelled consumer tag: ${consumerTag}`)
+          } catch (error) {
+            // Channel might already be closed
+            const errorMessage = error instanceof Error ? error.message : String(error)
+            if (!errorMessage.includes('Channel closed') && !errorMessage.includes('IllegalOperationError')) {
+              this.logger.warn(`Failed to cancel consumer ${consumerTag}: ${error}`)
+            }
+          }
         }
-        await channel.close()
       }
 
+      // Clear references but don't close channels
       this.channels.clear()
       this.consumerTags = []
       this.isConsuming = false

@@ -28,6 +28,7 @@ export class RabbitMQClient implements IQueueClient {
   private channels: Map<string, QueueChannel> = new Map()
   private reconnectAttempts = 0
   private isConnecting = false
+  private isShuttingDown = false
   private connectionStats: ConnectionStats = {
     connected: false,
     heartbeatsSent: 0,
@@ -74,14 +75,24 @@ export class RabbitMQClient implements IQueueClient {
       return
     }
 
+    // Mark as shutting down to prevent reconnection attempts
+    this.isShuttingDown = true
+
     try {
-      // Close all channels first
+      // Close all channels first - check if they're already closed
       for (const [name, channel] of this.channels) {
         try {
-          await channel.close()
-          this.logger.debug(`Closed channel: ${name}`)
+          // Check if channel is still open before closing
+          if (channel && typeof channel.close === 'function') {
+            await channel.close()
+            this.logger.debug(`Closed channel: ${name}`)
+          }
         } catch (error) {
-          this.logger.warn(`Failed to close channel ${name}: ${error}`)
+          // Only log if it's not an "already closed" error
+          const errorMessage = error instanceof Error ? error.message : String(error)
+          if (!errorMessage.includes('Channel closed') && !errorMessage.includes('IllegalOperationError')) {
+            this.logger.warn(`Failed to close channel ${name}: ${error}`)
+          }
         }
       }
       this.channels.clear()
@@ -96,6 +107,9 @@ export class RabbitMQClient implements IQueueClient {
     } catch (error) {
       this.logger.error(`Error during RabbitMQ disconnection: ${error}`)
       throw new QueueError("Failed to disconnect", error as Error)
+    } finally {
+      // Reset shutdown flag
+      this.isShuttingDown = false
     }
   }
 
@@ -203,6 +217,12 @@ export class RabbitMQClient implements IQueueClient {
     this.connection = null
     this.channels.clear()
 
+    // Don't attempt to reconnect if we're shutting down
+    if (this.isShuttingDown) {
+      this.logger.debug("Skipping reconnection during shutdown")
+      return
+    }
+
     // Attempt to reconnect
     if (this.reconnectAttempts < this.config.connectionRetry.maxAttempts) {
       this.reconnectAttempts++
@@ -214,6 +234,12 @@ export class RabbitMQClient implements IQueueClient {
       this.logger.info(`Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts})`)
 
       setTimeout(async () => {
+        // Check again if we're shutting down before reconnecting
+        if (this.isShuttingDown) {
+          this.logger.debug("Skipping reconnection during shutdown")
+          return
+        }
+        
         try {
           await this.connect()
         } catch (reconnectError) {
@@ -229,6 +255,12 @@ export class RabbitMQClient implements IQueueClient {
     this.connection = null
     this.channels.clear()
     this.connectionStats.channelsCount = 0
+
+    // Don't attempt reconnection if we're shutting down
+    if (this.isShuttingDown) {
+      this.logger.debug("Connection closed during shutdown")
+      return
+    }
 
     // Attempt reconnection
     await this.handleConnectionError(new Error("Connection closed"))

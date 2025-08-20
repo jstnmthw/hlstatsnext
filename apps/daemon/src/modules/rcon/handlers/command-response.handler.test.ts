@@ -76,7 +76,7 @@ describe("CommandResponseHandler", () => {
         expect(result.response).toBe(responseText)
       }
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        "⚠️ GoldSrc RCON: Non-standard response format detected",
+        "GoldSrc RCON: Non-standard response format detected",
       )
     })
 
@@ -92,7 +92,7 @@ describe("CommandResponseHandler", () => {
         expect(result.error.message).toBe("Authentication failed")
       }
       expect(mockLogger.error).toHaveBeenCalledWith(
-        "❌ GoldSrc RCON: Authentication failed - bad password",
+        "GoldSrc RCON: Authentication failed - bad password",
       )
     })
 
@@ -108,7 +108,7 @@ describe("CommandResponseHandler", () => {
         expect(result.error.message).toBe("Bad challenge")
       }
       expect(mockLogger.error).toHaveBeenCalledWith(
-        "❌ GoldSrc RCON: Bad challenge - need to reconnect",
+        "GoldSrc RCON: Bad challenge - need to reconnect",
       )
     })
 
@@ -124,7 +124,7 @@ describe("CommandResponseHandler", () => {
         expect(result.error.code).toBe(RconErrorCode.COMMAND_FAILED)
         expect(result.error.message).toBe(`Unknown command: ${command}`)
       }
-      expect(mockLogger.warn).toHaveBeenCalledWith(`⚠️ GoldSrc RCON: Unknown command: ${command}`)
+      expect(mockLogger.warn).toHaveBeenCalledWith(`GoldSrc RCON: Unknown command: ${command}`)
     })
 
     it("should log successful command execution", () => {
@@ -136,7 +136,7 @@ describe("CommandResponseHandler", () => {
 
       expect(result.type).toBe("success")
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        `✅ GoldSrc RCON: Command '${command}' executed successfully`,
+        `GoldSrc RCON: Command '${command}' executed successfully`,
         {
           responseLength: responseText.length,
           responsePreview: responseText,
@@ -153,7 +153,7 @@ describe("CommandResponseHandler", () => {
 
       expect(result.type).toBe("success")
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        `✅ GoldSrc RCON: Command '${command}' executed successfully`,
+        `GoldSrc RCON: Command '${command}' executed successfully`,
         {
           responseLength: longResponse.length,
           responsePreview: longResponse.substring(0, 200),
@@ -213,7 +213,7 @@ describe("CommandResponseHandler", () => {
 
       expect(result.type).toBe("success")
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        "⚠️ GoldSrc RCON: Non-standard response format detected",
+        "GoldSrc RCON: Non-standard response format detected",
       )
     })
 

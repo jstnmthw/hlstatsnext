@@ -138,4 +138,30 @@ export class ServerRepository implements IServerRepository {
       return []
     }
   }
+
+  async getModDefault(modCode: string, parameter: string): Promise<string | null> {
+    try {
+      const row = await this.database.prisma.modDefault.findUnique({
+        where: { code_parameter: { code: modCode, parameter } },
+        select: { value: true },
+      })
+      return row?.value ?? null
+    } catch (error) {
+      this.logger.error(`Failed to read MOD default ${parameter} for ${modCode}: ${error}`)
+      return null
+    }
+  }
+
+  async getServerConfigDefault(parameter: string): Promise<string | null> {
+    try {
+      const row = await this.database.prisma.serverConfigDefault.findUnique({
+        where: { parameter },
+        select: { value: true },
+      })
+      return row?.value ?? null
+    } catch (error) {
+      this.logger.error(`Failed to read server config default ${parameter}: ${error}`)
+      return null
+    }
+  }
 }

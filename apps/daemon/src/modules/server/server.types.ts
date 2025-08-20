@@ -3,6 +3,8 @@ export interface IServerService {
   getServerByAddress(address: string, port: number): Promise<ServerInfo | null>
   getServerGame(serverId: number): Promise<string>
   getServerConfigBoolean(serverId: number, parameter: string, fallback: boolean): Promise<boolean>
+  getServerConfig(serverId: number, parameter: string): Promise<string | null>
+  getServerModType(serverId: number): Promise<string>
   hasRconCredentials(serverId: number): Promise<boolean>
   findActiveServersWithRcon(maxAgeMinutes?: number): Promise<ServerInfo[]>
 
@@ -27,4 +29,8 @@ export interface IServerRepository {
   getServerConfig(serverId: number, parameter: string): Promise<string | null>
   hasRconCredentials(serverId: number): Promise<boolean>
   findActiveServersWithRcon(maxAgeMinutes?: number): Promise<ServerInfo[]>
+  
+  // Database-driven MOD configuration methods
+  getModDefault(modCode: string, parameter: string): Promise<string | null>
+  getServerConfigDefault(parameter: string): Promise<string | null>
 }

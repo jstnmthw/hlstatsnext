@@ -111,7 +111,7 @@ describe("EventConsumer", () => {
       await consumer.stop()
 
       expect(mockChannel.cancel).toHaveBeenCalledWith("test.queue-123-456")
-      expect(mockChannel.close).toHaveBeenCalledTimes(1)
+      expect(mockChannel.close).toHaveBeenCalledTimes(0) // Consumer doesn't close channels - handled by client
       expect(mockLogger.info).toHaveBeenCalledWith("Event consumer stopped")
 
       const stats = consumer.getConsumerStats()
@@ -125,12 +125,13 @@ describe("EventConsumer", () => {
     it("should handle stop errors", async () => {
       await consumer.start()
 
-      const error = new Error("Channel close failed")
-      vi.mocked(mockChannel.close).mockRejectedValueOnce(error)
+      const error = new Error("Channel cancel failed")
+      vi.mocked(mockChannel.cancel).mockRejectedValueOnce(error)
 
-      await expect(consumer.stop()).rejects.toThrow("Failed to stop consumer")
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "Error stopping consumer: Error: Channel close failed",
+      // Consumer should not throw on cancel errors, it should handle them gracefully
+      await expect(consumer.stop()).resolves.toBeUndefined()
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        "Failed to cancel consumer test.queue-123-456: Error: Channel cancel failed",
       )
     })
   })

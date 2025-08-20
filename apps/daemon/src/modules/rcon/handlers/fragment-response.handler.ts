@@ -93,7 +93,7 @@ export class FragmentedResponseHandler {
     const { packetId, totalFragments, currentFragment, fragmentByte, data } = fragmentInfo
 
     this.logger.debug(
-      `📦 GoldSrc RCON: Processing fragment ${currentFragment}/${totalFragments - 1} of packet ${packetId} (fragmentByte: 0x${fragmentByte.toString(16)})`,
+      `GoldSrc RCON: Processing fragment ${currentFragment}/${totalFragments - 1} of packet ${packetId} (fragmentByte: 0x${fragmentByte.toString(16)})`,
     )
 
     // Initialize fragment array if needed
@@ -114,7 +114,7 @@ export class FragmentedResponseHandler {
       const assembledData = Buffer.concat(fragments.filter((f) => f !== undefined))
       this.cleanup(packetId)
 
-      this.logger.debug(`✅ GoldSrc RCON: Fragment reassembly complete for packet ${packetId}`)
+      this.logger.debug(`GoldSrc RCON: Fragment reassembly complete for packet ${packetId}`)
 
       return { type: "complete", assembledData }
     }
@@ -128,7 +128,7 @@ export class FragmentedResponseHandler {
    */
   private setupFragmentTimeout(packetId: number): void {
     const timeout = setTimeout(() => {
-      this.logger.warn(`⏰ GoldSrc RCON: Fragment timeout for packet ${packetId}`)
+      this.logger.warn(`GoldSrc RCON: Fragment timeout for packet ${packetId}`)
       this.cleanup(packetId)
     }, this.FRAGMENT_TIMEOUT)
 

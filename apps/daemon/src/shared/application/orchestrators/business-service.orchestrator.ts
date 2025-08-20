@@ -19,6 +19,9 @@ import { ActionService } from "@/modules/action/action.service"
 import { GameDetectionService } from "@/modules/game/game-detection.service"
 import { ServerService } from "@/modules/server/server.service"
 import { RconService } from "@/modules/rcon/rcon.service"
+import { CommandResolverService } from "@/modules/rcon/services/command-resolver.service"
+import { RconCommandService } from "@/modules/rcon/services/rcon-command.service"
+import { PlayerNotificationService } from "@/modules/rcon/services/player-notification.service"
 
 import type { IPlayerService } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
@@ -66,7 +69,18 @@ export function createBusinessServices(
   const gameDetectionService = new GameDetectionService(logger)
   const serverService = new ServerService(repositories.serverRepository, logger)
 
-  // Second tier - services dependent on first tier
+  // Second tier - RCON and notification services
+  const rconService = new RconService(repositories.rconRepository, logger, rconConfig)
+  const commandResolverService = new CommandResolverService(repositories.serverRepository, logger)
+  const rconCommandService = new RconCommandService(rconService, commandResolverService, logger)
+  const playerNotificationService = new PlayerNotificationService(
+    rconCommandService,
+    commandResolverService,
+    serverService,
+    logger,
+  )
+
+  // Third tier - services dependent on second tier
   const playerService = new PlayerService(
     repositories.playerRepository,
     logger,
@@ -74,17 +88,16 @@ export function createBusinessServices(
     repositories.serverRepository,
     matchService,
     geoipService,
+    playerNotificationService,
   )
 
-  // Third tier - services dependent on second tier
+  // Fourth tier - services dependent on third tier
   const actionService = new ActionService(
     repositories.actionRepository,
     logger,
     playerService,
     matchService,
   )
-
-  const rconService = new RconService(repositories.rconRepository, logger, rconConfig)
 
   return {
     playerService,

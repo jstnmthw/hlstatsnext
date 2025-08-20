@@ -22,6 +22,7 @@ import type { IServerRepository } from "@/modules/server/server.types"
 import { normalizeSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
 import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builder"
 import { PlayerEventHandlerFactory } from "./handlers/player-event-handler.factory"
+import type { PlayerNotificationService } from "@/modules/rcon/services/player-notification.service"
 
 export class PlayerService implements IPlayerService {
   private readonly DEFAULT_RATING = 1000
@@ -42,6 +43,7 @@ export class PlayerService implements IPlayerService {
     private readonly serverRepository: IServerRepository,
     private readonly matchService?: IMatchService,
     private readonly geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
+    private readonly playerNotificationService?: PlayerNotificationService,
   ) {
     // Initialize the event handler factory
     this.eventHandlerFactory = new PlayerEventHandlerFactory(
@@ -51,6 +53,7 @@ export class PlayerService implements IPlayerService {
       serverRepository,
       matchService,
       geoipService,
+      playerNotificationService,
     )
   }
 

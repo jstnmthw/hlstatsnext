@@ -23,6 +23,7 @@ import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IServerRepository } from "@/modules/server/server.types"
+import type { PlayerNotificationService } from "@/modules/rcon/services/player-notification.service"
 
 export class PlayerEventHandlerFactory {
   private readonly handlers = new Map<EventType, BasePlayerEventHandler>()
@@ -34,6 +35,7 @@ export class PlayerEventHandlerFactory {
     serverRepository: IServerRepository,
     matchService?: IMatchService,
     geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
+    playerNotificationService?: PlayerNotificationService,
   ) {
     // Initialize all event handlers
     this.handlers.set(
@@ -83,7 +85,7 @@ export class PlayerEventHandlerFactory {
 
     this.handlers.set(
       EventType.PLAYER_KILL,
-      new KillEventHandler(repository, logger, matchService, rankingService),
+      new KillEventHandler(repository, logger, matchService, rankingService, playerNotificationService),
     )
 
     // Note: PLAYER_CHANGE_ROLE is not implemented as it doesn't affect stats

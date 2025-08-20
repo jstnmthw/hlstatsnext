@@ -47,4 +47,24 @@ export class ServerService implements IServerService {
   async findActiveServersWithRcon(maxAgeMinutes?: number): Promise<ServerInfo[]> {
     return await this.repository.findActiveServersWithRcon(maxAgeMinutes)
   }
+
+  async getServerConfig(serverId: number, parameter: string): Promise<string | null> {
+    return await this.repository.getServerConfig(serverId, parameter)
+  }
+
+  async getServerModType(serverId: number): Promise<string> {
+    try {
+      const modConfig = await this.repository.getServerConfig(serverId, 'Mod')
+      
+      // Return the configured MOD type, defaulting to empty string if null
+      if (!modConfig || modConfig.trim() === '') {
+        return ''
+      }
+      
+      return modConfig.trim().toUpperCase()
+    } catch (error) {
+      this.logger.error(`Failed to get MOD type for server ${serverId}: ${error}`)
+      return ''
+    }
+  }
 }

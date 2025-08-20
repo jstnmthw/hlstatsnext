@@ -18,6 +18,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
+import type { PlayerNotificationService } from "@/modules/rcon/services/player-notification.service"
 
 export class KillEventHandler extends BasePlayerEventHandler {
   private readonly DEFAULT_RATING = 1000
@@ -28,6 +29,7 @@ export class KillEventHandler extends BasePlayerEventHandler {
     logger: ILogger,
     matchService: IMatchService | undefined,
     private readonly rankingService: IRankingService,
+    private readonly notificationService?: PlayerNotificationService,
   ) {
     super(repository, logger, matchService)
   }
@@ -101,6 +103,16 @@ export class KillEventHandler extends BasePlayerEventHandler {
         killerStats,
         victimStats,
         skillAdjustment,
+      )
+
+      // Send player notifications if service is available
+      await this.sendPlayerNotifications(
+        event.serverId,
+        killerId,
+        victimId,
+        skillAdjustment,
+        killerStats,
+        victimStats,
       )
 
       return this.createSuccessResult(2) // Affected both killer and victim
@@ -348,5 +360,83 @@ export class KillEventHandler extends BasePlayerEventHandler {
         victimNewRating: (victimStats.skill || this.DEFAULT_RATING) + skillAdjustment.victimChange,
       },
     )
+  }
+
+  /**
+   * Send player notifications for skill changes
+   */
+  private async sendPlayerNotifications(
+    serverId: number,
+    killerId: number,
+    victimId: number,
+    skillAdjustment: { killerChange: number; victimChange: number },
+    killerStats: Player,
+    victimStats: Player,
+  ): Promise<void> {
+    this.logger.warn("Sending player notifications", {
+      serverId,
+      killerId,
+      victimId,
+      skillAdjustment,
+      killerStats,
+      victimStats,
+    })
+    if (!this.notificationService) {
+      this.logger.warn("No notification service available")
+      return
+    }
+
+    try {
+      const notifications: Array<Promise<void>> = []
+
+      // Notify killer about skill gain
+      if (skillAdjustment.killerChange > 0) {
+        const killerMessage = this.formatSkillMessage(
+          skillAdjustment.killerChange,
+          (killerStats.skill || this.DEFAULT_RATING) + skillAdjustment.killerChange,
+          true,
+        )
+
+        notifications.push(
+          this.notificationService.notifyPlayer(serverId, killerId, killerMessage, {
+            includePlayerName: true,
+          }),
+        )
+      }
+
+      // Notify victim about skill loss (only if significant)
+      if (skillAdjustment.victimChange < -1) {
+        const victimMessage = this.formatSkillMessage(
+          skillAdjustment.victimChange,
+          (victimStats.skill || this.DEFAULT_RATING) + skillAdjustment.victimChange,
+          false,
+        )
+
+        notifications.push(
+          this.notificationService.notifyPlayer(serverId, victimId, victimMessage, {
+            includePlayerName: true,
+          }),
+        )
+      }
+
+      // Send all notifications in parallel
+      if (notifications.length > 0) {
+        await Promise.all(notifications)
+      }
+    } catch (error) {
+      // Don't fail the kill event if notifications fail
+      this.logger.warn(`Failed to send player notifications: ${error}`)
+    }
+  }
+
+  /**
+   * Format skill change message for players
+   */
+  private formatSkillMessage(skillChange: number, newSkill: number, isGain: boolean): string {
+    const changeText = isGain ? `+${Math.round(skillChange)}` : `${Math.round(skillChange)}`
+
+    const direction = isGain ? "↑" : "↓"
+
+    return `Skill ${direction} ${changeText} (${Math.round(newSkill)})`
   }
 }

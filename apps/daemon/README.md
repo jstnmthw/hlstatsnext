@@ -9,6 +9,10 @@ The **HLStatsNext Daemon** is a high-performance, real-time game statistics engi
   - [Event-Driven Processing Pipeline](#event-driven-processing-pipeline)
   - [Core Components](#core-components)
   - [Architectural Patterns](#architectural-patterns)
+- [Server Authentication](#server-authentication)
+  - [Docker Server Support](#docker-server-support)
+  - [External Server Authentication](#external-server-authentication)
+  - [Development Mode](#development-mode)
 - [Development](#development)
   - [Quick Start](#quick-start)
   - [Project Structure](#project-structure)
@@ -57,11 +61,13 @@ Game Servers → UDP Ingress → Event Parser → RabbitMQ → Event Processor �
 
 ### Core Components
 
-- **UDP Ingress Service**: High-performance packet handling with rate limiting
-- **Event Parser System**: Game-specific parsers with extensible framework
+- **UDP Ingress Service**: High-performance packet handling with server authentication and rate limiting
+- **Event Parser System**: Game-specific parsers with extensible framework (CS 1.6, CSGO, CS2)
 - **Message Queue (RabbitMQ)**: Reliable event distribution with retry logic
 - **Event Processor**: Modular handlers for different event types
-- **Business Services**: Player, Weapon, Match, Ranking, and Server management
+- **Business Services**: Player, Weapon, Match, Ranking, Server, and Options management
+- **RCON Integration**: Multi-protocol RCON support (GoldSrc, Source) for server monitoring
+- **GeoIP Service**: IP geolocation using MaxMind GeoLite database integration
 - **Infrastructure Layer**: Shared patterns for repositories, event handling, and observability
 
 ### Architectural Patterns
@@ -70,6 +76,64 @@ Game Servers → UDP Ingress → Event Parser → RabbitMQ → Event Processor �
 - **Repository Pattern**: Consistent database access with transaction support
 - **Event Coordinator Pattern**: Cross-module orchestration for complex workflows
 - **Module Registry**: Dynamic handler registration and lifecycle management
+- **Factory Pattern**: Standardized object creation with dependency injection (Server, Config, Infrastructure)
+- **Orchestrator Pattern**: High-level business workflow coordination
+- **Builder Pattern**: Fluent APIs for complex object construction (StatUpdateBuilder, PlayerNameUpdateBuilder)
+- **Enricher Pattern**: Data augmentation services (GeoIP location enrichment)
+- **Validator Pattern**: Input validation and sanitization across application layers
+
+## Server Authentication
+
+The daemon implements a sophisticated server authentication system supporting both Docker-based and external game servers with intelligent discovery and caching mechanisms.
+
+### Docker Server Support
+
+Docker servers are automatically detected and authenticated using network analysis:
+
+- **Network Detection**: Automatic detection of Docker bridge networks (`172.16.0.0/16` - `172.31.255.255/16`, `10.0.0.0/8`)
+- **Intelligent Matching**: Maps Docker container IPs to pre-configured server records in the database
+- **Connection Types**: Database records with `connectionType: "docker"` are matched to incoming Docker traffic
+- **Rate-Limited Logging**: Prevents log spam with intelligent message throttling (5-minute cooldowns)
+
+```typescript
+// Docker servers are configured in the database
+{
+  connectionType: "docker",
+  dockerHost: "localhost", 
+  address: "172.17.0.2", // Docker bridge IP
+  port: 27015,
+  game: "cstrike"
+}
+```
+
+### External Server Authentication
+
+External servers require exact address and port matching:
+
+- **Database Lookup**: Direct IP:port matching against server records
+- **Caching Layer**: In-memory authentication cache for performance
+- **Validation**: Comprehensive address and port validation with security checks
+- **Automatic Registration**: Servers can be auto-created with proper configuration seeding
+
+### Development Mode
+
+Development environments support bypass authentication for rapid testing:
+
+- **Skip Authentication**: `skipAuth: true` bypasses database validation
+- **Development Sentinel**: Special server ID for dev environments (`-1`)
+- **Flexible Game Detection**: Defaults to configurable game type for development
+
+```typescript
+// Authentication flow
+const serverId = await authenticator.authenticateServer(address, port);
+if (serverId === null) {
+  // Server not authorized - reject connection
+} else if (serverId === INGRESS_CONSTANTS.DEV_AUTH_SENTINEL) {
+  // Development mode - allow with default configuration
+} else {
+  // Production server - use database configuration
+}
+```
 
 ## Development
 
@@ -102,15 +166,38 @@ apps/daemon/
 ├── src/
 │   ├── modules/              # Feature modules (self-contained domains)
 │   │   ├── player/           # Player lifecycle and statistics
+│   │   │   ├── handlers/     # Event handlers for player actions
+│   │   │   └── resolvers/    # Player resolution utilities
 │   │   ├── weapon/           # Weapon statistics and multipliers
 │   │   ├── match/            # Round and match state management
 │   │   ├── ranking/          # ELO-based skill calculations
 │   │   ├── server/           # Game server management
+│   │   │   ├── factories/    # Server creation with defaults
+│   │   │   ├── orchestrators/# Server discovery workflows
+│   │   │   ├── enrichers/    # GeoIP location enrichment
+│   │   │   └── seeders/      # Default configuration seeding
 │   │   ├── action/           # Game actions and achievements
-│   │   └── ingress/          # UDP server and log parsing
+│   │   ├── ingress/          # UDP server and log parsing
+│   │   │   ├── adapters/     # Server authentication
+│   │   │   ├── factories/    # Dependency injection
+│   │   │   └── parsers/      # Game log parsers
+│   │   ├── rcon/             # RCON server monitoring
+│   │   │   ├── protocols/    # GoldSrc/Source RCON protocols
+│   │   │   ├── parsers/      # Status command parsers
+│   │   │   └── handlers/     # Response handling
+│   │   ├── geoip/            # IP geolocation services
+│   │   └── options/          # Configuration management
 │   ├── shared/               # Shared infrastructure
 │   │   ├── application/      # Business logic patterns
+│   │   │   ├── factories/    # Infrastructure component creation
+│   │   │   ├── orchestrators/# High-level business workflows
+│   │   │   ├── utils/        # Business utilities (builders, calculators)
+│   │   │   └── validators/   # Input validation and sanitization
 │   │   ├── infrastructure/   # Technical patterns
+│   │   │   ├── messaging/    # Event bus and queue management
+│   │   │   ├── modules/      # Module registry and base classes
+│   │   │   ├── observability/# Metrics and monitoring
+│   │   │   └── persistence/  # Repository patterns
 │   │   └── types/            # Shared type definitions
 │   ├── config/               # Game and weapon configurations
 │   ├── database/             # Database client wrapper
@@ -284,12 +371,21 @@ CMD ["pnpm", "start"]
 
 ## Documentation
 
+### Architecture & Features
 - [`docs/MIGRATION.md`](./docs/MIGRATION.md) - Migration progress from Perl daemon
 - [`docs/EVENT_LIFECYCLE.md`](./docs/EVENT_LIFECYCLE.md) - Detailed event flow documentation
 - [`docs/features/EVENT_QUEUE.md`](./docs/features/EVENT_QUEUE.md) - RabbitMQ integration design
 - [`docs/features/PLAYER_RANKINGS.md`](./docs/features/PLAYER_RANKINGS.md) - Complete ranking system guide
-- [`src/shared/application/README.md`](./src/shared/application/README.md) - Application layer patterns
-- [`src/shared/infrastructure/README.md`](./src/shared/infrastructure/README.md) - Infrastructure patterns
+
+### Implementation Patterns
+- [`src/shared/application/README.md`](./src/shared/application/README.md) - Application layer patterns (factories, orchestrators, validators, builders)
+- [`src/shared/infrastructure/README.md`](./src/shared/infrastructure/README.md) - Infrastructure patterns (messaging, persistence, observability)
+
+### Core Services
+- **Server Authentication**: Database-driven server discovery with Docker network detection (`src/modules/ingress/adapters/`)
+- **RCON Integration**: Multi-protocol server monitoring and status parsing (`src/modules/rcon/`)
+- **GeoIP Services**: MaxMind GeoLite database integration for location enrichment (`src/modules/geoip/`)
+- **Configuration Management**: Cached options service for dynamic configuration (`src/modules/options/`)
 
 ## Contributing
 

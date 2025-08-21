@@ -18,8 +18,8 @@ export default function Page() {
           <ServerList className="col-span-2" />
           <div className="col-span-1">
             <div className="gap-2 border rounded-lg p-4">
-              <h2 className="text-lg font-bold">Latest News</h2>
-              <p className="text-sm text-zinc-400">
+              <h2 className="text-md font-bold mb-1">Latest News</h2>
+              <p className="text-xs text-zinc-400">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
               </p>
             </div>

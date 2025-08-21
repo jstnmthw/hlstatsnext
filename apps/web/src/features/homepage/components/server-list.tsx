@@ -53,8 +53,10 @@ export async function ServerList({ className }: { className?: string }) {
                   </div>
                 </div>
                 <div className="flex items-center px-3">
-                  <Button variant="outline" className="text-xs cursor-pointer" size="sm">
-                    <PlayIcon className="size-3" fill="currentColor" />
+                  <Button variant="outline" className="text-xs cursor-pointer" size="icon-sm">
+                    <a href={`steam://connect/${server.address}:${server.port}`}>
+                      <PlayIcon className="size-3" fill="currentColor" />
+                    </a>
                   </Button>
                 </div>
               </div>

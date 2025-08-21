@@ -46,7 +46,7 @@ export function Header({ fixed = false }: HeaderProps) {
               className="uppercase tracking-tight text-xs font-semibold text-zinc-300 hover:text-white transition-colors"
             >
               {item.type === "button" ? (
-                <Button variant="outline" className="cursor-pointer uppercase">
+                <Button variant="outline" className="cursor-pointer uppercase" size="xs">
                   {item.label}
                 </Button>
               ) : (

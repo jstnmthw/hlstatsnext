@@ -100,9 +100,17 @@ body {
   font-size: var(--font-size-base);
 }
 
-/* Fix border utility to use theme border color by default */
 @layer utilities {
   .border {
     border-color: var(--color-border);
+  }
+  .font-mono {
+    font-family:
+      var(--font-geist-mono), ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Monaco,
+      Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+
+  .font-sans {
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   }
 }

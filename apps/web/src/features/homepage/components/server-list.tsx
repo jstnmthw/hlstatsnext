@@ -42,7 +42,7 @@ export async function ServerList({ className }: { className?: string }) {
                     )}
                   />
                   <div className="flex flex-col">
-                    <span className="text-sm">
+                    <span className="text-sm font-mono">
                       {server.name || `${server.address}:${server.port}`}
                     </span>
                     <span className="text-xs text-muted-foreground font-mono">

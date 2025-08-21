@@ -6,7 +6,10 @@ import * as React from "react"
 // Base styles that apply to all button variants
 const baseButtonStyles = [
   // Base
-  "relative cursor-pointer isolate inline-flex items-baseline items-center justify-center gap-x-2 rounded-sm border text-base/6 font-semibold",
+  "relative cursor-pointer isolate inline-flex items-baseline items-center justify-center gap-x-2 rounded-md border text-base/6 font-semibold",
+
+  // Reduce gap when there's both icon and text
+  "has-[>[data-slot=icon]+*]:gap-x-1.5",
 
   // Focus
   "focus:outline-none data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-blue-500",
@@ -32,7 +35,7 @@ const solidBaseStyles = [
   "dark:border dark:border-white/5", // Add subtle border in dark mode for solid
   "after:absolute after:inset-0 after:-z-10 after:rounded-[calc(theme(borderRadius.md)-1px)]",
   "after:shadow-[inset_0_1px_theme(colors.white/15%)]", // Inner highlight
-  "dark:after:-inset-px dark:after:rounded-lg", // Dark mode adjustment for highlight
+  "dark:after:-inset-px", // Dark mode adjustment for highlight
   "disabled:before:shadow-none disabled:after:shadow-none", // Disabled state
 ]
 
@@ -468,13 +471,13 @@ const buttonVariants = cva(baseButtonStyles, {
       plain: "",
     },
     size: {
-      // Icon sizing remains per variant.
-      xs: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.1)-3px)] text-xs/6 has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.2)-1px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] [&>[data-slot=icon]]:size-4",
-      sm: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.1)-2px)] text-sm/6 has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.2)-1px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] [&>[data-slot=icon]]:size-4",
+      // Regular sizes with automatic icon-only detection
+      xs: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.1)-3px)] text-xs/6 has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.2)-1px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]:only-child]:px-[calc(theme(spacing.1)-1px)] has-[>[data-slot=icon]:only-child]:py-[calc(theme(spacing.1)-1px)] [&>[data-slot=icon]]:size-4",
+      sm: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.1)-2px)] text-sm/6 has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.2)-1px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]:only-child]:px-[calc(theme(spacing.2)-1.5px)] has-[>[data-slot=icon]:only-child]:py-[calc(theme(spacing.2)-1.5px)] [&>[data-slot=icon]]:size-4",
       default:
-        "px-[calc(theme(spacing.3)-2px)] py-[calc(theme(spacing.1)-1px)] text-sm/6 has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.2)-2px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] [&>[data-slot=icon]]:size-5",
-      lg: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.2)-1px)] text-base/6 has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.2)-1px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] [&>[data-slot=icon]]:size-5",
-      xl: "px-[calc(theme(spacing.3)-1px)] py-[calc(theme(spacing.3)-1px)] text-base/6 has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] [&>[data-slot=icon]]:size-6",
+        "px-[calc(theme(spacing.3)-2px)] py-[calc(theme(spacing.1)-1px)] text-sm/6 has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.2)-2px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]:only-child]:px-[calc(theme(spacing.2)-1px)] has-[>[data-slot=icon]:only-child]:py-[calc(theme(spacing.2)-1px)] [&>[data-slot=icon]]:size-4",
+      lg: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.2)-1px)] text-base/6 has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.2)-1px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]:only-child]:px-[calc(theme(spacing.2)-1px)] has-[>[data-slot=icon]:only-child]:py-[calc(theme(spacing.2)-1px)] [&>[data-slot=icon]]:size-5",
+      xl: "px-[calc(theme(spacing.3)-1px)] py-[calc(theme(spacing.3)-1px)] text-base/6 has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]:only-child]:px-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]:only-child]:py-[calc(theme(spacing.3)-1px)] [&>[data-slot=icon]]:size-6",
       "icon-xs":
         "px-[calc(theme(spacing.1)-1px)] py-[calc(theme(spacing.1)-1px)] [&>[data-slot=icon]]:size-4",
       "icon-sm":

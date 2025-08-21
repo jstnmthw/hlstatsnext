@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@repo/ui/button"
+import { cn } from "@repo/ui/lib/utils"
 import { BellIcon, BoltIcon, PaperclipIcon } from "lucide-react"
 import { redirect } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -138,12 +139,13 @@ export default function KitchenSinkPage() {
                   <li key={section.id}>
                     <button
                       onClick={() => scrollToSection(section.id)}
-                      className={`block w-full text-left text-sm font-medium transition-colors hover:text-primary ${
+                      className={cn(
+                        "block w-full cursor-pointer text-left text-sm font-medium transition-colors hover:text-primary dark:hover:text-indigo-500",
                         activeSection === section.id ||
-                        section.subsections.some((sub) => sub.id === activeSection)
-                          ? "text-primary"
-                          : "text-muted-foreground"
-                      }`}
+                          section.subsections.some((sub) => sub.id === activeSection)
+                          ? "text-primary dark:text-indigo-500"
+                          : "text-muted-foreground",
+                      )}
                     >
                       {section.title}
                     </button>
@@ -153,11 +155,12 @@ export default function KitchenSinkPage() {
                           <li key={subsection.id}>
                             <button
                               onClick={() => scrollToSection(subsection.id)}
-                              className={`block w-full text-left text-sm transition-colors hover:text-primary ${
+                              className={cn(
+                                "block w-full cursor-pointer text-left text-sm transition-colors hover:text-primary dark:hover:text-indigo-500",
                                 activeSection === subsection.id
-                                  ? "text-primary"
-                                  : "text-muted-foreground"
-                              }`}
+                                  ? "text-primary dark:text-indigo-500"
+                                  : "text-muted-foreground",
+                              )}
                             >
                               {subsection.title}
                             </button>

@@ -24,8 +24,8 @@ const navItems = [
     href: "/login",
   },
   {
-    label: "Register",
-    href: "/register",
+    label: "Sign Up",
+    href: "/signup",
     type: "button",
   },
 ]

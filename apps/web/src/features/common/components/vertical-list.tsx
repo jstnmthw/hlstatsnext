@@ -22,7 +22,7 @@ export const VerticalList = ({ className, children }: VerticalListProps) => {
 
 export const VerticalListHeader = ({ className, children }: VerticalListHeaderProps) => {
   return (
-    <h2 className={cn("uppercase tracking-tight text-xs font-bold p-2", className)}>{children}</h2>
+    <h2 className={cn("uppercase tracking-tight text-sm font-bold p-2", className)}>{children}</h2>
   )
 }
 

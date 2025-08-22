@@ -19,7 +19,7 @@ export default function Page() {
           <div className="col-span-1">
             <div className="gap-2 border rounded-lg p-4">
               <h2 className="text-md font-bold mb-1">Latest News</h2>
-              <p className="text-xs text-zinc-400">
+              <p className="text-sm text-zinc-400">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
               </p>
             </div>

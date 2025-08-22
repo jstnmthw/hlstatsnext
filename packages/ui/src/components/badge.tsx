@@ -1,7 +1,6 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-
 import { cn } from "../lib/utils"
 import { type ColorScheme, type StyleVariant, getComponentStyles } from "../lib/color-variants"
 
@@ -23,10 +22,16 @@ const badgeVariants = cva(
 )
 
 // Helper function for badge-specific styling
-const getBadgeStyles = (variant: StyleVariant, colorScheme: ColorScheme): string[] => {
+const getBadgeStyles = (
+  variant: StyleVariant,
+  colorScheme: ColorScheme,
+  asChild: boolean = false,
+): string[] => {
   return getComponentStyles(colorScheme, variant, {
     componentType: "badge",
     includeIcon: true,
+    includeHover: asChild,
+    includeActive: asChild,
   })
 }
 
@@ -48,7 +53,7 @@ function Badge({
   const Comp = asChild ? Slot : "span"
 
   // Get the specific variant+colorScheme styles using the helper
-  const dynamicStyles = getBadgeStyles(variant!, colorScheme)
+  const dynamicStyles = getBadgeStyles(variant!, colorScheme, asChild)
 
   return (
     <Comp

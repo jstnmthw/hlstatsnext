@@ -1,5 +1,7 @@
 import { SettingsIcon } from "lucide-react"
+import { AppLogo } from "@/features/common/components/app-logo"
 import Link from "next/link"
+import { Badge } from "@repo/ui/badge"
 
 const navItems = [
   {
@@ -24,16 +26,16 @@ export function AdminHeader() {
   return (
     <header className="w-full">
       <div className="container py-6 flex justify-between items-center">
-        <div className="flex items-center gap-2 font-bold">
-          {process.env.NEXT_PUBLIC_APP_NAME}{" "}
-          <span className="text-xs text-muted-foreground">v1.0.0</span>
+        <div className="flex items-center gap-2">
+          <AppLogo showVersion={false} />
+          <Badge variant="outline">Admin</Badge>
         </div>
         <nav className="flex items-center gap-8">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="uppercase tracking-tight text-sm font-semibold text-zinc-300 hover:text-white transition-colors"
+              className="uppercase tracking-tight text-sm font-semibold text-zinc-400 hover:text-white transition-colors"
             >
               {item.label}
             </Link>

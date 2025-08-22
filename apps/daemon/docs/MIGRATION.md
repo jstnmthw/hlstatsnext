@@ -459,6 +459,31 @@ The daemon has a solid foundation with complete player lifecycle tracking. The n
 
 ## Change Log
 
+- 2025-01-XX - **Fixed Tailwind font-size mapping and implemented simple 2px increment scale**
+  - **Problem**: `text-base` class was showing 16px instead of the custom `--font-size-base` value of 14px defined in theme files.
+  - **Root Cause**: Tailwind v4's default font-size utilities were not being properly overridden by the CSS variables defined in the `@theme` directive.
+  - **Solution**:
+    1. Added explicit utility class overrides in `@layer utilities` to ensure Tailwind's `text-*` classes use custom CSS variables
+    2. Implemented simple 2px increment font scale: xs=10px, sm=12px, base=14px, lg=16px, xl=18px, etc.
+    3. Updated line heights to maintain good readability ratios (1.6x for small text, scaling down to 1.24x for largest)
+  - **Font Scale**:
+    - `text-xs` = 10px (line-height: 16px)
+    - `text-sm` = 12px (line-height: 18px)
+    - `text-base` = 14px (line-height: 21px)
+    - `text-lg` = 16px (line-height: 24px)
+    - `text-xl` = 18px (line-height: 26px)
+    - And so on in 2px increments...
+  - **Files Modified**:
+    - `apps/web/src/app/globals.css` - Added font-size utility overrides and implemented simple scale
+    - `packages/ui/src/components/button.tsx` - Updated button sizes to use new font scale
+    - **Button Size Alignment**:
+    - `xs` = text-xs (10px) with standard padding (spacing.2)
+    - `sm` = text-sm (12px) with standard padding (spacing.2)
+    - `default` = text-base (14px) with standard padding (spacing.3)
+    - `lg` = text-lg (16px) with extra X spacing (spacing.4)
+    - `xl` = text-xl (18px) with extra X spacing (spacing.5)
+  - **Result**: Clean, predictable font sizing with 2px increments across all components, eliminating complex percentage calculations.
+
 - 2025-08-11
   - players_names: Added repository upsert method and wired alias aggregation across connect, change-name, disconnect (connection_time), kill (killer/victim), damage (shots/hits/headshots), teamkill (victim death). Tests added for repository and service wiring.
   - players_history: Confirmed snapshot writes via `MatchRepository.createPlayerHistory` and `MatchService.saveMatchToDatabase`; no schema change needed.

@@ -47,50 +47,35 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Font scale based on configurable base */
-  --text-size-xs: calc(var(--font-size-base) * 0.75); /* base * 0.75 */
-  --text-size-sm: calc(var(--font-size-base) * 0.875); /* base * 0.875 */
-  --text-size-base: var(--font-size-base);
-  --text-size-lg: calc(var(--font-size-base) * 2.125); /* base * 1.125 */
-  --text-size-xl: calc(var(--font-size-base) * 1.25); /* base * 1.25 */
-  --text-size-2xl: calc(var(--font-size-base) * 1.5); /* base * 1.5 */
-  --text-size-3xl: calc(var(--font-size-base) * 1.875); /* base * 1.875 */
-  --text-size-4xl: calc(var(--font-size-base) * 2.25); /* base * 2.25 */
-  --text-size-5xl: calc(var(--font-size-base) * 3); /* base * 3 */
-  --text-size-6xl: calc(var(--font-size-base) * 3.75); /* base * 3.75 */
-  --text-size-7xl: calc(var(--font-size-base) * 4.5); /* base * 4.5 */
-  --text-size-8xl: calc(var(--font-size-base) * 6); /* base * 6 */
-  --text-size-9xl: calc(var(--font-size-base) * 8); /* base * 8 */
+  /* Simple 2px increment font scale */
+  --text-size-xs: 10px;
+  --text-size-sm: 12px;
+  --text-size-base: 14px;
+  --text-size-lg: 16px;
+  --text-size-xl: 18px;
+  --text-size-2xl: 20px;
+  --text-size-3xl: 22px;
+  --text-size-4xl: 24px;
+  --text-size-5xl: 26px;
+  --text-size-6xl: 28px;
+  --text-size-7xl: 30px;
+  --text-size-8xl: 32px;
+  --text-size-9xl: 34px;
 
-  /* Line heights relative to text sizes */
-  --line-height-xs: calc(var(--text-size-xs) * 1.5);
-  --line-height-sm: calc(var(--text-size-sm) * 1.5);
-  --line-height-base: calc(var(--text-size-base) * 1.5);
-  --line-height-lg: calc(var(--text-size-lg) * 1.5);
-  --line-height-xl: calc(var(--text-size-xl) * 1.4);
-  --line-height-2xl: calc(var(--text-size-2xl) * 1.33);
-  --line-height-3xl: calc(var(--text-size-3xl) * 1.2);
-  --line-height-4xl: calc(var(--text-size-4xl) * 1.1);
-  --line-height-5xl: var(--text-size-5xl);
-  --line-height-6xl: var(--text-size-6xl);
-  --line-height-7xl: var(--text-size-7xl);
-  --line-height-8xl: var(--text-size-8xl);
-  --line-height-9xl: var(--text-size-9xl);
-
-  /* Map custom text sizes to Tailwind font-size utilities */
-  --font-size-xs: var(--text-size-xs);
-  --font-size-sm: var(--text-size-sm);
-  --font-size-base: var(--text-size-base);
-  --font-size-lg: var(--text-size-lg);
-  --font-size-xl: var(--text-size-xl);
-  --font-size-2xl: var(--text-size-2xl);
-  --font-size-3xl: var(--text-size-3xl);
-  --font-size-4xl: var(--text-size-4xl);
-  --font-size-5xl: var(--text-size-5xl);
-  --font-size-6xl: var(--text-size-6xl);
-  --font-size-7xl: var(--text-size-7xl);
-  --font-size-8xl: var(--text-size-8xl);
-  --font-size-9xl: var(--text-size-9xl);
+  /* Line heights for readability */
+  --line-height-xs: 16px; /* 10px * 1.6 */
+  --line-height-sm: 18px; /* 12px * 1.5 */
+  --line-height-base: 21px; /* 14px * 1.5 */
+  --line-height-lg: 24px; /* 16px * 1.5 */
+  --line-height-xl: 26px; /* 18px * 1.44 */
+  --line-height-2xl: 28px; /* 20px * 1.4 */
+  --line-height-3xl: 30px; /* 22px * 1.36 */
+  --line-height-4xl: 32px; /* 24px * 1.33 */
+  --line-height-5xl: 34px; /* 26px * 1.31 */
+  --line-height-6xl: 36px; /* 28px * 1.29 */
+  --line-height-7xl: 38px; /* 30px * 1.27 */
+  --line-height-8xl: 40px; /* 32px * 1.25 */
+  --line-height-9xl: 42px; /* 34px * 1.24 */
 }
 
 body {
@@ -112,5 +97,46 @@ body {
 
   .font-sans {
     font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* Override Tailwind's default font sizes with custom variables */
+  .text-xs {
+    font-size: var(--text-size-xs);
+  }
+  .text-sm {
+    font-size: var(--text-size-sm);
+  }
+  .text-base {
+    font-size: var(--text-size-base);
+  }
+  .text-lg {
+    font-size: var(--text-size-lg);
+  }
+  .text-xl {
+    font-size: var(--text-size-xl);
+  }
+  .text-2xl {
+    font-size: var(--text-size-2xl);
+  }
+  .text-3xl {
+    font-size: var(--text-size-3xl);
+  }
+  .text-4xl {
+    font-size: var(--text-size-4xl);
+  }
+  .text-5xl {
+    font-size: var(--text-size-5xl);
+  }
+  .text-6xl {
+    font-size: var(--text-size-6xl);
+  }
+  .text-7xl {
+    font-size: var(--text-size-7xl);
+  }
+  .text-8xl {
+    font-size: var(--text-size-8xl);
+  }
+  .text-9xl {
+    font-size: var(--text-size-9xl);
   }
 }

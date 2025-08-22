@@ -43,7 +43,7 @@ export function Header({ fixed = false }: HeaderProps) {
             <Link
               key={item.href}
               href={item.href}
-              className="uppercase tracking-tight text-xs font-semibold text-zinc-300 hover:text-white transition-colors"
+              className="uppercase tracking-tight text-sm font-semibold text-zinc-300 hover:text-white transition-colors"
             >
               {item.type === "button" ? (
                 <Button variant="outline" className="cursor-pointer uppercase" size="xs">

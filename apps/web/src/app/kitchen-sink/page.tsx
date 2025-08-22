@@ -1,8 +1,22 @@
 "use client"
 
 import { Button } from "@repo/ui/button"
+import { Badge } from "@repo/ui/badge"
 import { cn } from "@repo/ui/lib/utils"
-import { BellIcon, BoltIcon, PaperclipIcon } from "lucide-react"
+import {
+  BellIcon,
+  BoltIcon,
+  PaperclipIcon,
+  CheckIcon,
+  XIcon,
+  StarIcon,
+  AlertTriangleIcon,
+  InfoIcon,
+  CrownIcon,
+  FlameIcon,
+  HeartIcon,
+  ZapIcon,
+} from "lucide-react"
 import { redirect } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -36,6 +50,19 @@ export default function KitchenSinkPage() {
         { id: "button-colors-outline", title: "Outline Buttons - Colors" },
         { id: "button-colors-plain", title: "Plain Buttons - Colors" },
         { id: "button-icons", title: "Buttons with Icons" },
+      ],
+    },
+    {
+      id: "badges",
+      title: "Badges",
+      subsections: [
+        { id: "badge-variants", title: "Badge Variants" },
+        { id: "badge-colors-solid", title: "Solid Badges - Colors" },
+        { id: "badge-colors-outline", title: "Outline Badges - Colors" },
+        { id: "badge-colors-plain", title: "Plain Badges - Colors" },
+        { id: "badge-icons", title: "Badges with Icons" },
+        { id: "badge-numbers", title: "Number Badges" },
+        { id: "badge-status", title: "Status Badges" },
       ],
     },
     {
@@ -651,6 +678,496 @@ export default function KitchenSinkPage() {
                         <BoltIcon data-slot="icon" />
                         Button with Icon
                       </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Badges Section */}
+            <section id="badges" className="space-y-6">
+              <div>
+                <h2 className="mb-6 text-2xl font-semibold text-foreground border-b border-border pb-4">
+                  Badges
+                </h2>
+
+                {/* Basic Variants */}
+                <div id="badge-variants" className="mb-8">
+                  <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                    Badge Variants
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <Badge variant="solid">Solid Badge</Badge>
+                    <Badge variant="outline">Outline Badge</Badge>
+                    <Badge variant="plain">Plain Badge</Badge>
+                  </div>
+                </div>
+
+                {/* Colors - Solid */}
+                <div id="badge-colors-solid" className="mb-8">
+                  <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                    Solid Badges - Colors
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Badge variant="solid" colorScheme="dark">
+                      Dark
+                    </Badge>
+                    <Badge variant="solid" colorScheme="light">
+                      Light
+                    </Badge>
+                    <Badge variant="solid" colorScheme="dark/white">
+                      Dark/White
+                    </Badge>
+                    <Badge variant="solid" colorScheme="zinc">
+                      Zinc
+                    </Badge>
+                    <Badge variant="solid" colorScheme="red">
+                      Red
+                    </Badge>
+                    <Badge variant="solid" colorScheme="orange">
+                      Orange
+                    </Badge>
+                    <Badge variant="solid" colorScheme="amber">
+                      Amber
+                    </Badge>
+                    <Badge variant="solid" colorScheme="yellow">
+                      Yellow
+                    </Badge>
+                    <Badge variant="solid" colorScheme="lime">
+                      Lime
+                    </Badge>
+                    <Badge variant="solid" colorScheme="green">
+                      Green
+                    </Badge>
+                    <Badge variant="solid" colorScheme="emerald">
+                      Emerald
+                    </Badge>
+                    <Badge variant="solid" colorScheme="teal">
+                      Teal
+                    </Badge>
+                    <Badge variant="solid" colorScheme="cyan">
+                      Cyan
+                    </Badge>
+                    <Badge variant="solid" colorScheme="sky">
+                      Sky
+                    </Badge>
+                    <Badge variant="solid" colorScheme="blue">
+                      Blue
+                    </Badge>
+                    <Badge variant="solid" colorScheme="indigo">
+                      Indigo
+                    </Badge>
+                    <Badge variant="solid" colorScheme="violet">
+                      Violet
+                    </Badge>
+                    <Badge variant="solid" colorScheme="purple">
+                      Purple
+                    </Badge>
+                    <Badge variant="solid" colorScheme="fuchsia">
+                      Fuchsia
+                    </Badge>
+                    <Badge variant="solid" colorScheme="pink">
+                      Pink
+                    </Badge>
+                    <Badge variant="solid" colorScheme="rose">
+                      Rose
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Colors - Outline */}
+                <div id="badge-colors-outline" className="mb-8">
+                  <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                    Outline Badges - Colors
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Badge variant="outline" colorScheme="dark">
+                      Dark
+                    </Badge>
+                    <Badge variant="outline" colorScheme="light">
+                      Light
+                    </Badge>
+                    <Badge variant="outline" colorScheme="dark/white">
+                      Dark/White
+                    </Badge>
+                    <Badge variant="outline" colorScheme="zinc">
+                      Zinc
+                    </Badge>
+                    <Badge variant="outline" colorScheme="red">
+                      Red
+                    </Badge>
+                    <Badge variant="outline" colorScheme="orange">
+                      Orange
+                    </Badge>
+                    <Badge variant="outline" colorScheme="amber">
+                      Amber
+                    </Badge>
+                    <Badge variant="outline" colorScheme="yellow">
+                      Yellow
+                    </Badge>
+                    <Badge variant="outline" colorScheme="lime">
+                      Lime
+                    </Badge>
+                    <Badge variant="outline" colorScheme="green">
+                      Green
+                    </Badge>
+                    <Badge variant="outline" colorScheme="emerald">
+                      Emerald
+                    </Badge>
+                    <Badge variant="outline" colorScheme="teal">
+                      Teal
+                    </Badge>
+                    <Badge variant="outline" colorScheme="cyan">
+                      Cyan
+                    </Badge>
+                    <Badge variant="outline" colorScheme="sky">
+                      Sky
+                    </Badge>
+                    <Badge variant="outline" colorScheme="blue">
+                      Blue
+                    </Badge>
+                    <Badge variant="outline" colorScheme="indigo">
+                      Indigo
+                    </Badge>
+                    <Badge variant="outline" colorScheme="violet">
+                      Violet
+                    </Badge>
+                    <Badge variant="outline" colorScheme="purple">
+                      Purple
+                    </Badge>
+                    <Badge variant="outline" colorScheme="fuchsia">
+                      Fuchsia
+                    </Badge>
+                    <Badge variant="outline" colorScheme="pink">
+                      Pink
+                    </Badge>
+                    <Badge variant="outline" colorScheme="rose">
+                      Rose
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Colors - Plain */}
+                <div id="badge-colors-plain" className="mb-8">
+                  <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                    Plain Badges - Colors
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Badge variant="plain" colorScheme="dark">
+                      Dark
+                    </Badge>
+                    <Badge variant="plain" colorScheme="light">
+                      Light
+                    </Badge>
+                    <Badge variant="plain" colorScheme="dark/white">
+                      Dark/White
+                    </Badge>
+                    <Badge variant="plain" colorScheme="zinc">
+                      Zinc
+                    </Badge>
+                    <Badge variant="plain" colorScheme="red">
+                      Red
+                    </Badge>
+                    <Badge variant="plain" colorScheme="orange">
+                      Orange
+                    </Badge>
+                    <Badge variant="plain" colorScheme="amber">
+                      Amber
+                    </Badge>
+                    <Badge variant="plain" colorScheme="yellow">
+                      Yellow
+                    </Badge>
+                    <Badge variant="plain" colorScheme="lime">
+                      Lime
+                    </Badge>
+                    <Badge variant="plain" colorScheme="green">
+                      Green
+                    </Badge>
+                    <Badge variant="plain" colorScheme="emerald">
+                      Emerald
+                    </Badge>
+                    <Badge variant="plain" colorScheme="teal">
+                      Teal
+                    </Badge>
+                    <Badge variant="plain" colorScheme="cyan">
+                      Cyan
+                    </Badge>
+                    <Badge variant="plain" colorScheme="sky">
+                      Sky
+                    </Badge>
+                    <Badge variant="plain" colorScheme="blue">
+                      Blue
+                    </Badge>
+                    <Badge variant="plain" colorScheme="indigo">
+                      Indigo
+                    </Badge>
+                    <Badge variant="plain" colorScheme="violet">
+                      Violet
+                    </Badge>
+                    <Badge variant="plain" colorScheme="purple">
+                      Purple
+                    </Badge>
+                    <Badge variant="plain" colorScheme="fuchsia">
+                      Fuchsia
+                    </Badge>
+                    <Badge variant="plain" colorScheme="pink">
+                      Pink
+                    </Badge>
+                    <Badge variant="plain" colorScheme="rose">
+                      Rose
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* With Icons */}
+                <div id="badge-icons" className="mb-8">
+                  <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                    Badges with Icons
+                  </h3>
+                  <div className="space-y-4">
+                    {/* Icons Only */}
+                    <div>
+                      <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                        Icon Only
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Badge variant="solid" colorScheme="blue">
+                          <BellIcon />
+                        </Badge>
+                        <Badge variant="solid" colorScheme="green">
+                          <CheckIcon />
+                        </Badge>
+                        <Badge variant="solid" colorScheme="red">
+                          <XIcon />
+                        </Badge>
+                        <Badge variant="solid" colorScheme="amber">
+                          <AlertTriangleIcon />
+                        </Badge>
+                        <Badge variant="solid" colorScheme="purple">
+                          <StarIcon />
+                        </Badge>
+                        <Badge variant="solid" colorScheme="indigo">
+                          <InfoIcon />
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* Icon + Text */}
+                    <div>
+                      <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                        Icon + Text
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Badge variant="solid" colorScheme="green">
+                          <CheckIcon />
+                          Verified
+                        </Badge>
+                        <Badge variant="solid" colorScheme="blue">
+                          <BellIcon />
+                          Notifications
+                        </Badge>
+                        <Badge variant="solid" colorScheme="purple">
+                          <CrownIcon />
+                          Premium
+                        </Badge>
+                        <Badge variant="solid" colorScheme="orange">
+                          <FlameIcon />
+                          Hot
+                        </Badge>
+                        <Badge variant="solid" colorScheme="pink">
+                          <HeartIcon />
+                          Favorite
+                        </Badge>
+                        <Badge variant="solid" colorScheme="yellow">
+                          <ZapIcon />
+                          Fast
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* Outline Variants with Icons */}
+                    <div>
+                      <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                        Outline + Icons
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Badge variant="outline" colorScheme="green">
+                          <CheckIcon />
+                          Success
+                        </Badge>
+                        <Badge variant="outline" colorScheme="red">
+                          <XIcon />
+                          Error
+                        </Badge>
+                        <Badge variant="outline" colorScheme="amber">
+                          <AlertTriangleIcon />
+                          Warning
+                        </Badge>
+                        <Badge variant="outline" colorScheme="blue">
+                          <InfoIcon />
+                          Info
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Number Badges */}
+                <div id="badge-numbers" className="mb-8">
+                  <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                    Number Badges
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                        Notification Counts
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Badge variant="solid" colorScheme="red">
+                          1
+                        </Badge>
+                        <Badge variant="solid" colorScheme="red">
+                          3
+                        </Badge>
+                        <Badge variant="solid" colorScheme="red">
+                          12
+                        </Badge>
+                        <Badge variant="solid" colorScheme="red">
+                          99+
+                        </Badge>
+                        <Badge variant="solid" colorScheme="blue">
+                          42
+                        </Badge>
+                        <Badge variant="solid" colorScheme="green">
+                          100
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                        Versions & Numbers
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Badge variant="outline" colorScheme="zinc">
+                          v1.0.0
+                        </Badge>
+                        <Badge variant="outline" colorScheme="zinc">
+                          v2.1.5
+                        </Badge>
+                        <Badge variant="outline" colorScheme="blue">
+                          Beta
+                        </Badge>
+                        <Badge variant="outline" colorScheme="green">
+                          Stable
+                        </Badge>
+                        <Badge variant="outline" colorScheme="amber">
+                          RC1
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status Badges */}
+                <div id="badge-status" className="mb-8">
+                  <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
+                    Status Badges
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                        User Status
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Badge variant="solid" colorScheme="green">
+                          <span className="w-1.5 h-1.5 bg-white rounded-full mr-1"></span>
+                          Online
+                        </Badge>
+                        <Badge variant="solid" colorScheme="amber">
+                          <span className="w-1.5 h-1.5 bg-white rounded-full mr-1"></span>
+                          Away
+                        </Badge>
+                        <Badge variant="solid" colorScheme="red">
+                          <span className="w-1.5 h-1.5 bg-white rounded-full mr-1"></span>
+                          Busy
+                        </Badge>
+                        <Badge variant="solid" colorScheme="zinc">
+                          <span className="w-1.5 h-1.5 bg-white rounded-full mr-1"></span>
+                          Offline
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                        System Status
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Badge variant="outline" colorScheme="green">
+                          <CheckIcon />
+                          Operational
+                        </Badge>
+                        <Badge variant="outline" colorScheme="amber">
+                          <AlertTriangleIcon />
+                          Degraded
+                        </Badge>
+                        <Badge variant="outline" colorScheme="red">
+                          <XIcon />
+                          Down
+                        </Badge>
+                        <Badge variant="outline" colorScheme="blue">
+                          <InfoIcon />
+                          Maintenance
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                        Priority Levels
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Badge variant="solid" colorScheme="red">
+                          Critical
+                        </Badge>
+                        <Badge variant="solid" colorScheme="orange">
+                          High
+                        </Badge>
+                        <Badge variant="solid" colorScheme="amber">
+                          Medium
+                        </Badge>
+                        <Badge variant="solid" colorScheme="blue">
+                          Low
+                        </Badge>
+                        <Badge variant="solid" colorScheme="zinc">
+                          None
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                        As Links (hover to see effect)
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Badge asChild variant="solid" colorScheme="blue">
+                          <a href="#" className="cursor-pointer">
+                            Clickable Badge
+                          </a>
+                        </Badge>
+                        <Badge asChild variant="outline" colorScheme="purple">
+                          <a href="#" className="cursor-pointer">
+                            <StarIcon />
+                            Featured
+                          </a>
+                        </Badge>
+                        <Badge asChild variant="plain" colorScheme="green">
+                          <a href="#" className="cursor-pointer">
+                            View Details
+                          </a>
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                 </div>

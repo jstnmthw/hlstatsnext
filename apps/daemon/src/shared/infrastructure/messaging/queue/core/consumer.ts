@@ -154,7 +154,10 @@ export class EventConsumer implements IEventConsumer {
           } catch (error) {
             // Channel might already be closed
             const errorMessage = error instanceof Error ? error.message : String(error)
-            if (!errorMessage.includes('Channel closed') && !errorMessage.includes('IllegalOperationError')) {
+            if (
+              !errorMessage.includes("Channel closed") &&
+              !errorMessage.includes("IllegalOperationError")
+            ) {
               this.logger.warn(`Failed to cancel consumer ${consumerTag}: ${error}`)
             }
           }

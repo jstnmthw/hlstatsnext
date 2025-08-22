@@ -29,7 +29,7 @@ export interface IServerRepository {
   getServerConfig(serverId: number, parameter: string): Promise<string | null>
   hasRconCredentials(serverId: number): Promise<boolean>
   findActiveServersWithRcon(maxAgeMinutes?: number): Promise<ServerInfo[]>
-  
+
   // Database-driven MOD configuration methods
   getModDefault(modCode: string, parameter: string): Promise<string | null>
   getServerConfigDefault(parameter: string): Promise<string | null>

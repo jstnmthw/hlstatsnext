@@ -99,7 +99,7 @@ Docker servers are automatically detected and authenticated using network analys
 // Docker servers are configured in the database
 {
   connectionType: "docker",
-  dockerHost: "localhost", 
+  dockerHost: "localhost",
   address: "172.17.0.2", // Docker bridge IP
   port: 27015,
   game: "cstrike"
@@ -125,7 +125,7 @@ Development environments support bypass authentication for rapid testing:
 
 ```typescript
 // Authentication flow
-const serverId = await authenticator.authenticateServer(address, port);
+const serverId = await authenticator.authenticateServer(address, port)
 if (serverId === null) {
   // Server not authorized - reject connection
 } else if (serverId === INGRESS_CONSTANTS.DEV_AUTH_SENTINEL) {
@@ -372,16 +372,19 @@ CMD ["pnpm", "start"]
 ## Documentation
 
 ### Architecture & Features
+
 - [`docs/MIGRATION.md`](./docs/MIGRATION.md) - Migration progress from Perl daemon
 - [`docs/EVENT_LIFECYCLE.md`](./docs/EVENT_LIFECYCLE.md) - Detailed event flow documentation
 - [`docs/features/EVENT_QUEUE.md`](./docs/features/EVENT_QUEUE.md) - RabbitMQ integration design
 - [`docs/features/PLAYER_RANKINGS.md`](./docs/features/PLAYER_RANKINGS.md) - Complete ranking system guide
 
 ### Implementation Patterns
+
 - [`src/shared/application/README.md`](./src/shared/application/README.md) - Application layer patterns (factories, orchestrators, validators, builders)
 - [`src/shared/infrastructure/README.md`](./src/shared/infrastructure/README.md) - Infrastructure patterns (messaging, persistence, observability)
 
 ### Core Services
+
 - **Server Authentication**: Database-driven server discovery with Docker network detection (`src/modules/ingress/adapters/`)
 - **RCON Integration**: Multi-protocol server monitoring and status parsing (`src/modules/rcon/`)
 - **GeoIP Services**: MaxMind GeoLite database integration for location enrichment (`src/modules/geoip/`)

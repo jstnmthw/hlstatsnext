@@ -1,4 +1,4 @@
-import { Button } from "@repo/ui/button"
+import { SettingsIcon } from "lucide-react"
 import Link from "next/link"
 
 const navItems = [
@@ -14,12 +14,16 @@ const navItems = [
     label: "Players",
     href: "/players",
   },
+  {
+    label: "Users",
+    href: "/users",
+  },
 ]
 
 export function AdminHeader() {
   return (
     <header className="w-full">
-      <div className="max-w-screen-lg px-4 md:px-6 lg:px-8 mx-auto py-6 flex justify-between items-center">
+      <div className="container py-6 flex justify-between items-center">
         <div className="flex items-center gap-2 font-bold">
           {process.env.NEXT_PUBLIC_APP_NAME}{" "}
           <span className="text-xs text-muted-foreground">v1.0.0</span>
@@ -34,6 +38,9 @@ export function AdminHeader() {
               {item.label}
             </Link>
           ))}
+          <Link href="/admin">
+            <SettingsIcon className="size-4" />
+          </Link>
         </nav>
       </div>
     </header>

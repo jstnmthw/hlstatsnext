@@ -83,14 +83,17 @@ export class RabbitMQClient implements IQueueClient {
       for (const [name, channel] of this.channels) {
         try {
           // Check if channel is still open before closing
-          if (channel && typeof channel.close === 'function') {
+          if (channel && typeof channel.close === "function") {
             await channel.close()
             this.logger.debug(`Closed channel: ${name}`)
           }
         } catch (error) {
           // Only log if it's not an "already closed" error
           const errorMessage = error instanceof Error ? error.message : String(error)
-          if (!errorMessage.includes('Channel closed') && !errorMessage.includes('IllegalOperationError')) {
+          if (
+            !errorMessage.includes("Channel closed") &&
+            !errorMessage.includes("IllegalOperationError")
+          ) {
             this.logger.warn(`Failed to close channel ${name}: ${error}`)
           }
         }
@@ -239,7 +242,7 @@ export class RabbitMQClient implements IQueueClient {
           this.logger.debug("Skipping reconnection during shutdown")
           return
         }
-        
+
         try {
           await this.connect()
         } catch (reconnectError) {

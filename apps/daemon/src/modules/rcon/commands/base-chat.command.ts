@@ -36,13 +36,12 @@ export abstract class BaseChatCommand implements IChatCommand {
   protected escapeMessage(message: string): string {
     // Remove or escape problematic characters
     const escaped = message
-      .replace(/"/g, '\\"')  // Escape quotes
-      .replace(/\n/g, '\\n') // Escape newlines
-      .replace(/\r/g, '\\r') // Escape carriage returns
-      .replace(/\t/g, ' ')   // Replace tabs with spaces
-    
+      .replace(/"/g, '\\"') // Escape quotes
+      .replace(/\n/g, "\\n") // Escape newlines
+      .replace(/\r/g, "\\r") // Escape carriage returns
+      .replace(/\t/g, " ") // Replace tabs with spaces
+
     // Ensure message is quoted for RCON
     return `"${escaped}"`
   }
-
 }

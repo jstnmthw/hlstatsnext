@@ -13,7 +13,7 @@ export default function Page() {
     <PageWrapper>
       <AdminHeader />
       <MainContent>
-        <div>
+        <div className="max-w-screen-lg mx-auto">
           <h2 className="text-xl font-semibold tracking-tight mb-2">Admin Dashboard</h2>
           <p>
             Get started by creating your first Half-Life server to begin tracking player statistics

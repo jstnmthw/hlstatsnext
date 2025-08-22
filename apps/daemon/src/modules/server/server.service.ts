@@ -54,17 +54,17 @@ export class ServerService implements IServerService {
 
   async getServerModType(serverId: number): Promise<string> {
     try {
-      const modConfig = await this.repository.getServerConfig(serverId, 'Mod')
-      
+      const modConfig = await this.repository.getServerConfig(serverId, "Mod")
+
       // Return the configured MOD type, defaulting to empty string if null
-      if (!modConfig || modConfig.trim() === '') {
-        return ''
+      if (!modConfig || modConfig.trim() === "") {
+        return ""
       }
-      
+
       return modConfig.trim().toUpperCase()
     } catch (error) {
       this.logger.error(`Failed to get MOD type for server ${serverId}: ${error}`)
-      return ''
+      return ""
     }
   }
 }

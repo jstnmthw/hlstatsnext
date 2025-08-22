@@ -1,6 +1,6 @@
 /**
  * Unified RCON Command Service
- * 
+ *
  * Executes RCON commands using database-resolved command strings.
  * Handles batch optimization and message formatting automatically.
  */
@@ -32,36 +32,49 @@ export class RconCommandService {
     serverId: number,
     recipients: number[],
     message: string,
-    options: RconCommandOptions = {}
+    options: RconCommandOptions = {},
   ): Promise<void> {
     if (recipients.length === 0) {
       return
     }
 
-    const commandType = options.commandType || 'BroadCastEventsCommand'
-    
+    const commandType = options.commandType || "BroadCastEventsCommand"
+
     try {
       const capabilities = await this.commandResolver.getCommandCapabilities(serverId, commandType)
-      
+
       if (capabilities.supportsBatch && !options.forceSingle) {
-        await this.executeBatch(serverId, recipients, message, commandType, capabilities.maxBatchSize, capabilities.requiresHashPrefix)
+        await this.executeBatch(
+          serverId,
+          recipients,
+          message,
+          commandType,
+          capabilities.maxBatchSize,
+          capabilities.requiresHashPrefix,
+        )
       } else {
-        await this.executeIndividual(serverId, recipients, message, commandType, capabilities.requiresHashPrefix, options.batchDelay)
+        await this.executeIndividual(
+          serverId,
+          recipients,
+          message,
+          commandType,
+          capabilities.requiresHashPrefix,
+          options.batchDelay,
+        )
       }
 
       this.logger.debug(`Executed RCON command for ${recipients.length} recipients`, {
         serverId,
         commandType,
         recipientCount: recipients.length,
-        batchMode: capabilities.supportsBatch && !options.forceSingle
+        batchMode: capabilities.supportsBatch && !options.forceSingle,
       })
-
     } catch (error) {
       this.logger.error(`Failed to execute RCON command on server ${serverId}`, {
         serverId,
         commandType,
         recipientCount: recipients.length,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -76,7 +89,7 @@ export class RconCommandService {
     message: string,
     commandType: CommandType,
     maxBatchSize: number,
-    requiresHashPrefix: boolean
+    requiresHashPrefix: boolean,
   ): Promise<void> {
     const command = await this.commandResolver.getCommand(serverId, commandType)
     const escapedMessage = this.escapeMessage(message)
@@ -87,13 +100,13 @@ export class RconCommandService {
     for (const batch of batches) {
       let rconCommand: string
 
-      if (command.includes('hlx_sm_psay')) {
+      if (command.includes("hlx_sm_psay")) {
         // SourceMod: comma-separated user IDs
-        const userList = batch.join(',')
+        const userList = batch.join(",")
         rconCommand = `${command} ${userList} ${escapedMessage}`
-      } else if (command.includes('hlx_amx_bulkpsay')) {
+      } else if (command.includes("hlx_amx_bulkpsay")) {
         // AMX bulk command: space-separated with hash prefix
-        const userList = batch.map(id => `#${id}`).join(' ')
+        const userList = batch.map((id) => `#${id}`).join(" ")
         rconCommand = `${command} ${userList} ${escapedMessage}`
       } else {
         // Fallback to individual commands
@@ -115,7 +128,7 @@ export class RconCommandService {
     message: string,
     commandType: CommandType,
     requiresHashPrefix: boolean,
-    batchDelay?: number
+    batchDelay?: number,
   ): Promise<void> {
     const command = await this.commandResolver.getCommand(serverId, commandType)
     const escapedMessage = this.escapeMessage(message)
@@ -123,7 +136,7 @@ export class RconCommandService {
     for (const recipient of recipients) {
       const userId = requiresHashPrefix ? `#${recipient}` : recipient.toString()
       const rconCommand = `${command} ${userId} ${escapedMessage}`
-      
+
       this.logCommand(serverId, rconCommand, [recipient])
       await this.rconService.executeCommand(serverId, rconCommand)
 
@@ -140,18 +153,18 @@ export class RconCommandService {
   async executeAnnouncement(
     serverId: number,
     message: string,
-    commandType: CommandType = 'BroadCastEventsCommandAnnounce'
+    commandType: CommandType = "BroadCastEventsCommandAnnounce",
   ): Promise<void> {
     try {
       const command = await this.commandResolver.getCommand(serverId, commandType)
       const escapedMessage = this.escapeMessage(message)
-      
+
       // Handle special cases for announcement commands
       let rconCommand: string
-      if (command.includes('ma_hlx_csay')) {
+      if (command.includes("ma_hlx_csay")) {
         // Mani requires #all suffix for global announcements
         rconCommand = `${command} #all ${escapedMessage}`
-      } else if (command === 'say') {
+      } else if (command === "say") {
         // Plain say command for vanilla servers
         rconCommand = `say ${escapedMessage}`
       } else {
@@ -161,12 +174,11 @@ export class RconCommandService {
 
       this.logCommand(serverId, rconCommand, [])
       await this.rconService.executeCommand(serverId, rconCommand)
-
     } catch (error) {
       this.logger.error(`Failed to execute announcement command on server ${serverId}`, {
         serverId,
         commandType,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -177,10 +189,10 @@ export class RconCommandService {
    */
   private escapeMessage(message: string): string {
     return message
-      .replace(/"/g, '\\"')     // Escape quotes
-      .replace(/\n/g, '\\n')    // Escape newlines
-      .replace(/\r/g, '\\r')    // Escape carriage returns
-      .replace(/;/g, '\\;')     // Escape semicolons (command separators)
+      .replace(/"/g, '\\"') // Escape quotes
+      .replace(/\n/g, "\\n") // Escape newlines
+      .replace(/\r/g, "\\r") // Escape carriage returns
+      .replace(/;/g, "\\;") // Escape semicolons (command separators)
   }
 
   /**
@@ -200,9 +212,9 @@ export class RconCommandService {
   private logCommand(serverId: number, command: string, recipients: number[]): void {
     this.logger.debug(`Executing RCON command`, {
       serverId,
-      command: command.substring(0, 100) + (command.length > 100 ? '...' : ''),
+      command: command.substring(0, 100) + (command.length > 100 ? "..." : ""),
       recipientCount: recipients.length,
-      recipients: recipients.length <= 5 ? recipients : `${recipients.slice(0, 5)}...`
+      recipients: recipients.length <= 5 ? recipients : `${recipients.slice(0, 5)}...`,
     })
   }
 
@@ -210,6 +222,6 @@ export class RconCommandService {
    * Utility delay function
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise((resolve) => setTimeout(resolve, ms))
   }
 }

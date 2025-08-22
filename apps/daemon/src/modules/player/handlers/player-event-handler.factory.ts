@@ -85,7 +85,13 @@ export class PlayerEventHandlerFactory {
 
     this.handlers.set(
       EventType.PLAYER_KILL,
-      new KillEventHandler(repository, logger, matchService, rankingService, playerNotificationService),
+      new KillEventHandler(
+        repository,
+        logger,
+        matchService,
+        rankingService,
+        playerNotificationService,
+      ),
     )
 
     // Note: PLAYER_CHANGE_ROLE is not implemented as it doesn't affect stats

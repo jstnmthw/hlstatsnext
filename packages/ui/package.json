@@ -18,6 +18,10 @@
       "types": "./dist/components/badge.d.ts",
       "import": "./dist/components/badge.js"
     },
+    "./card": {
+      "types": "./dist/components/card.d.ts",
+      "import": "./dist/components/card.js"
+    },
     "./breadcrumb": {
       "types": "./dist/components/breadcrumb.d.ts",
       "import": "./dist/components/breadcrumb.js"

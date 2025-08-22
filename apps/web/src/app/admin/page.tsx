@@ -30,7 +30,7 @@ export default function Page() {
           <div className="text-center max-w-xs gap-2 flex flex-col items-center">
             <h3 className="text-lg font-semibold">No servers configured</h3>
             <p className="text-muted-foreground mb-4">
-              Create your first Half-Life server to begin tracking player statistics and activities.
+              Add your first Half-Life server to begin tracking player statistics and activities.
             </p>
             <Button variant="solid" size="default" colorScheme="green">
               <PlusCircleIcon data-slot="icon" />

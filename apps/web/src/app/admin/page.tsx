@@ -5,6 +5,7 @@ import { PageWrapper } from "@/features/common/components/page-wrapper"
 import { Button } from "@repo/ui/button"
 import { Card } from "@repo/ui/card"
 import { PlusCircleIcon, ServerIcon } from "lucide-react"
+import Link from "next/link"
 
 export const metadata = {
   title: "Admin - " + process.env.NEXT_PUBLIC_APP_NAME,
@@ -32,9 +33,11 @@ export default function Page() {
             <p className="text-muted-foreground mb-4">
               Add your first Half-Life server to begin tracking player statistics and activities.
             </p>
-            <Button variant="solid" size="default" colorScheme="green">
-              <PlusCircleIcon data-slot="icon" />
-              <span>Create server</span>
+            <Button variant="solid" size="default" colorScheme="green" asChild>
+              <Link href="/admin/server/create">
+                <PlusCircleIcon data-slot="icon" />
+                <span>Create server</span>
+              </Link>
             </Button>
           </div>
         </Card>

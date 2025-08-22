@@ -1,4 +1,4 @@
-import { Header } from "@/features/common/components/header"
+import { AdminHeader } from "@/features/admin/components/header"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
@@ -11,9 +11,15 @@ export const metadata = {
 export default function Page() {
   return (
     <PageWrapper>
-      <Header />
+      <AdminHeader />
       <MainContent>
-        <div className="grid grid-cols-3 gap-4">Admin Content</div>
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight mb-2">Admin Dashboard</h2>
+          <p>
+            Get started by creating your first Half-Life server to begin tracking player statistics
+            and activities.
+          </p>
+        </div>
       </MainContent>
       <Footer />
     </PageWrapper>

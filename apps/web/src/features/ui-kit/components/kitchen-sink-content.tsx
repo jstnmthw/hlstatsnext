@@ -1,4 +1,4 @@
-import { Button, Badge } from "@repo/ui"
+import { Button, Badge, cn } from "@repo/ui"
 import {
   BellIcon,
   BoltIcon,
@@ -14,9 +14,9 @@ import {
   ZapIcon,
 } from "lucide-react"
 
-export function KitchenSinkContent() {
+export function KitchenSinkContent({ className }: { className?: string }) {
   return (
-    <div className="container space-y-12">
+    <div className={cn("space-y-12", className)}>
       {/* Header */}
       <header className="space-y-4">
         <h1 className="text-5xl font-bold text-foreground">HlStatsNext - UI Kit</h1>

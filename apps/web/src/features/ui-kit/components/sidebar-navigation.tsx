@@ -11,9 +11,10 @@ interface TableOfContentsItem {
 
 interface SidebarNavigationProps {
   tableOfContents: TableOfContentsItem[]
+  className?: string
 }
 
-export function SidebarNavigation({ tableOfContents }: SidebarNavigationProps) {
+export function SidebarNavigation({ tableOfContents, className }: SidebarNavigationProps) {
   const [activeSection, setActiveSection] = useState("")
 
   // Handle smooth scrolling
@@ -72,42 +73,40 @@ export function SidebarNavigation({ tableOfContents }: SidebarNavigationProps) {
   }, [tableOfContents])
 
   return (
-    <aside className="fixed left-0 top-17 h-[calc(100vh-68px)] w-64 overflow-y-auto border-r border-border bg-background p-6">
-      <nav className="space-y-6">
-        <div>
-          <h2 className="mb-4 text-lg font-semibold">Table of Contents</h2>
-          <ul className="space-y-3">
-            {tableOfContents.map((section) => (
-              <li key={section.id}>
-                <button
-                  onClick={() => scrollToSection(section.id)}
-                  className={cn(
-                    "block w-full cursor-pointer text-left text-sm font-medium transition-all duration-200 rounded-md px-2 py-1 hover:text-white hover:bg-white/10",
-                    activeSection === section.id
-                      ? "text-white bg-white/15 font-semibold"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  {section.title}
-                </button>
-                {section.subsections.length > 0 && (
-                  <ul className="mt-2 ml-4 space-y-2">
-                    {section.subsections.map((subsection) => (
-                      <li key={subsection.id}>
-                        <button
-                          onClick={() => scrollToSection(subsection.id)}
-                          className="block w-full cursor-pointer text-left text-sm transition-all duration-200 rounded-md px-2 py-1 text-muted-foreground hover:text-white hover:bg-white/10"
-                        >
-                          {subsection.title}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+    <aside className={cn("border-l border-border bg-background", className)}>
+      <nav className="space-y-6 px-4 pt-4">
+        <h2 className="mb-4 font-semibold tracking-tight">Table of Contents</h2>
+        <ul className="space-y-3">
+          {tableOfContents.map((section) => (
+            <li key={section.id}>
+              <button
+                onClick={() => scrollToSection(section.id)}
+                className={cn(
+                  "block w-full cursor-pointer text-left text-sm font-medium transition-all duration-200 rounded-md px-2 py-1 hover:text-white hover:bg-white/10",
+                  activeSection === section.id
+                    ? "text-white bg-white/15 font-semibold"
+                    : "text-muted-foreground",
                 )}
-              </li>
-            ))}
-          </ul>
-        </div>
+              >
+                {section.title}
+              </button>
+              {section.subsections.length > 0 && (
+                <ul className="mt-2 ml-4 space-y-2">
+                  {section.subsections.map((subsection) => (
+                    <li key={subsection.id}>
+                      <button
+                        onClick={() => scrollToSection(subsection.id)}
+                        className="block w-full cursor-pointer text-left text-sm transition-all duration-200 rounded-md px-2 py-1 text-muted-foreground hover:text-white hover:bg-white/10"
+                      >
+                        {subsection.title}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
       </nav>
     </aside>
   )

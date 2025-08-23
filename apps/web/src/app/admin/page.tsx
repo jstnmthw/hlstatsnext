@@ -16,30 +16,32 @@ export default function Page() {
     <PageWrapper>
       <AdminHeader />
       <MainContent>
-        <div className="max-w-screen-lg mx-auto py-10 border-t border-border">
-          <h2 className="text-2xl font-medium tracking-tight">Admin Dashboard</h2>
-          <p className="text-muted-foreground">
-            Get started by creating your first Half-Life server to begin tracking player statistics
-            and activities.
-          </p>
-        </div>
-        <Card className="flex items-center flex-col gap-4 py-10 border-dashed container">
-          <div className="rounded-full bg-muted p-4">
-            <ServerIcon className="size-6" />
-          </div>
-          <div className="text-center max-w-xs gap-2 flex flex-col items-center">
-            <h3 className="text-lg font-semibold">No servers configured</h3>
-            <p className="text-muted-foreground mb-4">
-              Add your first Half-Life server to begin tracking player statistics and activities.
+        <div className="container">
+          <div className="py-10 border-t border-border">
+            <h2 className="text-2xl font-medium tracking-tight">Admin Dashboard</h2>
+            <p className="text-muted-foreground">
+              Get started by creating your first Half-Life server to begin tracking player
+              statistics and activities.
             </p>
-            <Button variant="solid" size="default" colorScheme="green" asChild>
-              <Link href="/admin/server/create">
-                <PlusCircleIcon data-slot="icon" />
-                <span>Create server</span>
-              </Link>
-            </Button>
           </div>
-        </Card>
+          <Card className="flex items-center flex-col gap-4 py-10 border-dashed">
+            <div className="rounded-full bg-muted p-4">
+              <ServerIcon className="size-6" />
+            </div>
+            <div className="text-center max-w-xs gap-2 flex flex-col items-center">
+              <h3 className="text-lg font-semibold">No servers configured</h3>
+              <p className="text-muted-foreground mb-4">
+                Add your first Half-Life server to begin tracking player statistics and activities.
+              </p>
+              <Button variant="solid" size="default" colorScheme="green" asChild>
+                <Link href="/admin/server/create">
+                  <PlusCircleIcon data-slot="icon" />
+                  <span>Create server</span>
+                </Link>
+              </Button>
+            </div>
+          </Card>
+        </div>
       </MainContent>
       <Footer />
     </PageWrapper>

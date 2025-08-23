@@ -3,9 +3,9 @@ export function Gradient({
   className,
   small,
 }: {
-  small?: boolean;
-  conic?: boolean;
-  className?: string;
+  small?: boolean
+  conic?: boolean
+  className?: string
 }) {
   return (
     <span
@@ -17,5 +17,5 @@ export function Gradient({
           : ""
       } ${className ?? ""}`}
     />
-  );
+  )
 }

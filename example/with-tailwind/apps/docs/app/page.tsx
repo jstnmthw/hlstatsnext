@@ -1,7 +1,7 @@
-import Image from "next/image";
-import { Card } from "@repo/ui/card";
-import { Gradient } from "@repo/ui/gradient";
-import { TurborepoLogo } from "@repo/ui/turborepo-logo";
+import Image from "next/image"
+import { Card } from "@repo/ui/card"
+import { Gradient } from "@repo/ui/gradient"
+import { TurborepoLogo } from "@repo/ui/turborepo-logo"
 
 const LINKS = [
   {
@@ -22,10 +22,9 @@ const LINKS = [
   {
     title: "Deploy",
     href: "https://vercel.com/new",
-    description:
-      "Instantly deploy your Turborepo to a shareable URL with Vercel.",
+    description: "Instantly deploy your Turborepo to a shareable URL with Vercel.",
   },
-];
+]
 
 export default function Page() {
   return (
@@ -59,29 +58,17 @@ export default function Page() {
         <div className="font-sans w-auto pb-16 pt-[48px] md:pb-24 lg:pb-32 md:pt-16 lg:pt-20 flex justify-between gap-8 items-center flex-col relative z-0">
           <div className="z-50 flex items-center justify-center w-full">
             <div className="absolute min-w-[614px] min-h-[614px]">
-              <Image
-                alt="Turborepo"
-                height={614}
-                src="circles.svg"
-                width={614}
-              />
+              <Image alt="Turborepo" height={614} src="circles.svg" width={614} />
             </div>
             <div className="absolute z-50 flex items-center justify-center w-64 h-64">
-              <Gradient
-                className="opacity-90 w-[120px] h-[120px]"
-                conic
-                small
-              />
+              <Gradient className="opacity-90 w-[120px] h-[120px]" conic small />
             </div>
 
             <div className="flex justify-center items-center z-50">
               <TurborepoLogo />
             </div>
           </div>
-          <Gradient
-            className="top-[-500px] opacity-[0.15] w-[1000px] h-[1000px]"
-            conic
-          />
+          <Gradient className="top-[-500px] opacity-[0.15] w-[1000px] h-[1000px]" conic />
           <div className="z-50 flex flex-col items-center justify-center gap-5 px-6 text-center lg:gap-6">
             <svg
               className="w-[160px] md:w-[200px] fill-black dark:fill-white"
@@ -112,5 +99,5 @@ export default function Page() {
         ))}
       </div>
     </main>
-  );
+  )
 }

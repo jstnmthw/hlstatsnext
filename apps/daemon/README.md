@@ -154,11 +154,12 @@ The daemon supports flexible bot handling through the `IgnoreBots` server config
 
 ```sql
 -- Server configuration example
-INSERT INTO servers_config (serverId, parameter, value) 
+INSERT INTO servers_config (serverId, parameter, value)
 VALUES (1, 'IgnoreBots', '1');  -- Exclude bots from player counts
 ```
 
 **IgnoreBots Settings:**
+
 - `0` (default): Include bots in `active_players` count
 - `1`: Exclude bots from `active_players` count (only count real players)
 
@@ -172,19 +173,19 @@ VALUES (1, 'IgnoreBots', '1');  -- Exclude bots from player counts
 
 ```typescript
 // Example enrichment flow
-const status = await rconService.getStatus(serverId);
-const ignoreBots = await serverService.getServerConfigBoolean(serverId, 'IgnoreBots', false);
+const status = await rconService.getStatus(serverId)
+const ignoreBots = await serverService.getServerConfigBoolean(serverId, "IgnoreBots", false)
 
-const activePlayers = ignoreBots 
-  ? status.realPlayerCount ?? status.players  // Only real players
-  : status.players;                           // All players (real + bots)
+const activePlayers = ignoreBots
+  ? (status.realPlayerCount ?? status.players) // Only real players
+  : status.players // All players (real + bots)
 
 await serverRepository.updateServerStatusFromRcon(serverId, {
   activePlayers,
   maxPlayers: status.maxPlayers,
   activeMap: status.map,
-  hostname: status.hostname
-});
+  hostname: status.hostname,
+})
 ```
 
 ## Development

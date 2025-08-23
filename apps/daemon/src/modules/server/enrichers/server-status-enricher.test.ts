@@ -52,7 +52,12 @@ describe("ServerStatusEnricher", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    enricher = new ServerStatusEnricher(mockRconService, mockServerRepository, mockServerService, mockLogger)
+    enricher = new ServerStatusEnricher(
+      mockRconService,
+      mockServerRepository,
+      mockServerService,
+      mockLogger,
+    )
     serverId = 1
   })
 
@@ -88,7 +93,11 @@ describe("ServerStatusEnricher", () => {
 
       // Assert
       expect(mockRconService.getStatus).toHaveBeenCalledWith(serverId)
-      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(serverId, "IgnoreBots", false)
+      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
+        serverId,
+        "IgnoreBots",
+        false,
+      )
       expect(mockServerRepository.resetMapStats).toHaveBeenCalledWith(
         serverId,
         "cs_backalley",
@@ -126,7 +135,11 @@ describe("ServerStatusEnricher", () => {
       await enricher.enrichServerStatus(serverId)
 
       // Assert
-      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(serverId, "IgnoreBots", false)
+      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
+        serverId,
+        "IgnoreBots",
+        false,
+      )
       expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(serverId, {
         activePlayers: 3, // Total players since IgnoreBots = false
         maxPlayers: 32,
@@ -166,7 +179,11 @@ describe("ServerStatusEnricher", () => {
       // Assert
       expect(mockRconService.connect).toHaveBeenCalledWith(serverId)
       expect(mockRconService.getStatus).toHaveBeenCalledWith(serverId)
-      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(serverId, "IgnoreBots", false)
+      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
+        serverId,
+        "IgnoreBots",
+        false,
+      )
     })
 
     it("should handle RCON failures gracefully", async () => {
@@ -212,7 +229,11 @@ describe("ServerStatusEnricher", () => {
       await enricher.enrichServerStatus(serverId)
 
       // Assert
-      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(serverId, "IgnoreBots", false)
+      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
+        serverId,
+        "IgnoreBots",
+        false,
+      )
       expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(
         serverId,
         expect.objectContaining({
@@ -249,7 +270,11 @@ describe("ServerStatusEnricher", () => {
       await enricher.enrichServerStatus(serverId)
 
       // Assert
-      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(serverId, "IgnoreBots", false)
+      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
+        serverId,
+        "IgnoreBots",
+        false,
+      )
       expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(
         serverId,
         expect.objectContaining({
@@ -291,7 +316,11 @@ describe("ServerStatusEnricher", () => {
         await enricher.enrichServerStatus(serverId)
 
         // Assert
-        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(serverId, "IgnoreBots", false)
+        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
+          serverId,
+          "IgnoreBots",
+          false,
+        )
         expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(serverId, {
           activePlayers: 5, // Total players (real + bots)
           maxPlayers: 32,
@@ -330,7 +359,11 @@ describe("ServerStatusEnricher", () => {
         await enricher.enrichServerStatus(serverId)
 
         // Assert
-        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(serverId, "IgnoreBots", false)
+        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
+          serverId,
+          "IgnoreBots",
+          false,
+        )
         expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(serverId, {
           activePlayers: 2, // Only real players
           maxPlayers: 32,
@@ -369,7 +402,11 @@ describe("ServerStatusEnricher", () => {
         await enricher.enrichServerStatus(serverId)
 
         // Assert
-        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(serverId, "IgnoreBots", false)
+        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
+          serverId,
+          "IgnoreBots",
+          false,
+        )
         expect(mockServerRepository.resetMapStats).toHaveBeenCalledWith(
           serverId,
           "cs_office",
@@ -406,7 +443,11 @@ describe("ServerStatusEnricher", () => {
         await enricher.enrichServerStatus(serverId)
 
         // Assert
-        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(serverId, "IgnoreBots", false)
+        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
+          serverId,
+          "IgnoreBots",
+          false,
+        )
         expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(serverId, {
           activePlayers: 6, // Falls back to total players when realPlayerCount unavailable
           maxPlayers: 32,
@@ -445,7 +486,11 @@ describe("ServerStatusEnricher", () => {
         await enricher.enrichServerStatus(serverId)
 
         // Assert
-        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(serverId, "IgnoreBots", false)
+        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
+          serverId,
+          "IgnoreBots",
+          false,
+        )
         expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(serverId, {
           activePlayers: 0, // Only real players (0)
           maxPlayers: 32,

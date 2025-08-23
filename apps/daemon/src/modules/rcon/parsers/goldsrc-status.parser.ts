@@ -24,7 +24,7 @@ export class GoldSrcStatusParser extends BaseStatusParser {
    * tcp/ip  :  0.0.0.0:27015
    * map     :  de_cbble at: 0 x, 0 y, 0 z
    * players :  30 active (32 max)
-   * 
+   *
    * Player list format:
    * #      name userid uniqueid frag time ping loss adr
    * # 1 "RAGE OF THE BOY" 104 BOT   0  4:27:51    0    0
@@ -192,8 +192,10 @@ export class GoldSrcStatusParser extends BaseStatusParser {
    */
   private parsePlayerLine(line: string): PlayerInfo | null {
     // Match pattern: # <slot> "<name>" <userid> <uniqueid> <frag> <time> <ping> <loss> [adr]
-    const playerMatch = line.match(/^#\s*(\d+)\s+"([^"]+)"\s+(\d+)\s+(\S+)\s+(-?\d+)\s+([\d:]+)\s+(\d+)\s+(\d+)/)
-    
+    const playerMatch = line.match(
+      /^#\s*(\d+)\s+"([^"]+)"\s+(\d+)\s+(\S+)\s+(-?\d+)\s+([\d:]+)\s+(\d+)\s+(\d+)/,
+    )
+
     if (!playerMatch) {
       this.logger.debug("Failed to parse player line", { line })
       return null
@@ -221,8 +223,8 @@ export class GoldSrcStatusParser extends BaseStatusParser {
       return
     }
 
-    status.realPlayerCount = status.playerList.filter(p => !p.isBot).length
-    status.botCount = status.playerList.filter(p => p.isBot).length
+    status.realPlayerCount = status.playerList.filter((p) => !p.isBot).length
+    status.botCount = status.playerList.filter((p) => p.isBot).length
 
     this.logger.debug("Player count breakdown", {
       total: status.players,

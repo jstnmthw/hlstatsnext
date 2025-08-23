@@ -66,7 +66,7 @@ Game Servers → UDP Ingress → Event Parser → RabbitMQ → Event Processor �
 - **Message Queue (RabbitMQ)**: Reliable event distribution with retry logic
 - **Event Processor**: Modular handlers for different event types
 - **Business Services**: Player, Weapon, Match, Ranking, Server, and Options management
-- **RCON Integration**: Multi-protocol RCON support (GoldSrc, Source) for server monitoring
+- **RCON Integration**: Multi-protocol RCON support (GoldSrc, Source) for real-time server status enrichment
 - **GeoIP Service**: IP geolocation using MaxMind GeoLite database integration
 - **Infrastructure Layer**: Shared patterns for repositories, event handling, and observability
 
@@ -79,7 +79,7 @@ Game Servers → UDP Ingress → Event Parser → RabbitMQ → Event Processor �
 - **Factory Pattern**: Standardized object creation with dependency injection (Server, Config, Infrastructure)
 - **Orchestrator Pattern**: High-level business workflow coordination
 - **Builder Pattern**: Fluent APIs for complex object construction (StatUpdateBuilder, PlayerNameUpdateBuilder)
-- **Enricher Pattern**: Data augmentation services (GeoIP location enrichment)
+- **Enricher Pattern**: Data augmentation services (GeoIP location, RCON server status enrichment)
 - **Validator Pattern**: Input validation and sanitization across application layers
 
 ## Server Authentication
@@ -135,6 +135,58 @@ if (serverId === null) {
 }
 ```
 
+## Server Status Enrichment
+
+The daemon implements real-time server status enrichment via RCON connections, providing accurate player counts and server information as the single source of truth.
+
+### RCON-Based Updates
+
+Server status is enriched through periodic RCON queries rather than event-based updates:
+
+- **Real-time Data**: Direct server status queries via `status` command
+- **Player Differentiation**: Automatic detection of real players vs bots using Steam ID patterns
+- **Map Change Detection**: Automatic map statistics reset when server map changes
+- **Configuration-Driven**: Per-server `IgnoreBots` setting controls bot inclusion in player counts
+
+### Bot Handling Configuration
+
+The daemon supports flexible bot handling through the `IgnoreBots` server configuration:
+
+```sql
+-- Server configuration example
+INSERT INTO servers_config (serverId, parameter, value) 
+VALUES (1, 'IgnoreBots', '1');  -- Exclude bots from player counts
+```
+
+**IgnoreBots Settings:**
+- `0` (default): Include bots in `active_players` count
+- `1`: Exclude bots from `active_players` count (only count real players)
+
+### Status Enrichment Process
+
+1. **RCON Connection**: Establish connection to game server
+2. **Status Query**: Execute `status` command to get real-time server data
+3. **Response Parsing**: Parse player list to differentiate bots from real players
+4. **Configuration Check**: Apply `IgnoreBots` setting to determine final player count
+5. **Database Update**: Update server status including `active_players`, `max_players`, `active_map`
+
+```typescript
+// Example enrichment flow
+const status = await rconService.getStatus(serverId);
+const ignoreBots = await serverService.getServerConfigBoolean(serverId, 'IgnoreBots', false);
+
+const activePlayers = ignoreBots 
+  ? status.realPlayerCount ?? status.players  // Only real players
+  : status.players;                           // All players (real + bots)
+
+await serverRepository.updateServerStatusFromRcon(serverId, {
+  activePlayers,
+  maxPlayers: status.maxPlayers,
+  activeMap: status.map,
+  hostname: status.hostname
+});
+```
+
 ## Development
 
 ### Quick Start
@@ -174,17 +226,18 @@ apps/daemon/
 │   │   ├── server/           # Game server management
 │   │   │   ├── factories/    # Server creation with defaults
 │   │   │   ├── orchestrators/# Server discovery workflows
-│   │   │   ├── enrichers/    # GeoIP location enrichment
+│   │   │   ├── enrichers/    # Server status enrichment via RCON
 │   │   │   └── seeders/      # Default configuration seeding
 │   │   ├── action/           # Game actions and achievements
 │   │   ├── ingress/          # UDP server and log parsing
 │   │   │   ├── adapters/     # Server authentication
 │   │   │   ├── factories/    # Dependency injection
 │   │   │   └── parsers/      # Game log parsers
-│   │   ├── rcon/             # RCON server monitoring
+│   │   ├── rcon/             # RCON server status enrichment
 │   │   │   ├── protocols/    # GoldSrc/Source RCON protocols
-│   │   │   ├── parsers/      # Status command parsers
-│   │   │   └── handlers/     # Response handling
+│   │   │   ├── parsers/      # Status response parsers (player lists, bot detection)
+│   │   │   ├── handlers/     # Response handling
+│   │   │   └── services/     # RCON command execution and monitoring
 │   │   ├── geoip/            # IP geolocation services
 │   │   └── options/          # Configuration management
 │   ├── shared/               # Shared infrastructure
@@ -233,7 +286,7 @@ See [`docs/EVENT_LIFECYCLE.md`](./docs/EVENT_LIFECYCLE.md) for detailed tracing 
 #### Match Events
 
 - Round start/end with timing
-- Team victories and scoring
+- Team victories and scoring (team wins increment round counts, not round end events)
 - Map changes and rotations
 
 #### Statistics Events
@@ -331,7 +384,7 @@ The daemon exposes Prometheus metrics:
 - `hlstats_events_processed_total` - Events by type and status
 - `hlstats_processing_duration_seconds` - Processing time histograms
 - `hlstats_queue_depth` - Current queue backlog
-- `hlstats_active_players` - Currently connected players
+- `hlstats_active_players` - Currently connected players (RCON-enriched, respects IgnoreBots config)
 
 ### Logging
 
@@ -386,7 +439,8 @@ CMD ["pnpm", "start"]
 ### Core Services
 
 - **Server Authentication**: Database-driven server discovery with Docker network detection (`src/modules/ingress/adapters/`)
-- **RCON Integration**: Multi-protocol server monitoring and status parsing (`src/modules/rcon/`)
+- **RCON Integration**: Multi-protocol server status enrichment with real-time player tracking (`src/modules/rcon/`)
+- **Server Status Enrichment**: RCON-based server data updates with bot detection and IgnoreBots support (`src/modules/server/enrichers/`)
 - **GeoIP Services**: MaxMind GeoLite database integration for location enrichment (`src/modules/geoip/`)
 - **Configuration Management**: Cached options service for dynamic configuration (`src/modules/options/`)
 

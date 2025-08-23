@@ -169,10 +169,7 @@ export class ServerRepository implements IServerRepository {
     }
   }
 
-  async updateServerStatusFromRcon(
-    serverId: number,
-    status: ServerStatusUpdate,
-  ): Promise<void> {
+  async updateServerStatusFromRcon(serverId: number, status: ServerStatusUpdate): Promise<void> {
     try {
       const updateData: Record<string, unknown> = {
         activePlayers: status.activePlayers,
@@ -201,11 +198,7 @@ export class ServerRepository implements IServerRepository {
     }
   }
 
-  async resetMapStats(
-    serverId: number,
-    newMap: string,
-    playerCount?: number,
-  ): Promise<void> {
+  async resetMapStats(serverId: number, newMap: string, playerCount?: number): Promise<void> {
     try {
       const updateData: Record<string, unknown> = {
         activeMap: newMap,

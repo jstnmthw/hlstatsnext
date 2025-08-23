@@ -9,14 +9,16 @@ import { Footer } from "@/features/common/components/footer"
 export default function UIKitPage() {
   return (
     <PageWrapper>
-      <AdminHeader className="border-b border-border" isFixed />
+      <AdminHeader className="border-b border-border" isFixed fullWidth />
       <MainContent fixedHeader>
         <SidebarNavigation tableOfContents={tableOfContents} />
         <div className="ml-64">
           <KitchenSinkContent />
         </div>
       </MainContent>
-      <Footer />
+      <div className="ml-64">
+        <Footer />
+      </div>
     </PageWrapper>
   )
 }

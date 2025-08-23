@@ -72,7 +72,7 @@ export function SidebarNavigation({ tableOfContents }: SidebarNavigationProps) {
   }, [tableOfContents])
 
   return (
-    <aside className="fixed left-0 top-17 h-[calc(100vh-88px)] w-64 overflow-y-auto border-r border-border bg-background p-6">
+    <aside className="fixed left-0 top-17 h-[calc(100vh-68px)] w-64 overflow-y-auto border-r border-border bg-background p-6">
       <nav className="space-y-6">
         <div>
           <h2 className="mb-4 text-lg font-semibold">Table of Contents</h2>

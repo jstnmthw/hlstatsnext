@@ -29,9 +29,11 @@ const navItems = [
 export function AdminHeader({
   className,
   isFixed = false,
+  fullWidth = false,
 }: {
   className?: string
   isFixed?: boolean
+  fullWidth?: boolean
 }) {
   return (
     <header
@@ -41,7 +43,12 @@ export function AdminHeader({
         isFixed && "fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-background/50",
       )}
     >
-      <div className="container py-6 flex justify-between items-center">
+      <div
+        className={cn(
+          "py-6 px-4 md:px-6 lg:px-8 flex justify-between items-center",
+          fullWidth ? "w-full" : "container",
+        )}
+      >
         <div className="flex items-center gap-2">
           <AppLogo showVersion={false} />
           <Badge variant="outline">Admin</Badge>

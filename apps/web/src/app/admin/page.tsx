@@ -23,7 +23,7 @@ export default function Page() {
             and activities.
           </p>
         </div>
-        <Card className="flex items-center flex-col gap-4 py-10 border-dashed">
+        <Card className="flex items-center flex-col gap-4 py-10 border-dashed container">
           <div className="rounded-full bg-muted p-4">
             <ServerIcon className="size-6" />
           </div>

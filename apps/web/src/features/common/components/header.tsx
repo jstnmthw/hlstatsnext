@@ -13,7 +13,7 @@ const navItems = [
   },
   {
     label: "UI Kit",
-    href: "/kitchen-sink",
+    href: "/admin/ui-kit",
   },
   {
     label: "Servers",

@@ -50,7 +50,6 @@ describe("IngressService", () => {
 
     ingressService = new IngressService(mockLogger, mockDependencies, {
       port: 27501,
-      skipAuth: true,
       logBots: false,
     })
     ingressService.setPublisher(mockEventPublisher)
@@ -121,16 +120,16 @@ describe("IngressService", () => {
       )
     })
 
-    it("should handle development mode server creation", async () => {
+    it("should return null for unauthenticated servers", async () => {
       const authenticateServerMock = mockDependencies.serverAuthenticator
         .authenticateServer as ReturnType<typeof vi.fn>
-      authenticateServerMock.mockResolvedValue(-1)
+      authenticateServerMock.mockResolvedValue(null)
 
       const serverId = await ingressService.authenticateServer("127.0.0.1", 27015)
 
-      expect(serverId).toBe(1)
-      expect(mockDependencies.gameDetector.detectGame).toHaveBeenCalled()
-      expect(mockDependencies.serverInfoProvider.findOrCreateServer).toHaveBeenCalled()
+      expect(serverId).toBeNull()
+      expect(mockDependencies.gameDetector.detectGame).not.toHaveBeenCalled()
+      expect(mockDependencies.serverInfoProvider.findOrCreateServer).not.toHaveBeenCalled()
     })
 
     it("should not emit events for unsupported games (noop parser)", async () => {

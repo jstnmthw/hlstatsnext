@@ -8,7 +8,6 @@ import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/co
 export interface IngressOptions {
   port?: number
   host?: string
-  skipAuth?: boolean
   logBots?: boolean
 }
 

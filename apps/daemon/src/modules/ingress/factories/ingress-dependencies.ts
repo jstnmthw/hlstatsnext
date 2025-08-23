@@ -20,16 +20,11 @@ export function createIngressDependencies(
   serverService: IServerService,
   gameDetectionService: IGameDetectionService,
   logger: ILogger,
-  options: { skipAuth?: boolean } = {},
 ): IngressDependencies {
   const serverOrchestrator = new ServerOrchestrator(database, serverService, logger)
 
   return {
-    serverAuthenticator: new DatabaseServerAuthenticator(
-      database,
-      logger,
-      options.skipAuth ?? false,
-    ),
+    serverAuthenticator: new DatabaseServerAuthenticator(database, logger),
     gameDetector: new GameDetectorAdapter(gameDetectionService),
     serverInfoProvider: serverOrchestrator,
   }

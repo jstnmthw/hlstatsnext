@@ -28,7 +28,6 @@ describe("createIngressConfig", () => {
       expect(config).toEqual({
         port: 27500,
         host: "0.0.0.0",
-        skipAuth: false,
         logBots: false,
       })
     })
@@ -79,21 +78,19 @@ describe("createIngressConfig", () => {
   })
 
   describe("development environment detection", () => {
-    it("should enable skipAuth and logBots in development environment", () => {
+    it("should enable logBots in development environment", () => {
       process.env.NODE_ENV = "development"
 
       const config = createIngressConfig()
 
-      expect(config.skipAuth).toBe(true)
       expect(config.logBots).toBe(true)
     })
 
-    it("should disable skipAuth and logBots in production environment", () => {
+    it("should disable logBots in production environment", () => {
       process.env.NODE_ENV = "production"
 
       const config = createIngressConfig()
 
-      expect(config.skipAuth).toBe(false)
       expect(config.logBots).toBe(false)
     })
 
@@ -101,11 +98,9 @@ describe("createIngressConfig", () => {
       process.env.NODE_ENV = "development"
 
       const config = createIngressConfig({
-        skipAuth: false,
         logBots: false,
       })
 
-      expect(config.skipAuth).toBe(false)
       expect(config.logBots).toBe(false)
     })
   })

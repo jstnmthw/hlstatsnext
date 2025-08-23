@@ -22,7 +22,6 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
   constructor(
     private readonly database: DatabaseClient,
     private readonly logger: ILogger,
-    private readonly skipAuth: boolean = false,
   ) {}
 
   async authenticateServer(address: string, port: number): Promise<number | null> {
@@ -59,6 +58,75 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
     }
   }
 
+  /**
+   * Match Docker server based on IP address patterns
+   */
+  private async matchDockerServer(address: string, port: number): Promise<{ serverId: number; dockerHost?: string | null; name: string; game: string } | null> {
+    const dockerServers = await this.database.prisma.server.findMany({
+      where: {
+        connectionType: "docker",
+      },
+      select: {
+        serverId: true,
+        dockerHost: true,
+        name: true,
+        game: true,
+      },
+    })
+
+    if (dockerServers.length === 0) {
+      return null
+    }
+
+    // Strategy 1: For container IPs (172.18.0.2, 172.18.0.3, etc.), match the actual container
+    // Real Docker containers typically have IPs ending in .2, .3, .4, etc.
+    const parts = address.split(".")
+    if (parts.length === 4) {
+      const lastOctet = parseInt(parts[3] || "0", 10)
+      
+      // If it's a container IP (not gateway), try to match by container order
+      if (lastOctet >= 2) {
+        // Match by container creation order (first container gets .2, second gets .3, etc.)
+        const containerIndex = lastOctet - 2
+        if (containerIndex < dockerServers.length) {
+          const server = dockerServers[containerIndex]
+          if (server) {
+            this.logWithRateLimit(
+              `docker-container-match-${address}`,
+              `Matched Docker container IP ${address} to server ${server.serverId} (${server.name}) based on container index`,
+              "info"
+            )
+            return server
+          }
+        }
+      }
+      
+      // If it's the Docker gateway IP (172.18.0.1), it's likely an external server routed through Docker
+      // We should reject this and let it be handled as an external server
+      if (lastOctet === 1) {
+        this.logWithRateLimit(
+          `docker-gateway-reject-${address}:${port}`,
+          `Rejecting Docker gateway IP ${address}:${port} - likely external server routed through Docker`,
+          "warn"
+        )
+        return null
+      }
+    }
+
+    // Fallback: Use first Docker server (for backward compatibility)
+    const fallbackServer = dockerServers[0]
+    if (fallbackServer) {
+      this.logWithRateLimit(
+        `docker-fallback-${address}`,
+        `Using fallback match for ${address} to server ${fallbackServer.serverId} (${fallbackServer.name})`,
+        "info"
+      )
+      return fallbackServer
+    }
+    
+    return null
+  }
+
   private mapAuthenticationResult(result: AuthenticationResult): number | null {
     switch (result.kind) {
       case "authenticated":
@@ -88,10 +156,6 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
         : { kind: "authenticated", serverId }
     }
 
-    // In skip auth mode (development), return dev-mode result
-    if (this.skipAuth) {
-      return { kind: "dev-mode" }
-    }
 
     // Look up server in database
     try {
@@ -109,36 +173,19 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
           "info",
         )
 
-        // For Docker servers, we need a more intelligent matching strategy
-        // Since multiple Docker servers might exist, we need to identify which one is connecting
-        // For now, we'll look for any Docker server that hasn't been matched yet
-        // In production, you might want to use additional identifiers from log content
-        const dockerServers = await this.database.prisma.server.findMany({
-          where: {
-            connectionType: "docker",
-          },
-          select: {
-            serverId: true,
-            dockerHost: true,
-            name: true,
-            game: true,
-          },
-        })
-
-        // For now, use the first available Docker server
-        // In a real implementation, you'd want to match based on game type or other identifiers
-        if (dockerServers.length > 0) {
-          const dockerServer = dockerServers[0]
-          if (dockerServer) {
-            server = dockerServer
-            this.logWithRateLimit(
-              `docker-auth-${address}:${port}`,
-              `Authenticated Docker server from ${address}:${port} as ID ${dockerServer.serverId} (${dockerServer.name})`,
-              "info",
-            )
-          }
+        // Smart Docker server matching strategy
+        // Different approaches for different IP patterns
+        const dockerServer = await this.matchDockerServer(address, port)
+        
+        if (dockerServer) {
+          server = dockerServer
+          this.logWithRateLimit(
+            `docker-auth-${address}:${port}`,
+            `Authenticated Docker server from ${address}:${port} as ID ${dockerServer.serverId} (${dockerServer.name})`,
+            "info",
+          )
         } else {
-          this.logger.debug(`No Docker servers configured in database`)
+          this.logger.debug(`No matching Docker server found for ${address}:${port}`)
         }
       }
 

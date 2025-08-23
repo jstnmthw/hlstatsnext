@@ -50,7 +50,7 @@ describe("Application Context", () => {
     })
 
     it("should create context with ingress options", () => {
-      const ingressOptions = { skipAuth: true }
+      const ingressOptions = {}
       const context = createAppContext(ingressOptions)
 
       expect(context).toBeDefined()
@@ -104,7 +104,7 @@ describe("Application Context", () => {
     })
 
     it("should pass ingress options to created context", () => {
-      const ingressOptions = { skipAuth: true }
+      const ingressOptions = {}
       const context = getAppContext(ingressOptions)
 
       expect(context).toBeDefined()
@@ -112,8 +112,8 @@ describe("Application Context", () => {
     })
 
     it("should ignore ingress options on subsequent calls", () => {
-      const context1 = getAppContext({ skipAuth: true })
-      const context2 = getAppContext({ skipAuth: false })
+      const context1 = getAppContext({})
+      const context2 = getAppContext({})
 
       expect(context1).toBe(context2) // Same instance, options ignored
     })
@@ -249,7 +249,7 @@ describe("Application Context", () => {
     it("should support multiple create and reset cycles", () => {
       const context1 = getAppContext()
       resetAppContext()
-      const context2 = getAppContext({ skipAuth: true })
+      const context2 = getAppContext({})
       resetAppContext()
       const context3 = getAppContext()
 

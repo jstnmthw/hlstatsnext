@@ -91,9 +91,6 @@ export class ServerStatusEnricher implements IServerStatusEnricher {
       this.logger.ok(
         `Players: ${status.realPlayerCount} real + ${status.botCount} bots = ${status.players} total${ignoreBotStatus} on server ${serverId}`,
       )
-      this.logger.ok(
-        `Final count: ${activePlayers} players ${ignoreBots ? "(real only)" : "(all)"}`,
-      )
     }
 
     return {

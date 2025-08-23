@@ -7,7 +7,6 @@ import { describe, it, expect, beforeEach, vi } from "vitest"
 import { DatabaseServerAuthenticator } from "./database-server-authenticator"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockDatabaseClient } from "@/tests/mocks/database"
-import { INGRESS_CONSTANTS } from "../types/ingress.types"
 
 describe("DatabaseServerAuthenticator", () => {
   let authenticator: DatabaseServerAuthenticator
@@ -25,7 +24,6 @@ describe("DatabaseServerAuthenticator", () => {
     authenticator = new DatabaseServerAuthenticator(
       mockDatabase as unknown as DatabaseClient,
       mockLogger,
-      false,
     )
   })
 
@@ -128,7 +126,6 @@ describe("DatabaseServerAuthenticator", () => {
       authenticator = new DatabaseServerAuthenticator(
         mockDatabase as unknown as DatabaseClient,
         mockLogger,
-        false,
       )
 
       for (const ip of nonDockerIPs) {
@@ -141,20 +138,6 @@ describe("DatabaseServerAuthenticator", () => {
     })
   })
 
-  describe("Development Mode", () => {
-    it("should return dev mode sentinel in skip auth mode", async () => {
-      authenticator = new DatabaseServerAuthenticator(
-        mockDatabase as unknown as DatabaseClient,
-        mockLogger,
-        true, // skipAuth = true
-      )
-
-      const result = await authenticator.authenticateServer("192.168.1.1", 12345)
-
-      expect(result).toBe(INGRESS_CONSTANTS.DEV_AUTH_SENTINEL)
-      expect(mockDatabase.prisma.server.findFirst).not.toHaveBeenCalled()
-    })
-  })
 
   describe("Error Handling", () => {
     it("should handle invalid IP addresses", async () => {

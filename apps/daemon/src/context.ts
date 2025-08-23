@@ -112,7 +112,6 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     services.serverService,
     services.gameDetectionService,
     infrastructure.logger,
-    { skipAuth: resolvedIngressOptions.skipAuth },
   )
 
   const ingressService = new IngressService(

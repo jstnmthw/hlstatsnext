@@ -32,13 +32,11 @@ const INGRESS_DEFAULTS = {
 export function createIngressConfig(ingressOptions?: IngressOptions): IngressOptions {
   const port = resolveIngressPort(ingressOptions?.port)
   const host = resolveIngressHost(ingressOptions?.host)
-  const skipAuth = resolveSkipAuth(ingressOptions?.skipAuth)
   const logBots = resolveLogBots(ingressOptions?.logBots)
 
   return {
     port,
     host,
-    skipAuth,
     logBots,
   }
 }
@@ -70,16 +68,6 @@ function resolveIngressHost(optionsHost?: string): string {
   return optionsHost ?? INGRESS_DEFAULTS.host
 }
 
-/**
- * Resolves skipAuth flag with development environment detection
- */
-function resolveSkipAuth(optionsSkipAuth?: boolean): boolean {
-  if (optionsSkipAuth !== undefined) {
-    return optionsSkipAuth
-  }
-
-  return isDevelopmentEnvironment()
-}
 
 /**
  * Resolves logBots flag with development environment detection

@@ -33,7 +33,6 @@ export class IngressService implements IIngressService {
     this.options = {
       port: 27500,
       host: "0.0.0.0",
-      skipAuth: false,
       logBots: false,
       ...options,
     }
@@ -122,31 +121,7 @@ export class IngressService implements IIngressService {
   }
 
   async authenticateServer(address: string, port: number): Promise<number | null> {
-    const serverId = await this.dependencies.serverAuthenticator.authenticateServer(address, port)
-
-    // Handle development mode
-    if (serverId === -1 && this.options.skipAuth) {
-      // Auto-detect game type for new servers in development mode
-      const gameDetection = await this.dependencies.gameDetector.detectGame(address, port, [])
-
-      this.logger.info(
-        `Detected game ${gameDetection.gameCode} for ${address}:${port} (confidence: ${gameDetection.confidence}, method: ${gameDetection.detection_method})`,
-      )
-
-      // Auto-create server in development mode
-      const server = await this.dependencies.serverInfoProvider.findOrCreateServer(
-        address,
-        port,
-        gameDetection.gameCode,
-      )
-
-      // Cache the created server ID in the authenticator
-      await this.dependencies.serverAuthenticator.cacheServer(address, port, server.serverId)
-
-      return server.serverId
-    }
-
-    return serverId
+    return await this.dependencies.serverAuthenticator.authenticateServer(address, port)
   }
 
   private async handleLogLine(

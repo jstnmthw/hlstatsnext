@@ -52,7 +52,7 @@ describe("HLStatsDaemon", () => {
 
     vi.mocked(getEnvironmentConfig).mockReturnValue({
       nodeEnv: "test",
-      ingressOptions: { skipAuth: true },
+      ingressOptions: {},
       rconConfig: { enabled: true, statusInterval: 30000 },
     })
 
@@ -75,7 +75,7 @@ describe("HLStatsDaemon", () => {
     it("should initialize with proper configuration", async () => {
       const mockedGetAppContext = vi.mocked(getAppContext)
 
-      expect(mockedGetAppContext).toHaveBeenCalledWith({ skipAuth: true })
+      expect(mockedGetAppContext).toHaveBeenCalledWith({})
       expect(mockContext.logger.info).toHaveBeenCalledWith("Initializing HLStatsNext Daemon...")
     })
   })

@@ -1,7 +1,6 @@
 export interface EnvironmentConfig {
   nodeEnv: string
   ingressOptions: {
-    skipAuth: boolean
     port?: number
   }
   rconConfig: {
@@ -12,12 +11,10 @@ export interface EnvironmentConfig {
 
 export function getEnvironmentConfig(): EnvironmentConfig {
   const nodeEnv = process.env.NODE_ENV ?? "development"
-  const isDevelopment = nodeEnv === "development"
 
   return {
     nodeEnv,
     ingressOptions: {
-      skipAuth: isDevelopment,
       port: process.env.INGRESS_PORT ? parseInt(process.env.INGRESS_PORT, 10) : undefined,
     },
     rconConfig: {

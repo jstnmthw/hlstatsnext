@@ -13,7 +13,7 @@ export default function Page() {
   return (
     <PageWrapper>
       <Header />
-      <MainContent>
+      <MainContent className="container">
         <div className="grid grid-cols-3 gap-4">
           <ServerList className="col-span-2" />
           <div className="col-span-1">

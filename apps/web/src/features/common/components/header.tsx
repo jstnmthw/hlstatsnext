@@ -1,20 +1,9 @@
+import { SettingsIcon } from "lucide-react"
 import { AppLogo } from "@/features/common/components/app-logo"
-import { Button, cn } from "@repo/ui"
 import Link from "next/link"
-
-interface HeaderProps {
-  fixed?: boolean
-}
+import { cn } from "@repo/ui"
 
 const navItems = [
-  {
-    label: "Admin",
-    href: "/admin",
-  },
-  {
-    label: "UI Kit",
-    href: "/admin/ui-kit",
-  },
   {
     label: "Servers",
     href: "/servers",
@@ -27,38 +16,34 @@ const navItems = [
     label: "Players",
     href: "/players",
   },
-  {
-    label: "Login",
-    href: "/login",
-  },
-  {
-    label: "Sign Up",
-    href: "/signup",
-    type: "button",
-  },
 ]
 
-export function Header({ fixed = false }: HeaderProps) {
+export function Header({ className, isFixed = false }: { className?: string; isFixed?: boolean }) {
   return (
-    <header className={cn("w-full", fixed && "fixed top-0 left-0 right-0 z-50")}>
-      <div className="container py-6 flex justify-between items-center">
-        <AppLogo />
+    <header
+      className={cn(
+        "w-full",
+        className,
+        isFixed && "fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-background/50",
+      )}
+    >
+      <div className={cn("py-6 flex justify-between items-center container")}>
+        <div className="flex items-center gap-2">
+          <AppLogo />
+        </div>
         <nav className="flex items-center gap-8">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="uppercase tracking-tight text-sm font-semibold text-zinc-300 hover:text-white transition-colors"
+              className="uppercase tracking-tight text-sm font-semibold text-zinc-400 hover:text-white transition-colors"
             >
-              {item.type === "button" ? (
-                <Button variant="outline" className="cursor-pointer uppercase" size="sm">
-                  {item.label}
-                </Button>
-              ) : (
-                item.label
-              )}
+              {item.label}
             </Link>
           ))}
+          <Link href="/admin" className="text-zinc-400 hover:text-white transition-colors">
+            <SettingsIcon className="size-4" />
+          </Link>
         </nav>
       </div>
     </header>

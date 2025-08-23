@@ -5,7 +5,7 @@ import { Badge, cn } from "@repo/ui"
 
 const navItems = [
   {
-    label: "Admin",
+    label: "Dashboard",
     href: "/admin",
   },
   {
@@ -48,7 +48,9 @@ export function AdminHeader({
       <div className={cn("py-6 flex justify-between items-center container")}>
         <div className="flex items-center gap-2">
           <AppLogo showVersion={false} />
-          <Badge variant="outline">Admin</Badge>
+          <Badge variant="outline" colorScheme="indigo">
+            Admin
+          </Badge>
         </div>
         <nav className="flex items-center gap-8">
           {navItems.map((item) => (
@@ -60,7 +62,7 @@ export function AdminHeader({
               {item.label}
             </Link>
           ))}
-          <Link href="/admin">
+          <Link href="/admin" className="text-zinc-400 hover:text-white transition-colors">
             <SettingsIcon className="size-4" />
           </Link>
         </nav>

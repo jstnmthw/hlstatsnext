@@ -1,6 +1,5 @@
 import { AppLogo } from "@/features/common/components/app-logo"
-import { Button } from "@repo/ui/button"
-import { cn } from "@repo/ui/lib/utils"
+import { Button, cn } from "@repo/ui"
 import Link from "next/link"
 
 interface HeaderProps {

@@ -1,7 +1,7 @@
 import { SettingsIcon } from "lucide-react"
 import { AppLogo } from "@/features/common/components/app-logo"
 import Link from "next/link"
-import { Badge } from "@repo/ui/badge"
+import { Badge } from "@repo/ui"
 
 const navItems = [
   {

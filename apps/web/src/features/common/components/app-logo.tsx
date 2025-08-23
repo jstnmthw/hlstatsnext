@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { cn } from "@repo/ui/lib/utils"
+import { cn } from "@repo/ui"
 
 export function AppLogo({
   className,

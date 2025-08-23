@@ -3,7 +3,7 @@ import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
 import { ServerCreateForm } from "@/features/admin/components/server-create-form"
-import { Card } from "@repo/ui/card"
+import { Card } from "@repo/ui"
 
 export const metadata = {
   title: "Create Server - Admin - " + process.env.NEXT_PUBLIC_APP_NAME,

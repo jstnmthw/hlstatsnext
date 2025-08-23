@@ -49,20 +49,14 @@ pnpm install
 ### Package Scripts
 
 ```bash
-# Development
-pnpm dev:styles        # Watch and compile CSS
-pnpm dev:components    # Watch and compile TypeScript
-
-# Building
-pnpm build:styles      # Build CSS for production
-pnpm build:components  # Build TypeScript for production
-
 # Utilities
 pnpm ui add [component]  # Add shadcn/ui components
 pnpm lint              # Lint the codebase
 pnpm check-types       # Type checking
 pnpm clean             # Clean node_modules
 ```
+
+> **Note**: This package follows TurboRepo's JIT (Just-In-Time) pattern - components are consumed directly as TypeScript source files by consuming applications, eliminating the need for build scripts.
 
 ## Project Structure
 
@@ -71,11 +65,13 @@ packages/ui/
 ├── src/
 │   ├── components/          # shadcn/ui and custom components
 │   │   ├── breadcrumb.tsx   # Example shadcn component
-│   │   └── index.ts         # Component exports
+│   │   ├── button.tsx       # Example shadcn component
+│   │   └── ...              # Other components
 │   ├── lib/
 │   │   └── utils.ts         # Utility functions (cn, etc.)
+│   ├── index.ts             # Main barrel export
+│   ├── icons.ts             # Re-exported lucide-react icons
 │   └── globals.css          # Global styles and CSS variables
-├── dist/                    # Built output
 ├── components.json          # shadcn/ui configuration
 ├── package.json
 ├── tsconfig.json
@@ -246,8 +242,8 @@ pnpm lint
 In your Next.js apps (`apps/web`) or other packages:
 
 ```typescript
-// Import specific components
-import { Button, Card, Input } from '@repo/ui'
+// Import components and utilities from main entry point
+import { Button, Card, Badge, cn } from '@repo/ui'
 
 // Import styles
 import '@repo/ui/globals.css'
@@ -256,10 +252,12 @@ import '@repo/ui/globals.css'
 export default function MyComponent() {
   return (
     <Card>
-      <Input placeholder="Enter your name" />
-      <Button variant="default" size="lg">
-        Submit
-      </Button>
+      <div className={cn("p-4", "space-y-2")}>
+        <Badge>New</Badge>
+        <Button variant="default" size="lg">
+          Submit
+        </Button>
+      </div>
     </Card>
   )
 }

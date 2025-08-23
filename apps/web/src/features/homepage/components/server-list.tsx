@@ -1,8 +1,6 @@
 import { query } from "@/lib/apollo-client"
 import { graphql } from "@/lib/gql"
-import { Button } from "@repo/ui/button"
-import { PlayIcon } from "@repo/ui/icons"
-import { cn } from "@repo/ui/lib/utils"
+import { Button, PlayIcon, cn } from "@repo/ui"
 import {
   VerticalList,
   VerticalListHeader,

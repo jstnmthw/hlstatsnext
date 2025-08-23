@@ -1,8 +1,6 @@
 "use client"
 
-import { Button } from "@repo/ui/button"
-import { Badge } from "@repo/ui/badge"
-import { cn } from "@repo/ui/lib/utils"
+import { Button, Badge, cn } from "@repo/ui"
 import {
   BellIcon,
   BoltIcon,

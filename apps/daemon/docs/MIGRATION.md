@@ -492,6 +492,23 @@ The daemon has a solid foundation with complete player lifecycle tracking. The n
 - 2025-08-12
   - GeoIP seeding: Updated `packages/database/src/scripts/seed-geoip.ts` to use MaxMind download permalinks with Basic Auth (Account ID + License Key). Switched CSV download format to `.zip` and added system `unzip`-based extraction with fallback helper. Env example updated to include `MAXMIND_ACCOUNT_ID` and `MAXMIND_LICENSE_KEY`. This resolves 404s from deprecated unauthenticated URLs and aligns with MaxMind's current documentation.
 
+- 2025-01-XX - **UI Package JIT Restructuring: Adopted TurboRepo JIT pattern for @repo/ui**
+  - **Problem**: `@repo/ui` package was using pre-compilation pattern with individual component exports, which was tedious to maintain and inconsistent with monorepo's JIT pattern
+  - **Root Cause**: Original setup required manual export definitions for each component and separate build processes, contrary to TurboRepo best practices for shared packages
+  - **Solution**:
+    1. Simplified `package.json` exports to use source TypeScript files directly (`"." -> "./src/index.ts"`)
+    2. Created barrel export in `src/index.ts` for all components and utilities
+    3. Removed build scripts and build-time dependencies (`@tailwindcss/cli`, `tailwindcss`)
+    4. Updated all consuming apps to import from `@repo/ui` main entry point
+    5. Removed TurboRepo generators that were tied to old export pattern
+  - **Files Modified**:
+    - `packages/ui/package.json` - Simplified exports, removed build scripts
+    - `packages/ui/src/index.ts` - New barrel export file
+    - `packages/ui/turbo.json` - Removed build tasks
+    - All web app import statements - Changed from `@repo/ui/button` to `@repo/ui`
+  - **Validation**: TypeScript compilation and Next.js builds pass, JIT consumption working correctly
+  - **Result**: Simplified maintenance, consistent with monorepo patterns, shared Tailwind v4 config processes all CSS together
+
 - 2025-01-XX - **Dependency Cleanup: Fixed React duplication in UI package**
   - **Problem**: In `packages/ui/package.json`, React and React DOM were incorrectly listed in both `dependencies` and `peerDependencies`
   - **Root Cause**: Shared UI libraries should only have React as a `peerDependency` to avoid bundling multiple versions and potential conflicts

@@ -9,40 +9,20 @@
     "dist"
   ],
   "exports": {
+    ".": "./src/index.ts",
     "./globals.css": "./dist/index.css",
-    "./button": {
-      "types": "./dist/components/button.d.ts",
-      "import": "./dist/components/button.js"
-    },
-    "./badge": {
-      "types": "./dist/components/badge.d.ts",
-      "import": "./dist/components/badge.js"
-    },
-    "./card": {
-      "types": "./dist/components/card.d.ts",
-      "import": "./dist/components/card.js"
-    },
-    "./breadcrumb": {
-      "types": "./dist/components/breadcrumb.d.ts",
-      "import": "./dist/components/breadcrumb.js"
-    },
-    "./icons": {
-      "types": "./dist/icons.d.ts",
-      "import": "./dist/icons.js"
-    },
-    "./lib/utils": {
-      "types": "./dist/lib/utils.d.ts",
-      "import": "./dist/lib/utils.js"
-    }
+    "./lib/utils": "./src/lib/utils.ts"
   },
   "scripts": {
     "build:styles": "tailwindcss -i ./src/globals.css -o ./dist/index.css",
     "build:components": "tsc",
+    "build": "pnpm build:styles && pnpm build:components",
     "check-types": "tsc --noEmit",
     "dev:styles": "tailwindcss -i ./src/globals.css -o ./dist/index.css --watch",
     "dev:components": "tsc --watch",
+    "dev": "pnpm build:styles && pnpm dev:components",
     "lint": "eslint src --max-warnings 0",
-    "clean": "rm -rf node_modules",
+    "clean": "rm -rf node_modules dist",
     "ui": "pnpm dlx shadcn@latest"
   },
   "peerDependencies": {

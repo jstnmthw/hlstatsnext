@@ -11,7 +11,7 @@ import {
   SelectInput,
   ErrorMessage,
 } from "@/features/admin/components/form-inputs"
-import { Button } from "@repo/ui/button"
+import { Button } from "@repo/ui"
 
 function SubmitButton() {
   const { pending } = useFormStatus()

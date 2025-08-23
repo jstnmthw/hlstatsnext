@@ -61,7 +61,10 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
   /**
    * Match Docker server based on IP address patterns
    */
-  private async matchDockerServer(address: string, port: number): Promise<{ serverId: number; dockerHost?: string | null; name: string; game: string } | null> {
+  private async matchDockerServer(
+    address: string,
+    port: number,
+  ): Promise<{ serverId: number; dockerHost?: string | null; name: string; game: string } | null> {
     const dockerServers = await this.database.prisma.server.findMany({
       where: {
         connectionType: "docker",
@@ -83,7 +86,7 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
     const parts = address.split(".")
     if (parts.length === 4) {
       const lastOctet = parseInt(parts[3] || "0", 10)
-      
+
       // If it's a container IP (not gateway), try to match by container order
       if (lastOctet >= 2) {
         // Match by container creation order (first container gets .2, second gets .3, etc.)
@@ -94,20 +97,20 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
             this.logWithRateLimit(
               `docker-container-match-${address}`,
               `Matched Docker container IP ${address} to server ${server.serverId} (${server.name}) based on container index`,
-              "info"
+              "info",
             )
             return server
           }
         }
       }
-      
+
       // If it's the Docker gateway IP (172.18.0.1), it's likely an external server routed through Docker
       // We should reject this and let it be handled as an external server
       if (lastOctet === 1) {
         this.logWithRateLimit(
           `docker-gateway-reject-${address}:${port}`,
           `Rejecting Docker gateway IP ${address}:${port} - likely external server routed through Docker`,
-          "warn"
+          "warn",
         )
         return null
       }
@@ -119,11 +122,11 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
       this.logWithRateLimit(
         `docker-fallback-${address}`,
         `Using fallback match for ${address} to server ${fallbackServer.serverId} (${fallbackServer.name})`,
-        "info"
+        "info",
       )
       return fallbackServer
     }
-    
+
     return null
   }
 
@@ -156,7 +159,6 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
         : { kind: "authenticated", serverId }
     }
 
-
     // Look up server in database
     try {
       // First try exact match (works for external servers)
@@ -176,7 +178,7 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
         // Smart Docker server matching strategy
         // Different approaches for different IP patterns
         const dockerServer = await this.matchDockerServer(address, port)
-        
+
         if (dockerServer) {
           server = dockerServer
           this.logWithRateLimit(

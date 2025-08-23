@@ -138,7 +138,6 @@ describe("DatabaseServerAuthenticator", () => {
     })
   })
 
-
   describe("Error Handling", () => {
     it("should handle invalid IP addresses", async () => {
       const result = await authenticator.authenticateServer("not.an.ip", 27015)

@@ -68,7 +68,6 @@ function resolveIngressHost(optionsHost?: string): string {
   return optionsHost ?? INGRESS_DEFAULTS.host
 }
 
-
 /**
  * Resolves logBots flag with development environment detection
  */

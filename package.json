@@ -20,12 +20,14 @@
     "dev": "turbo run dev",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
+    "prepare": "husky",
     "ui": "pnpm --filter @repo/ui ui",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage"
   },
   "devDependencies": {
     "dotenv-cli": "^8.0.0",
+    "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-tailwindcss": "^0.6.14",

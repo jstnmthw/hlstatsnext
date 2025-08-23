@@ -492,6 +492,14 @@ The daemon has a solid foundation with complete player lifecycle tracking. The n
 - 2025-08-12
   - GeoIP seeding: Updated `packages/database/src/scripts/seed-geoip.ts` to use MaxMind download permalinks with Basic Auth (Account ID + License Key). Switched CSV download format to `.zip` and added system `unzip`-based extraction with fallback helper. Env example updated to include `MAXMIND_ACCOUNT_ID` and `MAXMIND_LICENSE_KEY`. This resolves 404s from deprecated unauthenticated URLs and aligns with MaxMind's current documentation.
 
+- 2025-01-XX - **Dependency Cleanup: Fixed React duplication in UI package**
+  - **Problem**: In `packages/ui/package.json`, React and React DOM were incorrectly listed in both `dependencies` and `peerDependencies`
+  - **Root Cause**: Shared UI libraries should only have React as a `peerDependency` to avoid bundling multiple versions and potential conflicts
+  - **Solution**: Removed `react` and `react-dom` from the `dependencies` section, keeping them only in `peerDependencies`
+  - **Files Modified**: `packages/ui/package.json` - Cleaned up dependencies section
+  - **Validation**: All monorepo packages reviewed, lint/type-check/tests pass, no other dependency misplacements found
+  - **Result**: Proper dependency management across monorepo, avoiding React version conflicts in consuming applications
+
 - 2025-08-10
   - Parser: Added support for legacy/GoldSrc-style connect lines ("entered the game") in `CsParser`.
   - Persistence: Implemented connect/disconnect logging to `events_connect` and `events_disconnect` via `PlayerRepository.createConnectEvent`/`createDisconnectEvent`; on disconnect, backfills `event_time_disconnect` on the last connect row.

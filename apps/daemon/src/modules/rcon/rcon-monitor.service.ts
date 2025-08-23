@@ -1,6 +1,7 @@
 import type { AppContext } from "@/context"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { ServerInfo } from "@/modules/server/server.types"
+import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 
 export interface RconMonitorConfig {
   enabled: boolean
@@ -12,11 +13,17 @@ export class RconMonitorService {
   private logger: ILogger
   private config: RconMonitorConfig
   private intervalId?: NodeJS.Timeout
+  private serverStatusEnricher: IServerStatusEnricher
 
-  constructor(context: AppContext, config: RconMonitorConfig) {
+  constructor(
+    context: AppContext,
+    config: RconMonitorConfig,
+    serverStatusEnricher: IServerStatusEnricher,
+  ) {
     this.context = context
     this.logger = context.logger
     this.config = config
+    this.serverStatusEnricher = serverStatusEnricher
   }
 
   start(): void {
@@ -66,7 +73,7 @@ export class RconMonitorService {
   private async monitorSingleServer(server: ServerInfo): Promise<void> {
     try {
       await this.ensureServerConnection(server)
-      await this.getAndLogServerStatus(server)
+      await this.enrichServerStatus(server)
     } catch (error) {
       await this.handleServerError(server, error)
     }
@@ -84,22 +91,10 @@ export class RconMonitorService {
     }
   }
 
-  private async getAndLogServerStatus(server: ServerInfo): Promise<void> {
-    const status = await this.context.rconService.getStatus(server.serverId)
+  private async enrichServerStatus(server: ServerInfo): Promise<void> {
+    await this.serverStatusEnricher.enrichServerStatus(server.serverId)
 
-    this.logger.ok(
-      `==================================================================================================`,
-    )
-    this.logger.ok(
-      `SERVER STATUS: ${server.name} (${server.serverId}), Map: ${status.map}, Players: ${status.players}/${status.maxPlayers}, FPS: ${status.fps}`,
-    )
-    this.logger.ok(
-      `==================================================================================================`,
-    )
-
-    if (status.hostname) {
-      this.logger.debug(`Server ${server.serverId} hostname: ${status.hostname}`)
-    }
+    this.logger.debug(`Enriched status for server ${server.serverId} (${server.name})`)
   }
 
   private async handleServerError(server: ServerInfo, error: unknown): Promise<void> {

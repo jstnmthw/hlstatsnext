@@ -37,6 +37,9 @@ cpu     :  25.5`
         cpu: 25.5,
         uptime: 0,
         timestamp: expect.any(Date),
+        playerList: [],
+        realPlayerCount: 0,
+        botCount: 0,
       })
 
       expect(mockLogger.debug).toHaveBeenCalledWith("📊 Parsed server status", {
@@ -44,6 +47,89 @@ cpu     :  25.5`
         map: "de_cbble",
         players: "15/32",
         version: "48/1.1.2.7/Stdio 10211 secure  (10)",
+      })
+    })
+
+    it("should parse status response with player list", () => {
+      const response = `hostname:  [DEV] CS1.6 Test Server
+version :  48/1.1.2.7/Stdio 10211 secure  (10)
+tcp/ip  :  0.0.0.0:27015
+map     :  cs_backalley at: 0 x, 0 y, 0 z
+players :  5 active (32 max)
+
+#      name userid uniqueid frag time ping loss adr
+# 1 "RAGE OF THE BOY" 104 BOT   0  4:27:51    0    0
+# 2   "Domo" 105 BOT   0  4:27:51    0    0
+# 3 "ksqueakj" 106 BOT   0  4:27:51    0    0
+# 4 "Galdalfus" 107 BOT   0  4:27:51    0    0
+# 5  "d3m0n" 108 STEAM_0:1:470900   0 00:19   10    0
+5 users`
+
+      const result = parser.parseStatus(response)
+
+      expect(result).toEqual({
+        hostname: "[DEV] CS1.6 Test Server",
+        version: "48/1.1.2.7/Stdio 10211 secure  (10)",
+        map: "cs_backalley",
+        players: 5,
+        maxPlayers: 32,
+        fps: 0,
+        uptime: 0,
+        timestamp: expect.any(Date),
+        playerList: [
+          {
+            name: "RAGE OF THE BOY",
+            userid: 104,
+            uniqueid: "BOT",
+            isBot: true,
+            frag: 0,
+            time: "4:27:51",
+            ping: 0,
+            loss: 0,
+          },
+          {
+            name: "Domo",
+            userid: 105,
+            uniqueid: "BOT",
+            isBot: true,
+            frag: 0,
+            time: "4:27:51",
+            ping: 0,
+            loss: 0,
+          },
+          {
+            name: "ksqueakj",
+            userid: 106,
+            uniqueid: "BOT",
+            isBot: true,
+            frag: 0,
+            time: "4:27:51",
+            ping: 0,
+            loss: 0,
+          },
+          {
+            name: "Galdalfus",
+            userid: 107,
+            uniqueid: "BOT",
+            isBot: true,
+            frag: 0,
+            time: "4:27:51",
+            ping: 0,
+            loss: 0,
+          },
+          {
+            name: "d3m0n",
+            userid: 108,
+            uniqueid: "STEAM_0:1:470900",
+            isBot: false,
+            frag: 0,
+            time: "00:19",
+            ping: 10,
+            loss: 0,
+          },
+        ],
+        realPlayerCount: 1,
+        botCount: 4,
       })
     })
 
@@ -62,6 +148,9 @@ cpu     :  25.5`
         cpu: undefined,
         version: undefined,
         timestamp: expect.any(Date),
+        playerList: [],
+        realPlayerCount: 0,
+        botCount: 0,
       })
     })
 
@@ -268,6 +357,9 @@ cpu: not a number`
         uptime: 0,
         fps: 0,
         timestamp: expect.any(Date),
+        playerList: [],
+        realPlayerCount: 0,
+        botCount: 0,
       })
     })
 
@@ -281,6 +373,9 @@ cpu: not a number`
         uptime: 0,
         fps: 0,
         timestamp: expect.any(Date),
+        playerList: [],
+        realPlayerCount: 0,
+        botCount: 0,
       })
     })
   })

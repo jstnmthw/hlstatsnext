@@ -373,7 +373,7 @@ export class KillEventHandler extends BasePlayerEventHandler {
     killerStats: Player,
     victimStats: Player,
   ): Promise<void> {
-    this.logger.warn("Sending player notifications", {
+    this.logger.info("Sending player notifications", {
       serverId,
       killerId,
       victimId,

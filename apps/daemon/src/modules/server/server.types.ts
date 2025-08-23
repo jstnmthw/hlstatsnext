@@ -21,6 +21,14 @@ export interface ServerInfo {
   address: string
   port: number
   lastEvent?: Date
+  activeMap?: string
+}
+
+export interface ServerStatusUpdate {
+  activePlayers: number
+  maxPlayers: number
+  activeMap: string
+  hostname?: string
 }
 
 export interface IServerRepository {
@@ -29,6 +37,10 @@ export interface IServerRepository {
   getServerConfig(serverId: number, parameter: string): Promise<string | null>
   hasRconCredentials(serverId: number): Promise<boolean>
   findActiveServersWithRcon(maxAgeMinutes?: number): Promise<ServerInfo[]>
+
+  // RCON status enrichment methods
+  updateServerStatusFromRcon(serverId: number, status: ServerStatusUpdate): Promise<void>
+  resetMapStats(serverId: number, newMap: string, playerCount?: number): Promise<void>
 
   // Database-driven MOD configuration methods
   getModDefault(modCode: string, parameter: string): Promise<string | null>

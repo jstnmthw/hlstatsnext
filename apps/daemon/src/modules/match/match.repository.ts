@@ -295,9 +295,7 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
           mapCtHits: 0,
           mapTsShots: 0,
           mapTsHits: 0,
-          ...(typeof playerCount === "number"
-            ? { players: playerCount, activePlayers: playerCount }
-            : {}),
+          ...(typeof playerCount === "number" ? { players: playerCount } : {}),
           lastEvent: new Date(),
         },
         options,
@@ -326,7 +324,6 @@ export class MatchRepository extends BaseRepository<ServerRecord> implements IMa
       })
     } catch (error) {
       this.handleError("getLastKnownMap", error)
-      return null
     }
   }
 }

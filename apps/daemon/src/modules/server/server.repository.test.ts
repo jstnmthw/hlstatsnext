@@ -102,6 +102,7 @@ describe("ServerRepository", () => {
           name: true,
           address: true,
           port: true,
+          activeMap: true,
         },
       })
     })
@@ -121,6 +122,7 @@ describe("ServerRepository", () => {
           name: true,
           address: true,
           port: true,
+          activeMap: true,
         },
       })
     })
@@ -183,6 +185,7 @@ describe("ServerRepository", () => {
           name: true,
           address: true,
           port: true,
+          activeMap: true,
         },
       })
     })
@@ -206,6 +209,7 @@ describe("ServerRepository", () => {
           name: true,
           address: true,
           port: true,
+          activeMap: true,
         },
       })
     })

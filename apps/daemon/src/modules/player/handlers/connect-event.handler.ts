@@ -118,12 +118,12 @@ export class ConnectEventHandler extends BasePlayerEventHandler {
   }
 
   /**
-   * Update server active players count
+   * Update server last event timestamp
    */
   private async updateServerStats(serverId: number): Promise<void> {
     try {
+      // Note: activePlayers count is now updated via RCON enricher
       await this.repository.updateServerForPlayerEvent?.(serverId, {
-        activePlayers: { increment: 1 },
         lastEvent: new Date(),
       })
     } catch (error) {

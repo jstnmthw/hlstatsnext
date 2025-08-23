@@ -81,7 +81,11 @@ export class HLStatsDaemon {
 
     this.context = getAppContext(config.ingressOptions)
     this.logger = this.context.logger
-    this.rconMonitor = new RconMonitorService(this.context, config.rconConfig)
+    this.rconMonitor = new RconMonitorService(
+      this.context,
+      config.rconConfig,
+      this.context.serverStatusEnricher,
+    )
     this.databaseConnection = new DatabaseConnectionService(this.context)
 
     this.logger.info("Initializing HLStatsNext Daemon...")

@@ -397,7 +397,6 @@ export class MatchService implements IMatchService {
         matchStats.teamScores[winningTeam] = (matchStats.teamScores[winningTeam] || 0) + 1
       }
 
-      await this.repository.incrementServerRounds(serverId)
 
       this.logger.debug(
         `Round ended on server ${serverId}${winningTeam ? `: ${winningTeam} won` : ""}${

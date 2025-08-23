@@ -56,6 +56,8 @@ describe("PlayerService", () => {
       getServerConfig: vi.fn(),
       hasRconCredentials: vi.fn().mockResolvedValue(false),
       findActiveServersWithRcon: vi.fn().mockResolvedValue([]),
+      updateServerStatusFromRcon: vi.fn(),
+      resetMapStats: vi.fn(),
       getModDefault: vi.fn().mockResolvedValue(null),
       getServerConfigDefault: vi.fn().mockResolvedValue(null),
     }
@@ -455,6 +457,8 @@ describe("PlayerService", () => {
         getServerConfig: vi.fn(),
         hasRconCredentials: vi.fn().mockResolvedValue(false),
         findActiveServersWithRcon: vi.fn().mockResolvedValue([]),
+        updateServerStatusFromRcon: vi.fn(),
+        resetMapStats: vi.fn(),
         getModDefault: vi.fn().mockResolvedValue(null),
         getServerConfigDefault: vi.fn().mockResolvedValue(null),
       }

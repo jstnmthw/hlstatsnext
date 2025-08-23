@@ -67,6 +67,18 @@ export interface RconConnection {
   connectionAttempts: number
 }
 
+// Player Information from Status Response
+export interface PlayerInfo {
+  name: string
+  userid: number
+  uniqueid: string
+  isBot: boolean
+  frag: number
+  time: string
+  ping: number
+  loss: number
+}
+
 export interface ServerStatus {
   map: string
   players: number
@@ -77,6 +89,9 @@ export interface ServerStatus {
   hostname?: string
   cpu?: number
   timestamp: Date
+  playerList?: PlayerInfo[]
+  realPlayerCount?: number
+  botCount?: number
 }
 
 // Protocol Types

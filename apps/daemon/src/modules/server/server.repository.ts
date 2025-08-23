@@ -1,6 +1,6 @@
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IServerRepository, ServerInfo } from "./server.types"
+import type { IServerRepository, ServerInfo, ServerStatusUpdate } from "./server.types"
 
 export class ServerRepository implements IServerRepository {
   constructor(
@@ -18,6 +18,7 @@ export class ServerRepository implements IServerRepository {
           name: true,
           address: true,
           port: true,
+          activeMap: true,
         },
       })
 
@@ -41,6 +42,7 @@ export class ServerRepository implements IServerRepository {
           name: true,
           address: true,
           port: true,
+          activeMap: true,
         },
       })
 
@@ -115,6 +117,7 @@ export class ServerRepository implements IServerRepository {
           address: true,
           port: true,
           lastEvent: true,
+          activeMap: true,
         },
         orderBy: {
           lastEvent: "desc",
@@ -128,6 +131,7 @@ export class ServerRepository implements IServerRepository {
         address: server.address,
         port: server.port,
         lastEvent: server.lastEvent || undefined,
+        activeMap: server.activeMap || undefined,
       }))
     } catch (error) {
       const effectiveMaxAge =
@@ -162,6 +166,77 @@ export class ServerRepository implements IServerRepository {
     } catch (error) {
       this.logger.error(`Failed to read server config default ${parameter}: ${error}`)
       return null
+    }
+  }
+
+  async updateServerStatusFromRcon(
+    serverId: number,
+    status: ServerStatusUpdate,
+  ): Promise<void> {
+    try {
+      const updateData: Record<string, unknown> = {
+        activePlayers: status.activePlayers,
+        maxPlayers: status.maxPlayers,
+        activeMap: status.activeMap,
+        lastEvent: new Date(),
+      }
+
+      if (status.hostname) {
+        updateData.name = status.hostname
+      }
+
+      await this.database.prisma.server.update({
+        where: { serverId },
+        data: updateData,
+      })
+
+      this.logger.debug(`Updated server ${serverId} status from RCON`, {
+        activePlayers: status.activePlayers,
+        maxPlayers: status.maxPlayers,
+        activeMap: status.activeMap,
+      })
+    } catch (error) {
+      this.logger.error(`Failed to update server status from RCON for ${serverId}: ${error}`)
+      throw error
+    }
+  }
+
+  async resetMapStats(
+    serverId: number,
+    newMap: string,
+    playerCount?: number,
+  ): Promise<void> {
+    try {
+      const updateData: Record<string, unknown> = {
+        activeMap: newMap,
+        mapChanges: { increment: 1 },
+        mapStarted: Math.floor(Date.now() / 1000),
+        mapRounds: 0,
+        mapCtWins: 0,
+        mapTsWins: 0,
+        mapCtShots: 0,
+        mapCtHits: 0,
+        mapTsShots: 0,
+        mapTsHits: 0,
+        lastEvent: new Date(),
+      }
+
+      if (typeof playerCount === "number") {
+        updateData.activePlayers = playerCount
+        updateData.maxPlayers = Math.max(playerCount, 32) // Reasonable default
+      }
+
+      await this.database.prisma.server.update({
+        where: { serverId },
+        data: updateData,
+      })
+
+      this.logger.info(`Reset map stats for server ${serverId} to ${newMap}`, {
+        playerCount,
+      })
+    } catch (error) {
+      this.logger.error(`Failed to reset map stats for server ${serverId}: ${error}`)
+      throw error
     }
   }
 }

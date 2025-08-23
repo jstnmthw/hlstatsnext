@@ -86,7 +86,7 @@ describe("MatchService", () => {
 
       expect(result.success).toBe(true)
       expect(result.affected).toBe(1)
-      expect(mockRepository.incrementServerRounds).toHaveBeenCalledWith(1)
+      expect(mockRepository.incrementServerRounds).not.toHaveBeenCalled()
     })
 
     it("should handle TEAM_WIN events", async () => {
@@ -152,11 +152,15 @@ describe("MatchService", () => {
     it("should handle errors in match event processing", async () => {
       vi.mocked(mockRepository.incrementServerRounds).mockRejectedValue(new Error("Database error"))
 
-      const event: RoundEndEvent = {
-        eventType: EventType.ROUND_END,
+      const event: TeamWinEvent = {
+        eventType: EventType.TEAM_WIN,
         serverId: 1,
         timestamp: new Date(),
-        data: {},
+        data: {
+          winningTeam: "CT",
+          triggerName: "CTs_Win",
+          score: { ct: 16, t: 14 },
+        },
       }
 
       const result = await matchService.handleMatchEvent(event)

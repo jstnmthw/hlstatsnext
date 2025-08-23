@@ -22,6 +22,7 @@ import { RconService } from "@/modules/rcon/rcon.service"
 import { CommandResolverService } from "@/modules/rcon/services/command-resolver.service"
 import { RconCommandService } from "@/modules/rcon/services/rcon-command.service"
 import { PlayerNotificationService } from "@/modules/rcon/services/player-notification.service"
+import { ServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 
 import type { IPlayerService } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
@@ -31,6 +32,7 @@ import type { IActionService } from "@/modules/action/action.types"
 import type { IGameDetectionService } from "@/modules/game/game-detection.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { IRconService } from "@/modules/rcon/rcon.types"
+import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 
 export interface BusinessServiceCollection {
   playerService: IPlayerService
@@ -41,6 +43,7 @@ export interface BusinessServiceCollection {
   gameDetectionService: IGameDetectionService
   serverService: IServerService
   rconService: IRconService
+  serverStatusEnricher: IServerStatusEnricher
 }
 
 /**
@@ -99,6 +102,14 @@ export function createBusinessServices(
     matchService,
   )
 
+  // Fifth tier - enrichers dependent on multiple services
+  const serverStatusEnricher = new ServerStatusEnricher(
+    rconService,
+    repositories.serverRepository,
+    serverService,
+    logger,
+  )
+
   return {
     playerService,
     matchService,
@@ -108,5 +119,6 @@ export function createBusinessServices(
     gameDetectionService,
     serverService,
     rconService,
+    serverStatusEnricher,
   }
 }

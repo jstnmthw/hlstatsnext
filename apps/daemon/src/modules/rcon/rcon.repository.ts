@@ -80,42 +80,29 @@ export class RconRepository implements IRconRepository {
 
   async updateServerStatus(serverId: number, status: ServerStatus): Promise<void> {
     try {
-      // Update server table with current player count
-      await this.database.prisma.server.update({
-        where: { serverId },
+      // Insert status history record using ServerLoad table
+      await this.database.prisma.serverLoad.create({
         data: {
-          players: status.players,
+          serverId,
+          timestamp: Math.floor(status.timestamp.getTime() / 1000), // Convert to Unix timestamp
+          activePlayers: status.realPlayerCount ?? status.players,
+          minPlayers: status.realPlayerCount ?? status.players, // Use current as min for now
           maxPlayers: status.maxPlayers,
+          map: status.map,
+          uptime: status.uptime.toString(),
+          fps: status.fps.toString(),
         },
       })
 
-      // Insert status history record using ServerLoad table
-      try {
-        await this.database.prisma.serverLoad.create({
-          data: {
-            serverId,
-            timestamp: Math.floor(status.timestamp.getTime() / 1000), // Convert to Unix timestamp
-            activePlayers: status.players,
-            minPlayers: status.players, // Use current as min for now
-            maxPlayers: status.maxPlayers,
-            map: status.map,
-            uptime: status.uptime.toString(),
-            fps: status.fps.toString(),
-          },
-        })
-      } catch (statusError) {
-        // ServerLoad insert might fail due to primary key constraints - this is optional
-        this.logger.debug(`Could not insert server status history: ${statusError}`)
-      }
-
-      this.logger.debug(`Updated status for server ${serverId}`, {
+      this.logger.debug(`Recorded server load history for server ${serverId}`, {
         map: status.map,
-        players: status.players,
+        realPlayers: status.realPlayerCount,
+        totalPlayers: status.players,
         maxPlayers: status.maxPlayers,
       })
     } catch (error) {
-      this.logger.error(`Failed to update server status for ${serverId}: ${error}`)
-      throw error
+      // ServerLoad insert might fail due to primary key constraints - this is optional
+      this.logger.debug(`Could not insert server status history: ${error}`)
     }
   }
 

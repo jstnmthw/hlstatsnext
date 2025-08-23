@@ -17,6 +17,7 @@ import type { IIngressService } from "@/modules/ingress/ingress.types"
 import type { IGameDetectionService } from "@/modules/game/game-detection.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { IRconService } from "@/modules/rcon/rcon.types"
+import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 
 import { DatabaseClient } from "@/database/client"
 import { QueueModule } from "@/shared/infrastructure/messaging/module"
@@ -59,6 +60,7 @@ export interface AppContext {
   gameDetectionService: IGameDetectionService
   serverService: IServerService
   rconService: IRconService
+  serverStatusEnricher: IServerStatusEnricher
 
   // Module Event Handlers
   playerEventHandler: PlayerEventHandler
@@ -142,6 +144,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     gameDetectionService: services.gameDetectionService,
     serverService: services.serverService,
     rconService: services.rconService,
+    serverStatusEnricher: services.serverStatusEnricher,
 
     // Event Handlers
     playerEventHandler: eventComponents.playerEventHandler,

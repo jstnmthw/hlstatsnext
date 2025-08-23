@@ -13,5 +13,8 @@ export const { getClient, query, PreloadQuery } = registerApolloClient(() => {
     link: new HttpLink({
       uri,
     }),
+    devtools: {
+      enabled: process.env.NODE_ENV === "development",
+    },
   })
 })

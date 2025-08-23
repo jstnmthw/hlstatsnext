@@ -17,7 +17,7 @@
     "dev:components": "tsc --watch",
     "dev": "pnpm dev:components",
     "lint": "eslint src --max-warnings 0",
-    "clean": "rm -rf node_modules dist",
+    "clean": "rm -rf node_modules dist .turbo",
     "ui": "pnpm dlx shadcn@latest"
   },
   "peerDependencies": {

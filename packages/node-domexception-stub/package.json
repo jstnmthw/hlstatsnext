@@ -1,0 +1,9 @@
+{
+  "name": "node-domexception-stub",
+  "version": "1.0.0",
+  "description": "Stub for node-domexception that uses native DOMException",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

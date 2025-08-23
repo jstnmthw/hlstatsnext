@@ -31,7 +31,7 @@ export function TextInput({ className, ...props }: React.InputHTMLAttributes<HTM
         "placeholder:text-muted-foreground",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        className
+        className,
       )}
       {...props}
     />
@@ -39,23 +39,21 @@ export function TextInput({ className, ...props }: React.InputHTMLAttributes<HTM
 }
 
 export function NumberInput({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <TextInput
-      type="number"
-      className={className}
-      {...props}
-    />
-  )
+  return <TextInput type="number" className={className} {...props} />
 }
 
-export function SelectInput({ className, children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
+export function SelectInput({
+  className,
+  children,
+  ...props
+}: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       className={cn(
         "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        className
+        className,
       )}
       {...props}
     >
@@ -64,7 +62,10 @@ export function SelectInput({ className, children, ...props }: React.SelectHTMLA
   )
 }
 
-export function Textarea({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+export function Textarea({
+  className,
+  ...props
+}: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       className={cn(
@@ -72,7 +73,7 @@ export function Textarea({ className, ...props }: React.TextareaHTMLAttributes<H
         "placeholder:text-muted-foreground",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        className
+        className,
       )}
       {...props}
     />
@@ -85,9 +86,5 @@ interface ErrorMessageProps {
 }
 
 export function ErrorMessage({ children, className }: ErrorMessageProps) {
-  return (
-    <p className={cn("text-sm text-red-500", className)}>
-      {children}
-    </p>
-  )
+  return <p className={cn("text-sm text-red-500", className)}>{children}</p>
 }

@@ -22,7 +22,7 @@ export default function CreateServerPage() {
               Add a new Half-Life server to begin tracking player statistics and activities.
             </p>
           </div>
-          
+
           <Card className="p-6">
             <ServerCreateForm />
           </Card>

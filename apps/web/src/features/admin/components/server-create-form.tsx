@@ -3,37 +3,28 @@
 import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 import { createServer } from "@/features/admin/actions/create-server"
-import { 
-  FormField, 
-  Label, 
-  TextInput, 
-  NumberInput, 
-  SelectInput, 
-  ErrorMessage 
+import {
+  FormField,
+  Label,
+  TextInput,
+  NumberInput,
+  SelectInput,
+  ErrorMessage,
 } from "@/features/admin/components/form-inputs"
 import { Button } from "@repo/ui/button"
 
 function SubmitButton() {
   const { pending } = useFormStatus()
-  
+
   return (
-    <Button 
-      type="submit" 
-      disabled={pending}
-      variant="solid"
-      colorScheme="green"
-      className="w-full"
-    >
+    <Button type="submit" disabled={pending} variant="solid" colorScheme="green" className="w-full">
       {pending ? "Creating Server..." : "Create Server"}
     </Button>
   )
 }
 
 export function ServerCreateForm() {
-  const [state, formAction] = useActionState(
-    createServer,
-    { success: true, message: "" }
-  )
+  const [state, formAction] = useActionState(createServer, { success: true, message: "" })
 
   return (
     <form action={formAction} className="space-y-6">
@@ -55,15 +46,11 @@ export function ServerCreateForm() {
             required
             maxLength={100}
           />
-          {state.errors?.name && (
-            <ErrorMessage>{state.errors.name[0]}</ErrorMessage>
-          )}
+          {state.errors?.name && <ErrorMessage>{state.errors.name[0]}</ErrorMessage>}
         </FormField>
 
         <FormField>
-          <Label htmlFor="game">
-            Game Type
-          </Label>
+          <Label htmlFor="game">Game Type</Label>
           <SelectInput id="game" name="game" defaultValue="cstrike">
             <option value="cstrike">Counter-Strike</option>
             <option value="cstrike2">Counter-Strike 2</option>
@@ -71,9 +58,7 @@ export function ServerCreateForm() {
             <option value="dod">Day of Defeat</option>
             <option value="hl">Half-Life</option>
           </SelectInput>
-          {state.errors?.game && (
-            <ErrorMessage>{state.errors.game[0]}</ErrorMessage>
-          )}
+          {state.errors?.game && <ErrorMessage>{state.errors.game[0]}</ErrorMessage>}
         </FormField>
       </div>
 
@@ -89,9 +74,7 @@ export function ServerCreateForm() {
             required
             maxLength={255}
           />
-          {state.errors?.address && (
-            <ErrorMessage>{state.errors.address[0]}</ErrorMessage>
-          )}
+          {state.errors?.address && <ErrorMessage>{state.errors.address[0]}</ErrorMessage>}
         </FormField>
 
         <FormField>
@@ -107,16 +90,12 @@ export function ServerCreateForm() {
             max={65535}
             required
           />
-          {state.errors?.port && (
-            <ErrorMessage>{state.errors.port[0]}</ErrorMessage>
-          )}
+          {state.errors?.port && <ErrorMessage>{state.errors.port[0]}</ErrorMessage>}
         </FormField>
       </div>
 
       <FormField>
-        <Label htmlFor="rconPassword">
-          RCON Password
-        </Label>
+        <Label htmlFor="rconPassword">RCON Password</Label>
         <TextInput
           id="rconPassword"
           name="rconPassword"
@@ -127,15 +106,13 @@ export function ServerCreateForm() {
         <p className="text-xs text-muted-foreground">
           Optional. Used for remote server administration and real-time monitoring.
         </p>
-        {state.errors?.rconPassword && (
-          <ErrorMessage>{state.errors.rconPassword[0]}</ErrorMessage>
-        )}
+        {state.errors?.rconPassword && <ErrorMessage>{state.errors.rconPassword[0]}</ErrorMessage>}
       </FormField>
 
       <div className="flex gap-4 pt-6">
         <SubmitButton />
-        <Button 
-          type="button" 
+        <Button
+          type="button"
           variant="outline"
           className="w-full"
           onClick={() => window.history.back()}

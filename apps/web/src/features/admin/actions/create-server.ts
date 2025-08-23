@@ -7,9 +7,19 @@ import { redirect } from "next/navigation"
 import type { DocumentNode } from "graphql"
 
 const CreateServerSchema = z.object({
-  name: z.string().min(1, "Server name is required").max(100, "Server name must be less than 100 characters"),
-  address: z.string().min(1, "Server address is required").max(255, "Server address must be less than 255 characters"),
-  port: z.coerce.number().int().min(1, "Port must be greater than 0").max(65535, "Port must be less than 65535"),
+  name: z
+    .string()
+    .min(1, "Server name is required")
+    .max(100, "Server name must be less than 100 characters"),
+  address: z
+    .string()
+    .min(1, "Server address is required")
+    .max(255, "Server address must be less than 255 characters"),
+  port: z.coerce
+    .number()
+    .int()
+    .min(1, "Port must be greater than 0")
+    .max(65535, "Port must be less than 65535"),
   game: z.string().optional().default("cstrike"),
   rconPassword: z.string().optional(),
 })
@@ -24,7 +34,7 @@ export type CreateServerResult = {
 
 export async function createServer(
   _prevState: CreateServerResult,
-  formData: FormData
+  formData: FormData,
 ): Promise<CreateServerResult> {
   try {
     // Extract and validate form data

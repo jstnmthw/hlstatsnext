@@ -196,7 +196,7 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
         this.logWithRateLimit(
           `auth-success-${serverKey}`,
           `Authenticated server ${serverKey} as ID ${server.serverId}`,
-          "info",
+          "ok",
         )
         return { kind: "authenticated", serverId: server.serverId }
       } else {
@@ -234,7 +234,7 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
   private logWithRateLimit(
     messageKey: string,
     message: string,
-    level: "info" | "warn" | "debug" = "info",
+    level: "info" | "warn" | "debug" | "ok" = "info",
   ): void {
     const now = Date.now()
     const lastLogTime = this.loggedMessages.get(messageKey)

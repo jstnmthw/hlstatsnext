@@ -85,14 +85,6 @@ export class ServerStatusEnricher implements IServerStatusEnricher {
       activePlayers = status.players
     }
 
-    // Log player breakdown for debugging
-    if (status.realPlayerCount !== undefined && status.botCount !== undefined) {
-      const ignoreBotStatus = ignoreBots ? " (IgnoreBots=ON)" : " (IgnoreBots=OFF)"
-      this.logger.ok(
-        `Players: ${status.realPlayerCount} real + ${status.botCount} bots = ${status.players} total${ignoreBotStatus} on server ${serverId}`,
-      )
-    }
-
     return {
       activePlayers,
       maxPlayers: status.maxPlayers,
@@ -109,6 +101,14 @@ export class ServerStatusEnricher implements IServerStatusEnricher {
     update: ServerStatusUpdate,
     newMap: string,
   ): Promise<void> {
+    // Get IgnoreBots configuration (default to false - include bots)
+    const ignoreBots = await this.serverService.getServerConfigBoolean(
+      serverId,
+      "IgnoreBots",
+      false,
+    )
+    const ignoreBotStatus = ignoreBots ? "(IgnoreBots=ON)" : "(IgnoreBots=OFF)"
+
     // Check if map changed to potentially reset map stats
     const currentMap = await this.getCurrentMap(serverId)
     const mapChanged = currentMap && currentMap !== newMap
@@ -121,7 +121,7 @@ export class ServerStatusEnricher implements IServerStatusEnricher {
     } else {
       await this.serverRepository.updateServerStatusFromRcon(serverId, update)
       this.logger.ok(
-        `Updated server ${serverId}: ${update.activePlayers}/${update.maxPlayers} players on ${update.activeMap}`,
+        `Updated server ${serverId}: ${update.activePlayers}/${update.maxPlayers} players on ${update.activeMap} ${ignoreBotStatus}`,
       )
     }
   }

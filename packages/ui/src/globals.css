@@ -1,1 +1,13 @@
-@import "tailwindcss";
+/* Component-specific styles only - web app handles base Tailwind compilation */
+
+:root {
+  /* UI package specific CSS variables */
+  --ui-component-radius: 0.5rem;
+  /* Component-specific variables can be added here as needed */
+}
+
+/* Component-specific base styles if needed */
+@layer components {
+  /* Custom component styles that aren't covered by Tailwind utilities */
+  /* These will be included in the final compiled CSS */
+}

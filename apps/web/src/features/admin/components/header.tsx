@@ -5,6 +5,10 @@ import { Badge } from "@repo/ui"
 
 const navItems = [
   {
+    label: "UI Kit",
+    href: "/kitchen-sink",
+  },
+  {
     label: "Servers",
     href: "/servers",
   },

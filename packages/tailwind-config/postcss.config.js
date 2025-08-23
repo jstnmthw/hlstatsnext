@@ -1,6 +1,8 @@
-// Optional PostCSS configuration for applications that need it
+// PostCSS configuration with monorepo base path for UI component scanning
 export const postcssConfig = {
   plugins: {
-    "@tailwindcss/postcss": {},
+    "@tailwindcss/postcss": {
+      base: process.cwd() + "/../..", // Points to monorepo root for content scanning
+    },
   },
-};
+}

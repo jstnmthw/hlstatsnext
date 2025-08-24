@@ -72,20 +72,45 @@ export async function createServer(
       },
     })
 
-    if (result.errors) {
-      console.error("GraphQL errors:", result.errors)
+    if (!result.data?.createOneServer) {
+      console.error("GraphQL mutation failed")
       return {
         success: false,
         message: "Failed to create server. Please try again.",
       }
     }
 
-    console.log("Server created successfully:", result.data?.createOneServer)
-
     // Redirect to admin page on success
     redirect("/admin")
   } catch (error) {
+    // Let Next.js redirect errors pass through
+    if (error && typeof error === "object" && "message" in error) {
+      const errorMessage = (error as Error).message
+      if (errorMessage === "NEXT_REDIRECT") {
+        throw error
+      }
+    }
+
     console.error("Server creation error:", error)
+
+    // Handle Prisma unique constraint errors
+    if (error && typeof error === "object" && "message" in error) {
+      const errorMessage = (error as Error).message
+      if (
+        errorMessage.includes("Unique constraint failed") &&
+        (errorMessage.includes("servers_address_port_key") || errorMessage.includes("addressport"))
+      ) {
+        return {
+          success: false,
+          message: "A server with this address and port already exists.",
+          errors: {
+            address: ["This server address and port combination is already in use"],
+            port: ["This server address and port combination is already in use"],
+          },
+        }
+      }
+    }
+
     return {
       success: false,
       message: "An unexpected error occurred. Please try again.",

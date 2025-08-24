@@ -15,6 +15,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
+  IPAddress,
 } from "@repo/ui"
 
 import {
@@ -1037,6 +1038,13 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                   Disabled Input
                 </label>
                 <Input id="disabled-input" type="text" placeholder="Disabled" disabled />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="ip-address" className="text-sm font-medium">
+                  IP Address
+                </label>
+                <IPAddress />
               </div>
             </div>
           </div>

@@ -25,32 +25,30 @@ function SubmitButton() {
   )
 }
 
-function ErrorDisplay({ state }: { state: { success: boolean; message: string } }) {
-  const { pending } = useFormStatus()
-
-  // Don't render anything if there's no error message
-  if (state.success || !state.message) {
+function ErrorDisplay({
+  state,
+  pending,
+}: {
+  state: { success: boolean; message: string }
+  pending: boolean
+}) {
+  if (state.success || !state.message || pending) {
     return null
   }
 
   return (
-    <div
-      className={`px-3 py-2 border rounded-md !border-red-500/20 flex items-center justify-between transition-opacity duration-200 ${
-        pending ? "opacity-0 pointer-events-none" : "opacity-100"
-      }`}
-    >
+    <div className="px-3 py-2 border rounded-md !border-red-500/20 flex items-center justify-between transition-opacity duration-200 opacity-100">
       <p className="text-red-800 text-sm dark:text-red-500">{state.message}</p>
     </div>
   )
 }
 
 export function ServerCreateForm() {
-  const [state, formAction] = useActionState(createServer, { success: true, message: "" })
+  const [state, formAction, pending] = useActionState(createServer, { success: true, message: "" })
 
   return (
     <form action={formAction} className="space-y-6">
-      <pre className="text-xs text-muted-foreground">{JSON.stringify(state, null, 2)}</pre>
-      <ErrorDisplay state={state} />
+      <ErrorDisplay state={state} pending={pending} />
 
       <div className="grid gap-6 md:grid-cols-2">
         <FormField>
@@ -61,7 +59,7 @@ export function ServerCreateForm() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="cstrike">Counter-Strike</SelectItem>
-              <SelectItem value="cstrike2">Counter-Strike 2</SelectItem>
+              <SelectItem value="css">Counter-Strike: Source</SelectItem>
               <SelectItem value="tf">Team Fortress Classic</SelectItem>
               <SelectItem value="dod">Day of Defeat</SelectItem>
               <SelectItem value="hl">Half-Life</SelectItem>
@@ -87,7 +85,7 @@ export function ServerCreateForm() {
           <Input
             id="port"
             name="port"
-            type="number"
+            type="text"
             placeholder="27015"
             min={1}
             max={65535}

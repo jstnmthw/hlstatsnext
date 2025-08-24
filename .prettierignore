@@ -8,7 +8,7 @@ dist/
 build/
 
 # Generated files
-apps/web/lib/gql/
+apps/web/src/lib/gql/
 generated/
 legacy/
 

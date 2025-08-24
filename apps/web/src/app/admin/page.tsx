@@ -34,7 +34,7 @@ export default function Page() {
                 Add your first Half-Life server to begin tracking player statistics and activities.
               </p>
               <Button variant="solid" size="default" colorScheme="green" asChild>
-                <Link href="/admin/server/add">
+                <Link href="/admin/servers/add">
                   <PlusCircleIcon data-slot="icon" />
                   <span>Add server</span>
                 </Link>

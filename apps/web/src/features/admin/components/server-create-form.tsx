@@ -31,30 +31,16 @@ export function ServerCreateForm() {
   return (
     <form action={formAction} className="space-y-6">
       {!state.success && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-red-800 text-sm">{state.message}</p>
+        <div className="px-3 py-2 border rounded-md !border-red-500/20 flex items-center justify-between">
+          <p className="text-red-800 text-sm dark:text-red-500">{state.message}</p>
         </div>
       )}
 
       <div className="grid gap-6 md:grid-cols-2">
         <FormField>
-          <Label htmlFor="name" required>
-            Server Name
-          </Label>
-          <Input
-            id="name"
-            name="name"
-            placeholder="My Counter-Strike Server"
-            required
-            maxLength={100}
-          />
-          {state.errors?.name && <ErrorMessage>{state.errors.name[0]}</ErrorMessage>}
-        </FormField>
-
-        <FormField>
           <Label htmlFor="game">Game Type</Label>
           <Select name="game" defaultValue="cstrike">
-            <SelectTrigger id="game">
+            <SelectTrigger id="game" className="w-1/2">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -87,7 +73,6 @@ export function ServerCreateForm() {
             name="port"
             type="number"
             placeholder="27015"
-            defaultValue={27015}
             min={1}
             max={65535}
             required

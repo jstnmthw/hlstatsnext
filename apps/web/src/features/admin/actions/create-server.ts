@@ -1,16 +1,13 @@
 "use server"
 
-import { getClient } from "@/lib/apollo-client"
-import { CREATE_SERVER_MUTATION } from "@/features/admin/graphql/server-mutations"
-import { z } from "zod"
-import { redirect } from "next/navigation"
 import type { DocumentNode } from "graphql"
 
+import { z } from "zod"
+import { redirect } from "next/navigation"
+import { getClient } from "@/lib/apollo-client"
+import { CREATE_SERVER_MUTATION } from "@/features/admin/graphql/server-mutations"
+
 const CreateServerSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Server name is required")
-    .max(100, "Server name must be less than 100 characters"),
   address: z
     .string()
     .min(1, "Server address is required")
@@ -39,7 +36,6 @@ export async function createServer(
   try {
     // Extract and validate form data
     const rawData = {
-      name: formData.get("name"),
       address: formData.get("address"),
       port: formData.get("port"),
       game: formData.get("game"),
@@ -60,7 +56,6 @@ export async function createServer(
 
     // Prepare GraphQL input
     const serverInput = {
-      name: data.name,
       address: data.address,
       port: data.port,
       game: data.game,

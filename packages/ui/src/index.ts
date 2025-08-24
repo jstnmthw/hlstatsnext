@@ -1,9 +1,6 @@
 // Components
 export { Badge } from "./components/badge"
-export type { BadgeProps } from "./components/badge"
-
 export { Button, buttonVariants } from "./components/button"
-export type { ButtonProps } from "./components/button"
 
 export {
   Breadcrumb,
@@ -15,7 +12,19 @@ export {
   BreadcrumbEllipsis,
 } from "./components/breadcrumb"
 
+export {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "./components/select"
+
 export { Card } from "./components/card"
+export { Input } from "./components/input"
+export { Textarea } from "./components/textarea"
 
 // Icons (re-export from lucide-react)
 export * from "./icons"

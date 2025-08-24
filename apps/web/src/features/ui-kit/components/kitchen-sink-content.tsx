@@ -1,4 +1,15 @@
-import { Button, Badge, cn } from "@repo/ui"
+import { Button, Badge, cn, Input, Textarea } from "@repo/ui"
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui"
+
 import {
   BellIcon,
   BoltIcon,
@@ -997,49 +1008,28 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                 <label htmlFor="text-input" className="text-sm font-medium">
                   Text Input
                 </label>
-                <input
-                  id="text-input"
-                  type="text"
-                  placeholder="Enter text..."
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                />
+                <Input id="text-input" type="text" placeholder="Enter text..." />
               </div>
 
               <div className="space-y-2">
                 <label htmlFor="email-input" className="text-sm font-medium">
                   Email Input
                 </label>
-                <input
-                  id="email-input"
-                  type="email"
-                  placeholder="email@example.com"
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                />
+                <Input id="email-input" type="email" placeholder="email@example.com" />
               </div>
 
               <div className="space-y-2">
                 <label htmlFor="password-input" className="text-sm font-medium">
                   Password Input
                 </label>
-                <input
-                  id="password-input"
-                  type="password"
-                  placeholder="••••••••"
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                />
+                <Input id="password-input" type="password" placeholder="••••••••" />
               </div>
 
               <div className="space-y-2">
                 <label htmlFor="disabled-input" className="text-sm font-medium">
                   Disabled Input
                 </label>
-                <input
-                  id="disabled-input"
-                  type="text"
-                  placeholder="Disabled"
-                  disabled
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                />
+                <Input id="disabled-input" type="text" placeholder="Disabled" disabled />
               </div>
             </div>
           </div>
@@ -1049,12 +1039,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
             <label htmlFor="textarea-field" className="text-sm font-medium">
               Textarea
             </label>
-            <textarea
-              id="textarea-field"
-              placeholder="Enter your message..."
-              rows={4}
-              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-            />
+            <Textarea id="textarea-field" placeholder="Enter your message..." rows={4} />
           </div>
 
           {/* Select */}
@@ -1062,15 +1047,20 @@ export function KitchenSinkContent({ className }: { className?: string }) {
             <label htmlFor="select-field" className="text-sm font-medium">
               Select
             </label>
-            <select
-              id="select-field"
-              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="">Choose an option...</option>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
-            </select>
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select a game" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Games</SelectLabel>
+                  <SelectItem value="cstrike">Counter-Strike 1.6</SelectItem>
+                  <SelectItem value="tfc">Team Fortress Classic</SelectItem>
+                  <SelectItem value="dod">Day of Defeat</SelectItem>
+                  <SelectItem value="opfor">Opposing Force</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Checkboxes and Radio */}

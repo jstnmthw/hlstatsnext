@@ -368,7 +368,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                   <BellIcon data-slot="icon" />
                   <span>Small Button</span>
                 </Button>
-                <Button variant="outline" colorScheme="indigo" size="default">
+                <Button variant="outline" colorScheme="indigo">
                   <BellIcon data-slot="icon" />
                   <span>Default Button</span>
                 </Button>

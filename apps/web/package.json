@@ -17,6 +17,7 @@
     "@apollo/client": "^3.14.0",
     "@apollo/client-integration-nextjs": "^0.12.3",
     "@repo/ui": "workspace:*",
+    "@tanstack/react-table": "^8.21.3",
     "graphql": "^16.11.0",
     "lucide-react": "^0.513.0",
     "next": "^15.5.0",

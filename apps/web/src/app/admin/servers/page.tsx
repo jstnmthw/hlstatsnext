@@ -2,16 +2,21 @@ import { AdminHeader } from "@/features/admin/servers/components/header"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { ServerList } from "@/features/homepage/components/server-list"
+import { DataTable } from "@/features/common/components/data-table"
+import { columns } from "@/features/admin/servers/components/columns"
 import { Button } from "@repo/ui"
+import { query } from "@/lib/apollo-client"
 import Link from "next/link"
+import { GET_SERVERS_QUERY } from "@/features/common/graphql/servers"
 
 export const metadata = {
   title: "Servers - Admin - " + process.env.NEXT_PUBLIC_APP_NAME,
   description: "Manage your game servers and track player statistics and activities.",
 }
 
-export default function ServersPage() {
+export default async function ServersPage() {
+  const { data } = await query({ query: GET_SERVERS_QUERY })
+
   return (
     <PageWrapper>
       <AdminHeader />
@@ -31,7 +36,7 @@ export default function ServersPage() {
                 </Button>
               </div>
             </div>
-            <ServerList />
+            <DataTable columns={columns} data={data.findManyServer} />
           </div>
         </div>
       </MainContent>

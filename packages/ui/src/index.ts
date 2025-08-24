@@ -19,6 +19,8 @@ export {
   SelectValue,
 } from "./components/select"
 
+export { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/table"
+
 export { Card } from "./components/card"
 export { Label } from "./components/label"
 export { Badge } from "./components/badge"

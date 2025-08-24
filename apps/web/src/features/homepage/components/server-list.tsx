@@ -1,26 +1,11 @@
 import { query } from "@/lib/apollo-client"
-import { graphql } from "@/lib/gql"
+import { GET_SERVERS_QUERY } from "@/features/common/graphql/servers"
 import { Button, PlayIcon, cn } from "@repo/ui"
 import {
   VerticalList,
   VerticalListHeader,
   VerticalListItem,
 } from "@/features/common/components/vertical-list"
-
-const GET_SERVERS_QUERY = graphql(`
-  query GetServersWithStatus {
-    findManyServer {
-      serverId
-      name
-      address
-      port
-      activePlayers
-      maxPlayers
-      activeMap
-      lastEvent
-    }
-  }
-`)
 
 export async function ServerList({ className }: { className?: string }) {
   const { data } = await query({ query: GET_SERVERS_QUERY })

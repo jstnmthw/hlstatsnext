@@ -45,7 +45,7 @@ ref/
 packages/database/data/
 
 # Servers
-servers/
+/servers/
 
 # Legacy
 # legacy/

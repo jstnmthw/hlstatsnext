@@ -1012,37 +1012,37 @@ export function KitchenSinkContent({ className }: { className?: string }) {
           <div id="input-fields" className="space-y-4">
             <h3 className="text-xl font-medium">Input Fields</h3>
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
+              <div className="space-y-1 flex flex-col">
                 <label htmlFor="text-input" className="text-sm font-medium">
                   Text Input
                 </label>
                 <Input id="text-input" type="text" placeholder="Enter text..." />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1 flex flex-col">
                 <label htmlFor="email-input" className="text-sm font-medium">
                   Email Input
                 </label>
                 <Input id="email-input" type="email" placeholder="email@example.com" />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1 flex flex-col">
                 <label htmlFor="password-input" className="text-sm font-medium">
                   Password Input
                 </label>
                 <Input id="password-input" type="password" placeholder="••••••••" />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1 flex flex-col">
                 <label htmlFor="disabled-input" className="text-sm font-medium">
                   Disabled Input
                 </label>
                 <Input id="disabled-input" type="text" placeholder="Disabled" disabled />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1 flex flex-col">
                 <label htmlFor="ip-address" className="text-sm font-medium">
-                  IP Address
+                  IP Address & Port
                 </label>
                 <IPAddress />
               </div>
@@ -1050,7 +1050,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
           </div>
 
           {/* Textarea */}
-          <div id="textarea" className="space-y-2">
+          <div id="textarea" className="space-y-1 flex flex-col">
             <label htmlFor="textarea-field" className="text-sm font-medium">
               Textarea
             </label>
@@ -1058,7 +1058,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
           </div>
 
           {/* Select */}
-          <div id="select" className="space-y-2">
+          <div id="select" className="space-y-1 flex flex-col">
             <label htmlFor="select-field" className="text-sm font-medium">
               Select
             </label>

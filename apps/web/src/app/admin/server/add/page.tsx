@@ -17,15 +17,14 @@ export default function CreateServerPage() {
       <MainContent>
         <div className="container">
           <div className="py-10 border-t border-border">
-            <h1 className="text-3xl font-medium tracking-tight">Add Server</h1>
-            <p className="text-muted-foreground">
-              Add a new Half-Life server to begin tracking player statistics and activities.
-            </p>
+            <Card className="p-6 max-w-lg mx-auto">
+              <h1 className="text-3xl font-medium tracking-tight mb-2">Add Server</h1>
+              <p className="text-muted-foreground mb-6 text-sm">
+                Add a new Half-Life server to begin tracking player statistics and activities.
+              </p>
+              <ServerCreateForm />
+            </Card>
           </div>
-
-          <Card className="p-6">
-            <ServerCreateForm />
-          </Card>
         </div>
       </MainContent>
       <Footer />

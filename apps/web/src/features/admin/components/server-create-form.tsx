@@ -1,9 +1,8 @@
 "use client"
 
 import { useActionState } from "react"
-import { useFormStatus } from "react-dom"
 import { createServer } from "@/features/admin/actions/create-server"
-import { FormField, ErrorMessage } from "@/features/admin/components/form"
+import { FormField, ErrorMessage, ErrorDisplay } from "@/features/admin/components/form"
 import {
   Button,
   Input,
@@ -15,34 +14,6 @@ import {
   Label,
 } from "@repo/ui"
 
-function SubmitButton() {
-  const { pending } = useFormStatus()
-
-  return (
-    <Button type="submit" disabled={pending} variant="solid" colorScheme="green" className="w-full">
-      {pending ? "Creating Server..." : "Create Server"}
-    </Button>
-  )
-}
-
-function ErrorDisplay({
-  state,
-  pending,
-}: {
-  state: { success: boolean; message: string }
-  pending: boolean
-}) {
-  if (state.success || !state.message || pending) {
-    return null
-  }
-
-  return (
-    <div className="px-3 py-2 border rounded-md !border-red-500/20 flex items-center justify-between transition-opacity duration-200 opacity-100">
-      <p className="text-red-800 text-sm dark:text-red-500">{state.message}</p>
-    </div>
-  )
-}
-
 export function ServerCreateForm() {
   const [state, formAction, pending] = useActionState(createServer, { success: true, message: "" })
 
@@ -50,11 +21,11 @@ export function ServerCreateForm() {
     <form action={formAction} className="space-y-6">
       <ErrorDisplay state={state} pending={pending} />
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid md:grid-cols-1">
         <FormField>
           <Label htmlFor="game">Game Type</Label>
           <Select name="game" defaultValue="cstrike">
-            <SelectTrigger id="game" className="w-1/2">
+            <SelectTrigger id="game" className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -69,16 +40,23 @@ export function ServerCreateForm() {
         </FormField>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <FormField>
+      <div className="grid grid-cols-5">
+        <FormField className="col-span-3">
           <Label htmlFor="address" required>
             Server Address
           </Label>
-          <Input id="address" name="address" placeholder="192.168.1.100" required maxLength={255} />
+          <Input
+            id="address"
+            name="address"
+            placeholder="192.168.1.100"
+            required
+            maxLength={255}
+            className="rounded-r-none"
+          />
           {state.errors?.address && <ErrorMessage>{state.errors.address[0]}</ErrorMessage>}
         </FormField>
 
-        <FormField>
+        <FormField className="col-span-2">
           <Label htmlFor="port" required>
             Port
           </Label>
@@ -90,28 +68,41 @@ export function ServerCreateForm() {
             min={1}
             max={65535}
             required
+            className="rounded-l-none -ml-px border-l-transparent"
           />
           {state.errors?.port && <ErrorMessage>{state.errors.port[0]}</ErrorMessage>}
         </FormField>
       </div>
 
-      <FormField>
-        <Label htmlFor="rconPassword">RCON Password</Label>
-        <Input
-          id="rconPassword"
-          name="rconPassword"
-          type="password"
-          placeholder="Optional remote console password"
-          maxLength={255}
-        />
-        <p className="text-xs text-muted-foreground">
-          Optional. Used for remote server administration and real-time monitoring.
-        </p>
-        {state.errors?.rconPassword && <ErrorMessage>{state.errors.rconPassword[0]}</ErrorMessage>}
-      </FormField>
+      <div className="grid md:grid-cols-1">
+        <FormField>
+          <Label htmlFor="rconPassword">RCON Password</Label>
+          <Input
+            id="rconPassword"
+            name="rconPassword"
+            type="password"
+            placeholder="Optional remote console password"
+            maxLength={255}
+          />
+          <p className="text-xs text-muted-foreground">
+            Optional. Used for remote server administration and real-time monitoring.
+          </p>
+          {state.errors?.rconPassword && (
+            <ErrorMessage>{state.errors.rconPassword[0]}</ErrorMessage>
+          )}
+        </FormField>
+      </div>
 
       <div className="flex gap-4 pt-6">
-        <SubmitButton />
+        <Button
+          type="submit"
+          disabled={pending}
+          variant="solid"
+          colorScheme="green"
+          className="w-full"
+        >
+          {pending ? "Adding Server..." : "Submit"}
+        </Button>
         <Button
           type="button"
           variant="outline"

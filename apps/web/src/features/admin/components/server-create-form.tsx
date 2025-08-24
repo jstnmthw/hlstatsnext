@@ -3,15 +3,17 @@
 import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 import { createServer } from "@/features/admin/actions/create-server"
+import { FormField, ErrorMessage } from "@/features/admin/components/form"
 import {
-  FormField,
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Label,
-  TextInput,
-  NumberInput,
-  SelectInput,
-  ErrorMessage,
-} from "@/features/admin/components/form-inputs"
-import { Button } from "@repo/ui"
+} from "@repo/ui"
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -39,7 +41,7 @@ export function ServerCreateForm() {
           <Label htmlFor="name" required>
             Server Name
           </Label>
-          <TextInput
+          <Input
             id="name"
             name="name"
             placeholder="My Counter-Strike Server"
@@ -51,13 +53,18 @@ export function ServerCreateForm() {
 
         <FormField>
           <Label htmlFor="game">Game Type</Label>
-          <SelectInput id="game" name="game" defaultValue="cstrike">
-            <option value="cstrike">Counter-Strike</option>
-            <option value="cstrike2">Counter-Strike 2</option>
-            <option value="tf">Team Fortress Classic</option>
-            <option value="dod">Day of Defeat</option>
-            <option value="hl">Half-Life</option>
-          </SelectInput>
+          <Select name="game" defaultValue="cstrike">
+            <SelectTrigger id="game">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="cstrike">Counter-Strike</SelectItem>
+              <SelectItem value="cstrike2">Counter-Strike 2</SelectItem>
+              <SelectItem value="tf">Team Fortress Classic</SelectItem>
+              <SelectItem value="dod">Day of Defeat</SelectItem>
+              <SelectItem value="hl">Half-Life</SelectItem>
+            </SelectContent>
+          </Select>
           {state.errors?.game && <ErrorMessage>{state.errors.game[0]}</ErrorMessage>}
         </FormField>
       </div>
@@ -67,13 +74,7 @@ export function ServerCreateForm() {
           <Label htmlFor="address" required>
             Server Address
           </Label>
-          <TextInput
-            id="address"
-            name="address"
-            placeholder="192.168.1.100"
-            required
-            maxLength={255}
-          />
+          <Input id="address" name="address" placeholder="192.168.1.100" required maxLength={255} />
           {state.errors?.address && <ErrorMessage>{state.errors.address[0]}</ErrorMessage>}
         </FormField>
 
@@ -81,9 +82,10 @@ export function ServerCreateForm() {
           <Label htmlFor="port" required>
             Port
           </Label>
-          <NumberInput
+          <Input
             id="port"
             name="port"
+            type="number"
             placeholder="27015"
             defaultValue={27015}
             min={1}
@@ -96,7 +98,7 @@ export function ServerCreateForm() {
 
       <FormField>
         <Label htmlFor="rconPassword">RCON Password</Label>
-        <TextInput
+        <Input
           id="rconPassword"
           name="rconPassword"
           type="password"

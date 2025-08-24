@@ -1,7 +1,13 @@
-import { Label } from "@/features/admin/components/form-inputs"
-import { Button, Badge, cn, Input, Textarea, Checkbox, RadioGroup, RadioGroupItem } from "@repo/ui"
-
 import {
+  Button,
+  Badge,
+  cn,
+  Input,
+  Textarea,
+  Checkbox,
+  RadioGroup,
+  RadioGroupItem,
+  Label,
   Select,
   SelectContent,
   SelectGroup,
@@ -1000,7 +1006,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
         <h2 className="text-3xl font-semibold text-foreground border-b border-border pb-4">
           Form Elements
         </h2>
-        <div className="space-y-6 rounded-lg border border-border bg-card p-6">
+        <div className="space-y-6 rounded-lg border border-border p-6">
           {/* Text Inputs */}
           <div id="input-fields" className="space-y-4">
             <h3 className="text-xl font-medium">Input Fields</h3>

@@ -27,6 +27,7 @@ export { RadioGroup, RadioGroupItem } from "./components/radio-group"
 export { Card } from "./components/card"
 export { Input } from "./components/input"
 export { Textarea } from "./components/textarea"
+export { Label } from "./components/label"
 
 // Icons (re-export from lucide-react)
 export * from "./icons"

@@ -5,7 +5,7 @@ import type { DocumentNode } from "graphql"
 import { z } from "zod"
 import { redirect } from "next/navigation"
 import { getClient } from "@/lib/apollo-client"
-import { CREATE_SERVER_MUTATION } from "@/features/admin/graphql/server-mutations"
+import { CREATE_SERVER_MUTATION } from "@/features/admin/servers/graphql/server-mutations"
 
 // IP address validation helper
 const isValidIPAddress = (ip: string): boolean => {

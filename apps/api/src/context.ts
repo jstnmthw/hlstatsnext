@@ -1,11 +1,12 @@
 import { db } from "@repo/database/client"
-import { ServerService } from "@/modules/server"
 
 /**
  * Services container for dependency injection
+ * Currently empty - all operations handled by generated CRUD resolvers
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface Services {
-  readonly server: ServerService
+  // Reserved for future custom services
 }
 
 /**
@@ -21,7 +22,7 @@ export interface Context {
  */
 export function createContext(): Context {
   const services: Services = {
-    server: new ServerService(db),
+    // No custom services currently needed
   }
 
   return {

@@ -1,4 +1,5 @@
-import { Button, Badge, cn, Input, Textarea } from "@repo/ui"
+import { Label } from "@/features/admin/components/form-inputs"
+import { Button, Badge, cn, Input, Textarea, Checkbox, RadioGroup, RadioGroupItem } from "@repo/ui"
 
 import {
   Select,
@@ -1063,53 +1064,54 @@ export function KitchenSinkContent({ className }: { className?: string }) {
             </Select>
           </div>
 
-          {/* Checkboxes and Radio */}
-          <div className="grid gap-4 md:grid-cols-2">
-            <div id="checkboxes" className="space-y-2">
-              <h4 className="text-sm font-medium">Checkboxes</h4>
-              <div className="space-y-2">
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" className="h-4 w-4 rounded border-input" />
-                  <span className="text-sm">Option 1</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" className="h-4 w-4 rounded border-input" defaultChecked />
-                  <span className="text-sm">Option 2 (checked)</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" className="h-4 w-4 rounded border-input" disabled />
-                  <span className="text-sm">Option 3 (disabled)</span>
-                </label>
+          {/* Checkboxes */}
+          <div className="flex flex-col gap-6" id="checkboxes">
+            <h3 className="text-xl font-medium">Checkboxes</h3>
+            <div className="flex items-center gap-3">
+              <Checkbox id="terms" />
+              <Label htmlFor="terms">Accept terms and conditions</Label>
+            </div>
+            <div className="flex items-start gap-3">
+              <Checkbox id="terms-2" defaultChecked />
+              <div className="grid gap-2">
+                <Label htmlFor="terms-2">Accept terms and conditions</Label>
+                <p className="text-muted-foreground text-sm">
+                  By clicking this checkbox, you agree to the terms and conditions.
+                </p>
               </div>
             </div>
+            <div className="flex items-start gap-3">
+              <Checkbox id="toggle" disabled />
+              <Label htmlFor="toggle">Enable notifications</Label>
+            </div>
+            <Label className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-primary has-[[aria-checked=true]]:bg-primary/10 dark:has-[[aria-checked=true]]:border-primary dark:has-[[aria-checked=true]]:bg-primary/10">
+              <Checkbox id="toggle-2" defaultChecked />
+              <div className="grid gap-1.5 font-normal">
+                <p className="text-sm leading-none font-medium">Enable notifications</p>
+                <p className="text-muted-foreground text-sm">
+                  You can enable or disable notifications at any time.
+                </p>
+              </div>
+            </Label>
+          </div>
 
-            <div id="radio-buttons" className="space-y-2">
-              <h4 className="text-sm font-medium">Radio Buttons</h4>
-              <div className="space-y-2">
-                <label className="flex items-center space-x-2">
-                  <input type="radio" name="radio-group" className="h-4 w-4 border-input" />
-                  <span className="text-sm">Option A</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="radio-group"
-                    className="h-4 w-4 border-input"
-                    defaultChecked
-                  />
-                  <span className="text-sm">Option B (selected)</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="radio-group"
-                    className="h-4 w-4 border-input"
-                    disabled
-                  />
-                  <span className="text-sm">Option C (disabled)</span>
-                </label>
+          {/* Radios */}
+          <div className="flex flex-col gap-6" id="radios">
+            <h3 className="text-xl font-medium">Radios</h3>
+            <RadioGroup defaultValue="comfortable">
+              <div className="flex items-center gap-3">
+                <RadioGroupItem value="default" id="r1" />
+                <Label htmlFor="r1">Default</Label>
               </div>
-            </div>
+              <div className="flex items-center gap-3">
+                <RadioGroupItem value="comfortable" id="r2" />
+                <Label htmlFor="r2">Comfortable</Label>
+              </div>
+              <div className="flex items-center gap-3">
+                <RadioGroupItem value="compact" id="r3" />
+                <Label htmlFor="r3">Compact</Label>
+              </div>
+            </RadioGroup>
           </div>
         </div>
       </section>

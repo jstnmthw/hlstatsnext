@@ -22,6 +22,8 @@ export {
   SelectValue,
 } from "./components/select"
 
+export { Checkbox } from "./components/checkbox"
+export { RadioGroup, RadioGroupItem } from "./components/radio-group"
 export { Card } from "./components/card"
 export { Input } from "./components/input"
 export { Textarea } from "./components/textarea"

@@ -25,7 +25,7 @@ export { Badge } from "./components/badge"
 export { Input } from "./components/input"
 export { Textarea } from "./components/textarea"
 export { Checkbox } from "./components/checkbox"
-export { IPAddress } from "./components/ip-address"
+export { IPAddress, Port } from "./components/ip-address"
 export { RadioGroup, RadioGroupItem } from "./components/radio-group"
 export { Button, buttonVariants } from "./components/button"
 

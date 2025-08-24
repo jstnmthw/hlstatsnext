@@ -12,6 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
   Label,
+  IPAddress,
+  Port,
 } from "@repo/ui"
 
 export function ServerCreateForm() {
@@ -21,9 +23,11 @@ export function ServerCreateForm() {
     <form action={formAction} className="space-y-6">
       <ErrorDisplay state={state} pending={pending} />
 
-      <div className="grid md:grid-cols-1">
+      <div className="grid md:grid-cols-2 gap-4">
         <FormField>
-          <Label htmlFor="game">Game Type</Label>
+          <Label htmlFor="game" required>
+            Game Type
+          </Label>
           <Select name="game" defaultValue="cstrike">
             <SelectTrigger id="game" className="w-full">
               <SelectValue />
@@ -38,38 +42,28 @@ export function ServerCreateForm() {
           </Select>
           {state.errors?.game && <ErrorMessage>{state.errors.game[0]}</ErrorMessage>}
         </FormField>
-      </div>
 
-      <div className="grid grid-cols-5">
-        <FormField className="col-span-3">
+        <FormField>
           <Label htmlFor="address" required>
             Server Address
           </Label>
-          <Input
-            id="address"
-            name="address"
-            placeholder="192.168.1.100"
-            required
-            maxLength={255}
-            className="rounded-r-none"
-          />
+          <div className="flex">
+            <IPAddress
+              className="rounded-r-none"
+              name="address"
+              required
+              placeholder="192.168.1.1"
+              title="Enter a valid IP address (e.g., 192.168.1.1)"
+            />
+            <Port
+              className="rounded-l-none -ml-px border-l-transparent max-w-18"
+              name="port"
+              required
+              placeholder="27015"
+              title="Enter a port number (1-65535)"
+            />
+          </div>
           {state.errors?.address && <ErrorMessage>{state.errors.address[0]}</ErrorMessage>}
-        </FormField>
-
-        <FormField className="col-span-2">
-          <Label htmlFor="port" required>
-            Port
-          </Label>
-          <Input
-            id="port"
-            name="port"
-            type="text"
-            placeholder="27015"
-            min={1}
-            max={65535}
-            required
-            className="rounded-l-none -ml-px border-l-transparent"
-          />
           {state.errors?.port && <ErrorMessage>{state.errors.port[0]}</ErrorMessage>}
         </FormField>
       </div>

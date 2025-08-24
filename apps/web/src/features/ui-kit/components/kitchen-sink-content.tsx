@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
   IPAddress,
+  Port,
 } from "@repo/ui"
 
 import {
@@ -1044,7 +1045,13 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                 <label htmlFor="ip-address" className="text-sm font-medium">
                   IP Address & Port
                 </label>
-                <IPAddress />
+                <div className="flex">
+                  <IPAddress
+                    placeholder="192.168.1.1"
+                    className="rounded-r-none border-r-0 flex-1"
+                  />
+                  <Port placeholder="27015" className="rounded-l-none w-18" />
+                </div>
               </div>
             </div>
           </div>

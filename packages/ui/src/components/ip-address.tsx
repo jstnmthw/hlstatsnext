@@ -1,91 +1,151 @@
 "use client"
 
 import { Input } from "./input"
-import { useState } from "react"
+import { cn } from "../lib/utils"
+import { useState, useRef } from "react"
 
-export function IPAddress() {
-  const [ip, setIp] = useState("")
-  const [port, setPort] = useState("")
+interface IPAddressProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+  name?: string
+}
 
-  const handleIPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    const formatted = formatIPAddress(value)
-    setIp(formatted)
-  }
+interface PortProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+  name?: string
+}
 
-  const handlePortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, "") // Only allow digits
-    const numValue = Number.parseInt(value, 10)
+const formatIPAddress = (value: string): string => {
+  // Remove all non-numeric characters except dots
+  const cleaned = value.replace(/[^\d.]/g, "")
 
-    // Limit port to valid range (1-65535)
-    if (value === "" || (numValue >= 1 && numValue <= 65535)) {
-      setPort(value)
+  // Split by dots and process each octet
+  const parts = cleaned.split(".")
+  const formattedParts: string[] = []
+
+  for (let i = 0; i < Math.min(parts.length, 4); i++) {
+    let part = parts[i] || ""
+
+    // Limit each octet to 3 digits and max value of 255
+    if (part.length > 3) {
+      part = part.slice(0, 3)
     }
-  }
 
-  const formatIPAddress = (value: string) => {
-    // Remove all non-numeric characters except dots
-    const cleaned = value.replace(/[^\d.]/g, "")
-
-    // Split by dots and process each octet
-    const parts = cleaned.split(".")
-    const formattedParts: string[] = []
-
-    for (let i = 0; i < Math.min(parts.length, 4); i++) {
-      let part = parts[i]
-
-      // Limit each octet to 3 digits and max value of 255
-      if (part && part.length > 3) {
-        part = part.slice(0, 3)
-      } else if (!part) {
-        part = "0"
-      }
-
+    // Only validate and cap if there's actually a value
+    if (part.length > 0) {
       const numValue = Number.parseInt(part, 10)
       if (!isNaN(numValue) && numValue > 255) {
         part = "255"
       }
-
-      formattedParts.push(part)
     }
 
-    // Join with dots, but don't add trailing dot
-    let formatted = formattedParts.join(".")
+    formattedParts.push(part)
+  }
 
-    // Add dots automatically as user types
-    if (cleaned.length > 0 && !cleaned.endsWith(".") && formattedParts.length < 4) {
-      const lastPart = formattedParts[formattedParts.length - 1]
-      if (
-        lastPart &&
-        (lastPart.length === 3 || (lastPart.length > 0 && Number.parseInt(lastPart, 10) > 25))
-      ) {
+  // Join with dots - preserve the structure the user is building
+  let formatted = formattedParts.join(".")
+
+  // Auto-add dot only when the current octet is complete and valid
+  if (cleaned.length > 0 && !cleaned.endsWith(".") && formattedParts.length < 4) {
+    const lastPart = formattedParts[formattedParts.length - 1]
+    if (lastPart && lastPart.length === 3) {
+      // Only add dot when we have exactly 3 digits
+      formatted += "."
+    } else if (lastPart && lastPart.length >= 2) {
+      // Add dot for numbers >= 25 (since 256+ is invalid anyway)
+      const num = Number.parseInt(lastPart, 10)
+      if (num >= 25 && num <= 255) {
         formatted += "."
       }
     }
+  }
 
-    return formatted
+  return formatted
+}
+
+export function IPAddress({
+  name,
+  className,
+  placeholder = "192.168.1.1",
+  ...props
+}: IPAddressProps) {
+  const [displayValue, setDisplayValue] = useState("")
+  const hiddenInputRef = useRef<HTMLInputElement>(null)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value
+    const formatted = formatIPAddress(rawValue)
+
+    setDisplayValue(formatted)
+
+    // Update hidden input for form submission
+    if (hiddenInputRef.current) {
+      hiddenInputRef.current.value = formatted
+    }
   }
 
   return (
-    <div className="flex">
+    <>
       <Input
-        id="ip-address"
+        {...props}
         type="text"
-        value={ip}
-        onChange={handleIPChange}
-        placeholder="192.168.1.1"
+        value={displayValue}
+        onChange={handleChange}
+        placeholder={placeholder}
         maxLength={15}
-        className="font-mono rounded-r-none border-r-0 flex-1"
+        pattern="^(\d{1,3}\.){3}\d{1,3}$"
+        title="Enter a valid IP address (e.g., 192.168.1.1)"
+        className={cn("font-mono font-medium", className)}
       />
+      {/* Hidden input for form submission */}
+      <input ref={hiddenInputRef} type="hidden" name={name} value={displayValue} />
+    </>
+  )
+}
+
+export function Port({ name, className, placeholder = "27015", ...props }: PortProps) {
+  const [displayValue, setDisplayValue] = useState("")
+  const hiddenInputRef = useRef<HTMLInputElement>(null)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, "") // Only allow digits
+
+    // Allow empty value (user can clear the field)
+    if (rawValue === "") {
+      setDisplayValue(rawValue)
+      if (hiddenInputRef.current) {
+        hiddenInputRef.current.value = rawValue
+      }
+      return
+    }
+
+    // Remove leading zeros except for "0" itself
+    const cleanValue = rawValue.replace(/^0+/, "") || "0"
+    const numValue = Number.parseInt(cleanValue, 10)
+
+    // Limit port to valid range (0-65535)
+    // Note: Port 0 is technically valid (means "any available port")
+    if (numValue >= 0 && numValue <= 65535) {
+      setDisplayValue(cleanValue)
+      if (hiddenInputRef.current) {
+        hiddenInputRef.current.value = cleanValue
+      }
+    }
+    // If invalid, don't update the display value (effectively rejecting the input)
+  }
+
+  return (
+    <>
       <Input
-        id="port"
+        {...props}
         type="text"
-        value={port}
-        onChange={handlePortChange}
-        placeholder="8080"
+        value={displayValue}
+        onChange={handleChange}
+        placeholder={placeholder}
         maxLength={5}
-        className="font-mono rounded-l-none w-24"
+        pattern="^([1-9]\d{0,4}|0)$"
+        title="Enter a port number between 0 and 65535"
+        className={cn("font-mono font-medium", className)}
       />
-    </div>
+      {/* Hidden input for form submission */}
+      <input ref={hiddenInputRef} type="hidden" name={name} value={displayValue} />
+    </>
   )
 }

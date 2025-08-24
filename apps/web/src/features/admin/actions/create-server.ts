@@ -7,11 +7,32 @@ import { redirect } from "next/navigation"
 import { getClient } from "@/lib/apollo-client"
 import { CREATE_SERVER_MUTATION } from "@/features/admin/graphql/server-mutations"
 
+// IP address validation helper
+const isValidIPAddress = (ip: string): boolean => {
+  // Check basic format (xxx.xxx.xxx.xxx)
+  const ipRegex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/
+  const match = ip.match(ipRegex)
+
+  if (!match) {
+    return false
+  }
+
+  // Validate each octet is 0-255
+  const octets = match.slice(1, 5)
+  return octets.every((octet) => {
+    const num = parseInt(octet, 10)
+    return num >= 0 && num <= 255
+  })
+}
+
 const CreateServerSchema = z.object({
   address: z
     .string()
     .min(1, "Server address is required")
-    .max(255, "Server address must be less than 255 characters"),
+    .max(15, "IP address is too long")
+    .refine(isValidIPAddress, {
+      message: "Please enter a valid IP address (e.g., 192.168.1.1)",
+    }),
   port: z.coerce
     .number()
     .int()

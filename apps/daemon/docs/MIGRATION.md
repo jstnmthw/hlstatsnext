@@ -517,6 +517,17 @@ The daemon has a solid foundation with complete player lifecycle tracking. The n
   - **Validation**: All monorepo packages reviewed, lint/type-check/tests pass, no other dependency misplacements found
   - **Result**: Proper dependency management across monorepo, avoiding React version conflicts in consuming applications
 
+- 2025-01-XX - **Server Add Form Error Message UX Enhancement**
+  - **Problem**: In the admin server creation form, error messages displayed at the top would persist even when the user re-submitted the form, creating poor UX
+  - **Root Cause**: The `useActionState` hook maintains the previous error state until the new action completes, causing error messages to remain visible during form submission
+  - **Solution**:
+    1. Created `ErrorDisplay` component that uses `useFormStatus` to detect pending form submission
+    2. Error messages are automatically hidden when `pending` is true or when `state.success` is true
+    3. This provides immediate feedback to users that their re-submission attempt is being processed
+  - **Files Modified**:
+    - `apps/web/src/features/admin/components/server-create-form.tsx` - Added ErrorDisplay component with pending state handling
+  - **Result**: Improved UX where error messages disappear immediately when user re-submits form, providing clear visual feedback
+
 - 2025-08-10
   - Parser: Added support for legacy/GoldSrc-style connect lines ("entered the game") in `CsParser`.
   - Persistence: Implemented connect/disconnect logging to `events_connect` and `events_disconnect` via `PlayerRepository.createConnectEvent`/`createDisconnectEvent`; on disconnect, backfills `event_time_disconnect` on the last connect row.

@@ -15,9 +15,9 @@ export default function CreateServerPage() {
     <PageWrapper>
       <AdminHeader />
       <MainContent>
-        <div className="max-w-screen-lg mx-auto py-10 border-t border-border">
-          <div className="mb-8">
-            <h1 className="text-3xl font-medium tracking-tight">Create Server</h1>
+        <div className="container">
+          <div className="py-10 border-t border-border">
+            <h1 className="text-3xl font-medium tracking-tight">Add Server</h1>
             <p className="text-muted-foreground">
               Add a new Half-Life server to begin tracking player statistics and activities.
             </p>

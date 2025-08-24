@@ -25,16 +25,32 @@ function SubmitButton() {
   )
 }
 
+function ErrorDisplay({ state }: { state: { success: boolean; message: string } }) {
+  const { pending } = useFormStatus()
+
+  // Don't render anything if there's no error message
+  if (state.success || !state.message) {
+    return null
+  }
+
+  return (
+    <div
+      className={`px-3 py-2 border rounded-md !border-red-500/20 flex items-center justify-between transition-opacity duration-200 ${
+        pending ? "opacity-0 pointer-events-none" : "opacity-100"
+      }`}
+    >
+      <p className="text-red-800 text-sm dark:text-red-500">{state.message}</p>
+    </div>
+  )
+}
+
 export function ServerCreateForm() {
   const [state, formAction] = useActionState(createServer, { success: true, message: "" })
 
   return (
     <form action={formAction} className="space-y-6">
-      {!state.success && (
-        <div className="px-3 py-2 border rounded-md !border-red-500/20 flex items-center justify-between">
-          <p className="text-red-800 text-sm dark:text-red-500">{state.message}</p>
-        </div>
-      )}
+      <pre className="text-xs text-muted-foreground">{JSON.stringify(state, null, 2)}</pre>
+      <ErrorDisplay state={state} />
 
       <div className="grid gap-6 md:grid-cols-2">
         <FormField>

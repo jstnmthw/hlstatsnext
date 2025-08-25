@@ -19,6 +19,15 @@ export {
   SelectValue,
 } from "./components/select"
 
+export {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./components/dropdown-menu"
+
 export { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/table"
 
 export { Card } from "./components/card"

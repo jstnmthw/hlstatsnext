@@ -12,7 +12,7 @@ const badgeVariants = cva(
         // Markers for the getBadgeStyles logic
         solid: "",
         outline: "",
-        plain: "",
+        ghost: "",
       },
     },
     defaultVariants: {

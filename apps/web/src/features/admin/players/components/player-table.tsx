@@ -1,3 +1,5 @@
+"use client"
+
 import { DataTable } from "@/features/common/components/data-table"
 import { columns, PlayerListItem } from "./player-columns"
 

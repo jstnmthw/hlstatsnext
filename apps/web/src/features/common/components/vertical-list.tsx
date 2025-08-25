@@ -17,7 +17,9 @@ interface VerticalListItemProps {
 }
 
 export const VerticalList = ({ className, children }: VerticalListProps) => {
-  return <div className={cn("col-span-2 border rounded-lg", className)}>{children}</div>
+  return (
+    <div className={cn("col-span-2 border border-border rounded-lg", className)}>{children}</div>
+  )
 }
 
 export const VerticalListHeader = ({ className, children }: VerticalListHeaderProps) => {

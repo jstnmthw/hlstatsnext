@@ -26,7 +26,7 @@ export type ColorScheme =
   | "pink"
   | "rose"
 
-export type StyleVariant = "solid" | "outline" | "plain"
+export type StyleVariant = "solid" | "outline" | "ghost"
 
 export interface ComponentColorConfig {
   text: string
@@ -70,7 +70,7 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
       active: { background: "active:bg-zinc-950/5 dark:active:bg-zinc-100/10" },
       icon: "text-zinc-950 dark:text-white",
     },
-    plain: {
+    ghost: {
       text: "text-zinc-950 dark:text-white",
       border: "border-transparent",
       hover: { background: "hover:bg-zinc-950/[2.5%] dark:hover:bg-zinc-100/5" },
@@ -97,7 +97,7 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
       active: { background: "active:bg-zinc-950/5 dark:active:bg-zinc-100/10" },
       icon: "text-zinc-950 dark:text-white",
     },
-    plain: {
+    ghost: {
       text: "text-zinc-950 dark:text-white",
       border: "border-transparent",
       hover: { background: "hover:bg-zinc-950/[2.5%] dark:hover:bg-zinc-100/5" },
@@ -124,7 +124,7 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
       active: { background: "active:bg-zinc-950/5 dark:active:bg-white/10" },
       icon: "text-zinc-950 dark:text-white",
     },
-    plain: {
+    ghost: {
       text: "text-zinc-950 dark:text-white",
       border: "border-transparent",
       hover: { background: "hover:bg-zinc-950/[2.5%] dark:hover:bg-white/5" },
@@ -151,7 +151,7 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
       active: { background: "active:bg-zinc-600/10 dark:active:bg-zinc-400/10" },
       icon: "text-zinc-600 dark:text-zinc-400",
     },
-    plain: {
+    ghost: {
       text: "text-zinc-600 dark:text-zinc-400",
       border: "border-transparent",
       hover: { background: "hover:bg-zinc-600/5 dark:hover:bg-zinc-400/5" },
@@ -173,12 +173,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-green-600",
-      border: "border-green-600/50",
       hover: { background: "hover:bg-green-600/5" },
       active: { background: "active:bg-green-600/10" },
       icon: "text-green-600",
     },
-    plain: {
+    ghost: {
       text: "text-green-600",
       border: "border-transparent",
       hover: { background: "hover:bg-green-600/5" },
@@ -200,12 +199,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-blue-600",
-      border: "border-blue-600/50",
       hover: { background: "hover:bg-blue-600/5" },
       active: { background: "active:bg-blue-600/10" },
       icon: "text-blue-600",
     },
-    plain: {
+    ghost: {
       text: "text-blue-600",
       border: "border-transparent",
       hover: { background: "hover:bg-blue-600/5" },
@@ -227,12 +225,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-red-600",
-      border: "border-red-600/50",
       hover: { background: "hover:bg-red-600/5" },
       active: { background: "active:bg-red-600/10" },
       icon: "text-red-600",
     },
-    plain: {
+    ghost: {
       text: "text-red-600",
       border: "border-transparent",
       hover: { background: "hover:bg-red-600/5" },
@@ -254,12 +251,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-indigo-500",
-      border: "border-indigo-500/50",
       hover: { background: "hover:bg-indigo-500/5" },
       active: { background: "active:bg-indigo-500/10" },
       icon: "text-indigo-500",
     },
-    plain: {
+    ghost: {
       text: "text-indigo-500",
       border: "border-transparent",
       hover: { background: "hover:bg-indigo-500/5" },
@@ -281,12 +277,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-cyan-500",
-      border: "border-cyan-500/50",
       hover: { background: "hover:bg-cyan-500/5" },
       active: { background: "active:bg-cyan-500/10" },
       icon: "text-cyan-500",
     },
-    plain: {
+    ghost: {
       text: "text-cyan-500",
       border: "border-transparent",
       hover: { background: "hover:bg-cyan-500/5" },
@@ -308,12 +303,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-orange-500",
-      border: "border-orange-500/50",
       hover: { background: "hover:bg-orange-500/5" },
       active: { background: "active:bg-orange-500/10" },
       icon: "text-orange-500",
     },
-    plain: {
+    ghost: {
       text: "text-orange-500",
       border: "border-transparent",
       hover: { background: "hover:bg-orange-500/5" },
@@ -335,12 +329,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-amber-500",
-      border: "border-amber-500/50",
       hover: { background: "hover:bg-amber-500/5" },
       active: { background: "active:bg-amber-500/10" },
       icon: "text-amber-500",
     },
-    plain: {
+    ghost: {
       text: "text-amber-500",
       border: "border-transparent",
       hover: { background: "hover:bg-amber-500/5" },
@@ -362,12 +355,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-yellow-500",
-      border: "border-yellow-500/50",
       hover: { background: "hover:bg-yellow-500/5" },
       active: { background: "active:bg-yellow-500/10" },
       icon: "text-yellow-500",
     },
-    plain: {
+    ghost: {
       text: "text-yellow-500",
       border: "border-transparent",
       hover: { background: "hover:bg-yellow-500/5" },
@@ -389,12 +381,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-lime-500",
-      border: "border-lime-500/50",
       hover: { background: "hover:bg-lime-500/5" },
       active: { background: "active:bg-lime-500/10" },
       icon: "text-lime-500",
     },
-    plain: {
+    ghost: {
       text: "text-lime-500",
       border: "border-transparent",
       hover: { background: "hover:bg-lime-500/5" },
@@ -416,12 +407,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-emerald-600",
-      border: "border-emerald-600/50",
       hover: { background: "hover:bg-emerald-600/5" },
       active: { background: "active:bg-emerald-600/10" },
       icon: "text-emerald-600",
     },
-    plain: {
+    ghost: {
       text: "text-emerald-600",
       border: "border-transparent",
       hover: { background: "hover:bg-emerald-600/5" },
@@ -443,12 +433,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-teal-600",
-      border: "border-teal-600/50",
       hover: { background: "hover:bg-teal-600/5" },
       active: { background: "active:bg-teal-600/10" },
       icon: "text-teal-600",
     },
-    plain: {
+    ghost: {
       text: "text-teal-600",
       border: "border-transparent",
       hover: { background: "hover:bg-teal-600/5" },
@@ -470,12 +459,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-sky-500",
-      border: "border-sky-500/50",
       hover: { background: "hover:bg-sky-500/5" },
       active: { background: "active:bg-sky-500/10" },
       icon: "text-sky-500",
     },
-    plain: {
+    ghost: {
       text: "text-sky-500",
       border: "border-transparent",
       hover: { background: "hover:bg-sky-500/5" },
@@ -497,12 +485,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-violet-500",
-      border: "border-violet-500/50",
       hover: { background: "hover:bg-violet-500/5" },
       active: { background: "active:bg-violet-500/10" },
       icon: "text-violet-500",
     },
-    plain: {
+    ghost: {
       text: "text-violet-500",
       border: "border-transparent",
       hover: { background: "hover:bg-violet-500/5" },
@@ -524,12 +511,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-purple-500",
-      border: "border-purple-500/50",
       hover: { background: "hover:bg-purple-500/5" },
       active: { background: "active:bg-purple-500/10" },
       icon: "text-purple-500",
     },
-    plain: {
+    ghost: {
       text: "text-purple-500",
       border: "border-transparent",
       hover: { background: "hover:bg-purple-500/5" },
@@ -551,12 +537,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-fuchsia-500",
-      border: "border-fuchsia-500/50",
       hover: { background: "hover:bg-fuchsia-500/5" },
       active: { background: "active:bg-fuchsia-500/10" },
       icon: "text-fuchsia-500",
     },
-    plain: {
+    ghost: {
       text: "text-fuchsia-500",
       border: "border-transparent",
       hover: { background: "hover:bg-fuchsia-500/5" },
@@ -578,12 +563,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-pink-500",
-      border: "border-pink-500/50",
       hover: { background: "hover:bg-pink-500/5" },
       active: { background: "active:bg-pink-500/10" },
       icon: "text-pink-500",
     },
-    plain: {
+    ghost: {
       text: "text-pink-500",
       border: "border-transparent",
       hover: { background: "hover:bg-pink-500/5" },
@@ -605,12 +589,11 @@ const baseColorVariants: Record<ColorScheme, Record<StyleVariant, ComponentColor
     },
     outline: {
       text: "text-rose-500",
-      border: "border-rose-500/50",
       hover: { background: "hover:bg-rose-500/5" },
       active: { background: "active:bg-rose-500/10" },
       icon: "text-rose-500",
     },
-    plain: {
+    ghost: {
       text: "text-rose-500",
       border: "border-transparent",
       hover: { background: "hover:bg-rose-500/5" },

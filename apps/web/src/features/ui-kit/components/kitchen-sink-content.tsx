@@ -21,7 +21,6 @@ import {
 
 import {
   BellIcon,
-  BoltIcon,
   PaperclipIcon,
   CheckIcon,
   XIcon,
@@ -151,7 +150,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
             <div className="flex flex-wrap gap-4">
               <Button variant="solid">Solid Button</Button>
               <Button variant="outline">Outline Button</Button>
-              <Button variant="plain">Plain Button</Button>
+              <Button variant="ghost">Ghost Button</Button>
             </div>
           </div>
 
@@ -400,90 +399,112 @@ export function KitchenSinkContent({ className }: { className?: string }) {
               </div>
             </div>
 
-            {/* Colors - Plain */}
-            <div id="button-colors-plain" className="mb-8">
+            {/* Colors - Ghost */}
+            <div id="button-colors-ghost" className="mb-8">
               <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
-                Plain Buttons - Colors
+                Ghost Buttons - Colors
               </h3>
               <div className="flex flex-wrap gap-4">
-                <Button variant="plain" colorScheme="dark">
+                <Button variant="ghost" colorScheme="dark">
                   Dark
                 </Button>
-                <Button variant="plain" colorScheme="light">
+                <Button variant="ghost" colorScheme="light">
                   Light
                 </Button>
-                <Button variant="plain" colorScheme="dark/white">
+                <Button variant="ghost" colorScheme="dark/white">
                   Dark/White
                 </Button>
-                <Button variant="plain" colorScheme="zinc">
+                <Button variant="ghost" colorScheme="zinc">
                   Zinc
                 </Button>
-                <Button variant="plain" colorScheme="red">
+                <Button variant="ghost" colorScheme="red">
                   Red
                 </Button>
-                <Button variant="plain" colorScheme="orange">
+                <Button variant="ghost" colorScheme="orange">
                   Orange
                 </Button>
-                <Button variant="plain" colorScheme="amber">
+                <Button variant="ghost" colorScheme="amber">
                   Amber
                 </Button>
-                <Button variant="plain" colorScheme="yellow">
+                <Button variant="ghost" colorScheme="yellow">
                   Yellow
                 </Button>
-                <Button variant="plain" colorScheme="lime">
+                <Button variant="ghost" colorScheme="lime">
                   Lime
                 </Button>
-                <Button variant="plain" colorScheme="green">
+                <Button variant="ghost" colorScheme="green">
                   Green
                 </Button>
-                <Button variant="plain" colorScheme="emerald">
+                <Button variant="ghost" colorScheme="emerald">
                   Emerald
                 </Button>
-                <Button variant="plain" colorScheme="teal">
+                <Button variant="ghost" colorScheme="teal">
                   Teal
                 </Button>
-                <Button variant="plain" colorScheme="cyan">
+                <Button variant="ghost" colorScheme="cyan">
                   Cyan
                 </Button>
-                <Button variant="plain" colorScheme="sky">
+                <Button variant="ghost" colorScheme="sky">
                   Sky
                 </Button>
-                <Button variant="plain" colorScheme="blue">
+                <Button variant="ghost" colorScheme="blue">
                   Blue
                 </Button>
-                <Button variant="plain" colorScheme="indigo">
+                <Button variant="ghost" colorScheme="indigo">
                   Indigo
                 </Button>
-                <Button variant="plain" colorScheme="violet">
+                <Button variant="ghost" colorScheme="violet">
                   Violet
                 </Button>
-                <Button variant="plain" colorScheme="purple">
+                <Button variant="ghost" colorScheme="purple">
                   Purple
                 </Button>
-                <Button variant="plain" colorScheme="fuchsia">
+                <Button variant="ghost" colorScheme="fuchsia">
                   Fuchsia
                 </Button>
-                <Button variant="plain" colorScheme="pink">
+                <Button variant="ghost" colorScheme="pink">
                   Pink
                 </Button>
-                <Button variant="plain" colorScheme="rose">
+                <Button variant="ghost" colorScheme="rose">
                   Rose
                 </Button>
               </div>
               <div className="mt-4 flex flex-wrap items-center gap-4">
-                <Button variant="plain" colorScheme="blue" size="icon-xs">
+                <Button variant="ghost" colorScheme="purple" size="xs">
+                  <BellIcon data-slot="icon" />
+                  <span>Extra Small Button</span>
+                </Button>
+                <Button variant="ghost" colorScheme="purple" size="sm">
+                  <BellIcon data-slot="icon" />
+                  <span>Small Button</span>
+                </Button>
+                <Button variant="ghost" colorScheme="purple">
+                  <BellIcon data-slot="icon" />
+                  <span>Default Button</span>
+                </Button>
+                <Button variant="ghost" colorScheme="purple" size="lg">
+                  <BellIcon data-slot="icon" />
+                  <span>Large Button</span>
+                </Button>
+                <Button variant="ghost" colorScheme="purple" size="xl">
+                  <BellIcon data-slot="icon" />
+                  <span>Extra Large Button</span>
+                </Button>
+              </div>
+              <div className="mt-4 flex flex-wrap items-center gap-4">
+                <Button variant="ghost" colorScheme="blue" size="icon-xs">
                   <BellIcon data-slot="icon" />
                 </Button>
-                <Button variant="plain" colorScheme="indigo" size="icon-sm">
+                <Button variant="ghost" colorScheme="indigo" size="icon-sm">
                   <BellIcon data-slot="icon" />
                 </Button>
-                <Button variant="plain" colorScheme="purple" size="icon">
+                <Button variant="ghost" colorScheme="purple" size="icon">
                   <BellIcon data-slot="icon" />
                 </Button>
-                <Button variant="plain" colorScheme="fuchsia" size="icon-lg">
+                <Button variant="ghost" colorScheme="fuchsia" size="icon-lg">
                   <BellIcon data-slot="icon" />
                 </Button>
-                <Button variant="plain" colorScheme="pink" size="icon-xl">
+                <Button variant="ghost" colorScheme="pink" size="icon-xl">
                   <BellIcon data-slot="icon" />
                 </Button>
               </div>
@@ -503,9 +524,12 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                   <PaperclipIcon data-slot="icon" />
                   Button with Icon
                 </Button>
-                <Button variant="plain" colorScheme="blue">
-                  <BoltIcon data-slot="icon" />
+                <Button variant="ghost" colorScheme="blue">
+                  <StarIcon data-slot="icon" />
                   Button with Icon
+                </Button>
+                <Button variant="ghost" colorScheme="purple">
+                  <BellIcon data-slot="icon" />
                 </Button>
               </div>
             </div>
@@ -528,7 +552,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
             <div className="flex flex-wrap items-center gap-4">
               <Badge variant="solid">Solid Badge</Badge>
               <Badge variant="outline">Outline Badge</Badge>
-              <Badge variant="plain">Plain Badge</Badge>
+              <Badge variant="ghost">Ghost Badge</Badge>
             </div>
           </div>
 
@@ -671,78 +695,6 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                 Pink
               </Badge>
               <Badge variant="outline" colorScheme="rose">
-                Rose
-              </Badge>
-            </div>
-          </div>
-
-          {/* Colors - Plain */}
-          <div id="badge-colors-plain" className="mb-8">
-            <h3 className="mb-4 text-lg font-medium text-gray-700 dark:text-gray-200">
-              Plain Badges - Colors
-            </h3>
-            <div className="flex flex-wrap items-center gap-3">
-              <Badge variant="plain" colorScheme="dark">
-                Dark
-              </Badge>
-              <Badge variant="plain" colorScheme="light">
-                Light
-              </Badge>
-              <Badge variant="plain" colorScheme="dark/white">
-                Dark/White
-              </Badge>
-              <Badge variant="plain" colorScheme="zinc">
-                Zinc
-              </Badge>
-              <Badge variant="plain" colorScheme="red">
-                Red
-              </Badge>
-              <Badge variant="plain" colorScheme="orange">
-                Orange
-              </Badge>
-              <Badge variant="plain" colorScheme="amber">
-                Amber
-              </Badge>
-              <Badge variant="plain" colorScheme="yellow">
-                Yellow
-              </Badge>
-              <Badge variant="plain" colorScheme="lime">
-                Lime
-              </Badge>
-              <Badge variant="plain" colorScheme="green">
-                Green
-              </Badge>
-              <Badge variant="plain" colorScheme="emerald">
-                Emerald
-              </Badge>
-              <Badge variant="plain" colorScheme="teal">
-                Teal
-              </Badge>
-              <Badge variant="plain" colorScheme="cyan">
-                Cyan
-              </Badge>
-              <Badge variant="plain" colorScheme="sky">
-                Sky
-              </Badge>
-              <Badge variant="plain" colorScheme="blue">
-                Blue
-              </Badge>
-              <Badge variant="plain" colorScheme="indigo">
-                Indigo
-              </Badge>
-              <Badge variant="plain" colorScheme="violet">
-                Violet
-              </Badge>
-              <Badge variant="plain" colorScheme="purple">
-                Purple
-              </Badge>
-              <Badge variant="plain" colorScheme="fuchsia">
-                Fuchsia
-              </Badge>
-              <Badge variant="plain" colorScheme="pink">
-                Pink
-              </Badge>
-              <Badge variant="plain" colorScheme="rose">
                 Rose
               </Badge>
             </div>
@@ -991,7 +943,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                       Featured
                     </a>
                   </Badge>
-                  <Badge asChild variant="plain" colorScheme="green">
+                  <Badge asChild variant="ghost" colorScheme="green">
                     <a href="#" className="cursor-pointer">
                       View Details
                     </a>

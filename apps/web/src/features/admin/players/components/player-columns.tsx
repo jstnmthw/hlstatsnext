@@ -10,6 +10,7 @@ import {
 } from "@repo/ui"
 import { MoreHorizontal } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
+import { formatDate } from "@/lib/datetime-util"
 
 export type PlayerListItem = Pick<
   Player,
@@ -47,10 +48,20 @@ export const columns: ColumnDef<PlayerListItem>[] = [
   {
     header: "Last Event",
     accessorKey: "lastEvent",
+    cell: ({ row }) => {
+      const player = row.original
+      if (!player.lastEvent) return <span>-</span>
+      return <span>{formatDate(player.lastEvent)}</span>
+    },
   },
   {
     header: "Last Skill Change",
     accessorKey: "lastSkillChange",
+    cell: ({ row }) => {
+      const player = row.original
+      if (!player.lastSkillChange) return <span>-</span>
+      return <span>{formatDate(player.lastSkillChange)}</span>
+    },
   },
   {
     id: "actions",

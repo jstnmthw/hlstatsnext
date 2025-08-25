@@ -1,12 +1,12 @@
-import { AdminHeader } from "@/features/admin/servers/components/header"
+import Link from "next/link"
+import { query } from "@/lib/apollo-client"
+import { Button } from "@repo/ui"
 import { Footer } from "@/features/common/components/footer"
+import { AdminHeader } from "@/features/admin/servers/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { ServerDataTable } from "@/features/admin/servers/components/server-data-table"
-import { Button } from "@repo/ui"
-import { query } from "@/lib/apollo-client"
-import Link from "next/link"
 import { GET_SERVERS_QUERY } from "@/features/common/graphql/servers"
+import { ServerTable } from "@/features/admin/servers/components/server-table"
 
 export const metadata = {
   title: "Servers - Admin - " + process.env.NEXT_PUBLIC_APP_NAME,
@@ -35,7 +35,7 @@ export default async function ServersPage() {
                 </Button>
               </div>
             </div>
-            <ServerDataTable data={data.findManyServer} />
+            <ServerTable data={data.findManyServer} />
           </div>
         </div>
       </MainContent>

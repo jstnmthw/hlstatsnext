@@ -2,7 +2,7 @@
 
 import { useActionState } from "react"
 import { createServer } from "@/features/admin/servers/actions/create-server"
-import { FormField, ErrorMessage, ErrorDisplay } from "@/features/admin/servers/components/form"
+import { FormField, ErrorMessage, ErrorDisplay } from "@/features/common/components/form"
 import {
   Button,
   Input,

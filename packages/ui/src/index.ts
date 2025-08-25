@@ -26,6 +26,7 @@ export {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from "./components/dropdown-menu"
 
 export { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/table"

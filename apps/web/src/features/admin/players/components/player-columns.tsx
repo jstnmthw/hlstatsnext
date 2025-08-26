@@ -1,6 +1,7 @@
 import {
   Button,
   Checkbox,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -308,11 +309,17 @@ export const playerColumns = (context: PlayerColumnsContext): ColumnDef<PlayerLi
       <div className="flex items-center justify-end pr-3 pl-1">
         <Button
           variant="ghost"
-          className="size-8 p-0"
+          className="size-8 p-0 group"
           onClick={context.onRefresh}
           disabled={context.isPending}
         >
-          <RotateCw className={`size-4 ${context.isPending ? "animate-spin" : ""}`} />
+          <RotateCw
+            className={cn(
+              "size-4",
+              context.isPending ? "animate-spin" : "",
+              "text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200",
+            )}
+          />
         </Button>
       </div>
     ),

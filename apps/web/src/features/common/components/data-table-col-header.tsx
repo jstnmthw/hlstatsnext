@@ -1,12 +1,10 @@
 import { Column } from "@tanstack/react-table"
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react"
-
 import { cn, Button } from "@repo/ui"
 
 interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
   column?: Column<TData, TValue>
   title: string
-  // Server-side props
   field?: string
   sortField?: string
   sortOrder?: "asc" | "desc"
@@ -39,16 +37,18 @@ export function DataTableColumnHeader<TData, TValue>({
       <Button
         variant="ghost"
         size="sm"
-        className={cn("-ml-3 h-8", className)}
+        className={cn("-ml-3 h-8 group", className)}
         onClick={handleClick}
       >
-        <span>{title}</span>
+        <span className="text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200">
+          {title}
+        </span>
         {isCurrentSort && sortOrder === "desc" ? (
-          <ArrowDown className="size-3" />
+          <ArrowDown className="size-4 text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200" />
         ) : isCurrentSort && sortOrder === "asc" ? (
-          <ArrowUp className="size-3" />
+          <ArrowUp className="size-4 text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200" />
         ) : (
-          <ChevronsUpDown className="size-3" />
+          <ChevronsUpDown className="size-4 text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200" />
         )}
       </Button>
     )

@@ -1,4 +1,3 @@
-import { Player } from "@repo/database/client"
 import {
   Button,
   Checkbox,
@@ -9,11 +8,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui"
-import { MoreHorizontal, RotateCw } from "lucide-react"
+import { Player } from "@repo/database/client"
 import { ColumnDef } from "@tanstack/react-table"
 import { formatDate } from "@/lib/datetime-util"
-import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
 import { FilterConfig } from "@/features/common/types/data-table"
+import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
+import { MoreHorizontal, RotateCw } from "lucide-react"
 
 export type PlayerListItem = Pick<
   Player,

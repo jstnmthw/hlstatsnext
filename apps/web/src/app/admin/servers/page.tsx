@@ -9,7 +9,7 @@ import { GET_SERVERS_QUERY } from "@/features/common/graphql/servers"
 import { ServerTable } from "@/features/admin/servers/components/server-table"
 
 export const metadata = {
-  title: "Servers - Admin - " + process.env.NEXT_PUBLIC_APP_NAME,
+  title: "Manage Servers - " + process.env.NEXT_PUBLIC_APP_NAME,
   description: "Manage your game servers and track player statistics and activities.",
 }
 

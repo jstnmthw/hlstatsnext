@@ -30,12 +30,19 @@ import {
   DropdownMenuCheckboxItem,
 } from "@repo/ui"
 
+import { FilterConfig } from "@/features/common/types/data-table"
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  filterConfig?: FilterConfig
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  filterConfig,
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -63,12 +70,16 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   return (
     <>
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter names..."
-          value={(table.getColumn("lastName")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("lastName")?.setFilterValue(event.target.value)}
-          className="max-w-sm dark:bg-zinc-950"
-        />
+        {filterConfig && (
+          <Input
+            placeholder={filterConfig.placeholder}
+            value={(table.getColumn(filterConfig.columnId)?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn(filterConfig.columnId)?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm dark:bg-zinc-950"
+          />
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" colorScheme="light" className="ml-auto text-base" size="lg">

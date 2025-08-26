@@ -13,6 +13,7 @@ import { MoreHorizontal, RotateCw } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { formatDate } from "@/lib/datetime-util"
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
+import { FilterConfig } from "@/features/common/types/data-table"
 
 export type PlayerListItem = Pick<
   Player,
@@ -147,3 +148,9 @@ export const columns: ColumnDef<PlayerListItem>[] = [
     },
   },
 ]
+
+export const playerFilterConfig: FilterConfig = {
+  columnId: "lastName",
+  placeholder: "Filter names...",
+  label: "Player Name",
+}

@@ -1,12 +1,9 @@
 import Link from "next/link"
-import { query } from "@/lib/apollo-client"
 import { Button } from "@repo/ui"
 import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/servers/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { GET_SERVERS_QUERY } from "@/features/common/graphql/servers"
-import { ServerTable } from "@/features/admin/servers/components/server-table"
 
 export const metadata = {
   title: "Manage Servers - " + process.env.NEXT_PUBLIC_APP_NAME,
@@ -14,8 +11,6 @@ export const metadata = {
 }
 
 export default async function ServersPage() {
-  const { data } = await query({ query: GET_SERVERS_QUERY })
-
   return (
     <PageWrapper>
       <AdminHeader />
@@ -35,7 +30,9 @@ export default async function ServersPage() {
                 </Button>
               </div>
             </div>
-            <ServerTable data={data.findManyServer} />
+            <div className="text-center py-8 text-muted-foreground">
+              Server table temporarily disabled
+            </div>
           </div>
         </div>
       </MainContent>

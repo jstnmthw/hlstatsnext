@@ -3,3 +3,17 @@ export interface FilterConfig {
   placeholder: string
   label?: string
 }
+
+export interface DataTableOptions {
+  totalCount: number
+  currentPage: number
+  pageSize: number
+  sortField?: string
+  sortOrder?: "asc" | "desc"
+  search?: string
+  onPageChange: (page: number) => void
+  onSort: (field: string) => void
+  onSearch: (search: string) => void
+  onRefresh: () => void
+  isPending?: boolean
+}

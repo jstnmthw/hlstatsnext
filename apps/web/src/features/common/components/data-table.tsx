@@ -1,16 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 
 import {
   ColumnDef,
-  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
@@ -29,62 +24,89 @@ import {
   DropdownMenuContent,
   DropdownMenuCheckboxItem,
   Settings2Icon,
+  SearchIcon,
 } from "@repo/ui"
 
-import { FilterConfig } from "@/features/common/types/data-table"
+import { FilterConfig, DataTableOptions } from "@/features/common/types/data-table"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   filterConfig?: FilterConfig
+  options: DataTableOptions
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   filterConfig,
+  options,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+  const [searchValue, setSearchValue] = useState(options.search || "")
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    manualPagination: true,
+    manualSorting: true,
+    manualFiltering: true,
     state: {
-      sorting,
-      columnFilters,
+      sorting: [],
+      columnFilters: [],
       columnVisibility,
       rowSelection,
+      pagination: {
+        pageIndex: (options.currentPage || 1) - 1,
+        pageSize: options.pageSize || 10,
+      },
     },
+    pageCount: Math.ceil((options.totalCount || 0) / (options.pageSize || 10)),
   })
+
+  const paginationInfo = useMemo(() => {
+    const startItem = options.totalCount > 0 ? (options.currentPage - 1) * options.pageSize + 1 : 0
+    const endItem = Math.min(options.currentPage * options.pageSize, options.totalCount)
+    const canPreviousPage = options.currentPage > 1
+    const canNextPage = options.currentPage < Math.ceil(options.totalCount / options.pageSize)
+
+    return { startItem, endItem, totalCount: options.totalCount, canPreviousPage, canNextPage }
+  }, [options])
+
+  const handleSearchSubmit = () => {
+    options.onSearch(searchValue)
+  }
 
   return (
     <>
       <div className="flex items-center py-4">
         {filterConfig && (
-          <Input
-            placeholder={filterConfig.placeholder}
-            value={(table.getColumn(filterConfig.columnId)?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn(filterConfig.columnId)?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm dark:bg-zinc-950"
-          />
+          <div className="flex gap-2">
+            <Input
+              placeholder={filterConfig.placeholder}
+              value={searchValue}
+              onChange={(event) => setSearchValue(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleSearchSubmit()
+                }
+              }}
+              className="max-w-sm dark:bg-zinc-950"
+              disabled={options.isPending}
+            />
+            <Button variant="ghost" onClick={handleSearchSubmit} disabled={options.isPending}>
+              <SearchIcon className="size-4" data-slot="icon" />
+            </Button>
+          </div>
         )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" colorScheme="light" className="ml-auto text-base">
-              <Settings2Icon className="size-4" /> View
+            <Button variant="outline" colorScheme="light" className="ml-auto">
+              <Settings2Icon className="size-4" data-slot="icon" /> View
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -116,7 +138,14 @@ export function DataTable<TData, TValue>({
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                        : flexRender(header.column.columnDef.header, {
+                            ...header.getContext(),
+                            sortField: options.sortField,
+                            sortOrder: options.sortOrder,
+                            onSort: options.onSort,
+                            onRefresh: options.onRefresh,
+                            isPending: options.isPending,
+                          })}
                     </TableHead>
                   )
                 })}
@@ -124,7 +153,13 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {options.isPending ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Loading...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -144,21 +179,27 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+      <div className="flex items-center justify-between space-x-2 py-4">
+        <div className="text-sm text-muted-foreground">
+          Showing {paginationInfo.startItem} to {paginationInfo.endItem} of{" "}
+          {paginationInfo.totalCount} results
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => options.onPageChange(options.currentPage - 1)}
+            disabled={!paginationInfo.canPreviousPage || options.isPending}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => options.onPageChange(options.currentPage + 1)}
+            disabled={!paginationInfo.canNextPage || options.isPending}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </>
   )

@@ -1,65 +1,84 @@
 import { Column } from "@tanstack/react-table"
-import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from "lucide-react"
+import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react"
 
-import {
-  cn,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@repo/ui"
+import { cn, Button } from "@repo/ui"
 
 interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
-  column: Column<TData, TValue>
+  column?: Column<TData, TValue>
   title: string
+  // Server-side props
+  field?: string
+  sortField?: string
+  sortOrder?: "asc" | "desc"
+  onSort?: (field: string) => void
 }
 
 export function DataTableColumnHeader<TData, TValue>({
   column,
   title,
+  field,
+  sortField,
+  sortOrder,
+  onSort,
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
-  if (!column.getCanSort()) {
+  if (!column && field && onSort) {
+    const isCurrentSort = sortField === field
+
+    const handleClick = () => {
+      if (!isCurrentSort) {
+        onSort(`${field}:asc`)
+      } else if (sortOrder === "asc") {
+        onSort(`${field}:desc`)
+      } else {
+        onSort(`${field}:asc`)
+      }
+    }
+
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        className={cn("-ml-3 h-8", className)}
+        onClick={handleClick}
+      >
+        <span>{title}</span>
+        {isCurrentSort && sortOrder === "desc" ? (
+          <ArrowDown className="size-3" />
+        ) : isCurrentSort && sortOrder === "asc" ? (
+          <ArrowUp className="size-3" />
+        ) : (
+          <ChevronsUpDown className="size-3" />
+        )}
+      </Button>
+    )
+  }
+
+  if (!column || !column.getCanSort()) {
     return <div className={cn(className)}>{title}</div>
   }
 
+  const handleClick = () => {
+    const currentSort = column.getIsSorted()
+    if (currentSort === "asc") {
+      column.toggleSorting(true) // desc
+    } else if (currentSort === "desc") {
+      column.clearSorting() // no sort
+    } else {
+      column.toggleSorting(false) // asc
+    }
+  }
+
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="data-[state=open]:bg-accent -ml-3 h-8">
-            <span>{title}</span>
-            {column.getIsSorted() === "desc" ? (
-              <ArrowDown className="size-3" />
-            ) : column.getIsSorted() === "asc" ? (
-              <ArrowUp className="size-3" />
-            ) : (
-              <ChevronsUpDown className="size-3" />
-            )}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-            <ArrowUp />
-            Asc
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-            <ArrowDown />
-            Desc
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => column.clearSorting()}>
-            <ChevronsUpDown />
-            Unsort
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-            <EyeOff />
-            Hide
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <Button variant="ghost" size="sm" className={cn("-ml-3 h-8", className)} onClick={handleClick}>
+      <span>{title}</span>
+      {column.getIsSorted() === "desc" ? (
+        <ArrowDown className="size-3" />
+      ) : column.getIsSorted() === "asc" ? (
+        <ArrowUp className="size-3" />
+      ) : (
+        <ChevronsUpDown className="size-3" />
+      )}
+    </Button>
   )
 }

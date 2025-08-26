@@ -6,6 +6,7 @@ import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/servers/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
+import { Navbar } from "@/features/admin/common/navbar"
 import { PlayerDataTable } from "@/features/admin/players/components/player-data-table"
 import {
   GET_PLAYERS_WITH_PAGINATION,
@@ -75,31 +76,30 @@ export default async function PlayersPage(props: PlayersPageProps) {
     <PageWrapper>
       <AdminHeader />
       <MainContent>
+        <Navbar />
         <div className="container">
-          <div className="border-t border-border">
-            <div className="mt-8 mb-8 flex justify-between items-center">
-              <div>
-                <h1 className="text-3xl font-medium tracking-tight">Manage Players</h1>
-                <p className="text-muted-foreground">
-                  Manage your game players and track their statistics and activities.
-                </p>
-              </div>
-              <div>
-                <Button variant="solid" colorScheme="green" size="sm">
-                  <Link href="/admin/servers/add">Add Server</Link>
-                </Button>
-              </div>
+          <div className="mt-8 mb-8 flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-medium tracking-tight">Manage Players</h1>
+              <p className="text-muted-foreground">
+                Manage your game players and track their statistics and activities.
+              </p>
             </div>
-            <PlayerDataTable
-              data={players}
-              totalCount={totalCount}
-              currentPage={page}
-              pageSize={pageSize}
-              sortField={sortField}
-              sortOrder={sortOrder}
-              search={search}
-            />
+            <div>
+              <Button variant="solid" colorScheme="green" size="sm">
+                <Link href="/admin/servers/add">Add Server</Link>
+              </Button>
+            </div>
           </div>
+          <PlayerDataTable
+            data={players}
+            totalCount={totalCount}
+            currentPage={page}
+            pageSize={pageSize}
+            sortField={sortField}
+            sortOrder={sortOrder}
+            search={search}
+          />
         </div>
       </MainContent>
       <Footer />

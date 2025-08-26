@@ -27,7 +27,7 @@ export const columns: ColumnDef<PlayerListItem>[] = [
   {
     id: "select",
     header: ({ table }) => (
-      <div className="flex items-center justify-center pr-3 pl-1">
+      <div className="flex items-center justify-center pr-3 pl-1 max-w-10">
         <Checkbox
           checked={
             table.getIsAllPageRowsSelected() ||
@@ -39,7 +39,7 @@ export const columns: ColumnDef<PlayerListItem>[] = [
       </div>
     ),
     cell: ({ row }) => (
-      <div className="flex items-center justify-center pr-3 pl-1">
+      <div className="flex items-center justify-center pr-3 pl-1 max-w-10">
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -53,7 +53,7 @@ export const columns: ColumnDef<PlayerListItem>[] = [
   {
     accessorKey: "playerId",
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Player ID" />
+      return <DataTableColumnHeader column={column} title="ID" />
     },
     cell: ({ row }) => {
       const player = row.original
@@ -116,7 +116,7 @@ export const columns: ColumnDef<PlayerListItem>[] = [
     id: "actions",
     header: () => {
       return (
-        <div>
+        <div className="flex items-center justify-end pr-3 pl-1">
           <Button variant="ghost" className="size-8 p-0">
             <RotateCw className="size-4" />
           </Button>
@@ -129,10 +129,12 @@ export const columns: ColumnDef<PlayerListItem>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="size-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center justify-end pr-3 pl-1">
+              <Button variant="ghost" className="size-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="size-4" />
+              </Button>
+            </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>

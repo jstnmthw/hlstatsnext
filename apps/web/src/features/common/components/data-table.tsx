@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuCheckboxItem,
+  Settings2Icon,
 } from "@repo/ui"
 
 import { FilterConfig } from "@/features/common/types/data-table"
@@ -82,8 +83,8 @@ export function DataTable<TData, TValue>({
         )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" colorScheme="light" className="ml-auto text-base" size="lg">
-              Columns
+            <Button variant="outline" colorScheme="light" className="ml-auto text-base">
+              <Settings2Icon className="size-4" /> View
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

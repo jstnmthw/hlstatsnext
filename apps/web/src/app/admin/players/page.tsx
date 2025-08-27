@@ -12,6 +12,11 @@ import {
   GET_PLAYERS_WITH_PAGINATION,
   GET_PLAYER_COUNT,
 } from "@/features/admin/players/graphql/player-queries"
+import {
+  parseUrlParams,
+  buildPaginationVariables,
+  buildCountVariables,
+} from "@/features/common/graphql/pagination"
 
 export const metadata: Metadata = {
   title: "Manage Players - " + process.env.NEXT_PUBLIC_APP_NAME,
@@ -30,33 +35,16 @@ interface PlayersPageProps {
 export default async function PlayersPage(props: PlayersPageProps) {
   const searchParams = await props.searchParams
 
-  // Parse URL parameters
-  const page = Number(searchParams.page) || 1
-  const pageSize = 10
-  const sortField = searchParams.sortField || "lastName"
-  const sortOrder = (searchParams.sortOrder as "asc" | "desc") || "asc"
-  const search = searchParams.search || ""
+  // Parse URL parameters using shared utility
+  const params = parseUrlParams(searchParams, {
+    sortField: "lastName",
+    sortOrder: "asc",
+    pageSize: 10,
+  })
 
-  // Build GraphQL variables
-  const queryVariables: Record<string, unknown> = {
-    take: pageSize,
-    skip: (page - 1) * pageSize,
-  }
-
-  if (sortField) {
-    queryVariables.orderBy = [{ [sortField]: sortOrder }]
-  }
-
-  if (search) {
-    queryVariables.where = {
-      OR: [{ lastName: { contains: search } }, { email: { contains: search } }],
-    }
-  }
-
-  const countVariables: Record<string, unknown> = {}
-  if (search) {
-    countVariables.where = queryVariables.where
-  }
+  // Build GraphQL variables using shared utility
+  const queryVariables = buildPaginationVariables(params, ["lastName", "email"])
+  const countVariables = buildCountVariables(params, ["lastName", "email"])
 
   // Fetch data on server
   const { data } = await query({
@@ -94,11 +82,11 @@ export default async function PlayersPage(props: PlayersPageProps) {
           <PlayerDataTable
             data={players}
             totalCount={totalCount}
-            currentPage={page}
-            pageSize={pageSize}
-            sortField={sortField}
-            sortOrder={sortOrder}
-            search={search}
+            currentPage={params.page}
+            pageSize={params.pageSize}
+            sortField={params.sortField}
+            sortOrder={params.sortOrder}
+            search={params.search}
           />
         </div>
       </MainContent>

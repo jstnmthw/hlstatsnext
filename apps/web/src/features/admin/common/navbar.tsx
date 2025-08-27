@@ -36,7 +36,7 @@ const navItems = [
 
 export function Navbar() {
   return (
-    <nav className="flex items-center justify-between border-b border-t border-border bg-zinc-900/50">
+    <nav className="flex items-center justify-between border-b border-border">
       <ul className="flex items-center gap-6 container py-2">
         {navItems.map((item) => (
           <li key={item.href}>

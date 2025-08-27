@@ -98,7 +98,12 @@ export function DataTable<TData, TValue>({
               className="max-w-sm dark:bg-zinc-950"
               disabled={options.isPending}
             />
-            <Button variant="ghost" onClick={handleSearchSubmit} disabled={options.isPending}>
+            <Button
+              variant="outline"
+              colorScheme="dark"
+              onClick={handleSearchSubmit}
+              disabled={options.isPending}
+            >
               <SearchIcon className="size-4" data-slot="icon" />
             </Button>
           </div>

@@ -1,7 +1,7 @@
-import { SettingsIcon } from "lucide-react"
-import { AppLogo } from "@/features/common/components/app-logo"
 import Link from "next/link"
 import { Badge, cn } from "@repo/ui"
+import { SettingsIcon } from "lucide-react"
+import { AppLogo } from "@/features/common/components/app-logo"
 
 const navItems = [
   {
@@ -30,21 +30,9 @@ const navItems = [
   },
 ]
 
-export function AdminHeader({
-  className,
-  isFixed = false,
-}: {
-  className?: string
-  isFixed?: boolean
-}) {
+export function AdminHeader({ className }: { className?: string }) {
   return (
-    <header
-      className={cn(
-        "w-full",
-        className,
-        isFixed && "fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-background/50",
-      )}
-    >
+    <header className={cn("w-full", className)}>
       <div className={cn("py-6 flex justify-between items-center container")}>
         <div className="flex items-center gap-2">
           <AppLogo showVersion={false} />

@@ -20,7 +20,7 @@
     "@tanstack/react-table": "^8.21.3",
     "graphql": "^16.11.0",
     "lucide-react": "^0.513.0",
-    "next": "^15.5.0",
+    "next": "^15.5.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "zod": "^3.25.76"

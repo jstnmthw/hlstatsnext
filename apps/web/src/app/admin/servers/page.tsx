@@ -3,10 +3,10 @@ import { Metadata } from "next"
 import { Button } from "@repo/ui"
 import { query } from "@/lib/apollo-client"
 import { Footer } from "@/features/common/components/footer"
-import { AdminHeader } from "@/features/admin/servers/components/header"
+import { AdminHeader } from "@/features/admin/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { Navbar } from "@/features/admin/common/navbar"
+import { Navbar } from "@/features/admin/common/components/navbar"
 import { ServerTable } from "@/features/admin/servers/components/server-table"
 import {
   GET_SERVERS_WITH_PAGINATION,

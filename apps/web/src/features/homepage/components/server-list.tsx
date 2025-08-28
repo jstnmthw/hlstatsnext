@@ -1,6 +1,7 @@
 import { query } from "@/lib/apollo-client"
-import { GET_SERVERS_QUERY } from "@/features/common/graphql/servers"
+import { Server } from "@repo/database/client"
 import { Button, PlayIcon, cn } from "@repo/ui"
+import { GET_SERVERS_QUERY } from "@/features/admin/servers/graphql/server-queries"
 import {
   VerticalList,
   VerticalListHeader,
@@ -14,7 +15,7 @@ export async function ServerList({ className }: { className?: string }) {
     <VerticalList className={cn("mb-10", className)}>
       <VerticalListHeader>Game Servers</VerticalListHeader>
       <ul>
-        {data.findManyServer?.map((server) => (
+        {data.findManyServer?.map((server: Server) => (
           <VerticalListItem key={server.serverId}>
             <div className="flex items-center justify-between">
               <div className="flex items-center justify-between w-full">
@@ -59,7 +60,7 @@ export async function ServerList({ className }: { className?: string }) {
  * @param lastEvent - The last event time of the server.
  * @returns "Online" if the server is online, "Offline" if the server is offline.
  */
-const getOnlineStatus = (lastEvent: string | null) => {
+const getOnlineStatus = (lastEvent: Date | null) => {
   if (lastEvent === null) {
     return "Offline"
   }

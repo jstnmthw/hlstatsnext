@@ -1,4 +1,4 @@
-import { AdminHeader } from "@/features/admin/servers/components/header"
+import { AdminHeader } from "@/features/admin/common/components/header"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"

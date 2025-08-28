@@ -2,7 +2,7 @@ import { SidebarNavigation } from "@/features/ui-kit/components/sidebar-navigati
 import { KitchenSinkContent } from "@/features/ui-kit/components/kitchen-sink-content"
 import { tableOfContents } from "@/features/ui-kit/constants/table-of-contents"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { AdminHeader } from "@/features/admin/servers/components/header"
+import { AdminHeader } from "@/features/admin/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { Footer } from "@/features/common/components/footer"
 

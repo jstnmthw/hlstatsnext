@@ -12,22 +12,6 @@ const navItems = [
     label: "UI Kit",
     href: "/admin/ui-kit",
   },
-  {
-    label: "Servers",
-    href: "/admin/servers",
-  },
-  {
-    label: "Games",
-    href: "/admin/games",
-  },
-  {
-    label: "Players",
-    href: "/admin/players",
-  },
-  {
-    label: "Users",
-    href: "/admin/users",
-  },
 ]
 
 export function AdminHeader({ className }: { className?: string }) {

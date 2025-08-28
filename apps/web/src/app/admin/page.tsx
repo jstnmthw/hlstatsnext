@@ -14,7 +14,7 @@ export const metadata = {
 export default function Page() {
   return (
     <PageWrapper>
-      <AdminHeader />
+      <AdminHeader currentPath="/admin" />
       <MainContent>
         <div className="container">
           <div className="py-10 border-t border-border">

@@ -1,7 +1,21 @@
-import { Button, cn, ScrollTextIcon, ServerIcon, SettingsIcon, User2Icon, UserIcon } from "@repo/ui"
+import {
+  cn,
+  Button,
+  ScrollTextIcon,
+  ServerIcon,
+  SettingsIcon,
+  User2Icon,
+  UserIcon,
+  GaugeIcon,
+} from "@repo/ui"
 import Link from "next/link"
 
 const navItems = [
+  {
+    label: "Dashboard",
+    href: "/admin",
+    icon: <GaugeIcon className="size-5 text-zinc-500" data-slot="icon" />,
+  },
   {
     label: "Servers",
     href: "/admin/servers",
@@ -38,7 +52,10 @@ export function Navbar({ currentPath }: NavbarProps) {
     <nav className="flex items-center justify-between border-b border-border">
       <ul className="flex items-center gap-6 container py-2">
         {navItems.map((item) => {
-          const isActive = currentPath === item.href || currentPath?.startsWith(item.href + "/")
+          const isActive =
+            item.href === "/admin"
+              ? currentPath === "/admin"
+              : currentPath === item.href || currentPath?.startsWith(item.href + "/")
           return (
             <li key={item.href}>
               <Button

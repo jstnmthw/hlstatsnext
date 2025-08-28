@@ -1053,7 +1053,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-3">
+            <div className="flex gap-3 items-center">
               <Checkbox id="toggle" disabled />
               <Label htmlFor="toggle">Enable notifications</Label>
             </div>

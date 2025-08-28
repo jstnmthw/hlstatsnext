@@ -139,8 +139,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         className={cn(
-          buttonVariants({ variant, size, className }), // Base cva styles
+          buttonVariants({ variant, size }), // Base cva styles
           dynamicStyles, // Variant + ColorScheme specific styles
+          className, // Custom classes last for proper override precedence
         )}
         ref={ref}
         {...props}

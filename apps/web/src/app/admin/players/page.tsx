@@ -6,7 +6,6 @@ import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { Navbar } from "@/features/admin/common/components/navbar"
 import { PlayerDataTable } from "@/features/admin/players/components/player-data-table"
 import {
   GET_PLAYERS_WITH_PAGINATION,
@@ -64,7 +63,6 @@ export default async function PlayersPage(props: PlayersPageProps) {
     <PageWrapper>
       <AdminHeader />
       <MainContent>
-        <Navbar />
         <div className="container">
           <div className="mt-8 mb-8 flex justify-between items-center">
             <div>

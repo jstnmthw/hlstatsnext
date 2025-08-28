@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Checkbox,
   cn,
@@ -91,6 +92,35 @@ export const serverColumns = (): ColumnDef<ServerListItem>[] => [
     },
   },
   {
+    id: "status",
+    accessorKey: "lastEvent",
+    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
+      <DataTableColumnHeader
+        title="Status"
+        field="lastEvent"
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
+      />
+    ),
+    cell: ({ row }) => {
+      const server = row.original
+      // Consider server online if it has recent activity (within last 30 minutes)
+      const isOnline =
+        server.lastEvent && new Date(server.lastEvent).getTime() > Date.now() - 30 * 60 * 1000
+
+      return (
+        <Badge
+          variant="outline"
+          colorScheme={isOnline ? "green" : "light"}
+          className={cn(isOnline && "dark:text-zinc-700 text-zinc-500")}
+        >
+          {isOnline ? "Online" : "Offline"}
+        </Badge>
+      )
+    },
+  },
+  {
     accessorKey: "name",
     header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
       <DataTableColumnHeader
@@ -175,6 +205,7 @@ export const serverColumns = (): ColumnDef<ServerListItem>[] => [
     },
   },
   {
+    id: "lastEventDate",
     accessorKey: "lastEvent",
     header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
       <DataTableColumnHeader

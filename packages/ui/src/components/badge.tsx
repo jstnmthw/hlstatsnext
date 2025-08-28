@@ -59,8 +59,9 @@ function Badge({
     <Comp
       data-slot="badge"
       className={cn(
-        badgeVariants({ variant, className }), // Base cva styles
+        badgeVariants({ variant }), // Base cva styles
         dynamicStyles, // Variant + ColorScheme specific styles
+        className, // Custom classes last for proper override precedence
       )}
       {...props}
     />

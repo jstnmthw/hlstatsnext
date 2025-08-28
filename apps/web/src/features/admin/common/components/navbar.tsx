@@ -7,6 +7,7 @@ import {
   User2Icon,
   UserIcon,
   GaugeIcon,
+  GamepadIcon,
 } from "@repo/ui"
 import Link from "next/link"
 
@@ -30,6 +31,11 @@ const navItems = [
     label: "Users",
     href: "/admin/users",
     icon: <UserIcon className="size-5" data-slot="icon" />,
+  },
+  {
+    label: "Games",
+    href: "/admin/games",
+    icon: <GamepadIcon className="size-5" data-slot="icon" />,
   },
   {
     label: "Logs",

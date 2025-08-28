@@ -17,17 +17,3 @@ export interface DataTableOptions {
   onRefresh: () => void
   isPending?: boolean
 }
-
-export interface DataTableConfig {
-  defaultSortField: string
-  defaultSortOrder: "asc" | "desc"
-  defaultPageSize: number
-}
-
-export interface DataTableUrlState {
-  page: number
-  sortField: string
-  sortOrder: "asc" | "desc"
-  search: string
-  pageSize: number
-}

@@ -2,7 +2,20 @@
 
 import { useCallback, useTransition } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { DataTableConfig, DataTableUrlState } from "../types/data-table"
+
+export interface DataTableConfig {
+  defaultSortField: string
+  defaultSortOrder: "asc" | "desc"
+  defaultPageSize: number
+}
+
+export interface DataTableUrlState {
+  page: number
+  sortField: string
+  sortOrder: "asc" | "desc"
+  search: string
+  pageSize: number
+}
 
 export function useDataTableUrl(config: DataTableConfig) {
   const router = useRouter()

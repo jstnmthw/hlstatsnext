@@ -11,7 +11,12 @@ const navItems = [
   },
 ]
 
-export function AdminHeader({ className }: { className?: string }) {
+interface AdminHeaderProps {
+  className?: string
+  currentPath?: string
+}
+
+export function AdminHeader({ className, currentPath }: AdminHeaderProps) {
   return (
     <>
       <header className={cn("w-full", className)}>
@@ -38,7 +43,7 @@ export function AdminHeader({ className }: { className?: string }) {
           </nav>
         </div>
       </header>
-      <Navbar />
+      <Navbar currentPath={currentPath} />
     </>
   )
 }

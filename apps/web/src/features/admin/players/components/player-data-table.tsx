@@ -2,7 +2,7 @@
 
 import { PlayerListItem, playerColumns, playerFilterConfig } from "./player-columns"
 import { ServerDataTable } from "@/features/common/components/server-data-table"
-import { DataTableUrlState } from "@/features/common/types/data-table"
+import { DataTableUrlState } from "@/features/common/hooks/use-data-table-url"
 
 interface PlayerDataTableProps {
   data: PlayerListItem[]
@@ -37,13 +37,7 @@ export function PlayerDataTable({
     search,
   }
 
-  const columns = playerColumns({
-    sortField,
-    sortOrder,
-    onSort: () => {}, // Will be handled by ServerDataTable
-    onRefresh: () => {}, // Will be handled by ServerDataTable
-    isPending: false, // Will be handled by ServerDataTable
-  })
+  const columns = playerColumns()
 
   return (
     <ServerDataTable

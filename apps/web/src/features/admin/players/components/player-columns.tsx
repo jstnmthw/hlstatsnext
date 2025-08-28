@@ -10,11 +10,19 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui"
 import { Player } from "@repo/database/client"
-import { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef, HeaderContext } from "@tanstack/react-table"
 import { formatDate } from "@/lib/datetime-util"
 import { FilterConfig } from "@/features/common/types/data-table"
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
 import { MoreHorizontal, RotateCw } from "lucide-react"
+
+interface ExtendedHeaderContext<TData, TValue> extends HeaderContext<TData, TValue> {
+  sortField?: string
+  sortOrder?: "asc" | "desc"
+  onSort?: (field: string) => void
+  onRefresh?: () => void
+  isPending?: boolean
+}
 
 export type PlayerListItem = Pick<
   Player,
@@ -158,15 +166,7 @@ export const playerFilterConfig: FilterConfig = {
   label: "Player Search",
 }
 
-interface PlayerColumnsContext {
-  sortField?: string
-  sortOrder?: "asc" | "desc"
-  onSort: (field: string) => void
-  onRefresh: () => void
-  isPending?: boolean
-}
-
-export const playerColumns = (context: PlayerColumnsContext): ColumnDef<PlayerListItem>[] => [
+export const playerColumns = (): ColumnDef<PlayerListItem>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -195,13 +195,13 @@ export const playerColumns = (context: PlayerColumnsContext): ColumnDef<PlayerLi
   },
   {
     accessorKey: "playerId",
-    header: () => (
+    header: (props: ExtendedHeaderContext<PlayerListItem, unknown>) => (
       <DataTableColumnHeader
         title="ID"
         field="playerId"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
     cell: ({ row }) => {
@@ -211,73 +211,73 @@ export const playerColumns = (context: PlayerColumnsContext): ColumnDef<PlayerLi
   },
   {
     accessorKey: "lastName",
-    header: () => (
+    header: (props: ExtendedHeaderContext<PlayerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Name"
         field="lastName"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
   },
   {
     accessorKey: "email",
-    header: () => (
+    header: (props: ExtendedHeaderContext<PlayerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Email"
         field="email"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
   },
   {
     accessorKey: "skill",
-    header: () => (
+    header: (props: ExtendedHeaderContext<PlayerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Skill"
         field="skill"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
   },
   {
     accessorKey: "kills",
-    header: () => (
+    header: (props: ExtendedHeaderContext<PlayerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Kills"
         field="kills"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
   },
   {
     accessorKey: "deaths",
-    header: () => (
+    header: (props: ExtendedHeaderContext<PlayerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Deaths"
         field="deaths"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
   },
   {
     accessorKey: "lastEvent",
-    header: () => (
+    header: (props: ExtendedHeaderContext<PlayerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Last Event"
         field="lastEvent"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
     cell: ({ row }) => {
@@ -288,13 +288,13 @@ export const playerColumns = (context: PlayerColumnsContext): ColumnDef<PlayerLi
   },
   {
     accessorKey: "lastSkillChange",
-    header: () => (
+    header: (props: ExtendedHeaderContext<PlayerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Last Skill Change"
         field="lastSkillChange"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
     cell: ({ row }) => {
@@ -305,18 +305,18 @@ export const playerColumns = (context: PlayerColumnsContext): ColumnDef<PlayerLi
   },
   {
     id: "actions",
-    header: () => (
+    header: (props: ExtendedHeaderContext<PlayerListItem, unknown>) => (
       <div className="flex items-center justify-end pr-3 pl-1">
         <Button
           variant="ghost"
           className="size-8 p-0 group"
-          onClick={context.onRefresh}
-          disabled={context.isPending}
+          onClick={props.onRefresh}
+          disabled={props.isPending}
         >
           <RotateCw
             className={cn(
               "size-4",
-              context.isPending ? "animate-spin" : "",
+              props.isPending ? "animate-spin" : "",
               "text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200",
             )}
           />

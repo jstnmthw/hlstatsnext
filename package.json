@@ -4,6 +4,7 @@
   "scripts": {
     "build": "turbo run build",
     "check-types": "turbo run check-types",
+    "check-all": "turbo run check-types && turbo run lint && pnpm format:fix",
     "clean": "turbo run clean && rm -rf node_modules .turbo",
     "codegen": "turbo run graphql:codegen",
     "db:fresh": "turbo run db:fresh",

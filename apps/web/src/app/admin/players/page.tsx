@@ -61,7 +61,7 @@ export default async function PlayersPage(props: PlayersPageProps) {
 
   return (
     <PageWrapper>
-      <AdminHeader />
+      <AdminHeader currentPath="/admin/players" />
       <MainContent>
         <div className="container">
           <div className="mt-8 mb-8 flex justify-between items-center">

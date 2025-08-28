@@ -2,7 +2,7 @@
 
 import { ServerListItem, serverColumns, serverFilterConfig } from "./server-columns"
 import { ServerDataTable } from "@/features/common/components/server-data-table"
-import { DataTableUrlState } from "@/features/common/types/data-table"
+import { DataTableUrlState } from "@/features/common/hooks/use-data-table-url"
 
 interface ServerDataTableProps {
   data: ServerListItem[]
@@ -37,13 +37,7 @@ export function ServerTable({
     search,
   }
 
-  const columns = serverColumns({
-    sortField,
-    sortOrder,
-    onSort: () => {}, // Will be handled by ServerDataTable
-    onRefresh: () => {}, // Will be handled by ServerDataTable
-    isPending: false, // Will be handled by ServerDataTable
-  })
+  const columns = serverColumns()
 
   return (
     <ServerDataTable

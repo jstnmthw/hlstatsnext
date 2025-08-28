@@ -13,7 +13,7 @@ export const metadata = {
 export default function CreateServerPage() {
   return (
     <PageWrapper>
-      <AdminHeader />
+      <AdminHeader currentPath="/admin/servers/add" />
       <MainContent>
         <div className="container">
           <div className="py-10 border-t border-border">

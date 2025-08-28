@@ -10,11 +10,19 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui"
 import { Server } from "@repo/database/client"
-import { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef, HeaderContext } from "@tanstack/react-table"
 import { formatDate } from "@/lib/datetime-util"
 import { FilterConfig } from "@/features/common/types/data-table"
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
 import { MoreHorizontal, RotateCw } from "lucide-react"
+
+interface ExtendedHeaderContext<TData, TValue> extends HeaderContext<TData, TValue> {
+  sortField?: string
+  sortOrder?: "asc" | "desc"
+  onSort?: (field: string) => void
+  onRefresh?: () => void
+  isPending?: boolean
+}
 
 export type ServerListItem = Pick<
   Server,
@@ -39,15 +47,7 @@ export const serverFilterConfig: FilterConfig = {
   label: "Server Search",
 }
 
-interface ServerColumnsContext {
-  sortField?: string
-  sortOrder?: "asc" | "desc"
-  onSort: (field: string) => void
-  onRefresh: () => void
-  isPending?: boolean
-}
-
-export const serverColumns = (context: ServerColumnsContext): ColumnDef<ServerListItem>[] => [
+export const serverColumns = (): ColumnDef<ServerListItem>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -76,13 +76,13 @@ export const serverColumns = (context: ServerColumnsContext): ColumnDef<ServerLi
   },
   {
     accessorKey: "serverId",
-    header: () => (
+    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
       <DataTableColumnHeader
         title="ID"
         field="serverId"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
     cell: ({ row }) => {
@@ -92,13 +92,13 @@ export const serverColumns = (context: ServerColumnsContext): ColumnDef<ServerLi
   },
   {
     accessorKey: "name",
-    header: () => (
+    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Name"
         field="name"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
     cell: ({ row }) => {
@@ -108,13 +108,13 @@ export const serverColumns = (context: ServerColumnsContext): ColumnDef<ServerLi
   },
   {
     accessorKey: "address",
-    header: () => (
+    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Address"
         field="address"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
     cell: ({ row }) => {
@@ -128,25 +128,25 @@ export const serverColumns = (context: ServerColumnsContext): ColumnDef<ServerLi
   },
   {
     accessorKey: "game",
-    header: () => (
+    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Game"
         field="game"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
   },
   {
     accessorKey: "activePlayers",
-    header: () => (
+    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Players"
         field="activePlayers"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
     cell: ({ row }) => {
@@ -160,13 +160,13 @@ export const serverColumns = (context: ServerColumnsContext): ColumnDef<ServerLi
   },
   {
     accessorKey: "activeMap",
-    header: () => (
+    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Current Map"
         field="activeMap"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
     cell: ({ row }) => {
@@ -176,13 +176,13 @@ export const serverColumns = (context: ServerColumnsContext): ColumnDef<ServerLi
   },
   {
     accessorKey: "lastEvent",
-    header: () => (
+    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
       <DataTableColumnHeader
         title="Last Event"
         field="lastEvent"
-        sortField={context.sortField}
-        sortOrder={context.sortOrder}
-        onSort={context.onSort}
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
       />
     ),
     cell: ({ row }) => {
@@ -193,18 +193,18 @@ export const serverColumns = (context: ServerColumnsContext): ColumnDef<ServerLi
   },
   {
     id: "actions",
-    header: () => (
+    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
       <div className="flex items-center justify-end pr-3 pl-1">
         <Button
           variant="ghost"
           className="size-8 p-0 group"
-          onClick={context.onRefresh}
-          disabled={context.isPending}
+          onClick={props.onRefresh}
+          disabled={props.isPending}
         >
           <RotateCw
             className={cn(
               "size-4",
-              context.isPending ? "animate-spin" : "",
+              props.isPending ? "animate-spin" : "",
               "text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200",
             )}
           />

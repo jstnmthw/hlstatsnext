@@ -4,8 +4,7 @@ import { useCallback } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTable } from "./data-table"
 import { FilterConfig } from "../types/data-table"
-import { useDataTableUrl } from "../hooks/use-data-table-url"
-import { DataTableConfig, DataTableUrlState } from "../types/data-table"
+import { useDataTableUrl, DataTableConfig, DataTableUrlState } from "../hooks/use-data-table-url"
 
 interface ServerDataTableProps<TData, TValue> {
   data: TData[]

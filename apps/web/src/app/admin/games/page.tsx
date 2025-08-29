@@ -6,7 +6,7 @@ import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { AdminTable } from "@/features/admin/common/components/data-table"
+import { AdminGamesTable } from "@/features/admin/games/components/admin-games-table"
 import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 import {
   GET_GAMES_WITH_PAGINATION,
@@ -69,8 +69,7 @@ export default async function GamesPage(props: AdminPageProps) {
               </Button>
             </div>
           </div>
-          <AdminTable
-            tableType="games"
+          <AdminGamesTable
             data={games}
             totalCount={totalCount}
             currentPage={params.page}

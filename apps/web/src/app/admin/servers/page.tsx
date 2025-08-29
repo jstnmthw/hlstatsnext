@@ -6,7 +6,7 @@ import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { AdminTable } from "@/features/admin/common/components/data-table"
+import { AdminServersTable } from "@/features/admin/servers/components/admin-servers-table"
 import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 import {
   GET_SERVERS_WITH_PAGINATION,
@@ -69,8 +69,7 @@ export default async function ServersPage(props: AdminPageProps) {
               </Button>
             </div>
           </div>
-          <AdminTable
-            tableType="servers"
+          <AdminServersTable
             data={servers}
             totalCount={totalCount}
             currentPage={params.page}

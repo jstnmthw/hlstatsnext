@@ -11,3 +11,21 @@ export const CREATE_SERVER_MUTATION = graphql(`
     }
   }
 `)
+
+export const UPDATE_SERVER_MUTATION = graphql(`
+  mutation UpdateServer($where: ServerWhereUniqueInput!, $data: ServerUpdateInput!) {
+    updateOneServer(where: $where, data: $data) {
+      serverId
+      name
+      address
+      port
+      game
+      publicAddress
+      statusUrl
+      rconPassword
+      connectionType
+      dockerHost
+      sortOrder
+    }
+  }
+`)

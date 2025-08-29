@@ -46,3 +46,21 @@ export const GET_SERVER_COUNT = gql`
     countServer(where: $where)
   }
 `
+
+export const GET_SERVER_BY_ID = gql`
+  query GetServerById($serverId: Int!) {
+    findUniqueServer(where: { serverId: $serverId }) {
+      serverId
+      name
+      address
+      port
+      game
+      publicAddress
+      statusUrl
+      rconPassword
+      connectionType
+      dockerHost
+      sortOrder
+    }
+  }
+`

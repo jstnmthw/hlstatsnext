@@ -1,3 +1,4 @@
+import Link from "next/link"
 import {
   Badge,
   Button,
@@ -267,7 +268,9 @@ export const serverColumns = (): ColumnDef<ServerListItem>[] => [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View server details</DropdownMenuItem>
-            <DropdownMenuItem>Edit server</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/admin/servers/${server.serverId}/edit`}>Edit server</Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

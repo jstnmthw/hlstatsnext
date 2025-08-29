@@ -6,7 +6,7 @@ import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { GameDataTable } from "@/features/admin/games/components/game-data-table"
+import { AdminTable } from "@/features/admin/components/admin-table"
 import {
   GET_GAMES_WITH_PAGINATION,
   GET_GAME_COUNT,
@@ -16,22 +16,14 @@ import {
   buildPaginationVariables,
   buildCountVariables,
 } from "@/features/common/graphql/pagination"
+import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 
 export const metadata: Metadata = {
   title: "Manage Games - " + process.env.NEXT_PUBLIC_APP_NAME,
   description: "Manage supported games and their configurations.",
 }
 
-interface GamesPageProps {
-  searchParams: Promise<{
-    page?: string
-    sortField?: string
-    sortOrder?: string
-    search?: string
-  }>
-}
-
-export default async function GamesPage(props: GamesPageProps) {
+export default async function GamesPage(props: AdminPageProps) {
   const searchParams = await props.searchParams
 
   // Parse URL parameters using shared utility
@@ -77,14 +69,15 @@ export default async function GamesPage(props: GamesPageProps) {
               </Button>
             </div>
           </div>
-          <GameDataTable
+          <AdminTable
+            tableType="games"
             data={games}
             totalCount={totalCount}
             currentPage={params.page}
             pageSize={params.pageSize}
             sortField={params.sortField}
             sortOrder={params.sortOrder}
-            search={params.search}
+            searchValue={params.search}
           />
         </div>
       </MainContent>

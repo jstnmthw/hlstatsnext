@@ -6,7 +6,7 @@ import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { ServerTable } from "@/features/admin/servers/components/server-table"
+import { AdminTable } from "@/features/admin/components/admin-table"
 import {
   GET_SERVERS_WITH_PAGINATION,
   GET_SERVER_COUNT,
@@ -16,22 +16,14 @@ import {
   buildPaginationVariables,
   buildCountVariables,
 } from "@/features/common/graphql/pagination"
+import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 
 export const metadata: Metadata = {
   title: "Manage Servers - " + process.env.NEXT_PUBLIC_APP_NAME,
   description: "Manage your game servers and track player statistics and activities.",
 }
 
-interface ServersPageProps {
-  searchParams: Promise<{
-    page?: string
-    sortField?: string
-    sortOrder?: string
-    search?: string
-  }>
-}
-
-export default async function ServersPage(props: ServersPageProps) {
+export default async function ServersPage(props: AdminPageProps) {
   const searchParams = await props.searchParams
 
   // Parse URL parameters using shared utility
@@ -77,14 +69,15 @@ export default async function ServersPage(props: ServersPageProps) {
               </Button>
             </div>
           </div>
-          <ServerTable
+          <AdminTable
+            tableType="servers"
             data={servers}
             totalCount={totalCount}
             currentPage={params.page}
             pageSize={params.pageSize}
             sortField={params.sortField}
             sortOrder={params.sortOrder}
-            search={params.search}
+            searchValue={params.search}
           />
         </div>
       </MainContent>

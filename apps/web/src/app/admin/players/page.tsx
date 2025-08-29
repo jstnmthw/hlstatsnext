@@ -6,7 +6,7 @@ import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { PlayerDataTable } from "@/features/admin/players/components/player-data-table"
+import { AdminTable } from "@/features/admin/components/admin-table"
 import {
   GET_PLAYERS_WITH_PAGINATION,
   GET_PLAYER_COUNT,
@@ -16,22 +16,14 @@ import {
   buildPaginationVariables,
   buildCountVariables,
 } from "@/features/common/graphql/pagination"
+import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 
 export const metadata: Metadata = {
   title: "Manage Players - " + process.env.NEXT_PUBLIC_APP_NAME,
   description: "Manage your game players and track their statistics and activities.",
 }
 
-interface PlayersPageProps {
-  searchParams: Promise<{
-    page?: string
-    sortField?: string
-    sortOrder?: string
-    search?: string
-  }>
-}
-
-export default async function PlayersPage(props: PlayersPageProps) {
+export default async function PlayersPage(props: AdminPageProps) {
   const searchParams = await props.searchParams
 
   // Parse URL parameters using shared utility
@@ -73,18 +65,19 @@ export default async function PlayersPage(props: PlayersPageProps) {
             </div>
             <div>
               <Button variant="solid" colorScheme="green" size="sm">
-                <Link href="/admin/servers/add">Add Server</Link>
+                <Link href="/admin/players/add">Add Player</Link>
               </Button>
             </div>
           </div>
-          <PlayerDataTable
+          <AdminTable
+            tableType="players"
             data={players}
             totalCount={totalCount}
             currentPage={params.page}
             pageSize={params.pageSize}
             sortField={params.sortField}
             sortOrder={params.sortOrder}
-            search={params.search}
+            searchValue={params.search}
           />
         </div>
       </MainContent>

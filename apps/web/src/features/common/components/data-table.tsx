@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useCallback } from "react"
 
 import {
   ColumnDef,
@@ -27,114 +27,236 @@ import {
   SearchIcon,
 } from "@repo/ui"
 
-import { FilterConfig, DataTableOptions } from "@/features/common/types/data-table"
+import { useDataTableUrl, DataTableConfig } from "@/features/common/hooks/use-data-table-url"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  filterConfig?: FilterConfig
-  options: DataTableOptions
+export interface DataTableProps<T> {
+  // Data
+  data: T[]
+  columns: ColumnDef<T>[]
+
+  // Server-side props (for server-rendered tables)
+  totalCount?: number
+  currentPage?: number
+  pageSize?: number
+  sortField?: string
+  sortOrder?: "asc" | "desc"
+  searchValue?: string
+
+  // Configuration for server-side behavior
+  serverConfig?: DataTableConfig
+
+  // Features (all optional with sensible defaults)
+  enablePagination?: boolean
+  enableSorting?: boolean
+  enableFiltering?: boolean
+  enableColumnVisibility?: boolean
+  enableRowSelection?: boolean
+  enableActions?: boolean
+
+  // UI Configuration
+  filterPlaceholder?: string
+
+  // Server-side callbacks (when provided, enables server mode)
+  onPageChange?: (page: number) => void
+  onSort?: (field: string, order: "asc" | "desc") => void
+  onSearch?: (value: string) => void
+  onRefresh?: () => void
+
+  // UI state
+  isLoading?: boolean
 }
 
-export function DataTable<TData, TValue>({
-  columns,
+export function DataTable<T>({
   data,
-  filterConfig,
-  options,
-}: DataTableProps<TData, TValue>) {
+  columns,
+  totalCount = 0,
+  currentPage = 1,
+  pageSize = 10,
+  sortField,
+  sortOrder = "asc",
+  searchValue = "",
+  serverConfig,
+  enablePagination = true,
+  enableSorting = true,
+  enableFiltering = true,
+  enableColumnVisibility = true,
+  enableRowSelection = true,
+  enableActions = true,
+  filterPlaceholder = "Search...",
+  onPageChange,
+  onSort,
+  onSearch,
+  onRefresh, // eslint-disable-line @typescript-eslint/no-unused-vars
+  isLoading = false,
+}: DataTableProps<T>) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
-  const [searchValue, setSearchValue] = useState(options.search || "")
+  const [searchInput, setSearchInput] = useState(searchValue)
+
+  // Determine if we're in server mode
+  const isServerMode = !!(onPageChange || onSort || onSearch)
+
+  // Use URL hooks only in server mode
+  const urlHooks = useDataTableUrl(
+    serverConfig || {
+      defaultSortField: sortField || "",
+      defaultSortOrder: sortOrder,
+      defaultPageSize: pageSize,
+    },
+  )
+
+  const { handleSort, handlePageChange, handleSearch, handleRefresh, isPending } = isServerMode
+    ? urlHooks
+    : {
+        handleSort: () => {},
+        handlePageChange: () => {},
+        handleSearch: () => {},
+        handleRefresh: () => {},
+        isPending: false,
+      }
+
+  // Filter out actions column if actions are disabled
+  const filteredColumns = enableActions ? columns : columns.filter((col) => col.id !== "actions")
 
   const table = useReactTable({
     data,
-    columns,
+    columns: filteredColumns,
     getCoreRowModel: getCoreRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    manualPagination: true,
-    manualSorting: true,
-    manualFiltering: true,
+    onColumnVisibilityChange: enableColumnVisibility ? setColumnVisibility : undefined,
+    onRowSelectionChange: enableRowSelection ? setRowSelection : undefined,
+    manualPagination: isServerMode,
+    manualSorting: isServerMode && enableSorting,
+    manualFiltering: isServerMode && enableFiltering,
     state: {
       sorting: [],
       columnFilters: [],
       columnVisibility,
       rowSelection,
       pagination: {
-        pageIndex: (options.currentPage || 1) - 1,
-        pageSize: options.pageSize || 10,
+        pageIndex: currentPage - 1,
+        pageSize: pageSize,
       },
     },
-    pageCount: Math.ceil((options.totalCount || 0) / (options.pageSize || 10)),
+    pageCount: isServerMode ? Math.ceil(totalCount / pageSize) : -1,
   })
 
   const paginationInfo = useMemo(() => {
-    const startItem = options.totalCount > 0 ? (options.currentPage - 1) * options.pageSize + 1 : 0
-    const endItem = Math.min(options.currentPage * options.pageSize, options.totalCount)
-    const canPreviousPage = options.currentPage > 1
-    const canNextPage = options.currentPage < Math.ceil(options.totalCount / options.pageSize)
+    const totalItems = isServerMode ? totalCount : data.length
+    const startItem = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0
+    const endItem = Math.min(currentPage * pageSize, totalItems)
+    const canPreviousPage = currentPage > 1
+    const canNextPage = currentPage < Math.ceil(totalItems / pageSize)
 
-    return { startItem, endItem, totalCount: options.totalCount, canPreviousPage, canNextPage }
-  }, [options])
+    return { startItem, endItem, totalCount: totalItems, canPreviousPage, canNextPage }
+  }, [currentPage, pageSize, totalCount, data.length, isServerMode])
 
-  const handleSearchSubmit = () => {
-    options.onSearch(searchValue)
-  }
+  const handleSearchSubmit = useCallback(() => {
+    if (isServerMode && serverConfig) {
+      const currentState = {
+        page: currentPage,
+        pageSize,
+        sortField: sortField || "",
+        sortOrder,
+        search: searchInput,
+      }
+      handleSearch(searchInput, currentState)
+    }
+  }, [
+    isServerMode,
+    serverConfig,
+    searchInput,
+    currentPage,
+    pageSize,
+    sortField,
+    sortOrder,
+    handleSearch,
+  ])
+
+  const handlePageChangeWrapper = useCallback(
+    (page: number) => {
+      if (isServerMode && serverConfig) {
+        const currentState = {
+          page: currentPage,
+          pageSize,
+          sortField: sortField || "",
+          sortOrder,
+          search: searchValue,
+        }
+        handlePageChange(page, currentState)
+      }
+    },
+    [
+      isServerMode,
+      serverConfig,
+      currentPage,
+      pageSize,
+      sortField,
+      sortOrder,
+      searchValue,
+      handlePageChange,
+    ],
+  )
+
+  const loading = isLoading || (isServerMode ? isPending : false)
 
   return (
     <>
       <div className="flex items-center py-4">
-        {filterConfig && (
+        {enableFiltering && (
           <div className="flex gap-2">
             <Input
-              placeholder={filterConfig.placeholder}
-              value={searchValue}
-              onChange={(event) => setSearchValue(event.target.value)}
+              placeholder={filterPlaceholder}
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   handleSearchSubmit()
                 }
               }}
               className="max-w-sm dark:bg-zinc-950"
-              disabled={options.isPending}
+              disabled={loading}
             />
             <Button
               variant="outline"
               colorScheme="dark"
               onClick={handleSearchSubmit}
-              disabled={options.isPending}
+              disabled={loading}
             >
               <SearchIcon className="size-4" data-slot="icon" />
             </Button>
           </div>
         )}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" colorScheme="light" className="ml-auto">
-              <Settings2Icon className="size-4" data-slot="icon" /> View
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                )
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+
+        {enableColumnVisibility && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" colorScheme="light" className="ml-auto">
+                <Settings2Icon className="size-4" data-slot="icon" /> View
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  )
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
+
       <div className="overflow-hidden rounded-md border border-border">
-        <div className={`${options.isPending ? "opacity-75" : ""} transition-opacity duration-200`}>
+        <div className={`${loading ? "opacity-75" : ""} transition-opacity duration-200`}>
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -146,11 +268,26 @@ export function DataTable<TData, TValue>({
                           ? null
                           : flexRender(header.column.columnDef.header, {
                               ...header.getContext(),
-                              sortField: options.sortField,
-                              sortOrder: options.sortOrder,
-                              onSort: options.onSort,
-                              onRefresh: options.onRefresh,
-                              isPending: options.isPending,
+                              sortField: sortField,
+                              sortOrder: sortOrder,
+                              onSort: isServerMode
+                                ? (field: string) => {
+                                    const currentState = {
+                                      page: currentPage,
+                                      pageSize,
+                                      sortField: sortField || "",
+                                      sortOrder,
+                                      search: searchValue,
+                                    }
+                                    handleSort(field, currentState)
+                                  }
+                                : undefined,
+                              onRefresh: isServerMode
+                                ? () => {
+                                    handleRefresh()
+                                  }
+                                : undefined,
+                              isPending: loading,
                             })}
                       </TableHead>
                     )
@@ -171,7 +308,7 @@ export function DataTable<TData, TValue>({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <TableCell colSpan={filteredColumns.length} className="h-24 text-center">
                     No results.
                   </TableCell>
                 </TableRow>
@@ -180,28 +317,31 @@ export function DataTable<TData, TValue>({
           </Table>
         </div>
       </div>
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="text-sm text-muted-foreground">
-          Showing {paginationInfo.startItem} to {paginationInfo.endItem} of{" "}
-          {paginationInfo.totalCount} results
+
+      {enablePagination && (
+        <div className="flex items-center justify-between space-x-2 py-4">
+          <div className="text-sm text-muted-foreground">
+            Showing {paginationInfo.startItem} to {paginationInfo.endItem} of{" "}
+            {paginationInfo.totalCount} results
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => handlePageChangeWrapper(currentPage - 1)}
+              disabled={!paginationInfo.canPreviousPage || loading}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handlePageChangeWrapper(currentPage + 1)}
+              disabled={!paginationInfo.canNextPage || loading}
+            >
+              Next
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => options.onPageChange(options.currentPage - 1)}
-            disabled={!paginationInfo.canPreviousPage || options.isPending}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => options.onPageChange(options.currentPage + 1)}
-            disabled={!paginationInfo.canNextPage || options.isPending}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      )}
     </>
   )
 }

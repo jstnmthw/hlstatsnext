@@ -1,7 +1,7 @@
 /* Dark Theme Variables */
 :root {
   --font-size-base: 14px;
-  --background: oklch(0.141 0.005 285.823);
+  --background: oklch(0.184 0.00812 285.546);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.21 0.006 285.885);
   --card-foreground: oklch(0.985 0 0);
@@ -16,9 +16,9 @@
   --accent: oklch(0.21 0.006 285.885);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(28.636% 0.00737 17.35);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 20%);
+  --destructive-foreground: oklch(0.286 0.00737 17.35);
+  --border: oklch(1 0 275 / 0.165);
+  --input: oklch(1 0 0 / 0.2);
   --ring: oklch(0.486 0.259 277);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -31,6 +31,6 @@
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.274 0.006 286.033);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-border: oklch(1 0 0 / 0.1);
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }

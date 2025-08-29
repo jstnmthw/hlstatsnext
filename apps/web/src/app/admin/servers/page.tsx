@@ -6,7 +6,8 @@ import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { AdminTable } from "@/features/admin/components/admin-table"
+import { AdminTable } from "@/features/admin/common/components/data-table"
+import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 import {
   GET_SERVERS_WITH_PAGINATION,
   GET_SERVER_COUNT,
@@ -16,7 +17,6 @@ import {
   buildPaginationVariables,
   buildCountVariables,
 } from "@/features/common/graphql/pagination"
-import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 
 export const metadata: Metadata = {
   title: "Manage Servers - " + process.env.NEXT_PUBLIC_APP_NAME,

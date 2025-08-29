@@ -1,3 +1,4 @@
+import Link from "next/link"
 import {
   cn,
   Button,
@@ -9,7 +10,6 @@ import {
   GaugeIcon,
   GamepadIcon,
 } from "@repo/ui"
-import Link from "next/link"
 
 const navItems = [
   {
@@ -55,7 +55,7 @@ interface NavbarProps {
 
 export function Navbar({ currentPath }: NavbarProps) {
   return (
-    <nav className="flex items-center justify-between border-b border-border">
+    <nav className="flex items-center justify-between border-b border-zinc-600 bg-zinc-950">
       <ul className="flex items-center gap-6 container">
         {navItems.map((item) => {
           const isActive =
@@ -65,7 +65,7 @@ export function Navbar({ currentPath }: NavbarProps) {
           return (
             <li key={item.href} className="relative py-2">
               {isActive && (
-                <span className="absolute inset-0 bg-radial-[at_50%_75%] from-indigo-500  to-zinc-950 from-0% to-75% opacity-20"></span>
+                <span className="absolute inset-0 bg-radial-[at_50%_75%] from-indigo-500 to-transparent from-0% to-75% opacity-20"></span>
               )}
               <Button
                 variant="ghost"

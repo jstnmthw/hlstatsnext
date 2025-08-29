@@ -1,6 +1,6 @@
 import Link from "next/link"
-import { Badge, cn } from "@repo/ui"
-import { SettingsIcon } from "lucide-react"
+import { Badge, Button, cn } from "@repo/ui"
+import { PaintbrushIcon, SettingsIcon } from "lucide-react"
 import { AppLogo } from "@/features/common/components/app-logo"
 import { Navbar } from "./navbar"
 
@@ -8,6 +8,18 @@ const navItems = [
   {
     label: "UI Kit",
     href: "/admin/ui-kit",
+    icon: (
+      <PaintbrushIcon className="size-4" aria-label="UI Kit" aria-hidden="true" data-slot="icon" />
+    ),
+    iconOnly: true,
+  },
+  {
+    label: "Settings",
+    href: "/admin/settings",
+    icon: (
+      <SettingsIcon className="size-4" aria-label="Settings" aria-hidden="true" data-slot="icon" />
+    ),
+    iconOnly: true,
   },
 ]
 
@@ -19,7 +31,7 @@ interface AdminHeaderProps {
 export function AdminHeader({ className, currentPath }: AdminHeaderProps) {
   return (
     <>
-      <header className={cn("w-full", className)}>
+      <header className={cn("w-full bg-zinc-950", className)}>
         <div className={cn("py-6 flex justify-between items-center container")}>
           <div className="flex items-center gap-2">
             <AppLogo showVersion={false} />
@@ -27,19 +39,21 @@ export function AdminHeader({ className, currentPath }: AdminHeaderProps) {
               Admin
             </Badge>
           </div>
-          <nav className="flex items-center gap-8">
+          <nav className="flex items-center gap-1">
             {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="uppercase tracking-tight text-sm font-semibold text-zinc-400 hover:text-white transition-colors"
-              >
-                {item.label}
-              </Link>
+              <Button key={item.href} variant="outline" colorScheme="zinc" size="icon-sm" asChild>
+                <Link key={item.href} href={item.href} aria-label={item.label}>
+                  {item.iconOnly ? (
+                    item.icon
+                  ) : (
+                    <>
+                      {item.icon}
+                      {item.label}
+                    </>
+                  )}
+                </Link>
+              </Button>
             ))}
-            <Link href="/admin" className="text-zinc-400 hover:text-white transition-colors">
-              <SettingsIcon className="size-4" />
-            </Link>
           </nav>
         </div>
       </header>

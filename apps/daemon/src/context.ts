@@ -23,6 +23,7 @@ import { DatabaseClient } from "@/database/client"
 import { QueueModule } from "@/shared/infrastructure/messaging/module"
 import { IngressService } from "@/modules/ingress/ingress.service"
 import { PlayerEventHandler } from "@/modules/player/player.events"
+import { systemClock } from "@/shared/infrastructure/time"
 import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
 import { MatchEventHandler } from "@/modules/match/match.events"
 import { ActionEventHandler } from "@/modules/action/action.events"
@@ -38,6 +39,8 @@ import { createRepositories } from "@/shared/application/orchestrators/repositor
 import { createBusinessServices } from "@/shared/application/orchestrators/business-service.orchestrator"
 import { createEventHandlers } from "@/shared/application/orchestrators/event-handler.orchestrator"
 import { createQueueModule } from "@/shared/infrastructure/factories/queue-module.factory"
+import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
+import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 
 // Types
 export interface AppContext {
@@ -88,6 +91,10 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   // Create infrastructure components
   const infrastructure = createInfrastructureComponents()
 
+  // Initialize UUID service for message ID generation (CRITICAL: must be done before parsers are used)
+  setUuidService(new SystemUuidService(systemClock))
+  infrastructure.logger.debug("UUID service initialized for message ID generation")
+
   // Create configuration objects
   const rconConfig = createRconConfig()
   const resolvedIngressOptions = createIngressConfig(ingressOptions)
@@ -112,6 +119,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     services.serverService,
     services.gameDetectionService,
     infrastructure.logger,
+    systemClock,
   )
 
   const ingressService = new IngressService(

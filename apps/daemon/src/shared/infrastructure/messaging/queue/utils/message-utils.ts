@@ -5,61 +5,61 @@
  * queue-related helper functions.
  */
 
-import { randomBytes } from "crypto"
+import type { IUuidService } from "@/shared/infrastructure/identifiers/uuid.interface"
+
+// Default UUID service instance (will be set by dependency injection in production)
+let uuidService: IUuidService | null = null
+
+/**
+ * Set the UUID service instance (for dependency injection)
+ */
+export function setUuidService(service: IUuidService): void {
+  uuidService = service
+}
+
+/**
+ * Get the current UUID service instance
+ */
+export function getUuidService(): IUuidService {
+  if (!uuidService) {
+    throw new Error("UUID service not initialized. Call setUuidService() first.")
+  }
+  return uuidService
+}
 
 /**
  * Generates a unique message ID using timestamp and random bytes
  */
 export function generateMessageId(): string {
-  const timestamp = Date.now().toString(36)
-  const random = randomBytes(8).toString("hex")
-  return `msg_${timestamp}_${random}`
+  return getUuidService().generateMessageId()
 }
 
 /**
  * Generates a correlation ID for distributed tracing
  */
 export function generateCorrelationId(): string {
-  const timestamp = Date.now().toString(36)
-  const random = randomBytes(6).toString("hex")
-  return `corr_${timestamp}_${random}`
+  return getUuidService().generateCorrelationId()
 }
 
 /**
  * Validates a message ID format
  */
 export function isValidMessageId(messageId: string): boolean {
-  return /^msg_[a-z0-9]{6,12}_[a-f0-9]{16}$/.test(messageId)
+  return getUuidService().isValidMessageId(messageId)
 }
 
 /**
  * Validates a correlation ID format
  */
 export function isValidCorrelationId(correlationId: string): boolean {
-  return /^corr_[a-z0-9]+_[a-f0-9]{12}$/.test(correlationId)
+  return getUuidService().isValidCorrelationId(correlationId)
 }
 
 /**
  * Extracts timestamp from message ID
  */
 export function extractTimestampFromMessageId(messageId: string): number | null {
-  const match = messageId.match(/^msg_([a-z0-9]{6,12})_[a-f0-9]{16}$/)
-  if (!match || !match[1]) return null
-
-  try {
-    const timestamp = parseInt(match[1], 36)
-    // Validate that the timestamp is a reasonable value
-    if (
-      !Number.isFinite(timestamp) ||
-      timestamp < 0 ||
-      timestamp > Date.now() + 365 * 24 * 60 * 60 * 1000
-    ) {
-      return null
-    }
-    return timestamp
-  } catch {
-    return null
-  }
+  return getUuidService().extractTimestampFromMessageId(messageId)
 }
 
 /**
@@ -69,6 +69,8 @@ export function calculateMessageAge(messageId: string): number | null {
   const timestamp = extractTimestampFromMessageId(messageId)
   if (!timestamp) return null
 
+  // Note: We can't use clock service here without injecting it, but this function
+  // is less critical for deterministic testing since it's mostly used for monitoring
   return Date.now() - timestamp
 }
 

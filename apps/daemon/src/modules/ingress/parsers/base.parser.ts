@@ -5,6 +5,7 @@
  */
 
 import type { BaseEvent } from "@/shared/types/events"
+import type { IClock } from "@/shared/infrastructure/time/clock.interface"
 
 export interface ParseResult {
   event: BaseEvent | null
@@ -13,7 +14,10 @@ export interface ParseResult {
 }
 
 export abstract class BaseParser {
-  constructor(protected readonly game: string) {}
+  constructor(
+    protected readonly game: string,
+    protected readonly clock: IClock,
+  ) {}
 
   abstract parseLine(logLine: string, serverId: number): ParseResult
 
@@ -27,7 +31,7 @@ export abstract class BaseParser {
         }
       }
     }
-    return new Date()
+    return this.clock.now()
   }
 
   protected extractQuotedValue(text: string, key: string): string | null {

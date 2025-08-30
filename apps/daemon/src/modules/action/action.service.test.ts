@@ -23,6 +23,7 @@ const createMockActionRepository = (): IActionRepository => ({
   logPlayerPlayerAction: vi.fn(),
   logTeamActionForPlayer: vi.fn(),
   logWorldAction: vi.fn(),
+  logTeamActionBatch: vi.fn(),
 })
 
 describe("ActionService", () => {
@@ -42,6 +43,8 @@ describe("ActionService", () => {
       getPlayerRating: vi.fn(),
       updatePlayerRatings: vi.fn(),
       handlePlayerEvent: vi.fn(),
+      getPlayerStatsBatch: vi.fn().mockResolvedValue(new Map()),
+      updatePlayerStatsBatch: vi.fn().mockResolvedValue(undefined),
     }
     mockMatchService = {
       getPlayersByTeam: vi.fn().mockReturnValue([]),
@@ -237,24 +240,28 @@ describe("ActionService", () => {
       vi.mocked(mockMatchService.getPlayersByTeam).mockReturnValue([1, 2, 0, -1])
       await actionService.handleActionEvent(actionEvent)
 
-      // Team bonus rows persisted for each teammate; bonus column equals rewardTeam (2)
-      expect(mockRepository.logTeamActionForPlayer).toHaveBeenCalledWith(
-        1,
-        42,
-        10,
-        expect.any(String),
-        2,
-      )
-      expect(mockRepository.logTeamActionForPlayer).toHaveBeenCalledWith(
-        2,
-        42,
-        10,
-        expect.any(String),
-        2,
-      )
-      // Skill awarded to valid teammates
-      expect(mockPlayerService.updatePlayerStats).toHaveBeenCalledWith(1, { skill: 2 })
-      expect(mockPlayerService.updatePlayerStats).toHaveBeenCalledWith(2, { skill: 2 })
+      // Team bonus rows persisted as batch; bonus column equals rewardTeam (2)
+      expect(mockRepository.logTeamActionBatch).toHaveBeenCalledWith([
+        {
+          playerId: 1,
+          serverId: 42,
+          actionId: 10,
+          map: expect.any(String),
+          bonus: 2,
+        },
+        {
+          playerId: 2,
+          serverId: 42,
+          actionId: 10,
+          map: expect.any(String),
+          bonus: 2,
+        },
+      ])
+      // Skill awarded to valid teammates as batch
+      expect(mockPlayerService.updatePlayerStatsBatch).toHaveBeenCalledWith([
+        { playerId: 1, skillDelta: 2 },
+        { playerId: 2, skillDelta: 2 },
+      ])
     })
 
     it("should add extra event bonus to rewardTeam when logging team bonus rows", async () => {
@@ -290,23 +297,27 @@ describe("ActionService", () => {
       await actionService.handleActionEvent(actionEvent)
 
       // Expect bonus column to contain rewardTeam + bonus = 3 + 4 = 7
-      expect(mockRepository.logTeamActionForPlayer).toHaveBeenCalledWith(
-        5,
-        100,
-        11,
-        expect.any(String),
-        7,
-      )
-      expect(mockRepository.logTeamActionForPlayer).toHaveBeenCalledWith(
-        9,
-        100,
-        11,
-        expect.any(String),
-        7,
-      )
-      // Skill update uses the same total
-      expect(mockPlayerService.updatePlayerStats).toHaveBeenCalledWith(5, { skill: 7 })
-      expect(mockPlayerService.updatePlayerStats).toHaveBeenCalledWith(9, { skill: 7 })
+      expect(mockRepository.logTeamActionBatch).toHaveBeenCalledWith([
+        {
+          playerId: 5,
+          serverId: 100,
+          actionId: 11,
+          map: expect.any(String),
+          bonus: 7,
+        },
+        {
+          playerId: 9,
+          serverId: 100,
+          actionId: 11,
+          map: expect.any(String),
+          bonus: 7,
+        },
+      ])
+      // Skill update uses the same total as batch
+      expect(mockPlayerService.updatePlayerStatsBatch).toHaveBeenCalledWith([
+        { playerId: 5, skillDelta: 7 },
+        { playerId: 9, skillDelta: 7 },
+      ])
     })
 
     it("should handle ACTION_WORLD events", async () => {
@@ -451,6 +462,8 @@ describe("ActionService", () => {
         getTopPlayers: vi.fn().mockResolvedValue([]),
         getRoundParticipants: vi.fn().mockResolvedValue([]),
         handlePlayerEvent: vi.fn().mockResolvedValue({ success: true }),
+        getPlayerStatsBatch: vi.fn().mockResolvedValue(new Map()),
+        updatePlayerStatsBatch: vi.fn().mockResolvedValue(undefined),
       }
 
       // Create service with player service

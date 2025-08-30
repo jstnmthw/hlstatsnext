@@ -189,4 +189,41 @@ export class ActionRepository implements IActionRepository {
       this.logger.error(`Failed to log suicide in ActionRepository helper: ${String(error)}`)
     }
   }
+
+  /**
+   * Batch method to log team actions for multiple players
+   * Prevents N+1 queries when awarding team bonuses
+   */
+  async logTeamActionBatch(
+    teamActions: Array<{
+      playerId: number
+      serverId: number
+      actionId: number
+      map: string
+      bonus: number
+    }>,
+  ): Promise<void> {
+    try {
+      if (teamActions.length === 0) {
+        return
+      }
+
+      // Use createMany for efficient batch insert
+      await this.database.prisma.eventTeamBonus.createMany({
+        data: teamActions.map((action) => ({
+          eventTime: new Date(),
+          playerId: action.playerId > 0 ? action.playerId : 0,
+          serverId: action.serverId,
+          actionId: action.actionId,
+          map: action.map || "",
+          bonus: action.bonus,
+        })),
+        skipDuplicates: true,
+      })
+
+      this.logger.debug(`Batch logged ${teamActions.length} team actions`)
+    } catch (error) {
+      throw new Error(`Failed to batch log team actions: ${error}`)
+    }
+  }
 }

@@ -10,12 +10,9 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import type { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
-
-// Mock the message utils
-vi.mock("@/shared/infrastructure/messaging/queue/utils/message-utils", () => ({
-  generateMessageId: vi.fn().mockReturnValue("generated-msg-123"),
-  generateCorrelationId: vi.fn().mockReturnValue("generated-corr-456"),
-}))
+import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
+import { systemClock } from "@/shared/infrastructure/time"
 
 describe("RabbitMQEventProcessor", () => {
   let processor: RabbitMQEventProcessor
@@ -24,6 +21,9 @@ describe("RabbitMQEventProcessor", () => {
   let mockCoordinators: EventCoordinator[]
 
   beforeEach(() => {
+    // Initialize UUID service for all tests
+    setUuidService(new SystemUuidService(systemClock))
+
     mockLogger = {
       debug: vi.fn(),
       info: vi.fn(),

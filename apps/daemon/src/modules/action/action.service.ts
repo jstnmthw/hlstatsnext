@@ -1,5 +1,68 @@
 /**
  * Action Service
+ *
+ * Processes game action events with validation and batch optimizations.
+ *
+ * This service handles four types of action events:
+ * - Player Actions: Individual player actions (kills, objectives, etc.)
+ * - Player-vs-Player Actions: Actions involving two players (kills, damage, etc.)
+ * - Team Actions: Actions affecting entire teams (round wins, objectives, etc.)
+ * - World Actions: Server/map-level actions (map changes, server events, etc.)
+ *
+ * ## Architecture
+ *
+ * The service uses a validator-based architecture to reduce cyclomatic complexity:
+ *
+ * ```
+ * ActionService
+ * ├── ActionDefinitionValidator → Validates action definitions & types
+ * ├── PlayerValidator          → Validates player existence & resolution
+ * ├── MapResolver              → Resolves current map context
+ * └── Business Logic           → Core action processing & rewards
+ * ```
+ *
+ * ## Key Features
+ *
+ * - **Low Complexity**: Reduced from CC=9 to CC=4-5 per method
+ * - **Batch Operations**: Prevents N+1 queries for team actions
+ * - **Graceful Degradation**: Unknown actions/players don't fail system
+ * - **Context Resolution**: Automatic player resolution via metadata
+ * - **Comprehensive Logging**: Action tracking with point calculations
+ *
+ * ## Performance Optimizations
+ *
+ * - **Batch Player Lookups**: Single query for multiple players
+ * - **Batch Skill Updates**: Grouped updates by skill delta
+ * - **Batch Action Logging**: Single query for team action logs
+ * - **Early Returns**: Fast exit on invalid data
+ *
+ * @example Basic Usage
+ * ```typescript
+ * const actionService = new ActionService(repository, logger, playerService, matchService, rconService)
+ *
+ * const result = await actionService.handleActionEvent({
+ *   eventType: EventType.ACTION_PLAYER,
+ *   data: { playerId: 123, actionCode: 'Kill', game: 'cstrike' },
+ *   serverId: 1,
+ *   timestamp: new Date()
+ * })
+ *
+ * if (result.success) {
+ *   console.log(`Processed action affecting ${result.affected} players`)
+ * }
+ * ```
+ *
+ * @example Team Action Processing
+ * ```typescript
+ * // Team actions are automatically batched for performance
+ * const result = await actionService.handleActionEvent({
+ *   eventType: EventType.ACTION_TEAM,
+ *   data: { team: 'CT', actionCode: 'Round_Win', game: 'cstrike', bonus: 5 },
+ *   serverId: 1
+ * })
+ *
+ * // Processes all team members in 2-3 queries instead of N individual queries
+ * ```
  */
 
 import type {
@@ -13,17 +76,30 @@ import type {
 import type { IActionRepository } from "./action.types"
 import type { IPlayerService } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IRconService } from "@/modules/rcon/rcon.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 import { EventType } from "@/shared/types/events"
+import { ActionDefinitionValidator } from "./validators/action-definition.validator"
+import { PlayerValidator } from "./validators/player.validator"
+import { MapResolver } from "./validators/map-resolver"
 
 export class ActionService implements IActionService {
+  private readonly actionDefinitionValidator: ActionDefinitionValidator
+  private readonly playerValidator: PlayerValidator
+  private readonly mapResolver: MapResolver
+
   constructor(
     private readonly repository: IActionRepository,
     private readonly logger: ILogger,
     private readonly playerService?: IPlayerService, // Optional to avoid circular dependency
     private readonly matchService?: IMatchService, // Optional to avoid circular dependency
-  ) {}
+    private readonly rconService?: IRconService, // Optional - used for real-time map resolution
+  ) {
+    this.actionDefinitionValidator = new ActionDefinitionValidator(repository, logger)
+    this.playerValidator = new PlayerValidator(playerService, logger)
+    this.mapResolver = new MapResolver(rconService) // Use RCON service as single source of truth for maps
+  }
 
   async handleActionEvent(event: ActionEvent): Promise<HandlerResult> {
     try {
@@ -49,55 +125,34 @@ export class ActionService implements IActionService {
 
   private async handlePlayerAction(event: ActionPlayerEvent): Promise<HandlerResult> {
     try {
-      let { playerId } = event.data
       const { actionCode, game, team, bonus } = event.data
 
-      // Look up action definition from database using canonical actionCode
-      const actionDef = await this.repository.findActionByCode(game, actionCode, team)
-
-      if (!actionDef) {
-        this.logger.warn(`Unknown action code: ${actionCode} for game ${game}`)
-        return { success: true } // Don't fail on unknown actions
+      // Validate action definition
+      const actionValidation = await this.actionDefinitionValidator.validatePlayerAction(
+        game,
+        actionCode,
+        team,
+      )
+      if (actionValidation.shouldEarlyReturn) {
+        return actionValidation.earlyResult!
       }
+      const actionDef = actionValidation.actionDef!
 
-      if (!actionDef.forPlayerActions) {
-        return { success: true }
+      // Validate and resolve player
+      const playerValidation = await this.playerValidator.validateSinglePlayer(
+        event.data.playerId,
+        actionCode,
+        event.meta as { steamId?: string; playerName?: string } | undefined,
+        game,
+      )
+      if (playerValidation.shouldEarlyReturn) {
+        return playerValidation.earlyResult!
       }
+      const playerId = playerValidation.playerId
 
-      // Verify player exists; try to resolve via meta if missing
-      if (this.playerService) {
-        const existing = await this.playerService.getPlayerStats(playerId)
-        if (!existing) {
-          const meta = event.meta as { steamId?: string; playerName?: string } | undefined
-          if (meta?.steamId && meta.playerName) {
-            try {
-              const resolvedId = await this.playerService.getOrCreatePlayer(
-                meta.steamId,
-                meta.playerName,
-                game,
-              )
-              playerId = resolvedId
-            } catch {
-              this.logger.warn(
-                `Player ${playerId} not found and could not be resolved, skipping action: ${actionCode}`,
-              )
-              return { success: true }
-            }
-          } else {
-            this.logger.warn(`Player ${playerId} not found, skipping action: ${actionCode}`)
-            return { success: true }
-          }
-        }
-      }
-
-      // Calculate total points (base reward + bonus)
+      // Calculate total points and resolve map
       const totalPoints = actionDef.rewardPlayer + (bonus || 0)
-
-      // Get current map from match service, initialize if needed
-      let currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
-      if (currentMap === "unknown" && this.matchService) {
-        currentMap = await this.matchService.initializeMapForServer(event.serverId)
-      }
+      const currentMap = await this.mapResolver.resolveCurrentMap(event.serverId)
 
       // Log the action event to database
       await this.repository.logPlayerAction(
@@ -134,44 +189,30 @@ export class ActionService implements IActionService {
     try {
       const { playerId, victimId, actionCode, game, team, bonus } = event.data
 
-      // Look up action definition from database
-      const actionDef = await this.repository.findActionByCode(game, actionCode, team)
+      // Validate action definition
+      const actionValidation = await this.actionDefinitionValidator.validatePlayerPlayerAction(
+        game,
+        actionCode,
+        team,
+      )
+      if (actionValidation.shouldEarlyReturn) {
+        return actionValidation.earlyResult!
+      }
+      const actionDef = actionValidation.actionDef!
 
-      if (!actionDef) {
-        this.logger.warn(`Unknown action code: ${actionCode} for game ${game}`)
-        return { success: true } // Don't fail on unknown actions
+      // Validate both players exist
+      const playerValidation = await this.playerValidator.validatePlayerPair(
+        playerId,
+        victimId,
+        actionCode,
+      )
+      if (playerValidation.shouldEarlyReturn) {
+        return playerValidation.earlyResult!
       }
 
-      if (!actionDef.forPlayerPlayerActions) {
-        return { success: true }
-      }
-
-      // Verify both players exist before logging action
-      if (this.playerService) {
-        const [playerStats, victimStats] = await Promise.all([
-          this.playerService.getPlayerStats(playerId),
-          this.playerService.getPlayerStats(victimId),
-        ])
-
-        if (!playerStats) {
-          this.logger.warn(`Player ${playerId} not found, skipping action: ${actionCode}`)
-          return { success: true } // Don't fail, but skip the action
-        }
-
-        if (!victimStats) {
-          this.logger.warn(`Victim ${victimId} not found, skipping action: ${actionCode}`)
-          return { success: true } // Don't fail, but skip the action
-        }
-      }
-
-      // Calculate total points (base reward + bonus)
+      // Calculate total points and resolve map
       const totalPoints = actionDef.rewardPlayer + (bonus || 0)
-
-      // Get current map from match service, initialize if needed
-      let currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
-      if (currentMap === "unknown" && this.matchService) {
-        currentMap = await this.matchService.initializeMapForServer(event.serverId)
-      }
+      const currentMap = await this.mapResolver.resolveCurrentMap(event.serverId)
 
       // Log the action event to database
       await this.repository.logPlayerPlayerAction(
@@ -209,52 +250,46 @@ export class ActionService implements IActionService {
     try {
       const { team, actionCode, game, bonus } = event.data
 
-      // Look up action definition from database
-      const actionDef = await this.repository.findActionByCode(game, actionCode, team)
-
-      if (!actionDef) {
-        this.logger.warn(`Unknown action code: ${actionCode} for game ${game}`)
-        return { success: true } // Don't fail on unknown actions
+      // Validate action definition
+      const actionValidation = await this.actionDefinitionValidator.validateTeamAction(
+        game,
+        actionCode,
+        team,
+      )
+      if (actionValidation.shouldEarlyReturn) {
+        return actionValidation.earlyResult!
       }
+      const actionDef = actionValidation.actionDef!
 
-      if (!actionDef.forTeamActions) {
-        return { success: true }
-      }
-
-      // Calculate total points (base reward + bonus)
+      // Calculate total points and resolve map
       const totalPoints = actionDef.rewardTeam + (bonus || 0)
+      const currentMap = await this.mapResolver.resolveCurrentMap(event.serverId)
 
-      // Get current map from match service, initialize if needed
-      let currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
-      if (currentMap === "unknown" && this.matchService) {
-        currentMap = await this.matchService.initializeMapForServer(event.serverId)
-      }
-
-      // Log team bonus rows per teammate and grant rewardTeam
+      // Log team bonus rows per teammate and grant rewardTeam (using batch operations)
       if (this.matchService) {
         const teamPlayers = this.matchService.getPlayersByTeam(event.serverId, team)
         const validPlayerIds = teamPlayers.filter((pid) => typeof pid === "number" && pid > 0)
         if (validPlayerIds.length > 0) {
           const awardedPerPlayer = actionDef.rewardTeam + (bonus || 0)
-          await Promise.all(
-            validPlayerIds.map((pid) =>
-              this.repository.logTeamActionForPlayer(
-                pid,
-                event.serverId,
-                actionDef.id,
-                currentMap,
-                awardedPerPlayer,
-              ),
-            ),
+
+          // Batch log team actions instead of N individual queries
+          await this.repository.logTeamActionBatch(
+            validPlayerIds.map((pid) => ({
+              playerId: pid,
+              serverId: event.serverId,
+              actionId: actionDef.id,
+              map: currentMap,
+              bonus: awardedPerPlayer,
+            })),
           )
 
+          // Batch update player stats instead of N individual queries
           if (this.playerService && actionDef.rewardTeam !== 0) {
-            await Promise.all(
-              validPlayerIds.map((pid) =>
-                this.playerService!.updatePlayerStats(pid, {
-                  skill: awardedPerPlayer,
-                }),
-              ),
+            await this.playerService.updatePlayerStatsBatch(
+              validPlayerIds.map((pid) => ({
+                playerId: pid,
+                skillDelta: awardedPerPlayer,
+              })),
             )
           }
 
@@ -284,26 +319,19 @@ export class ActionService implements IActionService {
     try {
       const { actionCode, game, bonus } = event.data
 
-      // Look up action definition from database
-      const actionDef = await this.repository.findActionByCode(game, actionCode)
-
-      if (!actionDef) {
-        this.logger.warn(`Unknown action code: ${actionCode} for game ${game}`)
-        return { success: true } // Don't fail on unknown actions
+      // Validate action definition
+      const actionValidation = await this.actionDefinitionValidator.validateWorldAction(
+        game,
+        actionCode,
+      )
+      if (actionValidation.shouldEarlyReturn) {
+        return actionValidation.earlyResult!
       }
-
-      if (!actionDef.forWorldActions) {
-        return { success: true }
-      }
+      const actionDef = actionValidation.actionDef!
 
       // World actions typically don't have player rewards, but may have server-wide effects
       const totalPoints = bonus || 0
-
-      // Get current map from match service, initialize if needed
-      let currentMap = this.matchService?.getCurrentMap(event.serverId) || ""
-      if (currentMap === "unknown" && this.matchService) {
-        currentMap = await this.matchService.initializeMapForServer(event.serverId)
-      }
+      const currentMap = await this.mapResolver.resolveCurrentMap(event.serverId)
 
       // Log the action event to database
       await this.repository.logWorldAction(event.serverId, actionDef.id, currentMap, bonus || 0)

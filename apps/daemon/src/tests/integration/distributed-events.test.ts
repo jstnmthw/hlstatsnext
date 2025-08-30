@@ -43,6 +43,12 @@ describe.skip("Distributed Event Processing", () => {
     playerService = {
       handlePlayerEvent: vi.fn(),
       getOrCreatePlayer: vi.fn().mockResolvedValue(123),
+      getPlayerStats: vi.fn(),
+      updatePlayerStats: vi.fn(),
+      getPlayerRating: vi.fn(),
+      updatePlayerRatings: vi.fn(),
+      getPlayerStatsBatch: vi.fn().mockResolvedValue(new Map()),
+      updatePlayerStatsBatch: vi.fn().mockResolvedValue(undefined),
     } as unknown as IPlayerService
 
     matchService = {

@@ -8,6 +8,7 @@ import type { DatabaseClient } from "@/database/client"
 import type { IServerService } from "@/modules/server/server.types"
 import type { IGameDetectionService } from "@/modules/game/game-detection.types"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { IClock } from "@/shared/infrastructure/time/clock.interface"
 import { DatabaseServerAuthenticator } from "../adapters/database-server-authenticator"
 import { GameDetectorAdapter } from "../adapters/game-detector-adapter"
 import { ServerOrchestrator } from "@/modules/server/orchestrators/server-orchestrator"
@@ -20,6 +21,7 @@ export function createIngressDependencies(
   serverService: IServerService,
   gameDetectionService: IGameDetectionService,
   logger: ILogger,
+  clock: IClock,
 ): IngressDependencies {
   const serverOrchestrator = new ServerOrchestrator(database, serverService, logger)
 
@@ -27,5 +29,6 @@ export function createIngressDependencies(
     serverAuthenticator: new DatabaseServerAuthenticator(database, logger),
     gameDetector: new GameDetectorAdapter(gameDetectionService),
     serverInfoProvider: serverOrchestrator,
+    clock,
   }
 }

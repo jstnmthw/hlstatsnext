@@ -7,6 +7,8 @@ import { BaseParser } from "./base.parser"
 import type { ParseResult } from "./base.parser"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
+import type { IClock } from "@/shared/infrastructure/time/clock.interface"
+import { TestClock } from "@/shared/infrastructure/time/test-clock"
 
 // Helper type for accessing protected methods
 type ParserWithMethods = {
@@ -18,8 +20,8 @@ type ParserWithMethods = {
 
 // Concrete implementation for testing
 class TestParser extends BaseParser {
-  constructor(game: string) {
-    super(game)
+  constructor(game: string, clock: IClock) {
+    super(game, clock)
   }
 
   parseLine(logLine: string, serverId: number): ParseResult {
@@ -44,9 +46,11 @@ class TestParser extends BaseParser {
 
 describe("BaseParser", () => {
   let parser: TestParser
+  let clock: TestClock
 
   beforeEach(() => {
-    parser = new TestParser("csgo")
+    clock = new TestClock()
+    parser = new TestParser("csgo", clock)
   })
 
   describe("Parser instantiation", () => {
@@ -64,23 +68,19 @@ describe("BaseParser", () => {
 
   describe("createTimestamp", () => {
     it("should create current timestamp when no date string provided", () => {
-      const before = new Date()
       const timestamp = (parser as unknown as ParserWithMethods).createTimestamp()
-      const after = new Date()
+      const expectedTime = clock.now()
 
       expect(timestamp).toBeInstanceOf(Date)
-      expect(timestamp.getTime()).toBeGreaterThanOrEqual(before.getTime())
-      expect(timestamp.getTime()).toBeLessThanOrEqual(after.getTime())
+      expect(timestamp.getTime()).toBe(expectedTime.getTime())
     })
 
     it("should create current timestamp when undefined provided", () => {
-      const before = new Date()
       const timestamp = (parser as unknown as ParserWithMethods).createTimestamp(undefined)
-      const after = new Date()
+      const expectedTime = clock.now()
 
       expect(timestamp).toBeInstanceOf(Date)
-      expect(timestamp.getTime()).toBeGreaterThanOrEqual(before.getTime())
-      expect(timestamp.getTime()).toBeLessThanOrEqual(after.getTime())
+      expect(timestamp.getTime()).toBe(expectedTime.getTime())
     })
 
     it("should parse valid date strings", () => {
@@ -110,14 +110,13 @@ describe("BaseParser", () => {
         "",
       ]
 
+      const expectedTime = clock.now()
+
       for (const dateStr of invalidDates) {
-        const before = new Date()
         const timestamp = (parser as unknown as ParserWithMethods).createTimestamp(dateStr)
-        const after = new Date()
 
         expect(timestamp).toBeInstanceOf(Date)
-        expect(timestamp.getTime()).toBeGreaterThanOrEqual(before.getTime())
-        expect(timestamp.getTime()).toBeLessThanOrEqual(after.getTime())
+        expect(timestamp.getTime()).toBe(expectedTime.getTime())
       }
     })
 
@@ -405,8 +404,8 @@ describe("BaseParser", () => {
     })
 
     it("should handle multiple parsers with different games", () => {
-      const csgoParser = new TestParser("csgo")
-      const tf2Parser = new TestParser("tf2")
+      const csgoParser = new TestParser("csgo", new TestClock())
+      const tf2Parser = new TestParser("tf2", new TestClock())
 
       expect((csgoParser as unknown as ParserWithMethods).game).toBe("csgo")
       expect((tf2Parser as unknown as ParserWithMethods).game).toBe("tf2")

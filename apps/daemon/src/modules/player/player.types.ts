@@ -213,6 +213,10 @@ export interface IPlayerService {
   getPlayerStats(playerId: number): Promise<Player | null>
   updatePlayerStats(playerId: number, updates: PlayerStatsUpdate): Promise<void>
 
+  // Batch operations for performance optimization
+  getPlayerStatsBatch(playerIds: number[]): Promise<Map<number, Player>>
+  updatePlayerStatsBatch(updates: Array<{ playerId: number; skillDelta: number }>): Promise<void>
+
   // Rating system
   getPlayerRating(playerId: number): Promise<SkillRating>
   updatePlayerRatings(updates: RatingUpdate[]): Promise<void>
@@ -368,4 +372,8 @@ export interface IPlayerRepository {
 
   // Helpers
   hasRecentConnect(serverId: number, playerId: number, withinMs?: number): Promise<boolean>
+
+  // Batch operations for performance optimization
+  getPlayerStatsBatch(playerIds: number[]): Promise<Map<number, Player>>
+  updatePlayerStatsBatch(updates: Array<{ playerId: number; skillDelta: number }>): Promise<void>
 }

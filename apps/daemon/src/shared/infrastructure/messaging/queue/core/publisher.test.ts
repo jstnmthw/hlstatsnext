@@ -15,6 +15,9 @@ import { MessagePriority, QueuePublishError } from "./types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
+import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
+import { systemClock } from "@/shared/infrastructure/time"
 
 describe("EventPublisher", () => {
   let publisher: EventPublisher
@@ -23,6 +26,9 @@ describe("EventPublisher", () => {
   let mockLogger: ILogger
 
   beforeEach(() => {
+    // Initialize UUID service for all tests
+    setUuidService(new SystemUuidService(systemClock))
+
     mockChannel = {
       publish: vi.fn().mockReturnValue(true),
       ack: vi.fn(),

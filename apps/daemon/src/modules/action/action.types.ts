@@ -103,4 +103,15 @@ export interface IActionRepository {
     bonus?: number,
   ): Promise<void>
   logWorldAction(serverId: number, actionId: number, map: string, bonus?: number): Promise<void>
+
+  // Batch operations for performance optimization
+  logTeamActionBatch(
+    teamActions: Array<{
+      playerId: number
+      serverId: number
+      actionId: number
+      map: string
+      bonus: number
+    }>,
+  ): Promise<void>
 }

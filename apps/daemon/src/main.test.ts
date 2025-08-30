@@ -2,17 +2,31 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { HLStatsDaemon } from "./main"
 import type { AppContext } from "@/context"
 import type { BaseEvent, EventType } from "@/shared/types/events"
-import { getAppContext } from "@/context"
+import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { getEnvironmentConfig } from "@/config/environment.config"
 import { RconMonitorService } from "@/modules/rcon/rcon-monitor.service"
 import { DatabaseConnectionService } from "@/database/connection.service"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockDatabaseClient } from "@/tests/mocks/database"
+import { DeterministicUuidService } from "@/shared/infrastructure/identifiers/deterministic-uuid.service"
+import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import { SystemClock } from "@/shared/infrastructure/time/system-clock"
 
 vi.mock("@/context")
 vi.mock("@/config/environment.config")
 vi.mock("@/modules/rcon/rcon-monitor.service")
 vi.mock("@/database/connection.service")
+vi.mock("@/shared/infrastructure/messaging/queue/utils/message-utils", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let currentUuidService: any = null
+  return {
+    getUuidService: () => currentUuidService,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setUuidService: (service: any) => {
+      currentUuidService = service
+    },
+  }
+})
 
 const mockEventPublisher = {
   publish: vi.fn(),
@@ -35,11 +49,15 @@ const mockContext = {
   ingressService: {
     start: vi.fn(),
     stop: vi.fn(),
+    processRawEvent: vi.fn().mockResolvedValue(null),
   },
   rconService: {
     disconnectAll: vi.fn(),
   },
   eventPublisher: mockEventPublisher,
+  queueModule: {
+    shutdown: vi.fn(),
+  },
 } as unknown as AppContext
 
 describe("HLStatsDaemon", () => {
@@ -49,6 +67,7 @@ describe("HLStatsDaemon", () => {
     vi.clearAllMocks()
 
     vi.mocked(getAppContext).mockReturnValue(mockContext)
+    vi.mocked(initializeQueueInfrastructure).mockResolvedValue()
 
     vi.mocked(getEnvironmentConfig).mockReturnValue({
       nodeEnv: "test",
@@ -81,6 +100,12 @@ describe("HLStatsDaemon", () => {
   })
 
   describe("start", () => {
+    beforeEach(() => {
+      // Initialize UUID service for tests (following pattern from other tests)
+      const systemClock = new SystemClock()
+      setUuidService(new DeterministicUuidService(systemClock))
+    })
+
     it("should start successfully when database connection succeeds", async () => {
       vi.mocked(mockDatabaseConnection.testConnection).mockResolvedValue(true)
       vi.mocked(mockContext.ingressService.start).mockResolvedValue(undefined)
@@ -88,6 +113,8 @@ describe("HLStatsDaemon", () => {
       await daemon.start()
 
       expect(mockDatabaseConnection.testConnection).toHaveBeenCalled()
+      expect(mockContext.logger.info).toHaveBeenCalledWith("Running preflight checks...")
+      expect(mockContext.logger.ok).toHaveBeenCalledWith("All preflight checks passed")
       expect(mockContext.logger.info).toHaveBeenCalledWith("Starting services")
       expect(mockContext.ingressService.start).toHaveBeenCalled()
       expect(mockRconMonitor.start).toHaveBeenCalled()
@@ -114,6 +141,7 @@ describe("HLStatsDaemon", () => {
 
     it("should handle service start errors", async () => {
       vi.mocked(mockDatabaseConnection.testConnection).mockResolvedValue(true)
+      // Mock an error in the service startup phase (after preflight checks)
       vi.mocked(mockContext.ingressService.start).mockRejectedValue(new Error("Service error"))
       const mockExit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never)
 
@@ -122,6 +150,89 @@ describe("HLStatsDaemon", () => {
       expect(mockContext.logger.failed).toHaveBeenCalledWith(
         "Failed to start daemon",
         "Service error",
+      )
+      expect(mockExit).toHaveBeenCalledWith(1)
+
+      mockExit.mockRestore()
+    })
+
+    it("should fail startup when UUID service is not initialized", async () => {
+      vi.mocked(mockDatabaseConnection.testConnection).mockResolvedValue(true)
+
+      // Clear UUID service to simulate uninitialized state
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setUuidService(null as any)
+
+      const mockExit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never)
+
+      await daemon.start()
+
+      expect(mockContext.logger.failed).toHaveBeenCalledWith(
+        "Failed to start daemon",
+        expect.stringContaining("UUID service preflight check failed"),
+      )
+      expect(mockExit).toHaveBeenCalledWith(1)
+
+      mockExit.mockRestore()
+    })
+
+    it("should fail startup when event publisher is not available", async () => {
+      vi.mocked(mockDatabaseConnection.testConnection).mockResolvedValue(true)
+
+      // Remove event publisher from context but ensure UUID service is working
+      const contextWithoutPublisher = {
+        ...mockContext,
+        eventPublisher: undefined,
+        logger: createMockLogger(), // Fresh logger for this test
+      }
+      vi.mocked(getAppContext).mockReturnValue(contextWithoutPublisher)
+
+      const newDaemon = new HLStatsDaemon()
+      const mockExit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never)
+
+      await newDaemon.start()
+
+      expect(contextWithoutPublisher.logger.failed).toHaveBeenCalledWith(
+        "Failed to start daemon",
+        expect.stringContaining("Event publisher not initialized"),
+      )
+      expect(mockExit).toHaveBeenCalledWith(1)
+
+      mockExit.mockRestore()
+    })
+
+    it("should validate parser functionality with sample log line", async () => {
+      vi.mocked(mockDatabaseConnection.testConnection).mockResolvedValue(true)
+      vi.mocked(mockContext.ingressService.start).mockResolvedValue(undefined)
+
+      await daemon.start()
+
+      // Verify processRawEvent was called with test data during preflight
+      expect(mockContext.ingressService.processRawEvent).toHaveBeenCalledWith(
+        'L 01/01/2024 - 12:00:00: "TestPlayer<999><STEAM_TEST><CT>" connected',
+        "127.0.0.1",
+        27015,
+      )
+      expect(mockContext.logger.debug).toHaveBeenCalledWith(
+        "Parser functionality validated successfully",
+      )
+    })
+
+    it("should handle parser errors gracefully during preflight", async () => {
+      vi.mocked(mockDatabaseConnection.testConnection).mockResolvedValue(true)
+
+      // Make processRawEvent throw an error (parser error)
+      vi.mocked(mockContext.ingressService.processRawEvent).mockRejectedValue(
+        new Error("Parser error"),
+      )
+
+      const mockExit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never)
+
+      await daemon.start()
+
+      expect(mockContext.logger.failed).toHaveBeenCalledWith(
+        "Failed to start daemon",
+        expect.stringContaining("Parser preflight check failed: Parser error"),
       )
       expect(mockExit).toHaveBeenCalledWith(1)
 

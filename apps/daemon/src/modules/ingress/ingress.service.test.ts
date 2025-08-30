@@ -7,6 +7,7 @@ import { IngressService } from "./ingress.service"
 import { createMockLogger } from "../../tests/mocks/logger"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { IngressDependencies } from "./ingress.dependencies"
+import { TestClock } from "@/shared/infrastructure/time/test-clock"
 
 describe("IngressService", () => {
   let ingressService: IngressService
@@ -46,6 +47,7 @@ describe("IngressService", () => {
           name: "Test Server",
         }),
       },
+      clock: new TestClock(),
     }
 
     ingressService = new IngressService(mockLogger, mockDependencies, {

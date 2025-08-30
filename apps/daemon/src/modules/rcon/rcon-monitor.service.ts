@@ -34,6 +34,10 @@ export class RconMonitorService {
 
     this.logger.ok(`Starting RCON status monitoring (interval: ${this.config.statusInterval}ms)`)
 
+    // Attempt immediate connection on startup
+    this.performInitialMonitoring()
+
+    // Set up interval for subsequent checks
     this.intervalId = setInterval(async () => {
       try {
         await this.monitorActiveServers()
@@ -49,6 +53,19 @@ export class RconMonitorService {
       this.intervalId = undefined
       this.logger.info("RCON monitoring stopped")
     }
+  }
+
+  private performInitialMonitoring(): void {
+    // Execute initial monitoring asynchronously without blocking startup
+    setImmediate(async () => {
+      try {
+        this.logger.debug("Performing initial RCON connection attempt...")
+        await this.monitorActiveServers()
+        this.logger.debug("Initial RCON monitoring completed")
+      } catch (error) {
+        this.logger.error(`Error in initial RCON monitoring: ${error}`)
+      }
+    })
   }
 
   private async monitorActiveServers(): Promise<void> {

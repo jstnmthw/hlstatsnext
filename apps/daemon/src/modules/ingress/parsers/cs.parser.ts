@@ -6,6 +6,7 @@
 
 import type { ParseResult } from "./base.parser"
 import type { BaseEvent } from "@/shared/types/events"
+import type { IClock } from "@/shared/infrastructure/time/clock.interface"
 import { BaseParser } from "./base.parser"
 import { EventType } from "@/shared/types/events"
 import { GameConfig } from "@/config/game.config"
@@ -21,8 +22,71 @@ export class CsParser extends BaseParser {
   // Track the current map for Round_Start events
   private currentMap: string = ""
 
-  constructor(game: string = GameConfig.getDefaultGame()) {
-    super(game)
+  // Parser strategy map for different log line patterns
+  private readonly parserStrategies: Array<{
+    patterns: string[]
+    handler: (line: string, serverId: number) => ParseResult
+  }> = [
+    {
+      patterns: [" killed "],
+      handler: (line, serverId) => this.parseKillEvent(line, serverId),
+    },
+    {
+      patterns: [" attacked "],
+      handler: (line, serverId) => this.parseDamageEvent(line, serverId),
+    },
+    {
+      patterns: [" committed suicide with ", " killed self "],
+      handler: (line, serverId) => this.parseSuicideEvent(line, serverId),
+    },
+    {
+      patterns: [" connected, address "],
+      handler: (line, serverId) => this.parseConnectEvent(line, serverId),
+    },
+    {
+      patterns: [" entered the game"],
+      handler: (line, serverId) => this.parseEnterEvent(line, serverId),
+    },
+    {
+      patterns: [" disconnected (reason ", " disconnected"],
+      handler: (line, serverId) => this.parseDisconnectEvent(line, serverId),
+    },
+    {
+      patterns: [" joined team ", " changed team to "],
+      handler: (line, serverId) => this.parseChangeTeamEvent(line, serverId),
+    },
+    {
+      patterns: [" changed role to ", " changed role "],
+      handler: (line, serverId) => this.parseChangeRoleEvent(line, serverId),
+    },
+    {
+      patterns: [" changed name to "],
+      handler: (line, serverId) => this.parseChangeNameEvent(line, serverId),
+    },
+    {
+      patterns: [" say ", " say_team "],
+      handler: (line, serverId) => this.parseChatEvent(line, serverId),
+    },
+    {
+      patterns: ["Mapchange to ", "Started map ", "changelevel:"],
+      handler: (line, serverId) => this.parseMapChangeEvent(line, serverId),
+    },
+    {
+      patterns: ['World triggered "Round_Start"'],
+      handler: (line, serverId) => this.parseRoundStartEvent(line, serverId),
+    },
+    {
+      patterns: ['triggered "Terrorists_Win"', 'triggered "CTs_Win"'],
+      handler: (line, serverId) => this.parseTeamWinEvent(line, serverId),
+    },
+    {
+      patterns: ['World triggered "Round_End"'],
+      handler: (line, serverId) => this.parseRoundEndEvent(line, serverId),
+    },
+  ]
+
+  constructor(game: string = GameConfig.getDefaultGame(), clock: IClock) {
+    super(game, clock)
   }
 
   parseLine(logLine: string, serverId: number): ParseResult {
@@ -30,98 +94,16 @@ export class CsParser extends BaseParser {
       // Remove timestamp prefix if present
       const cleanLine = logLine.replace(/^L \d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}: /, "")
 
-      // Player kill events
-      if (cleanLine.includes(" killed ")) {
-        return this.parseKillEvent(cleanLine, serverId)
+      // Try pattern-based parsing first
+      const strategyResult = this.tryParseWithStrategies(cleanLine, serverId)
+      if (strategyResult) {
+        return strategyResult
       }
 
-      // Player damage events
-      if (cleanLine.includes(" attacked ")) {
-        return this.parseDamageEvent(cleanLine, serverId)
-      }
-
-      // Suicide events
-      if (cleanLine.includes(" committed suicide with ") || cleanLine.includes(" killed self ")) {
-        return this.parseSuicideEvent(cleanLine, serverId)
-      }
-
-      // Player connect/disconnect
-      if (cleanLine.includes(" connected, address ")) {
-        return this.parseConnectEvent(cleanLine, serverId)
-      }
-
-      if (cleanLine.includes(" entered the game")) {
-        return this.parseEnterEvent(cleanLine, serverId)
-      }
-
-      if (cleanLine.includes(" disconnected (reason ")) {
-        return this.parseDisconnectEvent(cleanLine, serverId)
-      }
-
-      if (cleanLine.includes(" disconnected")) {
-        return this.parseDisconnectEvent(cleanLine, serverId)
-      }
-
-      // Team change events
-      if (cleanLine.includes(" joined team ") || cleanLine.includes(" changed team to ")) {
-        return this.parseChangeTeamEvent(cleanLine, serverId)
-      }
-
-      // Role change events (if present in mod logs)
-      if (cleanLine.includes(" changed role to ") || cleanLine.includes(" changed role ")) {
-        return this.parseChangeRoleEvent(cleanLine, serverId)
-      }
-
-      // Name change events
-      if (cleanLine.includes(" changed name to ")) {
-        return this.parseChangeNameEvent(cleanLine, serverId)
-      }
-
-      // Chat messages
-      if (cleanLine.includes(" say ") || cleanLine.includes(" say_team ")) {
-        return this.parseChatEvent(cleanLine, serverId)
-      }
-
-      // Player action triggers (exclude world events)
-      if (cleanLine.includes('triggered "') && !cleanLine.includes("World triggered")) {
-        // Player-triggered ACTION_PLAYER
-        const actionResult = this.parseActionEvent(cleanLine, serverId)
-        if (actionResult.success && actionResult.event) {
-          return actionResult
-        }
-
-        // Team-triggered non-win ACTION_TEAM
-        const teamActionResult = this.parseTeamActionEvent(cleanLine, serverId)
-        if (teamActionResult.success && teamActionResult.event) {
-          return teamActionResult
-        }
-        // Fall through to other event parsing if not an action
-      }
-
-      // Map change events (before round events)
-      if (
-        cleanLine.includes("Mapchange to ") ||
-        cleanLine.includes("Started map ") ||
-        cleanLine.includes("changelevel:")
-      ) {
-        return this.parseMapChangeEvent(cleanLine, serverId)
-      }
-
-      // Round events
-      if (cleanLine.includes('World triggered "Round_Start"')) {
-        return this.parseRoundStartEvent(cleanLine, serverId)
-      }
-
-      // Parse team win events first (these happen before Round_End)
-      if (
-        cleanLine.includes('triggered "Terrorists_Win"') ||
-        cleanLine.includes('triggered "CTs_Win"')
-      ) {
-        return this.parseTeamWinEvent(cleanLine, serverId)
-      }
-
-      if (cleanLine.includes('World triggered "Round_End"')) {
-        return this.parseRoundEndEvent(cleanLine, serverId)
+      // Handle special cases that need custom logic
+      const specialResult = this.tryParseSpecialCases(cleanLine, serverId)
+      if (specialResult) {
+        return specialResult
       }
 
       // Default: unhandled event type
@@ -133,6 +115,35 @@ export class CsParser extends BaseParser {
         error: error instanceof Error ? error.message : String(error),
       }
     }
+  }
+
+  private tryParseWithStrategies(cleanLine: string, serverId: number): ParseResult | null {
+    for (const strategy of this.parserStrategies) {
+      if (strategy.patterns.some((pattern) => cleanLine.includes(pattern))) {
+        return strategy.handler(cleanLine, serverId)
+      }
+    }
+    return null
+  }
+
+  private tryParseSpecialCases(cleanLine: string, serverId: number): ParseResult | null {
+    // Player action triggers (exclude world events) - needs custom logic
+    if (cleanLine.includes('triggered "') && !cleanLine.includes("World triggered")) {
+      // Player-triggered ACTION_PLAYER
+      const actionResult = this.parseActionEvent(cleanLine, serverId)
+      if (actionResult.success && actionResult.event) {
+        return actionResult
+      }
+
+      // Team-triggered non-win ACTION_TEAM
+      const teamActionResult = this.parseTeamActionEvent(cleanLine, serverId)
+      if (teamActionResult.success && teamActionResult.event) {
+        return teamActionResult
+      }
+      // Fall through to other event parsing if not an action
+    }
+
+    return null
   }
 
   private parseKillEvent(logLine: string, serverId: number): ParseResult {
@@ -438,17 +449,18 @@ export class CsParser extends BaseParser {
       return { event: null, success: false }
     }
 
-    const [, playerName, playerIdStr, steamId, , newTeam] = match as unknown as [
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-    ]
-    const playerId = parseInt(playerIdStr)
-    if (!playerName || !playerIdStr || !steamId || Number.isNaN(playerId) || !newTeam) {
+    const playerName = match[1]
+    const playerIdStr = match[2]
+    const steamId = match[3]
+    const newTeam = match[5]
+
+    if (!playerName || !playerIdStr || !steamId || !newTeam) {
       return { event: null, success: false, error: "Missing required fields in team change" }
+    }
+
+    const playerId = parseInt(playerIdStr)
+    if (Number.isNaN(playerId)) {
+      return { event: null, success: false, error: "Invalid player ID in team change" }
     }
 
     const event: BaseEvent = {

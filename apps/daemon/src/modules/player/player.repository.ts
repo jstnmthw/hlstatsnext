@@ -9,11 +9,15 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository, PlayerCreateData, PlayerNameStatsUpdate } from "./player.types"
 import type { FindOptions, CreateOptions, UpdateOptions } from "@/shared/types/database"
 import type { Player, Prisma } from "@repo/database/client"
-import { BaseRepository } from "@/shared/infrastructure/persistence/repository.base"
+import {
+  BatchedRepository,
+  type BatchUpdateOperation,
+  type BatchCreateOperation,
+} from "@/shared/infrastructure/data/batch-repository"
 import { GameConfig } from "@/config/game.config"
 import { PlayerNameUpdateBuilder } from "@/shared/application/utils/player-name-update.builder"
 
-export class PlayerRepository extends BaseRepository<Player> implements IPlayerRepository {
+export class PlayerRepository extends BatchedRepository<Player> implements IPlayerRepository {
   protected tableName = "player"
 
   constructor(db: DatabaseClient, logger: ILogger) {
@@ -733,5 +737,152 @@ export class PlayerRepository extends BaseRepository<Player> implements IPlayerR
     } catch (error) {
       this.handleError("upsertPlayerName", error)
     }
+  }
+
+  // Batch operations implementation required by BatchedRepository
+
+  async findManyById(ids: number[], options?: FindOptions): Promise<Map<number, Player>> {
+    try {
+      if (ids.length === 0) {
+        return new Map()
+      }
+
+      const players = await this.executeWithTransaction(async (client) => {
+        const query: Prisma.PlayerFindManyArgs = {
+          where: { playerId: { in: ids } },
+        }
+
+        if (options?.include) {
+          query.include = options.include as Prisma.PlayerInclude
+        }
+        if (options?.select) {
+          query.select = options.select as Prisma.PlayerSelect
+        }
+
+        return client.player.findMany(query)
+      }, options)
+
+      // Convert to Map for O(1) lookups
+      const playerMap = new Map<number, Player>()
+      for (const player of players || []) {
+        playerMap.set(player.playerId, player)
+      }
+
+      this.logger.debug(`Batch found ${playerMap.size}/${ids.length} players`)
+      return playerMap
+    } catch (error) {
+      this.logger.error(`Failed to batch find players: ${error}`)
+      return new Map()
+    }
+  }
+
+  async createMany(
+    operations: BatchCreateOperation<Player>[],
+    options?: CreateOptions,
+  ): Promise<void> {
+    try {
+      if (operations.length === 0) {
+        return
+      }
+
+      await this.executeBatchedOperation(operations, async (chunk) => {
+        await this.executeWithTransaction(async (client) => {
+          await client.player.createMany({
+            data: chunk.map((op) => op.data),
+            skipDuplicates: true,
+          })
+        }, options)
+      })
+
+      this.logger.debug(`Batch created ${operations.length} players`)
+    } catch (error) {
+      this.handleError("createMany", error)
+    }
+  }
+
+  async updateMany(
+    operations: BatchUpdateOperation<Player>[],
+    options?: UpdateOptions,
+  ): Promise<void> {
+    try {
+      if (operations.length === 0) {
+        return
+      }
+
+      // Group operations by the fields being updated for optimization
+      const groupedOperations = this.groupOperationsByKey(operations, (op) =>
+        JSON.stringify(Object.keys(op.data).sort()),
+      )
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      for (const [fieldsKey, ops] of groupedOperations) {
+        await this.executeBatchedOperation(ops, async (chunk) => {
+          await this.executeWithTransaction(async (client) => {
+            // For each chunk, perform individual updates
+            // Note: Prisma doesn't support batch updates with different data per record
+            // so we use Promise.all for concurrent execution
+            await Promise.all(
+              chunk.map((op) =>
+                client.player.update({
+                  where: { playerId: op.id },
+                  data: op.data,
+                }),
+              ),
+            )
+          }, options)
+        })
+      }
+
+      this.logger.debug(`Batch updated ${operations.length} players`)
+    } catch (error) {
+      this.handleError("updateMany", error)
+    }
+  }
+
+  /**
+   * Batch method to get player stats for multiple player IDs
+   * Optimized for ActionService to prevent N+1 queries
+   */
+  async getPlayerStatsBatch(playerIds: number[]): Promise<Map<number, Player>> {
+    return this.findManyById(playerIds, {
+      select: {
+        playerId: true,
+        skill: true,
+        lastName: true,
+        game: true,
+        // Add other fields as needed by ActionService
+      },
+    })
+  }
+
+  /**
+   * Batch method to update player stats for multiple players
+   * Optimized for team bonus operations
+   */
+  async updatePlayerStatsBatch(
+    updates: Array<{ playerId: number; skillDelta: number }>,
+  ): Promise<void> {
+    if (updates.length === 0) return
+
+    // Group updates by skill delta for efficient batch processing
+    const skillGroups = updates.reduce((groups, update) => {
+      const key = update.skillDelta.toString()
+      if (!groups.has(key)) {
+        groups.set(key, [])
+      }
+      groups.get(key)!.push(update.playerId)
+      return groups
+    }, new Map<string, number[]>())
+
+    // Execute batch updates for each skill delta group
+    const updatePromises = Array.from(skillGroups.entries()).map(([skillDeltaStr, playerIds]) => {
+      const skillDelta = parseInt(skillDeltaStr, 10)
+      return this.db.prisma.player.updateMany({
+        where: { playerId: { in: playerIds } },
+        data: { skill: { increment: skillDelta } },
+      })
+    })
+
+    await Promise.all(updatePromises)
   }
 }

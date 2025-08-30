@@ -27,6 +27,7 @@ import type { BaseEvent } from "@/shared/types/events"
 import { getEnvironmentConfig } from "@/config/environment.config"
 import { RconMonitorService } from "@/modules/rcon/rcon-monitor.service"
 import { DatabaseConnectionService } from "@/database/connection.service"
+import { getUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 
 /**
  * Main daemon class for the HLStatsNext statistics collection system.
@@ -129,6 +130,9 @@ export class HLStatsDaemon {
 
       await initializeQueueInfrastructure(this.context)
 
+      // Run preflight checks to ensure critical services are ready
+      await this.runPreflightChecks()
+
       this.logger.info("Starting services")
       await this.startServices()
 
@@ -141,6 +145,73 @@ export class HLStatsDaemon {
       )
       process.exit(1)
     }
+  }
+
+  /**
+   * Runs preflight checks to validate critical services are properly initialized.
+   *
+   * This method performs essential validation before starting services:
+   * - Validates UUID service is initialized for message ID generation
+   * - Tests parser functionality with sample log line
+   * - Ensures event publisher is available
+   *
+   * These checks help catch initialization issues early and prevent
+   * silent failures in production.
+   *
+   * @private
+   * @throws {Error} When critical services are not properly initialized
+   */
+  private async runPreflightChecks(): Promise<void> {
+    this.logger.info("Running preflight checks...")
+
+    // 1. Verify UUID service is initialized
+    try {
+      const uuidService = getUuidService()
+      if (!uuidService) {
+        throw new Error("UUID service not initialized")
+      }
+
+      // Test UUID generation
+      const testId = uuidService.generateMessageId()
+      if (!testId || !testId.startsWith("msg_")) {
+        throw new Error("UUID service not functioning correctly")
+      }
+
+      this.logger.debug("UUID service validated successfully")
+    } catch (error) {
+      throw new Error(
+        `UUID service preflight check failed: ${error instanceof Error ? error.message : String(error)}`,
+      )
+    }
+
+    // 2. Test parser functionality with sample log line
+    try {
+      if (!this.context.eventPublisher) {
+        throw new Error("Event publisher not initialized - queue infrastructure may have failed")
+      }
+
+      // Test parsing with a sample CS log line
+      await this.context.ingressService.processRawEvent(
+        'L 01/01/2024 - 12:00:00: "TestPlayer<999><STEAM_TEST><CT>" connected',
+        "127.0.0.1",
+        27015,
+      )
+
+      // We expect null here (server not authenticated), but the important thing is it doesn't crash
+      // If it crashes, it means UUID service or parser setup is broken
+      this.logger.debug("Parser functionality validated successfully")
+    } catch (error) {
+      throw new Error(
+        `Parser preflight check failed: ${error instanceof Error ? error.message : String(error)}`,
+      )
+    }
+
+    // 3. Verify event publisher is available
+    if (!this.context.eventPublisher) {
+      throw new Error("Event publisher not available - ingress service cannot publish events")
+    }
+
+    this.logger.ok("All preflight checks passed")
   }
 
   /**

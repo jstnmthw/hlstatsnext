@@ -253,4 +253,31 @@ export class PlayerService implements IPlayerService {
       }
     }
   }
+
+  // Batch operations for performance optimization
+
+  async getPlayerStatsBatch(playerIds: number[]): Promise<Map<number, Player>> {
+    try {
+      return await this.repository.getPlayerStatsBatch(playerIds)
+    } catch (error) {
+      this.logger.error(`Failed to batch get player stats: ${error}`)
+      return new Map() // Return empty map on error
+    }
+  }
+
+  async updatePlayerStatsBatch(
+    updates: Array<{ playerId: number; skillDelta: number }>,
+  ): Promise<void> {
+    try {
+      if (updates.length === 0) {
+        return
+      }
+
+      await this.repository.updatePlayerStatsBatch(updates)
+      this.logger.debug(`Batch updated stats for ${updates.length} players`)
+    } catch (error) {
+      this.logger.error(`Failed to batch update player stats: ${error}`)
+      throw error
+    }
+  }
 }

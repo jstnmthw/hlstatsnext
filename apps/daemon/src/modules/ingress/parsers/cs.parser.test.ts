@@ -9,13 +9,20 @@ import { CsParser } from "./cs.parser"
 import { EventType } from "@/shared/types/events"
 import type { PlayerDamageEvent } from "@/modules/player/player.types"
 import type { MapChangeEvent, RoundStartEvent } from "@/modules/match/match.types"
+import { TestClock } from "@/shared/infrastructure/time/test-clock"
+import { DeterministicUuidService } from "@/shared/infrastructure/identifiers/deterministic-uuid.service"
+import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 
 describe("CsParser", () => {
   const serverId = 1
   let parser: CsParser
+  let clock: TestClock
 
   beforeEach(() => {
-    parser = new CsParser("cstrike")
+    clock = new TestClock()
+    // Initialize UUID service for tests
+    setUuidService(new DeterministicUuidService(clock))
+    parser = new CsParser("cstrike", clock)
   })
 
   describe("parseKillEvent", () => {

@@ -113,7 +113,13 @@ export class IngressService implements IIngressService {
     const parseResult = parser.parseLine(rawData, serverId)
 
     if (!parseResult.success) {
-      this.logger.debug(`Failed to parse log line: ${parseResult.error}`)
+      // Use warn level for parse failures - these are important to see
+      this.logger.warn(`Failed to parse log line from server ${serverId}: ${parseResult.error}`, {
+        serverId,
+        logLine: rawData.substring(0, 100), // First 100 chars for context
+        parseError: parseResult.error,
+      })
+      this.stats.totalErrors++
       return null
     }
 
@@ -153,8 +159,16 @@ export class IngressService implements IIngressService {
           eventId: event.eventId,
         })
       }
+
+      this.stats.totalLogsProcessed++
     } catch (error) {
-      this.logger.error(`Error processing log line: ${error}`)
+      this.stats.totalErrors++
+      this.logger.error(`Error processing log line from ${serverAddress}:${serverPort}: ${error}`, {
+        serverAddress,
+        serverPort,
+        logLine: logLine.substring(0, 100), // First 100 chars for context
+        errorMessage: error instanceof Error ? error.message : String(error),
+      })
     }
   }
 
@@ -164,7 +178,7 @@ export class IngressService implements IIngressService {
 
     // Fetch game for server and create appropriate parser
     const gameCode = await this.dependencies.serverInfoProvider.getServerGame(serverId)
-    const parser = ParserFactory.create(gameCode)
+    const parser = ParserFactory.create(gameCode, this.dependencies.clock)
     this.parserCache.set(serverId, parser)
     return parser
   }

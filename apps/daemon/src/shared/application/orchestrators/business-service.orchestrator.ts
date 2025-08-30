@@ -100,6 +100,7 @@ export function createBusinessServices(
     logger,
     playerService,
     matchService,
+    rconService, // Pass RCON service for real-time map resolution
   )
 
   // Fifth tier - enrichers dependent on multiple services

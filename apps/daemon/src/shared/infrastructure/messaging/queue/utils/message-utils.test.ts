@@ -17,9 +17,17 @@ import {
   formatDuration,
   safeJsonStringify,
   safeJsonParse,
+  setUuidService,
 } from "./message-utils"
+import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
+import { systemClock } from "@/shared/infrastructure/time"
 
 describe("Message Utils", () => {
+  beforeEach(() => {
+    // Initialize UUID service for all tests
+    setUuidService(new SystemUuidService(systemClock))
+  })
+
   describe("ID Generation", () => {
     it("should generate valid message IDs", () => {
       const messageId = generateMessageId()

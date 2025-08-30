@@ -18,6 +18,8 @@ const createMockPlayerService = (): IPlayerService => ({
   getPlayerRating: vi.fn(),
   updatePlayerRatings: vi.fn(),
   handlePlayerEvent: vi.fn(),
+  getPlayerStatsBatch: vi.fn().mockResolvedValue(new Map()),
+  updatePlayerStatsBatch: vi.fn().mockResolvedValue(undefined),
 })
 
 const createMockServerService = (): IServerService => ({

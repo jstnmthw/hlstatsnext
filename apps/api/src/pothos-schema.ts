@@ -1,7 +1,8 @@
 import { builder } from "./builder"
 import { generateAllCrud } from "@repo/database/graphql/crud"
 
-// Import custom resolvers (none currently needed)
+// Import custom resolvers
+import "./modules/server/server.resolver"
 
 // Define the base Query and Mutation types first
 builder.queryType({})

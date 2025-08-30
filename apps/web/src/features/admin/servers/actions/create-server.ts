@@ -93,13 +93,24 @@ export async function createServer(
       },
     })
 
-    if (!result.data?.createOneServer) {
+    if (!result.data?.createServerWithConfig) {
       console.error("GraphQL mutation failed")
       return {
         success: false,
         message: "Failed to create server. Please try again.",
       }
     }
+
+    const { success, message, configsCount } = result.data.createServerWithConfig
+
+    if (!success) {
+      return {
+        success: false,
+        message: message || "Failed to create server. Please try again.",
+      }
+    }
+
+    console.log(`Server created successfully with ${configsCount} configuration entries`)
 
     // Redirect to admin page on success
     redirect("/admin")

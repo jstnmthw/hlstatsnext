@@ -2,14 +2,18 @@
 
 import { Input } from "./input"
 import { cn } from "../lib/utils"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 
-interface IPAddressProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+interface IPAddressProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value"> {
   name?: string
+  defaultValue?: string
 }
 
-interface PortProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+interface PortProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value"> {
   name?: string
+  defaultValue?: string
 }
 
 const formatIPAddress = (value: string): string => {
@@ -64,10 +68,18 @@ export function IPAddress({
   name,
   className,
   placeholder = "192.168.1.1",
+  defaultValue = "",
   ...props
 }: IPAddressProps) {
-  const [displayValue, setDisplayValue] = useState("")
+  const [displayValue, setDisplayValue] = useState(defaultValue)
   const hiddenInputRef = useRef<HTMLInputElement>(null)
+
+  // Initialize hidden input with default value
+  useEffect(() => {
+    if (hiddenInputRef.current && defaultValue) {
+      hiddenInputRef.current.value = defaultValue
+    }
+  }, [defaultValue])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value
@@ -100,9 +112,22 @@ export function IPAddress({
   )
 }
 
-export function Port({ name, className, placeholder = "27015", ...props }: PortProps) {
-  const [displayValue, setDisplayValue] = useState("")
+export function Port({
+  name,
+  className,
+  placeholder = "27015",
+  defaultValue = "",
+  ...props
+}: PortProps) {
+  const [displayValue, setDisplayValue] = useState(defaultValue)
   const hiddenInputRef = useRef<HTMLInputElement>(null)
+
+  // Initialize hidden input with default value
+  useEffect(() => {
+    if (hiddenInputRef.current && defaultValue) {
+      hiddenInputRef.current.value = defaultValue
+    }
+  }, [defaultValue])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/\D/g, "") // Only allow digits

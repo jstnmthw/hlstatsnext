@@ -75,3 +75,6 @@ builder.mutationField("createServerWithConfig", (t) =>
     },
   }),
 )
+
+// Note: Server field resolvers for player counts have been simplified to avoid type system complexity
+// The full player data is available through the dedicated getServerPlayers query

@@ -151,3 +151,36 @@ export function formatDate(date: Date | string): string {
   // AM/PM
   return format(dateObj, "dd/MM/yyyy hh:mm a")
 }
+
+/**
+ * Formats duration in seconds to human readable format
+ *
+ * @param seconds - Duration in seconds
+ * @returns Formatted duration string (e.g., "2h 30m", "45m", "30s")
+ */
+export function formatDuration(seconds: number): string {
+  if (seconds < 60) {
+    return `${seconds}s`
+  }
+
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) {
+    return `${minutes}m`
+  }
+
+  const hours = Math.floor(minutes / 60)
+  const remainingMinutes = minutes % 60
+
+  if (hours < 24) {
+    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`
+  }
+
+  const days = Math.floor(hours / 24)
+  const remainingHours = hours % 24
+
+  if (remainingHours > 0) {
+    return `${days}d ${remainingHours}h`
+  }
+
+  return `${days}d`
+}

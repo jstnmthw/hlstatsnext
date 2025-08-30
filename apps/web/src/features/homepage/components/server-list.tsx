@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { query } from "@/lib/apollo-client"
 import { Server } from "@repo/database/client"
 import { Button, PlayIcon, cn } from "@repo/ui"
@@ -29,7 +30,14 @@ export async function ServerList({ className }: { className?: string }) {
                     )}
                   />
                   <div>
-                    <h3 className="text-sm font-mono">{server.name}</h3>
+                    <h3 className="text-sm font-mono">
+                      <Link
+                        href={`/servers/${server.serverId}`}
+                        className="hover:underline hover:text-blue-400 transition-colors"
+                      >
+                        {server.name}
+                      </Link>
+                    </h3>
                     <ul className="flex flex-row text-sm font-mono space-x-2">
                       {server.activeMap && <li>{server.activeMap}</li>}
                       <li className="text-muted-foreground">

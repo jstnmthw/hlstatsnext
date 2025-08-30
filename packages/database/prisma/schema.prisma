@@ -182,6 +182,11 @@ model Player {
   @@index([game], name: "game")
   @@index([kills], name: "kills")
   @@index([hideRanking], name: "hide_ranking")
+  @@index([lastEvent], name: "last_event")
+  @@index([country], name: "country")
+  @@index([connectionTime], name: "connection_time")
+  @@index([skill, kills], name: "skill_kills")
+  @@index([game, skill], name: "game_skill")
   @@map("players")
 }
 
@@ -350,6 +355,11 @@ model EventConnect {
   server Server @relation(fields: [serverId], references: [serverId])
 
   @@index([playerId])
+  @@index([serverId])
+  @@index([serverId, playerId])
+  @@index([serverId, eventTime])
+  @@index([playerId, eventTime])
+  @@index([serverId, eventTimeDisconnect, eventTime])
   @@map("events_connect")
 }
 
@@ -806,6 +816,9 @@ model Server {
   loads                    ServerLoad[]
 
   @@unique([address, port], name: "addressport")
+  @@index([game])
+  @@index([lastEvent])
+  @@index([name])
   @@map("servers")
 }
 

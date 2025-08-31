@@ -41,9 +41,6 @@ export async function updateServer(
     // Prepare Prisma field update operations input
     const serverInput = prepareUpdateServerInput(validation.data)
 
-    // Debug logging
-    console.log("Update server input:", JSON.stringify(serverInput, null, 2))
-
     // Execute GraphQL mutation
     const client = getClient()
     const result = await client.mutate({

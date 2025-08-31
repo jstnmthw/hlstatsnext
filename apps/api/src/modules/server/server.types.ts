@@ -1,7 +1,7 @@
 import type { Prisma } from "@repo/database/client"
 
 export interface CreateServerInput {
-  address: string
+  address?: string
   port: number
   game: string
   name?: string

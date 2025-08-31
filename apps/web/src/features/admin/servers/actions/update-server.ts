@@ -25,34 +25,63 @@ const isValidIPAddress = (ip: string): boolean => {
   })
 }
 
-const UpdateServerSchema = z.object({
-  serverId: z.coerce.number().int().positive("Server ID is required"),
-  name: z.string().max(255, "Name is too long").optional(),
-  address: z
-    .string()
-    .min(1, "Server address is required")
-    .max(15, "IP address is too long")
-    .refine(isValidIPAddress, {
-      message: "Please enter a valid IP address (e.g., 192.168.1.1)",
-    }),
-  port: z.coerce
-    .number()
-    .int()
-    .min(1, "Port must be greater than 0")
-    .max(65535, "Port must be less than 65535"),
-  game: z.string().optional().default("cstrike"),
-  publicAddress: z.string().max(128, "Public address is too long").optional(),
-  statusUrl: z
-    .string()
-    .url("Please enter a valid URL")
-    .max(255, "Status URL is too long")
-    .optional()
-    .or(z.literal("")),
-  rconPassword: z.string().max(255, "RCON password is too long").optional(),
-  connectionType: z.enum(["external", "docker"]).optional().default("external"),
-  dockerHost: z.string().max(255, "Docker host is too long").optional(),
-  sortOrder: z.coerce.number().int().min(0).max(127).optional().default(0),
-})
+const UpdateServerSchema = z
+  .object({
+    serverId: z.coerce.number().int().positive("Server ID is required"),
+    name: z.string().max(255, "Name is too long").optional().or(z.null()),
+    address: z
+      .string()
+      .min(1, "Server address is required")
+      .max(15, "IP address is too long")
+      .refine(isValidIPAddress, {
+        message: "Please enter a valid IP address (e.g., 192.168.1.1)",
+      })
+      .optional()
+      .or(z.null()),
+    docker_host: z
+      .string()
+      .min(1, "Docker host is required")
+      .max(255, "Docker host is too long")
+      .optional()
+      .or(z.null()),
+    port: z.coerce
+      .number()
+      .int()
+      .min(1, "Port must be greater than 0")
+      .max(65535, "Port must be less than 65535"),
+    game: z.string().optional().default("cstrike"),
+    publicAddress: z.string().max(128, "Public address is too long").optional().or(z.null()),
+    statusUrl: z
+      .string()
+      .url("Please enter a valid URL")
+      .max(255, "Status URL is too long")
+      .optional()
+      .or(z.literal(""))
+      .or(z.null()),
+    rconPassword: z.string().max(255, "RCON password is too long").optional().or(z.null()),
+    connection_type: z.enum(["external", "docker"]).optional().default("external"),
+    sortOrder: z.coerce.number().int().min(0).max(127).optional().default(0),
+  })
+  .superRefine((data, ctx) => {
+    // Ensure either address or docker_host is provided based on connection type
+    if (data.connection_type === "docker") {
+      if (!data.docker_host || data.docker_host.trim() === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Docker host is required for Docker connection type",
+          path: ["docker_host"],
+        })
+      }
+    } else {
+      if (!data.address || data.address.trim() === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Server address is required for external connection type",
+          path: ["address"],
+        })
+      }
+    }
+  })
 
 export type UpdateServerFormData = z.infer<typeof UpdateServerSchema>
 
@@ -72,13 +101,13 @@ export async function updateServer(
       serverId: formData.get("serverId"),
       name: formData.get("name"),
       address: formData.get("address"),
+      docker_host: formData.get("docker_host"),
       port: formData.get("port"),
       game: formData.get("game"),
       publicAddress: formData.get("publicAddress"),
       statusUrl: formData.get("statusUrl"),
       rconPassword: formData.get("rconPassword"),
-      connectionType: formData.get("connectionType"),
-      dockerHost: formData.get("dockerHost"),
+      connection_type: formData.get("connection_type"),
       sortOrder: formData.get("sortOrder"),
     }
 
@@ -94,42 +123,41 @@ export async function updateServer(
 
     const data = validation.data
 
-    // Additional validation: Docker host is required for docker connection type
-    if (data.connectionType === "docker" && (!data.dockerHost || data.dockerHost.trim() === "")) {
-      return {
-        success: false,
-        message: "Docker host is required for Docker connection type",
-        errors: {
-          dockerHost: ["Docker host is required when connection type is Docker"],
-        },
-      }
+    // Prepare GraphQL input using Prisma's field update operations format
+    const serverInput: Record<string, { set: string | number | null }> = {
+      port: { set: data.port },
+      game: { set: data.game },
+      connectionType: { set: data.connection_type },
+      sortOrder: { set: data.sortOrder },
     }
 
-    // Prepare GraphQL input - only include fields that have values
-    const serverInput: Record<string, string | number> = {
-      address: data.address,
-      port: data.port,
-      game: data.game,
-      connectionType: data.connectionType,
-      sortOrder: data.sortOrder,
+    // Handle connection type specific fields
+    if (data.connection_type === "docker") {
+      // For Docker servers, set dockerHost and clear address
+      serverInput.dockerHost = { set: data.docker_host || "" }
+      serverInput.address = { set: "" } // Set to empty string for Docker servers
+    } else {
+      // For external servers, set address and clear dockerHost
+      serverInput.address = { set: data.address || "" }
+      serverInput.dockerHost = { set: null } // Clear dockerHost for external servers
     }
 
     // Only include optional fields if they have values
     if (data.name && data.name.trim() !== "") {
-      serverInput.name = data.name.trim()
+      serverInput.name = { set: data.name.trim() }
     }
     if (data.publicAddress && data.publicAddress.trim() !== "") {
-      serverInput.publicAddress = data.publicAddress.trim()
+      serverInput.publicAddress = { set: data.publicAddress.trim() }
     }
     if (data.statusUrl && data.statusUrl.trim() !== "") {
-      serverInput.statusUrl = data.statusUrl.trim()
+      serverInput.statusUrl = { set: data.statusUrl.trim() }
     }
     if (data.rconPassword && data.rconPassword.trim() !== "") {
-      serverInput.rconPassword = data.rconPassword.trim()
+      serverInput.rconPassword = { set: data.rconPassword.trim() }
     }
-    if (data.dockerHost && data.dockerHost.trim() !== "") {
-      serverInput.dockerHost = data.dockerHost.trim()
-    }
+
+    // Debug logging
+    console.log("Update server input:", JSON.stringify(serverInput, null, 2))
 
     // Execute GraphQL mutation
     const client = getClient()
@@ -163,6 +191,17 @@ export async function updateServer(
     }
 
     console.error("Server update error:", error)
+
+    // Log the GraphQL errors if available
+    if (error && typeof error === "object" && "networkError" in error) {
+      const apolloError = error as { networkError?: { result?: { errors?: unknown[] } } }
+      if (apolloError.networkError?.result?.errors) {
+        console.error(
+          "GraphQL errors:",
+          JSON.stringify(apolloError.networkError.result.errors, null, 2),
+        )
+      }
+    }
 
     // Handle Prisma unique constraint errors
     if (error && typeof error === "object" && "message" in error) {

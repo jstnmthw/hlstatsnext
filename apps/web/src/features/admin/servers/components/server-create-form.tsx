@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 import { createServer } from "@/features/admin/servers/actions/create-server"
 import { FormField, ErrorMessage, ErrorDisplay } from "@/features/common/components/form"
 import { Button, Input, Label, IPAddress, Port, Switch, BasicSelect } from "@repo/ui"
@@ -10,6 +10,7 @@ type GameProps = Pick<Game, "code" | "name">
 
 export function ServerCreateForm({ games }: { games: GameProps[] }) {
   const [state, formAction, pending] = useActionState(createServer, { success: true, message: "" })
+  const [isDockerMode, setIsDockerMode] = useState(false)
 
   return (
     <form action={formAction} className="space-y-6">
@@ -18,12 +19,19 @@ export function ServerCreateForm({ games }: { games: GameProps[] }) {
       <div className="grid md:grid-cols-1 gap-4">
         <FormField>
           <Label htmlFor="connection-type">Docker</Label>
-          <Switch id="connection-type" name="connection-type" />
+          <Switch
+            id="connection-type"
+            name="connection-type"
+            checked={isDockerMode}
+            onCheckedChange={setIsDockerMode}
+          />
           <p className="text-xs text-muted-foreground">
             The server is running in the same Docker network as the game server manager.
           </p>
         </FormField>
       </div>
+
+      <input type="hidden" name="connection_type" value={isDockerMode ? "docker" : "external"} />
 
       <div className="grid md:grid-cols-2 gap-4">
         <FormField>
@@ -41,16 +49,15 @@ export function ServerCreateForm({ games }: { games: GameProps[] }) {
         </FormField>
 
         <FormField>
-          <Label htmlFor="address" required>
-            Server Address
+          <Label htmlFor={isDockerMode ? "docker_host" : "address"} required>
+            {isDockerMode ? "Docker Host" : "Server Address"}
           </Label>
           <div className="flex">
             <IPAddress
               className="rounded-r-none"
-              name="address"
+              name={isDockerMode ? "docker_host" : "address"}
+              mode={isDockerMode ? "docker-host" : "ip-address"}
               required
-              placeholder="192.168.1.1"
-              title="Enter a valid IP address (e.g., 192.168.1.1)"
             />
             <Port
               className="rounded-l-none -ml-px border-l-transparent max-w-18"
@@ -61,6 +68,7 @@ export function ServerCreateForm({ games }: { games: GameProps[] }) {
             />
           </div>
           {state.errors?.address && <ErrorMessage>{state.errors.address[0]}</ErrorMessage>}
+          {state.errors?.docker_host && <ErrorMessage>{state.errors.docker_host[0]}</ErrorMessage>}
           {state.errors?.port && <ErrorMessage>{state.errors.port[0]}</ErrorMessage>}
         </FormField>
       </div>

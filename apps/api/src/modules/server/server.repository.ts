@@ -3,17 +3,19 @@ import type { CreateServerInput, ServerConfigCopyResult } from "./server.types"
 
 export class ServerRepository {
   async createServer(data: CreateServerInput) {
+    const connectionType = data.connectionType || "external"
+
     return await db.server.create({
       data: {
-        address: data.address,
+        address: connectionType === "external" ? data.address || "" : "",
         port: data.port,
         game: data.game,
         name: data.name || "",
         rconPassword: data.rconPassword || "",
         publicAddress: data.publicAddress || "",
         statusUrl: data.statusUrl,
-        connectionType: data.connectionType || "external",
-        dockerHost: data.dockerHost,
+        connectionType,
+        dockerHost: connectionType === "docker" ? data.dockerHost : null,
         sortOrder: data.sortOrder || 0,
       },
       include: {

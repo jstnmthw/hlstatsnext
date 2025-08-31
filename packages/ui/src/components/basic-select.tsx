@@ -15,11 +15,9 @@ const BasicSelect = forwardRef<HTMLSelectElement, BasicSelectProps>(
           data-slot="select"
           className={cn(
             // Base styling from kitchen sink with adjustments for select
-            "w-full rounded-md border text-base border-input font-sans bg-background px-3 py-2 shadow-sm transition-colors",
+            "w-full rounded-md border text-base border-input font-sans bg-zinc-800 px-3 py-1 h-9 shadow-sm transition-[color,box-shadow]",
             // Focus and interaction styles
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            // Active and hover states to prevent grey flash
-            "hover:bg-background active:bg-background",
+            "focus-visible:outline-none focus-visible:border-primary focus-visible:ring-[3px] focus-visible:ring-ring/50",
             // Disabled states
             "disabled:cursor-not-allowed disabled:opacity-50",
             // Text and appearance
@@ -36,7 +34,7 @@ const BasicSelect = forwardRef<HTMLSelectElement, BasicSelectProps>(
           {...props}
         >
           {placeholder && (
-            <option value="" disabled className="text-muted-foreground bg-background">
+            <option value="" disabled>
               {placeholder}
             </option>
           )}

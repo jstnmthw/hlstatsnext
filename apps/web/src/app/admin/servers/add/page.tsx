@@ -13,7 +13,6 @@ export const metadata = {
 }
 
 export default async function CreateServerPage() {
-  // Fetch games data on the server
   const { data } = await query({
     query: GET_GAMES_FOR_SELECT,
   })

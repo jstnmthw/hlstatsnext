@@ -55,7 +55,7 @@ interface NavbarProps {
 
 export function Navbar({ currentPath }: NavbarProps) {
   return (
-    <nav className="flex items-center justify-between border-b border-zinc-600 bg-zinc-950">
+    <nav className="flex items-center justify-between border-b border-zinc-700 bg-zinc-950">
       <ul className="flex items-center gap-6 container">
         {navItems.map((item) => {
           const isActive =
@@ -72,7 +72,7 @@ export function Navbar({ currentPath }: NavbarProps) {
                 colorScheme="light"
                 asChild
                 className={cn(
-                  "font-medium text-zinc-500 dark:text-zinc-300 [&>[data-slot=icon]]:text-zinc-500",
+                  "font-semibold tracking-tight text-zinc-500 dark:text-zinc-300 [&>[data-slot=icon]]:text-zinc-500",
                   isActive &&
                     "after:content-[''] text-zinc-500 dark:text-zinc-300 [&>[data-slot=icon]]:text-primary after:absolute after:-bottom-[9px] after:left-0 after:w-full after:h-px after:bg-primary",
                 )}

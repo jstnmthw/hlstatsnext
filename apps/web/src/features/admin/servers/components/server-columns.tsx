@@ -111,11 +111,7 @@ export const serverColumns = (): ColumnDef<ServerListItem>[] => [
         server.lastEvent && new Date(server.lastEvent).getTime() > Date.now() - 30 * 60 * 1000
 
       return (
-        <Badge
-          variant="outline"
-          colorScheme={isOnline ? "green" : "light"}
-          className={cn(isOnline && "dark:text-zinc-700 text-zinc-500")}
-        >
+        <Badge variant="outline" colorScheme={isOnline ? "green" : "light"}>
           {isOnline ? "Online" : "Offline"}
         </Badge>
       )

@@ -25,22 +25,52 @@ const isValidIPAddress = (ip: string): boolean => {
   })
 }
 
-const CreateServerSchema = z.object({
-  address: z
-    .string()
-    .min(1, "Server address is required")
-    .max(15, "IP address is too long")
-    .refine(isValidIPAddress, {
-      message: "Please enter a valid IP address (e.g., 192.168.1.1)",
-    }),
-  port: z.coerce
-    .number()
-    .int()
-    .min(1, "Port must be greater than 0")
-    .max(65535, "Port must be less than 65535"),
-  game: z.string().optional().default("cstrike"),
-  rconPassword: z.string().optional(),
-})
+const CreateServerSchema = z
+  .object({
+    address: z
+      .string()
+      .min(1, "Server address is required")
+      .max(15, "IP address is too long")
+      .refine(isValidIPAddress, {
+        message: "Please enter a valid IP address (e.g., 192.168.1.1)",
+      })
+      .optional()
+      .or(z.null()),
+    docker_host: z
+      .string()
+      .min(1, "Docker host is required")
+      .max(255, "Docker host is too long")
+      .optional()
+      .or(z.null()),
+    port: z.coerce
+      .number()
+      .int()
+      .min(1, "Port must be greater than 0")
+      .max(65535, "Port must be less than 65535"),
+    game: z.string().optional().default("cstrike"),
+    connection_type: z.enum(["external", "docker"]).optional().default("external"),
+    rconPassword: z.string().optional().or(z.null()),
+  })
+  .superRefine((data, ctx) => {
+    // Ensure either address or docker_host is provided based on connection type
+    if (data.connection_type === "docker") {
+      if (!data.docker_host || data.docker_host.trim() === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Docker host is required for Docker connection type",
+          path: ["docker_host"],
+        })
+      }
+    } else {
+      if (!data.address || data.address.trim() === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Server address is required for external connection type",
+          path: ["address"],
+        })
+      }
+    }
+  })
 
 export type CreateServerFormData = z.infer<typeof CreateServerSchema>
 
@@ -58,8 +88,10 @@ export async function createServer(
     // Extract and validate form data
     const rawData = {
       address: formData.get("address"),
+      docker_host: formData.get("docker_host"),
       port: formData.get("port"),
       game: formData.get("game"),
+      connection_type: formData.get("connection_type"),
       rconPassword: formData.get("rconPassword"),
     }
 
@@ -77,19 +109,29 @@ export async function createServer(
 
     // Prepare GraphQL input
     const serverInput = {
-      address: data.address,
+      ...(data.connection_type === "docker"
+        ? { dockerHost: data.docker_host }
+        : { address: data.address }),
       port: data.port,
       game: data.game,
+      connectionType: data.connection_type,
       // Only include rconPassword if it's provided
       ...(data.rconPassword && { rconPassword: data.rconPassword }),
     }
+
+    // Clean up any undefined or null values that might cause GraphQL issues
+    const cleanedInput = Object.fromEntries(
+      Object.entries(serverInput).filter(
+        ([, value]) => value !== undefined && value !== null && value !== "",
+      ),
+    )
 
     // Execute GraphQL mutation
     const client = getClient()
     const result = await client.mutate({
       mutation: CREATE_SERVER_MUTATION as DocumentNode,
       variables: {
-        data: serverInput,
+        data: cleanedInput,
       },
     })
 

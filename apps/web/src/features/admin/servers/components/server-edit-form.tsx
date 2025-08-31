@@ -1,26 +1,12 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 import { updateServer } from "@/features/admin/servers/actions/update-server"
 import { FormField, ErrorMessage, ErrorDisplay } from "@/features/common/components/form"
-import {
-  Button,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Label,
-  IPAddress,
-  Port,
-} from "@repo/ui"
-import { GameSelect } from "./game-select"
+import { Button, Input, Switch, Label, IPAddress, Port, BasicSelect } from "@repo/ui"
+import type { Game } from "@repo/database/client"
 
-interface Game {
-  code: string
-  name: string
-}
+type GameProps = Pick<Game, "code" | "name">
 
 interface ServerEditFormProps {
   server: {
@@ -36,17 +22,19 @@ interface ServerEditFormProps {
     dockerHost?: string
     sortOrder: number
   }
-  games: Game[]
+  games: GameProps[]
 }
 
 export function ServerEditForm({ server, games }: ServerEditFormProps) {
   const [state, formAction, pending] = useActionState(updateServer, { success: true, message: "" })
+  const [isDockerMode, setIsDockerMode] = useState(server.connectionType === "docker")
 
   return (
     <form action={formAction} className="space-y-6">
       <ErrorDisplay state={state} pending={pending} />
 
       <input type="hidden" name="serverId" value={server.serverId} />
+      <input type="hidden" name="connection_type" value={isDockerMode ? "docker" : "external"} />
 
       <div className="grid md:grid-cols-2 gap-4">
         <FormField>
@@ -65,24 +53,44 @@ export function ServerEditForm({ server, games }: ServerEditFormProps) {
           <Label htmlFor="game" required>
             Game Type
           </Label>
-          <GameSelect name="game" defaultValue={server.game || "cstrike"} required games={games} />
+          <BasicSelect name="game" defaultValue={server.game} required>
+            {games.map((game) => (
+              <option key={game.code} value={game.code}>
+                {game.name}
+              </option>
+            ))}
+          </BasicSelect>
           {state.errors?.game && <ErrorMessage>{state.errors.game[0]}</ErrorMessage>}
+        </FormField>
+      </div>
+
+      <div className="grid md:grid-cols-1 gap-4">
+        <FormField>
+          <Label htmlFor="connection-type">Docker</Label>
+          <Switch
+            id="connection-type"
+            name="connection-type"
+            checked={isDockerMode}
+            onCheckedChange={setIsDockerMode}
+          />
+          <p className="text-xs text-muted-foreground">
+            The server is running in the same Docker network as the game server manager.
+          </p>
         </FormField>
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
         <FormField>
-          <Label htmlFor="address" required>
-            Server Address
+          <Label htmlFor={isDockerMode ? "docker_host" : "address"} required>
+            {isDockerMode ? "Docker Host" : "Server Address"}
           </Label>
           <div className="flex">
             <IPAddress
               className="rounded-r-none"
-              name="address"
+              name={isDockerMode ? "docker_host" : "address"}
+              mode={isDockerMode ? "docker-host" : "ip-address"}
               required
-              placeholder="192.168.1.1"
-              title="Enter a valid IP address (e.g., 192.168.1.1)"
-              defaultValue={server.address}
+              defaultValue={isDockerMode ? server.dockerHost || "" : server.address}
             />
             <Port
               className="rounded-l-none -ml-px border-l-transparent max-w-18"
@@ -94,6 +102,7 @@ export function ServerEditForm({ server, games }: ServerEditFormProps) {
             />
           </div>
           {state.errors?.address && <ErrorMessage>{state.errors.address[0]}</ErrorMessage>}
+          {state.errors?.docker_host && <ErrorMessage>{state.errors.docker_host[0]}</ErrorMessage>}
           {state.errors?.port && <ErrorMessage>{state.errors.port[0]}</ErrorMessage>}
         </FormField>
 
@@ -128,39 +137,6 @@ export function ServerEditForm({ server, games }: ServerEditFormProps) {
           />
           <p className="text-xs text-muted-foreground">Optional. URL for server status page.</p>
           {state.errors?.statusUrl && <ErrorMessage>{state.errors.statusUrl[0]}</ErrorMessage>}
-        </FormField>
-
-        <FormField>
-          <Label htmlFor="connectionType">Connection Type</Label>
-          <Select name="connectionType" defaultValue={server.connectionType || "external"}>
-            <SelectTrigger id="connectionType" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="external">External</SelectItem>
-              <SelectItem value="docker">Docker</SelectItem>
-            </SelectContent>
-          </Select>
-          {state.errors?.connectionType && (
-            <ErrorMessage>{state.errors.connectionType[0]}</ErrorMessage>
-          )}
-        </FormField>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <FormField>
-          <Label htmlFor="dockerHost">Docker Host</Label>
-          <Input
-            id="dockerHost"
-            name="dockerHost"
-            placeholder="container_name or IP"
-            defaultValue={server.dockerHost || ""}
-            maxLength={255}
-          />
-          <p className="text-xs text-muted-foreground">
-            Required for Docker connection type. Container hostname or static IP.
-          </p>
-          {state.errors?.dockerHost && <ErrorMessage>{state.errors.dockerHost[0]}</ErrorMessage>}
         </FormField>
 
         <FormField>

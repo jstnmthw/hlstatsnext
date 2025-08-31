@@ -8,7 +8,7 @@ const serverService = new ServerService()
 // Define custom input type for server creation
 const CreateServerInputType = builder.inputType("CreateServerInput", {
   fields: (t) => ({
-    address: t.string({ required: true }),
+    address: t.string({ required: false }),
     port: t.int({ required: true }),
     game: t.string({ required: true }),
     name: t.string({ required: false }),
@@ -59,7 +59,7 @@ builder.mutationField("createServerWithConfig", (t) =>
     },
     resolve: async (_, { data }) => {
       const input: CreateServerInput = {
-        address: data.address,
+        address: data.address || undefined,
         port: data.port,
         game: data.game,
         name: data.name || undefined,

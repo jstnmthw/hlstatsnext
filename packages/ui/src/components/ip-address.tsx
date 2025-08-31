@@ -8,6 +8,7 @@ interface IPAddressProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value"> {
   name?: string
   defaultValue?: string
+  mode?: "ip-address" | "docker-host"
 }
 
 interface PortProps
@@ -64,11 +65,17 @@ const formatIPAddress = (value: string): string => {
   return formatted
 }
 
+const formatDockerHost = (value: string): string => {
+  // Allow alphanumeric, dots, underscores, and hyphens for Docker hostnames
+  return value.replace(/[^a-zA-Z0-9.\-_]/g, "")
+}
+
 export function IPAddress({
   name,
   className,
-  placeholder = "192.168.1.1",
+  placeholder,
   defaultValue = "",
+  mode = "ip-address",
   ...props
 }: IPAddressProps) {
   const [displayValue, setDisplayValue] = useState(defaultValue)
@@ -83,7 +90,8 @@ export function IPAddress({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value
-    const formatted = formatIPAddress(rawValue)
+    const formatted =
+      mode === "docker-host" ? formatDockerHost(rawValue) : formatIPAddress(rawValue)
 
     setDisplayValue(formatted)
 
@@ -100,10 +108,14 @@ export function IPAddress({
         type="text"
         value={displayValue}
         onChange={handleChange}
-        placeholder={placeholder}
-        maxLength={15}
-        pattern="^(\d{1,3}\.){3}\d{1,3}$"
-        title="Enter a valid IP address (e.g., 192.168.1.1)"
+        placeholder={placeholder || (mode === "docker-host" ? "container_name" : "192.168.1.1")}
+        maxLength={mode === "docker-host" ? 255 : 15}
+        pattern={mode === "docker-host" ? "^[a-zA-Z0-9.\\-_]+$" : "^(\\d{1,3}\\.){3}\\d{1,3}$"}
+        title={
+          mode === "docker-host"
+            ? "Enter a Docker hostname (e.g., container_name)"
+            : "Enter a valid IP address (e.g., 192.168.1.1)"
+        }
         className={cn("font-mono font-medium", className)}
       />
       {/* Hidden input for form submission */}

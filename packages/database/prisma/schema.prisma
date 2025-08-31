@@ -815,7 +815,9 @@ model Server {
   configs                  ServerConfig[]
   loads                    ServerLoad[]
 
-  @@unique([address, port], name: "addressport")
+  // Ensure uniqueness across both connection types by including connectionType in constraints
+  @@unique([connectionType, address, port], name: "servers_external_unique")
+  @@unique([connectionType, dockerHost, port], name: "servers_docker_unique")
   @@index([game])
   @@index([lastEvent])
   @@index([name])

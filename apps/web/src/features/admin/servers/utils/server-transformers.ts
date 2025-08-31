@@ -5,10 +5,8 @@
  * following separation of concerns and single responsibility principles.
  */
 
-import type {
-  CreateServerFormData,
-  UpdateServerFormData,
-} from "@/lib/validators/schemas/server-schemas"
+import type { CreateServerFormData } from "@/features/admin/servers/actions/create-server"
+import type { UpdateServerFormData } from "@/features/admin/servers/actions/update-server"
 
 /**
  * Extracts form data into a typed object for validation

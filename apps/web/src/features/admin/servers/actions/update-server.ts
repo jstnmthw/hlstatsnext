@@ -1,12 +1,12 @@
 "use server"
 
 import type { DocumentNode } from "graphql"
+import { z } from "zod"
 import { redirect } from "next/navigation"
 import { getClient } from "@/lib/apollo-client"
 import { UPDATE_SERVER_MUTATION } from "@/features/admin/servers/graphql/server-mutations"
 import {
   UpdateServerSchema,
-  type UpdateServerFormData,
   type ServerOperationResult,
 } from "@/lib/validators/schemas/server-schemas"
 import {
@@ -22,7 +22,7 @@ import {
   createUnexpectedErrorResult,
 } from "@/features/admin/servers/utils/error-handlers"
 
-export type { UpdateServerFormData }
+export type UpdateServerFormData = z.infer<typeof UpdateServerSchema>
 export type UpdateServerResult = ServerOperationResult
 
 export async function updateServer(

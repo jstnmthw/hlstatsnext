@@ -1,12 +1,12 @@
 "use server"
 
 import type { DocumentNode } from "graphql"
+import { z } from "zod"
 import { redirect } from "next/navigation"
 import { getClient } from "@/lib/apollo-client"
 import { CREATE_SERVER_MUTATION } from "@/features/admin/servers/graphql/server-mutations"
 import {
   CreateServerSchema,
-  type CreateServerFormData,
   type ServerOperationResult,
 } from "@/lib/validators/schemas/server-schemas"
 import {
@@ -21,7 +21,7 @@ import {
   createUnexpectedErrorResult,
 } from "@/features/admin/servers/utils/error-handlers"
 
-export type { CreateServerFormData }
+export type CreateServerFormData = z.infer<typeof CreateServerSchema>
 export type CreateServerResult = ServerOperationResult
 
 export async function createServer(

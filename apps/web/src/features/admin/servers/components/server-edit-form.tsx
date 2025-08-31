@@ -17,6 +17,11 @@ import {
 } from "@repo/ui"
 import { GameSelect } from "./game-select"
 
+interface Game {
+  code: string
+  name: string
+}
+
 interface ServerEditFormProps {
   server: {
     serverId: number
@@ -31,9 +36,10 @@ interface ServerEditFormProps {
     dockerHost?: string
     sortOrder: number
   }
+  games: Game[]
 }
 
-export function ServerEditForm({ server }: ServerEditFormProps) {
+export function ServerEditForm({ server, games }: ServerEditFormProps) {
   const [state, formAction, pending] = useActionState(updateServer, { success: true, message: "" })
 
   return (
@@ -59,7 +65,7 @@ export function ServerEditForm({ server }: ServerEditFormProps) {
           <Label htmlFor="game" required>
             Game Type
           </Label>
-          <GameSelect name="game" defaultValue={server.game || "cstrike"} required />
+          <GameSelect name="game" defaultValue={server.game || "cstrike"} required games={games} />
           {state.errors?.game && <ErrorMessage>{state.errors.game[0]}</ErrorMessage>}
         </FormField>
       </div>

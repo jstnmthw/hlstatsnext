@@ -1,5 +1,4 @@
-import { Suspense } from "react"
-import { PreloadQuery } from "@/lib/apollo-client"
+import { query } from "@/lib/apollo-client"
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
@@ -13,7 +12,14 @@ export const metadata = {
   description: "Add a new game server to track player statistics and activities.",
 }
 
-export default function CreateServerPage() {
+export default async function CreateServerPage() {
+  // Fetch games data on the server
+  const { data } = await query({
+    query: GET_GAMES_FOR_SELECT,
+  })
+
+  const games = data.findManyGame || []
+
   return (
     <PageWrapper>
       <AdminHeader currentPath="/admin/servers/add" />
@@ -25,11 +31,7 @@ export default function CreateServerPage() {
               <p className="text-muted-foreground mb-6 text-sm">
                 Add a new Half-Life server to begin tracking player statistics and activities.
               </p>
-              <PreloadQuery query={GET_GAMES_FOR_SELECT}>
-                <Suspense fallback={<div>Loading...</div>}>
-                  <ServerCreateForm />
-                </Suspense>
-              </PreloadQuery>
+              <ServerCreateForm games={games} />
             </Card>
           </div>
         </div>

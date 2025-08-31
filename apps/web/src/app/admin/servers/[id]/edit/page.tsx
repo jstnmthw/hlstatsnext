@@ -1,7 +1,6 @@
 import { Metadata } from "next"
-import { Suspense } from "react"
 import { notFound } from "next/navigation"
-import { query, PreloadQuery } from "@/lib/apollo-client"
+import { query } from "@/lib/apollo-client"
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
@@ -32,14 +31,20 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
     notFound()
   }
 
-  // Fetch server data on server
+  // Fetch server data and games on server
   try {
-    const { data } = await query({
-      query: GET_SERVER_BY_ID,
-      variables: { serverId },
-    })
+    const [serverResult, gamesResult] = await Promise.all([
+      query({
+        query: GET_SERVER_BY_ID,
+        variables: { serverId },
+      }),
+      query({
+        query: GET_GAMES_FOR_SELECT,
+      }),
+    ])
 
-    const server = data.findUniqueServer
+    const server = serverResult.data.findUniqueServer
+    const games = gamesResult.data.findManyGame || []
 
     if (!server) {
       notFound()
@@ -56,25 +61,22 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
                 <p className="text-muted-foreground mb-6 text-sm">
                   Update server configuration and settings for {server.name || "Unnamed Server"}.
                 </p>
-                <PreloadQuery query={GET_GAMES_FOR_SELECT}>
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <ServerEditForm
-                      server={{
-                        serverId: server.serverId,
-                        name: server.name || "",
-                        address: server.address || "",
-                        port: server.port || 27015,
-                        game: server.game || "cstrike",
-                        publicAddress: server.publicAddress || "",
-                        statusUrl: server.statusUrl || "",
-                        rconPassword: server.rconPassword || "",
-                        connectionType: server.connectionType || "external",
-                        dockerHost: server.dockerHost || "",
-                        sortOrder: server.sortOrder || 0,
-                      }}
-                    />
-                  </Suspense>
-                </PreloadQuery>
+                <ServerEditForm
+                  server={{
+                    serverId: server.serverId,
+                    name: server.name || "",
+                    address: server.address || "",
+                    port: server.port || 27015,
+                    game: server.game || "cstrike",
+                    publicAddress: server.publicAddress || "",
+                    statusUrl: server.statusUrl || "",
+                    rconPassword: server.rconPassword || "",
+                    connectionType: server.connectionType || "external",
+                    dockerHost: server.dockerHost || "",
+                    sortOrder: server.sortOrder || 0,
+                  }}
+                  games={games}
+                />
               </Card>
             </div>
           </div>

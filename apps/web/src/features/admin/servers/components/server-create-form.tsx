@@ -6,7 +6,16 @@ import { FormField, ErrorMessage, ErrorDisplay } from "@/features/common/compone
 import { Button, Input, Label, IPAddress, Port, Switch } from "@repo/ui"
 import { GameSelect } from "./game-select"
 
-export function ServerCreateForm() {
+interface Game {
+  code: string
+  name: string
+}
+
+interface ServerCreateFormProps {
+  games: Game[]
+}
+
+export function ServerCreateForm({ games }: ServerCreateFormProps) {
   const [state, formAction, pending] = useActionState(createServer, { success: true, message: "" })
 
   return (
@@ -28,7 +37,7 @@ export function ServerCreateForm() {
           <Label htmlFor="game" required>
             Game Type
           </Label>
-          <GameSelect name="game" defaultValue="cstrike" required />
+          <GameSelect name="game" defaultValue="cstrike" required games={games} />
           {state.errors?.game && <ErrorMessage>{state.errors.game[0]}</ErrorMessage>}
         </FormField>
 

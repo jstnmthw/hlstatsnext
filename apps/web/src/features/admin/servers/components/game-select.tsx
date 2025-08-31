@@ -1,38 +1,29 @@
-"use client"
-
-import { useSuspenseQuery } from "@apollo/client"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/ui"
-import { GET_GAMES_FOR_SELECT } from "../graphql/game-queries"
+interface Game {
+  code: string
+  name: string
+}
 
 interface GameSelectProps {
   name: string
   defaultValue?: string
   required?: boolean
+  games: Game[]
 }
 
-export function GameSelect({ name, defaultValue, required }: GameSelectProps) {
-  const { data } = useSuspenseQuery(GET_GAMES_FOR_SELECT)
-
-  const games = data.findManyGame || []
-
+export function GameSelect({ name, defaultValue, required, games }: GameSelectProps) {
   return (
-    <Select name={name} defaultValue={defaultValue} required={required}>
-      <SelectTrigger id="game" className="w-full">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        {games.length === 0 ? (
-          <SelectItem value="" disabled>
-            No games available
-          </SelectItem>
-        ) : (
-          games.map((game) => (
-            <SelectItem key={game.code} value={game.code}>
-              {game.name}
-            </SelectItem>
-          ))
-        )}
-      </SelectContent>
-    </Select>
+    <select
+      id="game"
+      name={name}
+      defaultValue={defaultValue}
+      required={required}
+      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {games.map((game) => (
+        <option key={game.code} value={game.code}>
+          {game.name}
+        </option>
+      ))}
+    </select>
   )
 }

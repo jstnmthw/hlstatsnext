@@ -41,6 +41,7 @@ export { IPAddress, Port } from "./components/ip-address"
 export { RadioGroup, RadioGroupItem } from "./components/radio-group"
 export { Button, buttonVariants } from "./components/button"
 export { Switch } from "./components/switch"
+export { BasicSelect } from "./components/basic-select"
 
 // Icons
 export * from "./icons"

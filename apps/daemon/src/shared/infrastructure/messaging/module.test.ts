@@ -17,6 +17,9 @@ import type {
   RabbitMQConfig,
 } from "./queue/core/types"
 import type { IEventProcessor } from "./queue/core/consumer"
+import { RabbitMQClient } from "./queue/rabbitmq/client"
+import { EventPublisher } from "./queue/core/publisher"
+import { EventConsumer } from "./queue/core/consumer"
 
 // Mock the imported modules
 vi.mock("./queue/rabbitmq/client", () => ({
@@ -95,11 +98,6 @@ describe.skip("QueueModule", () => {
       autoStartConsumers: false,
       autoSetupTopology: true,
     }
-
-    // Set up constructor mocks
-    const { RabbitMQClient } = await import("./queue/rabbitmq/client.js")
-    const { EventPublisher } = await import("./queue/core/publisher.js")
-    const { EventConsumer } = await import("./queue/core/consumer.js")
 
     vi.mocked(RabbitMQClient).mockImplementation(
       () => mockClient as unknown as typeof RabbitMQClient.prototype,

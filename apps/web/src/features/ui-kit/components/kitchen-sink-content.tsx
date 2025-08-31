@@ -1017,24 +1017,40 @@ export function KitchenSinkContent({ className }: { className?: string }) {
           </div>
 
           {/* Select */}
-          <div id="select" className="space-y-1 flex flex-col">
-            <label htmlFor="select-field" className="text-sm font-medium">
-              Select
-            </label>
-            <Select>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select a game" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Games</SelectLabel>
-                  <SelectItem value="cstrike">Counter-Strike 1.6</SelectItem>
-                  <SelectItem value="tfc">Team Fortress Classic</SelectItem>
-                  <SelectItem value="dod">Day of Defeat</SelectItem>
-                  <SelectItem value="opfor">Opposing Force</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+          <div id="select" className="space-y-4 flex flex-col">
+            <div>
+              Client Side Select
+              <label htmlFor="select-field" className="text-sm font-medium">
+                Select
+              </label>
+              <Select>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select a game" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Games</SelectLabel>
+                    <SelectItem value="cstrike">Counter-Strike 1.6</SelectItem>
+                    <SelectItem value="tfc">Team Fortress Classic</SelectItem>
+                    <SelectItem value="dod">Day of Defeat</SelectItem>
+                    <SelectItem value="opfor">Opposing Force</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1 flex flex-col">
+              Server Side Select
+              <select
+                id="select-field"
+                className="w-[180px] rounded-md border text-base border-input font-sans bg-background px-3 py-2 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="cstrike">Counter-Strike 1.6</option>
+                <option value="tfc">Team Fortress Classic</option>
+                <option value="dod">Day of Defeat</option>
+                <option value="opfor">Opposing Force</option>
+              </select>
+            </div>
           </div>
 
           {/* Checkboxes */}

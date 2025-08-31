@@ -6,7 +6,7 @@ export interface WhereFilter {
 export interface PaginationVariables {
   take: number
   skip: number
-  orderBy?: Array<Record<string, "asc" | "desc">>
+  orderBy?: Array<Record<string, "asc" | "desc" | Record<string, "asc" | "desc">>>
   where?: WhereFilter
 }
 
@@ -33,7 +33,17 @@ export function buildPaginationVariables(
 
   // Add sorting
   if (params.sortField) {
-    variables.orderBy = [{ [params.sortField]: params.sortOrder || "asc" }]
+    // Handle nested field names for relations (e.g., "player.lastName" -> { player: { lastName: "asc" } })
+    if (params.sortField.includes(".")) {
+      const [relation, field] = params.sortField.split(".", 2)
+      if (relation && field) {
+        const orderByObject: Record<string, "asc" | "desc" | Record<string, "asc" | "desc">> = {}
+        orderByObject[relation] = { [field]: params.sortOrder || "asc" }
+        variables.orderBy = [orderByObject]
+      }
+    } else {
+      variables.orderBy = [{ [params.sortField]: params.sortOrder || "asc" }]
+    }
   }
 
   // Add search filter

@@ -16,7 +16,7 @@ export default function CreateServerPage() {
       <AdminHeader currentPath="/admin/servers/add" />
       <MainContent>
         <div className="container">
-          <div className="py-10 border-t border-border">
+          <div className="py-10">
             <Card className="p-6 max-w-lg mx-auto">
               <h1 className="text-3xl font-medium tracking-tight mb-2">Add Server</h1>
               <p className="text-muted-foreground mb-6 text-sm">

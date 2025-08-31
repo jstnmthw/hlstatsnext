@@ -308,7 +308,10 @@ export function DataTable<T>({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={filteredColumns.length} className="h-24 text-center">
+                  <TableCell
+                    colSpan={filteredColumns.length}
+                    className="h-24 text-center font-medium tracking-tight text-muted-foreground/60"
+                  >
                     No results.
                   </TableCell>
                 </TableRow>

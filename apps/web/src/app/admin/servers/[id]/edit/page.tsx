@@ -1,12 +1,14 @@
 import { Metadata } from "next"
+import { Suspense } from "react"
 import { notFound } from "next/navigation"
-import { query } from "@/lib/apollo-client"
+import { query, PreloadQuery } from "@/lib/apollo-client"
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
 import { ServerEditForm } from "@/features/admin/servers/components/server-edit-form"
 import { GET_SERVER_BY_ID } from "@/features/admin/servers/graphql/server-queries"
+import { GET_GAMES_FOR_SELECT } from "@/features/admin/servers/graphql/game-queries"
 import { Card } from "@repo/ui"
 
 interface EditServerPageProps {
@@ -54,21 +56,25 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
                 <p className="text-muted-foreground mb-6 text-sm">
                   Update server configuration and settings for {server.name || "Unnamed Server"}.
                 </p>
-                <ServerEditForm
-                  server={{
-                    serverId: server.serverId,
-                    name: server.name || "",
-                    address: server.address || "",
-                    port: server.port || 27015,
-                    game: server.game || "cstrike",
-                    publicAddress: server.publicAddress || "",
-                    statusUrl: server.statusUrl || "",
-                    rconPassword: server.rconPassword || "",
-                    connectionType: server.connectionType || "external",
-                    dockerHost: server.dockerHost || "",
-                    sortOrder: server.sortOrder || 0,
-                  }}
-                />
+                <PreloadQuery query={GET_GAMES_FOR_SELECT}>
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <ServerEditForm
+                      server={{
+                        serverId: server.serverId,
+                        name: server.name || "",
+                        address: server.address || "",
+                        port: server.port || 27015,
+                        game: server.game || "cstrike",
+                        publicAddress: server.publicAddress || "",
+                        statusUrl: server.statusUrl || "",
+                        rconPassword: server.rconPassword || "",
+                        connectionType: server.connectionType || "external",
+                        dockerHost: server.dockerHost || "",
+                        sortOrder: server.sortOrder || 0,
+                      }}
+                    />
+                  </Suspense>
+                </PreloadQuery>
               </Card>
             </div>
           </div>

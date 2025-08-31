@@ -40,6 +40,7 @@ export { Checkbox } from "./components/checkbox"
 export { IPAddress, Port } from "./components/ip-address"
 export { RadioGroup, RadioGroupItem } from "./components/radio-group"
 export { Button, buttonVariants } from "./components/button"
+export { Switch } from "./components/switch"
 
 // Icons
 export * from "./icons"

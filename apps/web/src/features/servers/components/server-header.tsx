@@ -2,7 +2,7 @@
 
 import { Badge, Button } from "@repo/ui"
 import { formatDate } from "@/lib/datetime-util"
-import { useServerBasicInfo, useServerPlayerCounts } from "../hooks/use-server-players"
+import { useServerBasicInfo /* , useServerPlayerCounts */ } from "../hooks/use-server-players"
 import { ExternalLink, RefreshCw, Copy } from "lucide-react"
 import { useState } from "react"
 
@@ -13,7 +13,10 @@ interface ServerHeaderProps {
 
 export function ServerHeader({ serverId, className }: ServerHeaderProps) {
   const { server, loading, error, refetch } = useServerBasicInfo(serverId)
-  const { totalCount, recentCount, loading: countsLoading } = useServerPlayerCounts(serverId)
+  // const { totalCount, recentCount, loading: countsLoading } = useServerPlayerCounts(serverId)
+  const totalCount = 0,
+    recentCount = 0,
+    countsLoading = false
   const [copied, setCopied] = useState(false)
 
   const handleCopyAddress = async () => {

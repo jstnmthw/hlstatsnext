@@ -1,8 +1,11 @@
+import { Suspense } from "react"
+import { PreloadQuery } from "@/lib/apollo-client"
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
 import { ServerCreateForm } from "@/features/admin/servers/components/server-create-form"
+import { GET_GAMES_FOR_SELECT } from "@/features/admin/servers/graphql/game-queries"
 import { Card } from "@repo/ui"
 
 export const metadata = {
@@ -22,7 +25,11 @@ export default function CreateServerPage() {
               <p className="text-muted-foreground mb-6 text-sm">
                 Add a new Half-Life server to begin tracking player statistics and activities.
               </p>
-              <ServerCreateForm />
+              <PreloadQuery query={GET_GAMES_FOR_SELECT}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <ServerCreateForm />
+                </Suspense>
+              </PreloadQuery>
             </Card>
           </div>
         </div>

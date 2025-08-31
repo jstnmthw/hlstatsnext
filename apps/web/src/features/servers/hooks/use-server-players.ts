@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client"
-import { GET_SERVER_PLAYERS, GET_SERVER_BASIC_INFO } from "../graphql/server-player-queries"
+import { /* GET_SERVER_PLAYERS, */ GET_SERVER_BASIC_INFO } from "../graphql/server-player-queries"
 
 export interface ServerPlayerFilters {
   search?: string
@@ -20,7 +20,7 @@ export interface ServerPlayerPagination {
   sortOrder?: "asc" | "desc"
 }
 
-export function useServerPlayers(
+/*export function useServerPlayers(
   serverId: number,
   filters: ServerPlayerFilters = {},
   pagination: ServerPlayerPagination = { page: 1, pageSize: 25 },
@@ -59,7 +59,7 @@ export function useServerPlayers(
     error,
     refetch,
   }
-}
+}*/
 
 export function useServerBasicInfo(serverId: number) {
   const { data, loading, error, refetch } = useQuery(GET_SERVER_BASIC_INFO, {
@@ -76,7 +76,7 @@ export function useServerBasicInfo(serverId: number) {
 }
 
 // Hook for getting just the counts (useful for badges/indicators)
-export function useServerPlayerCounts(serverId: number, filters: ServerPlayerFilters = {}) {
+/*export function useServerPlayerCounts(serverId: number, filters: ServerPlayerFilters = {}) {
   const { data, loading, error } = useQuery(GET_SERVER_PLAYERS, {
     variables: {
       serverId,
@@ -103,4 +103,4 @@ export function useServerPlayerCounts(serverId: number, filters: ServerPlayerFil
     loading,
     error,
   }
-}
+}*/

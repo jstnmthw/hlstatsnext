@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useMemo, useCallback } from "react"
+import { useState, useCallback } from "react"
 import { DataTable } from "@/features/common/components/data-table"
 import { useDataTableUrl } from "@/features/common/hooks/use-data-table-url"
 import { serverPlayerColumns, serverPlayerFilterConfig } from "./server-player-columns"
-import { useServerPlayers, type ServerPlayerFilters } from "../hooks/use-server-players"
+import { /* useServerPlayers, */ type ServerPlayerFilters } from "../hooks/use-server-players"
 import { ServerPlayerFiltersComponent } from "./server-player-filters"
 
 interface ServerPlayerTableProps {
@@ -42,22 +42,29 @@ export function ServerPlayerTable({
     useDataTableUrl(config)
 
   // Combine search value with other filters
-  const combinedFilters = useMemo(
-    () => ({
-      ...localFilters,
-      search: searchValue,
-    }),
-    [localFilters, searchValue],
-  )
+  // const combinedFilters = useMemo(
+  //   () => ({
+  //     ...localFilters,
+  //     search: searchValue,
+  //   }),
+  //   [localFilters, searchValue],
+  // )
 
   // Fetch server players data
-  const { players, totalCount, onlineCount, recentCount, loading, error, refetch } =
-    useServerPlayers(serverId, combinedFilters, {
-      page: currentPage,
-      pageSize,
-      sortField,
-      sortOrder,
-    })
+  // const { players, totalCount, onlineCount, recentCount, loading, error, refetch } =
+  //   useServerPlayers(serverId, combinedFilters, {
+  //     page: currentPage,
+  //     pageSize,
+  //     sortField,
+  //     sortOrder,
+  //   })
+  const players: never[] = [],
+    totalCount = 0,
+    onlineCount = 0,
+    recentCount = 0,
+    loading = false,
+    error = null
+  const refetch = useCallback(() => {}, [])
 
   // Create wrapper functions that match DataTable's expected signatures
   const handlePageChangeWrapper = useCallback(

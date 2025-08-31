@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client"
 
-export const GET_SERVER_PLAYERS = gql`
+/*export const GET_SERVER_PLAYERS = gql`
   query GetServerPlayers(
     $serverId: Int!
     $filters: GetServerPlayersFiltersInput
@@ -45,7 +45,7 @@ export const GET_SERVER_PLAYERS = gql`
       recentCount
     }
   }
-`
+`*/
 
 export const GET_SERVER_DETAILS_WITH_PLAYERS = gql`
   query GetServerDetailsWithPlayers($serverId: Int!) {
@@ -62,24 +62,6 @@ export const GET_SERVER_DETAILS_WITH_PLAYERS = gql`
       lastEvent
       city
       country
-      topPlayers(limit: 5) {
-        playerId
-        lastName
-        skill
-        kills
-        deaths
-        kdRatio
-        isOnline
-        rank
-      }
-      recentPlayers(limit: 5) {
-        playerId
-        lastName
-        skill
-        lastEvent
-        isOnline
-        sessionDuration
-      }
     }
   }
 `
@@ -103,7 +85,7 @@ export const GET_SERVER_BASIC_INFO = gql`
   }
 `
 
-export const GET_PLAYER_SERVER_HISTORY = gql`
+/*export const GET_PLAYER_SERVER_HISTORY = gql`
   query GetPlayerServerHistory($playerId: Int!, $serverId: Int!, $limit: Int) {
     getPlayerServerHistory(playerId: $playerId, serverId: $serverId, limit: $limit) {
       id
@@ -120,9 +102,9 @@ export const GET_PLAYER_SERVER_HISTORY = gql`
       }
     }
   }
-`
+`*/
 
-export const GET_SERVER_PLAYER_COUNT = gql`
+/*export const GET_SERVER_PLAYER_COUNT = gql`
   query GetServerPlayerCount($serverId: Int!, $filters: GetServerPlayersFiltersInput) {
     getServerPlayers(serverId: $serverId, filters: $filters, take: 0, skip: 0) {
       totalCount
@@ -130,4 +112,4 @@ export const GET_SERVER_PLAYER_COUNT = gql`
       recentCount
     }
   }
-`
+`*/

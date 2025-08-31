@@ -15,6 +15,7 @@ import {
   IPAddress,
   Port,
 } from "@repo/ui"
+import { GameSelect } from "./game-select"
 
 interface ServerEditFormProps {
   server: {
@@ -58,18 +59,7 @@ export function ServerEditForm({ server }: ServerEditFormProps) {
           <Label htmlFor="game" required>
             Game Type
           </Label>
-          <Select name="game" defaultValue={server.game || "cstrike"}>
-            <SelectTrigger id="game" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="cstrike">Counter-Strike</SelectItem>
-              <SelectItem value="css">Counter-Strike: Source</SelectItem>
-              <SelectItem value="tf">Team Fortress Classic</SelectItem>
-              <SelectItem value="dod">Day of Defeat</SelectItem>
-              <SelectItem value="hl">Half-Life</SelectItem>
-            </SelectContent>
-          </Select>
+          <GameSelect name="game" defaultValue={server.game || "cstrike"} required />
           {state.errors?.game && <ErrorMessage>{state.errors.game[0]}</ErrorMessage>}
         </FormField>
       </div>

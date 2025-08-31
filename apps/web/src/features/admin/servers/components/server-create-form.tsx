@@ -3,18 +3,8 @@
 import { useActionState } from "react"
 import { createServer } from "@/features/admin/servers/actions/create-server"
 import { FormField, ErrorMessage, ErrorDisplay } from "@/features/common/components/form"
-import {
-  Button,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Label,
-  IPAddress,
-  Port,
-} from "@repo/ui"
+import { Button, Input, Label, IPAddress, Port, Switch } from "@repo/ui"
+import { GameSelect } from "./game-select"
 
 export function ServerCreateForm() {
   const [state, formAction, pending] = useActionState(createServer, { success: true, message: "" })
@@ -23,23 +13,22 @@ export function ServerCreateForm() {
     <form action={formAction} className="space-y-6">
       <ErrorDisplay state={state} pending={pending} />
 
+      <div className="grid md:grid-cols-1 gap-4">
+        <FormField>
+          <Label htmlFor="connection-type">Docker</Label>
+          <Switch id="connection-type" name="connection-type" />
+          <p className="text-xs text-muted-foreground">
+            The server is running in the same Docker network as the game server manager.
+          </p>
+        </FormField>
+      </div>
+
       <div className="grid md:grid-cols-2 gap-4">
         <FormField>
           <Label htmlFor="game" required>
             Game Type
           </Label>
-          <Select name="game" defaultValue="cstrike">
-            <SelectTrigger id="game" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="cstrike">Counter-Strike</SelectItem>
-              <SelectItem value="css">Counter-Strike: Source</SelectItem>
-              <SelectItem value="tf">Team Fortress Classic</SelectItem>
-              <SelectItem value="dod">Day of Defeat</SelectItem>
-              <SelectItem value="hl">Half-Life</SelectItem>
-            </SelectContent>
-          </Select>
+          <GameSelect name="game" defaultValue="cstrike" required />
           {state.errors?.game && <ErrorMessage>{state.errors.game[0]}</ErrorMessage>}
         </FormField>
 

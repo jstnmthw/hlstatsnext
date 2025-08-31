@@ -9,7 +9,7 @@ export interface BasicSelectProps extends ComponentProps<"select"> {
 const BasicSelect = forwardRef<HTMLSelectElement, BasicSelectProps>(
   ({ className, children, placeholder, ...props }, ref) => {
     return (
-      <div className="relative">
+      <div className="relative max-w-fit">
         <select
           ref={ref}
           data-slot="select"
@@ -18,12 +18,13 @@ const BasicSelect = forwardRef<HTMLSelectElement, BasicSelectProps>(
             "w-full rounded-md border text-base border-input font-sans bg-background px-3 py-2 shadow-sm transition-colors",
             // Focus and interaction styles
             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            // Active and hover states to prevent grey flash
+            "hover:bg-background active:bg-background",
             // Disabled states
             "disabled:cursor-not-allowed disabled:opacity-50",
             // Text and appearance
             "text-foreground",
-            // Hide default browser arrow across different browsers
-            "appearance-none", // Modern browsers
+            // Hide default browser arrow and styling across different browsers
             "[&::-webkit-appearance]:none", // Webkit browsers
             "[&::-moz-appearance]:none", // Firefox
             "[-webkit-appearance:none]", // Safari fallback
@@ -35,7 +36,7 @@ const BasicSelect = forwardRef<HTMLSelectElement, BasicSelectProps>(
           {...props}
         >
           {placeholder && (
-            <option value="" disabled>
+            <option value="" disabled className="text-muted-foreground bg-background">
               {placeholder}
             </option>
           )}

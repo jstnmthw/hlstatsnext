@@ -3,19 +3,12 @@
 import { useActionState } from "react"
 import { createServer } from "@/features/admin/servers/actions/create-server"
 import { FormField, ErrorMessage, ErrorDisplay } from "@/features/common/components/form"
-import { Button, Input, Label, IPAddress, Port, Switch } from "@repo/ui"
-import { GameSelect } from "./game-select"
+import { Button, Input, Label, IPAddress, Port, Switch, BasicSelect } from "@repo/ui"
+import type { Game } from "@repo/database/client"
 
-interface Game {
-  code: string
-  name: string
-}
+type GameProps = Pick<Game, "code" | "name">
 
-interface ServerCreateFormProps {
-  games: Game[]
-}
-
-export function ServerCreateForm({ games }: ServerCreateFormProps) {
+export function ServerCreateForm({ games }: { games: GameProps[] }) {
   const [state, formAction, pending] = useActionState(createServer, { success: true, message: "" })
 
   return (
@@ -37,7 +30,13 @@ export function ServerCreateForm({ games }: ServerCreateFormProps) {
           <Label htmlFor="game" required>
             Game Type
           </Label>
-          <GameSelect name="game" defaultValue="cstrike" required games={games} />
+          <BasicSelect name="game" defaultValue="cstrike" required>
+            {games.map((game) => (
+              <option key={game.code} value={game.code}>
+                {game.name}
+              </option>
+            ))}
+          </BasicSelect>
           {state.errors?.game && <ErrorMessage>{state.errors.game[0]}</ErrorMessage>}
         </FormField>
 

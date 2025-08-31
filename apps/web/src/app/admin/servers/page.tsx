@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Metadata } from "next"
-import { Button } from "@repo/ui"
+import { Button, ServerIcon } from "@repo/ui"
 import { query } from "@/lib/apollo-client"
 import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
@@ -63,11 +63,12 @@ export default async function ServersPage(props: AdminPageProps) {
                 Manage your game servers and track player statistics and activities.
               </p>
             </div>
-            <div>
-              <Button variant="solid" colorScheme="green" size="sm">
-                <Link href="/admin/servers/add">Add Server</Link>
-              </Button>
-            </div>
+            <Button variant="solid" size="default" colorScheme="green" asChild className="!pl-2.5">
+              <Link href="/admin/servers/add">
+                <ServerIcon data-slot="icon" />
+                <span>Add server</span>
+              </Link>
+            </Button>
           </div>
           <AdminServersTable
             data={servers}

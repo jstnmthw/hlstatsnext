@@ -17,7 +17,7 @@ export default function Page() {
       <AdminHeader currentPath="/admin" />
       <MainContent>
         <div className="container">
-          <div className="py-10 border-t border-border">
+          <div className="py-10">
             <h2 className="text-2xl font-medium tracking-tight">Admin Dashboard</h2>
             <p className="text-muted-foreground">
               Get started by creating your first Half-Life server to begin tracking player

@@ -151,7 +151,7 @@ The Docker Compose setup includes four main services:
 | Service | Container Name     | Description                       | Ports         |
 | ------- | ------------------ | --------------------------------- | ------------- |
 | daemon  | hlstatsnext-daemon | HLStatsNext statistics daemon     | 27500/udp     |
-| db      | hlstatsnext-db     | MySQL 5.7 database server         | 3306          |
+| db      | hlstatsnext-db     | MySQL 8.4 database server         | 3306          |
 | cs1     | hlstatsnext-cs-1   | Counter-Strike server 1 (example) | 27015/tcp+udp |
 | cs2     | hlstatsnext-cs-2   | Counter-Strike server 2 (example) | 27016/tcp+udp |
 

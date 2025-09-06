@@ -4,9 +4,10 @@ import { useActionState, useState } from "react"
 import { updateServer } from "@/features/admin/servers/actions/update-server"
 import { FormField, ErrorMessage, ErrorDisplay } from "@/features/common/components/form"
 import { Button, Input, Switch, Label, IPAddress, Port, BasicSelect } from "@repo/ui"
-import type { Game } from "@repo/database/client"
+import type { Game, ModSupported } from "@repo/database/client"
 
 type GameProps = Pick<Game, "code" | "name">
+type ModProps = Pick<ModSupported, "code" | "name">
 
 interface ServerEditFormProps {
   server: {
@@ -21,11 +22,13 @@ interface ServerEditFormProps {
     connectionType: string
     dockerHost?: string
     sortOrder: number
+    mod: string
   }
   games: GameProps[]
+  mods: ModProps[]
 }
 
-export function ServerEditForm({ server, games }: ServerEditFormProps) {
+export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
   const [state, formAction, pending] = useActionState(updateServer, { success: true, message: "" })
   const [isDockerMode, setIsDockerMode] = useState(server.connectionType === "docker")
 
@@ -36,7 +39,7 @@ export function ServerEditForm({ server, games }: ServerEditFormProps) {
       <input type="hidden" name="serverId" value={server.serverId} />
       <input type="hidden" name="connection_type" value={isDockerMode ? "docker" : "external"} />
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-1 gap-4">
         <FormField>
           <Label htmlFor="name">Server Name</Label>
           <Input
@@ -48,7 +51,9 @@ export function ServerEditForm({ server, games }: ServerEditFormProps) {
           />
           {state.errors?.name && <ErrorMessage>{state.errors.name[0]}</ErrorMessage>}
         </FormField>
+      </div>
 
+      <div className="grid md:grid-cols-2 gap-4">
         <FormField>
           <Label htmlFor="game" required>
             Game Type
@@ -61,6 +66,21 @@ export function ServerEditForm({ server, games }: ServerEditFormProps) {
             ))}
           </BasicSelect>
           {state.errors?.game && <ErrorMessage>{state.errors.game[0]}</ErrorMessage>}
+        </FormField>
+
+        <FormField>
+          <Label htmlFor="mod">Server Mod</Label>
+          <BasicSelect name="mod" defaultValue={server.mod}>
+            {mods.map((mod) => (
+              <option key={mod.code} value={mod.code}>
+                {mod.name}
+              </option>
+            ))}
+          </BasicSelect>
+          <p className="text-xs text-muted-foreground">
+            Optional server administration mod for enhanced features.
+          </p>
+          {state.errors?.mod && <ErrorMessage>{state.errors.mod[0]}</ErrorMessage>}
         </FormField>
       </div>
 

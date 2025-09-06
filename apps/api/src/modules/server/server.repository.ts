@@ -1,5 +1,5 @@
 import { db } from "@repo/database/client"
-import type { CreateServerInput, ServerConfigCopyResult } from "./server.types"
+import type { CreateServerInput, UpdateServerInput, ServerConfigCopyResult } from "./server.types"
 
 export class ServerRepository {
   async createServer(data: CreateServerInput) {
@@ -17,6 +17,12 @@ export class ServerRepository {
         connectionType,
         dockerHost: connectionType === "docker" ? data.dockerHost : null,
         sortOrder: data.sortOrder || 0,
+        configs: {
+          create: {
+            parameter: "Mod",
+            value: data.mod || "",
+          },
+        },
       },
       include: {
         configs: true,
@@ -82,6 +88,49 @@ export class ServerRepository {
           orderBy: { parameter: "asc" },
         },
       },
+    })
+  }
+
+  async updateServerWithConfig(serverId: number, data: UpdateServerInput) {
+    const connectionType = data.connectionType || "external"
+
+    return await db.$transaction(async (tx) => {
+      // Update the server record
+      const server = await tx.server.update({
+        where: { serverId },
+        data: {
+          name: data.name || "",
+          address: connectionType === "external" ? data.address || "" : "",
+          port: data.port,
+          game: data.game,
+          publicAddress: data.publicAddress || "",
+          statusUrl: data.statusUrl,
+          rconPassword: data.rconPassword || "",
+          connectionType,
+          dockerHost: connectionType === "docker" ? data.dockerHost : null,
+          sortOrder: data.sortOrder || 0,
+        },
+      })
+
+      // Update or create the Mod config entry
+      await tx.serverConfig.upsert({
+        where: {
+          serverId_parameter: {
+            serverId,
+            parameter: "Mod",
+          },
+        },
+        create: {
+          serverId,
+          parameter: "Mod",
+          value: data.mod || "",
+        },
+        update: {
+          value: data.mod || "",
+        },
+      })
+
+      return server
     })
   }
 }

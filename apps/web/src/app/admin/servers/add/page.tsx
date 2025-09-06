@@ -5,6 +5,7 @@ import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
 import { ServerCreateForm } from "@/features/admin/servers/components/server-create-form"
 import { GET_GAMES_FOR_SELECT } from "@/features/admin/servers/graphql/game-queries"
+import { GET_MODS_FOR_SELECT } from "@/features/admin/servers/graphql/mod-queries"
 import { Card } from "@repo/ui"
 
 export const metadata = {
@@ -13,11 +14,17 @@ export const metadata = {
 }
 
 export default async function CreateServerPage() {
-  const { data } = await query({
-    query: GET_GAMES_FOR_SELECT,
-  })
+  const [gamesResult, modsResult] = await Promise.all([
+    query({
+      query: GET_GAMES_FOR_SELECT,
+    }),
+    query({
+      query: GET_MODS_FOR_SELECT,
+    }),
+  ])
 
-  const games = data.findManyGame || []
+  const games = gamesResult.data.findManyGame || []
+  const mods = modsResult.data.findManyModSupported || []
 
   return (
     <PageWrapper>
@@ -30,7 +37,7 @@ export default async function CreateServerPage() {
               <p className="text-muted-foreground mb-6 text-sm">
                 Add a new Half-Life server to begin tracking player statistics and activities.
               </p>
-              <ServerCreateForm games={games} />
+              <ServerCreateForm games={games} mods={mods} />
             </Card>
           </div>
         </div>

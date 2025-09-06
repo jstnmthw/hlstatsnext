@@ -8,6 +8,7 @@ import { PageWrapper } from "@/features/common/components/page-wrapper"
 import { ServerEditForm } from "@/features/admin/servers/components/server-edit-form"
 import { GET_SERVER_BY_ID } from "@/features/admin/servers/graphql/server-queries"
 import { GET_GAMES_FOR_SELECT } from "@/features/admin/servers/graphql/game-queries"
+import { GET_MODS_FOR_SELECT } from "@/features/admin/servers/graphql/mod-queries"
 import { Card } from "@repo/ui"
 
 interface EditServerPageProps {
@@ -31,9 +32,9 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
     notFound()
   }
 
-  // Fetch server data and games on server
+  // Fetch server data, games, and mods on server
   try {
-    const [serverResult, gamesResult] = await Promise.all([
+    const [serverResult, gamesResult, modsResult] = await Promise.all([
       query({
         query: GET_SERVER_BY_ID,
         variables: { serverId },
@@ -41,14 +42,24 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
       query({
         query: GET_GAMES_FOR_SELECT,
       }),
+      query({
+        query: GET_MODS_FOR_SELECT,
+      }),
     ])
 
     const server = serverResult.data.findUniqueServer
     const games = gamesResult.data.findManyGame || []
+    const mods = modsResult.data.findManyModSupported || []
 
     if (!server) {
       notFound()
     }
+
+    // Extract the mod config value
+    const modConfig = server.configs?.find(
+      (config: { parameter: string; value: string }) => config.parameter === "Mod",
+    )
+    const currentMod = modConfig?.value || ""
 
     return (
       <PageWrapper>
@@ -74,8 +85,10 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
                     connectionType: server.connectionType || "external",
                     dockerHost: server.dockerHost || "",
                     sortOrder: server.sortOrder || 0,
+                    mod: currentMod,
                   }}
                   games={games}
+                  mods={mods}
                 />
               </Card>
             </div>

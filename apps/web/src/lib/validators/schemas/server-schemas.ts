@@ -41,6 +41,8 @@ export const ServerFieldSchemas = {
 
   game: z.string().optional().default("cstrike"),
 
+  mod: z.string().optional().or(z.null()),
+
   publicAddress: z.string().max(128, "Public address is too long").optional().or(z.null()),
 
   statusUrl: z
@@ -93,6 +95,7 @@ export const CreateServerSchema = z
     docker_host: ServerFieldSchemas.dockerHost,
     port: ServerFieldSchemas.port,
     game: ServerFieldSchemas.game,
+    mod: ServerFieldSchemas.mod,
     connection_type: ServerFieldSchemas.connectionType,
     rconPassword: ServerFieldSchemas.rconPassword,
   })
@@ -109,6 +112,7 @@ export const UpdateServerSchema = z
     docker_host: ServerFieldSchemas.dockerHost,
     port: ServerFieldSchemas.port,
     game: ServerFieldSchemas.game,
+    mod: ServerFieldSchemas.mod,
     publicAddress: ServerFieldSchemas.publicAddress,
     statusUrl: ServerFieldSchemas.statusUrl,
     rconPassword: ServerFieldSchemas.rconPassword,

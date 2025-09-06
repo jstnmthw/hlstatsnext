@@ -19,6 +19,7 @@ export function extractFormDataForCreate(formData: FormData) {
     docker_host: formData.get("docker_host"),
     port: formData.get("port"),
     game: formData.get("game"),
+    mod: formData.get("mod"),
     connection_type: formData.get("connection_type"),
     rconPassword: formData.get("rconPassword"),
   }
@@ -37,6 +38,7 @@ export function extractFormDataForUpdate(formData: FormData) {
     docker_host: formData.get("docker_host"),
     port: formData.get("port"),
     game: formData.get("game"),
+    mod: formData.get("mod"),
     publicAddress: formData.get("publicAddress"),
     statusUrl: formData.get("statusUrl"),
     rconPassword: formData.get("rconPassword"),
@@ -58,7 +60,8 @@ export function prepareCreateServerInput(data: CreateServerFormData) {
     port: data.port,
     game: data.game,
     connectionType: data.connection_type,
-    // Only include rconPassword if it's provided
+    // Only include optional fields if they're provided
+    ...(data.mod && { mod: data.mod }),
     ...(data.rconPassword && { rconPassword: data.rconPassword }),
   }
 

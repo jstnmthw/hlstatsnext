@@ -4,11 +4,12 @@ import { useActionState, useState } from "react"
 import { createServer } from "@/features/admin/servers/actions/create-server"
 import { FormField, ErrorMessage, ErrorDisplay } from "@/features/common/components/form"
 import { Button, Input, Label, IPAddress, Port, Switch, BasicSelect } from "@repo/ui"
-import type { Game } from "@repo/database/client"
+import type { Game, ModSupported } from "@repo/database/client"
 
 type GameProps = Pick<Game, "code" | "name">
+type ModProps = Pick<ModSupported, "code" | "name">
 
-export function ServerCreateForm({ games }: { games: GameProps[] }) {
+export function ServerCreateForm({ games, mods }: { games: GameProps[]; mods: ModProps[] }) {
   const [state, formAction, pending] = useActionState(createServer, { success: true, message: "" })
   const [isDockerMode, setIsDockerMode] = useState(false)
 
@@ -48,6 +49,23 @@ export function ServerCreateForm({ games }: { games: GameProps[] }) {
           {state.errors?.game && <ErrorMessage>{state.errors.game[0]}</ErrorMessage>}
         </FormField>
 
+        <FormField>
+          <Label htmlFor="mod">Server Mod</Label>
+          <BasicSelect name="mod" defaultValue="">
+            {mods.map((mod) => (
+              <option key={mod.code} value={mod.code}>
+                {mod.name}
+              </option>
+            ))}
+          </BasicSelect>
+          <p className="text-xs text-muted-foreground">
+            Optional server administration mod for enhanced features.
+          </p>
+          {state.errors?.mod && <ErrorMessage>{state.errors.mod[0]}</ErrorMessage>}
+        </FormField>
+      </div>
+
+      <div className="grid md:grid-cols-1 gap-4">
         <FormField>
           <Label htmlFor={isDockerMode ? "docker_host" : "address"} required>
             {isDockerMode ? "Docker Host" : "Server Address"}

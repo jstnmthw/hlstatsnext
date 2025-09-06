@@ -1,6 +1,6 @@
 import { db } from "@repo/database/client"
 import { ServerRepository } from "./server.repository"
-import type { CreateServerInput, CreateServerResult } from "./server.types"
+import type { CreateServerInput, CreateServerResult, UpdateServerInput } from "./server.types"
 
 export class ServerService {
   private serverRepository: ServerRepository
@@ -36,5 +36,9 @@ export class ServerService {
 
   async getServer(serverId: number) {
     return await this.serverRepository.getServerWithConfigs(serverId)
+  }
+
+  async updateServerWithConfig(serverId: number, input: UpdateServerInput) {
+    return await this.serverRepository.updateServerWithConfig(serverId, input)
   }
 }

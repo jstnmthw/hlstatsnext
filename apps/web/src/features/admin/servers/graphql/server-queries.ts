@@ -48,7 +48,7 @@ export const GET_SERVER_COUNT = gql`
 `
 
 export const GET_SERVER_BY_ID = gql`
-  query GetServerById($serverId: Int!) {
+  query GetServerByIdWithConfigs($serverId: Int!) {
     findUniqueServer(where: { serverId: $serverId }) {
       serverId
       name
@@ -61,6 +61,10 @@ export const GET_SERVER_BY_ID = gql`
       connectionType
       dockerHost
       sortOrder
+      configs {
+        parameter
+        value
+      }
     }
   }
 `

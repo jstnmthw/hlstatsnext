@@ -2,11 +2,12 @@
  * Unified RCON Command Service
  *
  * Executes RCON commands using database-resolved command strings.
- * Handles batch optimization and message formatting automatically.
+ * Handles batch optimization, message formatting, and player session mapping automatically.
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IRconService } from "../rcon.types"
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import { CommandResolverService, type CommandType } from "./command-resolver.service"
 
 export interface RconCommandOptions {
@@ -22,15 +23,17 @@ export class RconCommandService {
   constructor(
     private readonly rconService: IRconService,
     private readonly commandResolver: CommandResolverService,
+    private readonly sessionService: IPlayerSessionService,
     private readonly logger: ILogger,
   ) {}
 
   /**
    * Execute RCON command with database-resolved command string
+   * Recipients are database player IDs that get converted to game user IDs
    */
   async execute(
     serverId: number,
-    recipients: number[],
+    recipients: number[], // Database player IDs
     message: string,
     options: RconCommandOptions = {},
   ): Promise<void> {
@@ -41,12 +44,48 @@ export class RconCommandService {
     const commandType = options.commandType || "BroadCastEventsCommand"
 
     try {
+      // Convert database player IDs to game user IDs (filters out bots automatically)
+      this.logger.info(
+        `Converting ${recipients.length} database player IDs to game user IDs for server ${serverId}`,
+        {
+          serverId,
+          recipients,
+          commandType,
+        },
+      )
+
+      const gameUserIds = await this.sessionService.convertToGameUserIds(serverId, recipients)
+
+      this.logger.info(`Conversion result: ${gameUserIds.length} valid game user IDs found`, {
+        serverId,
+        originalCount: recipients.length,
+        convertedCount: gameUserIds.length,
+        gameUserIds,
+      })
+
+      if (gameUserIds.length === 0) {
+        this.logger.warn(
+          `No valid game user IDs found for recipients on server ${serverId} (may be bots or offline players)`,
+          { serverId, recipients, commandType },
+        )
+        return
+      }
+
+      this.logger.debug(
+        `Converted ${recipients.length} database player IDs to ${gameUserIds.length} game user IDs`,
+        {
+          serverId,
+          originalCount: recipients.length,
+          convertedCount: gameUserIds.length,
+        },
+      )
+
       const capabilities = await this.commandResolver.getCommandCapabilities(serverId, commandType)
 
       if (capabilities.supportsBatch && !options.forceSingle) {
         await this.executeBatch(
           serverId,
-          recipients,
+          gameUserIds,
           message,
           commandType,
           capabilities.maxBatchSize,
@@ -55,7 +94,7 @@ export class RconCommandService {
       } else {
         await this.executeIndividual(
           serverId,
-          recipients,
+          gameUserIds,
           message,
           commandType,
           capabilities.requiresHashPrefix,
@@ -63,10 +102,10 @@ export class RconCommandService {
         )
       }
 
-      this.logger.debug(`Executed RCON command for ${recipients.length} recipients`, {
+      this.logger.debug(`Executed RCON command for ${gameUserIds.length} recipients`, {
         serverId,
         commandType,
-        recipientCount: recipients.length,
+        recipientCount: gameUserIds.length,
         batchMode: capabilities.supportsBatch && !options.forceSingle,
       })
     } catch (error) {
@@ -136,6 +175,14 @@ export class RconCommandService {
     for (const recipient of recipients) {
       const userId = requiresHashPrefix ? `#${recipient}` : recipient.toString()
       const rconCommand = `${command} ${userId} ${escapedMessage}`
+
+      this.logger.info(`Executing individual RCON command`, {
+        serverId,
+        command,
+        userId,
+        requiresHashPrefix,
+        rconCommand,
+      })
 
       this.logCommand(serverId, rconCommand, [recipient])
       await this.rconService.executeCommand(serverId, rconCommand)

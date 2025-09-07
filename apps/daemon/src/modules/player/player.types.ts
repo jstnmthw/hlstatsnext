@@ -11,8 +11,10 @@ import type { Player } from "@repo/database/client"
 export interface PlayerKillEvent extends BaseEvent {
   eventType: EventType.PLAYER_KILL
   data: {
-    killerId: number
-    victimId: number
+    killerGameUserId?: number // Original from parser
+    victimGameUserId?: number // Original from parser
+    killerId: number // Resolved by PlayerEventHandler
+    victimId: number // Resolved by PlayerEventHandler
     weapon: string
     headshot: boolean
     distance?: number
@@ -25,7 +27,8 @@ export interface PlayerKillEvent extends BaseEvent {
 export interface PlayerConnectEvent extends BaseEvent {
   eventType: EventType.PLAYER_CONNECT
   data: {
-    playerId: number
+    gameUserId: number
+    playerId?: number // Added by PlayerEventHandler ID resolution
     steamId: string
     playerName: string
     ipAddress: string
@@ -38,7 +41,8 @@ export interface PlayerConnectEvent extends BaseEvent {
 export interface PlayerDisconnectEvent extends BaseEvent {
   eventType: EventType.PLAYER_DISCONNECT
   data: {
-    playerId: number
+    gameUserId: number
+    playerId?: number // Added by PlayerEventHandler ID resolution
     reason?: string
     sessionDuration?: number
   }
@@ -58,8 +62,10 @@ export interface PlayerSuicideEvent extends BaseEvent {
 export interface PlayerDamageEvent extends BaseEvent {
   eventType: EventType.PLAYER_DAMAGE
   data: {
-    attackerId: number
-    victimId: number
+    attackerGameUserId?: number // Original from parser
+    victimGameUserId?: number // Original from parser
+    attackerId: number // Resolved by PlayerEventHandler
+    victimId: number // Resolved by PlayerEventHandler
     weapon: string
     damage: number
     damageArmor: number
@@ -206,10 +212,18 @@ export interface PlayerWithCounts extends Player {
   }
 }
 
-// Service interfaces
-export interface IPlayerService {
-  // Player management
+// Player resolver interface for breaking circular dependencies
+export interface IPlayerResolver {
+  /**
+   * Get or create a player by Steam ID and name
+   * Returns the database player ID
+   */
   getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number>
+}
+
+// Service interfaces
+export interface IPlayerService extends IPlayerResolver {
+  // Player management inherits getOrCreatePlayer from IPlayerResolver
   getPlayerStats(playerId: number): Promise<Player | null>
   updatePlayerStats(playerId: number, updates: PlayerStatsUpdate): Promise<void>
 

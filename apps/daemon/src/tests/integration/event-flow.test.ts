@@ -113,10 +113,10 @@ describe("Event Flow Integration", () => {
       expect(event?.eventId).toMatch(/^msg_[a-z0-9]+_[a-f0-9]{16}$/) // SystemUuidService format
       expect(event?.correlationId).toMatch(/^corr_[a-z0-9]+_[a-f0-9]{12}$/) // SystemUuidService format
 
-      // Verify event data
+      // Verify event data (parser outputs gameUserId before resolution)
       expect(event?.data).toEqual({
-        killerId: 2,
-        victimId: 3,
+        killerGameUserId: 2,
+        victimGameUserId: 3,
         weapon: "ak47",
         headshot: true,
         killerTeam: "CT",

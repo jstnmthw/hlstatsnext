@@ -23,8 +23,9 @@ import { CommandResolverService } from "@/modules/rcon/services/command-resolver
 import { RconCommandService } from "@/modules/rcon/services/rcon-command.service"
 import { PlayerNotificationService } from "@/modules/rcon/services/player-notification.service"
 import { ServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
-
-import type { IPlayerService } from "@/modules/player/player.types"
+import { PlayerSessionRepository } from "@/modules/player/repositories/player-session.repository"
+import { PlayerSessionService } from "@/modules/player/services/player-session.service"
+import { SimplePlayerResolverService } from "@/modules/player/services/simple-player-resolver.service"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IWeaponService } from "@/modules/weapon/weapon.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
@@ -33,6 +34,8 @@ import type { IGameDetectionService } from "@/modules/game/game-detection.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { IRconService } from "@/modules/rcon/rcon.types"
 import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
+import type { IPlayerService } from "@/modules/player/player.types"
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 
 export interface BusinessServiceCollection {
   playerService: IPlayerService
@@ -44,6 +47,7 @@ export interface BusinessServiceCollection {
   serverService: IServerService
   rconService: IRconService
   serverStatusEnricher: IServerStatusEnricher
+  sessionService: IPlayerSessionService
 }
 
 /**
@@ -72,26 +76,53 @@ export function createBusinessServices(
   const gameDetectionService = new GameDetectionService(logger)
   const serverService = new ServerService(repositories.serverRepository, logger)
 
-  // Second tier - RCON and notification services
+  // Second tier - RCON base services
   const rconService = new RconService(repositories.rconRepository, logger, rconConfig)
   const commandResolverService = new CommandResolverService(repositories.serverRepository, logger)
-  const rconCommandService = new RconCommandService(rconService, commandResolverService, logger)
+
+  // Session management services
+  const sessionRepository = new PlayerSessionRepository(logger)
+  const simplePlayerResolver = new SimplePlayerResolverService(
+    repositories.playerRepository,
+    logger,
+  )
+
+  // Session management services - create first since PlayerService needs it
+  const sessionService = new PlayerSessionService(
+    sessionRepository,
+    rconService,
+    serverService,
+    simplePlayerResolver,
+    repositories.playerRepository,
+    logger,
+  )
+
+  // RCON command services
+  const rconCommandService = new RconCommandService(
+    rconService,
+    commandResolverService,
+    sessionService,
+    logger,
+  )
   const playerNotificationService = new PlayerNotificationService(
     rconCommandService,
     commandResolverService,
     serverService,
+    sessionService,
     logger,
   )
 
-  // Third tier - services dependent on second tier
+  // Now create PlayerService with all dependencies properly injected
   const playerService = new PlayerService(
     repositories.playerRepository,
     logger,
     rankingService,
     repositories.serverRepository,
+    serverService,
+    sessionService, // Pass the real session service
     matchService,
     geoipService,
-    playerNotificationService,
+    playerNotificationService, // Pass the real notification service
   )
 
   // Fourth tier - services dependent on third tier
@@ -121,5 +152,6 @@ export function createBusinessServices(
     serverService,
     rconService,
     serverStatusEnricher,
+    sessionService,
   }
 }

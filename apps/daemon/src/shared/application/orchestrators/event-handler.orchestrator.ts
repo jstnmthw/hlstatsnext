@@ -78,6 +78,7 @@ function createHandlerInstances(
   const actionEventHandler = new ActionEventHandler(
     logger,
     services.actionService,
+    services.sessionService,
     services.matchService,
     services.playerService,
     services.serverService,

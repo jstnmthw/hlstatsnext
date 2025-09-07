@@ -22,8 +22,10 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
-import type { IServerRepository } from "@/modules/server/server.types"
+import type { IServerRepository, IServerService } from "@/modules/server/server.types"
 import type { PlayerNotificationService } from "@/modules/rcon/services/player-notification.service"
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
+import type { IPlayerService } from "@/modules/player/player.types"
 
 export class PlayerEventHandlerFactory {
   private readonly handlers = new Map<EventType, BasePlayerEventHandler>()
@@ -33,6 +35,9 @@ export class PlayerEventHandlerFactory {
     logger: ILogger,
     rankingService: IRankingService,
     serverRepository: IServerRepository,
+    serverService: IServerService,
+    sessionService: IPlayerSessionService,
+    playerService: IPlayerService,
     matchService?: IMatchService,
     geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
     playerNotificationService?: PlayerNotificationService,
@@ -40,17 +45,38 @@ export class PlayerEventHandlerFactory {
     // Initialize all event handlers
     this.handlers.set(
       EventType.PLAYER_CONNECT,
-      new ConnectEventHandler(repository, logger, matchService, geoipService),
+      new ConnectEventHandler(
+        repository,
+        logger,
+        sessionService,
+        playerService,
+        serverService,
+        matchService,
+        geoipService,
+      ),
     )
 
     this.handlers.set(
       EventType.PLAYER_DISCONNECT,
-      new DisconnectEventHandler(repository, logger, matchService, serverRepository),
+      new DisconnectEventHandler(
+        repository,
+        logger,
+        sessionService,
+        matchService,
+        serverRepository,
+      ),
     )
 
     this.handlers.set(
       EventType.PLAYER_ENTRY,
-      new EntryEventHandler(repository, logger, matchService),
+      new EntryEventHandler(
+        repository,
+        logger,
+        sessionService,
+        playerService,
+        serverService,
+        matchService,
+      ),
     )
 
     this.handlers.set(

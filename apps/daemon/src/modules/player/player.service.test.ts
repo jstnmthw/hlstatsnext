@@ -7,6 +7,8 @@ import { PlayerService } from "./player.service"
 import { PlayerRepository } from "./player.repository"
 import { createMockLogger } from "../../tests/mocks/logger"
 import { createMockDatabaseClient } from "../../tests/mocks/database"
+import { createMockServerService } from "../../tests/mocks/server.service.mock"
+import { createMockSessionService } from "../../tests/mocks/session.service.mock"
 import type { Player } from "@repo/database/client"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
@@ -62,11 +64,16 @@ describe("PlayerService", () => {
       getServerConfigDefault: vi.fn().mockResolvedValue(null),
     }
 
+    const mockServerService = createMockServerService()
+    const mockSessionService = createMockSessionService()
+
     playerService = new PlayerService(
       mockRepository,
       mockLogger,
       mockRankingService,
       mockServerRepository,
+      mockServerService,
+      mockSessionService,
       mockMatchService,
     )
   })
@@ -463,12 +470,17 @@ describe("PlayerService", () => {
         getServerConfigDefault: vi.fn().mockResolvedValue(null),
       }
 
+      const localMockServerService = createMockServerService()
+      const localMockSessionService = createMockSessionService()
+
       // Create PlayerService without MatchService
       const playerServiceNoMatch = new PlayerService(
         mockRepository,
         mockLogger,
         mockRankingService,
         localMockServerRepository,
+        localMockServerService,
+        localMockSessionService,
       )
 
       const killerStats = {

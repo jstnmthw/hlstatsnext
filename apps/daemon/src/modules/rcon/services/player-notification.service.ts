@@ -3,10 +3,12 @@
  *
  * Handles player notifications via RCON using database-driven command resolution.
  * Automatically resolves the appropriate RCON command based on server configuration.
+ * Never sends private messages to bots regardless of configuration.
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IServerService } from "@/modules/server/server.types"
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import { RconCommandService } from "./rcon-command.service"
 import { CommandResolverService, type CommandType } from "./command-resolver.service"
 
@@ -28,7 +30,7 @@ export interface NotificationOptions {
 }
 
 export interface PlayerNotificationData {
-  playerId: number
+  playerId: number // Database player ID
   playerName?: string
 }
 
@@ -37,23 +39,36 @@ export class PlayerNotificationService {
     private readonly rconCommand: RconCommandService,
     private readonly commandResolver: CommandResolverService,
     private readonly serverService: IServerService,
+    private readonly sessionService: IPlayerSessionService,
     private readonly logger: ILogger,
   ) {}
 
   /**
    * Send a notification to a single player
+   * Automatically skips bots as they cannot receive private messages
    */
   async notifyPlayer(
     serverId: number,
-    playerId: number,
+    playerId: number, // Database player ID
     message: string,
     options: NotificationOptions = {},
   ): Promise<void> {
+    // Check if this player can receive private messages (not a bot)
+    const canSend = await this.sessionService.canSendPrivateMessage(serverId, playerId)
+
+    if (!canSend) {
+      this.logger.warn(
+        `Cannot send private message to player ${playerId} on server ${serverId} (may be bot or offline)`,
+      )
+      return
+    }
+
     await this.notifyMultiplePlayers(serverId, [{ playerId }], message, options)
   }
 
   /**
    * Send a notification to multiple players
+   * Automatically filters out bots as they cannot receive private messages
    */
   async notifyMultiplePlayers(
     serverId: number,
@@ -69,13 +84,17 @@ export class PlayerNotificationService {
       const commandType = options.commandType || "BroadCastEventsCommand"
       const playerIds = players.map((p) => p.playerId)
 
+      // Filter out bots and offline players - the RconCommandService will handle this
+      // through the session service, but we'll log the original count
+      this.logger.debug(`Attempting to notify ${players.length} players on server ${serverId}`)
+
       // Check if server supports private messaging
       const supportsPrivate =
         (await this.commandResolver.supportsBatch(serverId, commandType)) ||
         (await this.hasPrivateMessagingCommand(serverId, commandType))
 
       if (supportsPrivate) {
-        // Use private messaging
+        // Use private messaging - RconCommandService will automatically filter bots
         await this.executeWithRetry(
           () =>
             this.rconCommand.execute(serverId, playerIds, message, {
@@ -90,9 +109,9 @@ export class PlayerNotificationService {
         await this.executePublicNotifications(serverId, players, message, options)
       }
 
-      this.logger.debug(`Sent notification to ${players.length} players on server ${serverId}`, {
+      this.logger.debug(`Notification processing completed for server ${serverId}`, {
         serverId,
-        playerCount: players.length,
+        requestedPlayers: players.length,
         commandType,
         messageLength: message.length,
         privateMessaging: supportsPrivate,

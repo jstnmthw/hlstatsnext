@@ -1,7 +1,7 @@
 /**
  * Player Connect Event Handler
  *
- * Handles player connection events including GeoIP enrichment,
+ * Handles player connection events including session creation, GeoIP enrichment,
  * server stats updates, and player name tracking.
  */
 
@@ -13,13 +13,18 @@ import type { HandlerResult } from "@/shared/types/common"
 import type { PlayerEvent, PlayerConnectEvent } from "@/modules/player/player.types"
 import type { PlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerRepository } from "@/modules/player/player.types"
+import type { IPlayerRepository, IPlayerService } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
+import type { IServerService } from "@/modules/server/server.types"
 
 export class ConnectEventHandler extends BasePlayerEventHandler {
   constructor(
     repository: IPlayerRepository,
     logger: ILogger,
+    private readonly sessionService: IPlayerSessionService,
+    private readonly playerService: IPlayerService,
+    private readonly serverService: IServerService,
     matchService?: IMatchService,
     private readonly geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
   ) {
@@ -33,7 +38,72 @@ export class ConnectEventHandler extends BasePlayerEventHandler {
       }
 
       const connectEvent = event as PlayerConnectEvent
-      const { playerId, ipAddress } = connectEvent.data
+      const { gameUserId, playerId, steamId, ipAddress } = connectEvent.data
+      const meta = event.meta as PlayerMeta
+
+      this.logger.info(`Processing PLAYER_CONNECT`, {
+        serverId: event.serverId,
+        gameUserId,
+        playerId,
+        steamId,
+        playerName: meta?.playerName,
+        isBot: meta?.isBot,
+        ipAddress,
+      })
+
+      // Check IgnoreBots configuration
+      const ignoreBots = await this.serverService.getServerConfigBoolean(
+        event.serverId,
+        "IgnoreBots",
+        true,
+      )
+
+      // Skip bot session creation if IgnoreBots=true
+      if (ignoreBots && meta.isBot) {
+        this.logger.debug(`Not creating session for bot ${meta.playerName} (IgnoreBots=true)`)
+        return this.createSuccessResult()
+      }
+
+      // Use the resolved database player ID from the PlayerEventHandler
+      if (playerId === undefined) {
+        return this.createErrorResult("playerId not resolved by PlayerEventHandler")
+      }
+      const databasePlayerId = playerId
+
+      // Create player session using the original gameUserId
+      if (gameUserId !== undefined) {
+        this.logger.info(`Creating session for PLAYER_CONNECT`, {
+          serverId: event.serverId,
+          gameUserId,
+          databasePlayerId,
+          steamId,
+          playerName: meta.playerName,
+          isBot: meta.isBot,
+        })
+
+        await this.sessionService.createSession({
+          serverId: event.serverId,
+          gameUserId,
+          databasePlayerId,
+          steamId,
+          playerName: meta.playerName,
+          isBot: meta.isBot,
+        })
+
+        this.logger.info(`Session created successfully for PLAYER_CONNECT`, {
+          serverId: event.serverId,
+          gameUserId,
+          databasePlayerId,
+          playerName: meta.playerName,
+        })
+      } else {
+        this.logger.warn(`Cannot create session - no gameUserId provided`, {
+          serverId: event.serverId,
+          playerId,
+          steamId,
+          playerName: meta.playerName,
+        })
+      }
 
       // Build player stats update with GeoIP enrichment
       const updateBuilder = StatUpdateBuilder.create().updateLastEvent()
@@ -47,18 +117,20 @@ export class ConnectEventHandler extends BasePlayerEventHandler {
       }
 
       // Update player stats
-      await this.repository.update(playerId, updateBuilder.build())
+      await this.repository.update(databasePlayerId, updateBuilder.build())
 
       // Update player name usage
-      await this.updatePlayerNameUsage(playerId, event.meta as PlayerMeta)
+      await this.updatePlayerNameUsage(databasePlayerId, meta)
 
       // Update server stats
       await this.updateServerStats(event.serverId)
 
       // Create connect event log
-      await this.createConnectEventLog(playerId, event.serverId, ipAddress || "")
+      await this.createConnectEventLog(databasePlayerId, event.serverId, ipAddress || "")
 
-      this.logger.debug(`Player connected: ${playerId}`)
+      this.logger.debug(
+        `Player ${meta.playerName} connected: gameUserId=${gameUserId}, databasePlayerId=${databasePlayerId}`,
+      )
 
       return this.createSuccessResult()
     })

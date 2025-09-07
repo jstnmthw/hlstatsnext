@@ -135,7 +135,7 @@ export class CommandResolverService {
    */
   private determineCapabilities(command: string): CommandCapabilities {
     // Analyze command to determine capabilities
-    if (command.includes("hlx_amx_bulkpsay")) {
+    if (command.includes("hlx_amx_bulkpsay") || command.includes("amx_bulkpsay")) {
       return {
         supportsBatch: true,
         maxBatchSize: 8,
@@ -155,7 +155,11 @@ export class CommandResolverService {
       command.includes("hlx_amx_psay") ||
       command.includes("ms_psay") ||
       command.includes("hlx_psay") ||
-      command.includes("ma_hlx_psay")
+      command.includes("ma_hlx_psay") ||
+      command.includes("amx_psay") || // Pure AMX Mod X command
+      command.includes("amx_say") || // Another common AMX command
+      command.includes("amx_tell") || // Yet another AMX command
+      command.includes("amx_pm") // Private message AMX command
     ) {
       return {
         supportsBatch: false, // Individual commands only

@@ -7,18 +7,20 @@
 
 import { EventType } from "@/shared/types/events"
 import { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
-import type { BaseEvent, DualPlayerMeta, PlayerMeta } from "@/shared/types/events"
+import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import type { IActionService, ActionEvent } from "@/modules/action/action.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IPlayerService } from "@/modules/player/player.types"
 import type { IServerService } from "@/modules/server/server.types"
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 
 export class ActionEventHandler extends BaseModuleEventHandler {
   constructor(
     logger: ILogger,
     private readonly actionService: IActionService,
+    private readonly sessionService: IPlayerSessionService,
     private readonly matchService?: IMatchService,
     private readonly playerService?: IPlayerService,
     private readonly serverService?: IServerService,
@@ -31,7 +33,7 @@ export class ActionEventHandler extends BaseModuleEventHandler {
   async handleActionPlayer(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_PLAYER for server ${event.serverId}`)
 
-    const actionEvent = (await this.resolvePlayerIds(event)) as ActionEvent
+    const actionEvent = await this.resolvePlayerIds(event as ActionEvent)
     this.logPlayerInfo(actionEvent)
 
     await this.actionService.handleActionEvent(actionEvent)
@@ -56,7 +58,7 @@ export class ActionEventHandler extends BaseModuleEventHandler {
   async handleActionPlayerPlayer(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_PLAYER_PLAYER for server ${event.serverId}`)
 
-    const actionEvent = (await this.resolvePlayerIds(event)) as ActionEvent
+    const actionEvent = await this.resolvePlayerIds(event as ActionEvent)
     this.logPlayerInfo(actionEvent)
 
     await this.actionService.handleActionEvent(actionEvent)
@@ -113,11 +115,10 @@ export class ActionEventHandler extends BaseModuleEventHandler {
 
   /**
    * Resolve player ids for action events
+   * Convert gameUserId to database playerId using session service
    */
-  private async resolvePlayerIds(event: BaseEvent): Promise<BaseEvent> {
+  private async resolvePlayerIds<T extends BaseEvent>(event: T): Promise<T> {
     try {
-      if (!this.playerService || !this.serverService) return event
-
       if (
         event.eventType !== EventType.ACTION_PLAYER &&
         event.eventType !== EventType.ACTION_PLAYER_PLAYER
@@ -125,34 +126,59 @@ export class ActionEventHandler extends BaseModuleEventHandler {
         return event
       }
 
-      const game = await this.serverService.getServerGame(event.serverId)
-      const meta = event.meta as PlayerMeta | DualPlayerMeta | undefined
       const data = (event.data as Record<string, unknown>) || {}
       const resolved: Record<string, unknown> = { ...data }
 
-      if (typeof data.playerId === "number" && meta && "steamId" in meta) {
-        const m = meta
-        resolved.playerId = await this.playerService.getOrCreatePlayer(
-          m.steamId || "",
-          m.playerName || "",
-          game,
+      // Convert gameUserId to database playerId for ACTION_PLAYER
+      if (typeof data.gameUserId === "number") {
+        const session = await this.sessionService.getSessionByGameUserId(
+          event.serverId,
+          data.gameUserId,
         )
-      }
 
-      if (typeof data.victimId === "number" && meta && "victim" in meta) {
-        const m = meta
-
-        if (m.victim?.steamId) {
-          resolved.victimId = await this.playerService.getOrCreatePlayer(
-            m.victim.steamId,
-            m.victim.playerName || "",
-            game,
+        if (session) {
+          resolved.playerId = session.databasePlayerId
+          this.logger.debug(
+            `Resolved gameUserId ${data.gameUserId} to database playerId ${session.databasePlayerId} for action event`,
           )
+        } else {
+          this.logger.warn(
+            `No session found for gameUserId ${data.gameUserId} on server ${event.serverId}, action may fail`,
+          )
+          // Keep the original gameUserId as playerId as fallback (though this may cause issues)
+          resolved.playerId = data.gameUserId
         }
+
+        // Remove gameUserId from resolved data since ActionEvent expects playerId
+        delete resolved.gameUserId
       }
-      return { ...event, data: resolved }
-    } catch {
-      this.logger.error(`Failed to resolve player ids for event ${event.eventType}`)
+
+      // Convert victimGameUserId to database victimId for ACTION_PLAYER_PLAYER
+      if (typeof data.victimGameUserId === "number") {
+        const victimSession = await this.sessionService.getSessionByGameUserId(
+          event.serverId,
+          data.victimGameUserId,
+        )
+
+        if (victimSession) {
+          resolved.victimId = victimSession.databasePlayerId
+          this.logger.debug(
+            `Resolved victimGameUserId ${data.victimGameUserId} to database victimId ${victimSession.databasePlayerId} for action event`,
+          )
+        } else {
+          this.logger.warn(
+            `No session found for victimGameUserId ${data.victimGameUserId} on server ${event.serverId}, action may fail`,
+          )
+          resolved.victimId = data.victimGameUserId
+        }
+
+        // Remove victimGameUserId from resolved data
+        delete resolved.victimGameUserId
+      }
+
+      return { ...event, data: resolved } as T
+    } catch (error) {
+      this.logger.error(`Failed to resolve player ids for event ${event.eventType}: ${error}`)
       return event
     }
   }

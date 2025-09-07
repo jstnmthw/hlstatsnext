@@ -184,11 +184,11 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Missing required fields in kill event" }
     }
 
-    const killerId = parseInt(killerIdStr)
-    const victimId = parseInt(victimIdStr)
+    const killerGameUserId = parseInt(killerIdStr)
+    const victimGameUserId = parseInt(victimIdStr)
 
-    if (isNaN(killerId) || isNaN(victimId)) {
-      return { event: null, success: false, error: "Invalid player ID in kill event" }
+    if (isNaN(killerGameUserId) || isNaN(victimGameUserId)) {
+      return { event: null, success: false, error: "Invalid game user ID in kill event" }
     }
 
     const event: BaseEvent = {
@@ -199,8 +199,8 @@ export class CsParser extends BaseParser {
       eventId: generateMessageId(),
       correlationId: generateCorrelationId(),
       data: {
-        killerId,
-        victimId,
+        killerGameUserId,
+        victimGameUserId,
         weapon,
         headshot: !!headshot,
         killerTeam,
@@ -269,11 +269,11 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Missing required fields in damage event" }
     }
 
-    const attackerId = parseInt(attackerIdStr)
-    const victimId = parseInt(victimIdStr)
+    const attackerGameUserId = parseInt(attackerIdStr)
+    const victimGameUserId = parseInt(victimIdStr)
 
-    if (isNaN(attackerId) || isNaN(victimId)) {
-      return { event: null, success: false, error: "Invalid player ID in damage event" }
+    if (isNaN(attackerGameUserId) || isNaN(victimGameUserId)) {
+      return { event: null, success: false, error: "Invalid game user ID in damage event" }
     }
 
     const event: BaseEvent = {
@@ -284,8 +284,8 @@ export class CsParser extends BaseParser {
       eventId: generateMessageId(),
       correlationId: generateCorrelationId(),
       data: {
-        attackerId,
-        victimId,
+        attackerGameUserId,
+        victimGameUserId,
         weapon,
         damage: parseInt(damage || "0") || 0,
         damageArmor: parseInt(damageArmor || "0") || 0,
@@ -322,9 +322,9 @@ export class CsParser extends BaseParser {
     }
 
     const [, playerName, playerIdStr, steamId, team, weapon] = match
-    const playerId = parseInt(playerIdStr || "")
+    const gameUserId = parseInt(playerIdStr || "")
 
-    if (!playerName || !playerIdStr || !steamId || Number.isNaN(playerId)) {
+    if (!playerName || !playerIdStr || !steamId || Number.isNaN(gameUserId)) {
       return { event: null, success: false, error: "Missing required fields in suicide event" }
     }
 
@@ -336,7 +336,7 @@ export class CsParser extends BaseParser {
       eventId: generateMessageId(),
       correlationId: generateCorrelationId(),
       data: {
-        playerId,
+        gameUserId,
         team: team || "UNKNOWN",
         weapon: weapon || "world",
       },
@@ -365,9 +365,9 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Missing required fields in connect event" }
     }
 
-    const playerId = parseInt(playerIdStr || "")
-    if (isNaN(playerId)) {
-      return { event: null, success: false, error: "Invalid player ID in connect event" }
+    const gameUserId = parseInt(playerIdStr || "")
+    if (isNaN(gameUserId)) {
+      return { event: null, success: false, error: "Invalid game user ID in connect event" }
     }
 
     const event: BaseEvent = {
@@ -378,7 +378,7 @@ export class CsParser extends BaseParser {
       eventId: generateMessageId(),
       correlationId: generateCorrelationId(),
       data: {
-        playerId,
+        gameUserId,
         steamId,
         playerName,
         ipAddress,
@@ -412,9 +412,9 @@ export class CsParser extends BaseParser {
       }
     }
 
-    const playerId = parseInt(playerIdStr || "")
-    if (isNaN(playerId)) {
-      return { event: null, success: false, error: "Invalid player ID in enter/connect event" }
+    const gameUserId = parseInt(playerIdStr || "")
+    if (isNaN(gameUserId)) {
+      return { event: null, success: false, error: "Invalid game user ID in enter/connect event" }
     }
 
     const event: BaseEvent = {
@@ -425,7 +425,7 @@ export class CsParser extends BaseParser {
       eventId: generateMessageId(),
       correlationId: generateCorrelationId(),
       data: {
-        playerId,
+        gameUserId,
       },
       meta: {
         steamId,
@@ -458,9 +458,9 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Missing required fields in team change" }
     }
 
-    const playerId = parseInt(playerIdStr)
-    if (Number.isNaN(playerId)) {
-      return { event: null, success: false, error: "Invalid player ID in team change" }
+    const gameUserId = parseInt(playerIdStr)
+    if (Number.isNaN(gameUserId)) {
+      return { event: null, success: false, error: "Invalid game user ID in team change" }
     }
 
     const event: BaseEvent = {
@@ -471,7 +471,7 @@ export class CsParser extends BaseParser {
       eventId: generateMessageId(),
       correlationId: generateCorrelationId(),
       data: {
-        playerId,
+        gameUserId,
         team: newTeam,
       },
       meta: {
@@ -495,10 +495,10 @@ export class CsParser extends BaseParser {
 
     const [, playerName, playerIdStr, steamId, , roleRaw] = match
     const safePlayerIdStr = playerIdStr || "-1"
-    const playerId = parseInt(safePlayerIdStr)
+    const gameUserId = parseInt(safePlayerIdStr)
     const role = roleRaw || ""
 
-    if (!playerName || !playerIdStr || !steamId || Number.isNaN(playerId) || role === undefined) {
+    if (!playerName || !playerIdStr || !steamId || Number.isNaN(gameUserId) || role === undefined) {
       return { event: null, success: false, error: "Missing required fields in role change" }
     }
 
@@ -510,7 +510,7 @@ export class CsParser extends BaseParser {
       eventId: generateMessageId(),
       correlationId: generateCorrelationId(),
       data: {
-        playerId,
+        gameUserId,
         role,
       },
       meta: {
@@ -534,10 +534,10 @@ export class CsParser extends BaseParser {
 
     const [, oldName, playerIdStr, steamId, , newNameRaw] = match
     const safePlayerIdStr2 = playerIdStr || "-1"
-    const playerId = parseInt(safePlayerIdStr2)
+    const gameUserId = parseInt(safePlayerIdStr2)
     const newName = newNameRaw || ""
 
-    if (!oldName || !playerIdStr || !steamId || Number.isNaN(playerId) || newName === undefined) {
+    if (!oldName || !playerIdStr || !steamId || Number.isNaN(gameUserId) || newName === undefined) {
       return { event: null, success: false, error: "Missing required fields in name change" }
     }
 
@@ -549,7 +549,7 @@ export class CsParser extends BaseParser {
       eventId: generateMessageId(),
       correlationId: generateCorrelationId(),
       data: {
-        playerId,
+        gameUserId,
         oldName,
         newName,
       },
@@ -581,7 +581,7 @@ export class CsParser extends BaseParser {
       }
 
       const parsedId = parseInt(playerIdStr)
-      const playerId = Number.isNaN(parsedId) ? -1 : parsedId
+      const gameUserId = Number.isNaN(parsedId) ? -1 : parsedId
       const event: BaseEvent = {
         eventType: EventType.PLAYER_DISCONNECT,
         timestamp: this.createTimestamp(),
@@ -590,7 +590,7 @@ export class CsParser extends BaseParser {
         eventId: generateMessageId(),
         correlationId: generateCorrelationId(),
         data: {
-          playerId,
+          gameUserId,
           reason: reason ?? "",
         },
         meta: {
@@ -612,7 +612,7 @@ export class CsParser extends BaseParser {
       }
 
       const parsedId = parseInt(playerIdStr)
-      const playerId = Number.isNaN(parsedId) ? -1 : parsedId
+      const gameUserId = Number.isNaN(parsedId) ? -1 : parsedId
       const event: BaseEvent = {
         eventType: EventType.PLAYER_DISCONNECT,
         timestamp: this.createTimestamp(),
@@ -621,7 +621,7 @@ export class CsParser extends BaseParser {
         eventId: generateMessageId(),
         correlationId: generateCorrelationId(),
         data: {
-          playerId,
+          gameUserId,
           reason: "",
         },
         meta: {
@@ -653,9 +653,9 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Missing required fields in chat event" }
     }
 
-    const playerId = parseInt(playerIdStr)
-    if (isNaN(playerId)) {
-      return { event: null, success: false, error: "Invalid player ID in chat event" }
+    const gameUserId = parseInt(playerIdStr)
+    if (isNaN(gameUserId)) {
+      return { event: null, success: false, error: "Invalid game user ID in chat event" }
     }
 
     const event: BaseEvent = {
@@ -666,7 +666,7 @@ export class CsParser extends BaseParser {
       eventId: generateMessageId(),
       correlationId: generateCorrelationId(),
       data: {
-        playerId,
+        gameUserId,
         message,
         team,
         isDead: false, // Would need additional parsing to determine
@@ -698,9 +698,9 @@ export class CsParser extends BaseParser {
         }
       }
 
-      const playerId = parseInt(playerIdStr)
-      if (isNaN(playerId)) {
-        return { event: null, success: false, error: "Invalid player ID in action event" }
+      const gameUserId = parseInt(playerIdStr)
+      if (isNaN(gameUserId)) {
+        return { event: null, success: false, error: "Invalid game user ID in action event" }
       }
 
       const event: BaseEvent = {
@@ -711,7 +711,7 @@ export class CsParser extends BaseParser {
         eventId: generateMessageId(),
         correlationId: generateCorrelationId(),
         data: {
-          playerId,
+          gameUserId,
           actionCode,
           game: this.game,
           team: team || undefined,

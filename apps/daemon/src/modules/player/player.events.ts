@@ -75,6 +75,9 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
     switch (event.eventType) {
       case EventType.PLAYER_KILL:
         return await this.resolveKillEventPlayerIds(event)
+      case EventType.PLAYER_DAMAGE:
+      case EventType.PLAYER_TEAMKILL:
+        return await this.resolveDualPlayerEventPlayerIds(event)
       default:
         return await this.resolveSinglePlayerEvent(event)
     }
@@ -107,12 +110,95 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
           playerMeta.playerName,
           serverGame,
         )
-        resolvedEvent.data = { ...((event.data as Record<string, unknown>) ?? {}), playerId }
+        const eventData = (event.data as Record<string, unknown>) ?? {}
+
+        const resolvedData = {
+          ...eventData,
+          playerId,
+          // Keep the original gameUserId for handlers that need it
+        }
+
+        resolvedEvent.data = resolvedData
       }
 
       return resolvedEvent
     } catch (error) {
       this.logger.error(`Failed to resolve player IDs for event ${event.eventType}: ${error}`)
+      return event as PlayerEvent // Return original event if resolution fails
+    }
+  }
+
+  /**
+   * Resolve player IDs for dual-player events (PLAYER_DAMAGE, PLAYER_TEAMKILL)
+   * that contain gameUserId fields that need to be converted to database player IDs
+   */
+  private async resolveDualPlayerEventPlayerIds(event: BaseEvent): Promise<PlayerEvent> {
+    try {
+      const meta = event.meta as KillEventMeta
+      if (!meta || !meta.killer || !meta.victim) {
+        this.logger.error(`Missing meta data for ${event.eventType} event`, {
+          eventId: event.eventId,
+        })
+        return event as PlayerEvent
+      }
+
+      // Get the server's game type for player creation
+      const serverGame = await this.serverService.getServerGame(event.serverId)
+
+      // Resolve both attacker and victim player IDs from Steam IDs
+      const [attackerId, victimId] = await Promise.all([
+        this.playerService.getOrCreatePlayer(
+          meta.killer.steamId,
+          meta.killer.playerName,
+          serverGame,
+        ),
+        this.playerService.getOrCreatePlayer(
+          meta.victim.steamId,
+          meta.victim.playerName,
+          serverGame,
+        ),
+      ])
+
+      // Create resolved event with database player IDs, removing gameUserId fields
+      const eventData = event.data as Record<string, unknown>
+
+      // Build the correct data shape based on event type
+      if (event.eventType === EventType.PLAYER_DAMAGE) {
+        const resolvedEvent = {
+          ...event,
+          data: {
+            ...eventData,
+            attackerId,
+            victimId,
+            // Keep the original gameUserId fields for handlers that need them
+          },
+        }
+
+        this.logger.debug(
+          `Resolved ${event.eventType} player IDs: attacker ${meta.killer.steamId} -> ${attackerId}, victim ${meta.victim.steamId} -> ${victimId}`,
+        )
+
+        return resolvedEvent as PlayerEvent
+      }
+
+      // Handle other dual-player event types (PLAYER_TEAMKILL, etc.)
+      const resolvedEvent = {
+        ...event,
+        data: {
+          ...eventData,
+          attackerId,
+          victimId,
+          // Keep the original gameUserId fields for handlers that need them
+        },
+      }
+
+      this.logger.debug(
+        `Resolved ${event.eventType} player IDs: attacker ${meta.killer.steamId} -> ${attackerId}, victim ${meta.victim.steamId} -> ${victimId}`,
+      )
+
+      return resolvedEvent as PlayerEvent
+    } catch (error) {
+      this.logger.error(`Failed to resolve ${event.eventType} player IDs: ${error}`)
       return event as PlayerEvent // Return original event if resolution fails
     }
   }
@@ -145,21 +231,24 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
         ),
       ])
 
-      // Create resolved event with database player IDs
+      // Create resolved event with database player IDs, removing gameUserId fields
+      const eventData = event.data as Record<string, unknown>
+
       const resolvedEvent = {
         ...event,
         data: {
-          ...(event.data as Record<string, unknown>),
+          ...eventData,
           killerId,
           victimId,
+          // Keep the original gameUserId fields for handlers that need them
         },
-      } as PlayerEvent
+      }
 
       this.logger.debug(
         `Resolved PLAYER_KILL player IDs: killer ${meta.killer.steamId} -> ${killerId}, victim ${meta.victim.steamId} -> ${victimId}`,
       )
 
-      return resolvedEvent
+      return resolvedEvent as PlayerEvent
     } catch (error) {
       this.logger.error(`Failed to resolve PLAYER_KILL player IDs: ${error}`)
       return event as PlayerEvent // Return original event if resolution fails

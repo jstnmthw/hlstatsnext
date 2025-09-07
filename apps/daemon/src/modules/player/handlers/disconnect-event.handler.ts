@@ -1,7 +1,7 @@
 /**
  * Player Disconnect Event Handler
  *
- * Handles player disconnection events including player resolution,
+ * Handles player disconnection events including session cleanup,
  * session duration tracking, and server stats updates.
  */
 
@@ -17,11 +17,13 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IServerRepository } from "@/modules/server/server.types"
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 
 export class DisconnectEventHandler extends BasePlayerEventHandler {
   constructor(
     repository: IPlayerRepository,
     logger: ILogger,
+    private readonly sessionService: IPlayerSessionService,
     matchService: IMatchService | undefined,
     private readonly serverRepository: IServerRepository,
   ) {
@@ -35,30 +37,97 @@ export class DisconnectEventHandler extends BasePlayerEventHandler {
       }
 
       const disconnectEvent = event as PlayerDisconnectEvent
-      const { sessionDuration } = disconnectEvent.data
-      let { playerId } = disconnectEvent.data
+      const { gameUserId, playerId } = disconnectEvent.data
+      const meta = event.meta as PlayerMeta
 
-      // Resolve player ID if invalid
-      playerId = await this.resolvePlayerId(playerId, disconnectEvent, event.serverId)
+      let databasePlayerId: number
+      let sessionDuration = 0
 
-      if (playerId <= 0) {
-        this.logger.debug("Invalid player ID resolved for disconnect, skipping event")
-        return this.createSuccessResult(0)
+      // Try to look up the session first if we have a valid gameUserId
+      if (gameUserId !== undefined && gameUserId !== -1) {
+        const session = await this.sessionService.getSessionByGameUserId(event.serverId, gameUserId)
+
+        if (session) {
+          databasePlayerId = session.databasePlayerId
+          sessionDuration = Math.floor((Date.now() - session.connectedAt.getTime()) / 1000)
+
+          // Remove the session
+          await this.sessionService.removeSession(event.serverId, gameUserId)
+        } else {
+          // Try to resolve by Steam ID if we have it in meta
+          if (meta?.steamId) {
+            const sessionBySteam = await this.sessionService.getSessionBySteamId(
+              event.serverId,
+              meta.steamId,
+            )
+            if (sessionBySteam) {
+              // Remove the session (it may have wrong game user ID)
+              await this.sessionService.removeSession(event.serverId, sessionBySteam.gameUserId)
+              this.logger.debug(`Cleaned up mismatched session for ${meta.playerName}`)
+            }
+          }
+
+          // Use resolved playerId from PlayerEventHandler if available
+          if (playerId !== undefined && playerId > 0) {
+            databasePlayerId = playerId
+          } else {
+            // Try to resolve invalid playerId (for bots)
+            const originalPlayerId = disconnectEvent.data.playerId || -1
+            const resolvedPlayerId = await this.resolvePlayerId(
+              originalPlayerId,
+              disconnectEvent,
+              event.serverId,
+            )
+            if (resolvedPlayerId > 0) {
+              databasePlayerId = resolvedPlayerId
+            } else {
+              this.logger.debug("No session and no valid playerId, skipping disconnect processing")
+              return this.createSuccessResult()
+            }
+          }
+        }
+      } else {
+        // No valid gameUserId, use resolved playerId from PlayerEventHandler
+        if (playerId !== undefined && playerId > 0) {
+          databasePlayerId = playerId
+
+          // For events without sessions (like bot disconnects), we can't calculate duration
+          this.logger.debug(`Using resolved playerId ${playerId} for disconnect without session`)
+        } else {
+          // Try to resolve invalid playerId (for bots)
+          const originalPlayerId = disconnectEvent.data.playerId || -1
+          const resolvedPlayerId = await this.resolvePlayerId(
+            originalPlayerId,
+            disconnectEvent,
+            event.serverId,
+          )
+          if (resolvedPlayerId > 0) {
+            databasePlayerId = resolvedPlayerId
+            this.logger.debug(
+              `Resolved invalid playerId to ${databasePlayerId} for disconnect without session`,
+            )
+          } else {
+            this.logger.debug("No valid gameUserId or playerId, skipping disconnect processing")
+            return this.createSuccessResult()
+          }
+        }
       }
 
-      // Update player stats
-      await this.updatePlayerStats(playerId, sessionDuration)
+      // Update player stats with session duration
+      await this.updatePlayerStats(databasePlayerId, sessionDuration)
 
       // Update player name stats
-      await this.updatePlayerNameStats(playerId, event.meta as PlayerMeta, sessionDuration)
+      await this.updatePlayerNameStats(databasePlayerId, meta, sessionDuration)
 
       // Update server stats
       await this.updateServerStats(event.serverId)
 
       // Create disconnect event log
-      await this.createDisconnectEventLog(playerId, event.serverId)
+      await this.createDisconnectEventLog(databasePlayerId, event.serverId)
 
-      this.logger.debug(`Player disconnected: ${playerId}`)
+      this.logger.debug(
+        `Player ${meta?.playerName || "unknown"} disconnected: gameUserId=${gameUserId}, databasePlayerId=${databasePlayerId}, duration=${sessionDuration}s`,
+      )
 
       return this.createSuccessResult()
     })

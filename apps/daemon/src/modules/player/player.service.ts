@@ -13,12 +13,13 @@ import type {
   PlayerEvent,
   PlayerWithCounts,
 } from "./player.types"
+import type { IPlayerSessionService } from "./types/player-session.types"
 import type { Player } from "@repo/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
-import type { IServerRepository } from "@/modules/server/server.types"
+import type { IServerRepository, IServerService } from "@/modules/server/server.types"
 import { normalizeSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
 import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builder"
 import { PlayerEventHandlerFactory } from "./handlers/player-event-handler.factory"
@@ -33,28 +34,42 @@ export class PlayerService implements IPlayerService {
   // Request-level cache for player resolution to prevent race conditions
   private readonly playerResolutionCache = new Map<string, Promise<number>>()
 
-  // Event handler factory for delegating to specific handlers
-  private readonly eventHandlerFactory: PlayerEventHandlerFactory
+  // Event handler factory for delegating to specific handlers (lazy initialized)
+  private eventHandlerFactory?: PlayerEventHandlerFactory
 
   constructor(
     private readonly repository: IPlayerRepository,
     private readonly logger: ILogger,
     private readonly rankingService: IRankingService,
     private readonly serverRepository: IServerRepository,
+    private readonly serverService: IServerService,
+    private readonly sessionService: IPlayerSessionService,
     private readonly matchService?: IMatchService,
     private readonly geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
     private readonly playerNotificationService?: PlayerNotificationService,
   ) {
-    // Initialize the event handler factory
-    this.eventHandlerFactory = new PlayerEventHandlerFactory(
-      repository,
-      logger,
-      rankingService,
-      serverRepository,
-      matchService,
-      geoipService,
-      playerNotificationService,
-    )
+    // Event handler factory will be initialized lazily when first needed
+  }
+
+  /**
+   * Get or initialize the event handler factory
+   */
+  private getEventHandlerFactory(): PlayerEventHandlerFactory {
+    if (!this.eventHandlerFactory) {
+      this.eventHandlerFactory = new PlayerEventHandlerFactory(
+        this.repository,
+        this.logger,
+        this.rankingService,
+        this.serverRepository,
+        this.serverService,
+        this.sessionService,
+        this,
+        this.matchService,
+        this.geoipService,
+        this.playerNotificationService,
+      )
+    }
+    return this.eventHandlerFactory
   }
 
   async getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number> {
@@ -238,7 +253,7 @@ export class PlayerService implements IPlayerService {
   async handlePlayerEvent(event: PlayerEvent): Promise<HandlerResult> {
     try {
       // Use the event handler factory to get the appropriate handler
-      const handler = this.eventHandlerFactory.getHandler(event.eventType)
+      const handler = this.getEventHandlerFactory().getHandler(event.eventType)
 
       if (!handler) {
         this.logger.debug(`PlayerService: Unhandled event type: ${event.eventType}`)

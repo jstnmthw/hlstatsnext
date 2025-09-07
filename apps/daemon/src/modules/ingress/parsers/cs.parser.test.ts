@@ -7,7 +7,27 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { CsParser } from "./cs.parser"
 import { EventType } from "@/shared/types/events"
-import type { PlayerDamageEvent } from "@/modules/player/player.types"
+import type { BaseEvent, DualPlayerMeta } from "@/shared/types/events"
+
+// Parser output types (before ID resolution)
+interface RawDamageEventData {
+  attackerGameUserId: number
+  victimGameUserId: number
+  weapon: string
+  damage: number
+  damageArmor: number
+  healthRemaining: number
+  armorRemaining: number
+  hitgroup: string
+  attackerTeam: string
+  victimTeam: string
+}
+
+interface RawDamageEvent extends BaseEvent {
+  eventType: EventType.PLAYER_DAMAGE
+  data: RawDamageEventData
+  meta?: DualPlayerMeta
+}
 import type { MapChangeEvent, RoundStartEvent } from "@/modules/match/match.types"
 import { TestClock } from "@/shared/infrastructure/time/test-clock"
 import { DeterministicUuidService } from "@/shared/infrastructure/identifiers/deterministic-uuid.service"
@@ -35,8 +55,8 @@ describe("CsParser", () => {
       expect(result.event).not.toBeNull()
       expect(result.event?.eventType).toBe(EventType.PLAYER_KILL)
       expect(result.event?.data).toEqual({
-        killerId: 2,
-        victimId: 3,
+        killerGameUserId: 2,
+        victimGameUserId: 3,
         weapon: "ak47",
         headshot: true,
         killerTeam: "CT",
@@ -76,10 +96,10 @@ describe("CsParser", () => {
       expect(result.event).toBeDefined()
       expect(result.event?.eventType).toBe(EventType.PLAYER_DAMAGE)
 
-      const damageEvent = result.event as PlayerDamageEvent
+      const damageEvent = result.event as RawDamageEvent
       const data = damageEvent.data
-      expect(data.attackerId).toBe(2)
-      expect(data.victimId).toBe(3)
+      expect(data.attackerGameUserId).toBe(2)
+      expect(data.victimGameUserId).toBe(3)
       expect(data.weapon).toBe("ak47")
       expect(data.damage).toBe(27)
       expect(data.damageArmor).toBe(0)
@@ -96,7 +116,7 @@ describe("CsParser", () => {
       const result = parser.parseLine(logLine, serverId)
 
       expect(result.success).toBe(true)
-      const damageEvent = result.event as PlayerDamageEvent
+      const damageEvent = result.event as RawDamageEvent
       const data = damageEvent.data
       expect(data.weapon).toBe("awp")
       expect(data.damage).toBe(448)
@@ -110,7 +130,7 @@ describe("CsParser", () => {
       const result = parser.parseLine(logLine, serverId)
 
       expect(result.success).toBe(true)
-      const damageEvent = result.event as PlayerDamageEvent
+      const damageEvent = result.event as RawDamageEvent
       const data = damageEvent.data
       expect(data.hitgroup).toBe("generic")
       expect(data.damage).toBe(20)
@@ -123,7 +143,7 @@ describe("CsParser", () => {
       const result = parser.parseLine(logLine, serverId)
 
       expect(result.success).toBe(true)
-      const damageEvent = result.event as PlayerDamageEvent
+      const damageEvent = result.event as RawDamageEvent
       const meta = damageEvent.meta
       expect(meta?.killer.isBot).toBe(true)
       expect(meta?.victim.isBot).toBe(false)
@@ -135,7 +155,7 @@ describe("CsParser", () => {
       const result = parser.parseLine(logLine, serverId)
 
       expect(result.success).toBe(true)
-      const damageEvent = result.event as PlayerDamageEvent
+      const damageEvent = result.event as RawDamageEvent
       const data = damageEvent.data
       expect(data.attackerTeam).toBe("CT")
       expect(data.victimTeam).toBe("CT")
@@ -151,7 +171,7 @@ describe("CsParser", () => {
       expect(result.event).not.toBeNull()
       expect(result.event?.eventType).toBe(EventType.PLAYER_CONNECT)
       expect(result.event?.data).toEqual({
-        playerId: 2,
+        gameUserId: 2,
         steamId: "STEAM_789",
         playerName: "Player",
         ipAddress: "192.168.1.1:27005",
@@ -168,7 +188,7 @@ describe("CsParser", () => {
       expect(result.event).not.toBeNull()
       expect(result.event?.eventType).toBe(EventType.PLAYER_DISCONNECT)
       expect(result.event?.data).toEqual({
-        playerId: 2,
+        gameUserId: 2,
         reason: "Disconnect",
       })
     })
@@ -181,7 +201,7 @@ describe("CsParser", () => {
       expect(result.event).not.toBeNull()
       expect(result.event?.eventType).toBe(EventType.PLAYER_DISCONNECT)
       expect(result.event?.data).toEqual({
-        playerId: -1,
+        gameUserId: -1,
         reason: "",
       })
     })
@@ -196,7 +216,7 @@ describe("CsParser", () => {
       expect(result.event).not.toBeNull()
       expect(result.event?.eventType).toBe(EventType.CHAT_MESSAGE)
       expect(result.event?.data).toEqual({
-        playerId: 2,
+        gameUserId: 2,
         message: "hello world",
         team: "CT",
         isDead: false,
@@ -208,7 +228,7 @@ describe("CsParser", () => {
       const result = parser.parseLine(logLine, serverId)
       expect(result.success).toBe(true)
       expect(result.event?.data).toEqual({
-        playerId: 2,
+        gameUserId: 2,
         message: "team message",
         team: "CT",
         isDead: false,
@@ -225,7 +245,7 @@ describe("CsParser", () => {
       expect(result.event).not.toBeNull()
       expect(result.event?.eventType).toBe(EventType.ACTION_PLAYER)
       expect(result.event?.data).toEqual({
-        playerId: 2,
+        gameUserId: 2,
         actionCode: "Spawned_With_The_Bomb",
         game: "cstrike",
         team: "TERRORIST",
@@ -244,7 +264,7 @@ describe("CsParser", () => {
       expect(result.success).toBe(true)
       expect(result.event?.eventType).toBe(EventType.ACTION_PLAYER)
       expect(result.event?.data).toEqual({
-        playerId: 7,
+        gameUserId: 7,
         actionCode: "Planted_The_Bomb",
         game: "cstrike",
         team: "TERRORIST",
@@ -258,7 +278,7 @@ describe("CsParser", () => {
       expect(result.success).toBe(true)
       expect(result.event?.eventType).toBe(EventType.ACTION_PLAYER)
       expect(result.event?.data).toEqual({
-        playerId: 12,
+        gameUserId: 12,
         actionCode: "Defused_The_Bomb",
         game: "cstrike",
         team: "CT",

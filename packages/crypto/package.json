@@ -1,0 +1,31 @@
+{
+  "name": "@repo/crypto",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf node_modules dist .turbo",
+    "lint": "eslint src/**/*.ts",
+    "test": "vitest run --silent",
+    "test:watch": "vitest --watch"
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts"
+  },
+  "dependencies": {
+    "argon2": "^0.31.0"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^24.0.0",
+    "eslint": "^9.30.0",
+    "typescript": "^5.8.3",
+    "vitest": "^1.6.0"
+  }
+}

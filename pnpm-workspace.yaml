@@ -2,10 +2,11 @@ packages:
   - apps/*
   - packages/*
 ignoredBuiltDependencies:
-  - '@parcel/watcher'
-  - '@prisma/client'
-  - '@prisma/engines'
-  - '@tailwindcss/oxide'
+  - "@parcel/watcher"
+  - "@prisma/client"
+  - "@prisma/engines"
+  - "@tailwindcss/oxide"
+  - argon2
   - esbuild
   - prisma
   - sharp

@@ -100,7 +100,11 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   const resolvedIngressOptions = createIngressConfig(ingressOptions)
 
   // Create repositories
-  const repositories = createRepositories(infrastructure.database, infrastructure.logger)
+  const repositories = createRepositories(
+    infrastructure.database,
+    infrastructure.logger,
+    infrastructure.crypto,
+  )
 
   // Create business services
   const services = createBusinessServices(

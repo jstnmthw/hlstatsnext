@@ -15,6 +15,45 @@ import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/me
 import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
 import { systemClock } from "@/shared/infrastructure/time"
 
+// Mock the crypto package for integration tests
+vi.mock("@repo/crypto", () => ({
+  createCryptoService: vi.fn(() => ({
+    hashPassword: vi.fn().mockResolvedValue("hashed_password"),
+    verifyPassword: vi.fn().mockResolvedValue(true),
+    encrypt: vi.fn().mockResolvedValue("encrypted_data"),
+    decrypt: vi.fn().mockResolvedValue("decrypted_data"),
+  })),
+}))
+
+// Mock the infrastructure config factory
+vi.mock("@/shared/application/factories/infrastructure-config.factory", () => ({
+  createInfrastructureComponents: vi.fn(() => ({
+    database: {
+      prisma: {
+        server: {
+          findUnique: vi.fn().mockResolvedValue({
+            serverId: 1,
+            game: "cstrike",
+            name: "Test Server",
+          }),
+        },
+      },
+    },
+    logger: {
+      info: vi.fn(),
+      debug: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    },
+    crypto: {
+      hashPassword: vi.fn().mockResolvedValue("hashed_password"),
+      verifyPassword: vi.fn().mockResolvedValue(true),
+      encrypt: vi.fn().mockResolvedValue("encrypted_data"),
+      decrypt: vi.fn().mockResolvedValue("decrypted_data"),
+    },
+  })),
+}))
+
 describe("Event Flow Integration", () => {
   let mockEventPublisher: IEventPublisher
   let capturedEvents: BaseEvent[] = []

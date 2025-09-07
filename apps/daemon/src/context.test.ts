@@ -22,6 +22,30 @@ vi.mock("@/modules/game/game-detection.service")
 vi.mock("@/modules/server/server.repository")
 vi.mock("@/modules/server/server.service")
 
+// Mock the crypto package
+vi.mock("@repo/crypto", () => ({
+  createCryptoService: vi.fn(() => ({
+    hashPassword: vi.fn().mockResolvedValue("hashed_password"),
+    verifyPassword: vi.fn().mockResolvedValue(true),
+    encrypt: vi.fn().mockResolvedValue("encrypted_data"),
+    decrypt: vi.fn().mockResolvedValue("decrypted_data"),
+  })),
+}))
+
+// Mock the infrastructure config factory
+vi.mock("@/shared/application/factories/infrastructure-config.factory", () => ({
+  createInfrastructureComponents: vi.fn(() => ({
+    database: {},
+    logger: {},
+    crypto: {
+      hashPassword: vi.fn().mockResolvedValue("hashed_password"),
+      verifyPassword: vi.fn().mockResolvedValue(true),
+      encrypt: vi.fn().mockResolvedValue("encrypted_data"),
+      decrypt: vi.fn().mockResolvedValue("decrypted_data"),
+    },
+  })),
+}))
+
 describe("Application Context", () => {
   beforeEach(() => {
     vi.clearAllMocks()

@@ -52,6 +52,16 @@
     ],
     "overrides": {
       "node-domexception": "file:./packages/node-domexception-stub"
-    }
+    },
+    "ignoredBuiltDependencies": [
+      "@parcel/watcher",
+      "@prisma/client",
+      "@prisma/engines",
+      "@tailwindcss/oxide",
+      "argon2",
+      "esbuild",
+      "prisma",
+      "sharp"
+    ]
   }
 }

@@ -1,44 +1,172 @@
-import { db } from "@repo/database/client"
+/**
+ * Server Management Service
+ *
+ * Handles server RCON password encryption/decryption and server management.
+ */
+
+import type { ICryptoService } from "@repo/crypto"
+import type { Server } from "@repo/database/client"
 import { ServerRepository } from "./server.repository"
-import type { CreateServerInput, CreateServerResult, UpdateServerInput } from "./server.types"
+import type { CreateServerInput, CreateServerResult } from "./server.types"
 
 export class ServerService {
-  private serverRepository: ServerRepository
+  private readonly serverRepository: ServerRepository
 
-  constructor() {
+  constructor(private readonly crypto: ICryptoService) {
     this.serverRepository = new ServerRepository()
   }
 
-  async createServerWithConfig(input: CreateServerInput): Promise<CreateServerResult> {
-    return await db.$transaction(async () => {
-      // Create the server first
-      const server = await this.serverRepository.createServer(input)
+  /**
+   * Create a new server with encrypted RCON password
+   */
+  async createServer(serverData: {
+    name: string
+    address: string
+    port: number
+    rconPassword: string
+    game?: string
+    publicAddress?: string
+    statusUrl?: string
+    connectionType?: string
+    dockerHost?: string
+  }): Promise<Server> {
+    // Encrypt the RCON password
+    const encryptedRconPassword = await this.crypto.encrypt(serverData.rconPassword)
 
-      // Copy configuration defaults
-      const configResult = await this.serverRepository.copyServerConfigDefaults(
-        server.serverId,
-        server.game,
-      )
-
-      // Get the server with all its configurations
-      const serverWithConfigs = await this.serverRepository.getServerWithConfigs(server.serverId)
-
-      if (!serverWithConfigs) {
-        throw new Error("Failed to retrieve created server with configurations")
-      }
-
-      return {
-        server: serverWithConfigs,
-        configsCount: configResult.totalConfigs,
-      }
+    const server = await this.serverRepository.createServer({
+      name: serverData.name,
+      address: serverData.address,
+      port: serverData.port,
+      rconPassword: encryptedRconPassword,
+      game: serverData.game || "valve",
+      publicAddress: serverData.publicAddress,
+      statusUrl: serverData.statusUrl,
+      connectionType: serverData.connectionType,
+      dockerHost: serverData.dockerHost,
     })
+
+    return server
   }
 
-  async getServer(serverId: number) {
-    return await this.serverRepository.getServerWithConfigs(serverId)
+  /**
+   * Create a new server with encrypted RCON password and configuration defaults
+   */
+  async createServerWithConfig(input: CreateServerInput): Promise<CreateServerResult> {
+    // Encrypt the RCON password before creating server
+    const encryptedRconPassword = input.rconPassword
+      ? await this.crypto.encrypt(input.rconPassword)
+      : undefined
+
+    // Create the server with encrypted password and all configurations in a single transaction
+    const serverInput = {
+      ...input,
+      rconPassword: encryptedRconPassword,
+    }
+
+    return await this.serverRepository.createServerWithConfig(serverInput)
   }
 
-  async updateServerWithConfig(serverId: number, input: UpdateServerInput) {
-    return await this.serverRepository.updateServerWithConfig(serverId, input)
+  /**
+   * Update server RCON password
+   */
+  async updateRconPassword(serverId: number, newPassword: string): Promise<boolean> {
+    if (!newPassword) {
+      throw new Error("RCON password is required")
+    }
+
+    // Encrypt the new password
+    const encryptedPassword = await this.crypto.encrypt(newPassword)
+
+    await this.serverRepository.updateServerWithConfig(serverId, {
+      rconPassword: encryptedPassword,
+    })
+
+    return true
+  }
+
+  /**
+   * Get decrypted RCON password for a server (for daemon use)
+   */
+  async getRconPassword(serverId: number): Promise<string | null> {
+    const server = await this.serverRepository.getServerWithConfigs(serverId)
+
+    if (!server || !server.rconPassword) {
+      return null
+    }
+
+    try {
+      // Decrypt the RCON password
+      return await this.crypto.decrypt(server.rconPassword)
+    } catch (error) {
+      console.error("Failed to decrypt RCON password for server", serverId, error)
+      return null
+    }
+  }
+
+  /**
+   * Get server details without exposing RCON password
+   */
+  async getServer(serverId: number): Promise<Omit<Server, "rconPassword"> | null> {
+    const server = await this.serverRepository.getServerWithConfigs(serverId)
+
+    if (!server) {
+      return null
+    }
+
+    // Remove RCON password from response
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { rconPassword, ...serverWithoutPassword } = server
+    return serverWithoutPassword
+  }
+
+  /**
+   * Get all servers without exposing RCON passwords
+   */
+  async getAllServers(): Promise<Array<Omit<Server, "rconPassword">>> {
+    const servers = await this.serverRepository.getAllServers()
+
+    // Remove RCON passwords from response
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return servers.map(({ rconPassword, ...server }) => server)
+  }
+
+  /**
+   * Update server details (excluding RCON password)
+   */
+  async updateServer(
+    serverId: number,
+    updates: Partial<
+      Pick<Server, "name" | "address" | "port" | "publicAddress" | "statusUrl" | "game">
+    >,
+  ): Promise<Server> {
+    const updatedServer = await this.serverRepository.updateServerWithConfig(serverId, updates)
+
+    return updatedServer
+  }
+
+  /**
+   * Test RCON connection (for validation)
+   */
+  async testRconConnection(serverId: number): Promise<{ success: boolean; message: string }> {
+    try {
+      const server = await this.serverRepository.getServerWithConfigs(serverId)
+
+      if (!server) {
+        return { success: false, message: "Server not found" }
+      }
+
+      const decryptedPassword = await this.crypto.decrypt(server.rconPassword)
+
+      // TODO: Implement actual RCON connection test here
+      // For now, just validate that we can decrypt the password
+      if (decryptedPassword) {
+        return { success: true, message: "RCON password decrypted successfully" }
+      } else {
+        return { success: false, message: "Failed to decrypt RCON password" }
+      }
+    } catch (error) {
+      console.error("RCON connection test failed:", error)
+      return { success: false, message: "RCON connection test failed" }
+    }
   }
 }

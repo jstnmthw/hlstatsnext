@@ -762,7 +762,7 @@ model Server {
   game           String    @default("valve") @db.VarChar(32)
   publicAddress  String    @default("") @map("public_address") @db.VarChar(128)
   statusUrl      String?   @map("status_url") @db.VarChar(255)
-  rconPassword   String    @default("") @map("rcon_password") @db.VarChar(128)
+  rconPassword   String    @default("") @map("rcon_password") @db.VarChar(512)
   connectionType String    @default("external") @map("connection_type") @db.VarChar(8) // 'docker' or 'external'
   dockerHost     String?   @map("docker_host") @db.VarChar(255) // Container hostname or static IP for Docker servers
   kills         Int       @default(0)
@@ -878,7 +878,7 @@ model Team {
 
 model User {
   username String @id @db.VarChar(16)
-  password String @db.VarChar(32)
+  password String @db.VarChar(255)
   acclevel Int    @default(0)
   playerId Int    @unique @default(0) @map("player_id") @db.UnsignedInt
 

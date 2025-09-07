@@ -1,12 +1,15 @@
 import { db } from "@repo/database/client"
+import { createCryptoService, type ICryptoService } from "@repo/crypto"
+import { ServerService } from "./modules/server/server.service"
+import { AuthService } from "./modules/auth/auth.service"
 
 /**
  * Services container for dependency injection
- * Currently empty - all operations handled by generated CRUD resolvers
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface Services {
-  // Reserved for future custom services
+  readonly crypto: ICryptoService
+  readonly server: ServerService
+  readonly auth: AuthService
 }
 
 /**
@@ -21,8 +24,17 @@ export interface Context {
  * Create GraphQL context with dependency injection
  */
 export function createContext(): Context {
+  // Require encryption key in all environments
+  if (!process.env.ENCRYPTION_KEY) {
+    throw new Error("ENCRYPTION_KEY environment variable is required")
+  }
+
+  const crypto = createCryptoService()
+
   const services: Services = {
-    // No custom services currently needed
+    crypto,
+    server: new ServerService(crypto),
+    auth: new AuthService(crypto),
   }
 
   return {

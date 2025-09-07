@@ -7,6 +7,7 @@
 
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { ICryptoService } from "@repo/crypto"
 import type { IRconRepository, RconCredentials, ServerStatus } from "./rcon.types"
 import { GameEngine } from "./rcon.types"
 
@@ -14,6 +15,7 @@ export class RconRepository implements IRconRepository {
   constructor(
     private readonly database: DatabaseClient,
     private readonly logger: ILogger,
+    private readonly crypto: ICryptoService,
   ) {}
 
   async getRconCredentials(serverId: number): Promise<RconCredentials | null> {
@@ -45,6 +47,15 @@ export class RconRepository implements IRconRepository {
       // Map game string to GameEngine enum
       const gameEngine = this.mapGameToEngine(server.game)
 
+      // Decrypt the RCON password
+      let decryptedPassword: string
+      try {
+        decryptedPassword = await this.crypto.decrypt(server.rconPassword)
+      } catch (error) {
+        this.logger.error(`Failed to decrypt RCON password for server ${serverId}: ${error}`)
+        return null
+      }
+
       // Determine the correct connection address based on server type
       let connectionAddress: string
       let connectionPort: number
@@ -69,7 +80,7 @@ export class RconRepository implements IRconRepository {
         serverId: server.serverId,
         address: connectionAddress,
         port: connectionPort,
-        rconPassword: server.rconPassword,
+        rconPassword: decryptedPassword,
         gameEngine,
       }
     } catch (error) {

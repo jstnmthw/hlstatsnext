@@ -17,11 +17,11 @@ export interface CreateServerInput {
 export interface UpdateServerInput {
   name?: string
   address?: string
-  port: number
-  game: string
+  port?: number
+  game?: string
   mod?: string
   publicAddress?: string
-  statusUrl?: string
+  statusUrl?: string | null
   rconPassword?: string
   connectionType?: string
   dockerHost?: string

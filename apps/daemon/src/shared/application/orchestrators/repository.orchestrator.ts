@@ -7,6 +7,7 @@
 
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { ICryptoService } from "@repo/crypto"
 
 import { PlayerRepository } from "@/modules/player/player.repository"
 import { MatchRepository } from "@/modules/match/match.repository"
@@ -29,18 +30,20 @@ export interface RepositoryCollection {
  *
  * @param database - Database client instance
  * @param logger - Logger instance
+ * @param crypto - Crypto service instance
  * @returns Collection of all repository instances
  */
 export function createRepositories(
   database: DatabaseClient,
   logger: ILogger,
+  crypto: ICryptoService,
 ): RepositoryCollection {
   const playerRepository = new PlayerRepository(database, logger)
   const matchRepository = new MatchRepository(database, logger)
   const weaponRepository = new WeaponRepository(database, logger)
   const actionRepository = new ActionRepository(database, logger)
   const serverRepository = new ServerRepository(database, logger)
-  const rconRepository = new RconRepository(database, logger)
+  const rconRepository = new RconRepository(database, logger, crypto)
 
   return {
     playerRepository,

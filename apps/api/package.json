@@ -16,10 +16,12 @@
     "@pothos/plugin-prisma": "^4.8.2",
     "@pothos/plugin-relay": "^4.4.2",
     "@pothos/plugin-with-input": "^4.1.1",
+    "@repo/crypto": "workspace:*",
     "@repo/database": "workspace:*",
     "cors": "^2.8.5",
     "graphql": "^16.11.0",
-    "graphql-yoga": "^5.13.5"
+    "graphql-yoga": "^5.13.5",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

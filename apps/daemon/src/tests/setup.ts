@@ -15,6 +15,9 @@ beforeAll(async () => {
   process.env.NODE_ENV = "test"
   process.env.LOG_LEVEL = "silent"
 
+  // Set test encryption key (32-byte base64 encoded key)
+  process.env.ENCRYPTION_KEY = "UeiKre+QpJAdqs8HECeQsuhJGOEatW+gu/t0pXPE5ns="
+
   // Initialize test database
   await seedTestDatabase()
 })

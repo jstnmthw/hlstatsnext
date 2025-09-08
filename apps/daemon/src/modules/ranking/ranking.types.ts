@@ -23,4 +23,15 @@ export interface IRankingService {
     context: KillContext,
   ): Promise<{ killerChange: number; victimChange: number }>
   calculateSuicidePenalty(): number
+  calculateTeamkillPenalty(): number
+
+  /**
+   * Get the rank position of a player (1 = highest skill)
+   */
+  getPlayerRankPosition(playerId: number): Promise<number>
+
+  /**
+   * Get rank positions for multiple players efficiently
+   */
+  getBatchPlayerRanks(playerIds: number[]): Promise<Map<number, number>>
 }

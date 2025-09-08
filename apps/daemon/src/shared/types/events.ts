@@ -40,6 +40,9 @@ export enum EventType {
   SERVER_STATS_UPDATE = "SERVER_STATS_UPDATE",
   ADMIN_ACTION = "ADMIN_ACTION",
   CHAT_MESSAGE = "CHAT_MESSAGE",
+
+  // Unknown/default
+  UNKNOWN = "UNKNOWN",
 }
 
 export interface Position3D {

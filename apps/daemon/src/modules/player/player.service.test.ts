@@ -33,6 +33,9 @@ describe("PlayerService", () => {
       calculateRatingAdjustment: vi.fn().mockResolvedValue({ winner: 10, loser: -8 }),
       calculateSkillAdjustment: vi.fn().mockResolvedValue({ killerChange: 10, victimChange: -8 }),
       calculateSuicidePenalty: vi.fn().mockReturnValue(-5),
+      calculateTeamkillPenalty: vi.fn().mockReturnValue(-10),
+      getPlayerRankPosition: vi.fn().mockResolvedValue(1),
+      getBatchPlayerRanks: vi.fn().mockResolvedValue(new Map()),
     }
 
     // Create mock match service

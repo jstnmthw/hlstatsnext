@@ -6,18 +6,23 @@ import { describe, it, expect, beforeEach, vi } from "vitest"
 import { RankingService, type KillContext } from "./ranking.service"
 import { createMockLogger } from "../../tests/mocks/logger"
 import { createMockWeaponRepository } from "../../tests/mocks/weapon.repository"
+import { createMockDatabaseClient } from "../../tests/mocks/database"
 import type { SkillRating } from "./ranking.types"
 import type { IWeaponRepository } from "../weapon/weapon.types"
+import type { TransactionalPrisma } from "@/database/client"
 
 describe("RankingService", () => {
   let rankingService: RankingService
   let mockLogger: ReturnType<typeof createMockLogger>
   let mockWeaponRepository: IWeaponRepository
+  let mockDatabase: TransactionalPrisma
 
   beforeEach(() => {
     mockLogger = createMockLogger()
     mockWeaponRepository = createMockWeaponRepository()
-    rankingService = new RankingService(mockLogger, mockWeaponRepository)
+    const mockDatabaseClient = createMockDatabaseClient()
+    mockDatabase = mockDatabaseClient.prisma
+    rankingService = new RankingService(mockLogger, mockWeaponRepository, mockDatabase)
   })
 
   describe("Service instantiation", () => {

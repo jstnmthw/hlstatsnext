@@ -16,6 +16,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
+import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 
 export class SuicideEventHandler extends BasePlayerEventHandler {
   constructor(
@@ -23,6 +24,7 @@ export class SuicideEventHandler extends BasePlayerEventHandler {
     logger: ILogger,
     matchService: IMatchService | undefined,
     private readonly rankingService: IRankingService,
+    private readonly eventNotificationService?: IEventNotificationService,
   ) {
     super(repository, logger, matchService)
   }
@@ -67,10 +69,39 @@ export class SuicideEventHandler extends BasePlayerEventHandler {
       // Update server stats
       await this.updateServerStats(event.serverId)
 
+      // Send suicide notification
+      await this.sendSuicideNotification(event, skillPenalty)
+
       this.logger.debug(`Player suicide: ${playerId} (penalty: ${skillPenalty})`)
 
       return this.createSuccessResult()
     })
+  }
+
+  /**
+   * Send suicide event notification
+   */
+  private async sendSuicideNotification(event: PlayerEvent, skillPenalty: number): Promise<void> {
+    if (!this.eventNotificationService) {
+      return
+    }
+
+    try {
+      const suicideEvent = event as PlayerSuicideEvent
+      const { playerId } = suicideEvent.data
+      const playerName = (event.meta as PlayerMeta)?.playerName
+
+      await this.eventNotificationService.notifySuicideEvent({
+        serverId: event.serverId,
+        playerId,
+        playerName,
+        weapon: suicideEvent.data.weapon,
+        skillPenalty,
+        timestamp: new Date(),
+      })
+    } catch (error) {
+      this.logger.warn(`Failed to send suicide notification: ${error}`)
+    }
   }
 
   /**

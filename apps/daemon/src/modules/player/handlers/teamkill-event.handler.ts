@@ -15,9 +15,17 @@ import type { DualPlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IRankingService } from "@/modules/ranking/ranking.types"
+import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 
 export class TeamkillEventHandler extends BasePlayerEventHandler {
-  constructor(repository: IPlayerRepository, logger: ILogger, matchService?: IMatchService) {
+  constructor(
+    repository: IPlayerRepository,
+    logger: ILogger,
+    matchService: IMatchService | undefined,
+    private readonly rankingService?: IRankingService,
+    private readonly eventNotificationService?: IEventNotificationService,
+  ) {
     super(repository, logger, matchService)
   }
 
@@ -30,8 +38,14 @@ export class TeamkillEventHandler extends BasePlayerEventHandler {
       const teamkillEvent = event as PlayerTeamkillEvent
       const { killerId, victimId, headshot } = teamkillEvent.data
 
+      // Calculate skill penalty for teamkill
+      const skillPenalty = this.rankingService?.calculateTeamkillPenalty() || -5
+
       // Build killer stats update
-      const killerUpdateBuilder = StatUpdateBuilder.create().addTeamkills(1).updateLastEvent()
+      const killerUpdateBuilder = StatUpdateBuilder.create()
+        .addTeamkills(1)
+        .addSkillChange(skillPenalty) // Apply penalty to killer
+        .updateLastEvent()
 
       if (headshot) {
         killerUpdateBuilder.addHeadshots(1)
@@ -59,10 +73,42 @@ export class TeamkillEventHandler extends BasePlayerEventHandler {
       // Update player name stats
       await this.updatePlayerNameStats(killerId, victimId, event.meta as DualPlayerMeta)
 
+      // Send teamkill notification
+      await this.sendTeamkillNotification(event, skillPenalty)
+
       this.logger.debug(`Teamkill: ${killerId} -> ${victimId} (${teamkillEvent.data.weapon})`)
 
       return this.createSuccessResult(2) // Affected both killer and victim
     })
+  }
+
+  /**
+   * Send teamkill event notification
+   */
+  private async sendTeamkillNotification(event: PlayerEvent, skillPenalty: number): Promise<void> {
+    if (!this.eventNotificationService) {
+      return
+    }
+
+    try {
+      const teamkillEvent = event as PlayerTeamkillEvent
+      const { killerId, victimId, headshot } = teamkillEvent.data
+      const meta = event.meta as DualPlayerMeta
+
+      await this.eventNotificationService.notifyTeamKillEvent({
+        serverId: event.serverId,
+        killerId,
+        victimId,
+        killerName: meta?.killer?.playerName,
+        victimName: meta?.victim?.playerName,
+        weapon: teamkillEvent.data.weapon,
+        headshot,
+        skillPenalty,
+        timestamp: new Date(),
+      })
+    } catch (error) {
+      this.logger.warn(`Failed to send teamkill notification: ${error}`)
+    }
   }
 
   /**

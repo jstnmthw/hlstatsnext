@@ -18,7 +18,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
-import type { PlayerNotificationService } from "@/modules/rcon/services/player-notification.service"
+import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 
 export class KillEventHandler extends BasePlayerEventHandler {
   private readonly DEFAULT_RATING = 1000
@@ -29,7 +29,7 @@ export class KillEventHandler extends BasePlayerEventHandler {
     logger: ILogger,
     matchService: IMatchService | undefined,
     private readonly rankingService: IRankingService,
-    private readonly notificationService?: PlayerNotificationService,
+    private readonly eventNotificationService?: IEventNotificationService,
   ) {
     super(repository, logger, matchService)
   }
@@ -105,14 +105,15 @@ export class KillEventHandler extends BasePlayerEventHandler {
         skillAdjustment,
       )
 
-      // Send player notifications if service is available
-      await this.sendPlayerNotifications(
+      // Send event notification with comprehensive formatting
+      await this.sendEventNotification(
         event.serverId,
         killerId,
         victimId,
         skillAdjustment,
-        killerStats,
-        victimStats,
+        killEvent.meta,
+        weapon,
+        headshot,
       )
 
       return this.createSuccessResult(2) // Affected both killer and victim
@@ -363,80 +364,52 @@ export class KillEventHandler extends BasePlayerEventHandler {
   }
 
   /**
-   * Send player notifications for skill changes
+   * Send comprehensive event notification with rich formatting
    */
-  private async sendPlayerNotifications(
+  private async sendEventNotification(
     serverId: number,
     killerId: number,
     victimId: number,
     skillAdjustment: { killerChange: number; victimChange: number },
-    killerStats: Player,
-    victimStats: Player,
+    meta?: DualPlayerMeta,
+    weapon?: string,
+    headshot?: boolean,
   ): Promise<void> {
-    this.logger.info("Sending player notifications", {
-      serverId,
-      killerId,
-      victimId,
-      skillAdjustment,
-      killerStats,
-      victimStats,
-    })
-    if (!this.notificationService) {
-      this.logger.warn("No notification service available")
+    if (!this.eventNotificationService) {
+      this.logger.debug("No event notification service available")
       return
     }
 
     try {
-      const notifications: Array<Promise<void>> = []
-
-      // Notify killer about skill gain
-      if (skillAdjustment.killerChange > 0) {
-        const killerMessage = this.formatSkillMessage(
-          skillAdjustment.killerChange,
-          (killerStats.skill || this.DEFAULT_RATING) + skillAdjustment.killerChange,
-          true,
-        )
-
-        notifications.push(
-          this.notificationService.notifyPlayer(serverId, killerId, killerMessage, {
-            includePlayerName: true,
-          }),
-        )
+      // Prepare kill event notification data
+      const killNotificationData = {
+        serverId,
+        killerId,
+        victimId,
+        killerName: meta?.killer?.playerName,
+        victimName: meta?.victim?.playerName,
+        weapon: weapon || "unknown",
+        headshot: headshot || false,
+        skillAdjustment,
+        timestamp: new Date(),
       }
 
-      // Notify victim about skill loss (only if significant)
-      if (skillAdjustment.victimChange < -1) {
-        const victimMessage = this.formatSkillMessage(
-          skillAdjustment.victimChange,
-          (victimStats.skill || this.DEFAULT_RATING) + skillAdjustment.victimChange,
-          false,
-        )
+      // Send the notification through the event notification service
+      await this.eventNotificationService.notifyKillEvent(killNotificationData)
 
-        notifications.push(
-          this.notificationService.notifyPlayer(serverId, victimId, victimMessage, {
-            includePlayerName: true,
-          }),
-        )
-      }
-
-      // Send all notifications in parallel
-      if (notifications.length > 0) {
-        await Promise.all(notifications)
-      }
+      this.logger.debug(`Kill event notification sent for server ${serverId}`, {
+        killerId,
+        victimId,
+        skillAdjustment,
+      })
     } catch (error) {
       // Don't fail the kill event if notifications fail
-      this.logger.warn(`Failed to send player notifications: ${error}`)
+      this.logger.warn(`Failed to send kill event notification: ${error}`, {
+        serverId,
+        killerId,
+        victimId,
+        error: error instanceof Error ? error.message : String(error),
+      })
     }
-  }
-
-  /**
-   * Format skill change message for players
-   */
-  private formatSkillMessage(skillChange: number, newSkill: number, isGain: boolean): string {
-    const changeText = isGain ? `+${Math.round(skillChange)}` : `${Math.round(skillChange)}`
-
-    const direction = isGain ? "↑" : "↓"
-
-    return `Skill ${direction} ${changeText} (${Math.round(newSkill)})`
   }
 }

@@ -22,6 +22,8 @@ import { RconService } from "@/modules/rcon/rcon.service"
 import { CommandResolverService } from "@/modules/rcon/services/command-resolver.service"
 import { RconCommandService } from "@/modules/rcon/services/rcon-command.service"
 import { PlayerNotificationService } from "@/modules/rcon/services/player-notification.service"
+import { EventNotificationService } from "@/modules/rcon/services/event-notification.service"
+import { NotificationConfigRepository } from "@/modules/rcon/repositories/notification-config.repository"
 import { ServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 import { PlayerSessionRepository } from "@/modules/player/repositories/player-session.repository"
 import { PlayerSessionService } from "@/modules/player/services/player-session.service"
@@ -69,7 +71,7 @@ export function createBusinessServices(
   rconConfig: RconConfig,
 ): BusinessServiceCollection {
   // First tier - services with minimal dependencies
-  const rankingService = new RankingService(logger, repositories.weaponRepository)
+  const rankingService = new RankingService(logger, repositories.weaponRepository, database.prisma)
   const matchService = new MatchService(repositories.matchRepository, logger)
   const geoipService = new GeoIPService(database, logger)
   const weaponService = new WeaponService(repositories.weaponRepository, logger)
@@ -112,6 +114,16 @@ export function createBusinessServices(
     logger,
   )
 
+  // Create notification config repository and event notification service
+  const notificationConfigRepository = new NotificationConfigRepository(database.prisma, logger)
+  const eventNotificationService = new EventNotificationService(
+    playerNotificationService,
+    notificationConfigRepository,
+    rankingService,
+    serverService,
+    logger,
+  )
+
   // Now create PlayerService with all dependencies properly injected
   const playerService = new PlayerService(
     repositories.playerRepository,
@@ -122,7 +134,7 @@ export function createBusinessServices(
     sessionService, // Pass the real session service
     matchService,
     geoipService,
-    playerNotificationService, // Pass the real notification service
+    eventNotificationService, // Pass the new event notification service
   )
 
   // Fourth tier - services dependent on third tier

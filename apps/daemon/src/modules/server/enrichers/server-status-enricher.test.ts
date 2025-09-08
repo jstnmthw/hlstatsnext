@@ -31,6 +31,7 @@ const mockServerRepository: IServerRepository = {
 }
 
 const mockServerService: IServerService = {
+  findById: vi.fn(),
   getServer: vi.fn(),
   getServerByAddress: vi.fn(),
   getServerGame: vi.fn(),

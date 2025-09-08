@@ -17,12 +17,10 @@ vi.mock("@/config/environment.config")
 vi.mock("@/modules/rcon/rcon-monitor.service")
 vi.mock("@/database/connection.service")
 vi.mock("@/shared/infrastructure/messaging/queue/utils/message-utils", () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let currentUuidService: any = null
+  let currentUuidService: unknown = null
   return {
     getUuidService: () => currentUuidService,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setUuidService: (service: any) => {
+    setUuidService: (service: unknown) => {
       currentUuidService = service
     },
   }
@@ -160,8 +158,7 @@ describe("HLStatsDaemon", () => {
       vi.mocked(mockDatabaseConnection.testConnection).mockResolvedValue(true)
 
       // Clear UUID service to simulate uninitialized state
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setUuidService(null as any)
+      setUuidService(null as never)
 
       const mockExit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never)
 

@@ -17,6 +17,7 @@ import type { IPlayerRepository, IPlayerService } from "@/modules/player/player.
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import type { IServerService } from "@/modules/server/server.types"
+import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 
 export class ConnectEventHandler extends BasePlayerEventHandler {
   constructor(
@@ -27,6 +28,7 @@ export class ConnectEventHandler extends BasePlayerEventHandler {
     private readonly serverService: IServerService,
     matchService?: IMatchService,
     private readonly geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
+    private readonly eventNotificationService?: IEventNotificationService,
   ) {
     super(repository, logger, matchService)
   }
@@ -128,12 +130,48 @@ export class ConnectEventHandler extends BasePlayerEventHandler {
       // Create connect event log
       await this.createConnectEventLog(databasePlayerId, event.serverId, ipAddress || "")
 
+      // Send connect notification
+      await this.sendConnectNotification(event, databasePlayerId, ipAddress)
+
       this.logger.debug(
         `Player ${meta.playerName} connected: gameUserId=${gameUserId}, databasePlayerId=${databasePlayerId}`,
       )
 
       return this.createSuccessResult()
     })
+  }
+
+  /**
+   * Send connect event notification
+   */
+  private async sendConnectNotification(
+    event: PlayerEvent,
+    playerId: number,
+    ipAddress?: string,
+  ): Promise<void> {
+    if (!this.eventNotificationService) {
+      return
+    }
+
+    try {
+      const connectEvent = event as PlayerConnectEvent
+      const meta = event.meta as PlayerMeta
+
+      // Calculate connection time (for now just use 0, could be enhanced)
+      const connectionTime = 0
+
+      await this.eventNotificationService.notifyConnectEvent({
+        serverId: event.serverId,
+        playerId,
+        playerName: meta?.playerName,
+        steamId: connectEvent.data.steamId,
+        ipAddress: ipAddress || "",
+        connectionTime,
+        timestamp: new Date(),
+      })
+    } catch (error) {
+      this.logger.warn(`Failed to send connect notification: ${error}`)
+    }
   }
 
   /**

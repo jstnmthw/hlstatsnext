@@ -7,6 +7,7 @@ import type { IRankingService, SkillRating } from "./ranking.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IWeaponRepository } from "../weapon/weapon.types"
 import type { Weapon } from "@repo/database/client"
+import type { TransactionalPrisma } from "@/database/client"
 import { GameConfig } from "@/config/game.config"
 import {
   calculateKillSkillAdjustment,
@@ -52,6 +53,7 @@ export class RankingService implements IRankingService {
   constructor(
     private readonly logger: ILogger,
     private readonly weaponRepository: IWeaponRepository,
+    private readonly db: TransactionalPrisma,
   ) {}
 
   /**
@@ -116,6 +118,18 @@ export class RankingService implements IRankingService {
    */
   calculateSuicidePenalty(): number {
     return calculateSuicidePenaltyPure(this.skillConfig)
+  }
+
+  /**
+   * Calculate penalty for teamkill events
+   *
+   * Returns a fixed negative rating adjustment applied when a player
+   * kills a teammate. This is typically a larger penalty than suicide.
+   * Default: -10 rating points
+   */
+  calculateTeamkillPenalty(): number {
+    // For now, use double the suicide penalty as teamkills are more serious
+    return calculateSuicidePenaltyPure(this.skillConfig) * 2
   }
 
   /**
@@ -208,5 +222,103 @@ export class RankingService implements IRankingService {
   clearWeaponCache(): void {
     this.weaponModifierCache.clear()
     this.cacheLastUpdated = 0
+  }
+
+  /**
+   * Get the rank position of a player based on skill (1 = highest skill)
+   * Uses efficient database query with RANK() window function
+   */
+  async getPlayerRankPosition(playerId: number): Promise<number> {
+    try {
+      // Use raw SQL for efficient ranking calculation
+      const result = await this.db.$queryRaw<Array<{ rank: bigint }>>`
+        SELECT rank_pos as rank
+        FROM (
+          SELECT 
+            player_id,
+            RANK() OVER (ORDER BY skill DESC) as rank_pos
+          FROM players
+          WHERE hide_ranking = 0
+        ) ranked
+        WHERE player_id = ${playerId}
+      `
+
+      if (result.length === 0) {
+        this.logger.warn(`Player ${playerId} not found in ranking query`)
+        return 0 // Player not found or has rankings hidden
+      }
+
+      // Convert BigInt to number
+      const rank = Number(result[0]?.rank ?? 0)
+
+      this.logger.debug(`Player ${playerId} rank: ${rank}`)
+      return rank
+    } catch (error) {
+      this.logger.error(`Failed to get rank position for player ${playerId}`, {
+        playerId,
+        error: error instanceof Error ? error.message : String(error),
+      })
+      return 0 // Return 0 on error to indicate no ranking
+    }
+  }
+
+  /**
+   * Get rank positions for multiple players efficiently
+   * Returns a Map of playerId -> rank position
+   */
+  async getBatchPlayerRanks(playerIds: number[]): Promise<Map<number, number>> {
+    const rankMap = new Map<number, number>()
+
+    if (playerIds.length === 0) {
+      return rankMap
+    }
+
+    try {
+      // Use raw SQL for efficient batch ranking calculation
+      const result = await this.db.$queryRaw<Array<{ player_id: number; rank: bigint }>>`
+        SELECT 
+          player_id,
+          rank_pos as rank
+        FROM (
+          SELECT 
+            player_id,
+            RANK() OVER (ORDER BY skill DESC) as rank_pos
+          FROM players
+          WHERE hide_ranking = 0
+        ) ranked
+        WHERE player_id IN (${playerIds.join(",")})
+      `
+
+      // Convert results to Map
+      for (const row of result) {
+        rankMap.set(row.player_id, Number(row.rank))
+      }
+
+      this.logger.debug(`Retrieved ranks for ${result.length}/${playerIds.length} players`, {
+        requestedCount: playerIds.length,
+        foundCount: result.length,
+      })
+
+      // Fill missing players with rank 0
+      for (const playerId of playerIds) {
+        if (!rankMap.has(playerId)) {
+          rankMap.set(playerId, 0)
+        }
+      }
+
+      return rankMap
+    } catch (error) {
+      this.logger.error(`Failed to get batch player ranks`, {
+        playerIds: playerIds.slice(0, 10), // Log first 10 IDs
+        playerCount: playerIds.length,
+        error: error instanceof Error ? error.message : String(error),
+      })
+
+      // Return map with all players having rank 0 on error
+      for (const playerId of playerIds) {
+        rankMap.set(playerId, 0)
+      }
+      return rankMap
+    }
   }
 }

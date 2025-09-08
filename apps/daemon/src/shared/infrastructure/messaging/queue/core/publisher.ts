@@ -204,6 +204,7 @@ export function defaultRoutingKeyMapper(event: BaseEvent): string {
     [EventType.SERVER_STATS_UPDATE]: "server.stats",
     [EventType.ADMIN_ACTION]: "admin.action",
     [EventType.CHAT_MESSAGE]: "chat.message",
+    [EventType.UNKNOWN]: "unknown",
   }
 
   return routingMap[event.eventType] ?? "unknown"

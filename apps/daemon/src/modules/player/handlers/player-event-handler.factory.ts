@@ -23,7 +23,7 @@ import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IServerRepository, IServerService } from "@/modules/server/server.types"
-import type { PlayerNotificationService } from "@/modules/rcon/services/player-notification.service"
+import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import type { IPlayerService } from "@/modules/player/player.types"
 
@@ -40,7 +40,7 @@ export class PlayerEventHandlerFactory {
     playerService: IPlayerService,
     matchService?: IMatchService,
     geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
-    playerNotificationService?: PlayerNotificationService,
+    eventNotificationService?: IEventNotificationService,
   ) {
     // Initialize all event handlers
     this.handlers.set(
@@ -53,6 +53,7 @@ export class PlayerEventHandlerFactory {
         serverService,
         matchService,
         geoipService,
+        eventNotificationService,
       ),
     )
 
@@ -64,6 +65,7 @@ export class PlayerEventHandlerFactory {
         sessionService,
         matchService,
         serverRepository,
+        eventNotificationService,
       ),
     )
 
@@ -91,7 +93,13 @@ export class PlayerEventHandlerFactory {
 
     this.handlers.set(
       EventType.PLAYER_SUICIDE,
-      new SuicideEventHandler(repository, logger, matchService, rankingService),
+      new SuicideEventHandler(
+        repository,
+        logger,
+        matchService,
+        rankingService,
+        eventNotificationService,
+      ),
     )
 
     this.handlers.set(
@@ -101,7 +109,13 @@ export class PlayerEventHandlerFactory {
 
     this.handlers.set(
       EventType.PLAYER_TEAMKILL,
-      new TeamkillEventHandler(repository, logger, matchService),
+      new TeamkillEventHandler(
+        repository,
+        logger,
+        matchService,
+        rankingService,
+        eventNotificationService,
+      ),
     )
 
     this.handlers.set(
@@ -116,7 +130,7 @@ export class PlayerEventHandlerFactory {
         logger,
         matchService,
         rankingService,
-        playerNotificationService,
+        eventNotificationService,
       ),
     )
 

@@ -15,6 +15,22 @@ import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/me
 import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
 import { systemClock } from "@/shared/infrastructure/time"
 
+// Type for testing ingress service internal access
+interface TestIngressService {
+  dependencies: {
+    serverAuthenticator: {
+      authenticateServer: ReturnType<typeof vi.fn>
+    }
+    serverInfoProvider: {
+      getServerGame: ReturnType<typeof vi.fn>
+    }
+  }
+  logger?: Record<string, ReturnType<typeof vi.fn>>
+  setPublisher: (publisher: IEventPublisher) => void
+  processRawEvent: (logLine: string, host: string, port: number) => Promise<BaseEvent | null>
+  getStats: () => { totalLogsProcessed: number; totalErrors: number }
+}
+
 // Mock the crypto package for integration tests
 vi.mock("@repo/crypto", () => ({
   createCryptoService: vi.fn(() => ({
@@ -90,7 +106,7 @@ describe("Event Flow Integration", () => {
     const mockGetServerGame = vi.fn().mockResolvedValue("cstrike")
 
     // Override dependencies for this test
-    const ingressService = context.ingressService as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    const ingressService = context.ingressService as unknown as TestIngressService
     const originalAuthenticator = ingressService.dependencies.serverAuthenticator
     const originalServerInfo = ingressService.dependencies.serverInfoProvider
 
@@ -158,8 +174,10 @@ describe("Event Flow Integration", () => {
     setUuidService(null as never) // Force uninitialized state
 
     // Override logger to capture errors
-    const ingressService = context.ingressService as any // eslint-disable-line @typescript-eslint/no-explicit-any
-    Object.assign(ingressService.logger, mockLogger)
+    const ingressService = context.ingressService as unknown as TestIngressService
+    if (ingressService.logger) {
+      Object.assign(ingressService.logger, mockLogger)
+    }
 
     // Mock server authentication
     const mockAuthenticateServer = vi.fn().mockResolvedValue(1)
@@ -195,7 +213,7 @@ describe("Event Flow Integration", () => {
     const mockAuthenticateServer = vi.fn().mockResolvedValue(1)
     const mockGetServerGame = vi.fn().mockResolvedValue("cstrike")
 
-    const ingressService = context.ingressService as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    const ingressService = context.ingressService as unknown as TestIngressService
     ingressService.dependencies.serverAuthenticator.authenticateServer = mockAuthenticateServer
     ingressService.dependencies.serverInfoProvider.getServerGame = mockGetServerGame
 
@@ -234,8 +252,10 @@ describe("Event Flow Integration", () => {
     const context = createAppContext()
 
     // Override logger
-    const ingressService = context.ingressService as any // eslint-disable-line @typescript-eslint/no-explicit-any
-    Object.assign(ingressService.logger, mockLogger)
+    const ingressService = context.ingressService as unknown as TestIngressService
+    if (ingressService.logger) {
+      Object.assign(ingressService.logger, mockLogger)
+    }
 
     // Mock dependencies
     const mockAuthenticateServer = vi.fn().mockResolvedValue(1)
@@ -265,7 +285,7 @@ describe("Event Flow Integration", () => {
     const mockAuthenticateServer = vi.fn().mockResolvedValue(1)
     const mockGetServerGame = vi.fn().mockResolvedValue("cstrike")
 
-    const ingressService = context.ingressService as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    const ingressService = context.ingressService as unknown as TestIngressService
     ingressService.dependencies.serverAuthenticator.authenticateServer = mockAuthenticateServer
     ingressService.dependencies.serverInfoProvider.getServerGame = mockGetServerGame
 

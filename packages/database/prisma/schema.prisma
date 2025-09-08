@@ -814,6 +814,7 @@ model Server {
   eventsTeamkill           EventTeamkill[]
   configs                  ServerConfig[]
   loads                    ServerLoad[]
+  notificationConfig       NotificationConfig?
 
   // Ensure uniqueness across both connection types by including connectionType in constraints
   @@unique([connectionType, address, port], name: "servers_external_unique")
@@ -860,6 +861,21 @@ model ServerLoad {
   @@index([serverId])
   @@index([timestamp])
   @@map("servers_load")
+}
+
+model NotificationConfig {
+  serverId       Int      @id @map("server_id") @db.UnsignedInt
+  engineType     String   @map("engine_type") @db.VarChar(20) // 'goldsrc', 'source', 'source2'
+  colorEnabled   Int      @default(0) @map("color_enabled") @db.TinyInt // Boolean as TinyInt
+  colorScheme    Json?    @map("color_scheme") // JSON field for color configuration
+  eventTypes     Json?    @map("event_types") // Which events to notify (JSON array)
+  messageFormats Json?    @map("message_formats") // Custom message templates
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  server Server @relation(fields: [serverId], references: [serverId], onDelete: Cascade)
+
+  @@map("notification_config")
 }
 
 model Team {

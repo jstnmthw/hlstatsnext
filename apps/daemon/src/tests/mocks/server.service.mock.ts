@@ -9,6 +9,7 @@ import { vi } from "vitest"
 
 export function createMockServerService(): IServerService {
   return {
+    findById: vi.fn().mockResolvedValue(null),
     getServer: vi.fn().mockResolvedValue(null),
     getServerByAddress: vi.fn().mockResolvedValue(null),
     getServerGame: vi.fn().mockResolvedValue("cstrike"),

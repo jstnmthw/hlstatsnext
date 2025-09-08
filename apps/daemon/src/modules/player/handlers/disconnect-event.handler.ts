@@ -18,6 +18,7 @@ import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IServerRepository } from "@/modules/server/server.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
+import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 
 export class DisconnectEventHandler extends BasePlayerEventHandler {
   constructor(
@@ -26,6 +27,7 @@ export class DisconnectEventHandler extends BasePlayerEventHandler {
     private readonly sessionService: IPlayerSessionService,
     matchService: IMatchService | undefined,
     private readonly serverRepository: IServerRepository,
+    private readonly eventNotificationService?: IEventNotificationService,
   ) {
     super(repository, logger, matchService)
   }
@@ -125,12 +127,44 @@ export class DisconnectEventHandler extends BasePlayerEventHandler {
       // Create disconnect event log
       await this.createDisconnectEventLog(databasePlayerId, event.serverId)
 
+      // Send disconnect notification
+      await this.sendDisconnectNotification(event, databasePlayerId, sessionDuration)
+
       this.logger.debug(
         `Player ${meta?.playerName || "unknown"} disconnected: gameUserId=${gameUserId}, databasePlayerId=${databasePlayerId}, duration=${sessionDuration}s`,
       )
 
       return this.createSuccessResult()
     })
+  }
+
+  /**
+   * Send disconnect event notification
+   */
+  private async sendDisconnectNotification(
+    event: PlayerEvent,
+    playerId: number,
+    sessionDuration: number,
+  ): Promise<void> {
+    if (!this.eventNotificationService) {
+      return
+    }
+
+    try {
+      const disconnectEvent = event as PlayerDisconnectEvent
+      const meta = event.meta as PlayerMeta
+
+      await this.eventNotificationService.notifyDisconnectEvent({
+        serverId: event.serverId,
+        playerId,
+        playerName: meta?.playerName,
+        reason: disconnectEvent.data.reason || "Disconnect",
+        sessionDuration,
+        timestamp: new Date(),
+      })
+    } catch (error) {
+      this.logger.warn(`Failed to send disconnect notification: ${error}`)
+    }
   }
 
   /**

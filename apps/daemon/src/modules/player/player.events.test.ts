@@ -23,6 +23,7 @@ const createMockPlayerService = (): IPlayerService => ({
 })
 
 const createMockServerService = (): IServerService => ({
+  findById: vi.fn(),
   getServer: vi.fn(),
   getServerByAddress: vi.fn(),
   getServerGame: vi.fn().mockResolvedValue("csgo"),

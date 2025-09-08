@@ -1,4 +1,5 @@
 export interface IServerService {
+  findById(serverId: number): Promise<ServerInfo | null>
   getServer(serverId: number): Promise<ServerInfo | null>
   getServerByAddress(address: string, port: number): Promise<ServerInfo | null>
   getServerGame(serverId: number): Promise<string>

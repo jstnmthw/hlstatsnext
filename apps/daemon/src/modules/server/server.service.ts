@@ -8,6 +8,10 @@ export class ServerService implements IServerService {
     private readonly logger: ILogger,
   ) {}
 
+  async findById(serverId: number): Promise<ServerInfo | null> {
+    return await this.repository.findById(serverId)
+  }
+
   async getServer(serverId: number): Promise<ServerInfo | null> {
     return await this.repository.findById(serverId)
   }

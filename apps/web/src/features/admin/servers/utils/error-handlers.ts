@@ -6,6 +6,7 @@
  */
 
 import type { ServerOperationResult } from "@/lib/validators/schemas/server-schemas"
+import { logDevError } from "@/lib/dev-logger"
 
 /**
  * Checks if an error is a Next.js redirect error that should be re-thrown
@@ -61,10 +62,19 @@ export function logGraphQLErrors(error: unknown): void {
 
   const apolloError = error as { networkError?: { result?: { errors?: unknown[] } } }
   if (apolloError.networkError?.result?.errors) {
-    console.error(
-      "GraphQL errors:",
-      JSON.stringify(apolloError.networkError.result.errors, null, 2),
-    )
+    if (process.env.NODE_ENV === "development") {
+      // In development, show full error details with proper array content
+      logDevError("GraphQL network errors:", apolloError.networkError.result.errors)
+
+      // Also log the entire error object for full context
+      logDevError("Full Apollo error object:", apolloError)
+    } else {
+      // In production, use the existing JSON.stringify approach
+      console.error(
+        "GraphQL errors:",
+        JSON.stringify(apolloError.networkError.result.errors, null, 2),
+      )
+    }
   }
 }
 

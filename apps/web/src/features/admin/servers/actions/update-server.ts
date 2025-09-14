@@ -18,6 +18,7 @@ import {
   createGraphQLFailureResult,
   createUnexpectedErrorResult,
 } from "@/features/admin/servers/utils/error-handlers"
+import { logDevError } from "@/lib/dev-logger"
 
 export type UpdateServerFormData = z.infer<typeof UpdateServerSchema>
 export type UpdateServerResult = ServerOperationResult
@@ -74,7 +75,7 @@ export async function updateServer(
       throw error
     }
 
-    console.error("Server update error:", error)
+    logDevError("Server update error:", error)
 
     // Log GraphQL errors with proper formatting
     logGraphQLErrors(error)

@@ -20,6 +20,7 @@ import {
   createGraphQLFailureResult,
   createUnexpectedErrorResult,
 } from "@/features/admin/servers/utils/error-handlers"
+import { logDevError } from "@/lib/dev-logger"
 
 export type CreateServerFormData = z.infer<typeof CreateServerSchema>
 export type CreateServerResult = ServerOperationResult
@@ -73,7 +74,7 @@ export async function createServer(
       throw error
     }
 
-    console.error("Server creation error:", error)
+    logDevError("Server creation error:", error)
 
     // Handle specific error types
     const uniqueConstraintError = handleUniqueConstraintError(error)

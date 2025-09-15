@@ -232,9 +232,9 @@ export class RankingService implements IRankingService {
     try {
       // Use raw SQL for efficient ranking calculation
       const result = await this.db.$queryRaw<Array<{ rank: bigint }>>`
-        SELECT rank_pos as rank
+        SELECT rank_pos as \`rank\`
         FROM (
-          SELECT 
+          SELECT
             player_id,
             RANK() OVER (ORDER BY skill DESC) as rank_pos
           FROM players
@@ -276,11 +276,11 @@ export class RankingService implements IRankingService {
     try {
       // Use raw SQL for efficient batch ranking calculation
       const result = await this.db.$queryRaw<Array<{ player_id: number; rank: bigint }>>`
-        SELECT 
+        SELECT
           player_id,
-          rank_pos as rank
+          rank_pos as \`rank\`
         FROM (
-          SELECT 
+          SELECT
             player_id,
             RANK() OVER (ORDER BY skill DESC) as rank_pos
           FROM players

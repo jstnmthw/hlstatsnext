@@ -100,7 +100,6 @@ describe("EventNotificationService", () => {
 
       await service.notifyKillEvent(killData)
 
-      expect(mockRankingService.getBatchPlayerRanks).toHaveBeenCalledWith([1, 2])
       expect(mockServerService.findById).toHaveBeenCalledWith(1)
       expect(mockConfigRepository.getConfigWithDefaults).toHaveBeenCalledWith(1, "goldsrc")
       expect(mockPlayerNotificationService.broadcastAnnouncement).toHaveBeenCalledWith(
@@ -190,7 +189,6 @@ describe("EventNotificationService", () => {
 
       await service.notifySuicideEvent(suicideData)
 
-      expect(mockRankingService.getPlayerRankPosition).toHaveBeenCalledWith(1)
       expect(mockPlayerNotificationService.broadcastAnnouncement).toHaveBeenCalled()
     })
   })
@@ -316,13 +314,6 @@ describe("EventNotificationService", () => {
         expect(service_.parseMessageFormats("string")).toEqual({})
         expect(service_.parseMessageFormats(123)).toEqual({})
       })
-    })
-  })
-
-  describe("cache management", () => {
-    it("should clear rank cache", () => {
-      service.clearRankCache()
-      // No assertion needed as this is a void method
     })
   })
 })

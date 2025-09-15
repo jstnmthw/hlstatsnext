@@ -68,11 +68,6 @@ export interface IEventNotificationService {
 }
 
 export class EventNotificationService implements IEventNotificationService {
-  // Cache for rank lookups during event processing to avoid repeated queries
-  private rankCache = new Map<number, number>()
-  private cacheTimestamps = new Map<number, number>()
-  private readonly RANK_CACHE_TTL = 60000 // 1 minute
-
   constructor(
     private readonly playerNotificationService: PlayerNotificationService,
     private readonly configRepository: INotificationConfigRepository,
@@ -88,16 +83,8 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
-      // Get ranks for both players if not provided
-      let { killerRank, victimRank } = data
-      if (killerRank === undefined || victimRank === undefined) {
-        const ranks = await this.getBatchRanks([data.killerId, data.victimId])
-        killerRank = killerRank ?? ranks.get(data.killerId) ?? 0
-        victimRank = victimRank ?? ranks.get(data.victimId) ?? 0
-      }
-
       // Build the notification message
-      const message = await this.buildKillMessage(data, killerRank, victimRank)
+      const message = await this.buildKillMessage(data)
 
       // Send as public announcement
       await this.playerNotificationService.broadcastAnnouncement(
@@ -110,8 +97,8 @@ export class EventNotificationService implements IEventNotificationService {
         serverId: data.serverId,
         killerId: data.killerId,
         victimId: data.victimId,
-        killerRank,
-        victimRank,
+        killerSkill: data.killerSkill,
+        victimSkill: data.victimSkill,
         points: data.skillAdjustment.killerChange,
       })
     } catch (error) {
@@ -131,14 +118,8 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
-      // Get player rank if not provided
-      let { playerRank } = data
-      if (playerRank === undefined) {
-        playerRank = await this.getPlayerRank(data.playerId)
-      }
-
       // Build the notification message
-      const message = await this.buildSuicideMessage(data, playerRank)
+      const message = await this.buildSuicideMessage(data)
 
       // Send as public announcement
       await this.playerNotificationService.broadcastAnnouncement(
@@ -150,7 +131,7 @@ export class EventNotificationService implements IEventNotificationService {
       this.logger.info(`Suicide notification sent for server ${data.serverId}`, {
         serverId: data.serverId,
         playerId: data.playerId,
-        playerRank,
+        playerSkill: data.playerSkill,
         penalty: data.skillPenalty,
       })
     } catch (error) {
@@ -338,11 +319,7 @@ export class EventNotificationService implements IEventNotificationService {
   /**
    * Build kill event message with color formatting
    */
-  private async buildKillMessage(
-    data: KillEventNotificationData,
-    killerRank: number,
-    victimRank: number,
-  ): Promise<string> {
+  private async buildKillMessage(data: KillEventNotificationData): Promise<string> {
     const config = await this.getServerConfig(data.serverId)
     const formatter = ColorFormatterFactory.create(
       this.validateEngineType(config.engineType),
@@ -353,21 +330,14 @@ export class EventNotificationService implements IEventNotificationService {
     return NotificationMessageBuilder.create()
       .withColorFormatter(formatter)
       .withTemplates(this.parseMessageFormats(config.messageFormats))
-      .fromKillEvent({
-        ...data,
-        killerRank,
-        victimRank,
-      })
+      .fromKillEvent(data)
       .build()
   }
 
   /**
    * Build suicide event message with color formatting
    */
-  private async buildSuicideMessage(
-    data: SuicideEventNotificationData,
-    playerRank: number,
-  ): Promise<string> {
+  private async buildSuicideMessage(data: SuicideEventNotificationData): Promise<string> {
     const config = await this.getServerConfig(data.serverId)
     const formatter = ColorFormatterFactory.create(
       this.validateEngineType(config.engineType),
@@ -378,10 +348,7 @@ export class EventNotificationService implements IEventNotificationService {
     return NotificationMessageBuilder.create()
       .withColorFormatter(formatter)
       .withTemplates(this.parseMessageFormats(config.messageFormats))
-      .fromSuicideEvent({
-        ...data,
-        playerRank,
-      })
+      .fromSuicideEvent(data)
       .build()
   }
 
@@ -525,100 +492,6 @@ export class EventNotificationService implements IEventNotificationService {
     }
 
     return gameToEngine[game.toLowerCase()] || "goldsrc"
-  }
-
-  /**
-   * Get player rank with caching
-   */
-  private async getPlayerRank(playerId: number): Promise<number> {
-    // Check cache first
-    if (this.isRankCacheValid(playerId)) {
-      return this.rankCache.get(playerId) || 0
-    }
-
-    try {
-      const rank = await this.rankingService.getPlayerRankPosition(playerId)
-
-      // Cache the result
-      this.rankCache.set(playerId, rank)
-      this.cacheTimestamps.set(playerId, Date.now())
-
-      return rank
-    } catch (error) {
-      this.logger.warn(`Failed to get rank for player ${playerId}`, {
-        playerId,
-        error: error instanceof Error ? error.message : String(error),
-      })
-      return 0
-    }
-  }
-
-  /**
-   * Get ranks for multiple players efficiently
-   */
-  private async getBatchRanks(playerIds: number[]): Promise<Map<number, number>> {
-    const uncachedIds: number[] = []
-    const result = new Map<number, number>()
-
-    // Check cache for each player
-    for (const playerId of playerIds) {
-      if (this.isRankCacheValid(playerId)) {
-        result.set(playerId, this.rankCache.get(playerId) || 0)
-      } else {
-        uncachedIds.push(playerId)
-      }
-    }
-
-    // Fetch uncached ranks in batch
-    if (uncachedIds.length > 0) {
-      try {
-        const batchRanks = await this.rankingService.getBatchPlayerRanks(uncachedIds)
-        const now = Date.now()
-
-        for (const [playerId, rank] of batchRanks) {
-          result.set(playerId, rank)
-          // Cache the result
-          this.rankCache.set(playerId, rank)
-          this.cacheTimestamps.set(playerId, now)
-        }
-      } catch (error) {
-        this.logger.warn(`Failed to get batch ranks for ${uncachedIds.length} players`, {
-          playerIds: uncachedIds.slice(0, 5),
-          error: error instanceof Error ? error.message : String(error),
-        })
-
-        // Fill with zeros on error
-        for (const playerId of uncachedIds) {
-          result.set(playerId, 0)
-        }
-      }
-    }
-
-    return result
-  }
-
-  /**
-   * Check if cached rank is still valid
-   */
-  private isRankCacheValid(playerId: number): boolean {
-    if (!this.rankCache.has(playerId)) {
-      return false
-    }
-
-    const timestamp = this.cacheTimestamps.get(playerId)
-    if (!timestamp) {
-      return false
-    }
-
-    return Date.now() - timestamp < this.RANK_CACHE_TTL
-  }
-
-  /**
-   * Clear rank cache (useful for testing)
-   */
-  clearRankCache(): void {
-    this.rankCache.clear()
-    this.cacheTimestamps.clear()
   }
 
   /**

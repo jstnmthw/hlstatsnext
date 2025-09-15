@@ -62,7 +62,7 @@ describe("NotificationMessageBuilder", () => {
         .build()
 
       expect(message).toBe(
-        "[HLStatsNext]: TestKiller (#15) got +10 points for killing TestVictim (#23)",
+        "[HLStatsNext]: TestKiller (+15) killed TestVictim (-23) with {weapon} for +10 points",
       )
     })
 
@@ -78,8 +78,8 @@ describe("NotificationMessageBuilder", () => {
 
       expect(message).toContain("^2[HLStatsNext]^0") // Colored tag
       expect(message).toContain("^2+10^0") // Colored points
-      expect(message).toContain("^3#15^0") // Colored rank
-      expect(message).toContain("^3#23^0") // Colored rank
+      expect(message).toContain("^2+15^0") // Colored skill
+      expect(message).toContain("^1-23^0") // Colored skill
     })
 
     it("should build kill message with Source colors", () => {
@@ -94,7 +94,7 @@ describe("NotificationMessageBuilder", () => {
 
       expect(message).toContain("\x04[HLStatsNext]\x01") // Colored tag
       expect(message).toContain("\x04+10\x01") // Colored points
-      expect(message).toContain("\x09#15\x01") // Colored rank
+      expect(message).toContain("\x04+15\x01") // Colored skill
     })
 
     it("should handle missing player names in kill events", () => {
@@ -106,11 +106,11 @@ describe("NotificationMessageBuilder", () => {
         .build()
 
       expect(message).toBe(
-        "[HLStatsNext]: {killerName} (#15) got +10 points for killing {victimName} (#23)",
+        "[HLStatsNext]: {killerName} (+15) killed {victimName} (-23) with {weapon} for +10 points",
       )
     })
 
-    it("should handle missing ranks in kill events", () => {
+    it("should handle missing skills in kill events", () => {
       const message = builder
         .withEventType(EventType.PLAYER_KILL)
         .withKiller(1, "TestKiller")
@@ -119,7 +119,7 @@ describe("NotificationMessageBuilder", () => {
         .build()
 
       expect(message).toBe(
-        "[HLStatsNext]: TestKiller (#{killerRank}) got +10 points for killing TestVictim (#{victimRank})",
+        "[HLStatsNext]: TestKiller (+{killerSkill}) killed TestVictim (-{victimSkill}) with {weapon} for +10 points",
       )
     })
 
@@ -130,8 +130,8 @@ describe("NotificationMessageBuilder", () => {
         victimId: 200,
         killerName: "Player1",
         victimName: "Player2",
-        killerRank: 15,
-        victimRank: 23,
+        killerSkill: 1545,
+        victimSkill: 1523,
         skillAdjustment: {
           killerChange: 10,
           victimChange: -8,
@@ -141,7 +141,9 @@ describe("NotificationMessageBuilder", () => {
       }
 
       const message = builder.fromKillEvent(eventData).build()
-      expect(message).toBe("[HLStatsNext]: Player1 (#15) got +10 points for killing Player2 (#23)")
+      expect(message).toBe(
+        "[HLStatsNext]: Player1 (+1545) killed Player2 (-1523) with ak47 for +10 points",
+      )
     })
   })
 
@@ -153,7 +155,9 @@ describe("NotificationMessageBuilder", () => {
         .withPoints(-5)
         .build()
 
-      expect(message).toBe("[HLStatsNext]: TestPlayer (#15) lost -5 points for suicide")
+      expect(message).toBe(
+        "[HLStatsNext]: TestPlayer (15) lost -5 points for suicide with {weapon}",
+      )
     })
 
     it("should build suicide message with colors", () => {
@@ -178,7 +182,7 @@ describe("NotificationMessageBuilder", () => {
       }
 
       const message = builder.fromSuicideEvent(eventData).withPlayer(100, "Player1", 15).build()
-      expect(message).toBe("[HLStatsNext]: Player1 (#15) lost -5 points for suicide")
+      expect(message).toBe("[HLStatsNext]: Player1 (15) lost -5 points for suicide with worldspawn")
     })
   })
 
@@ -221,7 +225,9 @@ describe("NotificationMessageBuilder", () => {
         .withPoints(5)
         .build()
 
-      expect(message).toBe("[HLStatsNext]: TestPlayer got +5 points for Plant the Bomb")
+      expect(message).toBe(
+        "[HLStatsNext]: TestPlayer ({playerSkill}) got +5 points for Plant the Bomb",
+      )
     })
 
     it("should build player action message with colors", () => {
@@ -248,7 +254,9 @@ describe("NotificationMessageBuilder", () => {
       }
 
       const message = builder.fromActionEvent(eventData).build()
-      expect(message).toBe("[HLStatsNext]: Player1 got +5 points for Plant the Bomb")
+      expect(message).toBe(
+        "[HLStatsNext]: Player1 ({playerSkill}) got +5 points for Plant the Bomb",
+      )
     })
   })
 
@@ -262,7 +270,7 @@ describe("NotificationMessageBuilder", () => {
         .withPlayerCount(5)
         .build()
 
-      expect(message).toBe("[HLStatsNext]: Team TERRORIST got +2 points for Round Win")
+      expect(message).toBe("[HLStatsNext]: Team TERRORIST (5 players) got +2 points for Round Win")
     })
 
     it("should build team action message from event data", () => {
@@ -276,7 +284,7 @@ describe("NotificationMessageBuilder", () => {
       }
 
       const message = builder.fromTeamActionEvent(eventData).build()
-      expect(message).toBe("[HLStatsNext]: Team TERRORIST got +2 points for Round Win")
+      expect(message).toBe("[HLStatsNext]: Team TERRORIST (5 players) got +2 points for Round Win")
     })
   })
 
@@ -296,7 +304,7 @@ describe("NotificationMessageBuilder", () => {
         .withPlayer(1, "LeavingPlayer", 25)
         .build()
 
-      expect(message).toBe("[HLStatsNext]: LeavingPlayer (#25) disconnected")
+      expect(message).toBe("[HLStatsNext]: LeavingPlayer (25) disconnected")
     })
 
     it("should build connect message from event data", () => {
@@ -325,7 +333,7 @@ describe("NotificationMessageBuilder", () => {
       }
 
       const message = builder.fromDisconnectEvent(eventData).withPlayer(100, "Player1", 25).build()
-      expect(message).toBe("[HLStatsNext]: Player1 (#25) disconnected")
+      expect(message).toBe("[HLStatsNext]: Player1 (25) disconnected")
     })
   })
 
@@ -367,7 +375,7 @@ describe("NotificationMessageBuilder", () => {
         .withPoints(0)
         .build()
 
-      expect(message).toBe("[HLStatsNext]: TestPlayer got 0 points for Test Action")
+      expect(message).toBe("[HLStatsNext]: TestPlayer ({playerSkill}) got 0 points for Test Action")
     })
 
     it("should handle negative points correctly", () => {
@@ -378,7 +386,9 @@ describe("NotificationMessageBuilder", () => {
         .withPoints(-15)
         .build()
 
-      expect(message).toBe("[HLStatsNext]: TestPlayer got -15 points for Test Action")
+      expect(message).toBe(
+        "[HLStatsNext]: TestPlayer ({playerSkill}) got -15 points for Test Action",
+      )
     })
 
     it("should handle very large point values", () => {
@@ -389,7 +399,9 @@ describe("NotificationMessageBuilder", () => {
         .withPoints(999999)
         .build()
 
-      expect(message).toBe("[HLStatsNext]: TestPlayer got +999999 points for Test Action")
+      expect(message).toBe(
+        "[HLStatsNext]: TestPlayer ({playerSkill}) got +999999 points for Test Action",
+      )
     })
 
     it("should handle empty or undefined values", () => {
@@ -402,8 +414,8 @@ describe("NotificationMessageBuilder", () => {
 
       expect(message).toContain("{killerName}")
       expect(message).toContain("{victimName}")
-      expect(message).toContain("(#{killerRank})")
-      expect(message).toContain("(#0)")
+      expect(message).toContain("(+{killerSkill})")
+      expect(message).toContain("(-0)")
     })
 
     it("should handle special characters in player names", () => {
@@ -438,7 +450,7 @@ describe("NotificationMessageBuilder", () => {
       expect(message).not.toContain("^")
       expect(message).not.toContain("\\x")
       expect(message).toBe(
-        "[HLStatsNext]: TestKiller (#15) got +10 points for killing TestVictim (#23)",
+        "[HLStatsNext]: TestKiller (+15) killed TestVictim (-23) with {weapon} for +10 points",
       )
     })
 

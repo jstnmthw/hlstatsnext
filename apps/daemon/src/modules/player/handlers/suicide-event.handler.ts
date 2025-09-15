@@ -69,7 +69,7 @@ export class SuicideEventHandler extends BasePlayerEventHandler {
       // Update server stats
       await this.updateServerStats(event.serverId)
 
-      // Send suicide notification
+      // Send suicide notification (get skill after penalty is applied)
       await this.sendSuicideNotification(event, skillPenalty)
 
       this.logger.debug(`Player suicide: ${playerId} (penalty: ${skillPenalty})`)
@@ -91,10 +91,15 @@ export class SuicideEventHandler extends BasePlayerEventHandler {
       const { playerId } = suicideEvent.data
       const playerName = (event.meta as PlayerMeta)?.playerName
 
+      // Get current player skill after penalty has been applied
+      const playerStats = await this.repository.getPlayerStats(playerId)
+      const playerSkill = playerStats?.skill || 1000
+
       await this.eventNotificationService.notifySuicideEvent({
         serverId: event.serverId,
         playerId,
         playerName,
+        playerSkill,
         weapon: suicideEvent.data.weapon,
         skillPenalty,
         timestamp: new Date(),

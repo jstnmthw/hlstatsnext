@@ -62,24 +62,24 @@ export class NotificationMessageBuilder {
   /**
    * Set killer information
    */
-  withKiller(id: number, name?: string, rank?: number): this {
-    this.components.killer = { id, name, rank }
+  withKiller(id: number, name?: string, skill?: number): this {
+    this.components.killer = { id, name, skill }
     return this
   }
 
   /**
    * Set victim information
    */
-  withVictim(id: number, name?: string, rank?: number): this {
-    this.components.victim = { id, name, rank }
+  withVictim(id: number, name?: string, skill?: number): this {
+    this.components.victim = { id, name, skill }
     return this
   }
 
   /**
    * Set player information (for single-player events)
    */
-  withPlayer(id: number, name?: string, rank?: number): this {
-    this.components.player = { id, name, rank }
+  withPlayer(id: number, name?: string, skill?: number): this {
+    this.components.player = { id, name, skill }
     return this
   }
 
@@ -185,8 +185,8 @@ export class NotificationMessageBuilder {
    */
   fromKillEvent(data: KillEventNotificationData): this {
     return this.withEventType(EventType.PLAYER_KILL)
-      .withKiller(data.killerId, data.killerName, data.killerRank)
-      .withVictim(data.victimId, data.victimName, data.victimRank)
+      .withKiller(data.killerId, data.killerName, data.killerSkill)
+      .withVictim(data.victimId, data.victimName, data.victimSkill)
       .withPoints(data.skillAdjustment.killerChange)
       .withSkillAdjustment(data.skillAdjustment.killerChange, data.skillAdjustment.victimChange)
       .withWeapon(data.weapon || "")
@@ -198,7 +198,7 @@ export class NotificationMessageBuilder {
    */
   fromSuicideEvent(data: SuicideEventNotificationData): this {
     return this.withEventType(EventType.PLAYER_SUICIDE)
-      .withPlayer(data.playerId, data.playerName)
+      .withPlayer(data.playerId, data.playerName, data.playerSkill)
       .withPoints(data.skillPenalty)
       .withWeapon(data.weapon || "")
   }
@@ -219,7 +219,7 @@ export class NotificationMessageBuilder {
    */
   fromActionEvent(data: ActionEventNotificationData): this {
     return this.withEventType(EventType.ACTION_PLAYER)
-      .withPlayer(data.playerId, data.playerName)
+      .withPlayer(data.playerId, data.playerName, data.playerSkill)
       .withAction(data.actionCode, data.actionDescription)
       .withPoints(data.points)
   }
@@ -247,7 +247,7 @@ export class NotificationMessageBuilder {
    */
   fromDisconnectEvent(data: DisconnectEventNotificationData): this {
     return this.withEventType(EventType.PLAYER_DISCONNECT)
-      .withPlayer(data.playerId, data.playerName)
+      .withPlayer(data.playerId, data.playerName, data.playerSkill)
       .withConnectionTime(data.sessionDuration)
   }
 
@@ -302,19 +302,19 @@ export class NotificationMessageBuilder {
     // Killer information
     if (this.components.killer) {
       context.killerName = this.components.killer.name
-      context.killerRank = this.components.killer.rank
+      context.killerSkill = this.components.killer.skill
     }
 
     // Victim information
     if (this.components.victim) {
       context.victimName = this.components.victim.name
-      context.victimRank = this.components.victim.rank
+      context.victimSkill = this.components.victim.skill
     }
 
     // Player information
     if (this.components.player) {
       context.playerName = this.components.player.name
-      context.playerRank = this.components.player.rank
+      context.playerSkill = this.components.player.skill
     }
 
     // Other information
@@ -395,25 +395,25 @@ export class NotificationMessageBuilder {
       )
     }
 
-    // Format ranks
-    if (context.killerRank !== undefined) {
+    // Format skills
+    if (context.killerSkill !== undefined) {
       formattedMessage = formattedMessage.replace(
-        new RegExp(`#${context.killerRank}`, "g"),
-        this.colorFormatter.formatRank(context.killerRank),
+        new RegExp(`\\+${context.killerSkill}`, "g"),
+        this.colorFormatter.formatPoints(context.killerSkill),
       )
     }
 
-    if (context.victimRank !== undefined) {
+    if (context.victimSkill !== undefined) {
       formattedMessage = formattedMessage.replace(
-        new RegExp(`#${context.victimRank}`, "g"),
-        this.colorFormatter.formatRank(context.victimRank),
+        new RegExp(`-${context.victimSkill}`, "g"),
+        this.colorFormatter.formatPoints(-context.victimSkill),
       )
     }
 
-    if (context.playerRank !== undefined) {
+    if (context.playerSkill !== undefined) {
       formattedMessage = formattedMessage.replace(
-        new RegExp(`#${context.playerRank}`, "g"),
-        this.colorFormatter.formatRank(context.playerRank),
+        new RegExp(`${context.playerSkill}`, "g"),
+        this.colorFormatter.formatPoints(context.playerSkill),
       )
     }
 

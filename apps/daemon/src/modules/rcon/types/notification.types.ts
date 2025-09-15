@@ -19,8 +19,8 @@ export interface KillEventNotificationData extends BaseNotificationData {
   victimId: number
   killerName?: string
   victimName?: string
-  killerRank?: number
-  victimRank?: number
+  killerSkill?: number
+  victimSkill?: number
   skillAdjustment: {
     killerChange: number
     victimChange: number
@@ -32,7 +32,7 @@ export interface KillEventNotificationData extends BaseNotificationData {
 export interface SuicideEventNotificationData extends BaseNotificationData {
   playerId: number
   playerName?: string
-  playerRank?: number
+  playerSkill?: number
   skillPenalty: number
   weapon?: string
 }
@@ -50,6 +50,7 @@ export interface TeamKillEventNotificationData extends BaseNotificationData {
 export interface ActionEventNotificationData extends BaseNotificationData {
   playerId: number
   playerName?: string
+  playerSkill?: number
   actionCode: string
   actionDescription: string
   points: number
@@ -74,6 +75,7 @@ export interface ConnectEventNotificationData extends BaseNotificationData {
 export interface DisconnectEventNotificationData extends BaseNotificationData {
   playerId: number
   playerName?: string
+  playerSkill?: number
   reason: string
   sessionDuration: number
 }
@@ -98,17 +100,17 @@ export interface MessageComponents {
   killer?: {
     id: number
     name?: string
-    rank?: number
+    skill?: number
   }
   victim?: {
     id: number
     name?: string
-    rank?: number
+    skill?: number
   }
   player?: {
     id: number
     name?: string
-    rank?: number
+    skill?: number
   }
   team?: string
   action?: {
@@ -145,15 +147,16 @@ export interface MessageTemplates {
  * Default message templates
  */
 export const DEFAULT_MESSAGE_TEMPLATES: MessageTemplates = {
-  kill: "[HLStatsNext]: {killerName} (#{killerRank}) got {points} points for killing {victimName} (#{victimRank})",
-  suicide: "[HLStatsNext]: {playerName} (#{playerRank}) lost {points} points for suicide",
+  kill: "[HLStatsNext]: {killerName} (+{killerSkill}) killed {victimName} (-{victimSkill}) with {weapon} for {points} points",
+  suicide:
+    "[HLStatsNext]: {playerName} ({playerSkill}) lost {points} points for suicide with {weapon}",
   teamkill: "[HLStatsNext]: {killerName} lost {points} points for team killing {victimName}",
-  playerAction: "[HLStatsNext]: {playerName} got {points} points for {action}",
-  teamAction: "[HLStatsNext]: Team {team} got {points} points for {action}",
+  playerAction: "[HLStatsNext]: {playerName} ({playerSkill}) got {points} points for {action}",
+  teamAction: "[HLStatsNext]: Team {team} ({playerCount} players) got {points} points for {action}",
   playerPlayerAction:
     "[HLStatsNext]: {playerName} got {points} points for {action} against {victimName}",
   connect: "[HLStatsNext]: {playerName} connected",
-  disconnect: "[HLStatsNext]: {playerName} (#{playerRank}) disconnected",
+  disconnect: "[HLStatsNext]: {playerName} ({playerSkill}) disconnected",
 }
 
 /**
@@ -173,11 +176,11 @@ export interface NotificationConfig {
  */
 export interface TemplateContext {
   killerName?: string
-  killerRank?: number
+  killerSkill?: number
   victimName?: string
-  victimRank?: number
+  victimSkill?: number
   playerName?: string
-  playerRank?: number
+  playerSkill?: number
   team?: string
   action?: string
   points?: string // Formatted with + or - prefix

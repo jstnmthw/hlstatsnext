@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev": "tsx watch src/main.ts",
     "start": "tsx watch src/main.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts --max-warnings 0",

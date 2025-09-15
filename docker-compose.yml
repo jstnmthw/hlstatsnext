@@ -59,68 +59,68 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  daemon:
-    build:
-      context: .
-      dockerfile: ./apps/daemon/Dockerfile
-    container_name: hlstatsnext-daemon
-    hostname: hlstatsnext-daemon
-    volumes:
-      - ./:/app
-    environment:
-      - NODE_ENV=${NODE_ENV:-production}
-      - DATABASE_URL=mysql://${DB_USER:-hlstatsnext}:${DB_PASS:-hlstatsnext}@db:3306/${DB_NAME:-hlstatsnext}
-      - RABBITMQ_URL=amqp://${RABBITMQ_USER:-hlstats}:${RABBITMQ_PASSWORD:-hlstats}@rabbitmq:5672/${RABBITMQ_VHOST:-hlstats}
-      - UDP_PORT=27500
-      - LOG_LEVEL=${LOG_LEVEL:-info}
-    working_dir: /app/apps/daemon
-    depends_on:
-      db:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    ports:
-      - "27500:27500/udp" # UDP port for game server logs
-      - "3001:3001" # HTTP port for API/health checks
-    networks:
-      - default
-    restart: unless-stopped
+  # daemon:
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/daemon/Dockerfile
+  #   container_name: hlstatsnext-daemon
+  #   hostname: hlstatsnext-daemon
+  #   volumes:
+  #     - ./:/app
+  #   environment:
+  #     - NODE_ENV=${NODE_ENV:-production}
+  #     - DATABASE_URL=mysql://${DB_USER:-hlstatsnext}:${DB_PASS:-hlstatsnext}@db:3306/${DB_NAME:-hlstatsnext}
+  #     - RABBITMQ_URL=amqp://${RABBITMQ_USER:-hlstats}:${RABBITMQ_PASSWORD:-hlstats}@rabbitmq:5672/${RABBITMQ_VHOST:-hlstats}
+  #     - UDP_PORT=27500
+  #     - LOG_LEVEL=${LOG_LEVEL:-info}
+  #   working_dir: /app/apps/daemon
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
+  #   ports:
+  #     - "27500:27500/udp" # UDP port for game server logs
+  #     - "3001:3001" # HTTP port for API/health checks
+  #   networks:
+  #     - default
+  #   restart: unless-stopped
 
-  cstrike:
-    image: gameservermanagers/gameserver:cs
-    container_name: hlstatsnext-cstrike
-    hostname: hlstatsnext-cstrike
-    networks:
-      - default
-    environment:
-      - UID=${USER_ID:-1000}
-      - GID=${GROUP_ID:-1000}
-      - GAME=cs
-      - LGSM_GAMESERVER=csserver
-    volumes:
-      - ./servers/cs1:/data
-    ports:
-      - "27015:27015/udp" # UDP port for game server logs
-      - "27015:27015/tcp" # TCP port for game server
-    restart: unless-stopped
+  # cstrike:
+  #   image: gameservermanagers/gameserver:cs
+  #   container_name: hlstatsnext-cstrike
+  #   hostname: hlstatsnext-cstrike
+  #   networks:
+  #     - default
+  #   environment:
+  #     - UID=${USER_ID:-1000}
+  #     - GID=${GROUP_ID:-1000}
+  #     - GAME=cs
+  #     - LGSM_GAMESERVER=csserver
+  #   volumes:
+  #     - ./servers/cs1:/data
+  #   ports:
+  #     - "27015:27015/udp" # UDP port for game server logs
+  #     - "27015:27015/tcp" # TCP port for game server
+  #   restart: unless-stopped
 
-  tfc:
-    image: gameservermanagers/gameserver:tfc
-    container_name: hlstatsnext-tfc
-    hostname: hlstatsnext-tfc
-    networks:
-      - default
-    environment:
-      - UID=${USER_ID:-1000}
-      - GID=${GROUP_ID:-1000}
-      - GAME=tfc
-      - LGSM_GAMESERVER=tfcserver
-    volumes:
-      - ./servers/tfc:/data
-    ports:
-      - "27016:27015/udp" # UDP port for game server logs
-      - "27016:27015/tcp" # TCP port for game server
-    restart: unless-stopped
+  # tfc:
+  #   image: gameservermanagers/gameserver:tfc
+  #   container_name: hlstatsnext-tfc
+  #   hostname: hlstatsnext-tfc
+  #   networks:
+  #     - default
+  #   environment:
+  #     - UID=${USER_ID:-1000}
+  #     - GID=${GROUP_ID:-1000}
+  #     - GAME=tfc
+  #     - LGSM_GAMESERVER=tfcserver
+  #   volumes:
+  #     - ./servers/tfc:/data
+  #   ports:
+  #     - "27016:27015/udp" # UDP port for game server logs
+  #     - "27016:27015/tcp" # TCP port for game server
+  #   restart: unless-stopped
 
 networks:
   default:

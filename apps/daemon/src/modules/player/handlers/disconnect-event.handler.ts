@@ -154,10 +154,15 @@ export class DisconnectEventHandler extends BasePlayerEventHandler {
       const disconnectEvent = event as PlayerDisconnectEvent
       const meta = event.meta as PlayerMeta
 
+      // Get current player skill for notification
+      const playerStats = await this.repository.getPlayerStats(playerId)
+      const playerSkill = playerStats?.skill || 1000
+
       await this.eventNotificationService.notifyDisconnectEvent({
         serverId: event.serverId,
         playerId,
         playerName: meta?.playerName,
+        playerSkill,
         reason: disconnectEvent.data.reason || "Disconnect",
         sessionDuration,
         timestamp: new Date(),

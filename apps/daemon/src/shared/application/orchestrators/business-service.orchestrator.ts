@@ -131,10 +131,10 @@ export function createBusinessServices(
     rankingService,
     repositories.serverRepository,
     serverService,
-    sessionService, // Pass the real session service
+    sessionService,
     matchService,
     geoipService,
-    eventNotificationService, // Pass the new event notification service
+    eventNotificationService,
   )
 
   // Fourth tier - services dependent on third tier
@@ -143,7 +143,8 @@ export function createBusinessServices(
     logger,
     playerService,
     matchService,
-    rconService, // Pass RCON service for real-time map resolution
+    rconService,
+    eventNotificationService,
   )
 
   // Fifth tier - enrichers dependent on multiple services

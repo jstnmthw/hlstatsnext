@@ -78,6 +78,7 @@ import type { IPlayerService } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 import type { HandlerResult } from "@/shared/types/common"
 import { EventType } from "@/shared/types/events"
 import { ActionDefinitionValidator } from "./validators/action-definition.validator"
@@ -95,6 +96,7 @@ export class ActionService implements IActionService {
     private readonly playerService?: IPlayerService, // Optional to avoid circular dependency
     private readonly matchService?: IMatchService, // Optional to avoid circular dependency
     private readonly rconService?: IRconService, // Optional - used for real-time map resolution
+    private readonly eventNotificationService?: IEventNotificationService, // Optional - for action notifications
   ) {
     this.actionDefinitionValidator = new ActionDefinitionValidator(repository, logger)
     this.playerValidator = new PlayerValidator(playerService, logger)
@@ -175,6 +177,41 @@ export class ActionService implements IActionService {
         `Player action processed: ${actionCode} by player ${playerId} on map ${currentMap} ` +
           `(${totalPoints > 0 ? "+" : ""}${totalPoints} points) (Server ID: ${event.serverId})`,
       )
+
+      // Send action notification if service is available and there are points to award
+      if (this.eventNotificationService && totalPoints !== 0) {
+        try {
+          // Get player skill and name if player service is available
+          let playerSkill: number | undefined
+          let playerName: string | undefined
+          if (this.playerService) {
+            try {
+              const playerStats = await this.playerService.getPlayerStats(playerId)
+              playerSkill = playerStats?.skill || 1000
+              playerName = playerStats?.lastName
+            } catch {
+              playerSkill = 1000
+            }
+          }
+
+          await this.eventNotificationService.notifyActionEvent({
+            serverId: event.serverId,
+            playerId,
+            playerName,
+            playerSkill,
+            actionCode,
+            actionDescription: actionCode.replace(/_/g, " "),
+            points: totalPoints,
+            timestamp: new Date(),
+          })
+        } catch (error) {
+          this.logger.warn(`Failed to send action notification`, {
+            actionCode,
+            playerId,
+            error: error instanceof Error ? error.message : String(error),
+          })
+        }
+      }
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -305,6 +342,29 @@ export class ActionService implements IActionService {
         `Team action: ${actionCode} by team ${team} ` +
           `(${totalPoints > 0 ? "+" : ""}${totalPoints} points)`,
       )
+
+      // Send team action notification if service is available and there are points to award
+      if (this.eventNotificationService && totalPoints !== 0) {
+        try {
+          const teamPlayerCount =
+            this.matchService?.getPlayersByTeam(event.serverId, team)?.length || 0
+          await this.eventNotificationService.notifyTeamActionEvent({
+            serverId: event.serverId,
+            team,
+            actionCode,
+            actionDescription: actionCode.replace(/_/g, " "),
+            points: totalPoints,
+            playerCount: teamPlayerCount,
+            timestamp: new Date(),
+          })
+        } catch (error) {
+          this.logger.warn(`Failed to send team action notification`, {
+            actionCode,
+            team,
+            error: error instanceof Error ? error.message : String(error),
+          })
+        }
+      }
 
       return { success: true, affected: 1 }
     } catch (error) {

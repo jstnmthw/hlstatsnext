@@ -378,5 +378,69 @@ cpu: not a number`
         botCount: 0,
       })
     })
+
+    it("should parse player list with IP addresses", () => {
+      const response = `hostname:  [DEV] CS1.6 Test Server
+version :  48/1.1.2.7/Stdio 10211 secure  (10)
+tcp/ip  :  0.0.0.0:27015
+map     :  de_dust2 at: 0 x, 0 y, 0 z
+players :  3 active (32 max)
+
+#      name userid uniqueid frag time ping loss adr
+# 1 "BOT1" 104 BOT   0  4:27:51    0    0
+# 2  "d3m0n" 108 STEAM_0:1:470900   0 00:19   10    0 192.168.1.100:27005
+# 3  "Player2" 109 STEAM_0:1:123456   5 01:30   25    1 10.0.0.5:27005
+3 users`
+
+      const result = parser.parseStatus(response)
+
+      expect(result).toEqual({
+        hostname: "[DEV] CS1.6 Test Server",
+        version: "48/1.1.2.7/Stdio 10211 secure  (10)",
+        map: "de_dust2",
+        players: 3,
+        maxPlayers: 32,
+        fps: 0,
+        uptime: 0,
+        timestamp: expect.any(Date),
+        playerList: [
+          {
+            name: "BOT1",
+            userid: 104,
+            uniqueid: "BOT",
+            isBot: true,
+            frag: 0,
+            time: "4:27:51",
+            ping: 0,
+            loss: 0,
+            address: undefined,
+          },
+          {
+            name: "d3m0n",
+            userid: 108,
+            uniqueid: "STEAM_0:1:470900",
+            isBot: false,
+            frag: 0,
+            time: "00:19",
+            ping: 10,
+            loss: 0,
+            address: "192.168.1.100:27005",
+          },
+          {
+            name: "Player2",
+            userid: 109,
+            uniqueid: "STEAM_0:1:123456",
+            isBot: false,
+            frag: 5,
+            time: "01:30",
+            ping: 25,
+            loss: 1,
+            address: "10.0.0.5:27005",
+          },
+        ],
+        realPlayerCount: 2,
+        botCount: 1,
+      })
+    })
   })
 })

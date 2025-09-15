@@ -154,14 +154,24 @@ export class DisconnectEventHandler extends BasePlayerEventHandler {
       const disconnectEvent = event as PlayerDisconnectEvent
       const meta = event.meta as PlayerMeta
 
-      // Get current player skill for notification
+      // Get current player skill and country for notification
       const playerStats = await this.repository.getPlayerStats(playerId)
       const playerSkill = playerStats?.skill || 1000
+
+      // Get player country from database
+      let playerCountry: string | undefined
+      try {
+        const player = await this.repository.findById(playerId)
+        playerCountry = player?.country || undefined
+      } catch (error) {
+        this.logger.warn(`Failed to fetch player country for disconnect notification: ${error}`)
+      }
 
       await this.eventNotificationService.notifyDisconnectEvent({
         serverId: event.serverId,
         playerId,
         playerName: meta?.playerName,
+        playerCountry,
         playerSkill,
         reason: disconnectEvent.data.reason || "Disconnect",
         sessionDuration,

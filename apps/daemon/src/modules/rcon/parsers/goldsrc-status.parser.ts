@@ -193,7 +193,7 @@ export class GoldSrcStatusParser extends BaseStatusParser {
   private parsePlayerLine(line: string): PlayerInfo | null {
     // Match pattern: # <slot> "<name>" <userid> <uniqueid> <frag> <time> <ping> <loss> [adr]
     const playerMatch = line.match(
-      /^#\s*(\d+)\s+"([^"]+)"\s+(\d+)\s+(\S+)\s+(-?\d+)\s+([\d:]+)\s+(\d+)\s+(\d+)/,
+      /^#\s*(\d+)\s+"([^"]+)"\s+(\d+)\s+(\S+)\s+(-?\d+)\s+([\d:]+)\s+(\d+)\s+(\d+)(?:\s+(\S+))?/,
     )
 
     if (!playerMatch) {
@@ -201,7 +201,7 @@ export class GoldSrcStatusParser extends BaseStatusParser {
       return null
     }
 
-    const [, , name, userid, uniqueid, frag, time, ping, loss] = playerMatch
+    const [, , name, userid, uniqueid, frag, time, ping, loss, address] = playerMatch
 
     return {
       name: (name || "").trim(),
@@ -212,6 +212,7 @@ export class GoldSrcStatusParser extends BaseStatusParser {
       time: (time || "").trim(),
       ping: this.parseInt(ping || "0"),
       loss: this.parseInt(loss || "0"),
+      address: address && address.trim() !== "" ? address.trim() : undefined,
     }
   }
 

@@ -12,6 +12,7 @@ import type {
   IServerService,
   ServerStatusUpdate,
 } from "@/modules/server/server.types"
+import type { IPlayerStatusEnricher } from "@/modules/player/enrichers/player-status-enricher"
 
 export interface IServerStatusEnricher {
   /**
@@ -29,6 +30,7 @@ export class ServerStatusEnricher implements IServerStatusEnricher {
     private readonly serverRepository: IServerRepository,
     private readonly serverService: IServerService,
     private readonly logger: ILogger,
+    private readonly playerStatusEnricher?: IPlayerStatusEnricher,
   ) {}
 
   /**
@@ -40,10 +42,16 @@ export class ServerStatusEnricher implements IServerStatusEnricher {
       const update = await this.buildStatusUpdate(serverId, status)
       await this.updateServerDatabase(serverId, update, status.map)
 
+      // Enrich player geo data if enricher is available and there are players with IPs
+      if (this.playerStatusEnricher && status.playerList && status.playerList.length > 0) {
+        await this.playerStatusEnricher.enrichPlayerGeoData(serverId, status.playerList)
+      }
+
       this.logger.debug(`Enriched server ${serverId} status`, {
         players: `${update.activePlayers}/${update.maxPlayers}`,
         map: update.activeMap,
         hostname: update.hostname,
+        playerEnrichment: this.playerStatusEnricher ? "enabled" : "disabled",
       })
     } catch (error) {
       this.logger.warn(`Failed to enrich server ${serverId} status: ${error}`)

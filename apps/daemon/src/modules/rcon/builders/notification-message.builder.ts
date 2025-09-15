@@ -78,8 +78,8 @@ export class NotificationMessageBuilder {
   /**
    * Set player information (for single-player events)
    */
-  withPlayer(id: number, name?: string, skill?: number): this {
-    this.components.player = { id, name, skill }
+  withPlayer(id: number, name?: string, skill?: number, country?: string): this {
+    this.components.player = { id, name, skill, country }
     return this
   }
 
@@ -239,7 +239,12 @@ export class NotificationMessageBuilder {
    * Build message from connect event data
    */
   fromConnectEvent(data: ConnectEventNotificationData): this {
-    return this.withEventType(EventType.PLAYER_CONNECT).withPlayer(data.playerId, data.playerName)
+    return this.withEventType(EventType.PLAYER_CONNECT).withPlayer(
+      data.playerId,
+      data.playerName,
+      undefined,
+      data.playerCountry,
+    )
   }
 
   /**
@@ -247,7 +252,7 @@ export class NotificationMessageBuilder {
    */
   fromDisconnectEvent(data: DisconnectEventNotificationData): this {
     return this.withEventType(EventType.PLAYER_DISCONNECT)
-      .withPlayer(data.playerId, data.playerName, data.playerSkill)
+      .withPlayer(data.playerId, data.playerName, data.playerSkill, data.playerCountry)
       .withConnectionTime(data.sessionDuration)
   }
 
@@ -315,6 +320,7 @@ export class NotificationMessageBuilder {
     if (this.components.player) {
       context.playerName = this.components.player.name
       context.playerSkill = this.components.player.skill
+      context.playerCountry = this.components.player.country
     }
 
     // Other information

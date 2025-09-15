@@ -295,7 +295,7 @@ describe("NotificationMessageBuilder", () => {
         .withPlayer(1, "NewPlayer", 25)
         .build()
 
-      expect(message).toBe("[HLStatsNext]: NewPlayer connected")
+      expect(message).toBe("[HLStatsNext]: NewPlayer from {playerCountry} connected")
     })
 
     it("should build disconnect message", () => {
@@ -304,7 +304,7 @@ describe("NotificationMessageBuilder", () => {
         .withPlayer(1, "LeavingPlayer", 25)
         .build()
 
-      expect(message).toBe("[HLStatsNext]: LeavingPlayer (25) disconnected")
+      expect(message).toBe("[HLStatsNext]: LeavingPlayer from {playerCountry} (25) disconnected")
     })
 
     it("should build connect message from event data", () => {
@@ -319,7 +319,23 @@ describe("NotificationMessageBuilder", () => {
       }
 
       const message = builder.fromConnectEvent(eventData).build()
-      expect(message).toBe("[HLStatsNext]: Player1 connected")
+      expect(message).toBe("[HLStatsNext]: Player1 from {playerCountry} connected")
+    })
+
+    it("should build connect message with country from event data", () => {
+      const eventData: ConnectEventNotificationData = {
+        serverId: 1,
+        playerId: 100,
+        playerName: "Player1",
+        playerCountry: "United States",
+        steamId: "STEAM_0:1:12345",
+        ipAddress: "127.0.0.1",
+        connectionTime: 0,
+        timestamp: new Date(),
+      }
+
+      const message = builder.fromConnectEvent(eventData).build()
+      expect(message).toBe("[HLStatsNext]: Player1 from United States connected")
     })
 
     it("should build disconnect message from event data", () => {
@@ -332,8 +348,26 @@ describe("NotificationMessageBuilder", () => {
         timestamp: new Date(),
       }
 
-      const message = builder.fromDisconnectEvent(eventData).withPlayer(100, "Player1", 25).build()
-      expect(message).toBe("[HLStatsNext]: Player1 (25) disconnected")
+      const message = builder.fromDisconnectEvent(eventData).build()
+      expect(message).toBe(
+        "[HLStatsNext]: Player1 from {playerCountry} ({playerSkill}) disconnected",
+      )
+    })
+
+    it("should build disconnect message with country from event data", () => {
+      const eventData: DisconnectEventNotificationData = {
+        serverId: 1,
+        playerId: 100,
+        playerName: "Player1",
+        playerCountry: "Canada",
+        playerSkill: 1250,
+        reason: "Disconnect",
+        sessionDuration: 1800,
+        timestamp: new Date(),
+      }
+
+      const message = builder.fromDisconnectEvent(eventData).build()
+      expect(message).toBe("[HLStatsNext]: Player1 from Canada (1250) disconnected")
     })
   })
 

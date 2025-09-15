@@ -67,6 +67,7 @@ export interface TeamActionEventNotificationData extends BaseNotificationData {
 export interface ConnectEventNotificationData extends BaseNotificationData {
   playerId: number
   playerName?: string
+  playerCountry?: string
   steamId?: string
   ipAddress: string
   connectionTime: number
@@ -75,6 +76,7 @@ export interface ConnectEventNotificationData extends BaseNotificationData {
 export interface DisconnectEventNotificationData extends BaseNotificationData {
   playerId: number
   playerName?: string
+  playerCountry?: string
   playerSkill?: number
   reason: string
   sessionDuration: number
@@ -111,6 +113,7 @@ export interface MessageComponents {
     id: number
     name?: string
     skill?: number
+    country?: string
   }
   team?: string
   action?: {
@@ -155,8 +158,8 @@ export const DEFAULT_MESSAGE_TEMPLATES: MessageTemplates = {
   teamAction: "[HLStatsNext]: Team {team} ({playerCount} players) got {points} points for {action}",
   playerPlayerAction:
     "[HLStatsNext]: {playerName} got {points} points for {action} against {victimName}",
-  connect: "[HLStatsNext]: {playerName} connected",
-  disconnect: "[HLStatsNext]: {playerName} ({playerSkill}) disconnected",
+  connect: "[HLStatsNext]: {playerName} from {playerCountry} connected",
+  disconnect: "[HLStatsNext]: {playerName} from {playerCountry} ({playerSkill}) disconnected",
 }
 
 /**
@@ -181,6 +184,7 @@ export interface TemplateContext {
   victimSkill?: number
   playerName?: string
   playerSkill?: number
+  playerCountry?: string
   team?: string
   action?: string
   points?: string // Formatted with + or - prefix

@@ -26,6 +26,7 @@ import { EventNotificationService } from "@/modules/rcon/services/event-notifica
 import { NotificationConfigRepository } from "@/modules/rcon/repositories/notification-config.repository"
 import { ServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 import { PlayerSessionRepository } from "@/modules/player/repositories/player-session.repository"
+import { PlayerStatusEnricher } from "@/modules/player/enrichers/player-status-enricher"
 import { PlayerSessionService } from "@/modules/player/services/player-session.service"
 import { SimplePlayerResolverService } from "@/modules/player/services/simple-player-resolver.service"
 import type { IMatchService } from "@/modules/match/match.types"
@@ -148,11 +149,19 @@ export function createBusinessServices(
   )
 
   // Fifth tier - enrichers dependent on multiple services
+  const playerStatusEnricher = new PlayerStatusEnricher(
+    repositories.playerRepository,
+    serverService,
+    geoipService,
+    logger,
+  )
+
   const serverStatusEnricher = new ServerStatusEnricher(
     rconService,
     repositories.serverRepository,
     serverService,
     logger,
+    playerStatusEnricher,
   )
 
   return {

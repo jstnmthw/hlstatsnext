@@ -92,6 +92,7 @@ export interface PlayerInfo {
   time: string
   ping: number
   loss: number
+  address?: string
 }
 
 export interface ServerStatus {

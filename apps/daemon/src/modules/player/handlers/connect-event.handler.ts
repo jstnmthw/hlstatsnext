@@ -157,6 +157,15 @@ export class ConnectEventHandler extends BasePlayerEventHandler {
       const connectEvent = event as PlayerConnectEvent
       const meta = event.meta as PlayerMeta
 
+      // Get player country from database (GeoIP enrichment happens before this)
+      let playerCountry: string | undefined
+      try {
+        const player = await this.repository.findById(playerId)
+        playerCountry = player?.country || undefined
+      } catch (error) {
+        this.logger.warn(`Failed to fetch player country for notification: ${error}`)
+      }
+
       // Calculate connection time (for now just use 0, could be enhanced)
       const connectionTime = 0
 
@@ -164,6 +173,7 @@ export class ConnectEventHandler extends BasePlayerEventHandler {
         serverId: event.serverId,
         playerId,
         playerName: meta?.playerName,
+        playerCountry,
         steamId: connectEvent.data.steamId,
         ipAddress: ipAddress || "",
         connectionTime,

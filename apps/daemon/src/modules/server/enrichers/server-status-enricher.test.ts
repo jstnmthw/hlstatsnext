@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { ServerStatusEnricher } from "./server-status-enricher"
 import { createMockLogger } from "../../../tests/mocks/logger"
-import type { IRconService, ServerStatus } from "@/modules/rcon/rcon.types"
+import type { IRconService, ServerStatus } from "@/modules/rcon/types/rcon.types"
 import type { IServerRepository, IServerService } from "@/modules/server/server.types"
 
 // Mock implementations
@@ -16,6 +16,8 @@ const mockRconService: IRconService = {
   getStatus: vi.fn(),
   isConnected: vi.fn(),
   disconnectAll: vi.fn(),
+  getConnectionStats: vi.fn(),
+  getEngineDisplayNameForServer: vi.fn(),
 }
 
 const mockServerRepository: IServerRepository = {

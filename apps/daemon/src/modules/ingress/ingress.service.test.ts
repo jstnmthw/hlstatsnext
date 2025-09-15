@@ -7,7 +7,35 @@ import { IngressService } from "./ingress.service"
 import { createMockLogger } from "../../tests/mocks/logger"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { IngressDependencies } from "./ingress.dependencies"
+import type { ISocketFactory } from "./udp-server"
 import { TestClock } from "@/shared/infrastructure/time/test-clock"
+import type { Socket } from "dgram"
+
+// Mock socket for UDP server
+const createMockSocket = () => ({
+  bind: vi.fn((port, host, callback) => {
+    if (callback) callback()
+  }),
+  close: vi.fn((callback) => {
+    if (callback) callback()
+  }),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  on: vi.fn(((event: string, callback: (...args: unknown[]) => void) => {
+    // Store callbacks for potential triggering in tests
+    return mockSocket
+  }) as unknown as Socket["on"]),
+
+  removeAllListeners: vi.fn(),
+  address: vi.fn(() => ({ address: "0.0.0.0", family: "IPv4", port: 27501 })),
+  listening: false,
+})
+
+const mockSocket = createMockSocket()
+
+// Create mock socket factory
+const mockSocketFactory: ISocketFactory = {
+  createSocket: vi.fn(() => mockSocket as unknown as Socket),
+}
 
 describe("IngressService", () => {
   let ingressService: IngressService
@@ -50,10 +78,15 @@ describe("IngressService", () => {
       clock: new TestClock(),
     }
 
-    ingressService = new IngressService(mockLogger, mockDependencies, {
-      port: 27501,
-      logBots: false,
-    })
+    ingressService = new IngressService(
+      mockLogger,
+      mockDependencies,
+      {
+        port: 27501,
+        logBots: false,
+      },
+      mockSocketFactory,
+    )
     ingressService.setPublisher(mockEventPublisher)
   })
 

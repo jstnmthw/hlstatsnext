@@ -11,11 +11,11 @@ import type {
   ServerStatus,
   RconConfig,
   IRconProtocol,
-} from "./rcon.types"
-import { RconError, RconErrorCode, GameEngine } from "./rcon.types"
-import { SourceRconProtocol } from "./protocols/source-rcon.protocol"
-import { GoldSrcRconProtocol } from "./protocols/goldsrc-rcon.protocol"
-import { GoldSrcStatusParser } from "./parsers/goldsrc-status.parser"
+} from "../types/rcon.types"
+import { RconError, RconErrorCode, GameEngine } from "../types/rcon.types"
+import { SourceRconProtocol } from "../protocols/source-rcon.protocol"
+import { GoldSrcRconProtocol } from "../protocols/goldsrc-rcon.protocol"
+import { GoldSrcStatusParser } from "../parsers/goldsrc-status.parser"
 import type { ILogger } from "@/shared/utils/logger.types"
 
 export class RconService implements IRconService {
@@ -108,7 +108,6 @@ export class RconService implements IRconService {
 
     // All attempts failed
     const errorMessage = `RCON connection failed to server ${serverId} after ${attempts} attempts`
-    this.logger.error(`${errorMessage}: ${lastError?.message}`)
 
     throw new RconError(
       `${errorMessage}: ${lastError?.message}`,
@@ -202,6 +201,21 @@ export class RconService implements IRconService {
       lastActivity: conn.lastActivity,
       attempts: conn.connectionAttempts,
     }))
+  }
+
+  /**
+   * Get the engine display name for a server
+   */
+  async getEngineDisplayNameForServer(serverId: number): Promise<string> {
+    try {
+      const credentials = await this.repository.getRconCredentials(serverId)
+      if (!credentials) {
+        return "Unknown"
+      }
+      return this.getEngineDisplayName(credentials.gameEngine)
+    } catch {
+      return "Unknown"
+    }
   }
 
   private getActiveConnection(serverId: number): RconConnection {

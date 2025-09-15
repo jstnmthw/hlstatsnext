@@ -2,10 +2,16 @@ import type { AppContext } from "@/context"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { ServerInfo } from "@/modules/server/server.types"
 import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
+import type { RconConfig, ServerFailureState } from "../types/rcon.types"
+import { RetryBackoffCalculatorService } from "./retry-backoff-calculator.service"
 
 export interface RconMonitorConfig {
   enabled: boolean
   statusInterval: number
+  maxConsecutiveFailures?: number
+  backoffMultiplier?: number
+  maxBackoffMinutes?: number
+  dormantRetryMinutes?: number
 }
 
 export class RconMonitorService {
@@ -14,6 +20,7 @@ export class RconMonitorService {
   private config: RconMonitorConfig
   private intervalId?: NodeJS.Timeout
   private serverStatusEnricher: IServerStatusEnricher
+  private retryCalculator: RetryBackoffCalculatorService
 
   constructor(
     context: AppContext,
@@ -24,6 +31,7 @@ export class RconMonitorService {
     this.logger = context.logger
     this.config = config
     this.serverStatusEnricher = serverStatusEnricher
+    this.retryCalculator = new RetryBackoffCalculatorService(this.logger, config as RconConfig)
   }
 
   start(): void {
@@ -77,10 +85,30 @@ export class RconMonitorService {
         return
       }
 
-      this.logger.debug(`Found ${activeServers.length} active server(s) with RCON for monitoring`)
+      // Filter servers based on retry logic
+      const serversToMonitor = activeServers.filter((server) => {
+        const failureState = this.retryCalculator.getFailureState(server.serverId)
+        return this.retryCalculator.shouldRetry(failureState)
+      })
 
-      for (const server of activeServers) {
-        await this.monitorSingleServer(server)
+      const skippedCount = activeServers.length - serversToMonitor.length
+      if (skippedCount > 0) {
+        this.logger.debug(`Skipped ${skippedCount} servers in backoff period`)
+      }
+
+      this.logger.debug(
+        `Monitoring ${serversToMonitor.length} of ${activeServers.length} active server(s) with RCON`,
+      )
+
+      // Process servers concurrently but with individual error handling
+      const results = await Promise.allSettled(
+        serversToMonitor.map((server) => this.monitorSingleServer(server)),
+      )
+
+      // Log any unexpected errors (individual server errors are handled in monitorSingleServer)
+      const unexpectedErrors = results.filter((r) => r.status === "rejected")
+      if (unexpectedErrors.length > 0) {
+        this.logger.error(`${unexpectedErrors.length} servers had unexpected monitoring errors`)
       }
     } catch (error) {
       this.logger.error(`Error discovering active servers for RCON monitoring: ${error}`)
@@ -91,8 +119,13 @@ export class RconMonitorService {
     try {
       await this.ensureServerConnection(server)
       await this.enrichServerStatus(server)
+
+      // Reset failure state on successful operations
+      this.retryCalculator.resetFailureState(server.serverId)
     } catch (error) {
-      await this.handleServerError(server, error)
+      // Record the failure and get updated state
+      const failureState = this.retryCalculator.recordFailure(server.serverId)
+      await this.handleServerError(server, error, failureState)
     }
   }
 
@@ -114,9 +147,27 @@ export class RconMonitorService {
     this.logger.debug(`Enriched status for server ${server.serverId} (${server.name})`)
   }
 
-  private async handleServerError(server: ServerInfo, error: unknown): Promise<void> {
-    this.logger.error(
-      `RCON failed for server ${server.serverId} (${server.name}): ${error instanceof Error ? error.message : String(error)}`,
+  private async handleServerError(
+    server: ServerInfo,
+    error: unknown,
+    failureState: ServerFailureState,
+  ): Promise<void> {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+
+    // Get engine type for better logging context
+    const engineType = await this.context.rconService.getEngineDisplayNameForServer(server.serverId)
+
+    this.logger.debug(
+      `${engineType} RCON failed for server ${server.serverId} (${server.name}): ${errorMessage}`,
+      {
+        serverId: server.serverId,
+        serverName: server.name,
+        engineType,
+        consecutiveFailures: failureState.consecutiveFailures,
+        retryStatus: failureState.status,
+        nextRetryAt: failureState.nextRetryAt?.toISOString(),
+        error: errorMessage,
+      },
     )
 
     try {
@@ -124,5 +175,24 @@ export class RconMonitorService {
     } catch (disconnectError) {
       this.logger.debug(`Error disconnecting from server ${server.serverId}: ${disconnectError}`)
     }
+  }
+
+  /**
+   * Get current retry statistics for monitoring and debugging
+   */
+  getRetryStatistics(): {
+    totalServersInFailureState: number
+    healthyServers: number
+    backingOffServers: number
+    dormantServers: number
+  } {
+    return this.retryCalculator.getRetryStatistics()
+  }
+
+  /**
+   * Get detailed failure states for all servers
+   */
+  getAllFailureStates(): ServerFailureState[] {
+    return this.retryCalculator.getAllFailureStates()
   }
 }

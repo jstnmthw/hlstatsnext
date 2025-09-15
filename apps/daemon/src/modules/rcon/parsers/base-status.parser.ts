@@ -5,7 +5,7 @@
  * Follows the project's DDD architecture and extensibility principles.
  */
 
-import type { ServerStatus } from "../rcon.types"
+import type { ServerStatus } from "../types/rcon.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 
 /**
@@ -99,7 +99,7 @@ export abstract class BaseStatusParser {
    * Logs parsing debug information
    */
   protected logParsingResult(status: ServerStatus): void {
-    this.logger.debug("📊 Parsed server status", {
+    this.logger.debug("Parsed server status", {
       hostname: status.hostname,
       map: status.map,
       players: `${status.players}/${status.maxPlayers}`,

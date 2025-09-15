@@ -25,7 +25,7 @@ import type { AppContext } from "@/context"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
 import { getEnvironmentConfig } from "@/config/environment.config"
-import { RconMonitorService } from "@/modules/rcon/rcon-monitor.service"
+import { RconMonitorService } from "@/modules/rcon/services/rcon-monitor.service"
 import { DatabaseConnectionService } from "@/database/connection.service"
 import { getUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 

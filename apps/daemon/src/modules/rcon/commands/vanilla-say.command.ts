@@ -7,7 +7,7 @@
  */
 
 import { BaseChatCommand } from "./base-chat.command"
-import type { IRconService } from "../rcon.types"
+import type { IRconService } from "../types/rcon.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 
 export class VanillaSayCommand extends BaseChatCommand {

@@ -5,7 +5,7 @@
  * functionality like user ID formatting and message escaping.
  */
 
-import type { IRconService } from "../rcon.types"
+import type { IRconService } from "../types/rcon.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 
 export interface IChatCommand {

@@ -8,8 +8,8 @@
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { ICryptoService } from "@repo/crypto"
-import type { IRconRepository, RconCredentials, ServerStatus } from "./rcon.types"
-import { GameEngine } from "./rcon.types"
+import type { IRconRepository, RconCredentials, ServerStatus } from "../types/rcon.types"
+import { GameEngine } from "../types/rcon.types"
 
 export class RconRepository implements IRconRepository {
   constructor(

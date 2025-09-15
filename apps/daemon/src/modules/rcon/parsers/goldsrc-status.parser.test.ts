@@ -42,7 +42,7 @@ cpu     :  25.5`
         botCount: 0,
       })
 
-      expect(mockLogger.debug).toHaveBeenCalledWith("📊 Parsed server status", {
+      expect(mockLogger.debug).toHaveBeenCalledWith("Parsed server status", {
         hostname: "[DEV] CS1.6 Test Server",
         map: "de_cbble",
         players: "15/32",

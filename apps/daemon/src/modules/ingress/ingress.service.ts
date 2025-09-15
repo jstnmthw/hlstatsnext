@@ -10,7 +10,7 @@ import type { BaseEvent } from "@/shared/types/events"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { IngressDependencies } from "./ingress.dependencies"
 import type { BaseParser } from "./parsers/base.parser"
-import { UdpServer } from "./udp-server"
+import { UdpServer, type ISocketFactory } from "./udp-server"
 import { ParserFactory } from "./parsers/parser-factory"
 
 export class IngressService implements IIngressService {
@@ -29,6 +29,7 @@ export class IngressService implements IIngressService {
     private readonly logger: ILogger,
     private readonly dependencies: IngressDependencies,
     options: IngressOptions = {},
+    socketFactory?: ISocketFactory,
   ) {
     this.options = {
       port: 27500,
@@ -40,6 +41,7 @@ export class IngressService implements IIngressService {
     this.udpServer = new UdpServer(
       { port: this.options.port, host: this.options.host },
       this.logger,
+      socketFactory,
     )
   }
 

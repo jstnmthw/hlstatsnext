@@ -16,7 +16,7 @@ import type { IActionService } from "@/modules/action/action.types"
 import type { IIngressService } from "@/modules/ingress/ingress.types"
 import type { IGameDetectionService } from "@/modules/game/game-detection.types"
 import type { IServerService } from "@/modules/server/server.types"
-import type { IRconService } from "@/modules/rcon/rcon.types"
+import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 
 import { DatabaseClient } from "@/database/client"

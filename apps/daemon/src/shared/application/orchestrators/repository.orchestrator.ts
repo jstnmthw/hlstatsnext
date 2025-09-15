@@ -14,7 +14,7 @@ import { MatchRepository } from "@/modules/match/match.repository"
 import { WeaponRepository } from "@/modules/weapon/weapon.repository"
 import { ActionRepository } from "@/modules/action/action.repository"
 import { ServerRepository } from "@/modules/server/server.repository"
-import { RconRepository } from "@/modules/rcon/rcon.repository"
+import { RconRepository } from "@/modules/rcon/repositories/rcon.repository"
 
 export interface RepositoryCollection {
   playerRepository: PlayerRepository

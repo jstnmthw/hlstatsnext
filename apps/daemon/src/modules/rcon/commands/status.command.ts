@@ -5,7 +5,7 @@
  */
 
 import { BaseRconCommand } from "./command.types"
-import type { ServerStatus } from "../rcon.types"
+import type { ServerStatus } from "../types/rcon.types"
 
 export class StatusCommand extends BaseRconCommand<ServerStatus> {
   constructor() {

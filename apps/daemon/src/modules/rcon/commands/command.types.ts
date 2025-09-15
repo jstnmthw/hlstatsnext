@@ -2,7 +2,7 @@
  * RCON Command Type Definitions
  */
 
-import type { IRconProtocol } from "../rcon.types"
+import type { IRconProtocol } from "../types/rcon.types"
 
 export interface IRconCommand<T = unknown> {
   /**

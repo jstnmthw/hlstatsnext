@@ -8,6 +8,7 @@
     "lint": "eslint . --ext .ts --max-warnings 0",
     "lint:fix": "eslint . --ext .ts --fix",
     "udp-dump": "tsx scripts/udp-dump.ts",
+    "udp-debug": "tsx scripts/udp-debug.ts",
     "check-types": "tsc --noEmit",
     "test": "vitest run --silent",
     "test:coverage": "vitest run --coverage --silent",

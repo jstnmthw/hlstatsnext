@@ -32,7 +32,7 @@
  * ```
  */
 
-import type { IRconService } from "@/modules/rcon/rcon.types"
+import type { IRconService } from "@/modules/rcon/types/rcon.types"
 
 export class MapResolver {
   constructor(private readonly rconService: IRconService | undefined) {}

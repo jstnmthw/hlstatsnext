@@ -7,7 +7,7 @@
 
 import { describe, it, expect, vi, beforeEach, type MockedFunction } from "vitest"
 import { PlayerSessionService } from "./player-session.service"
-import type { PlayerInfo, ServerStatus } from "@/modules/rcon/rcon.types"
+import type { PlayerInfo, ServerStatus } from "@/modules/rcon/types/rcon.types"
 import { createMockLogger } from "../../../tests/mocks/logger"
 import { createMockServerService } from "../../../tests/mocks/server.service.mock"
 import { createMockRconService } from "../../../tests/mocks/rcon.service.mock"

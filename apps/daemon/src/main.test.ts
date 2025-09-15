@@ -4,7 +4,7 @@ import type { AppContext } from "@/context"
 import type { BaseEvent, EventType } from "@/shared/types/events"
 import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { getEnvironmentConfig } from "@/config/environment.config"
-import { RconMonitorService } from "@/modules/rcon/rcon-monitor.service"
+import { RconMonitorService } from "@/modules/rcon/services/rcon-monitor.service"
 import { DatabaseConnectionService } from "@/database/connection.service"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockDatabaseClient } from "@/tests/mocks/database"
@@ -14,7 +14,7 @@ import { SystemClock } from "@/shared/infrastructure/time/system-clock"
 
 vi.mock("@/context")
 vi.mock("@/config/environment.config")
-vi.mock("@/modules/rcon/rcon-monitor.service")
+vi.mock("@/modules/rcon/services/rcon-monitor.service")
 vi.mock("@/database/connection.service")
 vi.mock("@/shared/infrastructure/messaging/queue/utils/message-utils", () => {
   let currentUuidService: unknown = null
@@ -73,11 +73,13 @@ describe("HLStatsDaemon", () => {
       rconConfig: { enabled: true, statusInterval: 30000 },
     })
 
-    vi.mocked(RconMonitorService).mockImplementation(
+    const MockedRconMonitorService = vi.mocked(RconMonitorService, true)
+    MockedRconMonitorService.mockImplementation(
       () => mockRconMonitor as unknown as InstanceType<typeof RconMonitorService>,
     )
 
-    vi.mocked(DatabaseConnectionService).mockImplementation(
+    const MockedDatabaseConnectionService = vi.mocked(DatabaseConnectionService, true)
+    MockedDatabaseConnectionService.mockImplementation(
       () => mockDatabaseConnection as unknown as InstanceType<typeof DatabaseConnectionService>,
     )
 

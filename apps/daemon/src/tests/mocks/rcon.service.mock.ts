@@ -4,7 +4,7 @@
  * Provides mock implementations for RCON service interfaces
  */
 
-import type { IRconService } from "@/modules/rcon/rcon.types"
+import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import { vi } from "vitest"
 
 export function createMockRconService(): IRconService {
@@ -23,5 +23,7 @@ export function createMockRconService(): IRconService {
       timestamp: new Date(),
       playerList: [],
     }),
+    getConnectionStats: vi.fn().mockReturnValue([]),
+    getEngineDisplayNameForServer: vi.fn().mockResolvedValue("GoldSource"),
   }
 }

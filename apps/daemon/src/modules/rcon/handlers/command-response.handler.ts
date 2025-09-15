@@ -6,7 +6,7 @@
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
-import { RconError, RconErrorCode } from "../rcon.types"
+import { RconError, RconErrorCode } from "../types/rcon.types"
 
 /**
  * Types of response handling results

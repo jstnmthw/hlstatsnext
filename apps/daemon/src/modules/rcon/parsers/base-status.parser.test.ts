@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { BaseStatusParser, type StatusLine } from "./base-status.parser"
-import type { ServerStatus } from "../rcon.types"
+import type { ServerStatus } from "../types/rcon.types"
 import { createMockLogger } from "@/tests/mocks/logger"
 
 // Concrete implementation for testing the abstract base class
@@ -304,7 +304,7 @@ map: de_dust2`
 
       parser.testLogParsingResult(status)
 
-      expect(mockLogger.debug).toHaveBeenCalledWith("📊 Parsed server status", {
+      expect(mockLogger.debug).toHaveBeenCalledWith("Parsed server status", {
         hostname: "Test Server",
         map: "de_dust2",
         players: "15/32",
@@ -324,7 +324,7 @@ map: de_dust2`
 
       parser.testLogParsingResult(status)
 
-      expect(mockLogger.debug).toHaveBeenCalledWith("📊 Parsed server status", {
+      expect(mockLogger.debug).toHaveBeenCalledWith("Parsed server status", {
         hostname: undefined,
         map: "de_dust2",
         players: "5/10",
@@ -351,7 +351,7 @@ fps: 128.5`
         timestamp: expect.any(Date),
       })
 
-      expect(mockLogger.debug).toHaveBeenCalledWith("📊 Parsed server status", {
+      expect(mockLogger.debug).toHaveBeenCalledWith("Parsed server status", {
         hostname: "Integration Test Server",
         map: "unknown",
         players: "25/0",

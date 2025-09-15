@@ -76,7 +76,7 @@ import type {
 import type { IActionRepository } from "./action.types"
 import type { IPlayerService } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
-import type { IRconService } from "@/modules/rcon/rcon.types"
+import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 import { EventType } from "@/shared/types/events"

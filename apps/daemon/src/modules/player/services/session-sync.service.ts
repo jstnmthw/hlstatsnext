@@ -7,7 +7,7 @@
 
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
-import type { IRconService } from "@/modules/rcon/rcon.types"
+import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { IPlayerService } from "@/modules/player/player.types"
 

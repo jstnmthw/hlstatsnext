@@ -7,7 +7,7 @@
 
 import * as dgram from "node:dgram"
 import { BaseRconProtocol } from "./base-rcon.protocol"
-import { RconProtocolType, RconError, RconErrorCode } from "../rcon.types"
+import { RconProtocolType, RconError, RconErrorCode } from "../types/rcon.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import { FragmentedResponseHandler } from "../handlers/fragment-response.handler"
 import { CommandResponseHandler } from "../handlers/command-response.handler"
@@ -40,14 +40,14 @@ export class GoldSrcRconProtocol extends BaseRconProtocol {
     this.serverPort = port
     this.rconPassword = password
 
-    this.logger.debug(`🔍 GoldSrc RCON: Creating UDP socket for ${address}:${port}`)
+    this.logger.debug(`GoldSrc RCON: Creating UDP socket for ${address}:${port}`)
     this.socket = dgram.createSocket("udp4")
     this.setupSocketHandlers()
 
-    this.logger.debug(`🔍 GoldSrc RCON: Socket created, binding to local port...`)
+    this.logger.debug(`GoldSrc RCON: Socket created, binding to local port...`)
 
     try {
-      this.logger.debug(`🔍 GoldSrc RCON: Requesting challenge from ${address}:${port}...`)
+      this.logger.debug(`GoldSrc RCON: Requesting challenge from ${address}:${port}...`)
 
       // Get challenge from server
       await this.withTimeout(
@@ -199,7 +199,7 @@ export class GoldSrcRconProtocol extends BaseRconProtocol {
         if (error) {
           clearTimeout(timeout)
           this.socket?.off("message", onMessage)
-          this.logger.error(
+          this.logger.debug(
             `GoldSrc RCON: Failed to send challenge request to ${this.serverAddress}:${this.serverPort}`,
             {
               error: error.message,

@@ -6,7 +6,7 @@
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IRconService, ServerStatus } from "@/modules/rcon/rcon.types"
+import type { IRconService, ServerStatus } from "@/modules/rcon/types/rcon.types"
 import type {
   IServerRepository,
   IServerService,

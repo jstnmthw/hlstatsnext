@@ -7,7 +7,12 @@
 
 import * as net from "node:net"
 import { BaseRconProtocol } from "./base-rcon.protocol"
-import { RconProtocolType, SourceRconPacketType, RconError, RconErrorCode } from "../rcon.types"
+import {
+  RconProtocolType,
+  SourceRconPacketType,
+  RconError,
+  RconErrorCode,
+} from "../types/rcon.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 
 export class SourceRconProtocol extends BaseRconProtocol {

@@ -4,8 +4,8 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { RconService } from "./rcon.service"
-import type { IRconRepository, RconCredentials } from "./rcon.types"
-import { RconError, GameEngine } from "./rcon.types"
+import type { IRconRepository, RconCredentials } from "../types/rcon.types"
+import { RconError, GameEngine } from "../types/rcon.types"
 import { createMockLogger } from "@/tests/mocks/logger"
 
 const mockLogger = createMockLogger()

@@ -6,7 +6,7 @@
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IRconService } from "../rcon.types"
+import type { IRconService } from "../types/rcon.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import { CommandResolverService, type CommandType } from "./command-resolver.service"
 

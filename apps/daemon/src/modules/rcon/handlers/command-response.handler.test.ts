@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { CommandResponseHandler } from "./command-response.handler"
-import { RconErrorCode } from "../rcon.types"
+import { RconErrorCode } from "../types/rcon.types"
 import { createMockLogger } from "@/tests/mocks/logger"
 
 describe("CommandResponseHandler", () => {

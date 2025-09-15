@@ -36,6 +36,21 @@ export interface IRconService {
    * Disconnect all active connections
    */
   disconnectAll(): Promise<void>
+
+  /**
+   * Get the engine display name for a server
+   */
+  getEngineDisplayNameForServer(serverId: number): Promise<string>
+
+  /**
+   * Get connection statistics for all servers
+   */
+  getConnectionStats(): {
+    serverId: number
+    isConnected: boolean
+    lastActivity: Date
+    attempts: number
+  }[]
 }
 
 export interface IRconRepository {
@@ -149,6 +164,47 @@ export interface RconConfig {
   timeout: number // milliseconds
   maxRetries: number
   maxConnectionsPerServer: number
+  maxConsecutiveFailures?: number
+  backoffMultiplier?: number
+  maxBackoffMinutes?: number
+  dormantRetryMinutes?: number
+}
+
+// Failure Tracking
+export interface ServerFailureState {
+  readonly serverId: number
+  consecutiveFailures: number
+  lastFailureAt: Date | null
+  nextRetryAt: Date | null
+  status: ServerRetryStatus
+}
+
+export enum ServerRetryStatus {
+  HEALTHY = "healthy",
+  BACKING_OFF = "backing_off",
+  DORMANT = "dormant",
+}
+
+export interface RetryBackoffCalculator {
+  /**
+   * Calculate the next retry time based on failure count
+   */
+  calculateNextRetry(failureCount: number): Date
+
+  /**
+   * Determine if a server should be retried now
+   */
+  shouldRetry(failureState: ServerFailureState): boolean
+
+  /**
+   * Reset failure state on successful connection
+   */
+  resetFailureState(serverId: number): void
+
+  /**
+   * Record a failure and update backoff timing
+   */
+  recordFailure(serverId: number): ServerFailureState
 }
 
 // Errors

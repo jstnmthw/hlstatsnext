@@ -27,47 +27,52 @@
 #include "include/hlstatsnext_commands.inc"
 
 // Plugin information
-#define PLUGIN_NAME "HLStatsNext"
-#define PLUGIN_VERSION "0.1.0"
-#define PLUGIN_AUTHOR "d3m0n"
+#define PLUGIN_NAME    "HLStatsNext"
+#define PLUGIN_VERSION "1.0.0"
+#define PLUGIN_AUTHOR  "d3m0n"
 
 // Plugin lifecycle
-public plugin_init() {
-    // Register plugin
-    register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR);
+public plugin_init()
+{
+  // Register plugin
+  register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR);
 
-    // Initialize core systems
-    hlstatsnext_core_init();
-    hlstatsnext_colors_init();
-    hlstatsnext_commands_init();
+  // Initialize core systems
+  hlstatsnext_core_init();
+  hlstatsnext_colors_init();
+  hlstatsnext_commands_init();
 
-    // Register our commands
-    register_hlstatsnext_commands();
+  // Register our commands
+  register_hlstatsnext_commands();
 
-    // Log plugin initialization
-    log_amx("[%s] Plugin initialized successfully (v%s)", PLUGIN_NAME, PLUGIN_VERSION);
+  // Log plugin initialization
+  log_amx("[%s] Plugin initialized successfully (v%s)", PLUGIN_NAME, PLUGIN_VERSION);
 
-    return PLUGIN_CONTINUE;
+  return PLUGIN_CONTINUE;
 }
 
-public plugin_cfg() {
-    // Load configuration after server config is loaded
-    hlstatsnext_load_config();
+public plugin_cfg()
+{
+  // Load configuration after server config is loaded
+  hlstatsnext_load_config();
 
-    return PLUGIN_CONTINUE;
+  return PLUGIN_CONTINUE;
 }
 
-public plugin_end() {
-    // Cleanup
-    hlstatsnext_cleanup();
-    log_amx("[%s] Plugin terminated", PLUGIN_NAME);
+public plugin_end()
+{
+  // Cleanup
+  hlstatsnext_cleanup();
+  log_amx("[%s] Plugin terminated", PLUGIN_NAME);
 }
 
 // Client connection events
-public client_connect(id) {
-    hlstatsnext_client_connect(id);
+public client_connect(id)
+{
+  hlstatsnext_client_connect(id);
 }
 
-public client_disconnected(id) {
-    hlstatsnext_client_disconnect(id);
+public client_disconnected(id)
+{
+  hlstatsnext_client_disconnect(id);
 }

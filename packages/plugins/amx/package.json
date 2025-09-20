@@ -2,13 +2,11 @@
   "name": "@repo/plugins-amx",
   "version": "1.0.0",
   "private": true,
-  "description": "HLStatsNext AMX Mod X Plugin for enhanced game server messaging",
+  "description": "HLStatsNext AMX Mod X Plugin",
   "main": "compiled/hlstatsnext.amxx",
   "scripts": {
     "build": "pnpm run compile",
-    "compile": "pnpm run compile:plugin",
-    "compile:plugin": "echo 'AMX Mod X compiler (amxxpc) required - install from https://www.amxmodx.org/downloads-new.php'",
-    "compile:local": "amxxpc src/hlstatsnext.sma -iinclude -o=compiled/hlstatsnext.amxx",
+    "compile": "cd scripting && ./amxxpc ../src/hlstatsnext.sma -iinclude -o../compiled/hlstatsnext.amxx",
     "clean": "rm -rf compiled/*.amxx",
     "test": "echo 'Plugin tests not yet implemented'",
     "dev": "pnpm run compile && pnpm run deploy:dev",
@@ -20,7 +18,13 @@
   "devDependencies": {
     "@repo/typescript-config": "workspace:*"
   },
-  "files": ["compiled/", "configs/", "docs/", "src/", "README.md"],
+  "files": [
+    "compiled/",
+    "configs/",
+    "docs/",
+    "src/",
+    "README.md"
+  ],
   "keywords": [
     "amx",
     "amxmodx",

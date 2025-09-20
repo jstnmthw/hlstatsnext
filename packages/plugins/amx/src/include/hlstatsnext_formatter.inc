@@ -13,7 +13,7 @@
 #include "hlstatsnext_colors.inc"
 
 // Format event based on type
-stock format_event_message(const EventData:data, output[], maxlen) {
+stock format_event_message(const data[EventData], output[], maxlen) {
     switch (data[event_type]) {
         case EVT_KILL: format_kill_event(data, output, maxlen);
         case EVT_SUICIDE: format_suicide_event(data, output, maxlen);
@@ -30,7 +30,7 @@ stock format_event_message(const EventData:data, output[], maxlen) {
 }
 
 // Format kill event
-stock format_kill_event(const EventData:data, output[], maxlen) {
+stock format_kill_event(const data[EventData], output[], maxlen) {
     new tag[32], killer[48], victim[48], points_str[16], weapon_str[32];
 
     format_colored_tag(tag, charsmax(tag));
@@ -57,7 +57,7 @@ stock format_kill_event(const EventData:data, output[], maxlen) {
 }
 
 // Format suicide event
-stock format_suicide_event(const EventData:data, output[], maxlen) {
+stock format_suicide_event(const data[EventData], output[], maxlen) {
     new tag[32], player[48], points_str[16];
 
     format_colored_tag(tag, charsmax(tag));
@@ -74,7 +74,7 @@ stock format_suicide_event(const EventData:data, output[], maxlen) {
 }
 
 // Format teamkill event
-stock format_teamkill_event(const EventData:data, output[], maxlen) {
+stock format_teamkill_event(const data[EventData], output[], maxlen) {
     new tag[32], killer[48], victim[48], points_str[16];
 
     format_colored_tag(tag, charsmax(tag));
@@ -87,7 +87,7 @@ stock format_teamkill_event(const EventData:data, output[], maxlen) {
 }
 
 // Format action event
-stock format_action_event(const EventData:data, output[], maxlen) {
+stock format_action_event(const data[EventData], output[], maxlen) {
     new tag[32], player[48], points_str[16], action[80];
 
     format_colored_tag(tag, charsmax(tag));
@@ -105,7 +105,7 @@ stock format_action_event(const EventData:data, output[], maxlen) {
 }
 
 // Format team action event
-stock format_team_action_event(const EventData:data, output[], maxlen) {
+stock format_team_action_event(const data[EventData], output[], maxlen) {
     new tag[32], team[48], points_str[16], action[80];
 
     format_colored_tag(tag, charsmax(tag));
@@ -123,7 +123,7 @@ stock format_team_action_event(const EventData:data, output[], maxlen) {
 }
 
 // Format rank event (response to !rank command)
-stock format_rank_event(const EventData:data, output[], maxlen) {
+stock format_rank_event(const data[EventData], output[], maxlen) {
     new tag[32];
     format_colored_tag(tag, charsmax(tag));
 
@@ -132,7 +132,7 @@ stock format_rank_event(const EventData:data, output[], maxlen) {
 }
 
 // Format stats event (response to !stats command)
-stock format_stats_event(const EventData:data, output[], maxlen) {
+stock format_stats_event(const data[EventData], output[], maxlen) {
     new tag[32];
     format_colored_tag(tag, charsmax(tag));
 
@@ -144,7 +144,7 @@ stock format_stats_event(const EventData:data, output[], maxlen) {
 }
 
 // Format connect event
-stock format_connect_event(const EventData:data, output[], maxlen) {
+stock format_connect_event(const data[EventData], output[], maxlen) {
     new tag[32], player[48];
 
     format_colored_tag(tag, charsmax(tag));
@@ -160,7 +160,7 @@ stock format_connect_event(const EventData:data, output[], maxlen) {
 }
 
 // Format disconnect event
-stock format_disconnect_event(const EventData:data, output[], maxlen) {
+stock format_disconnect_event(const data[EventData], output[], maxlen) {
     new tag[32], player[48];
 
     format_colored_tag(tag, charsmax(tag));
@@ -184,7 +184,7 @@ stock format_disconnect_event(const EventData:data, output[], maxlen) {
 }
 
 // Format generic message
-stock format_generic_message(const EventData:data, output[], maxlen) {
+stock format_generic_message(const data[EventData], output[], maxlen) {
     new tag[32];
     format_colored_tag(tag, charsmax(tag));
 

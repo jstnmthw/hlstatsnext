@@ -10,7 +10,7 @@
 #define _hlstatsnext_util_included
 
 // String utility functions
-stock trim(string[]) {
+stock hlstatsnext_trim(string[]) {
     new len = strlen(string);
 
     // Trim trailing spaces
@@ -113,7 +113,7 @@ stock bool:is_version_compatible(const required_version[], const current_version
     return equal(required_version, current_version);
 }
 
-// Check if character is a digit
-stock bool:isdigit(c) {
+// Check if character is a digit (renamed to avoid conflict with core function)
+stock bool:hlstatsnext_isdigit(c) {
     return c >= '0' && c <= '9';
 }

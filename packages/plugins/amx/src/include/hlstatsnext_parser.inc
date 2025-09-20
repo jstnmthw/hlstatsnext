@@ -13,7 +13,7 @@
 
 // Parse main event command
 // Format: hlx_event <EVENT_TYPE> <DATA_FIELDS...>
-stock bool:parse_event_command(const command[], EventData:data) {
+stock bool:parse_event_command(const command[], data[EventData]) {
     init_event_data(data);
 
     new event_type_str[32];
@@ -28,23 +28,23 @@ stock bool:parse_event_command(const command[], EventData:data) {
 
     if (data[event_type] == EVT_UNKNOWN) {
         // Fallback to generic message
-        copy(data[message], charsmax(data[message]), command);
+        copy(data[message], 191, command);
         return true;
     }
 
     // Parse event-specific data
     switch (data[event_type]) {
-        case EVT_KILL: return parse_kill_event(remaining, data);
-        case EVT_SUICIDE: return parse_suicide_event(remaining, data);
-        case EVT_TEAMKILL: return parse_teamkill_event(remaining, data);
-        case EVT_ACTION: return parse_action_event(remaining, data);
-        case EVT_TEAM_ACTION: return parse_team_action_event(remaining, data);
-        case EVT_RANK: return parse_rank_event(remaining, data);
-        case EVT_STATS: return parse_stats_event(remaining, data);
-        case EVT_CONNECT: return parse_connect_event(remaining, data);
-        case EVT_DISCONNECT: return parse_disconnect_event(remaining, data);
+        case 1: return parse_kill_event(remaining, data);  // EVT_KILL
+        case 2: return parse_suicide_event(remaining, data);  // EVT_SUICIDE
+        case 3: return parse_teamkill_event(remaining, data);  // EVT_TEAMKILL
+        case 4: return parse_action_event(remaining, data);  // EVT_ACTION
+        case 5: return parse_team_action_event(remaining, data);  // EVT_TEAM_ACTION
+        case 6: return parse_rank_event(remaining, data);  // EVT_RANK
+        case 7: return parse_stats_event(remaining, data);  // EVT_STATS
+        case 9: return parse_connect_event(remaining, data);  // EVT_CONNECT
+        case 10: return parse_disconnect_event(remaining, data);  // EVT_DISCONNECT
         case EVT_MESSAGE: {
-            copy(data[message], charsmax(data[message]), remaining);
+            copy(data[message], 191, remaining);
             return true;
         }
     }
@@ -54,7 +54,7 @@ stock bool:parse_event_command(const command[], EventData:data) {
 
 // Parse kill event
 // Format: <killerId> "<killerName>" <killerSkill> <victimId> "<victimName>" <victimSkill> <points> <weapon> <headshot>
-stock bool:parse_kill_event(const params[], EventData:data) {
+stock bool:parse_kill_event(const params[], data[EventData]) {
     new temp[256];
     copy(temp, charsmax(temp), params);
 
@@ -109,7 +109,7 @@ stock bool:parse_kill_event(const params[], EventData:data) {
 
 // Parse suicide event
 // Format: <playerId> "<playerName>" <playerSkill> <penalty>
-stock bool:parse_suicide_event(const params[], EventData:data) {
+stock bool:parse_suicide_event(const params[], data[EventData]) {
     new temp[256];
     copy(temp, charsmax(temp), params);
 
@@ -140,7 +140,7 @@ stock bool:parse_suicide_event(const params[], EventData:data) {
 
 // Parse teamkill event
 // Format: <killerId> "<killerName>" <victimId> "<victimName>" <penalty>
-stock bool:parse_teamkill_event(const params[], EventData:data) {
+stock bool:parse_teamkill_event(const params[], data[EventData]) {
     new temp[256];
     copy(temp, charsmax(temp), params);
 
@@ -175,7 +175,7 @@ stock bool:parse_teamkill_event(const params[], EventData:data) {
 
 // Parse action event
 // Format: <playerId> "<playerName>" <playerSkill> "<actionCode>" "<actionDesc>" <points>
-stock bool:parse_action_event(const params[], EventData:data) {
+stock bool:parse_action_event(const params[], data[EventData]) {
     new temp[256];
     copy(temp, charsmax(temp), params);
 
@@ -214,7 +214,7 @@ stock bool:parse_action_event(const params[], EventData:data) {
 
 // Parse team action event
 // Format: "<teamName>" "<actionCode>" "<actionDesc>" <points> <playerCount>
-stock bool:parse_team_action_event(const params[], EventData:data) {
+stock bool:parse_team_action_event(const params[], data[EventData]) {
     new temp[256];
     copy(temp, charsmax(temp), params);
 
@@ -248,7 +248,7 @@ stock bool:parse_team_action_event(const params[], EventData:data) {
 
 // Parse rank event
 // Format: <playerId> <rank> <totalPlayers> <skill>
-stock bool:parse_rank_event(const params[], EventData:data) {
+stock bool:parse_rank_event(const params[], data[EventData]) {
     new temp[256];
     copy(temp, charsmax(temp), params);
 
@@ -280,7 +280,7 @@ stock bool:parse_rank_event(const params[], EventData:data) {
 
 // Parse stats event
 // Format: <playerId> <rank> <total> <skill> <kills> <deaths> <kdr> <accuracy> <headshots>
-stock bool:parse_stats_event(const params[], EventData:data) {
+stock bool:parse_stats_event(const params[], data[EventData]) {
     new temp[256];
     copy(temp, charsmax(temp), params);
 
@@ -337,7 +337,7 @@ stock bool:parse_stats_event(const params[], EventData:data) {
 
 // Parse connect event
 // Format: <playerId> "<playerName>" "<country>"
-stock bool:parse_connect_event(const params[], EventData:data) {
+stock bool:parse_connect_event(const params[], data[EventData]) {
     new temp[256];
     copy(temp, charsmax(temp), params);
 
@@ -362,7 +362,7 @@ stock bool:parse_connect_event(const params[], EventData:data) {
 
 // Parse disconnect event
 // Format: <playerId> "<playerName>" <sessionTime>
-stock bool:parse_disconnect_event(const params[], EventData:data) {
+stock bool:parse_disconnect_event(const params[], data[EventData]) {
     new temp[256];
     copy(temp, charsmax(temp), params);
 

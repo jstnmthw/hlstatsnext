@@ -68,6 +68,6 @@ public client_connect(id) {
     hlstatsnext_client_connect(id);
 }
 
-public client_disconnect(id) {
+public client_disconnected(id) {
     hlstatsnext_client_disconnect(id);
 }

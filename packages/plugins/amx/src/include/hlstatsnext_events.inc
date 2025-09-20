@@ -78,24 +78,24 @@ enum EventData {
 }
 
 // Initialize event data structure
-stock init_event_data(EventData:data) {
+stock init_event_data(data[EventData]) {
     data[event_type] = EVT_UNKNOWN;
     data[player_id] = 0;
     data[killer_id] = 0;
     data[victim_id] = 0;
-    data[player_name][0] = EOS;
-    data[killer_name][0] = EOS;
-    data[victim_name][0] = EOS;
+    data[player_name][0] = 0;
+    data[killer_name][0] = 0;
+    data[victim_name][0] = 0;
     data[player_skill] = 0;
     data[killer_skill] = 0;
     data[victim_skill] = 0;
     data[points] = 0;
     data[penalty] = 0;
-    data[action_code][0] = EOS;
-    data[action_desc][0] = EOS;
-    data[team_name][0] = EOS;
+    data[action_code][0] = 0;
+    data[action_desc][0] = 0;
+    data[team_name][0] = 0;
     data[player_count] = 0;
-    data[weapon][0] = EOS;
+    data[weapon][0] = 0;
     data[headshot] = false;
     data[rank] = 0;
     data[total_players] = 0;
@@ -105,8 +105,8 @@ stock init_event_data(EventData:data) {
     data[accuracy] = 0;
     data[headshots_percent] = 0;
     data[session_time] = 0;
-    data[country][0] = EOS;
-    data[message][0] = EOS;
+    data[country][0] = 0;
+    data[message][0] = 0;
 }
 
 // Get event type from string

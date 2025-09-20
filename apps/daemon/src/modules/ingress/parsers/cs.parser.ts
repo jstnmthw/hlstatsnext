@@ -28,6 +28,14 @@ export class CsParser extends BaseParser {
     handler: (line: string, serverId: number) => ParseResult
   }> = [
     {
+      patterns: ["Rcon:"],
+      handler: (line, serverId) => this.parseRconCommandEvent(line, serverId),
+    },
+    {
+      patterns: ['triggered "amx_'],
+      handler: (line, serverId) => this.parseAdminCommandEvent(line, serverId),
+    },
+    {
       patterns: [" killed "],
       handler: (line, serverId) => this.parseKillEvent(line, serverId),
     },
@@ -892,5 +900,19 @@ export class CsParser extends BaseParser {
     }
 
     return { event, success: true }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private parseRconCommandEvent(_logLine: string, _serverId: number): ParseResult {
+    // RCON command logs like: Rcon: "rcon 716044165 adminD5bIpFSQ amx_say [HLStatsNext]: pimpjuice..."
+    // These are administrative logs, not game events - ignore them silently
+    return { event: null, success: true }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private parseAdminCommandEvent(_logLine: string, _serverId: number): ParseResult {
+    // Admin command logs like: "[0x1] Public CS 1.6 Clan Server<0><><>" triggered "amx_say" (text...)
+    // These are administrative command executions, not game events - ignore them silently
+    return { event: null, success: true }
   }
 }

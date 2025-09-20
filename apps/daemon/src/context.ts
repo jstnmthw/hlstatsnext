@@ -17,6 +17,7 @@ import type { IIngressService } from "@/modules/ingress/ingress.types"
 import type { IGameDetectionService } from "@/modules/game/game-detection.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { IRconService } from "@/modules/rcon/types/rcon.types"
+import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
 import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 
 import { DatabaseClient } from "@/database/client"
@@ -35,6 +36,7 @@ import { createIngressDependencies } from "@/modules/ingress/factories/ingress-d
 import { createInfrastructureComponents } from "@/shared/application/factories/infrastructure-config.factory"
 import { createRconConfig } from "@/shared/application/factories/rcon-config.factory"
 import { createIngressConfig } from "@/shared/application/factories/ingress-config.factory"
+import { getScheduleConfig } from "@/modules/rcon/config/schedule.config"
 import { createRepositories } from "@/shared/application/orchestrators/repository.orchestrator"
 import { createBusinessServices } from "@/shared/application/orchestrators/business-service.orchestrator"
 import { createEventHandlers } from "@/shared/application/orchestrators/event-handler.orchestrator"
@@ -63,6 +65,7 @@ export interface AppContext {
   gameDetectionService: IGameDetectionService
   serverService: IServerService
   rconService: IRconService
+  rconScheduleService: IRconScheduleService
   serverStatusEnricher: IServerStatusEnricher
 
   // Module Event Handlers
@@ -97,6 +100,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
 
   // Create configuration objects
   const rconConfig = createRconConfig()
+  const scheduleConfig = getScheduleConfig(process.env.NODE_ENV || "production")
   const resolvedIngressOptions = createIngressConfig(ingressOptions)
 
   // Create repositories
@@ -112,6 +116,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     infrastructure.database,
     infrastructure.logger,
     rconConfig,
+    scheduleConfig,
   )
 
   // Create queue module
@@ -155,6 +160,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     gameDetectionService: services.gameDetectionService,
     serverService: services.serverService,
     rconService: services.rconService,
+    rconScheduleService: services.rconScheduleService,
     serverStatusEnricher: services.serverStatusEnricher,
 
     // Event Handlers

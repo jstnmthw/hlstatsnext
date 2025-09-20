@@ -485,6 +485,46 @@ describe("CsParser", () => {
     })
   })
 
+  describe("RCON and Admin Command Events", () => {
+    it("should handle RCON command logs silently", () => {
+      const logLine =
+        'Rcon: "rcon 716044165 adminD5bIpFSQ amx_say [HLStatsNext]: pimpjuice (+1202) killed DevilScream (-1238) with m4a1 for +21 points"'
+      const result = parser.parseLine(logLine, serverId)
+
+      expect(result.success).toBe(true)
+      expect(result.event).toBeNull()
+    })
+
+    it("should handle admin command logs silently", () => {
+      const logLine =
+        '"[0x1] Public CS 1.6 Clan Server<0><><>" triggered "amx_say" (text "[HLStatsNext]: pimpjuice (+1202) killed DevilScream (-1238) with m4a1 for +21 points")'
+      const result = parser.parseLine(logLine, serverId)
+
+      expect(result.success).toBe(true)
+      expect(result.event).toBeNull()
+    })
+
+    it("should not confuse RCON logs with kill events", () => {
+      // This should be handled by RCON parser, not kill parser
+      const logLine = 'Rcon: "amx_say Player1 killed Player2 with ak47"'
+      const result = parser.parseLine(logLine, serverId)
+
+      expect(result.success).toBe(true)
+      expect(result.event).toBeNull()
+      // Should not try to parse as kill event
+    })
+
+    it("should not confuse admin command logs with kill events", () => {
+      // This should be handled by admin command parser, not kill parser
+      const logLine = '"Server<0><><>" triggered "amx_say" (text "Player1 killed Player2")'
+      const result = parser.parseLine(logLine, serverId)
+
+      expect(result.success).toBe(true)
+      expect(result.event).toBeNull()
+      // Should not try to parse as kill event
+    })
+  })
+
   describe("Unhandled events", () => {
     it("should return a successful result with a null event for unhandled lines", () => {
       const logLine = "This is some random log line that we do not handle"

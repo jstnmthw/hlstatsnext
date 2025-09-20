@@ -24,6 +24,7 @@ import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import type { AppContext } from "@/context"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
+import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
 import { getEnvironmentConfig } from "@/config/environment.config"
 import { RconMonitorService } from "@/modules/rcon/services/rcon-monitor.service"
 import { DatabaseConnectionService } from "@/database/connection.service"
@@ -35,6 +36,7 @@ import { getUuidService } from "@/shared/infrastructure/messaging/queue/utils/me
  * This class orchestrates all components of the daemon including:
  * - Database connectivity management
  * - RCON monitoring for game servers
+ * - RCON scheduled command execution
  * - UDP ingress service for receiving game events
  * - Event publishing to message queues
  *
@@ -62,6 +64,9 @@ export class HLStatsDaemon {
   /** RCON monitoring service for server status checks */
   private rconMonitor: RconMonitorService
 
+  /** RCON scheduled command service for automated tasks */
+  private rconScheduler: IRconScheduleService
+
   /** Database connection management service */
   private databaseConnection: DatabaseConnectionService
 
@@ -87,6 +92,7 @@ export class HLStatsDaemon {
       config.rconConfig,
       this.context.serverStatusEnricher,
     )
+    this.rconScheduler = this.context.rconScheduleService
     this.databaseConnection = new DatabaseConnectionService(this.context)
 
     this.logger.info("Initializing HLStatsNext Daemon...")
@@ -98,7 +104,7 @@ export class HLStatsDaemon {
    * This method performs the complete startup sequence:
    * 1. Tests database connectivity
    * 2. Initializes message queue infrastructure
-   * 3. Starts all core services (ingress, RCON monitoring)
+   * 3. Starts all core services (ingress, RCON monitoring, RCON scheduler)
    * 4. Signals ready state
    *
    * The startup process is designed to fail fast if any critical component
@@ -220,6 +226,7 @@ export class HLStatsDaemon {
    * This private method handles the orchestrated startup of:
    * - Ingress service (UDP packet reception)
    * - RCON monitoring service (server status checks)
+   * - RCON scheduler service (scheduled command execution)
    *
    * Services are started with proper dependency ordering to ensure
    * the system comes online in a stable state.
@@ -230,14 +237,18 @@ export class HLStatsDaemon {
   private async startServices(): Promise<void> {
     await Promise.all([this.context.ingressService.start()])
 
+    // Start RCON services after ingress is ready
     this.rconMonitor.start()
+
+    // Start RCON scheduler after RCON monitoring is established
+    await this.rconScheduler.start()
   }
 
   /**
    * Gracefully shuts down the daemon and all its services.
    *
    * This method performs a clean shutdown sequence:
-   * 1. Stops RCON monitoring
+   * 1. Stops RCON scheduler and monitoring
    * 2. Stops ingress service and disconnects RCON connections
    * 3. Shuts down message queue infrastructure
    * 4. Closes database connections
@@ -260,6 +271,8 @@ export class HLStatsDaemon {
     this.logger.shutdown()
 
     try {
+      // Stop RCON services first
+      await this.rconScheduler.stop()
       this.rconMonitor.stop()
 
       await Promise.all([

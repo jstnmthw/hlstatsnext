@@ -9,6 +9,7 @@ import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { RepositoryCollection } from "./repository.orchestrator"
 import type { RconConfig } from "@/shared/application/factories/rcon-config.factory"
+import type { ScheduleConfig } from "@/modules/rcon/types/schedule.types"
 
 import { RankingService } from "@/modules/ranking/ranking.service"
 import { MatchService } from "@/modules/match/match.service"
@@ -19,6 +20,7 @@ import { ActionService } from "@/modules/action/action.service"
 import { GameDetectionService } from "@/modules/game/game-detection.service"
 import { ServerService } from "@/modules/server/server.service"
 import { RconService } from "@/modules/rcon/services/rcon.service"
+import { RconScheduleService } from "@/modules/rcon/schedulers/rcon-schedule.service"
 import { CommandResolverService } from "@/modules/rcon/services/command-resolver.service"
 import { RconCommandService } from "@/modules/rcon/services/rcon-command.service"
 import { PlayerNotificationService } from "@/modules/rcon/services/player-notification.service"
@@ -36,6 +38,7 @@ import type { IActionService } from "@/modules/action/action.types"
 import type { IGameDetectionService } from "@/modules/game/game-detection.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { IRconService } from "@/modules/rcon/types/rcon.types"
+import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
 import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 import type { IPlayerService } from "@/modules/player/player.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
@@ -49,6 +52,7 @@ export interface BusinessServiceCollection {
   gameDetectionService: IGameDetectionService
   serverService: IServerService
   rconService: IRconService
+  rconScheduleService: IRconScheduleService
   serverStatusEnricher: IServerStatusEnricher
   sessionService: IPlayerSessionService
 }
@@ -63,6 +67,7 @@ export interface BusinessServiceCollection {
  * @param database - Database client instance
  * @param logger - Logger instance
  * @param rconConfig - RCON configuration
+ * @param scheduleConfig - RCON schedule configuration
  * @returns Collection of all business service instances
  */
 export function createBusinessServices(
@@ -70,6 +75,7 @@ export function createBusinessServices(
   database: DatabaseClient,
   logger: ILogger,
   rconConfig: RconConfig,
+  scheduleConfig: ScheduleConfig,
 ): BusinessServiceCollection {
   // First tier - services with minimal dependencies
   const rankingService = new RankingService(logger, repositories.weaponRepository, database.prisma)
@@ -164,6 +170,14 @@ export function createBusinessServices(
     playerStatusEnricher,
   )
 
+  // Sixth tier - RCON scheduler service dependent on RCON and server services
+  const rconScheduleService = new RconScheduleService(
+    logger,
+    rconService,
+    serverService,
+    scheduleConfig,
+  )
+
   return {
     playerService,
     matchService,
@@ -173,6 +187,7 @@ export function createBusinessServices(
     gameDetectionService,
     serverService,
     rconService,
+    rconScheduleService,
     serverStatusEnricher,
     sessionService,
   }

@@ -52,6 +52,10 @@ const mockContext = {
   rconService: {
     disconnectAll: vi.fn(),
   },
+  rconScheduleService: {
+    start: vi.fn(),
+    stop: vi.fn(),
+  },
   eventPublisher: mockEventPublisher,
   queueModule: {
     shutdown: vi.fn(),
@@ -71,6 +75,12 @@ describe("HLStatsDaemon", () => {
       nodeEnv: "test",
       ingressOptions: {},
       rconConfig: { enabled: true, statusInterval: 30000 },
+      scheduleConfig: {
+        enabled: true,
+        defaultTimeoutMs: 30000,
+        historyRetentionHours: 24,
+        maxConcurrentPerServer: 3,
+      },
     })
 
     const MockedRconMonitorService = vi.mocked(RconMonitorService, true)
@@ -243,11 +253,13 @@ describe("HLStatsDaemon", () => {
     it("should stop successfully", async () => {
       vi.mocked(mockContext.ingressService.stop).mockResolvedValue(undefined)
       vi.mocked(mockContext.rconService.disconnectAll).mockResolvedValue(undefined)
+      vi.mocked(mockContext.rconScheduleService.stop).mockResolvedValue(undefined)
       vi.mocked(mockDatabaseConnection.disconnect).mockResolvedValue(undefined)
 
       await daemon.stop()
 
       expect(mockContext.logger.shutdown).toHaveBeenCalled()
+      expect(mockContext.rconScheduleService.stop).toHaveBeenCalled()
       expect(mockRconMonitor.stop).toHaveBeenCalled()
       expect(mockContext.ingressService.stop).toHaveBeenCalled()
       expect(mockContext.rconService.disconnectAll).toHaveBeenCalled()
@@ -256,6 +268,7 @@ describe("HLStatsDaemon", () => {
     })
 
     it("should handle service stop errors", async () => {
+      vi.mocked(mockContext.rconScheduleService.stop).mockResolvedValue(undefined)
       vi.mocked(mockContext.ingressService.stop).mockRejectedValue(new Error("Stop error"))
       vi.mocked(mockContext.rconService.disconnectAll).mockResolvedValue(undefined)
       vi.mocked(mockDatabaseConnection.disconnect).mockResolvedValue(undefined)

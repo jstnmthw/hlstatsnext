@@ -24,9 +24,9 @@
     "lint:fix": "eslint src/**/*.ts --fix"
   },
   "dependencies": {
-    "@prisma/client": "^6.15.0",
+    "@prisma/client": "^6.16.2",
     "dbgate-query-splitter": "^4.11.5",
-    "prisma": "^6.15.0",
+    "prisma": "^6.16.2",
     "unzipper": "^0.12.3"
   },
   "devDependencies": {
@@ -38,7 +38,7 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^24.3.0",
     "@types/unzipper": "^0.10.11",
-    "dotenv-cli": "^8.0.0",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^9.34.0",
     "glob": "^11.0.3",
     "prisma-generator-pothos-codegen": "^0.7.1",

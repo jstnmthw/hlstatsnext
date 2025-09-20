@@ -18,14 +18,14 @@
     "./types": "./src/types.ts"
   },
   "dependencies": {
-    "argon2": "^0.31.0"
+    "argon2": "^0.44.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^24.0.0",
-    "eslint": "^9.30.0",
-    "typescript": "^5.8.3",
-    "vitest": "^1.6.0"
+    "@types/node": "^24.5.2",
+    "eslint": "^9.36.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
   }
 }

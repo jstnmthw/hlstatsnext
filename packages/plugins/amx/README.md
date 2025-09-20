@@ -1,0 +1,245 @@
+# HLStatsNext AMX Mod X Plugin
+
+A sophisticated event processing plugin for AMX Mod X that handles structured commands from the HLStatsNext daemon. The plugin receives structured event data and handles all presentation formatting, including colors and localization.
+
+## Features
+
+- **Structured Event Processing**: Receives and processes structured commands from the HLStatsNext daemon
+- **Complete Presentation Control**: Handles all message formatting, colors, and localization in the plugin
+- **Event-Driven Architecture**: Processes kill, suicide, teamkill, action, connect, and disconnect events
+- **Colored Messages**: Beautiful, colored message formatting with configurable schemes
+- **Clean Separation**: Daemon handles data, plugin handles presentation
+- **Performance Optimized**: Minimal impact on server performance
+- **Security Focused**: Input validation and access control
+
+## Installation
+
+1. **Compile the Plugin**:
+
+   ```bash
+   cd packages/plugins/amx
+   # Ensure AMX Mod X compiler is installed
+   amxxpc src/hlstatsnext.sma -iinclude -o=compiled/hlstatsnext.amxx
+   ```
+
+2. **Install on Server**:
+
+   ```bash
+   cp compiled/hlstatsnext.amxx /path/to/server/addons/amxmodx/plugins/
+   cp configs/hlstatsnext.cfg /path/to/server/addons/amxmodx/configs/
+   ```
+
+3. **Add to Plugins List**:
+   Add `hlstatsnext.amxx` to `addons/amxmodx/configs/plugins.ini`
+
+4. **Update HLStatsNext Configuration**:
+   The HLStatsNext database configuration will be updated manually by administrators to use the new structured commands:
+   - `BroadCastEventsCommandAnnounce` → `hlx_announce`
+   - `BroadCastEventsCommand` → `hlx_event`
+   - `PlayerEventsCommand` → `hlx_event`
+   - `EnablePublicCommands` → Controls whether public commands are allowed
+
+5. **Restart Server**
+
+## Commands
+
+### Core Structured Commands (Used by HLStatsNext Daemon)
+
+| Command                                     | Description                          |
+| ------------------------------------------- | ------------------------------------ |
+| `hlx_event <target> <event_type> <data...>` | Process structured event from daemon |
+| `hlx_announce <message>`                    | Send announcement to all players     |
+
+### Event Types Supported
+
+- `KILL` - Player kill events with skill adjustments
+- `SUICIDE` - Player suicide events with penalties
+- `TEAMKILL` - Team kill events with penalties
+- `ACTION` - Individual player actions with points
+- `TEAM_ACTION` - Team-wide actions
+- `CONNECT` - Player connection events
+- `DISCONNECT` - Player disconnection events
+- `RANK` - Player rank responses
+- `STATS` - Player statistics responses
+- `MESSAGE` - Generic message delivery
+
+### Administrative Commands
+
+| Command              | Access Level | Description          |
+| -------------------- | ------------ | -------------------- |
+| `hlstatsnext_status` | ADMIN        | Show plugin status   |
+| `hlstatsnext_reload` | ADMIN        | Reload configuration |
+
+### Player Commands (Handled by HLStatsNext Daemon)
+
+The following commands are typed by players in chat and processed by the HLStatsNext daemon, which then responds using structured `hlx_event` commands:
+
+| Command    | Description                         | Daemon Response                                                                                            |
+| ---------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `!rank`    | Show player's rank and skill rating | `hlx_event <userid> RANK <playerId> <rank> <total> <skill>`                                                |
+| `!stats`   | Show detailed player statistics     | `hlx_event <userid> STATS <playerId> <rank> <total> <skill> <kills> <deaths> <kdr> <accuracy> <headshots>` |
+| `!top10`   | Show top 10 players                 | `hlx_event <userid> MESSAGE "Top 10: 1. ProGamer (2500)..."`                                               |
+| `!session` | Show current session statistics     | `hlx_event <userid> MESSAGE "Session: 15 kills, 8 deaths, 1.87 K/D"`                                       |
+
+## Configuration
+
+Edit `configs/hlstatsnext.cfg` to customize:
+
+- **Colors**: Customize color scheme and individual color codes
+- **Messages**: Configure message formatting options
+- **Performance**: Adjust performance and logging settings
+- **Commands**: Enable/disable specific command groups
+
+## Color Codes
+
+The plugin uses AMX Mod X color codes:
+
+- `^0` - Default/White
+- `^1` - Red
+- `^2` - Green
+- `^3` - Yellow
+- `^4` - Blue
+- `^5` - Magenta
+- `^6` - Cyan
+- `^7` - White
+- `^8` - Gray
+
+## Plugin Architecture
+
+The plugin follows a modular architecture with separate include files for different functionality:
+
+- **hlstatsnext_core.inc**: Core functionality and lifecycle management
+- **hlstatsnext_events.inc**: Event type definitions and data structures
+- **hlstatsnext_parser.inc**: Structured command parsing logic
+- **hlstatsnext_formatter.inc**: Message formatting and color presentation
+- **hlstatsnext_commands.inc**: Command registration and handlers
+- **hlstatsnext_util.inc**: Utility functions and helpers
+
+### Structured Command Processing Flow
+
+1. **Daemon** sends structured command via RCON: `hlx_event 0 KILL 5 "Player1" 1500 12 "Player2" 1450 15 ak47 0`
+2. **Parser** extracts event type and data fields
+3. **Formatter** applies colors and creates presentation message
+4. **Output** displays formatted message to players
+
+## Development
+
+### Prerequisites
+
+- AMX Mod X 1.8.2 or higher
+- AMX Mod X Compiler (amxxpc)
+- Node.js 24.0.0 or higher (for package management)
+- pnpm 10.17.0 (monorepo package manager)
+
+### Building from Source
+
+```bash
+# Install dependencies
+pnpm install
+
+# Compile the plugin (requires amxxpc in PATH)
+pnpm run compile:local
+
+# Package for distribution
+pnpm run package
+```
+
+### Adding New Features
+
+To add new features:
+
+1. Add new event types to `hlstatsnext_events.inc`
+2. Update parser in `hlstatsnext_parser.inc` to handle new command structure
+3. Add formatting logic in `hlstatsnext_formatter.inc`
+4. Update daemon's `StructuredCommandBuilder` to send new event types
+5. Update configuration file if needed
+
+## Integration with HLStatsNext
+
+### How It Works
+
+1. **Player Action**: Player performs action or types command
+2. **Game Server**: Logs event to console
+3. **HLStatsNext Daemon**: Monitors logs and processes events
+4. **Structured Command**: Daemon sends structured command via RCON
+5. **Plugin Processing**: Plugin parses structured data and formats message
+6. **Player Sees**: Colored, formatted message in chat
+
+### Example Flow: Kill Event
+
+```
+Player "ProPlayer" kills "Noob" with AK47 headshot
+            ↓
+Server logs: "ProPlayer<5><STEAM_ID><CT>" killed "Noob<12><STEAM_ID><TERRORIST>" with "ak47"
+            ↓
+HLStatsNext processes kill event and calculates skill changes
+            ↓
+RCON: hlx_event 0 KILL 5 "ProPlayer" 1500 12 "Noob" 1450 15 ak47 1
+            ↓
+Plugin parses: target=0, killer=5, victim=12, skill changes, weapon, headshot=true
+            ↓
+Plugin formats with colors and displays to all players
+            ↓
+Players see: [HLX] ProPlayer [+15] killed Noob [-15] with ak47 (headshot)
+```
+
+### Example Flow: Rank Command
+
+```
+Player types: !rank
+            ↓
+Server logs: "Player<5><STEAM_ID><CT>" say "!rank"
+            ↓
+HLStatsNext detects command and queries database
+            ↓
+RCON: hlx_event 5 RANK 5 42 1243 1850
+            ↓
+Plugin parses: target=5, playerId=5, rank=42, total=1243, skill=1850
+            ↓
+Plugin formats with colors
+            ↓
+Player sees: [HLX] You're rank #42 of 1,243 players with a skill of 1,850
+```
+
+## Troubleshooting
+
+### Plugin Won't Compile
+
+- Ensure AMX Mod X compiler is installed
+- Check that all include files are present
+- Verify syntax in .sma files
+
+### Structured Commands Don't Work
+
+- Check plugin is listed in plugins.ini
+- Verify daemon is sending `hlx_event` commands instead of old message commands
+- Check database configuration uses correct command strings
+- Review server console for parsing errors
+
+### Colors Not Displaying
+
+- Verify client supports color codes
+- Check hlstatsnext.cfg color settings
+- Ensure colors are enabled in configuration
+- Verify formatter is applying colors to parsed events
+
+### Events Not Processing
+
+- Check daemon is sending structured commands with correct format
+- Verify parser recognizes event types (KILL, SUICIDE, etc.)
+- Check that event data fields match expected format
+- Review plugin logs for parsing errors
+
+## Support
+
+For issues and feature requests, please refer to the main HLStatsNext project documentation.
+
+## License
+
+This plugin is part of the HLStatsNext project and is subject to its licensing terms.
+
+## Credits
+
+- HLStatsNext Team
+- AMX Mod X Community
+- Original HLStats contributors

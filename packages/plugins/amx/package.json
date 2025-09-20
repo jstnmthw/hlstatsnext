@@ -1,0 +1,42 @@
+{
+  "name": "@repo/plugins-amx",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HLStatsNext AMX Mod X Plugin for enhanced game server messaging",
+  "main": "compiled/hlstatsnext.amxx",
+  "scripts": {
+    "build": "pnpm run compile",
+    "compile": "pnpm run compile:plugin",
+    "compile:plugin": "echo 'AMX Mod X compiler (amxxpc) required - install from https://www.amxmodx.org/downloads-new.php'",
+    "compile:local": "amxxpc src/hlstatsnext.sma -iinclude -o=compiled/hlstatsnext.amxx",
+    "clean": "rm -rf compiled/*.amxx",
+    "test": "echo 'Plugin tests not yet implemented'",
+    "dev": "pnpm run compile && pnpm run deploy:dev",
+    "deploy:dev": "echo 'Deploy to test server: cp compiled/hlstatsnext.amxx /path/to/server/addons/amxmodx/plugins/'",
+    "package": "tar -czf hlstatsnext-plugin-v$npm_package_version.tar.gz compiled/ configs/ docs/",
+    "lint": "echo 'Pawn linting not configured - consider using manual code review'",
+    "validate": "echo 'Validation requires AMX Mod X compiler'"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*"
+  },
+  "files": ["compiled/", "configs/", "docs/", "src/", "README.md"],
+  "keywords": [
+    "amx",
+    "amxmodx",
+    "plugin",
+    "hlstatsnext",
+    "counter-strike",
+    "goldsrc",
+    "game-server"
+  ],
+  "license": "PROPRIETARY",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/hlstatsnext.com",
+    "directory": "packages/plugins/amx"
+  }
+}

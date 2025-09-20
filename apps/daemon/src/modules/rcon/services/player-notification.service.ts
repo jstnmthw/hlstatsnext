@@ -163,6 +163,27 @@ export class PlayerNotificationService {
   }
 
   /**
+   * Execute a raw RCON command directly
+   * Used for structured commands that don't need translation
+   */
+  async executeRawCommand(serverId: number, command: string): Promise<void> {
+    try {
+      await this.rconCommand.executeRaw(serverId, command)
+
+      this.logger.debug(`Executed raw command on server ${serverId}`, {
+        serverId,
+        command: command.substring(0, 100), // Log first 100 chars for safety
+      })
+    } catch (error) {
+      this.logger.error(`Failed to execute raw command on server ${serverId}`, {
+        serverId,
+        error: error instanceof Error ? error.message : String(error),
+      })
+      throw error
+    }
+  }
+
+  /**
    * Execute public notifications with player names (fallback for vanilla servers)
    */
   private async executePublicNotifications(

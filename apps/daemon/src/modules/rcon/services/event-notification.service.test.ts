@@ -4,13 +4,19 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { EventNotificationService } from "./event-notification.service"
-import type { KillEventNotificationData } from "../types/notification.types"
+import type {
+  KillEventNotificationData,
+  SuicideEventNotificationData,
+  TeamKillEventNotificationData,
+  ActionEventNotificationData,
+} from "../types/notification.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { INotificationConfigRepository } from "../repositories/notification-config.repository"
 import type { PlayerNotificationService } from "./player-notification.service"
 import { createMockLogger } from "../../../tests/mocks/logger"
+import { EventType } from "@/shared/types/events"
 
 describe("EventNotificationService", () => {
   let service: EventNotificationService
@@ -70,6 +76,10 @@ describe("EventNotificationService", () => {
 
     mockPlayerNotificationService = {
       broadcastAnnouncement: vi.fn().mockResolvedValue(undefined),
+      executeRawCommand: vi.fn().mockResolvedValue(undefined),
+      notifyPlayer: vi.fn().mockResolvedValue(undefined),
+      notifyMultiplePlayers: vi.fn().mockResolvedValue(undefined),
+      supportsPrivateMessaging: vi.fn().mockResolvedValue(true),
     } as unknown as PlayerNotificationService
 
     service = new EventNotificationService(
@@ -82,13 +92,15 @@ describe("EventNotificationService", () => {
   })
 
   describe("notifyKillEvent", () => {
-    it("should process kill event with rank information", async () => {
+    it("should send structured kill command when event is enabled", async () => {
       const killData: KillEventNotificationData = {
         serverId: 1,
         killerId: 1,
         victimId: 2,
         killerName: "Player1",
         victimName: "Player2",
+        killerSkill: 1500,
+        victimSkill: 1450,
         weapon: "ak47",
         headshot: true,
         skillAdjustment: {
@@ -100,220 +112,179 @@ describe("EventNotificationService", () => {
 
       await service.notifyKillEvent(killData)
 
-      expect(mockServerService.findById).toHaveBeenCalledWith(1)
-      expect(mockConfigRepository.getConfigWithDefaults).toHaveBeenCalledWith(1, "goldsrc")
-      expect(mockPlayerNotificationService.broadcastAnnouncement).toHaveBeenCalledWith(
+      expect(mockPlayerNotificationService.executeRawCommand).toHaveBeenCalledWith(
         1,
-        expect.stringContaining("Player1"),
-        expect.any(String),
+        'hlx_event 0 KILL 1 "Player1" 1500 2 "Player2" 1450 5 ak47 1',
       )
     })
 
-    it("should handle missing killer/victim names", async () => {
+    it("should not send notification when event is disabled", async () => {
+      mockConfigRepository.isEventTypeEnabled = vi.fn().mockResolvedValue(false)
+
       const killData: KillEventNotificationData = {
         serverId: 1,
         killerId: 1,
         victimId: 2,
-        weapon: "ak47",
-        headshot: false,
         skillAdjustment: {
-          killerChange: 3,
-          victimChange: -2,
+          killerChange: 5,
+          victimChange: -3,
         },
-        timestamp: new Date(),
       }
 
       await service.notifyKillEvent(killData)
 
-      expect(mockPlayerNotificationService.broadcastAnnouncement).toHaveBeenCalled()
+      expect(mockPlayerNotificationService.executeRawCommand).not.toHaveBeenCalled()
     })
 
-    it("should handle service errors gracefully", async () => {
-      ;(mockRankingService.getBatchPlayerRanks as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("Ranking service error"),
-      )
-
+    it("should handle kill events with missing player names", async () => {
       const killData: KillEventNotificationData = {
         serverId: 1,
-        killerId: 1,
-        victimId: 2,
-        killerName: "Player1",
-        victimName: "Player2",
-        weapon: "ak47",
-        headshot: false,
+        killerId: 5,
+        victimId: 10,
         skillAdjustment: {
-          killerChange: 3,
-          victimChange: -2,
+          killerChange: 10,
+          victimChange: -10,
         },
-        timestamp: new Date(),
-      }
-
-      // Should not throw but handle gracefully
-      await expect(service.notifyKillEvent(killData)).resolves.toBeUndefined()
-      expect(mockPlayerNotificationService.broadcastAnnouncement).toHaveBeenCalled()
-    })
-  })
-
-  describe("notifyTeamKillEvent", () => {
-    it("should process team kill event", async () => {
-      const teamKillData = {
-        serverId: 1,
-        killerId: 1,
-        victimId: 2,
-        killerName: "Player1",
-        victimName: "Player2",
-        weapon: "ak47",
+        weapon: "unknown",
         headshot: false,
-        skillPenalty: -5,
-        timestamp: new Date(),
       }
 
-      await service.notifyTeamKillEvent(teamKillData)
+      await service.notifyKillEvent(killData)
 
-      expect(mockServerService.findById).toHaveBeenCalledWith(1)
-      expect(mockConfigRepository.getConfigWithDefaults).toHaveBeenCalledWith(1, "goldsrc")
-      expect(mockPlayerNotificationService.broadcastAnnouncement).toHaveBeenCalled()
+      expect(mockPlayerNotificationService.executeRawCommand).toHaveBeenCalledWith(
+        1,
+        'hlx_event 0 KILL 5 "" 0 10 "" 0 10 unknown 0',
+      )
     })
   })
 
   describe("notifySuicideEvent", () => {
-    it("should process suicide event", async () => {
-      const suicideData = {
+    it("should send structured suicide command", async () => {
+      const suicideData: SuicideEventNotificationData = {
         serverId: 1,
-        playerId: 1,
-        playerName: "Player1",
-        weapon: "grenade",
-        skillPenalty: -5,
-        timestamp: new Date(),
+        playerId: 5,
+        playerName: "DepressedPlayer",
+        playerSkill: 1500,
+        skillPenalty: 5,
       }
 
       await service.notifySuicideEvent(suicideData)
 
-      expect(mockPlayerNotificationService.broadcastAnnouncement).toHaveBeenCalled()
+      expect(mockPlayerNotificationService.executeRawCommand).toHaveBeenCalledWith(
+        1,
+        'hlx_event 0 SUICIDE 5 "DepressedPlayer" 1500 5',
+      )
+    })
+
+    it("should not send notification when event is disabled", async () => {
+      mockConfigRepository.isEventTypeEnabled = vi.fn().mockResolvedValue(false)
+
+      const suicideData: SuicideEventNotificationData = {
+        serverId: 1,
+        playerId: 5,
+        playerName: "Player",
+        playerSkill: 1000,
+        skillPenalty: 2,
+      }
+
+      await service.notifySuicideEvent(suicideData)
+
+      expect(mockPlayerNotificationService.executeRawCommand).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("notifyTeamKillEvent", () => {
+    it("should send structured teamkill command", async () => {
+      const teamKillData: TeamKillEventNotificationData = {
+        serverId: 1,
+        killerId: 5,
+        victimId: 10,
+        killerName: "TeamKiller",
+        victimName: "TeamMate",
+        weapon: "m4a1",
+        headshot: false,
+        skillPenalty: 10,
+      }
+
+      await service.notifyTeamKillEvent(teamKillData)
+
+      expect(mockPlayerNotificationService.executeRawCommand).toHaveBeenCalledWith(
+        1,
+        'hlx_event 0 TEAMKILL 5 "TeamKiller" 10 "TeamMate" 10',
+      )
     })
   })
 
   describe("notifyActionEvent", () => {
-    it("should process action event", async () => {
-      const actionData = {
+    it("should send structured action command", async () => {
+      const actionData: ActionEventNotificationData = {
         serverId: 1,
-        playerId: 1,
-        playerName: "Player1",
-        actionCode: "plant_bomb",
-        actionDescription: "Plant the Bomb",
-        points: 3,
-        skillAdjustment: 3,
-        timestamp: new Date(),
+        playerId: 5,
+        playerName: "Bomber",
+        playerSkill: 1500,
+        actionCode: "bomb_planted",
+        actionDescription: "Planted the bomb",
+        points: 5,
       }
 
       await service.notifyActionEvent(actionData)
 
-      expect(mockPlayerNotificationService.broadcastAnnouncement).toHaveBeenCalled()
+      expect(mockPlayerNotificationService.executeRawCommand).toHaveBeenCalledWith(
+        1,
+        'hlx_event 0 ACTION 5 "Bomber" 1500 "bomb_planted" "Planted the bomb" 5',
+      )
     })
-  })
 
-  describe("notifyTeamActionEvent", () => {
-    it("should process team action event", async () => {
-      const teamActionData = {
+    it("should not send notification when event is disabled", async () => {
+      mockConfigRepository.isEventTypeEnabled = vi.fn().mockResolvedValue(false)
+
+      const actionData: ActionEventNotificationData = {
         serverId: 1,
-        team: "TERRORIST",
-        actionCode: "plant_bomb",
-        actionDescription: "Plant the Bomb",
-        points: 2,
-        skillAdjustment: 2,
-        timestamp: new Date(),
+        playerId: 5,
+        playerName: "Player",
+        actionCode: "action",
+        actionDescription: "Did something",
+        points: 1,
       }
 
-      await service.notifyTeamActionEvent(teamActionData)
+      await service.notifyActionEvent(actionData)
 
-      expect(mockPlayerNotificationService.broadcastAnnouncement).toHaveBeenCalled()
+      expect(mockPlayerNotificationService.executeRawCommand).not.toHaveBeenCalled()
     })
   })
 
-  describe("notifyConnectEvent", () => {
-    it("should process connect event", async () => {
-      const connectData = {
-        serverId: 1,
-        playerId: 1,
-        playerName: "Player1",
-        steamId: "STEAM_0:1:12345",
-        ipAddress: "127.0.0.1",
-        connectionTime: 300,
-        timestamp: new Date(),
-      }
+  describe("isEventTypeEnabled", () => {
+    it("should return true when event type is enabled", async () => {
+      mockConfigRepository.isEventTypeEnabled = vi.fn().mockResolvedValue(true)
 
-      await service.notifyConnectEvent(connectData)
+      const result = await service.isEventTypeEnabled(1, EventType.PLAYER_KILL)
 
-      expect(mockPlayerNotificationService.broadcastAnnouncement).toHaveBeenCalled()
-    })
-  })
-
-  describe("notifyDisconnectEvent", () => {
-    it("should process disconnect event", async () => {
-      const disconnectData = {
-        serverId: 1,
-        playerId: 1,
-        playerName: "Player1",
-        reason: "Disconnect",
-        sessionDuration: 1800,
-        timestamp: new Date(),
-      }
-
-      await service.notifyDisconnectEvent(disconnectData)
-
-      expect(mockPlayerNotificationService.broadcastAnnouncement).toHaveBeenCalled()
-    })
-  })
-
-  describe("private methods", () => {
-    describe("determineEngineType", () => {
-      it("should map common game codes correctly", () => {
-        // Access private method for testing
-        const service_ = service as unknown as {
-          determineEngineType: (game: string) => string
-        }
-
-        expect(service_.determineEngineType("cstrike")).toBe("goldsrc")
-        expect(service_.determineEngineType("css")).toBe("source")
-        expect(service_.determineEngineType("csgo")).toBe("source")
-        expect(service_.determineEngineType("cs2")).toBe("source2")
-        expect(service_.determineEngineType("unknown")).toBe("goldsrc")
-      })
+      expect(result).toBe(true)
+      expect(mockConfigRepository.isEventTypeEnabled).toHaveBeenCalledWith(1, EventType.PLAYER_KILL)
     })
 
-    describe("validateEngineType", () => {
-      it("should validate engine types correctly", () => {
-        const service_ = service as unknown as {
-          validateEngineType: (engineType: string) => string
-        }
+    it("should return false when event type is disabled", async () => {
+      mockConfigRepository.isEventTypeEnabled = vi.fn().mockResolvedValue(false)
 
-        expect(service_.validateEngineType("goldsrc")).toBe("goldsrc")
-        expect(service_.validateEngineType("source")).toBe("source")
-        expect(service_.validateEngineType("source2")).toBe("source2")
-        expect(service_.validateEngineType("invalid")).toBe("goldsrc")
-      })
+      const result = await service.isEventTypeEnabled(1, EventType.PLAYER_SUICIDE)
+
+      expect(result).toBe(false)
     })
 
-    describe("parseMessageFormats", () => {
-      it("should parse valid message formats", () => {
-        const service_ = service as unknown as {
-          parseMessageFormats: (messageFormats: unknown) => Record<string, unknown>
-        }
-        const formats = { kill: "Custom kill message" }
+    it("should return true on error and log warning", async () => {
+      mockConfigRepository.isEventTypeEnabled = vi.fn().mockRejectedValue(new Error("DB Error"))
 
-        const result = service_.parseMessageFormats(formats)
-        expect(result).toEqual(formats)
-      })
+      const result = await service.isEventTypeEnabled(1, EventType.PLAYER_KILL)
 
-      it("should return empty object for invalid formats", () => {
-        const service_ = service as unknown as {
-          parseMessageFormats: (messageFormats: unknown) => Record<string, unknown>
-        }
-
-        expect(service_.parseMessageFormats(null)).toEqual({})
-        expect(service_.parseMessageFormats("string")).toEqual({})
-        expect(service_.parseMessageFormats(123)).toEqual({})
-      })
+      expect(result).toBe(true)
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        "Failed to check if event type is enabled, defaulting to true",
+        expect.objectContaining({
+          serverId: 1,
+          eventType: EventType.PLAYER_KILL,
+          error: "DB Error",
+        }),
+      )
     })
   })
 })

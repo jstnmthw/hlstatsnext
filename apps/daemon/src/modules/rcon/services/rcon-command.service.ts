@@ -120,6 +120,26 @@ export class RconCommandService {
   }
 
   /**
+   * Execute a raw RCON command without any processing
+   */
+  async executeRaw(serverId: number, command: string): Promise<void> {
+    try {
+      await this.rconService.executeCommand(serverId, command)
+
+      this.logger.debug(`Executed raw RCON command`, {
+        serverId,
+        command: command.substring(0, 100), // Log first 100 chars for safety
+      })
+    } catch (error) {
+      this.logger.error(`Failed to execute raw RCON command`, {
+        serverId,
+        error: error instanceof Error ? error.message : String(error),
+      })
+      throw error
+    }
+  }
+
+  /**
    * Execute with batch optimization
    */
   private async executeBatch(

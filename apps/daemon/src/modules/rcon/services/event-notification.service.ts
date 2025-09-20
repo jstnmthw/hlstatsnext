@@ -11,8 +11,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IServerService } from "@/modules/server/server.types"
 import { PlayerNotificationService } from "./player-notification.service"
-import { NotificationMessageBuilder } from "../builders/notification-message.builder"
-import { ColorFormatterFactory, type EngineType } from "../formatters/color-formatter.factory"
+import { StructuredCommandBuilder } from "../builders/structured-command.builder"
 import type { INotificationConfigRepository } from "../repositories/notification-config.repository"
 import type {
   KillEventNotificationData,
@@ -22,7 +21,6 @@ import type {
   TeamActionEventNotificationData,
   ConnectEventNotificationData,
   DisconnectEventNotificationData,
-  MessageTemplates,
 } from "../types/notification.types"
 
 export interface IEventNotificationService {
@@ -83,15 +81,11 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
-      // Build the notification message
-      const message = await this.buildKillMessage(data)
+      // Build structured command
+      const command = StructuredCommandBuilder.buildKillCommand(data)
 
-      // Send as public announcement
-      await this.playerNotificationService.broadcastAnnouncement(
-        data.serverId,
-        message,
-        "BroadCastEventsCommandAnnounce",
-      )
+      // Execute the command (target 0 = all players)
+      await this.playerNotificationService.executeRawCommand(data.serverId, command)
 
       this.logger.info(`Kill notification sent for server ${data.serverId}`, {
         serverId: data.serverId,
@@ -118,15 +112,11 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
-      // Build the notification message
-      const message = await this.buildSuicideMessage(data)
+      // Build structured command
+      const command = StructuredCommandBuilder.buildSuicideCommand(data)
 
-      // Send as public announcement
-      await this.playerNotificationService.broadcastAnnouncement(
-        data.serverId,
-        message,
-        "BroadCastEventsCommandAnnounce",
-      )
+      // Execute the command (target 0 = all players)
+      await this.playerNotificationService.executeRawCommand(data.serverId, command)
 
       this.logger.info(`Suicide notification sent for server ${data.serverId}`, {
         serverId: data.serverId,
@@ -150,15 +140,11 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
-      // Build the notification message
-      const message = await this.buildTeamKillMessage(data)
+      // Build structured command
+      const command = StructuredCommandBuilder.buildTeamKillCommand(data)
 
-      // Send as public announcement
-      await this.playerNotificationService.broadcastAnnouncement(
-        data.serverId,
-        message,
-        "BroadCastEventsCommandAnnounce",
-      )
+      // Execute the command (target 0 = all players)
+      await this.playerNotificationService.executeRawCommand(data.serverId, command)
 
       this.logger.info(`Team kill notification sent for server ${data.serverId}`, {
         serverId: data.serverId,
@@ -183,15 +169,11 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
-      // Build the notification message
-      const message = await this.buildActionMessage(data)
+      // Build structured command
+      const command = StructuredCommandBuilder.buildActionCommand(data)
 
-      // Send as public announcement
-      await this.playerNotificationService.broadcastAnnouncement(
-        data.serverId,
-        message,
-        "BroadCastEventsCommandAnnounce",
-      )
+      // Execute the command (target 0 = all players)
+      await this.playerNotificationService.executeRawCommand(data.serverId, command)
 
       this.logger.info(`Action notification sent for server ${data.serverId}`, {
         serverId: data.serverId,
@@ -216,15 +198,11 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
-      // Build the notification message
-      const message = await this.buildTeamActionMessage(data)
+      // Build structured command
+      const command = StructuredCommandBuilder.buildTeamActionCommand(data)
 
-      // Send as public announcement
-      await this.playerNotificationService.broadcastAnnouncement(
-        data.serverId,
-        message,
-        "BroadCastEventsCommandAnnounce",
-      )
+      // Execute the command (target 0 = all players)
+      await this.playerNotificationService.executeRawCommand(data.serverId, command)
 
       this.logger.info(`Team action notification sent for server ${data.serverId}`, {
         serverId: data.serverId,
@@ -249,15 +227,11 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
-      // Build the notification message
-      const message = await this.buildConnectMessage(data)
+      // Build structured command
+      const command = StructuredCommandBuilder.buildConnectCommand(data)
 
-      // Send as public announcement
-      await this.playerNotificationService.broadcastAnnouncement(
-        data.serverId,
-        message,
-        "BroadCastEventsCommandAnnounce",
-      )
+      // Execute the command (target 0 = all players)
+      await this.playerNotificationService.executeRawCommand(data.serverId, command)
 
       this.logger.debug(`Connect notification sent for server ${data.serverId}`, {
         serverId: data.serverId,
@@ -279,15 +253,11 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
-      // Build the notification message
-      const message = await this.buildDisconnectMessage(data)
+      // Build structured command
+      const command = StructuredCommandBuilder.buildDisconnectCommand(data)
 
-      // Send as public announcement
-      await this.playerNotificationService.broadcastAnnouncement(
-        data.serverId,
-        message,
-        "BroadCastEventsCommandAnnounce",
-      )
+      // Execute the command (target 0 = all players)
+      await this.playerNotificationService.executeRawCommand(data.serverId, command)
 
       this.logger.debug(`Disconnect notification sent for server ${data.serverId}`, {
         serverId: data.serverId,
@@ -317,200 +287,6 @@ export class EventNotificationService implements IEventNotificationService {
   }
 
   /**
-   * Build kill event message with color formatting
-   */
-  private async buildKillMessage(data: KillEventNotificationData): Promise<string> {
-    const config = await this.getServerConfig(data.serverId)
-    const formatter = ColorFormatterFactory.create(
-      this.validateEngineType(config.engineType),
-      config.colorEnabled,
-      config.colorScheme,
-    )
-
-    return NotificationMessageBuilder.create()
-      .withColorFormatter(formatter)
-      .withTemplates(this.parseMessageFormats(config.messageFormats))
-      .fromKillEvent(data)
-      .build()
-  }
-
-  /**
-   * Build suicide event message with color formatting
-   */
-  private async buildSuicideMessage(data: SuicideEventNotificationData): Promise<string> {
-    const config = await this.getServerConfig(data.serverId)
-    const formatter = ColorFormatterFactory.create(
-      this.validateEngineType(config.engineType),
-      config.colorEnabled,
-      config.colorScheme,
-    )
-
-    return NotificationMessageBuilder.create()
-      .withColorFormatter(formatter)
-      .withTemplates(this.parseMessageFormats(config.messageFormats))
-      .fromSuicideEvent(data)
-      .build()
-  }
-
-  /**
-   * Build team kill event message with color formatting
-   */
-  private async buildTeamKillMessage(data: TeamKillEventNotificationData): Promise<string> {
-    const config = await this.getServerConfig(data.serverId)
-    const formatter = ColorFormatterFactory.create(
-      this.validateEngineType(config.engineType),
-      config.colorEnabled,
-      config.colorScheme,
-    )
-
-    return NotificationMessageBuilder.create()
-      .withColorFormatter(formatter)
-      .withTemplates(this.parseMessageFormats(config.messageFormats))
-      .fromTeamKillEvent(data)
-      .build()
-  }
-
-  /**
-   * Build action event message with color formatting
-   */
-  private async buildActionMessage(data: ActionEventNotificationData): Promise<string> {
-    const config = await this.getServerConfig(data.serverId)
-    const formatter = ColorFormatterFactory.create(
-      this.validateEngineType(config.engineType),
-      config.colorEnabled,
-      config.colorScheme,
-    )
-
-    return NotificationMessageBuilder.create()
-      .withColorFormatter(formatter)
-      .withTemplates(this.parseMessageFormats(config.messageFormats))
-      .fromActionEvent(data)
-      .build()
-  }
-
-  /**
-   * Build team action event message with color formatting
-   */
-  private async buildTeamActionMessage(data: TeamActionEventNotificationData): Promise<string> {
-    const config = await this.getServerConfig(data.serverId)
-    const formatter = ColorFormatterFactory.create(
-      this.validateEngineType(config.engineType),
-      config.colorEnabled,
-      config.colorScheme,
-    )
-
-    return NotificationMessageBuilder.create()
-      .withColorFormatter(formatter)
-      .withTemplates(this.parseMessageFormats(config.messageFormats))
-      .fromTeamActionEvent(data)
-      .build()
-  }
-
-  /**
-   * Build connect event message with color formatting
-   */
-  private async buildConnectMessage(data: ConnectEventNotificationData): Promise<string> {
-    const config = await this.getServerConfig(data.serverId)
-    const formatter = ColorFormatterFactory.create(
-      this.validateEngineType(config.engineType),
-      config.colorEnabled,
-      config.colorScheme,
-    )
-
-    return NotificationMessageBuilder.create()
-      .withColorFormatter(formatter)
-      .withTemplates(this.parseMessageFormats(config.messageFormats))
-      .fromConnectEvent(data)
-      .build()
-  }
-
-  /**
-   * Build disconnect event message with color formatting
-   */
-  private async buildDisconnectMessage(data: DisconnectEventNotificationData): Promise<string> {
-    const config = await this.getServerConfig(data.serverId)
-    const formatter = ColorFormatterFactory.create(
-      this.validateEngineType(config.engineType),
-      config.colorEnabled,
-      config.colorScheme,
-    )
-
-    return NotificationMessageBuilder.create()
-      .withColorFormatter(formatter)
-      .withTemplates(this.parseMessageFormats(config.messageFormats))
-      .fromDisconnectEvent(data)
-      .build()
-  }
-
-  /**
    * Get server configuration with defaults
    */
-  private async getServerConfig(serverId: number) {
-    try {
-      // Get server info to determine engine type
-      const server = await this.serverService.findById(serverId)
-      const engineType = this.determineEngineType(server?.game || "unknown")
-
-      return await this.configRepository.getConfigWithDefaults(serverId, engineType)
-    } catch (error) {
-      this.logger.warn(`Failed to get server config for ${serverId}, using defaults`, {
-        serverId,
-        error: error instanceof Error ? error.message : String(error),
-      })
-
-      // Return safe defaults
-      return {
-        serverId,
-        engineType: "goldsrc",
-        colorEnabled: false,
-        colorScheme: null,
-        eventTypes: null,
-        messageFormats: null,
-      }
-    }
-  }
-
-  /**
-   * Determine engine type from game code
-   */
-  private determineEngineType(game: string): EngineType {
-    // Map game codes to engine types
-    const gameToEngine: Record<string, EngineType> = {
-      cstrike: "goldsrc",
-      cs: "goldsrc",
-      "1.6": "goldsrc",
-      valve: "goldsrc",
-      hldm: "goldsrc",
-      tf: "goldsrc",
-
-      css: "source",
-      hl2mp: "source",
-      tf2: "source",
-
-      csgo: "source",
-      cs2: "source2",
-    }
-
-    return gameToEngine[game.toLowerCase()] || "goldsrc"
-  }
-
-  /**
-   * Parse and validate message formats from JSON
-   */
-  private parseMessageFormats(messageFormats: unknown): Partial<MessageTemplates> {
-    if (!messageFormats || typeof messageFormats !== "object") {
-      return {}
-    }
-
-    // Return as partial message templates (validation happens in builder)
-    return messageFormats as Partial<MessageTemplates>
-  }
-
-  /**
-   * Validate and convert engine type string to EngineType
-   */
-  private validateEngineType(engineType: string): EngineType {
-    const validTypes: EngineType[] = ["goldsrc", "source", "source2"]
-    return validTypes.includes(engineType as EngineType) ? (engineType as EngineType) : "goldsrc"
-  }
 }

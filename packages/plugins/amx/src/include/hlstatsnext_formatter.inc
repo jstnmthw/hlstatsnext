@@ -25,7 +25,7 @@ stock format_event_message(const data[EventData], output[], maxlen) {
         case EVT_CONNECT: format_connect_event(data, output, maxlen);
         case EVT_DISCONNECT: format_disconnect_event(data, output, maxlen);
         case EVT_MESSAGE: format_generic_message(data, output, maxlen);
-        default: format(output, maxlen, "[HLStatsNext]: Unknown event");
+        default: format(output, maxlen, "%s: Unknown event", HLSTATSNEXT_TAG);
     }
 }
 
@@ -45,14 +45,13 @@ stock format_kill_event(const data[EventData], output[], maxlen) {
         copy(weapon_str, charsmax(weapon_str), data[weapon]);
     }
 
-    // Include skill levels if available
+    // Format: [PluginTag] killer (+skill) got +points for killing victim (-skill) with weapon
     if (data[killer_skill] > 0 && data[victim_skill] > 0) {
-        format(output, maxlen, "%s %s (^3%d^0) eliminated %s (^3%d^0) with %s for %s points",
-               tag, killer, data[killer_skill], victim, data[victim_skill],
-               weapon_str, points_str);
+        format(output, maxlen, "%s %s (+%d) got %s points for killing %s (-%d) with %s",
+               tag, killer, data[killer_skill], points_str, victim, data[victim_skill], weapon_str);
     } else {
-        format(output, maxlen, "%s %s eliminated %s with %s for %s points",
-               tag, killer, victim, weapon_str, points_str);
+        format(output, maxlen, "%s %s got %s points for killing %s with %s",
+               tag, killer, points_str, victim, weapon_str);
     }
 }
 
@@ -65,7 +64,7 @@ stock format_suicide_event(const data[EventData], output[], maxlen) {
     format_colored_points(-data[penalty], points_str, charsmax(points_str));
 
     if (data[player_skill] > 0) {
-        format(output, maxlen, "%s %s (^3%d^0) lost %s points for suicide",
+        format(output, maxlen, "%s %s (%d) lost %s points for suicide",
                tag, player, data[player_skill], points_str);
     } else {
         format(output, maxlen, "%s %s lost %s points for suicide",
@@ -91,17 +90,13 @@ stock format_action_event(const data[EventData], output[], maxlen) {
     new tag[32], player[48], points_str[16], action[80];
 
     format_colored_tag(tag, charsmax(tag));
-    format_colored_player(data[player_name], player, charsmax(player));
+    copy(player, charsmax(player), data[player_name]);  // No color for action events
     format_colored_points(data[points], points_str, charsmax(points_str));
     format_colored_action(data[action_desc], action, charsmax(action));
 
-    if (data[player_skill] > 0) {
-        format(output, maxlen, "%s %s (^3%d^0) got %s points for %s",
-               tag, player, data[player_skill], points_str, action);
-    } else {
-        format(output, maxlen, "%s %s got %s points for %s",
-               tag, player, points_str, action);
-    }
+    // Format: [PluginTag] player got +points for action
+    format(output, maxlen, "%s %s got %s points for %s",
+           tag, player, points_str, action);
 }
 
 // Format team action event
@@ -127,7 +122,7 @@ stock format_rank_event(const data[EventData], output[], maxlen) {
     new tag[32];
     format_colored_tag(tag, charsmax(tag));
 
-    format(output, maxlen, "%s You're rank ^3#%d^0 of ^3%d^0 players with a skill of ^2%d^0",
+    format(output, maxlen, "%s You're rank #%d of %d players with skill %d",
            tag, data[rank], data[total_players], data[player_skill]);
 }
 
@@ -139,7 +134,7 @@ stock format_stats_event(const data[EventData], output[], maxlen) {
     new kdr_str[16];
     format(kdr_str, charsmax(kdr_str), "%.2f", data[kdr]);
 
-    format(output, maxlen, "%s K/D: ^2%d^0/^1%d^0 (^3%s^0) | Accuracy: ^2%d%%^0 | Headshots: ^2%d%%^0 | Rank: ^3#%d^0",
+    format(output, maxlen, "%s K/D: %d/%d (%s) | Acc: %d%% | HS: %d%% | Rank: #%d",
            tag, data[kills], data[deaths], kdr_str, data[accuracy], data[headshots_percent], data[rank]);
 }
 
@@ -151,7 +146,7 @@ stock format_connect_event(const data[EventData], output[], maxlen) {
     format_colored_player(data[player_name], player, charsmax(player));
 
     if (data[country][0] != EOS) {
-        format(output, maxlen, "%s %s from ^3%s^0 connected",
+        format(output, maxlen, "%s %s from %s connected",
                tag, player, data[country]);
     } else {
         format(output, maxlen, "%s %s connected",
@@ -198,12 +193,12 @@ stock format_colored_team(const team[], output[], maxlen) {
         return;
     }
 
-    // Apply team-specific colors
+    // Apply team-specific colors using proper client_print_color codes
     if (equal(team, "TERRORIST") || equal(team, "T")) {
-        format(output, maxlen, "^1%s^0", team); // Red for terrorists
+        format(output, maxlen, "^3%s^1", team); // Team color for terrorists
     } else if (equal(team, "CT") || equal(team, "COUNTER-TERRORIST")) {
-        format(output, maxlen, "^4%s^0", team); // Blue for CT
+        format(output, maxlen, "^3%s^1", team); // Team color for CT
     } else {
-        format(output, maxlen, "^3%s^0", team); // Yellow for other teams
+        format(output, maxlen, "^4%s^1", team); // Green for other teams
     }
 }

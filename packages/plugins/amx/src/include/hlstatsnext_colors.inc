@@ -11,35 +11,35 @@
 
 // Color scheme structure
 enum ColorScheme {
-    COLOR_TAG[4],        // [HLStatsNext] tag color
-    COLOR_KILLER[4],     // Killer name color
-    COLOR_VICTIM[4],     // Victim name color
-    COLOR_POINTS_POS[4], // Positive points color
-    COLOR_POINTS_NEG[4], // Negative points color
-    COLOR_ACTION[4],     // Action text color
-    COLOR_RESET[4]       // Reset/default color
+    COLOR_TAG[8],        // Plugin tag color
+    COLOR_KILLER[8],     // Killer name color
+    COLOR_VICTIM[8],     // Victim name color
+    COLOR_POINTS_POS[8], // Positive points color
+    COLOR_POINTS_NEG[8], // Negative points color
+    COLOR_ACTION[8],     // Action text color
+    COLOR_RESET[8]       // Reset/default color
 }
 
-// Default color scheme (green tag, red killer, blue victim)
+// Default color scheme (using proper client_print_color codes)
 new const g_default_colors[ColorScheme] = {
-    "^2",  // Green for [HLStatsNext]
-    "^1",  // Red for killer
-    "^4",  // Blue for victim
-    "^2",  // Green for positive points
-    "^1",  // Red for negative points
-    "^6",  // Cyan for actions
-    "^0"   // White/default for reset
+    "^4",  // Green for plugin tag
+    "^3",  // Team color for killer
+    "^4",  // Green for victim
+    "^4",  // Green for positive points
+    "^3",  // Team color for negative points
+    "^4",  // Green for actions
+    "^1"   // Default color for reset
 };
 
 // Alternative color scheme
 new const g_alternative_colors[ColorScheme] = {
-    "^3",  // Yellow for [HLStatsNext]
-    "^1",  // Red for killer
-    "^4",  // Blue for victim
-    "^2",  // Green for positive points
-    "^1",  // Red for negative points
-    "^5",  // Magenta for actions
-    "^0"   // White/default for reset
+    "^3",  // Team color for plugin tag
+    "^3",  // Team color for killer
+    "^4",  // Green for victim
+    "^4",  // Green for positive points
+    "^3",  // Team color for negative points
+    "^4",  // Green for actions
+    "^1"   // Default color for reset
 };
 
 // Current active color scheme
@@ -52,7 +52,7 @@ stock hlstatsnext_colors_init() {
     copy_color_scheme(g_default_colors, g_current_colors);
     g_colors_enabled = true;
 
-    log_amx("[HLStatsNext] Color system initialized");
+    log_amx("%s Color system initialized", HLSTATSNEXT_TAG);
 }
 
 // Copy color scheme
@@ -69,23 +69,21 @@ stock copy_color_scheme(const source[ColorScheme], dest[ColorScheme]) {
 // Format colored text components
 stock format_colored_tag(output[], maxlen) {
     if (g_colors_enabled) {
-        format(output, maxlen, "%s[HLStatsNext]%s",
-               g_current_colors[COLOR_TAG],
-               g_current_colors[COLOR_RESET]);
+        // Format: [^4HLStatsNext^1]: - brackets/colon default, text green
+        format(output, maxlen, "^1[%sHLStatsNext^1]:",
+               g_current_colors[COLOR_TAG]);
     } else {
-        copy(output, maxlen, "[HLStatsNext]");
+        copy(output, maxlen, HLSTATSNEXT_TAG);
     }
 }
 
 stock format_colored_player(const name[], output[], maxlen, bool:is_killer = false) {
     if (g_colors_enabled) {
-        new color[4];
         if (is_killer) {
-            copy(color, charsmax(color), g_current_colors[COLOR_KILLER]);
+            format(output, maxlen, "%s%s%s", g_current_colors[COLOR_KILLER], name, g_current_colors[COLOR_RESET]);
         } else {
-            copy(color, charsmax(color), g_current_colors[COLOR_VICTIM]);
+            format(output, maxlen, "%s%s%s", g_current_colors[COLOR_VICTIM], name, g_current_colors[COLOR_RESET]);
         }
-        format(output, maxlen, "%s%s%s", color, name, g_current_colors[COLOR_RESET]);
     } else {
         copy(output, maxlen, name);
     }
@@ -100,13 +98,11 @@ stock format_colored_points(points, output[], maxlen) {
     }
 
     if (g_colors_enabled) {
-        new color[4];
         if (points > 0) {
-            copy(color, charsmax(color), g_current_colors[COLOR_POINTS_POS]);
+            format(output, maxlen, "%s%s%s", g_current_colors[COLOR_POINTS_POS], points_text, g_current_colors[COLOR_RESET]);
         } else {
-            copy(color, charsmax(color), g_current_colors[COLOR_POINTS_NEG]);
+            format(output, maxlen, "%s%s%s", g_current_colors[COLOR_POINTS_NEG], points_text, g_current_colors[COLOR_RESET]);
         }
-        format(output, maxlen, "%s%s%s", color, points_text, g_current_colors[COLOR_RESET]);
     } else {
         copy(output, maxlen, points_text);
     }
@@ -114,10 +110,7 @@ stock format_colored_points(points, output[], maxlen) {
 
 stock format_colored_action(const action[], output[], maxlen) {
     if (g_colors_enabled) {
-        format(output, maxlen, "%s%s%s",
-               g_current_colors[COLOR_ACTION],
-               action,
-               g_current_colors[COLOR_RESET]);
+        format(output, maxlen, "%s%s%s", g_current_colors[COLOR_ACTION], action, g_current_colors[COLOR_RESET]);
     } else {
         copy(output, maxlen, action);
     }
@@ -141,5 +134,5 @@ stock load_color_scheme(const scheme_name[]) {
         copy_color_scheme(g_default_colors, g_current_colors);
     }
 
-    log_amx("[HLStatsNext] Color scheme loaded: %s", scheme_name);
+    log_amx("%s Color scheme loaded: %s", HLSTATSNEXT_TAG, scheme_name);
 }

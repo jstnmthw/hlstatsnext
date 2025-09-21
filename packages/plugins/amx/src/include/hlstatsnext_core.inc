@@ -13,6 +13,7 @@
 #define HLSTATSNEXT_MAX_MESSAGE_LENGTH 191
 #define HLSTATSNEXT_MAX_PLAYERS 32
 #define HLSTATSNEXT_CONFIG_FILE "hlstatsnext.cfg"
+#define HLSTATSNEXT_TAG "[HLStatsNext]:"
 
 // Plugin state
 enum HLStatsNextState {
@@ -36,7 +37,7 @@ stock hlstatsnext_core_init() {
     g_plugin_enabled = true;
     g_debug_mode = false;
 
-    log_amx("[HLStatsNext] Core initialized");
+    log_amx("%s Core initialized", HLSTATSNEXT_TAG);
 }
 
 // Configuration loading
@@ -48,9 +49,9 @@ stock hlstatsnext_load_config() {
     if (file_exists(config_file)) {
         // Load configuration from file
         load_config_file(config_file);
-        log_amx("[HLStatsNext] Configuration loaded from %s", config_file);
+        log_amx("%s Configuration loaded from %s", HLSTATSNEXT_TAG, config_file);
     } else {
-        log_amx("[HLStatsNext] Configuration file not found, using defaults");
+        log_amx("%s Configuration file not found, using defaults", HLSTATSNEXT_TAG);
     }
 
     g_plugin_state = g_plugin_enabled ? STATE_ACTIVE : STATE_DISABLED;
@@ -99,7 +100,7 @@ stock hlstatsnext_client_connect(id) {
     if (g_debug_mode) {
         new name[32];
         get_user_name(id, name, charsmax(name));
-        log_amx("[HLStatsNext] Client connected: %s (ID: %d)", name, id);
+        log_amx("%s Client connected: %s (ID: %d)", HLSTATSNEXT_TAG, name, id);
     }
 }
 
@@ -107,14 +108,14 @@ stock hlstatsnext_client_disconnect(id) {
     if (g_debug_mode) {
         new name[32];
         get_user_name(id, name, charsmax(name));
-        log_amx("[HLStatsNext] Client disconnected: %s (ID: %d)", name, id);
+        log_amx("%s Client disconnected: %s (ID: %d)", HLSTATSNEXT_TAG, name, id);
     }
 }
 
 // Cleanup function
 stock hlstatsnext_cleanup() {
     g_plugin_state = STATE_DISABLED;
-    log_amx("[HLStatsNext] Core cleanup completed");
+    log_amx("%s Core cleanup completed", HLSTATSNEXT_TAG);
 }
 
 // Utility functions

@@ -25,6 +25,7 @@
 #include "include/hlstatsnext_parser.inc"
 #include "include/hlstatsnext_formatter.inc"
 #include "include/hlstatsnext_commands.inc"
+// #include "include/hlstatsnext_player_commands.inc"
 
 // Plugin information
 #define PLUGIN_NAME    "HLStatsNext"
@@ -41,9 +42,12 @@ public plugin_init()
   hlstatsnext_core_init();
   hlstatsnext_colors_init();
   hlstatsnext_commands_init();
-
   // Register our commands
   register_hlstatsnext_commands();
+
+  // Register player say commands
+  register_clcmd("say", "handle_say");
+  register_clcmd("say_team", "handle_say");
 
   // Log plugin initialization
   log_amx("[%s] Plugin initialized successfully (v%s)", PLUGIN_NAME, PLUGIN_VERSION);
@@ -75,4 +79,38 @@ public client_connect(id)
 public client_disconnected(id)
 {
   hlstatsnext_client_disconnect(id);
+}
+
+// Handle player say/say_team commands
+public handle_say(id) {
+  new said[192];
+  read_args(said, charsmax(said));
+  remove_quotes(said);
+
+  // Check if it's a command (starts with ! or /)
+  if (said[0] != '!' && said[0] != '/') {
+    return PLUGIN_CONTINUE;
+  }
+
+  // Get the command (remove the ! or /)
+  new command[32];
+  strtok(said[1], command, charsmax(command), said, charsmax(said), ' ');
+
+  // Convert to lowercase manually
+  for (new i = 0; i < strlen(command); i++) {
+    if (command[i] >= 'A' && command[i] <= 'Z') {
+      command[i] += 32;
+    }
+  }
+
+  // Handle help command
+  if (command[0] == 'h' && command[1] == 'e' && command[2] == 'l' && command[3] == 'p') {
+    client_print(id, print_chat, "[HLStatsNext]: Commands: !rank !stats !top10 !help");
+    return PLUGIN_HANDLED;
+  }
+
+  // Just log that a command was received
+  log_amx("Player %d used command: %s", id, command);
+
+  return PLUGIN_HANDLED;
 }

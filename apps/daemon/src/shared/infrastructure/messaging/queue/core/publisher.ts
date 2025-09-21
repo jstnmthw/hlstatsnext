@@ -202,6 +202,7 @@ export function defaultRoutingKeyMapper(event: BaseEvent): string {
     // System events
     [EventType.SERVER_SHUTDOWN]: "server.shutdown",
     [EventType.SERVER_STATS_UPDATE]: "server.stats",
+    [EventType.SERVER_AUTHENTICATED]: "server.authenticated",
     [EventType.ADMIN_ACTION]: "admin.action",
     [EventType.CHAT_MESSAGE]: "chat.message",
     [EventType.UNKNOWN]: "unknown",
@@ -225,6 +226,7 @@ export function defaultPriorityMapper(event: BaseEvent): MessagePriority {
     EventType.ACTION_TEAM,
     EventType.ACTION_WORLD,
     EventType.SERVER_SHUTDOWN,
+    EventType.SERVER_AUTHENTICATED,
   ])
 
   // Low priority events that can be processed later

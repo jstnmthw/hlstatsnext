@@ -38,6 +38,7 @@ export enum EventType {
   // System events
   SERVER_SHUTDOWN = "SERVER_SHUTDOWN",
   SERVER_STATS_UPDATE = "SERVER_STATS_UPDATE",
+  SERVER_AUTHENTICATED = "SERVER_AUTHENTICATED",
   ADMIN_ACTION = "ADMIN_ACTION",
   CHAT_MESSAGE = "CHAT_MESSAGE",
 
@@ -83,6 +84,12 @@ export interface ProcessedEvent {
   processedAt: Date
   success: boolean
   error?: string
+}
+
+// Specific event interfaces
+export interface ServerAuthenticatedEvent extends BaseEvent {
+  eventType: EventType.SERVER_AUTHENTICATED
+  serverId: number
 }
 
 // Type helpers for events with metadata

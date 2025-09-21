@@ -7,6 +7,7 @@
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import type { IngressOptions } from "@/modules/ingress/ingress.types"
 import type { IPlayerService } from "@/modules/player/player.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
@@ -24,6 +25,7 @@ import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-st
 import { DatabaseClient } from "@/database/client"
 import { QueueModule } from "@/shared/infrastructure/messaging/module"
 import { IngressService } from "@/modules/ingress/ingress.service"
+import { EventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus"
 import { PlayerEventHandler } from "@/modules/player/player.events"
 import { systemClock } from "@/shared/infrastructure/time"
 import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
@@ -50,6 +52,7 @@ export interface AppContext {
   // Infrastructure
   database: DatabaseClient
   logger: ILogger
+  eventBus: IEventBus
 
   // Queue Infrastructure (migration to queue-first)
   queueModule?: QueueModule
@@ -96,6 +99,9 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
   // Create infrastructure components
   const infrastructure = createInfrastructureComponents()
 
+  // Create EventBus for decoupled module communication
+  const eventBus = new EventBus(infrastructure.logger)
+
   // Initialize UUID service for message ID generation (CRITICAL: must be done before parsers are used)
   setUuidService(new SystemUuidService(systemClock))
   infrastructure.logger.debug("UUID service initialized for message ID generation")
@@ -131,6 +137,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     services.gameDetectionService,
     infrastructure.logger,
     systemClock,
+    eventBus,
   )
 
   const ingressService = new IngressService(
@@ -146,6 +153,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     // Infrastructure
     database: infrastructure.database,
     logger: infrastructure.logger,
+    eventBus,
 
     // Queue Infrastructure
     queueModule: queueResult.queueModule,

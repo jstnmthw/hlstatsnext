@@ -7,15 +7,30 @@ import { describe, it, expect, beforeEach, vi } from "vitest"
 import { DatabaseServerAuthenticator } from "./database-server-authenticator"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockDatabaseClient } from "@/tests/mocks/database"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
+import { EventType } from "@/shared/types/events"
 
 describe("DatabaseServerAuthenticator", () => {
   let authenticator: DatabaseServerAuthenticator
   let mockLogger: ReturnType<typeof createMockLogger>
   let mockDatabase: ReturnType<typeof createMockDatabaseClient>
+  let mockEventBus: IEventBus
 
   beforeEach(() => {
     mockLogger = createMockLogger()
     mockDatabase = createMockDatabaseClient()
+    mockEventBus = {
+      emit: vi.fn().mockResolvedValue(undefined),
+      on: vi.fn().mockReturnValue("mock-handler-id"),
+      off: vi.fn(),
+      clearHandlers: vi.fn(),
+      getStats: vi.fn().mockReturnValue({
+        totalHandlers: 0,
+        handlersByType: new Map(),
+        eventsEmitted: 0,
+        errors: 0,
+      }),
+    }
 
     // Set up specific mock functions
     mockDatabase.prisma.server.findFirst = vi.fn()
@@ -24,6 +39,7 @@ describe("DatabaseServerAuthenticator", () => {
     authenticator = new DatabaseServerAuthenticator(
       mockDatabase as unknown as DatabaseClient,
       mockLogger,
+      mockEventBus,
     )
   })
 
@@ -126,6 +142,7 @@ describe("DatabaseServerAuthenticator", () => {
       authenticator = new DatabaseServerAuthenticator(
         mockDatabase as unknown as DatabaseClient,
         mockLogger,
+        mockEventBus,
       )
 
       for (const ip of nonDockerIPs) {
@@ -194,6 +211,75 @@ describe("DatabaseServerAuthenticator", () => {
 
       expect(result).toBe(456)
       expect(mockDatabase.prisma.server.findFirst).toHaveBeenCalled()
+    })
+  })
+
+  describe("Event Emission", () => {
+    it("should emit SERVER_AUTHENTICATED event for new server authentication", async () => {
+      // Mock a successful authentication for a new server
+      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValueOnce({
+        serverId: 42,
+        name: "Test Server",
+        address: "192.168.1.100",
+        port: 27015,
+        game: "cstrike",
+        connectionType: "external",
+      } as never)
+
+      // Authenticate the server
+      const result = await authenticator.authenticateServer("192.168.1.100", 27015)
+
+      // Verify authentication succeeded
+      expect(result).toBe(42)
+
+      // Verify that the SERVER_AUTHENTICATED event was emitted
+      expect(mockEventBus.emit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: EventType.SERVER_AUTHENTICATED,
+          serverId: 42,
+          timestamp: expect.any(Date),
+        }),
+      )
+    })
+
+    it("should not emit event for already authenticated server", async () => {
+      // Cache a server first
+      await authenticator.cacheServer("192.168.1.100", 27015, 42)
+
+      // Clear the emit mock calls from previous operations
+      vi.mocked(mockEventBus.emit).mockClear()
+
+      // Authenticate the same server again (should use cache)
+      const result = await authenticator.authenticateServer("192.168.1.100", 27015)
+
+      // Verify authentication succeeded
+      expect(result).toBe(42)
+
+      // Verify that NO event was emitted (since it's not a new authentication)
+      expect(mockEventBus.emit).not.toHaveBeenCalled()
+    })
+
+    it("should handle event emission errors gracefully", async () => {
+      // Mock event emission to throw an error
+      vi.mocked(mockEventBus.emit).mockRejectedValueOnce(new Error("EventBus error"))
+
+      // Mock a successful authentication
+      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValueOnce({
+        serverId: 42,
+        name: "Test Server",
+        address: "192.168.1.100",
+        port: 27015,
+        game: "cstrike",
+        connectionType: "external",
+      } as never)
+
+      // Authentication should still succeed despite event emission error
+      const result = await authenticator.authenticateServer("192.168.1.100", 27015)
+
+      expect(result).toBe(42)
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.stringContaining("Error emitting server authentication event"),
+      )
     })
   })
 })

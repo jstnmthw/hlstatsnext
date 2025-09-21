@@ -95,16 +95,6 @@ export class HLStatsDaemon {
     this.rconScheduler = this.context.rconScheduleService
     this.databaseConnection = new DatabaseConnectionService(this.context)
 
-    // Set up callback for immediate RCON connection on new server authentication
-    this.context.ingressService.setOnNewServerAuthenticated((serverId: number) => {
-      // Execute asynchronously to avoid blocking the authentication process
-      setImmediate(() => {
-        this.rconMonitor.connectToServerImmediately(serverId).catch((error) => {
-          this.logger.error(`Failed immediate RCON connection for server ${serverId}: ${error}`)
-        })
-      })
-    })
-
     this.logger.info("Initializing HLStatsNext Daemon...")
   }
 

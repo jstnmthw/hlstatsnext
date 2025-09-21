@@ -7,8 +7,10 @@ import type { IServerAuthenticator } from "../ingress.dependencies"
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { AuthenticationResult } from "../types/ingress.types"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import { validateAddress } from "@/shared/application/validators/address-validator"
 import { validatePort } from "@/shared/application/validators/port-validator"
+import { EventType, type ServerAuthenticatedEvent } from "@/shared/types/events"
 
 /**
  * Server authenticator implementation using database
@@ -17,11 +19,11 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
   private readonly authenticatedServers = new Map<string, number>()
   private readonly loggedMessages = new Map<string, number>() // Track all rate-limited log messages
   private readonly LOG_COOLDOWN = 5 * 60 * 1000 // 5 minutes in milliseconds
-  private onNewServerAuthenticated?: (serverId: number) => void
 
   constructor(
     private readonly database: DatabaseClient,
     private readonly logger: ILogger,
+    private readonly eventBus: IEventBus,
   ) {}
 
   async authenticateServer(address: string, port: number): Promise<number | null> {
@@ -196,12 +198,17 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
           "ok",
         )
 
-        // Trigger callback for new authentications
-        if (isNewAuthentication && this.onNewServerAuthenticated) {
+        // Emit event for new authentications
+        if (isNewAuthentication) {
           try {
-            this.onNewServerAuthenticated(server.serverId)
+            const event: ServerAuthenticatedEvent = {
+              eventType: EventType.SERVER_AUTHENTICATED,
+              timestamp: new Date(),
+              serverId: server.serverId,
+            }
+            await this.eventBus.emit(event)
           } catch (error) {
-            this.logger.warn(`Error in new server authentication callback: ${error}`)
+            this.logger.warn(`Error emitting server authentication event: ${error}`)
           }
         }
 
@@ -232,13 +239,6 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
    */
   getAuthenticatedServerIds(): number[] {
     return Array.from(this.authenticatedServers.values())
-  }
-
-  /**
-   * Set callback function to be called when a new server is authenticated
-   */
-  setOnNewServerAuthenticated(callback: (serverId: number) => void): void {
-    this.onNewServerAuthenticated = callback
   }
 
   /**

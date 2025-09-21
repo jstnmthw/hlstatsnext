@@ -4,6 +4,7 @@ import type { ServerInfo } from "@/modules/server/server.types"
 import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 import type { RconConfig, ServerFailureState } from "../types/rcon.types"
 import { RetryBackoffCalculatorService } from "./retry-backoff-calculator.service"
+import { EventType, type ServerAuthenticatedEvent } from "@/shared/types/events"
 
 export interface RconMonitorConfig {
   enabled: boolean
@@ -21,6 +22,7 @@ export class RconMonitorService {
   private intervalId?: NodeJS.Timeout
   private serverStatusEnricher: IServerStatusEnricher
   private retryCalculator: RetryBackoffCalculatorService
+  private eventHandlerId?: string
 
   constructor(
     context: AppContext,
@@ -42,6 +44,12 @@ export class RconMonitorService {
 
     this.logger.ok(`Starting RCON status monitoring (interval: ${this.config.statusInterval}ms)`)
 
+    // Subscribe to SERVER_AUTHENTICATED events for immediate RCON connections
+    this.eventHandlerId = this.context.eventBus.on(
+      EventType.SERVER_AUTHENTICATED,
+      this.handleServerAuthenticated.bind(this),
+    )
+
     // Attempt immediate connection on startup
     this.performInitialMonitoring()
 
@@ -56,11 +64,31 @@ export class RconMonitorService {
   }
 
   stop(): void {
+    // Unsubscribe from events
+    if (this.eventHandlerId) {
+      this.context.eventBus.off(this.eventHandlerId)
+      this.eventHandlerId = undefined
+    }
+
+    // Stop interval monitoring
     if (this.intervalId) {
       clearInterval(this.intervalId)
       this.intervalId = undefined
-      this.logger.info("RCON monitoring stopped")
     }
+
+    this.logger.info("RCON monitoring stopped")
+  }
+
+  /**
+   * Handle SERVER_AUTHENTICATED events for immediate RCON connections
+   */
+  private async handleServerAuthenticated(event: ServerAuthenticatedEvent): Promise<void> {
+    // Execute asynchronously to avoid blocking the event emission
+    setImmediate(() => {
+      this.connectToServerImmediately(event.serverId).catch((error) => {
+        this.logger.error(`Failed immediate RCON connection for server ${event.serverId}: ${error}`)
+      })
+    })
   }
 
   private performInitialMonitoring(): void {

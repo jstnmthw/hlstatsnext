@@ -45,11 +45,17 @@ const mockDatabaseConnection = {
 const mockContext = {
   logger: createMockLogger(),
   database: createMockDatabaseClient(),
+  eventBus: {
+    emit: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
+    clearHandlers: vi.fn(),
+    getStats: vi.fn(),
+  },
   ingressService: {
     start: vi.fn(),
     stop: vi.fn(),
     processRawEvent: vi.fn().mockResolvedValue(null),
-    setOnNewServerAuthenticated: vi.fn(),
   },
   rconService: {
     disconnectAll: vi.fn(),

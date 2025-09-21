@@ -136,10 +136,6 @@ export class IngressService implements IIngressService {
     return this.dependencies.serverAuthenticator.getAuthenticatedServerIds()
   }
 
-  setOnNewServerAuthenticated(callback: (serverId: number) => void): void {
-    this.dependencies.serverAuthenticator.setOnNewServerAuthenticated(callback)
-  }
-
   private async handleLogLine(
     logLine: string,
     serverAddress: string,

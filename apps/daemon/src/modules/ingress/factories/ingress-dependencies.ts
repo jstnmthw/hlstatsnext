@@ -9,6 +9,7 @@ import type { IServerService } from "@/modules/server/server.types"
 import type { IGameDetectionService } from "@/modules/game/game-detection.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IClock } from "@/shared/infrastructure/time/clock.interface"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import { DatabaseServerAuthenticator } from "../adapters/database-server-authenticator"
 import { GameDetectorAdapter } from "../adapters/game-detector-adapter"
 import { ServerOrchestrator } from "@/modules/server/orchestrators/server-orchestrator"
@@ -22,11 +23,12 @@ export function createIngressDependencies(
   gameDetectionService: IGameDetectionService,
   logger: ILogger,
   clock: IClock,
+  eventBus: IEventBus,
 ): IngressDependencies {
   const serverOrchestrator = new ServerOrchestrator(database, serverService, logger)
 
   return {
-    serverAuthenticator: new DatabaseServerAuthenticator(database, logger),
+    serverAuthenticator: new DatabaseServerAuthenticator(database, logger, eventBus),
     gameDetector: new GameDetectorAdapter(gameDetectionService),
     serverInfoProvider: serverOrchestrator,
     clock,

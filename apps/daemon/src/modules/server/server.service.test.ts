@@ -35,7 +35,7 @@ describe("ServerService", () => {
   beforeEach(() => {
     mockLogger = createMockLogger()
     mockRepository = createMockServerRepository()
-    serverService = new ServerService(mockRepository as IServerRepository, mockLogger)
+    serverService = new ServerService(mockRepository as unknown as IServerRepository, mockLogger)
   })
 
   describe("Service instantiation", () => {

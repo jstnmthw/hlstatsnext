@@ -18,5 +18,7 @@ export function createMockServerService(): IServerService {
     getServerConfig: vi.fn().mockResolvedValue(null),
     hasRconCredentials: vi.fn().mockResolvedValue(false),
     findActiveServersWithRcon: vi.fn().mockResolvedValue([]),
+    findServersByIds: vi.fn().mockResolvedValue([]),
+    findAllServersWithRcon: vi.fn().mockResolvedValue([]),
   }
 }

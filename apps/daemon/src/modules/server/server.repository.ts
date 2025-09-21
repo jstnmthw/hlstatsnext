@@ -143,6 +143,90 @@ export class ServerRepository implements IServerRepository {
     }
   }
 
+  async findServersByIds(serverIds: number[]): Promise<ServerInfo[]> {
+    try {
+      if (serverIds.length === 0) {
+        return []
+      }
+
+      const servers = await this.database.prisma.server.findMany({
+        where: {
+          AND: [
+            {
+              serverId: {
+                in: serverIds,
+              },
+            },
+            {
+              rconPassword: {
+                not: "",
+              },
+            },
+          ],
+        },
+        select: {
+          serverId: true,
+          game: true,
+          name: true,
+          address: true,
+          port: true,
+          lastEvent: true,
+          activeMap: true,
+        },
+      })
+
+      return servers.map((server) => ({
+        serverId: server.serverId,
+        game: server.game,
+        name: server.name,
+        address: server.address,
+        port: server.port,
+        lastEvent: server.lastEvent || undefined,
+        activeMap: server.activeMap || undefined,
+      }))
+    } catch (error) {
+      this.logger.error(`Failed to find servers by IDs ${serverIds.join(", ")}: ${error}`)
+      return []
+    }
+  }
+
+  async findAllServersWithRcon(): Promise<ServerInfo[]> {
+    try {
+      const servers = await this.database.prisma.server.findMany({
+        where: {
+          rconPassword: {
+            not: "",
+          },
+        },
+        select: {
+          serverId: true,
+          game: true,
+          name: true,
+          address: true,
+          port: true,
+          lastEvent: true,
+          activeMap: true,
+        },
+        orderBy: {
+          lastEvent: "desc",
+        },
+      })
+
+      return servers.map((server) => ({
+        serverId: server.serverId,
+        game: server.game,
+        name: server.name,
+        address: server.address,
+        port: server.port,
+        lastEvent: server.lastEvent || undefined,
+        activeMap: server.activeMap || undefined,
+      }))
+    } catch (error) {
+      this.logger.error(`Failed to find all servers with RCON: ${error}`)
+      return []
+    }
+  }
+
   async getModDefault(modCode: string, parameter: string): Promise<string | null> {
     try {
       const row = await this.database.prisma.modDefault.findUnique({

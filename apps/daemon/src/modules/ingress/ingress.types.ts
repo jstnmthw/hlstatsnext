@@ -30,6 +30,7 @@ export interface IIngressService {
     serverPort: number,
   ): Promise<BaseEvent | null>
   authenticateServer(address: string, port: number): Promise<number | null>
+  getAuthenticatedServerIds(): number[]
 }
 
 export interface IngressStats {

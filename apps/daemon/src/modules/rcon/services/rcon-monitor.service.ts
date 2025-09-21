@@ -78,26 +78,52 @@ export class RconMonitorService {
 
   private async monitorActiveServers(): Promise<void> {
     try {
-      const activeServers = await this.context.serverService.findActiveServersWithRcon()
+      // Get servers with recent events (traditional discovery)
+      const recentlyActiveServers = await this.context.serverService.findActiveServersWithRcon()
 
-      if (activeServers.length === 0) {
+      // Get currently authenticated servers (new discovery method)
+      const authenticatedServerIds = this.context.ingressService.getAuthenticatedServerIds()
+      const authenticatedServers =
+        await this.context.serverService.findServersByIds(authenticatedServerIds)
+
+      // Combine both sets, deduplicating by serverId
+      const serverMap = new Map<number, ServerInfo>()
+
+      // Add recently active servers
+      for (const server of recentlyActiveServers) {
+        serverMap.set(server.serverId, server)
+      }
+
+      // Add authenticated servers (will overwrite if duplicate, which is fine)
+      for (const server of authenticatedServers) {
+        serverMap.set(server.serverId, server)
+      }
+
+      const allCandidateServers = Array.from(serverMap.values())
+
+      if (allCandidateServers.length === 0) {
         this.logger.warn("No active servers with RCON found for monitoring")
         return
       }
 
+      this.logger.debug(
+        `Discovered ${allCandidateServers.length} server(s) for RCON monitoring ` +
+          `(${recentlyActiveServers.length} recent events, ${authenticatedServers.length} authenticated)`,
+      )
+
       // Filter servers based on retry logic
-      const serversToMonitor = activeServers.filter((server) => {
+      const serversToMonitor = allCandidateServers.filter((server) => {
         const failureState = this.retryCalculator.getFailureState(server.serverId)
         return this.retryCalculator.shouldRetry(failureState)
       })
 
-      const skippedCount = activeServers.length - serversToMonitor.length
+      const skippedCount = allCandidateServers.length - serversToMonitor.length
       if (skippedCount > 0) {
         this.logger.debug(`Skipped ${skippedCount} servers in backoff period`)
       }
 
       this.logger.debug(
-        `Monitoring ${serversToMonitor.length} of ${activeServers.length} active server(s) with RCON`,
+        `Monitoring ${serversToMonitor.length} of ${allCandidateServers.length} server(s) with RCON`,
       )
 
       // Process servers concurrently but with individual error handling

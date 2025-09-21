@@ -57,6 +57,7 @@ describe("IngressService", () => {
       serverAuthenticator: {
         authenticateServer: vi.fn().mockResolvedValue(1),
         cacheServer: vi.fn().mockResolvedValue(undefined),
+        getAuthenticatedServerIds: vi.fn().mockReturnValue([]),
       },
       gameDetector: {
         detectGame: vi.fn().mockResolvedValue({

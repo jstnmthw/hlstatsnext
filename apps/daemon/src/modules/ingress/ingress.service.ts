@@ -132,6 +132,10 @@ export class IngressService implements IIngressService {
     return await this.dependencies.serverAuthenticator.authenticateServer(address, port)
   }
 
+  getAuthenticatedServerIds(): number[] {
+    return this.dependencies.serverAuthenticator.getAuthenticatedServerIds()
+  }
+
   private async handleLogLine(
     logLine: string,
     serverAddress: string,

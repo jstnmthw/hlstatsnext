@@ -21,6 +21,12 @@ export interface IServerAuthenticator {
    * Cache a server ID for a given address and port
    */
   cacheServer(address: string, port: number, serverId: number): Promise<void>
+
+  /**
+   * Get currently authenticated server IDs
+   * Useful for RCON monitoring to discover active servers
+   */
+  getAuthenticatedServerIds(): number[]
 }
 
 /**

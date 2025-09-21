@@ -8,6 +8,8 @@ export interface IServerService {
   getServerModType(serverId: number): Promise<string>
   hasRconCredentials(serverId: number): Promise<boolean>
   findActiveServersWithRcon(maxAgeMinutes?: number): Promise<ServerInfo[]>
+  findServersByIds(serverIds: number[]): Promise<ServerInfo[]>
+  findAllServersWithRcon(): Promise<ServerInfo[]>
 
   // Event handlers for server events
   handleServerShutdown?(serverId: number): Promise<void>
@@ -38,6 +40,8 @@ export interface IServerRepository {
   getServerConfig(serverId: number, parameter: string): Promise<string | null>
   hasRconCredentials(serverId: number): Promise<boolean>
   findActiveServersWithRcon(maxAgeMinutes?: number): Promise<ServerInfo[]>
+  findServersByIds(serverIds: number[]): Promise<ServerInfo[]>
+  findAllServersWithRcon(): Promise<ServerInfo[]>
 
   // RCON status enrichment methods
   updateServerStatusFromRcon(serverId: number, status: ServerStatusUpdate): Promise<void>

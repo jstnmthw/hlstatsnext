@@ -220,6 +220,20 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
   }
 
   /**
+   * Get currently authenticated server IDs
+   * Useful for RCON monitoring to discover active servers
+   */
+  getAuthenticatedServerIds(): number[] {
+    const serverIds: number[] = []
+    for (const serverId of this.authenticatedServers.values()) {
+      if (serverId !== INGRESS_CONSTANTS.DEV_AUTH_SENTINEL) {
+        serverIds.push(serverId)
+      }
+    }
+    return serverIds
+  }
+
+  /**
    * Clear authentication cache
    */
   clearCache(): void {

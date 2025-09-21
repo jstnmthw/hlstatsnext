@@ -30,6 +30,8 @@ const createMockServerService = (): IServerService => ({
   getServerConfigBoolean: vi.fn().mockResolvedValue(false),
   hasRconCredentials: vi.fn().mockResolvedValue(false),
   findActiveServersWithRcon: vi.fn().mockResolvedValue([]),
+  findServersByIds: vi.fn().mockResolvedValue([]),
+  findAllServersWithRcon: vi.fn().mockResolvedValue([]),
   handleServerShutdown: vi.fn(),
   handleStatsUpdate: vi.fn(),
   handleAdminAction: vi.fn(),

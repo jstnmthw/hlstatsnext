@@ -115,26 +115,6 @@ External servers require exact address and port matching:
 - **Validation**: Comprehensive address and port validation with security checks
 - **Automatic Registration**: Servers can be auto-created with proper configuration seeding
 
-### Development Mode
-
-Development environments support bypass authentication for rapid testing:
-
-- **Skip Authentication**: `skipAuth: true` bypasses database validation
-- **Development Sentinel**: Special server ID for dev environments (`-1`)
-- **Flexible Game Detection**: Defaults to configurable game type for development
-
-```typescript
-// Authentication flow
-const serverId = await authenticator.authenticateServer(address, port)
-if (serverId === null) {
-  // Server not authorized - reject connection
-} else if (serverId === INGRESS_CONSTANTS.DEV_AUTH_SENTINEL) {
-  // Development mode - allow with default configuration
-} else {
-  // Production server - use database configuration
-}
-```
-
 ## Server Status Enrichment
 
 The daemon implements real-time server status enrichment via RCON connections, providing accurate player counts and server information as the single source of truth.

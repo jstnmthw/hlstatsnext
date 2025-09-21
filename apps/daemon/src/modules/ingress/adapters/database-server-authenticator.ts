@@ -7,7 +7,6 @@ import type { IServerAuthenticator } from "../ingress.dependencies"
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { AuthenticationResult } from "../types/ingress.types"
-import { INGRESS_CONSTANTS } from "../types/ingress.types"
 import { validateAddress } from "@/shared/application/validators/address-validator"
 import { validatePort } from "@/shared/application/validators/port-validator"
 
@@ -134,8 +133,6 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
     switch (result.kind) {
       case "authenticated":
         return result.serverId
-      case "dev-mode":
-        return INGRESS_CONSTANTS.DEV_AUTH_SENTINEL
       case "unauthorized":
         return null
       default: {
@@ -154,9 +151,7 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
     // Check cache first
     if (this.authenticatedServers.has(serverKey)) {
       const serverId = this.authenticatedServers.get(serverKey)!
-      return serverId === INGRESS_CONSTANTS.DEV_AUTH_SENTINEL
-        ? { kind: "dev-mode" }
-        : { kind: "authenticated", serverId }
+      return { kind: "authenticated", serverId }
     }
 
     // Look up server in database
@@ -224,13 +219,7 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
    * Useful for RCON monitoring to discover active servers
    */
   getAuthenticatedServerIds(): number[] {
-    const serverIds: number[] = []
-    for (const serverId of this.authenticatedServers.values()) {
-      if (serverId !== INGRESS_CONSTANTS.DEV_AUTH_SENTINEL) {
-        serverIds.push(serverId)
-      }
-    }
-    return serverIds
+    return Array.from(this.authenticatedServers.values())
   }
 
   /**

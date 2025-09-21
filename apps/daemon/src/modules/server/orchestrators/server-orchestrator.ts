@@ -9,7 +9,6 @@ import type { IServerService } from "@/modules/server/server.types"
 import type { IServerInfoProvider } from "@/modules/ingress/ingress.dependencies"
 import type { Prisma } from "@repo/database/client"
 
-import { INGRESS_CONSTANTS } from "@/modules/ingress/types/ingress.types"
 import { validateAddress } from "@/shared/application/validators/address-validator"
 import { validatePort } from "@/shared/application/validators/port-validator"
 import { validateGameCode } from "@/shared/application/validators/game-code-validator"
@@ -34,11 +33,6 @@ export class ServerOrchestrator implements IServerInfoProvider {
   }
 
   async getServerGame(serverId: number): Promise<string> {
-    // Handle development mode special ID
-    if (serverId === INGRESS_CONSTANTS.DEV_AUTH_SENTINEL) {
-      return INGRESS_CONSTANTS.DEFAULT_DEV_GAME
-    }
-
     return this.serverService.getServerGame(serverId)
   }
 

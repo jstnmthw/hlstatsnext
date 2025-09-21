@@ -102,7 +102,7 @@ export class RconMonitorService {
       const allCandidateServers = Array.from(serverMap.values())
 
       if (allCandidateServers.length === 0) {
-        this.logger.warn("No active servers with RCON found for monitoring")
+        this.logger.info("No active servers with RCON found for monitoring")
         return
       }
 

@@ -267,11 +267,17 @@ export class PlayerSessionService implements IPlayerSessionService {
       )
 
       // Create session from RCON data
+      // Apply same unique ID logic for bots as in createSessionFromPlayerInfo
+      const steamId =
+        matchingPlayer.isBot && matchingPlayer.uniqueid === "BOT"
+          ? `BOT:${matchingPlayer.name}`
+          : matchingPlayer.uniqueid || "UNKNOWN"
+
       const sessionData = {
         serverId,
         gameUserId: matchingPlayer.userid,
         databasePlayerId: playerId,
-        steamId: matchingPlayer.uniqueid || "UNKNOWN",
+        steamId,
         playerName: player.lastName,
         isBot: matchingPlayer.isBot, // Use the isBot field from RCON PlayerInfo directly
       }
@@ -382,8 +388,16 @@ export class PlayerSessionService implements IPlayerSessionService {
     try {
       // For bots, we still need a database entry if we're tracking them
       const game = await this.serverService.getServerGame(serverId)
+
+      // Create unique Steam ID for bots to avoid collisions
+      // All bots normally have uniqueid "BOT", so we make it unique per bot name
+      const uniqueId =
+        playerInfo.isBot && playerInfo.uniqueid === "BOT"
+          ? `BOT:${playerInfo.name}`
+          : playerInfo.uniqueid
+
       databasePlayerId = await this.playerResolver.getOrCreatePlayer(
-        playerInfo.uniqueid,
+        uniqueId,
         playerInfo.name,
         game,
       )

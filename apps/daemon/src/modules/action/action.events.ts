@@ -142,11 +142,41 @@ export class ActionEventHandler extends BaseModuleEventHandler {
             `Resolved gameUserId ${data.gameUserId} to database playerId ${session.databasePlayerId} for action event`,
           )
         } else {
-          this.logger.warn(
-            `No session found for gameUserId ${data.gameUserId} on server ${event.serverId}, action may fail`,
+          // Try to create a fallback session for the player
+          this.logger.debug(
+            `No session found for gameUserId ${data.gameUserId} on server ${event.serverId}, attempting fallback session creation`,
           )
-          // Keep the original gameUserId as playerId as fallback (though this may cause issues)
-          resolved.playerId = data.gameUserId
+
+          try {
+            // Try to synchronize sessions for this server to create missing sessions
+            await this.sessionService.synchronizeServerSessions(event.serverId, {
+              clearExisting: false,
+            })
+
+            // Try to get the session again after synchronization
+            const fallbackSession = await this.sessionService.getSessionByGameUserId(
+              event.serverId,
+              data.gameUserId,
+            )
+
+            if (fallbackSession) {
+              resolved.playerId = fallbackSession.databasePlayerId
+              this.logger.debug(
+                `Created fallback session for gameUserId ${data.gameUserId} -> playerId ${fallbackSession.databasePlayerId}`,
+              )
+            } else {
+              // Last resort: use gameUserId as playerId
+              this.logger.warn(
+                `Could not create session for gameUserId ${data.gameUserId} on server ${event.serverId}, using gameUserId as fallback`,
+              )
+              resolved.playerId = data.gameUserId
+            }
+          } catch (error) {
+            this.logger.warn(
+              `Failed to create fallback session for gameUserId ${data.gameUserId} on server ${event.serverId}: ${error}`,
+            )
+            resolved.playerId = data.gameUserId
+          }
         }
 
         // Remove gameUserId from resolved data since ActionEvent expects playerId

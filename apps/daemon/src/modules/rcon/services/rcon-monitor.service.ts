@@ -161,7 +161,6 @@ export class RconMonitorService {
         `Attempting RCON connection to server ${server.serverId} (${server.address}:${server.port})...`,
       )
       await this.context.rconService.connect(server.serverId)
-      this.logger.ok(`RCON connected to server ${server.serverId} (${server.name})`)
     } else {
       this.logger.debug(`RCON already connected to server ${server.serverId}, getting status...`)
     }
@@ -220,5 +219,65 @@ export class RconMonitorService {
    */
   getAllFailureStates(): ServerFailureState[] {
     return this.retryCalculator.getAllFailureStates()
+  }
+
+  /**
+   * Immediately attempt RCON connection for a specific server
+   * Used for newly authenticated servers to avoid waiting for periodic check
+   */
+  async connectToServerImmediately(serverId: number): Promise<void> {
+    try {
+      const server = await this.context.serverService.findById(serverId)
+      if (!server) {
+        this.logger.warn(`Server ${serverId} not found for immediate RCON connection`)
+        return
+      }
+
+      // Check if server has RCON credentials
+      const hasRcon = await this.context.serverService.hasRconCredentials(serverId)
+      if (!hasRcon) {
+        this.logger.debug(
+          `Server ${serverId} has no RCON credentials, skipping immediate connection`,
+        )
+        return
+      }
+
+      // Check retry logic before attempting connection
+      const failureState = this.retryCalculator.getFailureState(serverId)
+      if (!this.retryCalculator.shouldRetry(failureState)) {
+        this.logger.debug(
+          `Server ${serverId} is in backoff period, skipping immediate connection attempt`,
+        )
+        return
+      }
+
+      // Check if server is already connected (from initial monitoring)
+      const wasAlreadyConnected = this.context.rconService.isConnected(serverId)
+
+      this.logger.info(
+        `Attempting immediate RCON connection for newly authenticated server ${serverId}`,
+      )
+      await this.ensureServerConnection(server)
+
+      // Only enrich status if we actually made a new connection
+      // If already connected, initial monitoring already handled the enrichment
+      if (!wasAlreadyConnected) {
+        await this.enrichServerStatus(server)
+
+        // Synchronize player sessions to ensure BOTs and players have sessions created
+        try {
+          this.logger.debug(`Synchronizing player sessions for newly connected server ${serverId}`)
+          const sessionCount = await this.context.sessionService.synchronizeServerSessions(serverId)
+          this.logger.debug(`Created ${sessionCount} player sessions for server ${serverId}`)
+        } catch (error) {
+          this.logger.warn(`Failed to synchronize sessions for server ${serverId}: ${error}`)
+        }
+      }
+
+      // Reset failure state on successful operations
+      this.retryCalculator.resetFailureState(server.serverId)
+    } catch (error) {
+      this.logger.error(`Error in immediate RCON connection for server ${serverId}: ${error}`)
+    }
   }
 }

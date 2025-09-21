@@ -9,6 +9,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { IngressOptions } from "@/modules/ingress/ingress.types"
 import type { IPlayerService } from "@/modules/player/player.types"
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IWeaponService } from "@/modules/weapon/weapon.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
@@ -67,6 +68,7 @@ export interface AppContext {
   rconService: IRconService
   rconScheduleService: IRconScheduleService
   serverStatusEnricher: IServerStatusEnricher
+  sessionService: IPlayerSessionService
 
   // Module Event Handlers
   playerEventHandler: PlayerEventHandler
@@ -162,6 +164,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     rconService: services.rconService,
     rconScheduleService: services.rconScheduleService,
     serverStatusEnricher: services.serverStatusEnricher,
+    sessionService: services.sessionService,
 
     // Event Handlers
     playerEventHandler: eventComponents.playerEventHandler,

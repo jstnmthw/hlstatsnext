@@ -34,6 +34,7 @@ const mockEventPublisher = {
 const mockRconMonitor = {
   start: vi.fn(),
   stop: vi.fn(),
+  connectToServerImmediately: vi.fn(),
 }
 
 const mockDatabaseConnection = {
@@ -48,6 +49,7 @@ const mockContext = {
     start: vi.fn(),
     stop: vi.fn(),
     processRawEvent: vi.fn().mockResolvedValue(null),
+    setOnNewServerAuthenticated: vi.fn(),
   },
   rconService: {
     disconnectAll: vi.fn(),

@@ -27,6 +27,11 @@ export interface IServerAuthenticator {
    * Useful for RCON monitoring to discover active servers
    */
   getAuthenticatedServerIds(): number[]
+
+  /**
+   * Set callback function to be called when a new server is authenticated
+   */
+  setOnNewServerAuthenticated(callback: (serverId: number) => void): void
 }
 
 /**

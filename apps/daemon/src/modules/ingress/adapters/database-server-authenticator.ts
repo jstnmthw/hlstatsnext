@@ -17,6 +17,7 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
   private readonly authenticatedServers = new Map<string, number>()
   private readonly loggedMessages = new Map<string, number>() // Track all rate-limited log messages
   private readonly LOG_COOLDOWN = 5 * 60 * 1000 // 5 minutes in milliseconds
+  private onNewServerAuthenticated?: (serverId: number) => void
 
   constructor(
     private readonly database: DatabaseClient,
@@ -187,12 +188,23 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
       }
 
       if (server) {
+        const isNewAuthentication = !this.authenticatedServers.has(serverKey)
         this.authenticatedServers.set(serverKey, server.serverId)
         this.logWithRateLimit(
           `auth-success-${serverKey}`,
           `Authenticated server ${serverKey} as ID ${server.serverId}`,
           "ok",
         )
+
+        // Trigger callback for new authentications
+        if (isNewAuthentication && this.onNewServerAuthenticated) {
+          try {
+            this.onNewServerAuthenticated(server.serverId)
+          } catch (error) {
+            this.logger.warn(`Error in new server authentication callback: ${error}`)
+          }
+        }
+
         return { kind: "authenticated", serverId: server.serverId }
       } else {
         this.logWithRateLimit(
@@ -220,6 +232,13 @@ export class DatabaseServerAuthenticator implements IServerAuthenticator {
    */
   getAuthenticatedServerIds(): number[] {
     return Array.from(this.authenticatedServers.values())
+  }
+
+  /**
+   * Set callback function to be called when a new server is authenticated
+   */
+  setOnNewServerAuthenticated(callback: (serverId: number) => void): void {
+    this.onNewServerAuthenticated = callback
   }
 
   /**

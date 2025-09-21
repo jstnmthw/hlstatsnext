@@ -163,7 +163,7 @@ export interface IPlayerSessionService {
   /**
    * Initialize sessions from current server status (for daemon startup)
    */
-  synchronizeServerSessions(serverId: number): Promise<number>
+  synchronizeServerSessions(serverId: number, options?: SessionSyncOptions): Promise<number>
 
   /**
    * Convert database player IDs to game user IDs for RCON commands

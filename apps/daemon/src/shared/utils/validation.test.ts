@@ -35,6 +35,25 @@ describe("Validation Utilities", () => {
       expect(validateSteamId("bOt")).toBe(true)
     })
 
+    it("should accept BOT:name format as valid Steam ID", () => {
+      expect(validateSteamId("BOT:Easy")).toBe(true)
+      expect(validateSteamId("BOT:Hard")).toBe(true)
+      expect(validateSteamId("BOT:Expert")).toBe(true)
+      expect(validateSteamId("BOT:Bot_Name_123")).toBe(true)
+      expect(validateSteamId("BOT:Player-Name")).toBe(true)
+      expect(validateSteamId("BOT:Test Bot")).toBe(true)
+      expect(validateSteamId("bot:lowercase")).toBe(true)
+      expect(validateSteamId("Bot:MixedCase")).toBe(true)
+      expect(validateSteamId("bOt:WeIrDcAsE")).toBe(true)
+    })
+
+    it("should handle BOT edge cases", () => {
+      expect(validateSteamId("BOT:")).toBe(true) // Empty name after colon
+      expect(validateSteamId("BOT: ")).toBe(true) // Just space after colon
+      expect(validateSteamId("BOT:  Multiple  Spaces  ")).toBe(true)
+      expect(validateSteamId(" BOT:Name ")).toBe(true) // Whitespace around entire string
+    })
+
     it("should reject invalid Steam ID formats (after normalization)", () => {
       const invalidSteamIds = [
         "1234567890123456", // 16 digits
@@ -387,7 +406,10 @@ describe("Validation Utilities", () => {
 
     it("should handle bot scenarios", () => {
       expect(validateSteamId("BOT")).toBe(true)
+      expect(validateSteamId("BOT:Easy")).toBe(true)
+      expect(validateSteamId("BOT:Expert Bot")).toBe(true)
       expect(validatePlayerName("Bot_Easy")).toBe(true)
+      expect(validatePlayerName("Expert Bot")).toBe(true)
       expect(sanitizePlayerName("Bot Expert (Hard)")).toBe("Bot_Expert_Hard")
     })
 

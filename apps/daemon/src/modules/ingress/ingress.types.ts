@@ -31,6 +31,7 @@ export interface IIngressService {
   ): Promise<BaseEvent | null>
   authenticateServer(address: string, port: number): Promise<number | null>
   getAuthenticatedServerIds(): number[]
+  setOnNewServerAuthenticated(callback: (serverId: number) => void): void
 }
 
 export interface IngressStats {

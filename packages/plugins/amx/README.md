@@ -93,13 +93,13 @@ Edit `configs/hlstatsnext.cfg` to customize:
 
 ## Color Codes
 
-The plugin uses Counter-Strike 1.6 compatible color codes with `client_print_color()`:
+The plugin uses color codes with `client_print_color()` for supported games:
 
 - `^1` - Default/White text
 - `^3` - Team color (red/blue based on player's team)
 - `^4` - Green text
 
-**Note**: Only `^1`, `^3`, and `^4` are supported in CS 1.6. The plugin's color scheme is designed around these limitations:
+**Important**: The `client_print_color()` function only works with **Counter-Strike 1.6 and Condition Zero**. For other GoldSRC games (Team Fortress Classic, Day of Defeat, Half-Life, etc.), the plugin will fall back to `client_print()` without color support. Only `^1`, `^3`, and `^4` color codes are supported in the compatible games. The plugin's color scheme is designed around these limitations:
 
 - Plugin tag "HLStatsNext" uses `^4` (green)
 - Brackets and colons use `^1` (default)
@@ -125,8 +125,8 @@ The plugin follows a modular architecture with separate include files for differ
 1. **Daemon** sends structured command via RCON: `hlx_event 0 KILL 5 "Player1" 1500 12 "Player2" 1450 15 ak47 0`
 2. **Parser** uses `read_argv()` to extract event type and data fields (proper quote handling)
 3. **Event Processor** processes the specific event type in dedicated function
-4. **Formatter** applies CS 1.6 compatible colors and creates presentation message
-5. **Output** displays formatted message using `client_print_color()` with proper sender parameter
+4. **Formatter** applies colors (if supported by the game) and creates presentation message
+5. **Output** displays formatted message using `client_print_color()` for CS 1.6/CZ or `client_print()` for other GoldSRC games
 
 ### Key Technical Improvements
 
@@ -231,11 +231,12 @@ Player sees: [HLX] You're rank #42 of 1,243 players with a skill of 1,850
 
 ### Colors Not Displaying
 
-- Verify you're using CS 1.6 compatible color codes (`^1`, `^3`, `^4` only)
+- Verify you're running Counter-Strike 1.6 or Condition Zero (other GoldSRC games don't support colored chat)
+- Check that you're using compatible color codes (`^1`, `^3`, `^4` only)
 - Check hlstatsnext.cfg color settings
 - Ensure colors are enabled in configuration
 - Verify formatter is applying colors to parsed events
-- Make sure `client_print_color()` is used instead of `client_print()`
+- Make sure `client_print_color()` is used instead of `client_print()` for supported games
 
 ### Events Not Processing
 

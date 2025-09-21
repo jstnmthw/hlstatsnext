@@ -1,6 +1,6 @@
 # HLStatsNext AMX Mod X Plugin
 
-A sophisticated event processing plugin for AMX Mod X that handles structured commands from the HLStatsNext daemon. The plugin receives structured event data and handles all presentation formatting, including colors and localization.
+An event processing plugin for AMX Mod X that handles structured commands from the HLStatsNext daemon. The plugin receives structured event data and handles all presentation formatting, including colors and localization.
 
 ## Features
 
@@ -8,6 +8,7 @@ A sophisticated event processing plugin for AMX Mod X that handles structured co
 - **Complete Presentation Control**: Handles all message formatting, colors, and localization in the plugin
 - **Event-Driven Architecture**: Processes kill, suicide, teamkill, action, connect, and disconnect events
 - **Colored Messages**: Beautiful, colored message formatting with configurable schemes
+- **Player Commands**: Support for `!rank`, `!stats`, `!help`, `!top10` commands
 - **Clean Separation**: Daemon handles data, plugin handles presentation
 - **Performance Optimized**: Minimal impact on server performance
 - **Security Focused**: Input validation and access control
@@ -92,41 +93,53 @@ Edit `configs/hlstatsnext.cfg` to customize:
 
 ## Color Codes
 
-The plugin uses AMX Mod X color codes:
+The plugin uses Counter-Strike 1.6 compatible color codes with `client_print_color()`:
 
-- `^0` - Default/White
-- `^1` - Red
-- `^2` - Green
-- `^3` - Yellow
-- `^4` - Blue
-- `^5` - Magenta
-- `^6` - Cyan
-- `^7` - White
-- `^8` - Gray
+- `^1` - Default/White text
+- `^3` - Team color (red/blue based on player's team)
+- `^4` - Green text
+
+**Note**: Only `^1`, `^3`, and `^4` are supported in CS 1.6. The plugin's color scheme is designed around these limitations:
+
+- Plugin tag "HLStatsNext" uses `^4` (green)
+- Brackets and colons use `^1` (default)
+- Killer names use `^3` (team color)
+- Victim names and positive points use `^4` (green)
+- Action event player names use default color (no coloring)
 
 ## Plugin Architecture
 
 The plugin follows a modular architecture with separate include files for different functionality:
 
-- **hlstatsnext_core.inc**: Core functionality and lifecycle management
+- **hlstatsnext_core.inc**: Core functionality, lifecycle management, and configurable constants
 - **hlstatsnext_events.inc**: Event type definitions and data structures
-- **hlstatsnext_parser.inc**: Structured command parsing logic
-- **hlstatsnext_formatter.inc**: Message formatting and color presentation
-- **hlstatsnext_commands.inc**: Command registration and handlers
+- **hlstatsnext_parser.inc**: Structured command parsing logic using `read_argv()`
+- **hlstatsnext_formatter.inc**: Message formatting and color presentation with CS 1.6 compatibility
+- **hlstatsnext_commands.inc**: Command registration and event processors
+- **hlstatsnext_colors.inc**: Color scheme management and formatting functions
 - **hlstatsnext_util.inc**: Utility functions and helpers
+- **hlstatsnext_messages.inc**: Basic message processing (simplified after refactor)
 
 ### Structured Command Processing Flow
 
 1. **Daemon** sends structured command via RCON: `hlx_event 0 KILL 5 "Player1" 1500 12 "Player2" 1450 15 ak47 0`
-2. **Parser** extracts event type and data fields
-3. **Formatter** applies colors and creates presentation message
-4. **Output** displays formatted message to players
+2. **Parser** uses `read_argv()` to extract event type and data fields (proper quote handling)
+3. **Event Processor** processes the specific event type in dedicated function
+4. **Formatter** applies CS 1.6 compatible colors and creates presentation message
+5. **Output** displays formatted message using `client_print_color()` with proper sender parameter
+
+### Key Technical Improvements
+
+- **Quote Handling**: Uses `read_argv()` instead of string manipulation to properly handle quoted arguments
+- **Memory Safety**: All buffer operations use `sizeof() - 1` instead of magic numbers
+- **Compiler Compatibility**: Character-by-character comparison avoids `std::bad_alloc` errors with `equal()`
+- **Message Length**: All messages optimized to stay under 192-byte limit for proper display
 
 ## Development
 
 ### Prerequisites
 
-- AMX Mod X 1.8.2 or higher
+- AMX Mod X 1.9.0 or higher
 - AMX Mod X Compiler (amxxpc)
 - Node.js 24.0.0 or higher (for package management)
 - pnpm 10.17.0 (monorepo package manager)
@@ -218,10 +231,11 @@ Player sees: [HLX] You're rank #42 of 1,243 players with a skill of 1,850
 
 ### Colors Not Displaying
 
-- Verify client supports color codes
+- Verify you're using CS 1.6 compatible color codes (`^1`, `^3`, `^4` only)
 - Check hlstatsnext.cfg color settings
 - Ensure colors are enabled in configuration
 - Verify formatter is applying colors to parsed events
+- Make sure `client_print_color()` is used instead of `client_print()`
 
 ### Events Not Processing
 
@@ -229,6 +243,14 @@ Player sees: [HLX] You're rank #42 of 1,243 players with a skill of 1,850
 - Verify parser recognizes event types (KILL, SUICIDE, etc.)
 - Check that event data fields match expected format
 - Review plugin logs for parsing errors
+- Ensure quoted arguments are properly handled by daemon
+
+### Compilation Issues
+
+- Use AMX Mod X 1.9.0 or higher for best compatibility
+- Avoid using `equal()` function due to compiler memory allocation issues
+- Replace `strlower()` with manual character conversion if undefined
+- Ensure all buffer sizes use `sizeof() - 1` calculations
 
 ## Support
 

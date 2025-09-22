@@ -152,12 +152,14 @@ export class StructuredCommandBuilder {
     rank: number,
     totalPlayers: number,
     skill: number,
+    steamId: string,
     target: number,
   ): string {
     const parts = [
       "hlx_event",
       target.toString(),
       "RANK",
+      this.escapeString(steamId),
       playerId.toString(),
       rank.toString(),
       totalPlayers.toString(),
@@ -179,12 +181,14 @@ export class StructuredCommandBuilder {
     kdr: number,
     accuracy: number,
     headshots: number,
+    steamId: string,
     target: number,
   ): string {
     const parts = [
       "hlx_event",
       target.toString(),
       "STATS",
+      this.escapeString(steamId),
       playerId.toString(),
       rank.toString(),
       total.toString(),
@@ -194,6 +198,32 @@ export class StructuredCommandBuilder {
       kdr.toFixed(2),
       accuracy.toString(),
       headshots.toString(),
+    ]
+    return parts.join(" ")
+  }
+
+  /**
+   * Build command for session response (to !session command)
+   */
+  static buildSessionCommand(
+    playerId: number,
+    sessionKills: number,
+    sessionDeaths: number,
+    sessionKdr: number,
+    sessionTime: number,
+    steamId: string,
+    target: number,
+  ): string {
+    const parts = [
+      "hlx_event",
+      target.toString(),
+      "SESSION",
+      this.escapeString(steamId),
+      playerId.toString(),
+      sessionKills.toString(),
+      sessionDeaths.toString(),
+      sessionKdr.toFixed(2),
+      sessionTime.toString(),
     ]
     return parts.join(" ")
   }

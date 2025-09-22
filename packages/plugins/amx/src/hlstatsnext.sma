@@ -1,18 +1,14 @@
 /*
  * HLStatsNext AMX Mod X Plugin
  *
- * Enhanced messaging system for HLStatsNext game statistics
- * Replaces vanilla amx_say with colored, formatted messages
- *
  * Author: HLStatsNext Team
  * Version: 1.0.0
  *
- * This plugin provides:
- * - Colored message formatting
- * - Clean message display (removes server prefixes)
- * - Extensible command system
- * - Integration with HLStatsNext daemon
  */
+
+// AMX optimization directives
+#pragma semicolon 1  // Enforce semicolons to reduce memory usage
+#pragma compress 1   // Enable binary compression for smaller file size
 
 #include <amxmodx>
 #include <amxmisc>
@@ -22,8 +18,6 @@
 #include "include/hlstatsnext_colors.inc"
 #include "include/hlstatsnext_util.inc"
 #include "include/hlstatsnext_events.inc"
-#include "include/hlstatsnext_parser.inc"
-#include "include/hlstatsnext_formatter.inc"
 #include "include/hlstatsnext_commands.inc"
 // #include "include/hlstatsnext_player_commands.inc"
 
@@ -82,13 +76,15 @@ public client_disconnected(id)
 }
 
 // Handle player say/say_team commands
-public handle_say(id) {
+public handle_say(id)
+{
   new said[192];
   read_args(said, charsmax(said));
   remove_quotes(said);
 
   // Check if it's a command (starts with ! or /)
-  if (said[0] != '!' && said[0] != '/') {
+  if (said[0] != '!' && said[0] != '/')
+  {
     return PLUGIN_CONTINUE;
   }
 
@@ -96,21 +92,25 @@ public handle_say(id) {
   new command[32];
   strtok(said[1], command, charsmax(command), said, charsmax(said), ' ');
 
-  // Convert to lowercase manually
-  for (new i = 0; i < strlen(command); i++) {
-    if (command[i] >= 'A' && command[i] <= 'Z') {
+  // Convert to lowercase manually - AMX optimization: cache strlen()
+  new len = strlen(command);
+  for (new i = 0; i < len; i++)
+  {
+    if (command[i] >= 'A' && command[i] <= 'Z')
+    {
       command[i] += 32;
     }
   }
 
-  // Handle help command
-  if (command[0] == 'h' && command[1] == 'e' && command[2] == 'l' && command[3] == 'p') {
-    client_print(id, print_chat, "[HLStatsNext]: Commands: !rank !stats !top10 !help");
+  // Handle help command with consistent formatting (local command) - AMX optimization: use equal()
+  if (equal(command, "help"))
+  {
+    new formatted_tag[32];
+    format_colored_tag(formatted_tag, charsmax(formatted_tag));
+    client_print_color(id, print_team_red, "%s Commands: !rank, !stats, !session, !help", formatted_tag);
     return PLUGIN_HANDLED;
   }
 
-  // Just log that a command was received
-  log_amx("Player %d used command: %s", id, command);
-
-  return PLUGIN_HANDLED;
+  // Let other commands pass through to be logged and handled by daemon
+  return PLUGIN_CONTINUE;
 }

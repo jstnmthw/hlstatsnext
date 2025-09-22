@@ -6,7 +6,12 @@
 
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerRepository, PlayerCreateData, PlayerNameStatsUpdate } from "./player.types"
+import type {
+  IPlayerRepository,
+  PlayerCreateData,
+  PlayerNameStatsUpdate,
+  PlayerSessionStats,
+} from "./player.types"
 import type { FindOptions, CreateOptions, UpdateOptions } from "@/shared/types/database"
 import type { Player, Prisma } from "@repo/database/client"
 import {
@@ -884,5 +889,102 @@ export class PlayerRepository extends BatchedRepository<Player> implements IPlay
     })
 
     await Promise.all(updatePromises)
+  }
+
+  /**
+   * Get player's rank position
+   */
+  async getPlayerRank(playerId: number): Promise<number | null> {
+    try {
+      this.validateId(playerId, "getPlayerRank")
+
+      const player = await this.db.prisma.player.findUnique({
+        where: { playerId },
+        select: { skill: true },
+      })
+
+      if (!player) {
+        return null
+      }
+
+      // Count players with higher skill rating
+      const higherSkillPlayers = await this.db.prisma.player.count({
+        where: {
+          skill: {
+            gt: player.skill,
+          },
+        },
+      })
+
+      return higherSkillPlayers + 1
+    } catch (error) {
+      this.handleError("getPlayerRank", error)
+      throw error
+    }
+  }
+
+  /**
+   * Get total number of players
+   */
+  async getTotalPlayerCount(): Promise<number> {
+    try {
+      return await this.db.prisma.player.count()
+    } catch (error) {
+      this.handleError("getTotalPlayerCount", error)
+      throw error
+    }
+  }
+
+  /**
+   * Get player's current session statistics
+   */
+  async getPlayerSessionStats(playerId: number): Promise<PlayerSessionStats | null> {
+    try {
+      this.validateId(playerId, "getPlayerSessionStats")
+
+      // Get the most recent connect event for this player
+      const lastConnect = await this.db.prisma.eventConnect.findFirst({
+        where: { playerId },
+        orderBy: { eventTime: "desc" },
+        select: { eventTime: true },
+      })
+
+      if (!lastConnect || !lastConnect.eventTime) {
+        // If no connect event found, return null to indicate no session data
+        return null
+      }
+
+      const sessionStart = lastConnect.eventTime
+
+      const kills = await this.db.prisma.eventFrag.count({
+        where: {
+          killerId: playerId,
+          eventTime: {
+            gte: sessionStart,
+          },
+        },
+      })
+
+      const deaths = await this.db.prisma.eventFrag.count({
+        where: {
+          victimId: playerId,
+          eventTime: {
+            gte: sessionStart,
+          },
+        },
+      })
+
+      // Calculate actual session time from connect event to now
+      const sessionTime = Math.floor((Date.now() - sessionStart.getTime()) / 1000)
+
+      return {
+        kills,
+        deaths,
+        sessionTime,
+      }
+    } catch (error) {
+      this.handleError("getPlayerSessionStats", error)
+      throw error
+    }
   }
 }

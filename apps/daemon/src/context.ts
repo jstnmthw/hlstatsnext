@@ -46,6 +46,7 @@ import { createEventHandlers } from "@/shared/application/orchestrators/event-ha
 import { createQueueModule } from "@/shared/infrastructure/factories/queue-module.factory"
 import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
 import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import { PlayerCommandCoordinator } from "@/shared/application/coordinators/player-command.coordinator"
 
 // Types
 export interface AppContext {
@@ -85,6 +86,11 @@ export interface AppContext {
 
   // Performance Monitoring
   eventMetrics: EventMetrics
+
+  // Repositories (for coordinators)
+  repositories: {
+    playerRepository: import("@/modules/player/player.types").IPlayerRepository
+  }
 }
 
 // Singleton instance for the application
@@ -184,6 +190,11 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     // Module Registry and Metrics
     moduleRegistry: eventComponents.moduleRegistry,
     eventMetrics: eventComponents.eventMetrics,
+
+    // Repositories (for coordinators)
+    repositories: {
+      playerRepository: repositories.playerRepository,
+    },
   }
 }
 
@@ -222,7 +233,13 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
     context.ingressService.setPublisher(context.eventPublisher)
 
     // Start RabbitMQ consumer via queue module
-    const coordinators: EventCoordinator[] = []
+    const coordinators: EventCoordinator[] = [
+      new PlayerCommandCoordinator(
+        context.repositories.playerRepository,
+        context.rconService,
+        context.logger,
+      ),
+    ]
     await context.queueModule.startRabbitMQConsumer(context.moduleRegistry, coordinators)
 
     // Keep a reference for shutdown if needed

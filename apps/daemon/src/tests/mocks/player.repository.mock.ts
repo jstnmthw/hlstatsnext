@@ -79,5 +79,14 @@ export function createMockPlayerRepository(): IPlayerRepository {
     // Batch operations
     getPlayerStatsBatch: vi.fn().mockResolvedValue(new Map()),
     updatePlayerStatsBatch: vi.fn().mockResolvedValue(undefined),
+
+    // Command-related methods
+    getPlayerRank: vi.fn().mockResolvedValue(1),
+    getTotalPlayerCount: vi.fn().mockResolvedValue(100),
+    getPlayerSessionStats: vi.fn().mockResolvedValue({
+      kills: 5,
+      deaths: 2,
+      sessionTime: 1800,
+    }),
   }
 }

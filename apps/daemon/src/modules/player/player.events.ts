@@ -63,6 +63,12 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
     }
 
     const resolvedEvent = await this.resolvePlayerIds(event)
+
+    // Update the original event with resolved data so coordinators receive it
+    if (resolvedEvent !== event) {
+      event.data = resolvedEvent.data
+    }
+
     await this.playerService.handlePlayerEvent(resolvedEvent)
   }
 

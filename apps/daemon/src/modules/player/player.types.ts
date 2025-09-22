@@ -167,6 +167,13 @@ export interface PlayerStats {
   deathStreak: number
   connectionTime: number
   lastEvent: Date | null
+  accuracy?: number
+}
+
+export interface PlayerSessionStats {
+  kills: number
+  deaths: number
+  sessionTime: number
 }
 
 export interface PlayerStatsUpdate {
@@ -390,4 +397,9 @@ export interface IPlayerRepository {
   // Batch operations for performance optimization
   getPlayerStatsBatch(playerIds: number[]): Promise<Map<number, Player>>
   updatePlayerStatsBatch(updates: Array<{ playerId: number; skillDelta: number }>): Promise<void>
+
+  // Player ranking and stats methods for commands
+  getPlayerRank(playerId: number): Promise<number | null>
+  getTotalPlayerCount(): Promise<number>
+  getPlayerSessionStats(playerId: number): Promise<PlayerSessionStats | null>
 }

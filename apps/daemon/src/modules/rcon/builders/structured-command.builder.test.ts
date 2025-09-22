@@ -294,13 +294,27 @@ describe("StructuredCommandBuilder", () => {
 
   describe("buildRankCommand", () => {
     it("should build rank command", () => {
-      const command = StructuredCommandBuilder.buildRankCommand(5, 42, 1243, 1850, 5)
-      expect(command).toBe("hlx_event 5 RANK 5 42 1243 1850")
+      const command = StructuredCommandBuilder.buildRankCommand(
+        5,
+        42,
+        1243,
+        1850,
+        "STEAM_1:0:12345",
+        5,
+      )
+      expect(command).toBe('hlx_event 5 RANK "STEAM_1:0:12345" 5 42 1243 1850')
     })
 
     it("should build rank command for broadcast", () => {
-      const command = StructuredCommandBuilder.buildRankCommand(10, 1, 100, 2500, 0)
-      expect(command).toBe("hlx_event 0 RANK 10 1 100 2500")
+      const command = StructuredCommandBuilder.buildRankCommand(
+        10,
+        1,
+        100,
+        2500,
+        "STEAM_1:0:67890",
+        0,
+      )
+      expect(command).toBe('hlx_event 0 RANK "STEAM_1:0:67890" 10 1 100 2500')
     })
   })
 
@@ -316,9 +330,10 @@ describe("StructuredCommandBuilder", () => {
         2.5,
         75,
         25,
+        "STEAM_1:0:12345",
         5,
       )
-      expect(command).toBe("hlx_event 5 STATS 5 42 1243 1850 150 60 2.50 75 25")
+      expect(command).toBe('hlx_event 5 STATS "STEAM_1:0:12345" 5 42 1243 1850 150 60 2.50 75 25')
     })
 
     it("should format KDR to 2 decimal places", () => {
@@ -332,9 +347,10 @@ describe("StructuredCommandBuilder", () => {
         3.030303,
         80,
         30,
+        "STEAM_1:0:67890",
         5,
       )
-      expect(command).toBe("hlx_event 5 STATS 5 10 100 2000 100 33 3.03 80 30")
+      expect(command).toBe('hlx_event 5 STATS "STEAM_1:0:67890" 5 10 100 2000 100 33 3.03 80 30')
     })
 
     it("should handle zero deaths (infinite KDR)", () => {
@@ -348,9 +364,10 @@ describe("StructuredCommandBuilder", () => {
         Infinity,
         90,
         40,
+        "STEAM_1:0:99999",
         5,
       )
-      expect(command).toBe("hlx_event 5 STATS 5 1 100 3000 50 0 Infinity 90 40")
+      expect(command).toBe('hlx_event 5 STATS "STEAM_1:0:99999" 5 1 100 3000 50 0 Infinity 90 40')
     })
   })
 

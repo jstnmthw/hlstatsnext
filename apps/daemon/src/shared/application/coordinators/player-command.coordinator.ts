@@ -8,6 +8,7 @@
 
 import { EventType } from "@/shared/types/events"
 import { StructuredCommandBuilder } from "@/modules/rcon/builders/structured-command.builder"
+import { CommandResolverService } from "@/modules/rcon/services/command-resolver.service"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import type { BaseEvent, PlayerMeta } from "@/shared/types/events"
 import type { PlayerChatEvent } from "@/modules/player/player.types"
@@ -19,6 +20,7 @@ export class PlayerCommandCoordinator implements EventCoordinator {
   constructor(
     private readonly playerRepository: IPlayerRepository,
     private readonly rconService: IRconService,
+    private readonly commandResolver: CommandResolverService,
     private readonly logger: ILogger,
   ) {}
 
@@ -99,10 +101,11 @@ export class PlayerCommandCoordinator implements EventCoordinator {
     targetId: number,
   ): Promise<void> {
     // Get player rank and total count
-    const [rank, totalPlayers, player] = await Promise.all([
+    const [rank, totalPlayers, player, commandPrefix] = await Promise.all([
       this.playerRepository.getPlayerRank(playerId),
       this.playerRepository.getTotalPlayerCount(),
       this.playerRepository.getPlayerStats(playerId),
+      this.commandResolver.getCommand(serverId, "PlayerEventsCommand"),
     ])
 
     if (rank === null || !player) {
@@ -112,6 +115,7 @@ export class PlayerCommandCoordinator implements EventCoordinator {
 
     // Send RCON command to display rank
     const rconCommand = StructuredCommandBuilder.buildRankCommand(
+      commandPrefix,
       playerId,
       rank,
       totalPlayers,
@@ -135,10 +139,11 @@ export class PlayerCommandCoordinator implements EventCoordinator {
     targetId: number,
   ): Promise<void> {
     // Get player stats, rank, and total count
-    const [player, rank, totalPlayers] = await Promise.all([
+    const [player, rank, totalPlayers, commandPrefix] = await Promise.all([
       this.playerRepository.getPlayerStats(playerId),
       this.playerRepository.getPlayerRank(playerId),
       this.playerRepository.getTotalPlayerCount(),
+      this.commandResolver.getCommand(serverId, "PlayerEventsCommand"),
     ])
 
     if (!player || rank === null) {
@@ -154,6 +159,7 @@ export class PlayerCommandCoordinator implements EventCoordinator {
 
     // Send RCON command to display stats
     const rconCommand = StructuredCommandBuilder.buildStatsCommand(
+      commandPrefix,
       playerId,
       rank,
       totalPlayers,
@@ -182,8 +188,12 @@ export class PlayerCommandCoordinator implements EventCoordinator {
     steamId: string,
     targetId: number,
   ): Promise<void> {
-    // Get session stats
-    const sessionStats = await this.playerRepository.getPlayerSessionStats(playerId)
+    // Get session stats and command prefix
+    const [sessionStats, commandPrefix] = await Promise.all([
+      this.playerRepository.getPlayerSessionStats(playerId),
+      this.commandResolver.getCommand(serverId, "PlayerEventsCommand"),
+    ])
+
     if (!sessionStats) {
       this.logger.warn("Could not find session stats for player", { playerId, serverId })
       return
@@ -195,6 +205,7 @@ export class PlayerCommandCoordinator implements EventCoordinator {
 
     // Send RCON command to display session stats
     const rconCommand = StructuredCommandBuilder.buildSessionCommand(
+      commandPrefix,
       playerId,
       sessionStats.kills,
       sessionStats.deaths,

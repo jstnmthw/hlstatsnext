@@ -68,7 +68,7 @@ describe("StructuredCommandBuilder", () => {
         headshot: false,
       }
 
-      const command = StructuredCommandBuilder.buildKillCommand(data)
+      const command = StructuredCommandBuilder.buildKillCommand("hlx_event", data)
       expect(command).toBe('hlx_event 0 KILL 5 "ProPlayer" 1500 12 "NoobPlayer" 1450 15 ak47 0')
     })
 
@@ -89,7 +89,7 @@ describe("StructuredCommandBuilder", () => {
         headshot: true,
       }
 
-      const command = StructuredCommandBuilder.buildKillCommand(data)
+      const command = StructuredCommandBuilder.buildKillCommand("hlx_event", data)
       expect(command).toBe('hlx_event 0 KILL 5 "HeadshotKing" 2000 12 "Victim" 1800 20 deagle 1')
     })
 
@@ -106,7 +106,7 @@ describe("StructuredCommandBuilder", () => {
         },
       }
 
-      const command = StructuredCommandBuilder.buildKillCommand(data, 5)
+      const command = StructuredCommandBuilder.buildKillCommand("hlx_event", data, 5)
       expect(command).toBe('hlx_event 5 KILL 5 "Player1" 0 12 "Player2" 0 10 unknown 0')
     })
 
@@ -121,7 +121,7 @@ describe("StructuredCommandBuilder", () => {
         },
       }
 
-      const command = StructuredCommandBuilder.buildKillCommand(data)
+      const command = StructuredCommandBuilder.buildKillCommand("hlx_event", data)
       expect(command).toBe('hlx_event 0 KILL 5 "" 0 12 "" 0 15 unknown 0')
     })
   })
@@ -136,7 +136,7 @@ describe("StructuredCommandBuilder", () => {
         skillPenalty: 5,
       }
 
-      const command = StructuredCommandBuilder.buildSuicideCommand(data)
+      const command = StructuredCommandBuilder.buildSuicideCommand("hlx_event", data)
       expect(command).toBe('hlx_event 0 SUICIDE 5 "DepressedPlayer" 1500 5')
     })
 
@@ -149,7 +149,7 @@ describe("StructuredCommandBuilder", () => {
         skillPenalty: 2,
       }
 
-      const command = StructuredCommandBuilder.buildSuicideCommand(data, 10)
+      const command = StructuredCommandBuilder.buildSuicideCommand("hlx_event", data, 10)
       expect(command).toBe('hlx_event 10 SUICIDE 5 "Player" 1000 2')
     })
   })
@@ -167,7 +167,7 @@ describe("StructuredCommandBuilder", () => {
         skillPenalty: 10,
       }
 
-      const command = StructuredCommandBuilder.buildTeamKillCommand(data)
+      const command = StructuredCommandBuilder.buildTeamKillCommand("hlx_event", data)
       expect(command).toBe('hlx_event 0 TEAMKILL 5 "TeamKiller" 12 "TeamMate" 10')
     })
   })
@@ -184,7 +184,7 @@ describe("StructuredCommandBuilder", () => {
         points: 5,
       }
 
-      const command = StructuredCommandBuilder.buildActionCommand(data)
+      const command = StructuredCommandBuilder.buildActionCommand("hlx_event", data)
       expect(command).toBe('hlx_event 0 ACTION 5 "Bomber" 1500 "bomb_planted" "Planted the bomb" 5')
     })
 
@@ -199,7 +199,7 @@ describe("StructuredCommandBuilder", () => {
         points: 10,
       }
 
-      const command = StructuredCommandBuilder.buildActionCommand(data)
+      const command = StructuredCommandBuilder.buildActionCommand("hlx_event", data)
       expect(command).toBe(
         'hlx_event 0 ACTION 5 "Player" 1000 "special_action" "Action with \\"quotes\\"" 10',
       )
@@ -217,7 +217,7 @@ describe("StructuredCommandBuilder", () => {
         playerCount: 4,
       }
 
-      const command = StructuredCommandBuilder.buildTeamActionCommand(data)
+      const command = StructuredCommandBuilder.buildTeamActionCommand("hlx_event", data)
       expect(command).toBe('hlx_event 0 TEAM_ACTION "TERRORIST" "round_win" "Won the round" 5 4')
     })
 
@@ -230,7 +230,7 @@ describe("StructuredCommandBuilder", () => {
         points: 10,
       }
 
-      const command = StructuredCommandBuilder.buildTeamActionCommand(data)
+      const command = StructuredCommandBuilder.buildTeamActionCommand("hlx_event", data)
       expect(command).toBe('hlx_event 0 TEAM_ACTION "CT" "objective" "Completed objective" 10 0')
     })
   })
@@ -246,7 +246,7 @@ describe("StructuredCommandBuilder", () => {
         connectionTime: 1234567890,
       }
 
-      const command = StructuredCommandBuilder.buildConnectCommand(data)
+      const command = StructuredCommandBuilder.buildConnectCommand("hlx_event", data)
       expect(command).toBe('hlx_event 0 CONNECT 5 "NewPlayer" "United States"')
     })
 
@@ -259,7 +259,7 @@ describe("StructuredCommandBuilder", () => {
         connectionTime: 1234567890,
       }
 
-      const command = StructuredCommandBuilder.buildConnectCommand(data)
+      const command = StructuredCommandBuilder.buildConnectCommand("hlx_event", data)
       expect(command).toBe('hlx_event 0 CONNECT 5 "Player" ""')
     })
   })
@@ -274,7 +274,7 @@ describe("StructuredCommandBuilder", () => {
         sessionDuration: 3600,
       }
 
-      const command = StructuredCommandBuilder.buildDisconnectCommand(data)
+      const command = StructuredCommandBuilder.buildDisconnectCommand("hlx_event", data)
       expect(command).toBe('hlx_event 0 DISCONNECT 5 "LeavingPlayer" 3600')
     })
 
@@ -287,7 +287,7 @@ describe("StructuredCommandBuilder", () => {
         sessionDuration: 1800,
       }
 
-      const command = StructuredCommandBuilder.buildDisconnectCommand(data, 10)
+      const command = StructuredCommandBuilder.buildDisconnectCommand("hlx_event", data, 10)
       expect(command).toBe('hlx_event 10 DISCONNECT 5 "Player" 1800')
     })
   })
@@ -295,6 +295,7 @@ describe("StructuredCommandBuilder", () => {
   describe("buildRankCommand", () => {
     it("should build rank command", () => {
       const command = StructuredCommandBuilder.buildRankCommand(
+        "hlx_event",
         5,
         42,
         1243,
@@ -307,6 +308,7 @@ describe("StructuredCommandBuilder", () => {
 
     it("should build rank command for broadcast", () => {
       const command = StructuredCommandBuilder.buildRankCommand(
+        "hlx_event",
         10,
         1,
         100,
@@ -321,6 +323,7 @@ describe("StructuredCommandBuilder", () => {
   describe("buildStatsCommand", () => {
     it("should build stats command", () => {
       const command = StructuredCommandBuilder.buildStatsCommand(
+        "hlx_event",
         5,
         42,
         1243,
@@ -338,6 +341,7 @@ describe("StructuredCommandBuilder", () => {
 
     it("should format KDR to 2 decimal places", () => {
       const command = StructuredCommandBuilder.buildStatsCommand(
+        "hlx_event",
         5,
         10,
         100,
@@ -355,6 +359,7 @@ describe("StructuredCommandBuilder", () => {
 
     it("should handle zero deaths (infinite KDR)", () => {
       const command = StructuredCommandBuilder.buildStatsCommand(
+        "hlx_event",
         5,
         1,
         100,
@@ -374,18 +379,26 @@ describe("StructuredCommandBuilder", () => {
   describe("buildMessageCommand", () => {
     it("should build message command for broadcast", () => {
       const command = StructuredCommandBuilder.buildMessageCommand(
+        "hlx_event",
         "Server will restart in 5 minutes",
       )
       expect(command).toBe('hlx_event 0 MESSAGE "Server will restart in 5 minutes"')
     })
 
     it("should build message command for specific target", () => {
-      const command = StructuredCommandBuilder.buildMessageCommand("Welcome to the server!", 5)
+      const command = StructuredCommandBuilder.buildMessageCommand(
+        "hlx_event",
+        "Welcome to the server!",
+        5,
+      )
       expect(command).toBe('hlx_event 5 MESSAGE "Welcome to the server!"')
     })
 
     it("should escape quotes in message", () => {
-      const command = StructuredCommandBuilder.buildMessageCommand('Message with "quotes"')
+      const command = StructuredCommandBuilder.buildMessageCommand(
+        "hlx_event",
+        'Message with "quotes"',
+      )
       expect(command).toBe('hlx_event 0 MESSAGE "Message with \\"quotes\\""')
     })
   })
@@ -393,6 +406,7 @@ describe("StructuredCommandBuilder", () => {
   describe("buildAnnouncementCommand", () => {
     it("should build announcement command", () => {
       const command = StructuredCommandBuilder.buildAnnouncementCommand(
+        "hlx_announce",
         "Welcome to HLStatsNext Server!",
       )
       expect(command).toBe("hlx_announce Welcome to HLStatsNext Server!")
@@ -401,7 +415,7 @@ describe("StructuredCommandBuilder", () => {
     it("should handle long announcements", () => {
       const longMessage =
         "This is a very long announcement that contains a lot of text and information"
-      const command = StructuredCommandBuilder.buildAnnouncementCommand(longMessage)
+      const command = StructuredCommandBuilder.buildAnnouncementCommand("hlx_announce", longMessage)
       expect(command).toBe(`hlx_announce ${longMessage}`)
     })
   })

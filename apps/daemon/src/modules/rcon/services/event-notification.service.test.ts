@@ -15,6 +15,7 @@ import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { INotificationConfigRepository } from "../repositories/notification-config.repository"
 import type { PlayerNotificationService } from "./player-notification.service"
+import type { CommandResolverService } from "./command-resolver.service"
 import { createMockLogger } from "../../../tests/mocks/logger"
 import { EventType } from "@/shared/types/events"
 
@@ -25,6 +26,7 @@ describe("EventNotificationService", () => {
   let mockServerService: IServerService
   let mockConfigRepository: INotificationConfigRepository
   let mockPlayerNotificationService: PlayerNotificationService
+  let mockCommandResolver: CommandResolverService
 
   beforeEach(() => {
     mockLogger = createMockLogger()
@@ -82,9 +84,23 @@ describe("EventNotificationService", () => {
       supportsPrivateMessaging: vi.fn().mockResolvedValue(true),
     } as unknown as PlayerNotificationService
 
+    mockCommandResolver = {
+      getCommand: vi.fn().mockResolvedValue("hlx_event"),
+      getCommandCapabilities: vi.fn().mockResolvedValue({
+        supportsBatch: false,
+        maxBatchSize: 1,
+        requiresHashPrefix: false,
+      }),
+      supportsBatch: vi.fn().mockResolvedValue(false),
+      getBatchLimit: vi.fn().mockResolvedValue(1),
+      clearCache: vi.fn(),
+      clearServerCache: vi.fn(),
+    } as unknown as CommandResolverService
+
     service = new EventNotificationService(
       mockPlayerNotificationService,
       mockConfigRepository,
+      mockCommandResolver,
       mockRankingService,
       mockServerService,
       mockLogger,

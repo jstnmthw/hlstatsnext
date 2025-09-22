@@ -2,7 +2,8 @@
  * Structured Command Builder
  *
  * Builds structured commands for the HLStatsNext AMX plugin.
- * Commands follow the format: hlx_event <target> <EVENT_TYPE> <DATA...>
+ * Commands follow the format: <commandPrefix> <target> <EVENT_TYPE> <DATA...>
+ * Command prefixes are resolved from database configuration (e.g., hlx_event, amx_psay, etc.)
  */
 
 import type {
@@ -28,9 +29,13 @@ export class StructuredCommandBuilder {
   /**
    * Build command for kill event
    */
-  static buildKillCommand(data: KillEventNotificationData, target: number = 0): string {
+  static buildKillCommand(
+    commandPrefix: string,
+    data: KillEventNotificationData,
+    target: number = 0,
+  ): string {
     const parts = [
-      "hlx_event",
+      commandPrefix,
       target.toString(),
       "KILL",
       data.killerId.toString(),
@@ -49,9 +54,13 @@ export class StructuredCommandBuilder {
   /**
    * Build command for suicide event
    */
-  static buildSuicideCommand(data: SuicideEventNotificationData, target: number = 0): string {
+  static buildSuicideCommand(
+    commandPrefix: string,
+    data: SuicideEventNotificationData,
+    target: number = 0,
+  ): string {
     const parts = [
-      "hlx_event",
+      commandPrefix,
       target.toString(),
       "SUICIDE",
       data.playerId.toString(),
@@ -65,9 +74,13 @@ export class StructuredCommandBuilder {
   /**
    * Build command for teamkill event
    */
-  static buildTeamKillCommand(data: TeamKillEventNotificationData, target: number = 0): string {
+  static buildTeamKillCommand(
+    commandPrefix: string,
+    data: TeamKillEventNotificationData,
+    target: number = 0,
+  ): string {
     const parts = [
-      "hlx_event",
+      commandPrefix,
       target.toString(),
       "TEAMKILL",
       data.killerId.toString(),
@@ -82,9 +95,13 @@ export class StructuredCommandBuilder {
   /**
    * Build command for action event
    */
-  static buildActionCommand(data: ActionEventNotificationData, target: number = 0): string {
+  static buildActionCommand(
+    commandPrefix: string,
+    data: ActionEventNotificationData,
+    target: number = 0,
+  ): string {
     const parts = [
-      "hlx_event",
+      commandPrefix,
       target.toString(),
       "ACTION",
       data.playerId.toString(),
@@ -100,9 +117,13 @@ export class StructuredCommandBuilder {
   /**
    * Build command for team action event
    */
-  static buildTeamActionCommand(data: TeamActionEventNotificationData, target: number = 0): string {
+  static buildTeamActionCommand(
+    commandPrefix: string,
+    data: TeamActionEventNotificationData,
+    target: number = 0,
+  ): string {
     const parts = [
-      "hlx_event",
+      commandPrefix,
       target.toString(),
       "TEAM_ACTION",
       this.escapeString(data.team),
@@ -117,9 +138,13 @@ export class StructuredCommandBuilder {
   /**
    * Build command for connect event
    */
-  static buildConnectCommand(data: ConnectEventNotificationData, target: number = 0): string {
+  static buildConnectCommand(
+    commandPrefix: string,
+    data: ConnectEventNotificationData,
+    target: number = 0,
+  ): string {
     const parts = [
-      "hlx_event",
+      commandPrefix,
       target.toString(),
       "CONNECT",
       data.playerId.toString(),
@@ -132,9 +157,13 @@ export class StructuredCommandBuilder {
   /**
    * Build command for disconnect event
    */
-  static buildDisconnectCommand(data: DisconnectEventNotificationData, target: number = 0): string {
+  static buildDisconnectCommand(
+    commandPrefix: string,
+    data: DisconnectEventNotificationData,
+    target: number = 0,
+  ): string {
     const parts = [
-      "hlx_event",
+      commandPrefix,
       target.toString(),
       "DISCONNECT",
       data.playerId.toString(),
@@ -148,6 +177,7 @@ export class StructuredCommandBuilder {
    * Build command for rank response (to !rank command)
    */
   static buildRankCommand(
+    commandPrefix: string,
     playerId: number,
     rank: number,
     totalPlayers: number,
@@ -156,7 +186,7 @@ export class StructuredCommandBuilder {
     target: number,
   ): string {
     const parts = [
-      "hlx_event",
+      commandPrefix,
       target.toString(),
       "RANK",
       this.escapeString(steamId),
@@ -172,6 +202,7 @@ export class StructuredCommandBuilder {
    * Build command for stats response (to !stats command)
    */
   static buildStatsCommand(
+    commandPrefix: string,
     playerId: number,
     rank: number,
     total: number,
@@ -185,7 +216,7 @@ export class StructuredCommandBuilder {
     target: number,
   ): string {
     const parts = [
-      "hlx_event",
+      commandPrefix,
       target.toString(),
       "STATS",
       this.escapeString(steamId),
@@ -206,6 +237,7 @@ export class StructuredCommandBuilder {
    * Build command for session response (to !session command)
    */
   static buildSessionCommand(
+    commandPrefix: string,
     playerId: number,
     sessionKills: number,
     sessionDeaths: number,
@@ -215,7 +247,7 @@ export class StructuredCommandBuilder {
     target: number,
   ): string {
     const parts = [
-      "hlx_event",
+      commandPrefix,
       target.toString(),
       "SESSION",
       this.escapeString(steamId),
@@ -231,15 +263,15 @@ export class StructuredCommandBuilder {
   /**
    * Build a generic message command (fallback)
    */
-  static buildMessageCommand(message: string, target: number = 0): string {
-    const parts = ["hlx_event", target.toString(), "MESSAGE", this.escapeString(message)]
+  static buildMessageCommand(commandPrefix: string, message: string, target: number = 0): string {
+    const parts = [commandPrefix, target.toString(), "MESSAGE", this.escapeString(message)]
     return parts.join(" ")
   }
 
   /**
    * Build announcement command (public message to all)
    */
-  static buildAnnouncementCommand(message: string): string {
-    return `hlx_announce ${message}`
+  static buildAnnouncementCommand(commandPrefix: string, message: string): string {
+    return `${commandPrefix} ${message}`
   }
 }

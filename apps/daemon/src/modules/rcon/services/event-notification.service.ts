@@ -12,6 +12,7 @@ import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IServerService } from "@/modules/server/server.types"
 import { PlayerNotificationService } from "./player-notification.service"
 import { StructuredCommandBuilder } from "../builders/structured-command.builder"
+import { CommandResolverService } from "./command-resolver.service"
 import type { INotificationConfigRepository } from "../repositories/notification-config.repository"
 import type {
   KillEventNotificationData,
@@ -69,6 +70,7 @@ export class EventNotificationService implements IEventNotificationService {
   constructor(
     private readonly playerNotificationService: PlayerNotificationService,
     private readonly configRepository: INotificationConfigRepository,
+    private readonly commandResolver: CommandResolverService,
     private readonly rankingService: IRankingService,
     private readonly serverService: IServerService,
     private readonly logger: ILogger,
@@ -81,8 +83,14 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
+      // Get command prefix from database configuration
+      const commandPrefix = await this.commandResolver.getCommand(
+        data.serverId,
+        "BroadCastEventsCommand",
+      )
+
       // Build structured command
-      const command = StructuredCommandBuilder.buildKillCommand(data)
+      const command = StructuredCommandBuilder.buildKillCommand(commandPrefix, data)
 
       // Execute the command (target 0 = all players)
       await this.playerNotificationService.executeRawCommand(data.serverId, command)
@@ -112,8 +120,14 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
+      // Get command prefix from database configuration
+      const commandPrefix = await this.commandResolver.getCommand(
+        data.serverId,
+        "BroadCastEventsCommand",
+      )
+
       // Build structured command
-      const command = StructuredCommandBuilder.buildSuicideCommand(data)
+      const command = StructuredCommandBuilder.buildSuicideCommand(commandPrefix, data)
 
       // Execute the command (target 0 = all players)
       await this.playerNotificationService.executeRawCommand(data.serverId, command)
@@ -140,8 +154,14 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
+      // Get command prefix from database configuration
+      const commandPrefix = await this.commandResolver.getCommand(
+        data.serverId,
+        "BroadCastEventsCommand",
+      )
+
       // Build structured command
-      const command = StructuredCommandBuilder.buildTeamKillCommand(data)
+      const command = StructuredCommandBuilder.buildTeamKillCommand(commandPrefix, data)
 
       // Execute the command (target 0 = all players)
       await this.playerNotificationService.executeRawCommand(data.serverId, command)
@@ -169,8 +189,14 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
+      // Get command prefix from database configuration
+      const commandPrefix = await this.commandResolver.getCommand(
+        data.serverId,
+        "BroadCastEventsCommand",
+      )
+
       // Build structured command
-      const command = StructuredCommandBuilder.buildActionCommand(data)
+      const command = StructuredCommandBuilder.buildActionCommand(commandPrefix, data)
 
       // Execute the command (target 0 = all players)
       await this.playerNotificationService.executeRawCommand(data.serverId, command)
@@ -198,8 +224,14 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
+      // Get command prefix from database configuration
+      const commandPrefix = await this.commandResolver.getCommand(
+        data.serverId,
+        "BroadCastEventsCommand",
+      )
+
       // Build structured command
-      const command = StructuredCommandBuilder.buildTeamActionCommand(data)
+      const command = StructuredCommandBuilder.buildTeamActionCommand(commandPrefix, data)
 
       // Execute the command (target 0 = all players)
       await this.playerNotificationService.executeRawCommand(data.serverId, command)
@@ -227,8 +259,14 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
+      // Get command prefix from database configuration
+      const commandPrefix = await this.commandResolver.getCommand(
+        data.serverId,
+        "BroadCastEventsCommand",
+      )
+
       // Build structured command
-      const command = StructuredCommandBuilder.buildConnectCommand(data)
+      const command = StructuredCommandBuilder.buildConnectCommand(commandPrefix, data)
 
       // Execute the command (target 0 = all players)
       await this.playerNotificationService.executeRawCommand(data.serverId, command)
@@ -253,8 +291,14 @@ export class EventNotificationService implements IEventNotificationService {
         return
       }
 
+      // Get command prefix from database configuration
+      const commandPrefix = await this.commandResolver.getCommand(
+        data.serverId,
+        "BroadCastEventsCommand",
+      )
+
       // Build structured command
-      const command = StructuredCommandBuilder.buildDisconnectCommand(data)
+      const command = StructuredCommandBuilder.buildDisconnectCommand(commandPrefix, data)
 
       // Execute the command (target 0 = all players)
       await this.playerNotificationService.executeRawCommand(data.serverId, command)

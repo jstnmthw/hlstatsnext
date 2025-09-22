@@ -20,6 +20,7 @@ import type { IGameDetectionService } from "@/modules/game/game-detection.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
+import type { CommandResolverService } from "@/modules/rcon/services/command-resolver.service"
 import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 
 import { DatabaseClient } from "@/database/client"
@@ -73,6 +74,7 @@ export interface AppContext {
   rconScheduleService: IRconScheduleService
   serverStatusEnricher: IServerStatusEnricher
   sessionService: IPlayerSessionService
+  commandResolverService: CommandResolverService
 
   // Module Event Handlers
   playerEventHandler: PlayerEventHandler
@@ -179,6 +181,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     rconScheduleService: services.rconScheduleService,
     serverStatusEnricher: services.serverStatusEnricher,
     sessionService: services.sessionService,
+    commandResolverService: services.commandResolverService,
 
     // Event Handlers
     playerEventHandler: eventComponents.playerEventHandler,
@@ -237,6 +240,7 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
       new PlayerCommandCoordinator(
         context.repositories.playerRepository,
         context.rconService,
+        context.commandResolverService,
         context.logger,
       ),
     ]

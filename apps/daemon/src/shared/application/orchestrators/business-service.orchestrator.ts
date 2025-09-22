@@ -55,6 +55,7 @@ export interface BusinessServiceCollection {
   rconScheduleService: IRconScheduleService
   serverStatusEnricher: IServerStatusEnricher
   sessionService: IPlayerSessionService
+  commandResolverService: CommandResolverService
 }
 
 /**
@@ -126,6 +127,7 @@ export function createBusinessServices(
   const eventNotificationService = new EventNotificationService(
     playerNotificationService,
     notificationConfigRepository,
+    commandResolverService,
     rankingService,
     serverService,
     logger,
@@ -190,5 +192,6 @@ export function createBusinessServices(
     rconScheduleService,
     serverStatusEnricher,
     sessionService,
+    commandResolverService,
   }
 }

@@ -37,7 +37,15 @@ export class ServerMessageCommand extends BaseScheduledCommand {
     const command = typeof schedule.command === "string" ? schedule.command : ""
 
     // Check if it's a valid say command or similar
-    const validMessageCommands = ["say", "say_team", "echo", "admin_say"]
+    const validMessageCommands = [
+      "say",
+      "say_team",
+      "echo",
+      "admin_say",
+      "amx_say",
+      "amx_csay",
+      "amx_tsay",
+    ]
     const isValidCommand = validMessageCommands.some((cmd) => command.toLowerCase().startsWith(cmd))
 
     if (!isValidCommand) {
@@ -146,17 +154,37 @@ export class ServerMessageCommand extends BaseScheduledCommand {
     // say "message"
     // say message
     // admin_say "message"
+    // amx_csay color "message"
+    // amx_say "message"
 
-    // First try to match quoted content (including empty quotes)
+    // Handle amx_csay with color parameter first (amx_csay color "message")
+    const amxCsayMatch = command.match(/^amx_csay\s+\w+\s+"([^"]*)"/)
+    if (amxCsayMatch !== null && amxCsayMatch[1] !== undefined) {
+      return amxCsayMatch[1]
+    }
+
+    // Handle amx_say and amx_tsay with quoted content
+    const amxQuotedMatch = command.match(/^(?:amx_say|amx_tsay)\s+"([^"]*)"/)
+    if (amxQuotedMatch !== null && amxQuotedMatch[1] !== undefined) {
+      return amxQuotedMatch[1]
+    }
+
+    // Handle standard say commands with quoted content
     const sayQuotedMatch = command.match(/^(?:say|say_team|admin_say|echo)\s+"([^"]*)"/)
     if (sayQuotedMatch !== null && sayQuotedMatch[1] !== undefined) {
       return sayQuotedMatch[1] // This can be empty string for 'say ""'
     }
 
-    // Then try unquoted content
+    // Handle unquoted content for standard commands
     const sayUnquotedMatch = command.match(/^(?:say|say_team|admin_say|echo)\s+(.+)$/)
     if (sayUnquotedMatch?.[1]) {
       return sayUnquotedMatch[1]
+    }
+
+    // Handle amx commands with unquoted content
+    const amxUnquotedMatch = command.match(/^(?:amx_say|amx_tsay)\s+(.+)$/)
+    if (amxUnquotedMatch?.[1]) {
+      return amxUnquotedMatch[1]
     }
 
     return ""

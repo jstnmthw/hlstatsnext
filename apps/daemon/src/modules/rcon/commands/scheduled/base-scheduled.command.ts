@@ -71,11 +71,13 @@ export abstract class BaseScheduledCommand implements IScheduledCommandExecutor 
         retryAttempt: isRetry ? attempt : undefined,
       }
 
-      this.logger.debug(`Scheduled command executed successfully: ${schedule.id}`, {
+      this.logger.ok(`Scheduled command: ${this.getResolvedCommand(schedule, server)}`, {
         scheduleId: schedule.id,
+        scheduleName: schedule.name,
         serverId: server.serverId,
+        serverName: server.name,
         executionTimeMs: result.executionTimeMs,
-        responseLength: response?.length || 0,
+        command: this.getResolvedCommand(schedule, server),
       })
 
       // Perform any post-execution tasks

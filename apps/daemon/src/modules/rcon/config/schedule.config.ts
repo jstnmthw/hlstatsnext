@@ -146,9 +146,9 @@ const defaultScheduledCommands: ScheduledCommand[] = [
   {
     id: "discord-promotion",
     name: "Discord Server Promotion",
-    cronExpression: "0 */5 * * * *", // Every 5 minutes
-    command: 'amx_csay yellow "Join our Discord community! Link: discord.gg/0x1clan"',
-    enabled: false, // Disabled by default - servers can customize and enable
+    cronExpression: "*/30 * * * * *",
+    command: 'amx_tsay yellow "Join our Discord community! Link: discord.gg/0x1clan"',
+    enabled: true, // Disabled by default - servers can customize and enable
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
     serverFilter: {

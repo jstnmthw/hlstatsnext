@@ -88,6 +88,14 @@ export class RconScheduleService implements IRconScheduleService {
 
       this.isStarted = true
 
+      // Start all registered tasks explicitly
+      for (const job of this.jobs.values()) {
+        job.task.start()
+        this.logger.info(
+          `Started cron task for schedule: ${job.schedule.id} (${job.schedule.cronExpression})`,
+        )
+      }
+
       this.logger.ok(
         `RCON scheduler started with ${this.jobs.size} active schedules out of ${this.config.schedules.length} total`,
         {

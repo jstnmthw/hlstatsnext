@@ -80,6 +80,32 @@ describe("ServerMessageCommand", () => {
       expect(isValid).toBe(true)
     })
 
+    it("should validate amx_csay command with color", async () => {
+      const schedule: ScheduledCommand = {
+        id: "test-amx-csay",
+        name: "Test AMX CSay",
+        cronExpression: "0 * * * * *",
+        command: 'amx_csay yellow "Join our Discord community! Link: discord.gg/0x1clan"',
+        enabled: true,
+      }
+
+      const isValid = await command.validate(schedule)
+      expect(isValid).toBe(true)
+    })
+
+    it("should validate amx_say command", async () => {
+      const schedule: ScheduledCommand = {
+        id: "test-amx-say",
+        name: "Test AMX Say",
+        cronExpression: "0 * * * * *",
+        command: 'amx_say "Server announcement"',
+        enabled: true,
+      }
+
+      const isValid = await command.validate(schedule)
+      expect(isValid).toBe(true)
+    })
+
     it("should reject non-message commands", async () => {
       const schedule: ScheduledCommand = {
         id: "test-invalid",

@@ -62,16 +62,11 @@ stock format_suicide_event(output[], maxlen) {
     new tag[32], player[48], points_str[16];
 
     format_colored_tag(tag, charsmax(tag));
-    format_colored_player(g_player_name, player, charsmax(player));
-    format_colored_points(-g_penalty, points_str, charsmax(points_str));
+    format_colored_player(g_player_name, player, charsmax(player), true);
+    format_colored_points(g_penalty, points_str, charsmax(points_str));
 
-    if (g_player_skill > 0) {
-        format(output, maxlen, "%s %s (%d) lost %s points for suicide",
-               tag, player, g_player_skill, points_str);
-    } else {
-        format(output, maxlen, "%s %s lost %s points for suicide",
-               tag, player, points_str);
-    }
+    format(output, maxlen, "%s %s lost %s points for suicide",
+           tag, player, points_str);
 }
 
 // Format teamkill event - uses global variables

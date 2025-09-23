@@ -22,6 +22,7 @@ import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
 import type { CommandResolverService } from "@/modules/rcon/services/command-resolver.service"
 import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
+import type { IPlayerRepository } from "@/modules/player/player.types"
 
 import { DatabaseClient } from "@/database/client"
 import { QueueModule } from "@/shared/infrastructure/messaging/module"
@@ -91,7 +92,7 @@ export interface AppContext {
 
   // Repositories (for coordinators)
   repositories: {
-    playerRepository: import("@/modules/player/player.types").IPlayerRepository
+    playerRepository: IPlayerRepository
   }
 }
 

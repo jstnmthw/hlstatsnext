@@ -42,7 +42,7 @@ const defaultScheduledCommands: ScheduledCommand[] = [
   {
     id: "hlstatsnext-promotion",
     name: "HLStatsNext Promotion",
-    cronExpression: "*/10 * * * * *",
+    cronExpression: "0 */10 * * * *", // Every 10 minutes
     command: "hlx_csay 80ff00 This server is running HLStatsNext Visit hlstatsnext.com",
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,

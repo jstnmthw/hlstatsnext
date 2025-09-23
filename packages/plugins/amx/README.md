@@ -9,6 +9,7 @@ An event processing plugin for AMX Mod X that handles structured commands from t
 - **Event-Driven Architecture**: Processes kill, suicide, teamkill, action, connect, and disconnect events
 - **Colored Messages**: Beautiful, colored message formatting with configurable schemes
 - **Player Commands**: Support for `!rank`, `!stats`, `!help`, `!top10` commands
+- **HUD Announce System**: Clean HUD messages for server/stats system with typewriter effects
 - **Clean Separation**: Daemon handles data, plugin handles presentation
 - **Performance Optimized**: Minimal impact on server performance
 - **Security Focused**: Input validation and access control
@@ -66,10 +67,38 @@ An event processing plugin for AMX Mod X that handles structured commands from t
 
 ### Administrative Commands
 
-| Command              | Access Level | Description          |
-| -------------------- | ------------ | -------------------- |
-| `hlstatsnext_status` | ADMIN        | Show plugin status   |
-| `hlstatsnext_reload` | ADMIN        | Reload configuration |
+| Command              | Access Level | Description                                |
+| -------------------- | ------------ | ------------------------------------------ |
+| `hlstatsnext_status` | ADMIN_RCON   | Show plugin status                         |
+| `hlstatsnext_reload` | ADMIN_RCON   | Reload configuration                       |
+| `hlx_csay`           | ADMIN_RCON   | Send center HUD message to all players     |
+| `hlx_tsay`           | ADMIN_RCON   | Send top HUD message to all players        |
+| `hlx_typehud`        | ADMIN_RCON   | Send typewriter HUD message to all players |
+
+### HUD Announce Commands
+
+Clean HUD messages for server/stats system without admin name prefix:
+
+| Command                             | Description                       | Example                                    |
+| ----------------------------------- | --------------------------------- | ------------------------------------------ |
+| `hlx_csay <RRGGBB> <message...>`    | Center HUD message (classic csay) | `hlx_csay FF9900 Welcome to the server!`   |
+| `hlx_tsay <RRGGBB> <message...>`    | Top HUD message (tsay position)   | `hlx_tsay 00FF00 Server restarting...`     |
+| `hlx_typehud <RRGGBB> <message...>` | Center typewriter HUD message     | `hlx_typehud 0080FF Top fragger: ProGamer` |
+
+**Color Formats Supported:**
+
+- **Hex**: `FF9900` (6 characters, case-insensitive)
+- **Decimal**: `255255000` (9 digits: RRRGGGBBB)
+- **Fallback**: If color parsing fails, uses `hlmsg_default_color` CVAR
+
+**Usage Examples:**
+
+```
+hlx_csay FF0000 Warning: Server maintenance in 5 minutes
+hlx_tsay 255255255 Visit our website at example.com
+hlx_typehud 00FF80 Welcome to HLStatsNext!
+hlx_csay "Message without color uses default"
+```
 
 ### Player Commands (Handled by HLStatsNext Daemon)
 
@@ -90,6 +119,28 @@ Edit `configs/hlstatsnext.cfg` to customize:
 - **Messages**: Configure message formatting options
 - **Performance**: Adjust performance and logging settings
 - **Commands**: Enable/disable specific command groups
+
+### HUD Message Configuration
+
+The following CVARs control HUD message appearance:
+
+| CVAR                  | Default | Description                              |
+| --------------------- | ------- | ---------------------------------------- |
+| `hlmsg_default_color` | 00FF80  | Default color (hex format)               |
+| `hlmsg_holdtime`      | 6.0     | How long message stays visible (seconds) |
+| `hlmsg_fadein`        | 0.1     | Fade in duration (seconds)               |
+| `hlmsg_fadeout`       | 0.2     | Fade out duration (seconds)              |
+| `hlmsg_channel`       | -1      | HUD channel (-1 = auto)                  |
+
+**Example CVAR usage:**
+
+```
+hlmsg_default_color "FF9900"    // Orange default color
+hlmsg_holdtime "8.0"            // Hold for 8 seconds
+hlmsg_fadein "0.2"              // Slower fade in
+hlmsg_fadeout "0.5"             // Slower fade out
+hlmsg_channel "3"               // Use specific channel
+```
 
 ## Color Codes
 
@@ -118,6 +169,7 @@ The plugin follows a modular architecture with separate include files for differ
 - **hlstatsnext_commands.inc**: Command registration and event processors
 - **hlstatsnext_colors.inc**: Color scheme management and formatting functions
 - **hlstatsnext_util.inc**: Utility functions and helpers
+- **hlstatsnext_hud.inc**: HUD message system with color parsing and display functions
 - **hlstatsnext_messages.inc**: Basic message processing (simplified after refactor)
 
 ### Structured Command Processing Flow
@@ -164,8 +216,10 @@ To add new features:
 1. Add new event types to `hlstatsnext_events.inc`
 2. Update parser in `hlstatsnext_parser.inc` to handle new command structure
 3. Add formatting logic in `hlstatsnext_formatter.inc`
-4. Update daemon's `StructuredCommandBuilder` to send new event types
-5. Update configuration file if needed
+4. Add new commands to `hlstatsnext_commands.inc` if needed
+5. For HUD features, extend `hlstatsnext_hud.inc` with new display functions
+6. Update daemon's `StructuredCommandBuilder` to send new event types
+7. Update configuration file if needed
 
 ## Integration with HLStatsNext
 

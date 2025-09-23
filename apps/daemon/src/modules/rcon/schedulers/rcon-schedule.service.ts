@@ -162,11 +162,8 @@ export class RconScheduleService implements IRconScheduleService {
     // Validate the command
     const executor = this.getExecutorForSchedule(schedule)
     if (!(await executor.validate(schedule))) {
-      throw new ScheduleError(
-        `Schedule validation failed: ${schedule.id}`,
-        ScheduleErrorCode.INVALID_COMMAND,
-        schedule.id,
-      )
+      this.logger.warn(`Schedule validation failed: ${schedule.id}, skipping this schedule`)
+      return // Skip invalid schedules instead of crashing the daemon
     }
 
     try {
@@ -547,7 +544,19 @@ export class RconScheduleService implements IRconScheduleService {
 
     // Determine command type
     let executorType: string
-    if (command.startsWith("say") || command.startsWith("admin_say")) {
+    const messageCommands = [
+      "say",
+      "say_team",
+      "admin_say",
+      "echo",
+      "amx_say",
+      "amx_csay",
+      "amx_tsay",
+      "hlx_tsay",
+    ]
+    const isMessageCommand = messageCommands.some((cmd) => command.toLowerCase().startsWith(cmd))
+
+    if (isMessageCommand) {
       executorType = "server-message"
     } else if (["status", "stats", "info", "fps_max"].some((cmd) => command.startsWith(cmd))) {
       executorType = "stats-snapshot"

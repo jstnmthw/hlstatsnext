@@ -89,8 +89,11 @@ describe("RconScheduleService", () => {
       return newTask as unknown as import("node-cron").ScheduledTask
     })
 
-    vi.mocked(cron.validate).mockImplementation(() => {
+    vi.mocked(cron.validate).mockImplementation((expression: string) => {
       // cron.validate() throws on invalid expressions, returns nothing on valid ones
+      if (expression === "invalid-cron") {
+        throw new Error("Invalid cron expression")
+      }
       return true
     })
 
@@ -252,17 +255,19 @@ describe("RconScheduleService", () => {
       )
     })
 
-    it("should reject invalid cron expressions", async () => {
-      // Just test that it validates using the mock
+    it("should handle invalid cron expressions gracefully", async () => {
       const testSchedule: ScheduledCommand = {
-        id: "test-schedule",
-        name: "Test Schedule",
+        id: "cron-test-schedule",
+        name: "Cron Test Schedule",
         cronExpression: "invalid-cron",
         command: 'say "Hello players!"',
         enabled: true,
       }
 
-      await expect(service.registerSchedule(testSchedule)).rejects.toThrow()
+      await service.registerSchedule(testSchedule)
+
+      const schedules = service.getSchedules()
+      expect(schedules).toHaveLength(0)
     })
   })
 
@@ -282,7 +287,6 @@ describe("RconScheduleService", () => {
 
       await service.registerSchedule(testSchedule)
 
-      // Verify the schedule was registered
       let schedules = service.getSchedules()
       expect(schedules).toHaveLength(1)
 

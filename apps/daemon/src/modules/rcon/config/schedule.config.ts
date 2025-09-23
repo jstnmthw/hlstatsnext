@@ -28,14 +28,66 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "server-rules-reminder",
     name: "Server Rules Reminder",
     cronExpression: "0 */30 * * * *", // Every 30 minutes
-    command: 'say "📋 Type !rules to see server rules | Use !help for commands"',
+    command: 'say "Type !help for a list of commands"',
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
     metadata: {
       category: "announcement",
       priority: "normal",
-      description: "Reminds players about server rules",
+      description: "Reminds players about server commands",
+    },
+  },
+
+  {
+    id: "hlstatsnext-promotion",
+    name: "HLStatsNext Promotion",
+    cronExpression: "*/10 * * * * *",
+    command: "hlx_csay 80ff00 This server is running HLStatsNext Visit hlstatsnext.com",
+    enabled: true,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+    ...DEFAULT_RETRY_SETTINGS,
+    metadata: {
+      category: "announcement",
+      priority: "normal",
+      description: "Promotes HLStatsNext",
+    },
+  },
+
+  {
+    id: "discord-promotion",
+    name: "Discord Server Promotion",
+    cronExpression: "0 */15 * * * *",
+    command: "hlx_csay 00FF00 Join our Discord community! Link: discord.gg/0x1clan",
+    enabled: true, // Disabled by default - servers can customize and enable
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+    ...DEFAULT_RETRY_SETTINGS,
+    serverFilter: {
+      minPlayers: 0,
+    },
+    metadata: {
+      category: "promotion",
+      priority: "low",
+      description: "Promotes Discord community",
+      customizable: true, // Indicates this should be customized per server
+    },
+  },
+
+  {
+    id: "map-vote-reminder",
+    name: "Map Vote Reminder",
+    cronExpression: "0 50 * * * *", // 10 minutes before each hour
+    command: "hlx_typehud 8000ff Don't forget to vote for the next map! Type !votemap",
+    enabled: false,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+    ...DEFAULT_RETRY_SETTINGS,
+    serverFilter: {
+      minPlayers: 4,
+    },
+    metadata: {
+      category: "gameplay",
+      priority: "normal",
+      description: "Reminds players to vote for maps",
     },
   },
 
@@ -43,7 +95,7 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "stats-announcement",
     name: "Stats Information",
     cronExpression: "0 15 * * * *", // Every hour at 15 minutes past
-    command: 'say "📊 Your stats are tracked! Visit hlstatsnext.com to view your progress"',
+    command: 'say "Your stats are tracked! Visit hlstatsnext.com to view your progress"',
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
@@ -78,7 +130,7 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "peak-hours-welcome",
     name: "Peak Hours Welcome Message",
     cronExpression: "0 0 18-23 * * *", // Every hour from 6 PM to 11 PM
-    command: 'say "🌟 Welcome to peak hours! Have fun and play fair!"',
+    command: 'say "Welcome to peak hours! Have fun and play fair!"',
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
@@ -96,7 +148,7 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "anti-camp-reminder",
     name: "Anti-Camping Reminder",
     cronExpression: "0 */45 * * * *", // Every 45 minutes
-    command: 'say "⚠️ Remember: Excessive camping may result in penalties"',
+    command: 'say "Remember: Excessive camping may result in penalties"',
     enabled: false, // Disabled by default, can be enabled per server
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
@@ -115,7 +167,7 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "server-restart-warning",
     name: "Server Restart Warning",
     cronExpression: "0 55 3 * * *", // Daily at 3:55 AM (5 minutes before restart)
-    command: 'say "🔄 Server restart in 5 minutes! Current round will finish normally."',
+    command: 'say "Server restart in 5 minutes! Current round will finish normally."',
     enabled: false, // Only enable on servers that have scheduled restarts
     timeoutMs: DEFAULT_TIMEOUT_MS,
     retryOnFailure: false, // Don't retry restart warnings
@@ -140,43 +192,6 @@ const defaultScheduledCommands: ScheduledCommand[] = [
       priority: "normal",
       description: "Regular server health check",
       captureStats: true,
-    },
-  },
-
-  {
-    id: "discord-promotion",
-    name: "Discord Server Promotion",
-    cronExpression: "*/30 * * * * *",
-    command: 'amx_tsay yellow "Join our Discord community! Link: discord.gg/0x1clan"',
-    enabled: true, // Disabled by default - servers can customize and enable
-    timeoutMs: DEFAULT_TIMEOUT_MS,
-    ...DEFAULT_RETRY_SETTINGS,
-    serverFilter: {
-      minPlayers: 0,
-    },
-    metadata: {
-      category: "promotion",
-      priority: "low",
-      description: "Promotes Discord community",
-      customizable: true, // Indicates this should be customized per server
-    },
-  },
-
-  {
-    id: "map-vote-reminder",
-    name: "Map Vote Reminder",
-    cronExpression: "0 50 * * * *", // 10 minutes before each hour
-    command: 'say "🗳️ Don\'t forget to vote for the next map! Type !votemap"',
-    enabled: false,
-    timeoutMs: DEFAULT_TIMEOUT_MS,
-    ...DEFAULT_RETRY_SETTINGS,
-    serverFilter: {
-      minPlayers: 4,
-    },
-    metadata: {
-      category: "gameplay",
-      priority: "normal",
-      description: "Reminds players to vote for maps",
     },
   },
 

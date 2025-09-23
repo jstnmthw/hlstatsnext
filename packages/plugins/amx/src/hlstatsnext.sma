@@ -19,7 +19,7 @@
 #include "include/hlstatsnext_util.inc"
 #include "include/hlstatsnext_events.inc"
 #include "include/hlstatsnext_commands.inc"
-// #include "include/hlstatsnext_player_commands.inc"
+#include "include/hlstatsnext_hud.inc"
 
 // Plugin information
 #define PLUGIN_NAME    "HLStatsNext"
@@ -36,6 +36,7 @@ public plugin_init()
   hlstatsnext_core_init();
   hlstatsnext_colors_init();
   hlstatsnext_commands_init();
+
   // Register our commands
   register_hlstatsnext_commands();
 
@@ -70,6 +71,7 @@ public client_connect(id)
   hlstatsnext_client_connect(id);
 }
 
+// Client disconnection events
 public client_disconnected(id)
 {
   hlstatsnext_client_disconnect(id);

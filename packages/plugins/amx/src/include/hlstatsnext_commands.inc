@@ -14,6 +14,7 @@
 #include "hlstatsnext_globals.inc"
 #include "hlstatsnext_parser.inc"
 #include "hlstatsnext_formatter.inc"
+#include "hlstatsnext_hud.inc"
 
 // Command access levels
 #define ACCESS_PUBLIC 0
@@ -30,6 +31,7 @@ new const SESSION_MSG_SECONDS[] = "%s Session: %d kills, %d deaths (%.2f) | Time
 
 // Commands initialization
 stock hlstatsnext_commands_init() {
+    hlstatsnext_hud_init();
     log_amx("%s Commands system initialized", HLSTATSNEXT_TAG);
 }
 
@@ -70,6 +72,14 @@ stock register_hlstatsnext_commands() {
     // Reload command
     register_concmd("hlstatsnext_reload", "cmd_hlstatsnext_reload", ACCESS_ADMIN,
                     "hlstatsnext_reload - Reload plugin configuration");
+
+    // HUD announce commands
+    register_concmd("hlx_csay", "cmd_hlx_csay", ACCESS_ADMIN,
+                    "hlx_csay <RRGGBB> <message...> - Send center HUD message");
+    register_concmd("hlx_tsay", "cmd_hlx_tsay", ACCESS_ADMIN,
+                    "hlx_tsay <RRGGBB> <message...> - Send top HUD message");
+    register_concmd("hlx_typehud", "cmd_hlx_typehud", ACCESS_ADMIN,
+                    "hlx_typehud <RRGGBB> <message...> - Send typewriter HUD message");
 
     log_amx("%s Commands registered successfully", HLSTATSNEXT_TAG);
 }
@@ -580,6 +590,108 @@ public cmd_hlstatsnext_reload(id, level, cid) {
 
     console_print(id, "%s Configuration reloaded", HLSTATSNEXT_TAG);
     log_amx("%s Configuration reloaded by admin", HLSTATSNEXT_TAG);
+
+    return PLUGIN_HANDLED;
+}
+
+// Parse HUD command arguments using global variables
+stock bool:parse_hud_args(argc) {
+    if (argc < 2) {
+        return false;
+    }
+
+    // Read entire argument string
+    read_args(g_hud_message, charsmax(g_hud_message));
+    remove_quotes(g_hud_message);
+
+    // Extract first word as potential color
+    new pos = strfind(g_hud_message, " ");
+    if (pos == -1) {
+        // Only one argument, use as message with default color
+        get_default_color(g_hud_r, g_hud_g, g_hud_b);
+        return true;
+    }
+
+    // Extract color part
+    copy(g_hud_color_str, charsmax(g_hud_color_str), g_hud_message);
+    g_hud_color_str[pos] = 0; // Null terminate at space
+
+    // Try to parse as color
+    if (parse_color(g_hud_color_str, g_hud_r, g_hud_g, g_hud_b)) {
+        // Valid color found, extract message after color
+        copy(g_hud_message, charsmax(g_hud_message), g_hud_message[pos + 1]);
+        trim(g_hud_message); // Remove leading/trailing spaces
+    } else {
+        // Not a valid color, use default and keep full message
+        get_default_color(g_hud_r, g_hud_g, g_hud_b);
+        // g_hud_message already contains the full message
+    }
+
+    return true;
+}
+
+// Command: hlx_csay - Center HUD message
+public cmd_hlx_csay(id, level, cid) {
+    if (!cmd_access(id, level, cid, 1)) {
+        return PLUGIN_HANDLED;
+    }
+
+    if (!is_plugin_active()) {
+        console_print(id, "%s Plugin is not active", HLSTATSNEXT_TAG);
+        return PLUGIN_HANDLED;
+    }
+
+    new argc = read_argc();
+    if (!parse_hud_args(argc)) {
+        console_print(id, "Usage: hlx_csay <RRGGBB> <message...>");
+        return PLUGIN_HANDLED;
+    }
+
+    display_hud_csay(g_hud_message, g_hud_r, g_hud_g, g_hud_b);
+
+    return PLUGIN_HANDLED;
+}
+
+// Command: hlx_tsay - Top HUD message
+public cmd_hlx_tsay(id, level, cid) {
+    if (!cmd_access(id, level, cid, 1)) {
+        return PLUGIN_HANDLED;
+    }
+
+    if (!is_plugin_active()) {
+        console_print(id, "%s Plugin is not active", HLSTATSNEXT_TAG);
+        return PLUGIN_HANDLED;
+    }
+
+    new argc = read_argc();
+    if (!parse_hud_args(argc)) {
+        console_print(id, "Usage: hlx_tsay <RRGGBB> <message...>");
+        return PLUGIN_HANDLED;
+    }
+
+    display_hud_tsay(g_hud_message, g_hud_r, g_hud_g, g_hud_b);
+
+    return PLUGIN_HANDLED;
+}
+
+// Command: hlx_typehud - Typewriter HUD message
+public cmd_hlx_typehud(id, level, cid) {
+    if (!cmd_access(id, level, cid, 1)) {
+        return PLUGIN_HANDLED;
+    }
+
+    if (!is_plugin_active()) {
+        console_print(id, "%s Plugin is not active", HLSTATSNEXT_TAG);
+        return PLUGIN_HANDLED;
+    }
+
+    new argc = read_argc();
+    if (!parse_hud_args(argc)) {
+        console_print(id, "Usage: hlx_typehud <RRGGBB> <message...>");
+        return PLUGIN_HANDLED;
+    }
+
+    display_hud_typehud(g_hud_message, g_hud_r, g_hud_g, g_hud_b);
 
     return PLUGIN_HANDLED;
 }

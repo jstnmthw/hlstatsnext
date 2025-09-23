@@ -12,6 +12,10 @@ apps/web/src/lib/gql/
 generated/
 legacy/
 
+# Plugins
+**/*.inc
+**/*.sma
+
 # Lock files
 pnpm-lock.yaml
 package-lock.json

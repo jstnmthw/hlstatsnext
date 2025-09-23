@@ -45,19 +45,52 @@ export class ServerMessageCommand extends BaseScheduledCommand {
       "amx_say",
       "amx_csay",
       "amx_tsay",
+      "hlx_tsay",
+      "hlx_csay",
+      "hlx_typehud",
     ]
     const isValidCommand = validMessageCommands.some((cmd) => command.toLowerCase().startsWith(cmd))
 
-    if (!isValidCommand) {
-      this.logger.warn(`Invalid message command for schedule ${schedule.id}: ${command}`)
-      return false
+    // Also check for generic hlx_ commands (future-proof for new hlx commands)
+    const isHlxCommand = /^hlx_\w+/.test(command.toLowerCase())
+
+    if (!isValidCommand && !isHlxCommand) {
+      // Check if this might be a message-like command we don't know about
+      // Look for typical message command patterns: contains quotes, has message-like keywords
+      const mightBeMessageCommand =
+        command.includes('"') || /(?:say|message|msg|chat|tell|announce)/i.test(command)
+
+      if (mightBeMessageCommand) {
+        this.logger.warn(`Unknown message command for schedule ${schedule.id}: ${command}`)
+        // For commands that look like messages, we'll be permissive
+      } else {
+        this.logger.warn(`Invalid message command for schedule ${schedule.id}: ${command}`)
+        return false // Clearly not a message command
+      }
     }
 
-    // Validate message content
+    // Validate message content (apply to both known and unknown commands)
     const messageContent = this.extractMessageContent(command)
     if (!messageContent || messageContent.trim().length === 0) {
-      this.logger.warn(`Empty message content for schedule ${schedule.id}`)
-      return false
+      this.logger.warn(`Empty message content for schedule ${schedule.id}: ${command}`)
+      // Only fail validation if we can't extract any message content
+      // This handles cases where our regex doesn't cover all command formats
+      if (isValidCommand || isHlxCommand) {
+        this.logger.warn(`Skipping schedule ${schedule.id} due to empty message content`)
+        return false // Known commands should have extractable content
+      } else {
+        // For unknown commands that look like messages, check if they have quoted content
+        const hasQuotedContent = /"[^"]+"/g.test(command)
+        if (hasQuotedContent) {
+          this.logger.info(
+            `Allowing unknown message command with quoted content for schedule ${schedule.id}`,
+          )
+          return true // Assume quoted content is the message
+        } else {
+          this.logger.warn(`Skipping schedule ${schedule.id} due to no extractable content`)
+          return false // No extractable or quoted content
+        }
+      }
     }
 
     // Check message length (most game servers have limits)
@@ -157,14 +190,26 @@ export class ServerMessageCommand extends BaseScheduledCommand {
     // amx_csay color "message"
     // amx_say "message"
 
-    // Handle amx_csay with color parameter first (amx_csay color "message")
-    const amxCsayMatch = command.match(/^amx_csay\s+\w+\s+"([^"]*)"/)
-    if (amxCsayMatch !== null && amxCsayMatch[1] !== undefined) {
-      return amxCsayMatch[1]
+    // Handle amx_csay and hlx_ commands with color parameter first (color "message" format)
+    const colorCommandMatch = command.match(
+      /^(?:amx_csay|hlx_tsay|hlx_csay|hlx_typehud)\s+\w+\s+"([^"]*)"/,
+    )
+    if (colorCommandMatch !== null && colorCommandMatch[1] !== undefined) {
+      return colorCommandMatch[1]
     }
 
-    // Handle amx_say and amx_tsay with quoted content
-    const amxQuotedMatch = command.match(/^(?:amx_say|amx_tsay)\s+"([^"]*)"/)
+    // Handle hlx_ and amx_ commands with color parameter and unquoted message
+    const colorUnquotedMatch = command.match(
+      /^(?:amx_csay|hlx_tsay|hlx_csay|hlx_typehud)\s+\w+\s+(.+)$/,
+    )
+    if (colorUnquotedMatch?.[1]) {
+      return colorUnquotedMatch[1]
+    }
+
+    // Handle amx_say, amx_tsay, and hlx_ commands with quoted content (no color parameter)
+    const amxQuotedMatch = command.match(
+      /^(?:amx_say|amx_tsay|hlx_tsay|hlx_csay|hlx_typehud)\s+"([^"]*)"/,
+    )
     if (amxQuotedMatch !== null && amxQuotedMatch[1] !== undefined) {
       return amxQuotedMatch[1]
     }
@@ -181,8 +226,10 @@ export class ServerMessageCommand extends BaseScheduledCommand {
       return sayUnquotedMatch[1]
     }
 
-    // Handle amx commands with unquoted content
-    const amxUnquotedMatch = command.match(/^(?:amx_say|amx_tsay)\s+(.+)$/)
+    // Handle amx and hlx commands with unquoted content (no color parameter)
+    const amxUnquotedMatch = command.match(
+      /^(?:amx_say|amx_tsay|hlx_tsay|hlx_csay|hlx_typehud)\s+(.+)$/,
+    )
     if (amxUnquotedMatch?.[1]) {
       return amxUnquotedMatch[1]
     }

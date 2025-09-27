@@ -112,7 +112,7 @@ describe("AmqpChannelAdapter", () => {
       const mockOnMessage = vi.fn()
       let messageHandler: (msg: amqp.ConsumeMessage | null) => void
 
-      vi.mocked(mockAmqpChannel.consume).mockImplementation(async (queue, handler) => {
+      vi.mocked(mockAmqpChannel.consume).mockImplementation(async (_queue, handler) => {
         messageHandler = handler
         return { consumerTag: "test-consumer-123" }
       })
@@ -180,7 +180,7 @@ describe("AmqpChannelAdapter", () => {
       const mockOnMessage = vi.fn()
       let messageHandler: (msg: amqp.ConsumeMessage | null) => void
 
-      vi.mocked(mockAmqpChannel.consume).mockImplementation(async (queue, handler) => {
+      vi.mocked(mockAmqpChannel.consume).mockImplementation(async (_queue, handler) => {
         messageHandler = handler
         return { consumerTag: "test-consumer-123" }
       })

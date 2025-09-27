@@ -95,8 +95,8 @@ export class ActionService implements IActionService {
     private readonly logger: ILogger,
     private readonly playerService?: IPlayerService, // Optional to avoid circular dependency
     private readonly matchService?: IMatchService, // Optional to avoid circular dependency
-    private readonly rconService?: IRconService, // Optional - used for real-time map resolution
     private readonly eventNotificationService?: IEventNotificationService, // Optional - for action notifications
+    rconService?: IRconService, // Optional - used for real-time map resolution via MapResolver
   ) {
     this.actionDefinitionValidator = new ActionDefinitionValidator(repository, logger)
     this.playerValidator = new PlayerValidator(playerService, logger)

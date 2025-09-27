@@ -9,7 +9,7 @@ This guide provides step-by-step instructions for implementing the HLStatsNext A
 ### System Requirements
 
 - **Node.js**: Version 24.0.0 or higher (as required by the monorepo)
-- **pnpm**: Version 10.17.0 (project package manager)
+- **pnpm**: Version 10.x (project package manager)
 - **AMX Mod X**: Version 1.8.2 or higher
 - **AMX Mod X Compiler**: `amxxpc` for compiling `.sma` files to `.amxx`
 - **Game Server**: Counter-Strike 1.6, Condition Zero, or compatible GoldSrc game

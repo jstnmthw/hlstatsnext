@@ -10,10 +10,21 @@ import { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-ha
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
-import type { IActionService, ActionEvent } from "@/modules/action/action.types"
+import type {
+  IActionService,
+  ActionEvent,
+  RawActionPlayerEvent,
+  RawActionPlayerPlayerEvent,
+  ActionPlayerEvent,
+  ActionPlayerPlayerEvent,
+} from "@/modules/action/action.types"
+import {
+  isRawActionPlayerEvent,
+  isRawActionPlayerPlayerEvent,
+  isActionTeamEvent,
+  isWorldActionEvent,
+} from "@/modules/action/action.types"
 import type { IMatchService } from "@/modules/match/match.types"
-import type { IPlayerService } from "@/modules/player/player.types"
-import type { IServerService } from "@/modules/server/server.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 
 export class ActionEventHandler extends BaseModuleEventHandler {
@@ -22,8 +33,6 @@ export class ActionEventHandler extends BaseModuleEventHandler {
     private readonly actionService: IActionService,
     private readonly sessionService: IPlayerSessionService,
     private readonly matchService?: IMatchService,
-    private readonly playerService?: IPlayerService,
-    private readonly serverService?: IServerService,
     metrics?: EventMetrics,
   ) {
     super(logger, metrics)
@@ -33,23 +42,27 @@ export class ActionEventHandler extends BaseModuleEventHandler {
   async handleActionPlayer(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_PLAYER for server ${event.serverId}`)
 
-    const actionEvent = await this.resolvePlayerIds(event as ActionEvent)
-    this.logPlayerInfo(actionEvent)
+    if (!isRawActionPlayerEvent(event)) {
+      this.logger.warn(`Invalid ACTION_PLAYER event structure for server ${event.serverId}`)
+      return
+    }
 
-    await this.actionService.handleActionEvent(actionEvent)
+    const resolvedEvent = await this.resolveActionPlayerEvent(event)
+    this.logPlayerInfo(resolvedEvent)
+
+    await this.actionService.handleActionEvent(resolvedEvent)
+
     // Inform match service for objective scoring when applicable
     try {
-      if (actionEvent.eventType === EventType.ACTION_PLAYER) {
-        const { actionCode } = actionEvent.data
+      const { actionCode, team } = resolvedEvent.data
 
-        // Bomb-related or key objective actions
-        await this.matchService?.handleObjectiveAction(
-          actionCode,
-          actionEvent.serverId,
-          (actionEvent.data as { playerId?: number }).playerId,
-          (actionEvent.data as { team?: string }).team,
-        )
-      }
+      // Bomb-related or key objective actions
+      await this.matchService?.handleObjectiveAction(
+        actionCode,
+        resolvedEvent.serverId,
+        resolvedEvent.data.playerId,
+        team,
+      )
     } catch {
       // non-fatal
     }
@@ -58,27 +71,30 @@ export class ActionEventHandler extends BaseModuleEventHandler {
   async handleActionPlayerPlayer(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_PLAYER_PLAYER for server ${event.serverId}`)
 
-    const actionEvent = await this.resolvePlayerIds(event as ActionEvent)
-    this.logPlayerInfo(actionEvent)
+    if (!isRawActionPlayerPlayerEvent(event)) {
+      this.logger.warn(`Invalid ACTION_PLAYER_PLAYER event structure for server ${event.serverId}`)
+      return
+    }
 
-    await this.actionService.handleActionEvent(actionEvent)
+    const resolvedEvent = await this.resolveActionPlayerPlayerEvent(event)
+    this.logPlayerInfo(resolvedEvent)
+
+    await this.actionService.handleActionEvent(resolvedEvent)
   }
 
   async handleActionTeam(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_TEAM for server ${event.serverId}`)
 
-    const actionEvent = event as ActionEvent
-    await this.actionService.handleActionEvent(actionEvent)
+    if (!isActionTeamEvent(event)) {
+      this.logger.warn(`Invalid ACTION_TEAM event structure for server ${event.serverId}`)
+      return
+    }
+
+    await this.actionService.handleActionEvent(event)
+
     try {
-      if (actionEvent.eventType === EventType.ACTION_TEAM) {
-        const { actionCode } = actionEvent.data as { actionCode: string }
-        await this.matchService?.handleObjectiveAction(
-          actionCode,
-          actionEvent.serverId,
-          undefined,
-          (actionEvent.data as { team: string }).team,
-        )
-      }
+      const { actionCode, team } = event.data
+      await this.matchService?.handleObjectiveAction(actionCode, event.serverId, undefined, team)
     } catch {
       // non-fatal
     }
@@ -87,7 +103,12 @@ export class ActionEventHandler extends BaseModuleEventHandler {
   async handleActionWorld(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_WORLD for server ${event.serverId}`)
 
-    await this.actionService.handleActionEvent(event as ActionEvent)
+    if (!isWorldActionEvent(event)) {
+      this.logger.warn(`Invalid ACTION_WORLD event structure for server ${event.serverId}`)
+      return
+    }
+
+    await this.actionService.handleActionEvent(event)
   }
 
   /**
@@ -96,13 +117,9 @@ export class ActionEventHandler extends BaseModuleEventHandler {
   private logPlayerInfo(actionEvent: ActionEvent): void {
     let playerInfo = ""
 
-    if (actionEvent.eventType === EventType.ACTION_PLAYER && "playerId" in actionEvent.data) {
+    if (actionEvent.eventType === EventType.ACTION_PLAYER) {
       playerInfo = `, playerId=${actionEvent.data.playerId}`
-    } else if (
-      actionEvent.eventType === EventType.ACTION_PLAYER_PLAYER &&
-      "playerId" in actionEvent.data &&
-      "victimId" in actionEvent.data
-    ) {
+    } else if (actionEvent.eventType === EventType.ACTION_PLAYER_PLAYER) {
       playerInfo = `, playerId=${actionEvent.data.playerId}, victimId=${actionEvent.data.victimId}`
     }
 
@@ -114,102 +131,157 @@ export class ActionEventHandler extends BaseModuleEventHandler {
   }
 
   /**
-   * Resolve player ids for action events
-   * Convert gameUserId to database playerId using session service
+   * Resolve gameUserId to database playerId for ACTION_PLAYER events
    */
-  private async resolvePlayerIds<T extends BaseEvent>(event: T): Promise<T> {
+  private async resolveActionPlayerEvent(event: RawActionPlayerEvent): Promise<ActionPlayerEvent> {
     try {
-      if (
-        event.eventType !== EventType.ACTION_PLAYER &&
-        event.eventType !== EventType.ACTION_PLAYER_PLAYER
-      ) {
-        return event
-      }
+      const { gameUserId, ...restData } = event.data
+      const session = await this.sessionService.getSessionByGameUserId(event.serverId, gameUserId)
 
-      const data = (event.data as Record<string, unknown>) || {}
-      const resolved: Record<string, unknown> = { ...data }
-
-      // Convert gameUserId to database playerId for ACTION_PLAYER
-      if (typeof data.gameUserId === "number") {
-        const session = await this.sessionService.getSessionByGameUserId(
-          event.serverId,
-          data.gameUserId,
+      if (session) {
+        this.logger.debug(
+          `Resolved gameUserId ${gameUserId} to database playerId ${session.databasePlayerId} for action event`,
         )
 
-        if (session) {
-          resolved.playerId = session.databasePlayerId
-          this.logger.debug(
-            `Resolved gameUserId ${data.gameUserId} to database playerId ${session.databasePlayerId} for action event`,
-          )
-        } else {
-          // Try to create a fallback session for the player
-          this.logger.debug(
-            `No session found for gameUserId ${data.gameUserId} on server ${event.serverId}, attempting fallback session creation`,
+        return {
+          ...event,
+          data: {
+            ...restData,
+            playerId: session.databasePlayerId,
+          },
+        }
+      } else {
+        // Try to create a fallback session for the player
+        this.logger.debug(
+          `No session found for gameUserId ${gameUserId} on server ${event.serverId}, attempting fallback session creation`,
+        )
+
+        try {
+          // Try to synchronize sessions for this server to create missing sessions
+          await this.sessionService.synchronizeServerSessions(event.serverId, {
+            clearExisting: false,
+          })
+
+          // Try to get the session again after synchronization
+          const fallbackSession = await this.sessionService.getSessionByGameUserId(
+            event.serverId,
+            gameUserId,
           )
 
-          try {
-            // Try to synchronize sessions for this server to create missing sessions
-            await this.sessionService.synchronizeServerSessions(event.serverId, {
-              clearExisting: false,
-            })
-
-            // Try to get the session again after synchronization
-            const fallbackSession = await this.sessionService.getSessionByGameUserId(
-              event.serverId,
-              data.gameUserId,
+          if (fallbackSession) {
+            this.logger.debug(
+              `Created fallback session for gameUserId ${gameUserId} -> playerId ${fallbackSession.databasePlayerId}`,
             )
 
-            if (fallbackSession) {
-              resolved.playerId = fallbackSession.databasePlayerId
-              this.logger.debug(
-                `Created fallback session for gameUserId ${data.gameUserId} -> playerId ${fallbackSession.databasePlayerId}`,
-              )
-            } else {
-              // Last resort: use gameUserId as playerId
-              this.logger.warn(
-                `Could not create session for gameUserId ${data.gameUserId} on server ${event.serverId}, using gameUserId as fallback`,
-              )
-              resolved.playerId = data.gameUserId
+            return {
+              ...event,
+              data: {
+                ...restData,
+                playerId: fallbackSession.databasePlayerId,
+              },
             }
-          } catch (error) {
+          } else {
+            // Last resort: use gameUserId as playerId
             this.logger.warn(
-              `Failed to create fallback session for gameUserId ${data.gameUserId} on server ${event.serverId}: ${error}`,
+              `Could not create session for gameUserId ${gameUserId} on server ${event.serverId}, using gameUserId as fallback`,
             )
-            resolved.playerId = data.gameUserId
+
+            return {
+              ...event,
+              data: {
+                ...restData,
+                playerId: gameUserId,
+              },
+            }
+          }
+        } catch (error) {
+          this.logger.warn(
+            `Failed to create fallback session for gameUserId ${gameUserId} on server ${event.serverId}: ${error}`,
+          )
+
+          return {
+            ...event,
+            data: {
+              ...restData,
+              playerId: gameUserId,
+            },
           }
         }
-
-        // Remove gameUserId from resolved data since ActionEvent expects playerId
-        delete resolved.gameUserId
       }
-
-      // Convert victimGameUserId to database victimId for ACTION_PLAYER_PLAYER
-      if (typeof data.victimGameUserId === "number") {
-        const victimSession = await this.sessionService.getSessionByGameUserId(
-          event.serverId,
-          data.victimGameUserId,
-        )
-
-        if (victimSession) {
-          resolved.victimId = victimSession.databasePlayerId
-          this.logger.debug(
-            `Resolved victimGameUserId ${data.victimGameUserId} to database victimId ${victimSession.databasePlayerId} for action event`,
-          )
-        } else {
-          this.logger.warn(
-            `No session found for victimGameUserId ${data.victimGameUserId} on server ${event.serverId}, action may fail`,
-          )
-          resolved.victimId = data.victimGameUserId
-        }
-
-        // Remove victimGameUserId from resolved data
-        delete resolved.victimGameUserId
-      }
-
-      return { ...event, data: resolved } as T
     } catch (error) {
-      this.logger.error(`Failed to resolve player ids for event ${event.eventType}: ${error}`)
-      return event
+      this.logger.error(`Failed to resolve player ids for ACTION_PLAYER event: ${error}`)
+
+      // Fallback to using gameUserId as playerId
+      const { gameUserId, ...restData } = event.data
+      return {
+        ...event,
+        data: {
+          ...restData,
+          playerId: gameUserId,
+        },
+      }
+    }
+  }
+
+  /**
+   * Resolve gameUserId and victimGameUserId to database playerIds for ACTION_PLAYER_PLAYER events
+   */
+  private async resolveActionPlayerPlayerEvent(
+    event: RawActionPlayerPlayerEvent,
+  ): Promise<ActionPlayerPlayerEvent> {
+    try {
+      const { gameUserId, victimGameUserId, ...restData } = event.data
+
+      // Resolve both player IDs
+      const [session, victimSession] = await Promise.all([
+        this.sessionService.getSessionByGameUserId(event.serverId, gameUserId),
+        this.sessionService.getSessionByGameUserId(event.serverId, victimGameUserId),
+      ])
+
+      const playerId = session ? session.databasePlayerId : gameUserId
+      const victimId = victimSession ? victimSession.databasePlayerId : victimGameUserId
+
+      if (session) {
+        this.logger.debug(
+          `Resolved gameUserId ${gameUserId} to database playerId ${session.databasePlayerId} for action event`,
+        )
+      } else {
+        this.logger.warn(
+          `No session found for gameUserId ${gameUserId} on server ${event.serverId}, using gameUserId as fallback`,
+        )
+      }
+
+      if (victimSession) {
+        this.logger.debug(
+          `Resolved victimGameUserId ${victimGameUserId} to database victimId ${victimSession.databasePlayerId} for action event`,
+        )
+      } else {
+        this.logger.warn(
+          `No session found for victimGameUserId ${victimGameUserId} on server ${event.serverId}, using victimGameUserId as fallback`,
+        )
+      }
+
+      return {
+        ...event,
+        data: {
+          ...restData,
+          playerId,
+          victimId,
+        },
+      }
+    } catch (error) {
+      this.logger.error(`Failed to resolve player ids for ACTION_PLAYER_PLAYER event: ${error}`)
+
+      // Fallback to using raw IDs
+      const { gameUserId, victimGameUserId, ...restData } = event.data
+      return {
+        ...event,
+        data: {
+          ...restData,
+          playerId: gameUserId,
+          victimId: victimGameUserId,
+        },
+      }
     }
   }
 }

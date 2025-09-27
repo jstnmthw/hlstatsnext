@@ -13,15 +13,13 @@ import type { Socket } from "dgram"
 
 // Mock socket for UDP server
 const createMockSocket = () => ({
-  bind: vi.fn((port, host, callback) => {
+  bind: vi.fn((_port?: number, _host?: string, callback?: () => void) => {
     if (callback) callback()
   }),
-  close: vi.fn((callback) => {
+  close: vi.fn((callback?: () => void) => {
     if (callback) callback()
   }),
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  on: vi.fn(((event: string, callback: (...args: unknown[]) => void) => {
-    // Store callbacks for potential triggering in tests
+  on: vi.fn((() => {
     return mockSocket
   }) as unknown as Socket["on"]),
 

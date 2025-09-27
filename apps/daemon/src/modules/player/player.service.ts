@@ -63,7 +63,6 @@ export class PlayerService implements IPlayerService {
         this.serverRepository,
         this.serverService,
         this.sessionService,
-        this,
         this.matchService,
         this.geoipService,
         this.eventNotificationService,

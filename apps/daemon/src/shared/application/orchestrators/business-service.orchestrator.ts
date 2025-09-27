@@ -117,7 +117,6 @@ export function createBusinessServices(
   const playerNotificationService = new PlayerNotificationService(
     rconCommandService,
     commandResolverService,
-    serverService,
     sessionService,
     logger,
   )
@@ -128,8 +127,6 @@ export function createBusinessServices(
     playerNotificationService,
     notificationConfigRepository,
     commandResolverService,
-    rankingService,
-    serverService,
     logger,
   )
 
@@ -152,8 +149,8 @@ export function createBusinessServices(
     logger,
     playerService,
     matchService,
-    rconService,
     eventNotificationService,
+    rconService,
   )
 
   // Fifth tier - enrichers dependent on multiple services

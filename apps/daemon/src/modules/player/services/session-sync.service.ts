@@ -7,18 +7,12 @@
 
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
-import type { IRconService } from "@/modules/rcon/types/rcon.types"
-import type { IServerService } from "@/modules/server/server.types"
-import type { IPlayerService } from "@/modules/player/player.types"
 
 export class SessionSyncService {
   private syncIntervals = new Map<number, NodeJS.Timeout>()
 
   constructor(
     private readonly sessionService: IPlayerSessionService,
-    private readonly rconService: IRconService,
-    private readonly serverService: IServerService,
-    private readonly playerService: IPlayerService,
     private readonly logger: ILogger,
   ) {}
 

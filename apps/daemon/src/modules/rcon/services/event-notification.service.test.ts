@@ -11,8 +11,6 @@ import type {
   ActionEventNotificationData,
 } from "../types/notification.types"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IRankingService } from "@/modules/ranking/ranking.types"
-import type { IServerService } from "@/modules/server/server.types"
 import type { INotificationConfigRepository } from "../repositories/notification-config.repository"
 import type { PlayerNotificationService } from "./player-notification.service"
 import type { CommandResolverService } from "./command-resolver.service"
@@ -22,42 +20,12 @@ import { EventType } from "@/shared/types/events"
 describe("EventNotificationService", () => {
   let service: EventNotificationService
   let mockLogger: ILogger
-  let mockRankingService: IRankingService
-  let mockServerService: IServerService
   let mockConfigRepository: INotificationConfigRepository
   let mockPlayerNotificationService: PlayerNotificationService
   let mockCommandResolver: CommandResolverService
 
   beforeEach(() => {
     mockLogger = createMockLogger()
-
-    mockRankingService = {
-      calculateRatingAdjustment: vi.fn().mockResolvedValue({ winner: 10, loser: -8 }),
-      calculateSkillAdjustment: vi.fn().mockResolvedValue({ killerChange: 10, victimChange: -8 }),
-      calculateSuicidePenalty: vi.fn().mockReturnValue(-5),
-      calculateTeamkillPenalty: vi.fn().mockReturnValue(-10),
-      getPlayerRankPosition: vi.fn().mockResolvedValue(1),
-      getBatchPlayerRanks: vi.fn().mockResolvedValue(
-        new Map([
-          [1, 1],
-          [2, 2],
-        ]),
-      ),
-    }
-
-    mockServerService = {
-      getServer: vi.fn(),
-      getServerByAddress: vi.fn(),
-      getServerGame: vi.fn(),
-      getServerConfigBoolean: vi.fn(),
-      findById: vi.fn().mockResolvedValue({
-        serverId: 1,
-        game: "cstrike",
-        name: "Test Server",
-        address: "127.0.0.1",
-        port: 27015,
-      }),
-    } as unknown as IServerService
 
     mockConfigRepository = {
       getConfig: vi.fn(),
@@ -101,8 +69,6 @@ describe("EventNotificationService", () => {
       mockPlayerNotificationService,
       mockConfigRepository,
       mockCommandResolver,
-      mockRankingService,
-      mockServerService,
       mockLogger,
     )
   })

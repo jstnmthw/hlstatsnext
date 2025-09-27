@@ -86,7 +86,6 @@ export function DataTable<T>({
   onPageChange,
   onSort,
   onSearch,
-  onRefresh, // eslint-disable-line @typescript-eslint/no-unused-vars
   isLoading = false,
 }: DataTableProps<T>) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})

@@ -7,12 +7,10 @@
  */
 
 import { EventType } from "@/shared/types/events"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IRankingService } from "@/modules/ranking/ranking.types"
-import type { IServerService } from "@/modules/server/server.types"
 import { PlayerNotificationService } from "./player-notification.service"
 import { StructuredCommandBuilder } from "../builders/structured-command.builder"
 import { CommandResolverService } from "./command-resolver.service"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { INotificationConfigRepository } from "../repositories/notification-config.repository"
 import type {
   KillEventNotificationData,
@@ -71,8 +69,6 @@ export class EventNotificationService implements IEventNotificationService {
     private readonly playerNotificationService: PlayerNotificationService,
     private readonly configRepository: INotificationConfigRepository,
     private readonly commandResolver: CommandResolverService,
-    private readonly rankingService: IRankingService,
-    private readonly serverService: IServerService,
     private readonly logger: ILogger,
   ) {}
 

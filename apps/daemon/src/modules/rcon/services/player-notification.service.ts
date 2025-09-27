@@ -7,7 +7,6 @@
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IServerService } from "@/modules/server/server.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import { RconCommandService } from "./rcon-command.service"
 import { CommandResolverService, type CommandType } from "./command-resolver.service"
@@ -38,7 +37,6 @@ export class PlayerNotificationService {
   constructor(
     private readonly rconCommand: RconCommandService,
     private readonly commandResolver: CommandResolverService,
-    private readonly serverService: IServerService,
     private readonly sessionService: IPlayerSessionService,
     private readonly logger: ILogger,
   ) {}

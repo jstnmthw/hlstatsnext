@@ -819,8 +819,7 @@ export class PlayerRepository extends BatchedRepository<Player> implements IPlay
         JSON.stringify(Object.keys(op.data).sort()),
       )
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      for (const [fieldsKey, ops] of groupedOperations) {
+      for (const [, ops] of groupedOperations) {
         await this.executeBatchedOperation(ops, async (chunk) => {
           await this.executeWithTransaction(async (client) => {
             // For each chunk, perform individual updates

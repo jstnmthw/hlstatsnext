@@ -194,7 +194,7 @@ The plugin follows a modular architecture with separate include files for differ
 - AMX Mod X 1.9.0 or higher
 - AMX Mod X Compiler (amxxpc)
 - Node.js 24.0.0 or higher (for package management)
-- pnpm 10.17.0 (monorepo package manager)
+- pnpm 10.x(monorepo package manager)
 
 ### Building from Source
 

@@ -80,12 +80,10 @@ function createHandlerInstances(
     services.actionService,
     services.sessionService,
     services.matchService,
-    services.playerService,
-    services.serverService,
     eventMetrics,
   )
 
-  const serverEventHandler = new ServerEventHandler(logger, services.serverService, eventMetrics)
+  const serverEventHandler = new ServerEventHandler(logger, eventMetrics)
 
   return {
     playerEventHandler,

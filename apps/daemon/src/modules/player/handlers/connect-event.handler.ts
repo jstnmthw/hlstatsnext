@@ -13,7 +13,7 @@ import type { HandlerResult } from "@/shared/types/common"
 import type { PlayerEvent, PlayerConnectEvent } from "@/modules/player/player.types"
 import type { PlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerRepository, IPlayerService } from "@/modules/player/player.types"
+import type { IPlayerRepository } from "@/modules/player/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import type { IServerService } from "@/modules/server/server.types"
@@ -24,7 +24,6 @@ export class ConnectEventHandler extends BasePlayerEventHandler {
     repository: IPlayerRepository,
     logger: ILogger,
     private readonly sessionService: IPlayerSessionService,
-    private readonly playerService: IPlayerService,
     private readonly serverService: IServerService,
     matchService?: IMatchService,
     private readonly geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },

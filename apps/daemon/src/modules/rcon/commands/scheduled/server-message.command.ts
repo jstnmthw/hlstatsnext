@@ -145,6 +145,7 @@ export class ServerMessageCommand extends BaseScheduledCommand {
       playerCount: 0, // PlayerCount not available in ServerInfo
       messageContent: this.sanitizeMessageForLogging(messageContent),
       category: schedule.metadata?.category,
+      rconResponse: response, // Include the actual RCON response
     })
 
     // Return a formatted response

@@ -25,7 +25,6 @@ import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IServerRepository, IServerService } from "@/modules/server/server.types"
 import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
-import type { IPlayerService } from "@/modules/player/player.types"
 
 export class PlayerEventHandlerFactory {
   private readonly handlers = new Map<EventType, BasePlayerEventHandler>()
@@ -37,7 +36,6 @@ export class PlayerEventHandlerFactory {
     serverRepository: IServerRepository,
     serverService: IServerService,
     sessionService: IPlayerSessionService,
-    playerService: IPlayerService,
     matchService?: IMatchService,
     geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
     eventNotificationService?: IEventNotificationService,
@@ -49,11 +47,9 @@ export class PlayerEventHandlerFactory {
         repository,
         logger,
         sessionService,
-        playerService,
         serverService,
         matchService,
         geoipService,
-        eventNotificationService,
       ),
     )
 
@@ -71,14 +67,7 @@ export class PlayerEventHandlerFactory {
 
     this.handlers.set(
       EventType.PLAYER_ENTRY,
-      new EntryEventHandler(
-        repository,
-        logger,
-        sessionService,
-        playerService,
-        serverService,
-        matchService,
-      ),
+      new EntryEventHandler(repository, logger, sessionService, matchService),
     )
 
     this.handlers.set(

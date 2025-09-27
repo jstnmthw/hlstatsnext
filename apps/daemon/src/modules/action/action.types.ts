@@ -2,9 +2,37 @@
  * Action Module Types
  */
 
-import type { BaseEvent, EventType, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
+import type { BaseEvent, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
 import type { HandlerResult } from "@/shared/types/common"
 
+// Raw event types (as parsed from logs, contain gameUserId)
+export interface RawActionPlayerEvent extends BaseEvent {
+  eventType: EventType.ACTION_PLAYER
+  data: {
+    gameUserId: number
+    actionCode: string
+    game: string
+    team?: string
+    bonus?: number
+  }
+  meta?: PlayerMeta
+}
+
+export interface RawActionPlayerPlayerEvent extends BaseEvent {
+  eventType: EventType.ACTION_PLAYER_PLAYER
+  data: {
+    gameUserId: number
+    victimGameUserId: number
+    actionCode: string
+    game: string
+    team?: string
+    bonus?: number
+  }
+  meta?: DualPlayerMeta
+}
+
+// Resolved event types (for business logic, contain playerId)
 export interface ActionPlayerEvent extends BaseEvent {
   eventType: EventType.ACTION_PLAYER
   data: {
@@ -50,11 +78,58 @@ export interface WorldActionEvent extends BaseEvent {
   }
 }
 
+// Union type for raw events (from parser)
+export type RawActionEvent =
+  | RawActionPlayerEvent
+  | RawActionPlayerPlayerEvent
+  | ActionTeamEvent // Team and world events don't need player resolution
+  | WorldActionEvent
+
+// Union type for resolved events (for business logic)
 export type ActionEvent =
   | ActionPlayerEvent
   | ActionPlayerPlayerEvent
   | ActionTeamEvent
   | WorldActionEvent
+
+// Type guards for safe event validation
+export function isRawActionPlayerEvent(event: BaseEvent): event is RawActionPlayerEvent {
+  return (
+    event.eventType === EventType.ACTION_PLAYER &&
+    event.data !== undefined &&
+    event.data !== null &&
+    typeof (event.data as Record<string, unknown>).gameUserId === "number"
+  )
+}
+
+export function isRawActionPlayerPlayerEvent(
+  event: BaseEvent,
+): event is RawActionPlayerPlayerEvent {
+  return (
+    event.eventType === EventType.ACTION_PLAYER_PLAYER &&
+    event.data !== undefined &&
+    event.data !== null &&
+    typeof (event.data as Record<string, unknown>).gameUserId === "number" &&
+    typeof (event.data as Record<string, unknown>).victimGameUserId === "number"
+  )
+}
+
+export function isActionTeamEvent(event: BaseEvent): event is ActionTeamEvent {
+  return event.eventType === EventType.ACTION_TEAM
+}
+
+export function isWorldActionEvent(event: BaseEvent): event is WorldActionEvent {
+  return event.eventType === EventType.ACTION_WORLD
+}
+
+export function isRawActionEvent(event: BaseEvent): event is RawActionEvent {
+  return (
+    isRawActionPlayerEvent(event) ||
+    isRawActionPlayerPlayerEvent(event) ||
+    isActionTeamEvent(event) ||
+    isWorldActionEvent(event)
+  )
+}
 
 export interface IActionService {
   handleActionEvent(event: ActionEvent): Promise<HandlerResult>

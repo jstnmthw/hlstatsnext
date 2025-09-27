@@ -151,11 +151,11 @@ export class StatsSnapshotCommand extends BaseScheduledCommand {
 
     // Handle special processing based on metadata
     if (schedule.metadata?.logToFile) {
-      await this.logSnapshotToFile(result, context)
+      await this.logSnapshotToFile(context)
     }
 
     if (schedule.metadata?.sendToMonitoring) {
-      await this.sendToMonitoringSystem(result, context)
+      await this.sendToMonitoringSystem(context)
     }
   }
 
@@ -264,46 +264,6 @@ export class StatsSnapshotCommand extends BaseScheduledCommand {
   }
 
   /**
-   * Parse player list from status response
-   */
-  private parsePlayerList(
-    response: string,
-  ): Array<{ name: string; userid: number; isBot: boolean }> {
-    const players: Array<{ name: string; userid: number; isBot: boolean }> = []
-    const lines = response.split("\n")
-
-    let inPlayerSection = false
-    for (const line of lines) {
-      if (line.includes("# userid name") || line.includes("#  name")) {
-        inPlayerSection = true
-        continue
-      }
-
-      if (inPlayerSection && line.trim() === "") {
-        break
-      }
-
-      if (inPlayerSection && line.includes("#")) {
-        try {
-          // Parse player line - format varies by game
-          const parts = line.trim().split(/\s+/)
-          if (parts.length >= 3) {
-            players.push({
-              name: parts[2]?.replace(/"/g, "") || "Unknown",
-              userid: parseInt(parts[1] || "0", 10),
-              isBot: line.includes("BOT"),
-            })
-          }
-        } catch {
-          // Skip malformed lines
-        }
-      }
-    }
-
-    return players
-  }
-
-  /**
    * Process the stats snapshot based on configuration
    */
   private async processStatsSnapshot(
@@ -373,10 +333,7 @@ export class StatsSnapshotCommand extends BaseScheduledCommand {
   /**
    * Log snapshot to file if configured
    */
-  private async logSnapshotToFile(
-    result: ScheduleExecutionResult,
-    context: ScheduleExecutionContext,
-  ): Promise<void> {
+  private async logSnapshotToFile(context: ScheduleExecutionContext): Promise<void> {
     // This would implement file logging
     // For now, just log the intention
     this.logger.debug(`Would log snapshot to file for schedule ${context.schedule.id}`)
@@ -385,10 +342,7 @@ export class StatsSnapshotCommand extends BaseScheduledCommand {
   /**
    * Send snapshot to monitoring system if configured
    */
-  private async sendToMonitoringSystem(
-    result: ScheduleExecutionResult,
-    context: ScheduleExecutionContext,
-  ): Promise<void> {
+  private async sendToMonitoringSystem(context: ScheduleExecutionContext): Promise<void> {
     // This would implement sending to monitoring/metrics system
     // For now, just log the intention
     this.logger.debug(

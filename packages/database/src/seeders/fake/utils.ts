@@ -130,8 +130,6 @@ export function generatePlayerData(): PlayerData {
   const lastName = faker.internet.username()
   const fullName = faker.person.fullName()
   const email = faker.datatype.boolean(0.7) ? faker.internet.email() : undefined
-  const homepage = faker.datatype.boolean(0.3) ? faker.internet.url() : undefined
-
   const city = faker.location.city()
   const state = faker.location.state()
   const lat = faker.location.latitude()

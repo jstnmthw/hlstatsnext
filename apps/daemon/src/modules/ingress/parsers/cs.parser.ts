@@ -7,6 +7,7 @@
 import type { ParseResult } from "./base.parser"
 import type { BaseEvent } from "@/shared/types/events"
 import type { IClock } from "@/shared/infrastructure/time/clock.interface"
+import type { ServerStateManager } from "@/modules/server/state/server-state-manager"
 import { BaseParser } from "./base.parser"
 import { EventType } from "@/shared/types/events"
 import { GameConfig } from "@/config/game.config"
@@ -16,12 +17,6 @@ import {
 } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 
 export class CsParser extends BaseParser {
-  // Track the last winning team for Round_End events
-  private lastWinningTeam: string | undefined
-
-  // Track the current map for Round_Start events
-  private currentMap: string = ""
-
   // Parser strategy map for different log line patterns
   private readonly parserStrategies: Array<{
     patterns: string[]
@@ -93,7 +88,11 @@ export class CsParser extends BaseParser {
     },
   ]
 
-  constructor(game: string = GameConfig.getDefaultGame(), clock: IClock) {
+  constructor(
+    game: string = GameConfig.getDefaultGame(),
+    clock: IClock,
+    private readonly stateManager: ServerStateManager,
+  ) {
     super(game, clock)
   }
 
@@ -775,7 +774,9 @@ export class CsParser extends BaseParser {
 
   private parseRoundStartEvent(logLine: string, serverId: number): ParseResult {
     // Example: World triggered "Round_Start"
-    // Map info comes from previously parsed map change events
+
+    const roundInfo = this.stateManager.startRound(serverId) || { roundNumber: 1 }
+    const serverState = this.stateManager.getServerState(serverId)
 
     const event: BaseEvent = {
       eventType: EventType.ROUND_START,
@@ -785,9 +786,9 @@ export class CsParser extends BaseParser {
       eventId: generateMessageId(),
       correlationId: generateCorrelationId(),
       data: {
-        map: this.currentMap || "", // Use current map from parser state
-        roundNumber: 1, // TODO: Track actual round number
-        maxPlayers: 0, // TODO: Get from server info
+        map: serverState?.currentMap || "",
+        roundNumber: roundInfo.roundNumber,
+        maxPlayers: serverState?.maxPlayers || 0,
       },
     }
 
@@ -796,7 +797,11 @@ export class CsParser extends BaseParser {
 
   private parseRoundEndEvent(logLine: string, serverId: number): ParseResult {
     // Example: World triggered "Round_End"
-    // The winning team was captured from the previous Terrorists_Win/CTs_Win event
+
+    const roundInfo = this.stateManager.endRound(serverId) || {
+      roundNumber: 1,
+      winningTeam: undefined,
+    }
 
     const event: BaseEvent = {
       eventType: EventType.ROUND_END,
@@ -806,12 +811,10 @@ export class CsParser extends BaseParser {
       eventId: generateMessageId(),
       correlationId: generateCorrelationId(),
       data: {
-        winningTeam: this.lastWinningTeam,
+        winningTeam: roundInfo.winningTeam,
+        roundNumber: roundInfo.roundNumber,
       },
     }
-
-    // Clear the winning team after using it
-    this.lastWinningTeam = undefined
 
     return { event, success: true }
   }
@@ -823,7 +826,9 @@ export class CsParser extends BaseParser {
       const [, team, triggerName] = teamWinMatch
 
       // Store winning team for subsequent Round_End event
-      this.lastWinningTeam = team
+      if (team) {
+        this.stateManager.setWinningTeam(serverId, team)
+      }
 
       // Extract scores
       const scoreMatch = logLine.match(/\(CT "(\d+)"\) \(T "(\d+)"\)/)
@@ -881,9 +886,11 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Could not extract map name from change event" }
     }
 
-    // Store the previous map and update current map
-    const previousMap = this.currentMap || undefined
-    this.currentMap = mapName
+    // Update map in state manager
+    const mapChange = this.stateManager.updateMap(serverId, mapName) || {
+      changed: true,
+      previousMap: undefined,
+    }
 
     const event: BaseEvent = {
       eventType: EventType.MAP_CHANGE,
@@ -895,7 +902,7 @@ export class CsParser extends BaseParser {
       data: {
         newMap: mapName,
         playerCount: 0, // Would need additional parsing to get player count
-        previousMap: previousMap,
+        previousMap: mapChange.previousMap,
       },
     }
 

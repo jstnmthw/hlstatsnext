@@ -4,8 +4,8 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { WeaponEventHandler } from "./weapon.events"
-import { createMockLogger } from "../../tests/mocks/logger"
-import { createMockEventBus } from "../../tests/mocks/event-bus"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { createMockEventBus } from "@/tests/mocks/event-bus"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import type { IWeaponService } from "./weapon.types"

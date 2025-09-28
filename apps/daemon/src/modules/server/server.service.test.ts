@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { ServerService } from "./server.service"
-import { createMockLogger } from "../../tests/mocks/logger"
+import { createMockLogger } from "@/tests/mocks/logger"
 import type { IServerRepository, ServerInfo } from "./server.types"
 
 const createMockServerRepository = () => ({

@@ -14,7 +14,7 @@ import type { ScheduleConfig } from "@/modules/rcon/types/schedule.types"
 import { RankingService } from "@/modules/ranking/ranking.service"
 import { MatchService } from "@/modules/match/match.service"
 import { GeoIPService } from "@/modules/geoip/geoip.service"
-import { PlayerService } from "@/modules/player/player.service"
+import { PlayerService } from "@/modules/player/services/player.service"
 import { WeaponService } from "@/modules/weapon/weapon.service"
 import { ActionService } from "@/modules/action/action.service"
 import { GameDetectionService } from "@/modules/game/game-detection.service"
@@ -40,7 +40,8 @@ import type { IServerService } from "@/modules/server/server.types"
 import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
 import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
-import type { IPlayerService } from "@/modules/player/player.types"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
+import type { IPlayerService } from "@/modules/player/types/player.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 
 export interface BusinessServiceCollection {
@@ -77,6 +78,7 @@ export function createBusinessServices(
   logger: ILogger,
   rconConfig: RconConfig,
   scheduleConfig: ScheduleConfig,
+  eventBus: IEventBus,
 ): BusinessServiceCollection {
   // First tier - services with minimal dependencies
   const rankingService = new RankingService(logger, repositories.weaponRepository, database.prisma)
@@ -175,6 +177,9 @@ export function createBusinessServices(
     rconService,
     serverService,
     scheduleConfig,
+    eventBus,
+    serverStatusEnricher,
+    sessionService,
   )
 
   return {

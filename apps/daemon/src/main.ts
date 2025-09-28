@@ -20,11 +20,11 @@
 import dotenv from "dotenv"
 dotenv.config()
 
-import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import type { AppContext } from "@/context"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { BaseEvent } from "@/shared/types/events"
 import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
+import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { getEnvironmentConfig } from "@/config/environment.config"
 import { RconMonitorService } from "@/modules/rcon/services/rcon-monitor.service"
 import { DatabaseConnectionService } from "@/database/connection.service"
@@ -82,11 +82,11 @@ export class HLStatsDaemon {
    * @throws {Error} When environment configuration is invalid
    * @throws {Error} When required services cannot be initialized
    */
-  constructor() {
+  private constructor(context: AppContext) {
+    this.context = context
+    this.logger = this.context.logger
     const config = getEnvironmentConfig()
 
-    this.context = getAppContext(config.ingressOptions)
-    this.logger = this.context.logger
     this.rconMonitor = new RconMonitorService(
       this.context,
       config.rconConfig,
@@ -96,6 +96,15 @@ export class HLStatsDaemon {
     this.databaseConnection = new DatabaseConnectionService(this.context)
 
     this.logger.info("Initializing HLStatsNext Daemon...")
+  }
+
+  /**
+   * Creates a new HLStatsDaemon instance asynchronously.
+   */
+  static async create(): Promise<HLStatsDaemon> {
+    const config = getEnvironmentConfig()
+    const context = await getAppContext(config.ingressOptions)
+    return new HLStatsDaemon(context)
   }
 
   /**
@@ -279,6 +288,7 @@ export class HLStatsDaemon {
         this.context.ingressService.stop(),
         this.context.rconService.disconnectAll(),
         this.context.queueModule?.shutdown() || Promise.resolve(),
+        this.context.cache.disconnect(),
       ])
 
       await this.databaseConnection.disconnect()
@@ -391,16 +401,18 @@ function createSignalHandler(daemon: HLStatsDaemon, signal: string) {
  * main();
  * ```
  */
-function main() {
-  const daemon = new HLStatsDaemon()
+async function main() {
+  try {
+    const daemon = await HLStatsDaemon.create()
 
-  process.on("SIGINT", createSignalHandler(daemon, "SIGINT"))
-  process.on("SIGTERM", createSignalHandler(daemon, "SIGTERM"))
+    process.on("SIGINT", createSignalHandler(daemon, "SIGINT"))
+    process.on("SIGTERM", createSignalHandler(daemon, "SIGTERM"))
 
-  daemon.start().catch((error) => {
-    daemon.getContext().logger.fatal(error instanceof Error ? error.message : String(error))
+    await daemon.start()
+  } catch (error) {
+    console.error("Failed to start daemon:", error instanceof Error ? error.message : String(error))
     process.exit(1)
-  })
+  }
 }
 
 /**

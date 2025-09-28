@@ -10,6 +10,9 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IRconService } from "../types/rcon.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { ScheduleConfig, ScheduledCommand } from "../types/schedule.types"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
+import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import { RconScheduleService } from "./rcon-schedule.service"
 import * as cron from "node-cron"
 
@@ -29,17 +32,20 @@ vi.mock("../commands/scheduled/server-message.command", () => ({
   },
 }))
 
-vi.mock("../commands/scheduled/stats-snapshot.command", () => ({
-  StatsSnapshotCommand: class {
+vi.mock("../commands/scheduled/server-monitoring.command", () => ({
+  ServerMonitoringCommand: class {
     constructor() {}
     async validate() {
       return true
     }
     async execute() {
-      return { success: true, response: "Stats captured" }
+      return { serversProcessed: 1, commandsSent: 1 }
     }
     getType() {
-      return "stats-snapshot"
+      return "server_monitoring"
+    }
+    async connectToServerImmediately() {
+      return
     }
   },
 }))
@@ -53,6 +59,9 @@ describe("RconScheduleService", () => {
   let mockRconService: MockProxy<IRconService>
   let mockServerService: MockProxy<IServerService>
   let mockScheduleConfig: ScheduleConfig
+  let mockEventBus: MockProxy<IEventBus>
+  let mockServerStatusEnricher: MockProxy<IServerStatusEnricher>
+  let mockSessionService: MockProxy<IPlayerSessionService>
   let mockScheduledTasks: Array<{
     start: MockedFunction<() => void>
     stop: MockedFunction<() => void>
@@ -63,6 +72,9 @@ describe("RconScheduleService", () => {
     mockLogger = mockDeep<ILogger>()
     mockRconService = mockDeep<IRconService>()
     mockServerService = mockDeep<IServerService>()
+    mockEventBus = mockDeep<IEventBus>()
+    mockServerStatusEnricher = mockDeep<IServerStatusEnricher>()
+    mockSessionService = mockDeep<IPlayerSessionService>()
 
     mockScheduleConfig = {
       enabled: true,
@@ -102,6 +114,9 @@ describe("RconScheduleService", () => {
       mockRconService,
       mockServerService,
       mockScheduleConfig,
+      mockEventBus,
+      mockServerStatusEnricher,
+      mockSessionService,
     )
   })
 
@@ -134,6 +149,9 @@ describe("RconScheduleService", () => {
         mockRconService,
         mockServerService,
         disabledConfig,
+        mockEventBus,
+        mockServerStatusEnricher,
+        mockSessionService,
       )
 
       await disabledService.start()
@@ -153,7 +171,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "test message"',
+        command: { type: "server-message", message: "test message" },
         enabled: true,
       }
 
@@ -167,6 +185,9 @@ describe("RconScheduleService", () => {
         mockRconService,
         mockServerService,
         configWithSchedule,
+        mockEventBus,
+        mockServerStatusEnricher,
+        mockSessionService,
       )
 
       await serviceWithSchedule.start()
@@ -198,7 +219,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "test"',
+        command: { type: "server-message", message: "test" },
         enabled: true,
       }
 
@@ -227,7 +248,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "test message"',
+        command: { type: "server-message", message: "test message" },
         enabled: true,
       }
 
@@ -244,7 +265,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "test"',
+        command: { type: "server-message", message: "test" },
         enabled: true,
       }
 
@@ -260,7 +281,7 @@ describe("RconScheduleService", () => {
         id: "cron-test-schedule",
         name: "Cron Test Schedule",
         cronExpression: "invalid-cron",
-        command: 'say "Hello players!"',
+        command: { type: "server-message", message: "Hello players!" },
         enabled: true,
       }
 
@@ -281,7 +302,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "test message"',
+        command: { type: "server-message", message: "test message" },
         enabled: true,
       }
 
@@ -316,7 +337,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "test"',
+        command: { type: "server-message", message: "test" },
         enabled: false,
       }
 
@@ -340,7 +361,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "test"',
+        command: { type: "server-message", message: "test" },
         enabled: true,
       }
 
@@ -381,7 +402,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "test"',
+        command: { type: "server-message", message: "test" },
         enabled: true,
       }
 
@@ -403,7 +424,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "test"',
+        command: { type: "server-message", message: "test" },
         enabled: true,
       }
 
@@ -415,9 +436,11 @@ describe("RconScheduleService", () => {
         scheduleId: testSchedule.id,
         name: testSchedule.name,
         enabled: testSchedule.enabled,
-        isRunning: true,
-        successCount: 0,
-        failureCount: 0,
+        status: "scheduled",
+        stats: expect.objectContaining({
+          successfulExecutions: 0,
+          failedExecutions: 0,
+        }),
       })
     })
   })
@@ -432,7 +455,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "test"',
+        command: { type: "server-message", message: "test" },
         enabled: true,
       }
 
@@ -456,9 +479,10 @@ describe("RconScheduleService", () => {
 
       expect(results).toHaveLength(1)
       expect(results[0]).toMatchObject({
-        commandId: testSchedule.id,
-        serverId: 1,
-        success: true,
+        executionId: expect.any(String),
+        status: "success",
+        serversProcessed: 1,
+        commandsSent: 1,
       })
     })
 
@@ -479,7 +503,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "test"',
+        command: { type: "server-message", message: "test" },
         enabled: true,
       }
 
@@ -505,14 +529,14 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "original"',
+        command: { type: "server-message", message: "original" },
         enabled: true,
       }
 
       const updatedSchedule: ScheduledCommand = {
         ...originalSchedule,
         name: "Updated Test Schedule",
-        command: 'say "updated"',
+        command: { type: "server-message", message: "updated" },
       }
 
       await service.registerSchedule(originalSchedule)
@@ -520,7 +544,7 @@ describe("RconScheduleService", () => {
 
       const schedules = service.getSchedules()
       expect(schedules[0]?.name).toBe("Updated Test Schedule")
-      expect(schedules[0]?.command).toBe('say "updated"')
+      expect(schedules[0]?.command).toEqual({ type: "server-message", message: "updated" })
     })
 
     it("should register new schedule if it doesn't exist", async () => {
@@ -528,7 +552,7 @@ describe("RconScheduleService", () => {
         id: "new-schedule",
         name: "New Schedule",
         cronExpression: "0 * * * * *",
-        command: 'say "new"',
+        command: { type: "server-message", message: "new" },
         enabled: true,
       }
 

@@ -34,8 +34,10 @@ vi.mock("@repo/crypto", () => ({
 
 // Mock the infrastructure config factory
 vi.mock("@/shared/application/factories/infrastructure-config.factory", () => ({
-  createInfrastructureComponents: vi.fn(() => ({
-    database: {},
+  createInfrastructureComponents: vi.fn().mockResolvedValue({
+    database: {
+      initializeConnectionPool: vi.fn().mockResolvedValue(undefined),
+    },
     logger: {},
     crypto: {
       hashPassword: vi.fn().mockResolvedValue("hashed_password"),
@@ -43,7 +45,7 @@ vi.mock("@/shared/application/factories/infrastructure-config.factory", () => ({
       encrypt: vi.fn().mockResolvedValue("encrypted_data"),
       decrypt: vi.fn().mockResolvedValue("decrypted_data"),
     },
-  })),
+  }),
 }))
 
 describe("Application Context", () => {

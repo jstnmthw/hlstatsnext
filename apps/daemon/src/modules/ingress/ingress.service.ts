@@ -184,7 +184,11 @@ export class IngressService implements IIngressService {
 
     // Fetch game for server and create appropriate parser
     const gameCode = await this.dependencies.serverInfoProvider.getServerGame(serverId)
-    const parser = ParserFactory.create(gameCode, this.dependencies.clock)
+    const parser = ParserFactory.create(
+      gameCode,
+      this.dependencies.clock,
+      this.dependencies.serverStateManager,
+    )
     this.parserCache.set(serverId, parser)
     return parser
   }

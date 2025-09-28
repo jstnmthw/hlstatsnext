@@ -4,16 +4,16 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { PlayerService } from "./player.service"
-import { PlayerRepository } from "./player.repository"
-import { createMockLogger } from "../../tests/mocks/logger"
-import { createMockDatabaseClient } from "../../tests/mocks/database"
-import { createMockServerService } from "../../tests/mocks/server.service.mock"
-import { createMockSessionService } from "../../tests/mocks/session.service.mock"
+import { PlayerRepository } from "../repositories/player.repository"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { createMockDatabaseClient } from "@/tests/mocks/database"
+import { createMockServerService } from "@/tests/mocks/server.service.mock"
+import { createMockSessionService } from "@/tests/mocks/session.service.mock"
 import type { Player } from "@repo/database/client"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import { EventType } from "@/shared/types/events"
-import type { PlayerKillEvent, PlayerEvent } from "./player.types"
+import type { PlayerKillEvent, PlayerEvent } from "../types/player.types"
 
 describe("PlayerService", () => {
   let playerService: PlayerService

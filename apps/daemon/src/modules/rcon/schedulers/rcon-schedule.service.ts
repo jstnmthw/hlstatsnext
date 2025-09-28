@@ -9,6 +9,9 @@ import * as cron from "node-cron"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IServerService, ServerInfo } from "@/modules/server/server.types"
 import type { IRconService } from "../types/rcon.types"
+import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import type {
   IRconScheduleService,
   IScheduledCommandExecutor,
@@ -22,7 +25,8 @@ import type {
 } from "../types/schedule.types"
 import { ScheduleError, ScheduleErrorCode } from "../types/schedule.types"
 import { ServerMessageCommand } from "../commands/scheduled/server-message.command"
-import { StatsSnapshotCommand } from "../commands/scheduled/stats-snapshot.command"
+import { ServerMonitoringCommand } from "../commands/scheduled/server-monitoring.command"
+import { EventType, type ServerAuthenticatedEvent } from "@/shared/types/events"
 
 /**
  * RCON Schedule Service Implementation
@@ -35,6 +39,9 @@ export class RconScheduleService implements IRconScheduleService {
   private readonly rconService: IRconService
   private readonly serverService: IServerService
   private readonly config: ScheduleConfig
+  private readonly eventBus: IEventBus
+  private readonly serverStatusEnricher: IServerStatusEnricher
+  private readonly sessionService: IPlayerSessionService
 
   /** Active scheduled jobs */
   private readonly jobs = new Map<string, ScheduleJob>()
@@ -48,16 +55,28 @@ export class RconScheduleService implements IRconScheduleService {
   /** Service state */
   private isStarted = false
 
+  /** Server monitoring command instance for immediate connections */
+  private serverMonitoringCommand?: ServerMonitoringCommand
+
+  /** Event handler ID for server authentication */
+  private eventHandlerId?: string
+
   constructor(
     logger: ILogger,
     rconService: IRconService,
     serverService: IServerService,
     config: ScheduleConfig,
+    eventBus: IEventBus,
+    serverStatusEnricher: IServerStatusEnricher,
+    sessionService: IPlayerSessionService,
   ) {
     this.logger = logger
     this.rconService = rconService
     this.serverService = serverService
     this.config = config
+    this.eventBus = eventBus
+    this.serverStatusEnricher = serverStatusEnricher
+    this.sessionService = sessionService
 
     this.initializeExecutors()
   }
@@ -96,6 +115,12 @@ export class RconScheduleService implements IRconScheduleService {
         )
       }
 
+      // Subscribe to SERVER_AUTHENTICATED events for immediate RCON connections
+      this.eventHandlerId = this.eventBus.on(
+        EventType.SERVER_AUTHENTICATED,
+        this.handleServerAuthenticated.bind(this),
+      )
+
       this.logger.ok(
         `RCON scheduler started with ${this.jobs.size} active schedules out of ${this.config.schedules.length} total`,
         {
@@ -119,6 +144,12 @@ export class RconScheduleService implements IRconScheduleService {
     }
 
     this.logger.info("Stopping RCON scheduler service...")
+
+    // Unsubscribe from events
+    if (this.eventHandlerId) {
+      this.eventBus.off(this.eventHandlerId)
+      this.eventHandlerId = undefined
+    }
 
     // Stop all active jobs
     for (const [scheduleId, job] of this.jobs) {
@@ -152,11 +183,10 @@ export class RconScheduleService implements IRconScheduleService {
 
     // Validate the schedule
     if (!this.isValidCronExpression(schedule.cronExpression)) {
-      throw new ScheduleError(
-        `Invalid cron expression: ${schedule.cronExpression}`,
-        ScheduleErrorCode.INVALID_CRON_EXPRESSION,
-        schedule.id,
+      this.logger.warn(
+        `Invalid cron expression for schedule ${schedule.id}: ${schedule.cronExpression}, skipping this schedule`,
       )
+      return // Skip invalid schedules instead of crashing the daemon
     }
 
     // Validate the command
@@ -289,13 +319,13 @@ export class RconScheduleService implements IRconScheduleService {
       scheduleId: job.schedule.id,
       name: job.schedule.name,
       enabled: job.schedule.enabled,
-      isRunning: job.schedule.enabled,
-      lastExecutedAt: job.stats.lastExecutedAt,
-      nextExecutionAt: job.stats.nextExecutionAt,
-      successCount: job.stats.successfulExecutions,
-      failureCount: job.stats.failedExecutions,
-      lastResult: job.history[job.history.length - 1],
-      averageExecutionTimeMs: job.stats.averageExecutionTimeMs,
+      cronExpression: job.schedule.cronExpression,
+      nextExecution: undefined, // Would need cron parser to calculate
+      lastExecution: job.stats.lastExecutionStart,
+      status: job.schedule.enabled
+        ? "scheduled"
+        : ("stopped" as "scheduled" | "running" | "stopped"),
+      stats: job.stats,
     }))
   }
 
@@ -341,8 +371,8 @@ export class RconScheduleService implements IRconScheduleService {
       this.logger.debug(`Schedule execution completed: ${scheduleId}`, {
         scheduleId,
         serversTargeted: results.length,
-        successCount: results.filter((r) => r.success).length,
-        failureCount: results.filter((r) => !r.success).length,
+        successCount: results.filter((r) => r.status === "success").length,
+        failureCount: results.filter((r) => r.status === "failed").length,
       })
     } catch (error) {
       this.logger.error(`Schedule execution failed: ${scheduleId}`, {
@@ -352,7 +382,7 @@ export class RconScheduleService implements IRconScheduleService {
 
       // Update failure stats
       job.stats.failedExecutions++
-      job.stats.lastExecutedAt = new Date()
+      job.stats.lastExecutionStart = new Date()
     }
   }
 
@@ -396,13 +426,17 @@ export class RconScheduleService implements IRconScheduleService {
       if (result.status === "fulfilled") {
         return result.value
       } else {
+        const endTime = new Date()
+        const executionId = `${schedule.id}-${server?.serverId ?? 0}-${Date.now()}`
         return {
-          commandId: schedule.id,
-          serverId: server?.serverId ?? 0,
-          success: false,
-          error: result.reason instanceof Error ? result.reason.message : String(result.reason),
-          executedAt: new Date(),
-          executionTimeMs: 0,
+          executionId,
+          startTime: endTime, // Use same time since we don't have start time
+          endTime,
+          duration: 0,
+          status: "failed" as const,
+          serversProcessed: 0,
+          commandsSent: 0,
+          errors: [result.reason instanceof Error ? result.reason.message : String(result.reason)],
         }
       }
     })
@@ -422,11 +456,12 @@ export class RconScheduleService implements IRconScheduleService {
       const executor = this.getExecutorForSchedule(schedule)
 
       // Create execution context
+      const executionId = `${schedule.id}-${server.serverId}-${Date.now()}`
       const context: ScheduleExecutionContext = {
+        scheduleId: schedule.id,
+        executionId,
         schedule,
-        server,
-        attempt: 1,
-        isRetry: false,
+        startTime: new Date(),
       }
 
       // Execute with retry logic
@@ -435,10 +470,20 @@ export class RconScheduleService implements IRconScheduleService {
 
       for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
         try {
-          context.attempt = attempt
-          context.isRetry = attempt > 1
+          const startTime = new Date()
+          const executorResult = await executor.execute(context)
+          const endTime = new Date()
 
-          const result = await executor.execute(context)
+          // Convert executor result to ScheduleExecutionResult
+          const result: ScheduleExecutionResult = {
+            executionId,
+            startTime,
+            endTime,
+            duration: endTime.getTime() - startTime.getTime(),
+            status: "success" as const,
+            serversProcessed: executorResult.serversProcessed,
+            commandsSent: executorResult.commandsSent,
+          }
           return result
         } catch (error) {
           lastError = error instanceof Error ? error : new Error(String(error))
@@ -540,35 +585,13 @@ export class RconScheduleService implements IRconScheduleService {
    * Get appropriate executor for a schedule
    */
   private getExecutorForSchedule(schedule: ScheduledCommand): IScheduledCommandExecutor {
-    const command = typeof schedule.command === "string" ? schedule.command : ""
+    // Get command type from the command object
+    const commandType = schedule.command.type
 
-    // Determine command type
-    let executorType: string
-    const messageCommands = [
-      "say",
-      "say_team",
-      "admin_say",
-      "echo",
-      "amx_say",
-      "amx_csay",
-      "amx_tsay",
-      "hlx_tsay",
-    ]
-    const isMessageCommand = messageCommands.some((cmd) => command.toLowerCase().startsWith(cmd))
-
-    if (isMessageCommand) {
-      executorType = "server-message"
-    } else if (["status", "stats", "info", "fps_max"].some((cmd) => command.startsWith(cmd))) {
-      executorType = "stats-snapshot"
-    } else {
-      // Default to server message for unknown commands
-      executorType = "server-message"
-    }
-
-    const executor = this.executors.get(executorType)
+    const executor = this.executors.get(commandType)
     if (!executor) {
       throw new ScheduleError(
-        `No executor found for command type: ${executorType}`,
+        `No executor found for command type: ${commandType}`,
         ScheduleErrorCode.INVALID_COMMAND,
         schedule.id,
       )
@@ -581,8 +604,20 @@ export class RconScheduleService implements IRconScheduleService {
    * Initialize command executors
    */
   private initializeExecutors(): void {
-    this.executors.set("server-message", new ServerMessageCommand(this.logger, this.rconService))
-    this.executors.set("stats-snapshot", new StatsSnapshotCommand(this.logger, this.rconService))
+    this.executors.set(
+      "server-message",
+      new ServerMessageCommand(this.logger, this.rconService, this.serverService),
+    )
+
+    // Create server monitoring command and store reference for immediate connections
+    this.serverMonitoringCommand = new ServerMonitoringCommand(
+      this.logger,
+      this.rconService,
+      this.serverService,
+      this.serverStatusEnricher,
+      this.sessionService,
+    )
+    this.executors.set("server-monitoring", this.serverMonitoringCommand)
   }
 
   /**
@@ -593,8 +628,6 @@ export class RconScheduleService implements IRconScheduleService {
       totalExecutions: 0,
       successfulExecutions: 0,
       failedExecutions: 0,
-      totalExecutionTimeMs: 0,
-      averageExecutionTimeMs: 0,
     }
   }
 
@@ -605,15 +638,17 @@ export class RconScheduleService implements IRconScheduleService {
     const { stats } = job
 
     stats.totalExecutions += results.length
-    stats.successfulExecutions += results.filter((r) => r.success).length
-    stats.failedExecutions += results.filter((r) => !r.success).length
-    stats.lastExecutedAt = new Date()
+    stats.successfulExecutions += results.filter((r) => r.status === "success").length
+    stats.failedExecutions += results.filter((r) => r.status === "failed").length
 
-    const totalTime = results.reduce((sum, r) => sum + r.executionTimeMs, 0)
-    stats.totalExecutionTimeMs += totalTime
-
-    if (stats.totalExecutions > 0) {
-      stats.averageExecutionTimeMs = stats.totalExecutionTimeMs / stats.totalExecutions
+    // Update execution timestamps
+    if (results.length > 0) {
+      const latestResult = results[results.length - 1]
+      if (latestResult) {
+        stats.lastExecutionStart = latestResult.startTime
+        stats.lastExecutionEnd = latestResult.endTime
+        stats.lastExecutionDuration = latestResult.duration
+      }
     }
   }
 
@@ -627,6 +662,22 @@ export class RconScheduleService implements IRconScheduleService {
     const maxHistory = 100 // Keep last 100 executions
     if (job.history.length > maxHistory) {
       job.history.splice(0, job.history.length - maxHistory)
+    }
+  }
+
+  /**
+   * Handle SERVER_AUTHENTICATED events for immediate RCON connections
+   */
+  private async handleServerAuthenticated(event: ServerAuthenticatedEvent): Promise<void> {
+    // If we have a server monitoring command, use it for immediate connections
+    if (this.serverMonitoringCommand) {
+      setImmediate(() => {
+        this.serverMonitoringCommand!.connectToServerImmediately(event.serverId).catch((error) => {
+          this.logger.error(
+            `Failed immediate RCON connection for server ${event.serverId}: ${error}`,
+          )
+        })
+      })
     }
   }
 

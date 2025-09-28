@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { ActionService } from "./action.service"
-import { createMockLogger } from "../../tests/mocks/logger"
+import { createMockLogger } from "@/tests/mocks/logger"
 import type { IActionRepository, ActionDefinition, ActionEvent } from "./action.types"
 import type {
   ActionPlayerEvent,
@@ -13,7 +13,7 @@ import type {
   WorldActionEvent,
 } from "./action.types"
 import { EventType } from "@/shared/types/events"
-import type { IPlayerService } from "@/modules/player/player.types"
+import type { IPlayerService } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 
 // Create mock repository

@@ -4,11 +4,12 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { IngressService } from "./ingress.service"
-import { createMockLogger } from "../../tests/mocks/logger"
+import { createMockLogger } from "@/tests/mocks/logger"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { IngressDependencies } from "./ingress.dependencies"
 import type { ISocketFactory } from "./udp-server"
 import { TestClock } from "@/shared/infrastructure/time/test-clock"
+import { ServerStateManager } from "@/modules/server/state/server-state-manager"
 import type { Socket } from "dgram"
 
 // Mock socket for UDP server
@@ -74,6 +75,7 @@ describe("IngressService", () => {
           name: "Test Server",
         }),
       },
+      serverStateManager: new ServerStateManager(createMockLogger()),
       clock: new TestClock(),
     }
 

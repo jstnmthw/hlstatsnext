@@ -6,6 +6,7 @@
 
 import type { GameDetectionResult } from "@/modules/game/game-detection.types"
 import type { IClock } from "@/shared/infrastructure/time/clock.interface"
+import type { ServerStateManager } from "@/modules/server/state/server-state-manager"
 
 /**
  * Server authentication service interface
@@ -61,5 +62,6 @@ export interface IngressDependencies {
   readonly serverAuthenticator: IServerAuthenticator
   readonly gameDetector: IGameDetector
   readonly serverInfoProvider: IServerInfoProvider
+  readonly serverStateManager: ServerStateManager
   readonly clock: IClock
 }

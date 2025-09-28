@@ -5,7 +5,7 @@
  * data integrity and prevent invalid stat modifications.
  */
 
-import type { PlayerStatsUpdate } from "@/modules/player/player.types"
+import type { PlayerStatsUpdate } from "@/modules/player/types/player.types"
 
 /**
  * Validates that a numeric stat update value is within acceptable bounds

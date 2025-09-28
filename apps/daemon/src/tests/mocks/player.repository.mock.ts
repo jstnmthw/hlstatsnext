@@ -3,7 +3,7 @@
  */
 
 import { vi } from "vitest"
-import type { IPlayerRepository } from "@/modules/player/player.types"
+import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { Player } from "@repo/database/client"
 
 export function createMockPlayerRepository(): IPlayerRepository {

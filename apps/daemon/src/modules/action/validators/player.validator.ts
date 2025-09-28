@@ -51,7 +51,7 @@
  * ```
  */
 
-import type { IPlayerService } from "@/modules/player/player.types"
+import type { IPlayerService } from "@/modules/player/types/player.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
 

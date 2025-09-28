@@ -8,9 +8,9 @@
 import { BasePlayerEventHandler } from "./base-player-event.handler"
 import { EventType } from "@/shared/types/events"
 import type { HandlerResult } from "@/shared/types/common"
-import type { PlayerEvent, PlayerChatEvent } from "@/modules/player/player.types"
+import type { PlayerEvent, PlayerChatEvent } from "@/modules/player/types/player.types"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerRepository } from "@/modules/player/player.types"
+import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 
 export class ChatEventHandler extends BasePlayerEventHandler {

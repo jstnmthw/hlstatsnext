@@ -8,7 +8,7 @@
 
 import { sanitizePlayerName } from "@/shared/utils/validation"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerRepository } from "@/modules/player/player.types"
+import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { IServerRepository } from "@/modules/server/server.types"
 import type { PlayerMeta } from "@/shared/types/events"
 

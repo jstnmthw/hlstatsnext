@@ -114,7 +114,9 @@ describe("BaseRepository", () => {
 
       expect(table).toBeDefined()
       // The table should be the mock's test property
-      expect(table).toBe((mockDatabase.prisma as Record<string, unknown>).test)
+      expect(table).toBe(
+        (mockDatabase.prisma as unknown as Record<string, unknown> & { test: unknown }).test,
+      )
     })
 
     it("should work with different table names", () => {

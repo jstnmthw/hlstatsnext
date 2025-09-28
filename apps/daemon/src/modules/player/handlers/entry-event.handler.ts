@@ -6,10 +6,10 @@
  */
 
 import type { HandlerResult } from "@/shared/types/common"
-import type { PlayerEvent } from "@/modules/player/player.types"
+import type { PlayerEvent } from "@/modules/player/types/player.types"
 import type { PlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerRepository } from "@/modules/player/player.types"
+import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import { BasePlayerEventHandler } from "./base-player-event.handler"

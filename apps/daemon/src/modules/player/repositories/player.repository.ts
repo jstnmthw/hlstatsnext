@@ -11,7 +11,7 @@ import type {
   PlayerCreateData,
   PlayerNameStatsUpdate,
   PlayerSessionStats,
-} from "./player.types"
+} from "../types/player.types"
 import type { FindOptions, CreateOptions, UpdateOptions } from "@/shared/types/database"
 import type { Player, Prisma } from "@repo/database/client"
 import {

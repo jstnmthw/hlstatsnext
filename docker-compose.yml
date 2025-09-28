@@ -59,6 +59,28 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  garnet:
+    image: ghcr.io/microsoft/garnet:latest
+    container_name: hlstatsnext-garnet
+    hostname: hlstatsnext-garnet
+    environment:
+      - GARNET_MEMORY=${GARNET_MEMORY:-1g}
+      - GARNET_PORT=${GARNET_PORT:-6379}
+    volumes:
+      - garnet-data:/data
+    ports:
+      - "6379:6379" # Redis-compatible port
+    networks:
+      - default
+    command: --port 6379 --memory ${GARNET_MEMORY:-1g} --checkpointdir /data
+    healthcheck:
+      test: ["CMD", "garnet-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
   # daemon:
   #   build:
   #     context: .
@@ -130,3 +152,4 @@ networks:
 volumes:
   db-volume:
   rabbitmq-data:
+  garnet-data:

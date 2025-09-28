@@ -12,8 +12,8 @@ import type {
   RatingUpdate,
   PlayerEvent,
   PlayerWithCounts,
-} from "./player.types"
-import type { IPlayerSessionService } from "./types/player-session.types"
+} from "../types/player.types"
+import type { IPlayerSessionService } from "../types/player-session.types"
 import type { Player } from "@repo/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
@@ -22,7 +22,7 @@ import type { IMatchService } from "@/modules/match/match.types"
 import type { IServerRepository, IServerService } from "@/modules/server/server.types"
 import { normalizeSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
 import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builder"
-import { PlayerEventHandlerFactory } from "./handlers/player-event-handler.factory"
+import { PlayerEventHandlerFactory } from "../handlers/player-event-handler.factory"
 import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 
 export class PlayerService implements IPlayerService {

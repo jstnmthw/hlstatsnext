@@ -9,7 +9,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import type { IngressOptions } from "@/modules/ingress/ingress.types"
-import type { IPlayerService } from "@/modules/player/player.types"
+import type { IPlayerService } from "@/modules/player/types/player.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IWeaponService } from "@/modules/weapon/weapon.types"
@@ -22,13 +22,14 @@ import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
 import type { CommandResolverService } from "@/modules/rcon/services/command-resolver.service"
 import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
-import type { IPlayerRepository } from "@/modules/player/player.types"
+import type { IPlayerRepository } from "@/modules/player/types/player.types"
+import type { ICacheService } from "@/shared/infrastructure/caching"
 
 import { DatabaseClient } from "@/database/client"
 import { QueueModule } from "@/shared/infrastructure/messaging/module"
 import { IngressService } from "@/modules/ingress/ingress.service"
 import { EventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus"
-import { PlayerEventHandler } from "@/modules/player/player.events"
+import { PlayerEventHandler } from "@/modules/player/events/player.events"
 import { systemClock } from "@/shared/infrastructure/time"
 import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
 import { MatchEventHandler } from "@/modules/match/match.events"
@@ -38,6 +39,7 @@ import { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import { RabbitMQConsumer } from "@/shared/infrastructure/messaging/queue/rabbitmq/consumer"
 import { createIngressDependencies } from "@/modules/ingress/factories/ingress-dependencies"
+import { ServerStateManager } from "@/modules/server/state/server-state-manager"
 import { createInfrastructureComponents } from "@/shared/application/factories/infrastructure-config.factory"
 import { createRconConfig } from "@/shared/application/factories/rcon-config.factory"
 import { createIngressConfig } from "@/shared/application/factories/ingress-config.factory"
@@ -56,6 +58,7 @@ export interface AppContext {
   database: DatabaseClient
   logger: ILogger
   eventBus: IEventBus
+  cache: ICacheService
 
   // Queue Infrastructure (migration to queue-first)
   queueModule?: QueueModule
@@ -134,16 +137,21 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     infrastructure.logger,
     rconConfig,
     scheduleConfig,
+    eventBus,
   )
 
   // Create queue module
   const queueResult = createQueueModule(infrastructure.logger)
+
+  // Create server state manager
+  const serverStateManager = new ServerStateManager(infrastructure.logger)
 
   // Create ingress dependencies and service
   const ingressDependencies = createIngressDependencies(
     infrastructure.database,
     services.serverService,
     services.gameDetectionService,
+    serverStateManager,
     infrastructure.logger,
     systemClock,
     eventBus,
@@ -163,6 +171,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     database: infrastructure.database,
     logger: infrastructure.logger,
     eventBus,
+    cache: infrastructure.cache,
 
     // Queue Infrastructure
     queueModule: queueResult.queueModule,

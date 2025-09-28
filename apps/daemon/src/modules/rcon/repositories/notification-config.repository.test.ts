@@ -4,8 +4,8 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { NotificationConfigRepository } from "./notification-config.repository"
-import { createMockLogger } from "../../../tests/mocks/logger"
-import { createMockDatabaseClient } from "../../../tests/mocks/database"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { createMockDatabaseClient } from "@/tests/mocks/database"
 import type { TransactionalPrisma } from "@/database/client"
 
 // Create proper mock interface for Prisma delegate

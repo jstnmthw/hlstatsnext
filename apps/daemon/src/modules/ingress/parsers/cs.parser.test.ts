@@ -32,17 +32,65 @@ import type { MapChangeEvent, RoundStartEvent } from "@/modules/match/match.type
 import { TestClock } from "@/shared/infrastructure/time/test-clock"
 import { DeterministicUuidService } from "@/shared/infrastructure/identifiers/deterministic-uuid.service"
 import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import type { ServerStateManager, ServerState } from "@/modules/server/state/server-state-manager"
 
 describe("CsParser", () => {
   const serverId = 1
   let parser: CsParser
   let clock: TestClock
+  let mockStateManager: ServerStateManager
 
   beforeEach(() => {
     clock = new TestClock()
     // Initialize UUID service for tests
     setUuidService(new DeterministicUuidService(clock))
-    parser = new CsParser("cstrike", clock)
+
+    // Create mock state manager
+    const serverStates = new Map<number, ServerState>()
+
+    mockStateManager = {
+      getServerState: (serverId: number) => {
+        if (!serverStates.has(serverId)) {
+          serverStates.set(serverId, {
+            currentMap: "",
+            currentRound: 0,
+            matchState: "waiting",
+            teamCounts: { terrorists: 0, counterTerrorists: 0, spectators: 0 },
+            maxPlayers: 32,
+            lastActivity: new Date(),
+          })
+        }
+        return serverStates.get(serverId)!
+      },
+
+      updateMap: (serverId: number, mapName: string) => {
+        const state = mockStateManager.getServerState(serverId)
+        const previousMap = state.currentMap === "" ? undefined : state.currentMap
+        state.currentMap = mapName
+        return { changed: true, previousMap }
+      },
+
+      setWinningTeam: (serverId: number, team: string) => {
+        const state = mockStateManager.getServerState(serverId)
+        state.lastWinningTeam = team
+      },
+
+      startRound: (serverId: number) => {
+        const state = mockStateManager.getServerState(serverId)
+        state.currentRound += 1
+        state.roundStartTime = new Date()
+        return { roundNumber: state.currentRound }
+      },
+
+      endRound: (serverId: number) => {
+        const state = mockStateManager.getServerState(serverId)
+        const winningTeam = state.lastWinningTeam
+        state.lastWinningTeam = undefined // Clear after retrieving
+        return { roundNumber: state.currentRound, winningTeam }
+      },
+    } as ServerStateManager
+
+    parser = new CsParser("cstrike", clock, mockStateManager)
   })
 
   describe("parseKillEvent", () => {
@@ -375,6 +423,7 @@ describe("CsParser", () => {
       expect(result.event?.eventType).toBe(EventType.ROUND_END)
       expect(result.event?.data).toEqual({
         winningTeam: "TERRORIST",
+        roundNumber: 0,
       })
     })
   })

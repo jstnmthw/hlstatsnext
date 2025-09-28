@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { HLStatsDaemon } from "./main"
 import type { AppContext } from "@/context"
 import type { BaseEvent, EventType } from "@/shared/types/events"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import { HLStatsDaemon } from "./main"
 import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { getEnvironmentConfig } from "@/config/environment.config"
 import { RconMonitorService } from "@/modules/rcon/services/rcon-monitor.service"
@@ -68,12 +68,15 @@ const mockContext = {
   queueModule: {
     shutdown: vi.fn(),
   },
+  cache: {
+    disconnect: vi.fn(),
+  },
 } as unknown as AppContext
 
 describe("HLStatsDaemon", () => {
   let daemon: HLStatsDaemon
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks()
 
     vi.mocked(getAppContext).mockReturnValue(mockContext)
@@ -101,7 +104,7 @@ describe("HLStatsDaemon", () => {
       () => mockDatabaseConnection as unknown as InstanceType<typeof DatabaseConnectionService>,
     )
 
-    daemon = new HLStatsDaemon()
+    daemon = await HLStatsDaemon.create()
   })
 
   afterEach(() => {
@@ -204,7 +207,7 @@ describe("HLStatsDaemon", () => {
       }
       vi.mocked(getAppContext).mockReturnValue(contextWithoutPublisher)
 
-      const newDaemon = new HLStatsDaemon()
+      const newDaemon = await HLStatsDaemon.create()
       const mockExit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never)
 
       await newDaemon.start()
@@ -262,6 +265,7 @@ describe("HLStatsDaemon", () => {
       vi.mocked(mockContext.ingressService.stop).mockResolvedValue(undefined)
       vi.mocked(mockContext.rconService.disconnectAll).mockResolvedValue(undefined)
       vi.mocked(mockContext.rconScheduleService.stop).mockResolvedValue(undefined)
+      vi.mocked(mockContext.cache.disconnect).mockResolvedValue(undefined)
       vi.mocked(mockDatabaseConnection.disconnect).mockResolvedValue(undefined)
 
       await daemon.stop()
@@ -279,6 +283,8 @@ describe("HLStatsDaemon", () => {
       vi.mocked(mockContext.rconScheduleService.stop).mockResolvedValue(undefined)
       vi.mocked(mockContext.ingressService.stop).mockRejectedValue(new Error("Stop error"))
       vi.mocked(mockContext.rconService.disconnectAll).mockResolvedValue(undefined)
+      vi.mocked(mockContext.cache.disconnect).mockResolvedValue(undefined)
+      vi.spyOn(mockContext.database, "disconnect").mockResolvedValue(undefined)
       vi.mocked(mockDatabaseConnection.disconnect).mockResolvedValue(undefined)
 
       await daemon.stop()

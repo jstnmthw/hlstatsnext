@@ -7,23 +7,19 @@
 
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IRconService } from "../../types/rcon.types"
-import type { ServerInfo } from "@/modules/server/server.types"
 import type {
   IScheduledCommandExecutor,
   ScheduledCommand,
   ScheduleExecutionContext,
-  ScheduleExecutionResult,
 } from "../../types/schedule.types"
-import { ScheduleError, ScheduleErrorCode } from "../../types/schedule.types"
 
 /**
  * Abstract base class for scheduled command executors.
  *
  * Provides common functionality like:
  * - Error handling and logging
- * - Timeout management
- * - Retry logic
- * - Result formatting
+ * - Command validation
+ * - Execution tracking
  */
 export abstract class BaseScheduledCommand implements IScheduledCommandExecutor {
   protected readonly logger: ILogger
@@ -35,83 +31,55 @@ export abstract class BaseScheduledCommand implements IScheduledCommandExecutor 
   }
 
   /**
-   * Execute the scheduled command with timeout and error handling
+   * Execute the scheduled command across all applicable servers
    */
-  async execute(context: ScheduleExecutionContext): Promise<ScheduleExecutionResult> {
-    const { schedule, server, attempt, isRetry } = context
-    const startTime = Date.now()
+  async execute(context: ScheduleExecutionContext): Promise<{
+    serversProcessed: number
+    commandsSent: number
+  }> {
+    const { schedule, scheduleId, executionId } = context
 
-    this.logger.debug(`Executing scheduled command: ${schedule.id} on server ${server.serverId}`, {
-      scheduleId: schedule.id,
-      serverId: server.serverId,
-      serverName: server.name,
-      attempt,
-      isRetry,
-      command: this.getResolvedCommand(schedule, server),
+    this.logger.debug(`Executing scheduled command: ${scheduleId}`, {
+      scheduleId,
+      executionId,
+      scheduleName: schedule.name,
+      commandType: this.getType(),
     })
 
     try {
-      // Validate the command before execution
-      await this.validateExecution(context)
+      // Delegate to subclass for actual execution
+      const result = await this.executeCommand(context)
 
-      // Execute with timeout
-      const timeoutMs = schedule.timeoutMs || 30000
-      const response = await this.executeWithTimeout(context, timeoutMs)
-
-      // Process the response
-      const processedResponse = await this.processResponse(response, context)
-
-      const result: ScheduleExecutionResult = {
-        commandId: schedule.id,
-        serverId: server.serverId,
-        success: true,
-        response: processedResponse,
-        executedAt: new Date(),
-        executionTimeMs: Date.now() - startTime,
-        retryAttempt: isRetry ? attempt : undefined,
-      }
-
-      this.logger.ok(`Scheduled command: ${this.getResolvedCommand(schedule, server)}`, {
-        scheduleId: schedule.id,
-        scheduleName: schedule.name,
-        serverId: server.serverId,
-        serverName: server.name,
-        executionTimeMs: result.executionTimeMs,
-        command: this.getResolvedCommand(schedule, server),
+      this.logger.debug(`Scheduled command completed: ${scheduleId}`, {
+        scheduleId,
+        executionId,
+        serversProcessed: result.serversProcessed,
+        commandsSent: result.commandsSent,
       })
-
-      // Perform any post-execution tasks
-      await this.onExecutionSuccess(result, context)
 
       return result
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-
-      const result: ScheduleExecutionResult = {
-        commandId: schedule.id,
-        serverId: server.serverId,
-        success: false,
-        error: errorMessage,
-        executedAt: new Date(),
-        executionTimeMs: Date.now() - startTime,
-        retryAttempt: isRetry ? attempt : undefined,
-      }
-
-      this.logger.warn(`Scheduled command failed: ${schedule.id}`, {
-        scheduleId: schedule.id,
-        serverId: server.serverId,
-        serverName: server.name,
-        attempt,
-        error: errorMessage,
-        executionTimeMs: result.executionTimeMs,
+      this.logger.error(`Scheduled command failed: ${scheduleId}`, {
+        scheduleId,
+        executionId,
+        error: error instanceof Error ? error.message : String(error),
       })
 
-      // Perform any post-execution error handling
-      await this.onExecutionError(error, result, context)
-
-      return result
+      // Return zero counts on error
+      return {
+        serversProcessed: 0,
+        commandsSent: 0,
+      }
     }
   }
+
+  /**
+   * Abstract method for subclasses to implement specific command execution
+   */
+  protected abstract executeCommand(context: ScheduleExecutionContext): Promise<{
+    serversProcessed: number
+    commandsSent: number
+  }>
 
   /**
    * Validate that the command can be executed
@@ -145,121 +113,8 @@ export abstract class BaseScheduledCommand implements IScheduledCommandExecutor 
    * Validate specific command requirements (override in subclasses)
    */
   protected async validateCommand(schedule: ScheduledCommand): Promise<boolean> {
-    // Base implementation - validate that command is not empty
-    const command =
-      typeof schedule.command === "string" ? schedule.command : schedule.command.toString()
-    return command.trim().length > 0
-  }
-
-  /**
-   * Validate execution context before running command
-   */
-  protected async validateExecution(context: ScheduleExecutionContext): Promise<void> {
-    const { server, schedule } = context
-
-    // Check if server matches filter criteria
-    if (!this.serverMatchesFilter(server, schedule)) {
-      throw new ScheduleError(
-        `Server ${server.serverId} does not meet filter criteria`,
-        ScheduleErrorCode.EXECUTION_FAILED,
-        schedule.id,
-        server.serverId,
-      )
-    }
-
-    // Check if server is available for RCON
-    if (!this.rconService.isConnected(server.serverId)) {
-      throw new ScheduleError(
-        `Server ${server.serverId} is not connected via RCON`,
-        ScheduleErrorCode.SERVER_NOT_AVAILABLE,
-        context.schedule.id,
-        server.serverId,
-      )
-    }
-  }
-
-  /**
-   * Execute the command with timeout protection
-   */
-  protected async executeWithTimeout(
-    context: ScheduleExecutionContext,
-    timeoutMs: number,
-  ): Promise<string> {
-    const { schedule, server } = context
-
-    // Resolve the command (handle function-based commands)
-    const command = this.getResolvedCommand(schedule, server)
-
-    // Execute with timeout
-    return await Promise.race([
-      this.rconService.executeCommand(server.serverId, command),
-      new Promise<never>((_, reject) =>
-        setTimeout(
-          () =>
-            reject(
-              new ScheduleError(
-                `Command execution timed out after ${timeoutMs}ms`,
-                ScheduleErrorCode.EXECUTION_TIMEOUT,
-                schedule.id,
-                server.serverId,
-              ),
-            ),
-          timeoutMs,
-        ),
-      ),
-    ])
-  }
-
-  /**
-   * Process the command response (override in subclasses for custom processing)
-   */
-  protected async processResponse(
-    response: string,
-    context: ScheduleExecutionContext,
-  ): Promise<string> {
-    // Base implementation adds basic logging
-    this.logger.debug(
-      `Command executed for schedule ${context.schedule.id}: ${response.slice(0, 100)}...`,
-    )
-    return response
-  }
-
-  /**
-   * Called after successful execution (override in subclasses)
-   */
-  protected async onExecutionSuccess(
-    result: ScheduleExecutionResult,
-    context: ScheduleExecutionContext,
-  ): Promise<void> {
-    // Base implementation logs successful execution
-    this.logger.debug(
-      `Schedule ${context.schedule.id} executed successfully on server ${result.serverId}`,
-    )
-  }
-
-  /**
-   * Called after execution error (override in subclasses)
-   */
-  protected async onExecutionError(
-    error: unknown,
-    result: ScheduleExecutionResult,
-    context: ScheduleExecutionContext,
-  ): Promise<void> {
-    // Base implementation logs execution errors
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    this.logger.warn(
-      `Schedule ${context.schedule.id} failed on server ${result.serverId}: ${errorMessage}`,
-    )
-  }
-
-  /**
-   * Resolve command string or function to final command
-   */
-  protected getResolvedCommand(schedule: ScheduledCommand, server: ServerInfo): string {
-    if (typeof schedule.command === "function") {
-      return schedule.command(server)
-    }
-    return schedule.command
+    // Base implementation - validate that command has a type
+    return !!(schedule.command && typeof schedule.command === "object" && schedule.command.type)
   }
 
   /**
@@ -271,50 +126,6 @@ export abstract class BaseScheduledCommand implements IScheduledCommandExecutor 
   }
 
   /**
-   * Check if a server matches the schedule's filter criteria
-   */
-  protected serverMatchesFilter(server: ServerInfo, schedule: ScheduledCommand): boolean {
-    const filter = schedule.serverFilter
-    if (!filter) {
-      return true // No filter = all servers match
-    }
-
-    // Check server ID inclusion/exclusion
-    if (filter.serverIds && !filter.serverIds.includes(server.serverId)) {
-      return false
-    }
-
-    if (filter.excludeServerIds && filter.excludeServerIds.includes(server.serverId)) {
-      return false
-    }
-
-    // Check game type filter
-    if (filter.gameTypes && filter.gameTypes.length > 0) {
-      // This would need to be implemented based on how game types are stored
-      // For now, return true if no game type is specified on the server
-    }
-
-    // Check player count filters
-    // Note: playerCount is not available in ServerInfo, would need server status
-    // For now, we'll skip player count validation
-    // TODO: Implement server status fetching for player count validation
-    if (filter.minPlayers !== undefined || filter.maxPlayers !== undefined) {
-      // Skip player count filtering until we have access to current server status
-      this.logger.debug(
-        `Player count filtering skipped for schedule ${schedule.id} - not implemented`,
-      )
-    }
-
-    // Check tags filter
-    if (filter.tags && filter.tags.length > 0) {
-      // This would need to be implemented based on how tags are stored
-      // For now, return true if no tags are specified on the server
-    }
-
-    return true
-  }
-
-  /**
    * Format execution time for logging
    */
   protected formatExecutionTime(milliseconds: number): string {
@@ -322,13 +133,5 @@ export abstract class BaseScheduledCommand implements IScheduledCommandExecutor 
       return `${milliseconds}ms`
     }
     return `${(milliseconds / 1000).toFixed(2)}s`
-  }
-
-  /**
-   * Sanitize command for logging (remove sensitive information)
-   */
-  protected sanitizeCommandForLogging(command: string): string {
-    // Remove potential passwords or sensitive data from logs
-    return command.replace(/password\s+\S+/gi, "password [REDACTED]")
   }
 }

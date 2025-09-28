@@ -4,7 +4,7 @@
  * Provides validation functions for player name operations and alias management.
  */
 
-import type { PlayerNameStatsUpdate } from "@/modules/player/player.types"
+import type { PlayerNameStatsUpdate } from "@/modules/player/types/player.types"
 
 /**
  * Validates that a player name meets basic requirements

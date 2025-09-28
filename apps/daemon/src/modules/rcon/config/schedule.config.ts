@@ -28,7 +28,10 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "server-rules-reminder",
     name: "Server Rules Reminder",
     cronExpression: "0 */30 * * * *", // Every 30 minutes
-    command: 'say "Type !help for a list of commands"',
+    command: {
+      type: "server-message",
+      message: 'say "Type !help for a list of commands"',
+    },
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
@@ -43,7 +46,10 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "hlstatsnext-promotion",
     name: "HLStatsNext Promotion",
     cronExpression: "0 */10 * * * *", // Every 10 minutes
-    command: "hlx_csay 80ff00 This server is running HLStatsNext Visit hlstatsnext.com",
+    command: {
+      type: "server-message",
+      message: "hlx_csay 80ff00 This server is running HLStatsNext Visit hlstatsnext.com",
+    },
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
@@ -58,7 +64,10 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "discord-promotion",
     name: "Discord Server Promotion",
     cronExpression: "0 */15 * * * *",
-    command: "hlx_csay 00FF00 Join our Discord community! Link: discord.gg/0x1clan",
+    command: {
+      type: "server-message",
+      message: "hlx_csay 00FF00 Join our Discord community! Link: discord.gg/0x1clan",
+    },
     enabled: true, // Disabled by default - servers can customize and enable
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
@@ -77,7 +86,10 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "map-vote-reminder",
     name: "Map Vote Reminder",
     cronExpression: "0 50 * * * *", // 10 minutes before each hour
-    command: "hlx_typehud 8000ff Don't forget to vote for the next map! Type !votemap",
+    command: {
+      type: "server-message",
+      message: "hlx_typehud 8000ff Don't forget to vote for the next map! Type !votemap",
+    },
     enabled: false,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
@@ -95,7 +107,10 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "stats-announcement",
     name: "Stats Information",
     cronExpression: "0 15 * * * *", // Every hour at 15 minutes past
-    command: 'say "Your stats are tracked! Visit hlstatsnext.com to view your progress"',
+    command: {
+      type: "server-message",
+      message: 'say "Your stats are tracked! Visit hlstatsnext.com to view your progress"',
+    },
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
@@ -113,7 +128,10 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "daily-stats-snapshot",
     name: "Daily Statistics Snapshot",
     cronExpression: "0 0 0 * * *", // Daily at midnight
-    command: "status",
+    command: {
+      type: "stats_snapshot",
+      command: "status",
+    },
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
@@ -130,7 +148,10 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "peak-hours-welcome",
     name: "Peak Hours Welcome Message",
     cronExpression: "0 0 18-23 * * *", // Every hour from 6 PM to 11 PM
-    command: 'say "Welcome to peak hours! Have fun and play fair!"',
+    command: {
+      type: "server-message",
+      message: 'say "Welcome to peak hours! Have fun and play fair!"',
+    },
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
@@ -148,7 +169,10 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "anti-camp-reminder",
     name: "Anti-Camping Reminder",
     cronExpression: "0 */45 * * * *", // Every 45 minutes
-    command: 'say "Remember: Excessive camping may result in penalties"',
+    command: {
+      type: "server-message",
+      message: 'say "Remember: Excessive camping may result in penalties"',
+    },
     enabled: false, // Disabled by default, can be enabled per server
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
@@ -167,7 +191,10 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "server-restart-warning",
     name: "Server Restart Warning",
     cronExpression: "0 55 3 * * *", // Daily at 3:55 AM (5 minutes before restart)
-    command: 'say "Server restart in 5 minutes! Current round will finish normally."',
+    command: {
+      type: "server-message",
+      message: 'say "Server restart in 5 minutes! Current round will finish normally."',
+    },
     enabled: false, // Only enable on servers that have scheduled restarts
     timeoutMs: DEFAULT_TIMEOUT_MS,
     retryOnFailure: false, // Don't retry restart warnings
@@ -183,7 +210,10 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "hourly-server-status",
     name: "Hourly Server Status Check",
     cronExpression: "0 0 * * * *", // Every hour on the hour
-    command: "stats",
+    command: {
+      type: "stats_snapshot",
+      command: "stats",
+    },
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
@@ -199,7 +229,10 @@ const defaultScheduledCommands: ScheduledCommand[] = [
     id: "performance-check",
     name: "Server Performance Check",
     cronExpression: "0 */15 * * * *", // Every 15 minutes
-    command: "fps_max",
+    command: {
+      type: "stats_snapshot",
+      command: "fps_max",
+    },
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     retryOnFailure: false,
@@ -210,6 +243,27 @@ const defaultScheduledCommands: ScheduledCommand[] = [
       description: "Monitors server performance metrics",
       captureStats: true,
       internal: true, // Not visible to players
+    },
+  },
+
+  {
+    id: "server-monitoring",
+    name: "Server Status Monitoring",
+    cronExpression: "*/30 * * * * *", // Every 30 seconds for real-time data
+    command: {
+      type: "server-monitoring",
+    },
+    enabled: true,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+    retryOnFailure: true,
+    maxRetries: 2,
+    metadata: {
+      category: "monitoring",
+      priority: "critical",
+      description: "Real-time server status monitoring and RCON health checks",
+      captureStats: true,
+      internal: true, // Not visible to players
+      realTime: true, // Indicates this is for real-time monitoring
     },
   },
 ]

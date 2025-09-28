@@ -22,7 +22,7 @@ schedulers/
 ├── ../commands/scheduled/
 │   ├── base-scheduled.command.ts       # Abstract base class
 │   ├── server-message.command.ts       # Message announcements
-│   └── stats-snapshot.command.ts       # Statistics collection
+│   └── server-monitoring.command.ts    # Server monitoring and enrichment
 ├── ../config/
 │   └── schedule.config.ts      # Default schedule configurations
 └── ../types/

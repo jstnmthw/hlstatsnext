@@ -74,7 +74,7 @@ import type {
   WorldActionEvent,
 } from "./action.types"
 import type { IActionRepository } from "./action.types"
-import type { IPlayerService } from "@/modules/player/player.types"
+import type { IPlayerService } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import type { ILogger } from "@/shared/utils/logger.types"

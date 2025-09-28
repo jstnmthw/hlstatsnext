@@ -7,7 +7,7 @@
  */
 
 import type { Player } from "@repo/database/client"
-import type { PlayerStatsUpdate } from "@/modules/player/player.types"
+import type { PlayerStatsUpdate } from "@/modules/player/types/player.types"
 import {
   validatePlayerStatsUpdate,
   sanitizePlayerStatsUpdate,

@@ -1,62 +1,40 @@
 /**
  * Database Client for HLStats Daemon
  *
- * Provides a centralized database client with connection management,
- * error handling, and transaction support for the daemon services.
- *
+ * Re-exports the shared DatabaseClient from @repo/database/client
+ * with daemon-specific configurations and types.
  */
 
-import { db, type PrismaClient } from "@repo/database/client"
+import { DatabaseClient as SharedDatabaseClient, type PrismaClient } from "@repo/database/client"
 
 export type TransactionalPrisma = Omit<
   PrismaClient,
   "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
 >
 
-export class DatabaseClient {
-  private client: PrismaClient | TransactionalPrisma
-
-  constructor(client: PrismaClient | TransactionalPrisma = db) {
-    this.client = client
-  }
-
+/**
+ * Daemon-specific database client extending the shared implementation
+ */
+export class DatabaseClient extends SharedDatabaseClient {
   /**
-   * Get the Prisma client instance
+   * Get the Prisma client instance with transaction support
    */
-  get prisma(): TransactionalPrisma {
-    return this.client
+  get prisma(): PrismaClient {
+    return super.prisma
   }
 
   /**
-   * Test database connectivity
+   * Get the Prisma client instance for transactions (subset of methods)
    */
-  async testConnection(): Promise<boolean> {
-    try {
-      await this.client.$queryRaw`SELECT 1`
-      return true
-    } catch (error) {
-      console.error("Database connection test failed:", error)
-      return false
-    }
+  get transactionalPrisma(): TransactionalPrisma {
+    return super.prisma as TransactionalPrisma
   }
 
   /**
-   * Execute a transaction
+   * Execute a transaction with proper typing
    */
   async transaction<T>(callback: (tx: TransactionalPrisma) => Promise<T>): Promise<T> {
-    if ("$transaction" in this.client) {
-      return this.client.$transaction(callback)
-    }
-    throw new Error("Cannot start a transaction within a transaction.")
-  }
-
-  /**
-   * Close database connection
-   */
-  async disconnect(): Promise<void> {
-    if ("$disconnect" in this.client) {
-      await this.client.$disconnect()
-    }
+    return super.transaction(callback)
   }
 }
 

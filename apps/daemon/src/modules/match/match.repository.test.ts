@@ -4,12 +4,12 @@
 
 import { describe, it, expect, beforeEach } from "vitest"
 import { MatchRepository } from "./match.repository"
-import { createMockLogger } from "../../tests/mocks/logger"
-import { createMockDatabaseClient, type MockDatabaseClient } from "../../tests/mocks/database"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { createMockDatabaseClient, type MockDatabaseClient } from "@/tests/mocks/database"
 import type { DatabaseClient } from "@/database/client"
 import { GameConfig } from "@/config/game.config"
 import type { Player, PlayerHistory } from "@repo/database/client"
-import { createMockServerRecord } from "../../tests/mocks/server"
+import { createMockServerRecord } from "@/tests/mocks/server"
 
 describe("MatchRepository", () => {
   let matchRepository: MatchRepository

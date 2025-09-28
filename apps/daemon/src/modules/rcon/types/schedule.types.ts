@@ -5,7 +5,6 @@
  */
 
 import type { ScheduledTask } from "node-cron"
-import type { ServerInfo } from "@/modules/server/server.types"
 
 // Core Schedule Types
 export interface ScheduledCommand {
@@ -18,8 +17,13 @@ export interface ScheduledCommand {
   /** Cron expression defining when to execute */
   cronExpression: string
 
-  /** Command to execute - can be static string or dynamic function */
-  command: string | ((server: ServerInfo) => string)
+  /** Command configuration */
+  command: {
+    /** Command type identifier */
+    type: string
+    /** Command-specific configuration */
+    [key: string]: unknown
+  }
 
   /** Whether this schedule is currently enabled */
   enabled: boolean
@@ -62,43 +66,43 @@ export interface ServerFilter {
 
 // Execution Results
 export interface ScheduleExecutionResult {
-  /** ID of the scheduled command */
-  commandId: string
+  /** Unique execution ID */
+  executionId: string
 
-  /** Server ID where command was executed */
-  serverId: number
+  /** When execution started */
+  startTime: Date
 
-  /** Whether execution was successful */
-  success: boolean
+  /** When execution ended */
+  endTime: Date
 
-  /** Response from the server (if successful) */
-  response?: string
+  /** Execution duration in milliseconds */
+  duration: number
 
-  /** Error message (if failed) */
-  error?: string
+  /** Execution status */
+  status: "success" | "failed"
 
-  /** When the command was executed */
-  executedAt: Date
+  /** Number of servers processed */
+  serversProcessed: number
 
-  /** How long the command took to execute */
-  executionTimeMs: number
+  /** Number of commands sent */
+  commandsSent: number
 
-  /** Retry attempt number (0 for first attempt) */
-  retryAttempt?: number
+  /** Error messages if any */
+  errors?: string[]
 }
 
 export interface ScheduleExecutionContext {
+  /** Schedule ID */
+  scheduleId: string
+
+  /** Unique execution ID */
+  executionId: string
+
   /** The scheduled command being executed */
   schedule: ScheduledCommand
 
-  /** Target server information */
-  server: ServerInfo
-
-  /** Execution attempt number */
-  attempt: number
-
-  /** Whether this is a retry */
-  isRetry: boolean
+  /** When execution started */
+  startTime: Date
 }
 
 // Service Interfaces
@@ -156,9 +160,12 @@ export interface IRconScheduleService {
 
 export interface IScheduledCommandExecutor {
   /**
-   * Execute a scheduled command on a specific server
+   * Execute a scheduled command
    */
-  execute(context: ScheduleExecutionContext): Promise<ScheduleExecutionResult>
+  execute(context: ScheduleExecutionContext): Promise<{
+    serversProcessed: number
+    commandsSent: number
+  }>
 
   /**
    * Validate command before execution
@@ -182,26 +189,20 @@ export interface ScheduleStatus {
   /** Whether the schedule is enabled */
   enabled: boolean
 
-  /** Whether the cron job is currently running */
-  isRunning: boolean
+  /** Cron expression */
+  cronExpression: string
+
+  /** Next execution time */
+  nextExecution?: Date
 
   /** Last execution time */
-  lastExecutedAt?: Date
+  lastExecution?: Date
 
-  /** Next scheduled execution time */
-  nextExecutionAt?: Date
+  /** Task status */
+  status: "scheduled" | "running" | "stopped"
 
-  /** Number of successful executions */
-  successCount: number
-
-  /** Number of failed executions */
-  failureCount: number
-
-  /** Last execution result */
-  lastResult?: ScheduleExecutionResult
-
-  /** Average execution time in milliseconds */
-  averageExecutionTimeMs?: number
+  /** Execution statistics */
+  stats: ScheduleJobStats
 }
 
 // Configuration
@@ -250,6 +251,11 @@ export enum ScheduleErrorCode {
   SERVER_NOT_AVAILABLE = "SERVER_NOT_AVAILABLE",
   INVALID_COMMAND = "INVALID_COMMAND",
   SCHEDULER_NOT_STARTED = "SCHEDULER_NOT_STARTED",
+  SCHEDULE_REGISTRATION_FAILED = "SCHEDULE_REGISTRATION_FAILED",
+  SCHEDULE_UNREGISTRATION_FAILED = "SCHEDULE_UNREGISTRATION_FAILED",
+  SCHEDULE_UPDATE_FAILED = "SCHEDULE_UPDATE_FAILED",
+  SCHEDULE_VALIDATION_FAILED = "SCHEDULE_VALIDATION_FAILED",
+  EXECUTOR_NOT_FOUND = "EXECUTOR_NOT_FOUND",
 }
 
 // Internal Scheduler Types
@@ -277,17 +283,14 @@ export interface ScheduleJobStats {
   /** Number of failed executions */
   failedExecutions: number
 
-  /** Last execution timestamp */
-  lastExecutedAt?: Date
+  /** Last execution start time */
+  lastExecutionStart?: Date
 
-  /** Next execution timestamp */
-  nextExecutionAt?: Date
+  /** Last execution end time */
+  lastExecutionEnd?: Date
 
-  /** Total execution time across all executions */
-  totalExecutionTimeMs: number
-
-  /** Average execution time */
-  averageExecutionTimeMs: number
+  /** Last execution duration in milliseconds */
+  lastExecutionDuration?: number
 }
 
 // Command Type Registry

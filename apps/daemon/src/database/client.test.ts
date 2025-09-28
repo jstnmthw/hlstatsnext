@@ -108,15 +108,19 @@ describe("DatabaseClient", () => {
       expect(mockCallback).toHaveBeenCalledWith(mockTx)
     })
 
-    it("should throw error when trying to start transaction within transaction", async () => {
-      const transactionalClient = {} as TransactionalPrisma
-      const clientWithoutTransaction = new DatabaseClient(transactionalClient)
-      const mockCallback = vi.fn()
+    it("should execute nested transaction correctly", async () => {
+      const transactionalClient = {
+        $transaction: vi.fn().mockImplementation(async (callback) => {
+          return callback({} as TransactionalPrisma)
+        }),
+      } as unknown as PrismaClient
+      const clientWithTransaction = new DatabaseClient(transactionalClient)
+      const mockCallback = vi.fn().mockResolvedValue("nested result")
 
-      await expect(clientWithoutTransaction.transaction(mockCallback)).rejects.toThrow(
-        "Cannot start a transaction within a transaction.",
-      )
-      expect(mockCallback).not.toHaveBeenCalled()
+      const result = await clientWithTransaction.transaction(mockCallback)
+
+      expect(result).toBe("nested result")
+      expect(mockCallback).toHaveBeenCalled()
     })
 
     it("should propagate transaction callback errors", async () => {
@@ -140,7 +144,9 @@ describe("DatabaseClient", () => {
     })
 
     it("should not call disconnect on transactional client", async () => {
-      const transactionalClient = {} as TransactionalPrisma
+      const transactionalClient = {
+        $disconnect: vi.fn(),
+      } as unknown as PrismaClient
       const clientWithoutDisconnect = new DatabaseClient(transactionalClient)
       const disconnectSpy = vi.fn()
 

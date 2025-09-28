@@ -4,10 +4,10 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { PlayerEventHandler } from "./player.events"
-import { createMockLogger } from "../../tests/mocks/logger"
+import { createMockLogger } from "@/tests/mocks/logger"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
-import type { IPlayerService } from "./player.types"
+import type { IPlayerService } from "../types/player.types"
 import type { IServerService } from "@/modules/server/server.types"
 
 // Create mock services

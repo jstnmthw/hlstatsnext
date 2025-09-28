@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { EventEmitter } from "events"
 import { UdpServer } from "./udp-server"
-import { createMockLogger } from "../../tests/mocks/logger"
+import { createMockLogger } from "@/tests/mocks/logger"
 import type { UdpServerOptions, ISocketFactory } from "./udp-server"
 import type { Socket, RemoteInfo } from "dgram"
 

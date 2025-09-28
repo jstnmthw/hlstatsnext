@@ -14,7 +14,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { INotificationConfigRepository } from "../repositories/notification-config.repository"
 import type { PlayerNotificationService } from "./player-notification.service"
 import type { CommandResolverService } from "./command-resolver.service"
-import { createMockLogger } from "../../../tests/mocks/logger"
+import { createMockLogger } from "@/tests/mocks/logger"
 import { EventType } from "@/shared/types/events"
 
 describe("EventNotificationService", () => {

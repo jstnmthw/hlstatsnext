@@ -5,7 +5,14 @@
 import type { BaseEvent, EventType, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
 import type { HandlerResult } from "@/shared/types/common"
 import type { FindOptions, UpdateOptions, CreateOptions } from "@/shared/types/database"
-import type { Player } from "@repo/database/client"
+import type { Player, Prisma } from "@repo/database/client"
+
+// Re-export Player type for convenience
+export type { Player } from "@repo/database/client"
+
+// Prisma input types for player operations
+export type PlayerCreateInput = Prisma.PlayerCreateInput
+export type PlayerUpdateInput = Prisma.PlayerUpdateInput
 
 // Player-specific event types
 export interface PlayerKillEvent extends BaseEvent {

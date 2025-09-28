@@ -6,7 +6,7 @@
  * in PlayerRepository.upsertPlayerName by encapsulating conditional field building.
  */
 
-import type { PlayerNameStatsUpdate } from "@/modules/player/player.types"
+import type { PlayerNameStatsUpdate } from "@/modules/player/types/player.types"
 import type { Prisma } from "@repo/database/client"
 import {
   validatePlayerNameStatsUpdate,

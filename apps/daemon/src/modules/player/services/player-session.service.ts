@@ -18,7 +18,7 @@ import type {
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IRconService, PlayerInfo } from "@/modules/rcon/types/rcon.types"
 import type { IServerService } from "@/modules/server/server.types"
-import type { IPlayerResolver, IPlayerRepository } from "../player.types"
+import type { IPlayerResolver, IPlayerRepository } from "../types/player.types"
 import type { Player } from "@repo/database/client"
 
 // Extended Player type with uniqueIds relation for fallback session creation

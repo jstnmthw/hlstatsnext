@@ -8,8 +8,8 @@ import { describe, it, expect, beforeEach, vi } from "vitest"
 import { EventType } from "@/shared/types/events"
 import { WeaponService } from "./weapon.service"
 import { WeaponRepository } from "./weapon.repository"
-import { createMockLogger } from "../../tests/mocks/logger"
-import { createMockDatabaseClient } from "../../tests/mocks/database"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { createMockDatabaseClient } from "@/tests/mocks/database"
 
 describe("WeaponService", () => {
   let weaponService: WeaponService

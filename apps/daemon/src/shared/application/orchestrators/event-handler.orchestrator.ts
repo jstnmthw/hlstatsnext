@@ -8,7 +8,7 @@
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { BusinessServiceCollection } from "./business-service.orchestrator"
 
-import { PlayerEventHandler } from "@/modules/player/player.events"
+import { PlayerEventHandler } from "@/modules/player/events/player.events"
 import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
 import { MatchEventHandler } from "@/modules/match/match.events"
 import { ActionEventHandler } from "@/modules/action/action.events"

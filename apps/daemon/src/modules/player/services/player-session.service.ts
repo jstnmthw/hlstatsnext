@@ -270,7 +270,7 @@ export class PlayerSessionService implements IPlayerSessionService {
       // Apply same unique ID logic for bots as in createSessionFromPlayerInfo
       const steamId =
         matchingPlayer.isBot && matchingPlayer.uniqueid === "BOT"
-          ? `BOT:${matchingPlayer.name}`
+          ? `BOT_${serverId}_${matchingPlayer.name}`
           : matchingPlayer.uniqueid || "UNKNOWN"
 
       const sessionData = {
@@ -393,13 +393,14 @@ export class PlayerSessionService implements IPlayerSessionService {
       // All bots normally have uniqueid "BOT", so we make it unique per bot name
       const uniqueId =
         playerInfo.isBot && playerInfo.uniqueid === "BOT"
-          ? `BOT:${playerInfo.name}`
+          ? `BOT_${serverId}_${playerInfo.name}`
           : playerInfo.uniqueid
 
       databasePlayerId = await this.playerResolver.getOrCreatePlayer(
         uniqueId,
         playerInfo.name,
         game,
+        serverId,
       )
     } catch (error) {
       this.logger.error(

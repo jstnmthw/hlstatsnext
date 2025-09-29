@@ -107,6 +107,7 @@ describe("PlayerEventHandler", () => {
         "STEAM_1:0:123456",
         "TestPlayer",
         "csgo",
+        1,
       )
       expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -159,12 +160,14 @@ describe("PlayerEventHandler", () => {
         "STEAM_1:0:111111",
         "KillerPlayer",
         "csgo",
+        1,
       )
       expect(playerService.getOrCreatePlayer).toHaveBeenNthCalledWith(
         2,
         "STEAM_1:0:222222",
         "VictimPlayer",
         "csgo",
+        1,
       )
 
       // Should call handlePlayerEvent with resolved database IDs
@@ -215,8 +218,8 @@ describe("PlayerEventHandler", () => {
 
       await handler.handleEvent(event)
 
-      expect(playerService.getOrCreatePlayer).toHaveBeenCalledWith("BOT", "Bot Mike", "csgo")
-      expect(playerService.getOrCreatePlayer).toHaveBeenCalledWith("BOT", "Bot Alice", "csgo")
+      expect(playerService.getOrCreatePlayer).toHaveBeenCalledWith("BOT", "Bot Mike", "csgo", 1)
+      expect(playerService.getOrCreatePlayer).toHaveBeenCalledWith("BOT", "Bot Alice", "csgo", 1)
       expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({

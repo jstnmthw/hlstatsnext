@@ -232,7 +232,12 @@ export interface IPlayerResolver {
    * Get or create a player by Steam ID and name
    * Returns the database player ID
    */
-  getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number>
+  getOrCreatePlayer(
+    steamId: string,
+    playerName: string,
+    game: string,
+    serverId?: number,
+  ): Promise<number>
 }
 
 // Service interfaces

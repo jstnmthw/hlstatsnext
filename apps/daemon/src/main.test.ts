@@ -4,7 +4,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { HLStatsDaemon } from "./main"
 import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { getEnvironmentConfig } from "@/config/environment.config"
-import { RconMonitorService } from "@/modules/rcon/services/rcon-monitor.service"
 import { DatabaseConnectionService } from "@/database/connection.service"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockDatabaseClient } from "@/tests/mocks/database"
@@ -14,7 +13,6 @@ import { SystemClock } from "@/shared/infrastructure/time/system-clock"
 
 vi.mock("@/context")
 vi.mock("@/config/environment.config")
-vi.mock("@/modules/rcon/services/rcon-monitor.service")
 vi.mock("@/database/connection.service")
 vi.mock("@/shared/infrastructure/messaging/queue/utils/message-utils", () => {
   let currentUuidService: unknown = null
@@ -29,12 +27,6 @@ vi.mock("@/shared/infrastructure/messaging/queue/utils/message-utils", () => {
 const mockEventPublisher = {
   publish: vi.fn(),
   publishBatch: vi.fn(),
-}
-
-const mockRconMonitor = {
-  start: vi.fn(),
-  stop: vi.fn(),
-  connectToServerImmediately: vi.fn(),
 }
 
 const mockDatabaseConnection = {
@@ -94,11 +86,6 @@ describe("HLStatsDaemon", () => {
       },
     })
 
-    const MockedRconMonitorService = vi.mocked(RconMonitorService, true)
-    MockedRconMonitorService.mockImplementation(
-      () => mockRconMonitor as unknown as InstanceType<typeof RconMonitorService>,
-    )
-
     const MockedDatabaseConnectionService = vi.mocked(DatabaseConnectionService, true)
     MockedDatabaseConnectionService.mockImplementation(
       () => mockDatabaseConnection as unknown as InstanceType<typeof DatabaseConnectionService>,
@@ -138,7 +125,7 @@ describe("HLStatsDaemon", () => {
       expect(mockContext.logger.ok).toHaveBeenCalledWith("All preflight checks passed")
       expect(mockContext.logger.info).toHaveBeenCalledWith("Starting services")
       expect(mockContext.ingressService.start).toHaveBeenCalled()
-      expect(mockRconMonitor.start).toHaveBeenCalled()
+      expect(mockContext.rconScheduleService.start).toHaveBeenCalled()
       expect(mockContext.logger.ok).toHaveBeenCalledWith("All services started successfully")
       expect(mockContext.logger.ready).toHaveBeenCalledWith(
         "HLStatsNext Daemon is ready to receive game server data",
@@ -272,7 +259,6 @@ describe("HLStatsDaemon", () => {
 
       expect(mockContext.logger.shutdown).toHaveBeenCalled()
       expect(mockContext.rconScheduleService.stop).toHaveBeenCalled()
-      expect(mockRconMonitor.stop).toHaveBeenCalled()
       expect(mockContext.ingressService.stop).toHaveBeenCalled()
       expect(mockContext.rconService.disconnectAll).toHaveBeenCalled()
       expect(mockDatabaseConnection.disconnect).toHaveBeenCalled()

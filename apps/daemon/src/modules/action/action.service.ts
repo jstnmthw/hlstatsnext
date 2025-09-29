@@ -16,9 +16,9 @@
  * ```
  * ActionService
  * ├── ActionDefinitionValidator →  Validates action definitions & types
- * ├── PlayerValidator          →  Validates player existence & resolution
- * ├── MapService (direct)      →  Resolves current map context via RCON
- * └── Business Logic           →  Core action processing & rewards
+ * ├── PlayerValidator           → Validates player existence & resolution
+ * ├── MapService (direct)       → Resolves current map context via RCON
+ * └── Business Logic            → Core action processing & rewards
  * ```
  *
  * ## Key Features

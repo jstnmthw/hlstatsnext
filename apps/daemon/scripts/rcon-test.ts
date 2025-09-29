@@ -103,7 +103,7 @@ async function getChallenge(): Promise<string> {
     ])
 
     console.log(`${colors.yellow}[1/3] Requesting challenge...${colors.reset}`)
-    console.log(`${colors.gray}  →  Sending: challenge rcon${colors.reset}`)
+    console.log(`${colors.gray} → Sending: challenge rcon${colors.reset}`)
 
     const timer = setTimeout(() => {
       socket.removeAllListeners("message")
@@ -140,7 +140,7 @@ async function sendRconCommand(challenge: string, cmd: string): Promise<string> 
     ])
 
     console.log(`${colors.yellow}[2/3] Sending RCON command...${colors.reset}`)
-    console.log(`${colors.gray}  →  Command: ${cmd}${colors.reset}`)
+    console.log(`${colors.gray} → Command: ${cmd}${colors.reset}`)
 
     const timer = setTimeout(() => {
       socket.removeAllListeners("message")

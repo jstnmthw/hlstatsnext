@@ -20,6 +20,7 @@ import type { IRconService, PlayerInfo } from "@/modules/rcon/types/rcon.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { IPlayerResolver, IPlayerRepository } from "../types/player.types"
 import type { Player } from "@repo/database/client"
+import { sanitizePlayerName } from "@/shared/utils/validation"
 
 // Extended Player type with uniqueIds relation for fallback session creation
 interface PlayerWithUniqueIds extends Player {
@@ -270,7 +271,7 @@ export class PlayerSessionService implements IPlayerSessionService {
       // Apply same unique ID logic for bots as in createSessionFromPlayerInfo
       const steamId =
         matchingPlayer.isBot && matchingPlayer.uniqueid === "BOT"
-          ? `BOT_${serverId}_${matchingPlayer.name}`
+          ? `BOT_${serverId}_${sanitizePlayerName(matchingPlayer.name)}`
           : matchingPlayer.uniqueid || "UNKNOWN"
 
       const sessionData = {
@@ -393,7 +394,7 @@ export class PlayerSessionService implements IPlayerSessionService {
       // All bots normally have uniqueid "BOT", so we make it unique per bot name
       const uniqueId =
         playerInfo.isBot && playerInfo.uniqueid === "BOT"
-          ? `BOT_${serverId}_${playerInfo.name}`
+          ? `BOT_${serverId}_${sanitizePlayerName(playerInfo.name)}`
           : playerInfo.uniqueid
 
       databasePlayerId = await this.playerResolver.getOrCreatePlayer(

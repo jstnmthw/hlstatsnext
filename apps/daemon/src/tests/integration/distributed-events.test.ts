@@ -187,8 +187,6 @@ describe.skip("Distributed Event Processing", () => {
       expect(playerService.handlePlayerEvent).toHaveBeenCalledTimes(0)
       // WeaponEventHandler should not handle kill events via EventBus anymore
       expect(weaponService.handleWeaponEvent).toHaveBeenCalledTimes(0)
-      // MatchEventHandler should not handle kill events via EventBus anymore
-      expect(matchService.handleKillInMatch).toHaveBeenCalledTimes(0)
       // RankingService should not handle kill events via EventBus anymore
       expect(rankingService.calculateSkillAdjustment).toHaveBeenCalledTimes(0)
 

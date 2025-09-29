@@ -14,10 +14,16 @@ import type { PlayerEvent, PlayerChangeNameEvent } from "@/modules/player/types/
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IMapService } from "@/modules/map/map.service"
 
 export class ChangeNameEventHandler extends BasePlayerEventHandler {
-  constructor(repository: IPlayerRepository, logger: ILogger, matchService?: IMatchService) {
-    super(repository, logger, matchService)
+  constructor(
+    repository: IPlayerRepository,
+    logger: ILogger,
+    matchService?: IMatchService,
+    mapService?: IMapService,
+  ) {
+    super(repository, logger, matchService, mapService)
   }
 
   async handle(event: PlayerEvent): Promise<HandlerResult> {

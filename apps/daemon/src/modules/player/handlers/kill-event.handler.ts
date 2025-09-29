@@ -17,6 +17,7 @@ import type { KillContext } from "@/modules/ranking/ranking.service"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IMapService } from "@/modules/map/map.service"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 
@@ -27,11 +28,12 @@ export class KillEventHandler extends BasePlayerEventHandler {
   constructor(
     repository: IPlayerRepository,
     logger: ILogger,
-    matchService: IMatchService | undefined,
     private readonly rankingService: IRankingService,
+    matchService: IMatchService | undefined,
+    mapService?: IMapService,
     private readonly eventNotificationService?: IEventNotificationService,
   ) {
-    super(repository, logger, matchService)
+    super(repository, logger, matchService, mapService)
   }
 
   async handle(event: PlayerEvent): Promise<HandlerResult> {
@@ -233,7 +235,7 @@ export class KillEventHandler extends BasePlayerEventHandler {
     // Handle team kills
     if (isTeamkill) {
       killerUpdateBuilder.addTeamkills(1)
-      this.logger.warn(`Team kill: ${killerStats.playerId} -> ${victimStats.playerId}`)
+      this.logger.warn(`Team kill: ${killerStats.playerId} → ${victimStats.playerId}`)
     }
 
     // Build victim updates
@@ -345,13 +347,13 @@ export class KillEventHandler extends BasePlayerEventHandler {
     victimStats: Player,
     skillAdjustment: { killerChange: number; victimChange: number },
   ): void {
-    this.logger.debug(`Kill event: ${killerId} → ${victimId} (weapon: ${skillAdjustment})`)
+    this.logger.debug(`Kill event: ${killerId} →  ${victimId} (weapon: ${skillAdjustment})`)
 
     // Log skill calculation results at INFO level for visibility
     this.logger.info(
       `Skill calculated: killer ${killerId} (${skillAdjustment.killerChange > 0 ? "+" : ""}${
         skillAdjustment.killerChange
-      }) -> victim ${victimId} (${skillAdjustment.victimChange})`,
+      }) → victim ${victimId} (${skillAdjustment.victimChange})`,
       {
         eventType: "PLAYER_KILL",
         serverId,

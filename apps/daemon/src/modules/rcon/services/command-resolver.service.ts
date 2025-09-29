@@ -36,7 +36,7 @@ export class CommandResolverService {
 
   /**
    * Get the appropriate RCON command for a server and command type
-   * Uses legacy HLStatsX priority: server_config -> mods_defaults -> servers_config_default -> fallback
+   * Uses priority: server_config → mods_defaults → servers_config_default → fallback
    */
   async getCommand(serverId: number, commandType: CommandType): Promise<string> {
     const cacheKey = `${serverId}:${commandType}`

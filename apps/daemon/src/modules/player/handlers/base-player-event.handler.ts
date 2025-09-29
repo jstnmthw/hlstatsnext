@@ -9,12 +9,14 @@ import type { PlayerEvent } from "@/modules/player/types/player.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IMapService } from "@/modules/map/map.service"
 
 export abstract class BasePlayerEventHandler {
   constructor(
     protected readonly repository: IPlayerRepository,
     protected readonly logger: ILogger,
     protected readonly matchService?: IMatchService,
+    protected readonly mapService?: IMapService,
   ) {}
 
   /**
@@ -23,14 +25,15 @@ export abstract class BasePlayerEventHandler {
   abstract handle(event: PlayerEvent): Promise<HandlerResult>
 
   /**
-   * Get current map from match service with fallback and initialization
+   * Get current map from centralized map service
    */
   protected async getCurrentMap(serverId: number): Promise<string> {
-    let map = this.matchService?.getCurrentMap(serverId) || ""
-    if (map === "unknown" && this.matchService) {
-      map = await this.matchService.initializeMapForServer(serverId)
+    // Use centralized map service if available
+    if (this.mapService) {
+      return await this.mapService.getCurrentMap(serverId)
     }
-    return map
+    // Legacy fallback - should not be needed once MapService is wired up
+    return "unknown"
   }
 
   /**

@@ -15,10 +15,10 @@
  *
  * ```
  * ActionService
- * ├── ActionDefinitionValidator → Validates action definitions & types
- * ├── PlayerValidator          → Validates player existence & resolution
- * ├── MapResolver              → Resolves current map context
- * └── Business Logic           → Core action processing & rewards
+ * ├── ActionDefinitionValidator →  Validates action definitions & types
+ * ├── PlayerValidator          →  Validates player existence & resolution
+ * ├── MapService (direct)      →  Resolves current map context via RCON
+ * └── Business Logic           →  Core action processing & rewards
  * ```
  *
  * ## Key Features
@@ -76,19 +76,17 @@ import type {
 import type { IActionRepository } from "./action.types"
 import type { IPlayerService } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
-import type { IRconService } from "@/modules/rcon/types/rcon.types"
+import type { IMapService } from "@/modules/map/map.service"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 import type { HandlerResult } from "@/shared/types/common"
 import { EventType } from "@/shared/types/events"
 import { ActionDefinitionValidator } from "./validators/action-definition.validator"
 import { PlayerValidator } from "./validators/player.validator"
-import { MapResolver } from "./validators/map-resolver"
 
 export class ActionService implements IActionService {
   private readonly actionDefinitionValidator: ActionDefinitionValidator
   private readonly playerValidator: PlayerValidator
-  private readonly mapResolver: MapResolver
 
   constructor(
     private readonly repository: IActionRepository,
@@ -96,11 +94,10 @@ export class ActionService implements IActionService {
     private readonly playerService?: IPlayerService, // Optional to avoid circular dependency
     private readonly matchService?: IMatchService, // Optional to avoid circular dependency
     private readonly eventNotificationService?: IEventNotificationService, // Optional - for action notifications
-    rconService?: IRconService, // Optional - used for real-time map resolution via MapResolver
+    private readonly mapService?: IMapService, // Optional - used for real-time map resolution
   ) {
     this.actionDefinitionValidator = new ActionDefinitionValidator(repository, logger)
     this.playerValidator = new PlayerValidator(playerService, logger)
-    this.mapResolver = new MapResolver(rconService) // Use RCON service as single source of truth for maps
   }
 
   async handleActionEvent(event: ActionEvent): Promise<HandlerResult> {
@@ -155,7 +152,7 @@ export class ActionService implements IActionService {
 
       // Calculate total points and resolve map
       const totalPoints = actionDef.rewardPlayer + (bonus || 0)
-      const currentMap = await this.mapResolver.resolveCurrentMap(event.serverId)
+      const currentMap = this.mapService ? await this.mapService.getCurrentMap(event.serverId) : ""
 
       // Log the action event to database
       await this.repository.logPlayerAction(
@@ -250,7 +247,7 @@ export class ActionService implements IActionService {
 
       // Calculate total points and resolve map
       const totalPoints = actionDef.rewardPlayer + (bonus || 0)
-      const currentMap = await this.mapResolver.resolveCurrentMap(event.serverId)
+      const currentMap = this.mapService ? await this.mapService.getCurrentMap(event.serverId) : ""
 
       // Log the action event to database
       await this.repository.logPlayerPlayerAction(
@@ -301,7 +298,7 @@ export class ActionService implements IActionService {
 
       // Calculate total points and resolve map
       const totalPoints = actionDef.rewardTeam + (bonus || 0)
-      const currentMap = await this.mapResolver.resolveCurrentMap(event.serverId)
+      const currentMap = this.mapService ? await this.mapService.getCurrentMap(event.serverId) : ""
 
       // Log team bonus rows per teammate and grant rewardTeam (using batch operations)
       if (this.matchService) {
@@ -333,7 +330,7 @@ export class ActionService implements IActionService {
 
           // Emit a clear success message for verification at round end/team win flow
           this.logger.info(
-            `Awarded team bonus: ${actionDef.code} → ${team} (${validPlayerIds.length} recipients × ${awardedPerPlayer} points each) (Server ID: ${event.serverId})`,
+            `Awarded team bonus: ${actionDef.code} →  ${team} (${validPlayerIds.length} recipients × ${awardedPerPlayer} points each) (Server ID: ${event.serverId})`,
           )
         }
       }
@@ -392,7 +389,7 @@ export class ActionService implements IActionService {
 
       // World actions typically don't have player rewards, but may have server-wide effects
       const totalPoints = bonus || 0
-      const currentMap = await this.mapResolver.resolveCurrentMap(event.serverId)
+      const currentMap = this.mapService ? await this.mapService.getCurrentMap(event.serverId) : ""
 
       // Log the action event to database
       await this.repository.logWorldAction(event.serverId, actionDef.id, currentMap, bonus || 0)

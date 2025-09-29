@@ -71,7 +71,6 @@ function createHandlerInstances(
     logger,
     services.matchService,
     services.actionService,
-    services.playerService,
     eventMetrics,
   )
 
@@ -79,7 +78,6 @@ function createHandlerInstances(
     logger,
     services.actionService,
     services.sessionService,
-    services.matchService,
     eventMetrics,
   )
 
@@ -161,7 +159,6 @@ function registerMatchModule(registry: ModuleRegistry, handler: MatchEventHandle
       EventType.ROUND_END,
       EventType.TEAM_WIN,
       EventType.MAP_CHANGE,
-      EventType.PLAYER_KILL, // For match statistics
     ],
   })
 }

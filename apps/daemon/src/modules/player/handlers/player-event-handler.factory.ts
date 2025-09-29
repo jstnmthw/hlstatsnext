@@ -21,6 +21,7 @@ import type { BasePlayerEventHandler } from "./base-player-event.handler"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IMapService } from "@/modules/map/map.service"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IServerRepository, IServerService } from "@/modules/server/server.types"
 import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
@@ -37,6 +38,7 @@ export class PlayerEventHandlerFactory {
     serverService: IServerService,
     sessionService: IPlayerSessionService,
     matchService?: IMatchService,
+    mapService?: IMapService,
     geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
     eventNotificationService?: IEventNotificationService,
   ) {
@@ -49,7 +51,9 @@ export class PlayerEventHandlerFactory {
         sessionService,
         serverService,
         matchService,
+        mapService,
         geoipService,
+        eventNotificationService,
       ),
     )
 
@@ -59,25 +63,26 @@ export class PlayerEventHandlerFactory {
         repository,
         logger,
         sessionService,
-        matchService,
         serverRepository,
+        matchService,
+        mapService,
         eventNotificationService,
       ),
     )
 
     this.handlers.set(
       EventType.PLAYER_ENTRY,
-      new EntryEventHandler(repository, logger, sessionService, matchService),
+      new EntryEventHandler(repository, logger, sessionService, matchService, mapService),
     )
 
     this.handlers.set(
       EventType.PLAYER_CHANGE_TEAM,
-      new ChangeTeamEventHandler(repository, logger, matchService),
+      new ChangeTeamEventHandler(repository, logger, matchService, mapService),
     )
 
     this.handlers.set(
       EventType.PLAYER_CHANGE_NAME,
-      new ChangeNameEventHandler(repository, logger, matchService),
+      new ChangeNameEventHandler(repository, logger, matchService, mapService),
     )
 
     this.handlers.set(
@@ -85,15 +90,16 @@ export class PlayerEventHandlerFactory {
       new SuicideEventHandler(
         repository,
         logger,
-        matchService,
         rankingService,
+        matchService,
+        mapService,
         eventNotificationService,
       ),
     )
 
     this.handlers.set(
       EventType.PLAYER_DAMAGE,
-      new DamageEventHandler(repository, logger, matchService),
+      new DamageEventHandler(repository, logger, matchService, mapService),
     )
 
     this.handlers.set(
@@ -102,6 +108,7 @@ export class PlayerEventHandlerFactory {
         repository,
         logger,
         matchService,
+        mapService,
         rankingService,
         eventNotificationService,
       ),
@@ -109,7 +116,7 @@ export class PlayerEventHandlerFactory {
 
     this.handlers.set(
       EventType.CHAT_MESSAGE,
-      new ChatEventHandler(repository, logger, matchService),
+      new ChatEventHandler(repository, logger, matchService, mapService),
     )
 
     this.handlers.set(
@@ -117,8 +124,9 @@ export class PlayerEventHandlerFactory {
       new KillEventHandler(
         repository,
         logger,
-        matchService,
         rankingService,
+        matchService,
+        mapService,
         eventNotificationService,
       ),
     )

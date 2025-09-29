@@ -15,10 +15,16 @@ import type { PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IMapService } from "@/modules/map/map.service"
 
 export class DamageEventHandler extends BasePlayerEventHandler {
-  constructor(repository: IPlayerRepository, logger: ILogger, matchService?: IMatchService) {
-    super(repository, logger, matchService)
+  constructor(
+    repository: IPlayerRepository,
+    logger: ILogger,
+    matchService?: IMatchService,
+    mapService?: IMapService,
+  ) {
+    super(repository, logger, matchService, mapService)
   }
 
   async handle(event: PlayerEvent): Promise<HandlerResult> {
@@ -48,7 +54,7 @@ export class DamageEventHandler extends BasePlayerEventHandler {
       await this.updateAttackerNameStats(attackerId, event.meta, isHeadshot)
 
       this.logger.debug(
-        `Damage: ${attackerId} -> ${victimId} (${damage} damage with ${weapon}, hitgroup: ${hitgroup})`,
+        `Damage: ${attackerId} → ${victimId} (${damage} damage with ${weapon}, hitgroup: ${hitgroup})`,
       )
 
       return this.createSuccessResult()

@@ -20,6 +20,11 @@ describe("KillEventHandler", () => {
   let mockLogger: ReturnType<typeof createMockLogger>
   let mockRankingService: IRankingService
   let mockMatchService: IMatchService
+  let mockMapService: {
+    getCurrentMap: ReturnType<typeof vi.fn>
+    getLastKnownMap: ReturnType<typeof vi.fn>
+    handleMapChange: ReturnType<typeof vi.fn>
+  }
   let mockEventNotificationService: IEventNotificationService
 
   const DEFAULT_RATING = 1000
@@ -79,15 +84,8 @@ describe("KillEventHandler", () => {
 
     mockMatchService = {
       handleMatchEvent: vi.fn().mockResolvedValue({ success: true }),
-      handleKillInMatch: vi.fn().mockResolvedValue({ success: true }),
-      handleObjectiveAction: vi.fn().mockResolvedValue({ success: true }),
-      getCurrentMap: vi.fn().mockReturnValue("de_dust2"),
-      initializeMapForServer: vi.fn().mockResolvedValue("de_dust2"),
       getMatchStats: vi.fn().mockReturnValue(undefined),
-      calculateMatchMVP: vi.fn().mockResolvedValue(undefined),
       resetMatchStats: vi.fn(),
-      updatePlayerWeaponStats: vi.fn(),
-      calculatePlayerScore: vi.fn().mockReturnValue(100),
       setPlayerTeam: vi.fn(),
       getPlayersByTeam: vi.fn().mockReturnValue([]),
       getServerGame: vi.fn().mockResolvedValue("cstrike"),
@@ -104,11 +102,18 @@ describe("KillEventHandler", () => {
       isEventTypeEnabled: vi.fn().mockResolvedValue(true),
     }
 
+    mockMapService = {
+      getCurrentMap: vi.fn().mockResolvedValue("de_dust2"),
+      getLastKnownMap: vi.fn().mockResolvedValue("de_dust2"),
+      handleMapChange: vi.fn(),
+    }
+
     handler = new KillEventHandler(
       mockPlayerRepository,
       mockLogger,
-      mockMatchService,
       mockRankingService,
+      mockMatchService,
+      mockMapService,
       mockEventNotificationService,
     )
   })
@@ -648,8 +653,6 @@ describe("KillEventHandler", () => {
         killerChange: 20,
         victimChange: -18,
       })
-
-      mockMatchService.getCurrentMap = vi.fn().mockResolvedValue("de_dust2")
 
       const killEvent: PlayerKillEvent = {
         eventType: EventType.PLAYER_KILL,

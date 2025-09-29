@@ -15,6 +15,7 @@ import type { DualPlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IMapService } from "@/modules/map/map.service"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 
@@ -23,10 +24,11 @@ export class TeamkillEventHandler extends BasePlayerEventHandler {
     repository: IPlayerRepository,
     logger: ILogger,
     matchService: IMatchService | undefined,
+    mapService?: IMapService,
     private readonly rankingService?: IRankingService,
     private readonly eventNotificationService?: IEventNotificationService,
   ) {
-    super(repository, logger, matchService)
+    super(repository, logger, matchService, mapService)
   }
 
   async handle(event: PlayerEvent): Promise<HandlerResult> {
@@ -76,7 +78,7 @@ export class TeamkillEventHandler extends BasePlayerEventHandler {
       // Send teamkill notification
       await this.sendTeamkillNotification(event, skillPenalty)
 
-      this.logger.debug(`Teamkill: ${killerId} -> ${victimId} (${teamkillEvent.data.weapon})`)
+      this.logger.debug(`Teamkill: ${killerId} → ${victimId} (${teamkillEvent.data.weapon})`)
 
       return this.createSuccessResult(2) // Affected both killer and victim
     })

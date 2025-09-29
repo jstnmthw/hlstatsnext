@@ -22,6 +22,11 @@ describe("PlayerService", () => {
   let mockDatabase: ReturnType<typeof createMockDatabaseClient>
   let mockRankingService: IRankingService
   let mockMatchService: IMatchService
+  let mockMapService: {
+    getCurrentMap: ReturnType<typeof vi.fn>
+    getLastKnownMap: ReturnType<typeof vi.fn>
+    handleMapChange: ReturnType<typeof vi.fn>
+  }
 
   beforeEach(() => {
     mockLogger = createMockLogger()
@@ -41,18 +46,18 @@ describe("PlayerService", () => {
     // Create mock match service
     mockMatchService = {
       handleMatchEvent: vi.fn().mockResolvedValue({ success: true }),
-      handleKillInMatch: vi.fn().mockResolvedValue({ success: true }),
-      handleObjectiveAction: vi.fn().mockResolvedValue({ success: true }),
-      getCurrentMap: vi.fn().mockReturnValue("de_dust2"),
-      initializeMapForServer: vi.fn().mockResolvedValue("de_dust2"),
       getMatchStats: vi.fn().mockReturnValue(undefined),
-      calculateMatchMVP: vi.fn().mockResolvedValue(undefined),
       resetMatchStats: vi.fn(),
-      updatePlayerWeaponStats: vi.fn(),
-      calculatePlayerScore: vi.fn().mockReturnValue(100),
       setPlayerTeam: vi.fn(),
       getPlayersByTeam: vi.fn().mockReturnValue([]),
       getServerGame: vi.fn().mockResolvedValue("cstrike"),
+    }
+
+    // Create mock map service
+    mockMapService = {
+      getCurrentMap: vi.fn().mockResolvedValue("de_dust2"),
+      getLastKnownMap: vi.fn().mockResolvedValue("de_dust2"),
+      handleMapChange: vi.fn(),
     }
 
     const mockServerRepository = {
@@ -80,6 +85,7 @@ describe("PlayerService", () => {
       mockServerService,
       mockSessionService,
       mockMatchService,
+      mockMapService,
     )
   })
 
@@ -198,8 +204,8 @@ describe("PlayerService", () => {
         undefined,
       )
 
-      // Verify match service was called for map resolution
-      expect(mockMatchService.getCurrentMap).toHaveBeenCalledWith(1)
+      // Verify map service was called for map resolution
+      expect(mockMapService.getCurrentMap).toHaveBeenCalledWith(1)
     })
 
     it("should handle headshot kills", async () => {
@@ -352,7 +358,7 @@ describe("PlayerService", () => {
       vi.spyOn(mockRepository, "logEventFrag").mockResolvedValue(undefined)
 
       // Mock MatchService to return specific map
-      mockMatchService.getCurrentMap = vi.fn().mockReturnValue("cs_office")
+      mockMapService.getCurrentMap = vi.fn().mockResolvedValue("cs_office")
 
       const killEvent: PlayerKillEvent = {
         eventType: EventType.PLAYER_KILL,
@@ -372,7 +378,7 @@ describe("PlayerService", () => {
       await playerService.handlePlayerEvent(killEvent)
 
       // Verify MatchService was called with correct serverId
-      expect(mockMatchService.getCurrentMap).toHaveBeenCalledWith(5)
+      expect(mockMapService.getCurrentMap).toHaveBeenCalledWith(5)
 
       // Verify EventFrag was created with correct map
       expect(mockRepository.logEventFrag).toHaveBeenCalledWith(
@@ -417,9 +423,8 @@ describe("PlayerService", () => {
       vi.spyOn(mockRepository, "update").mockResolvedValue(killerStats)
       vi.spyOn(mockRepository, "logEventFrag").mockResolvedValue(undefined)
 
-      // Mock MatchService to return "unknown" initially, then resolve to specific map
-      mockMatchService.getCurrentMap = vi.fn().mockReturnValue("unknown")
-      mockMatchService.initializeMapForServer = vi.fn().mockResolvedValue("de_mirage")
+      // Mock MapService to return "de_mirage" (MapService handles fallback internally)
+      mockMapService.getCurrentMap = vi.fn().mockResolvedValue("de_mirage")
 
       const killEvent: PlayerKillEvent = {
         eventType: EventType.PLAYER_KILL,
@@ -439,8 +444,7 @@ describe("PlayerService", () => {
       await playerService.handlePlayerEvent(killEvent)
 
       // Verify both methods were called
-      expect(mockMatchService.getCurrentMap).toHaveBeenCalledWith(3)
-      expect(mockMatchService.initializeMapForServer).toHaveBeenCalledWith(3)
+      expect(mockMapService.getCurrentMap).toHaveBeenCalledWith(3)
 
       // Verify EventFrag was created with resolved map
       expect(mockRepository.logEventFrag).toHaveBeenCalledWith(
@@ -488,6 +492,8 @@ describe("PlayerService", () => {
         localMockServerRepository,
         localMockServerService,
         localMockSessionService,
+        undefined, // no matchService
+        undefined, // no mapService
       )
 
       const killerStats = {
@@ -530,12 +536,12 @@ describe("PlayerService", () => {
 
       await playerServiceNoMatch.handlePlayerEvent(killEvent)
 
-      // Should fallback to empty string when MatchService is not available
+      // Should fallback to "unknown" when MapService is not available
       expect(mockRepository.logEventFrag).toHaveBeenCalledWith(
         1,
         2,
         1,
-        "",
+        "unknown",
         "glock",
         false,
         undefined,

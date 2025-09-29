@@ -36,7 +36,7 @@ export function normalizeSteamId(steamId: unknown): string | null {
     return steam64.toString()
   }
 
-  // Steam3: [U:1:A] → base + A; we only accept individual user type U
+  // Steam3: [U:1:A] →  base + A; we only accept individual user type U
   const steam3Match = /^\[([A-Za-z]):([0-5]):(\d+)\]$/.exec(raw)
   if (steam3Match) {
     const type = (steam3Match[1] ?? "").toUpperCase()
@@ -81,7 +81,7 @@ export function sanitizePlayerName(name: unknown): string {
 
   return name
     .trim()
-    .replace(/\s+/g, "_") // Spaces → underscores
+    .replace(/\s+/g, "_") // Spaces →  underscores
     .replace(/[^A-Za-z0-9_-]/g, "") // Remove exotic chars
     .substring(0, 48) // Leave room for prefixes within 64-char limit
 }

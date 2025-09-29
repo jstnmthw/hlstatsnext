@@ -57,65 +57,18 @@ export interface MatchStats {
   duration: number
   totalRounds: number
   teamScores: Record<string, number>
-  mvpPlayer?: number
   startTime: Date
-  playerStats: Map<number, PlayerRoundStats>
-  currentMap: string
   playerTeams?: Map<number, string>
-}
-
-export interface PlayerRoundStats {
-  playerId: number
-  kills: number
-  deaths: number
-  assists: number
-  damage: number
-  objectiveScore: number
-  clutchWins: number
-  headshots: number
-  shots: number
-  hits: number
-  suicides: number
-  teamkills: number
-}
-
-export interface MatchResult {
-  matchId?: string
-  duration: number
-  totalRounds: number
-  mvpPlayerId?: number
-  teamScores: Record<string, number>
-  playerStats: PlayerRoundStats[]
 }
 
 // Service interfaces
 export interface IMatchService {
   // Match management
   handleMatchEvent(event: MatchEvent): Promise<HandlerResult>
-  handleKillInMatch(event: BaseEvent): Promise<HandlerResult>
-
-  // Objective scoring from canonical action codes
-  handleObjectiveAction(
-    actionCode: string,
-    serverId: number,
-    actorPlayerId?: number,
-    team?: string,
-  ): Promise<HandlerResult>
 
   // Match state
   getMatchStats(serverId: number): MatchStats | undefined
-  getCurrentMap(serverId: number): string
-  initializeMapForServer(serverId: number): Promise<string>
   resetMatchStats(serverId: number): void
-  updatePlayerWeaponStats(
-    serverId: number,
-    playerId: number,
-    stats: { shots?: number; hits?: number; damage?: number },
-  ): void
-
-  // MVP calculations
-  calculateMatchMVP(serverId: number): Promise<number | undefined>
-  calculatePlayerScore(stats: PlayerRoundStats): number
 
   // Team tracking
   setPlayerTeam(serverId: number, playerId: number, team: string): void

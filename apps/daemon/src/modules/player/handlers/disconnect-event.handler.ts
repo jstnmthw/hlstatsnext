@@ -16,6 +16,7 @@ import type { PlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IMapService } from "@/modules/map/map.service"
 import type { IServerRepository } from "@/modules/server/server.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
@@ -25,11 +26,12 @@ export class DisconnectEventHandler extends BasePlayerEventHandler {
     repository: IPlayerRepository,
     logger: ILogger,
     private readonly sessionService: IPlayerSessionService,
-    matchService: IMatchService | undefined,
     private readonly serverRepository: IServerRepository,
+    matchService: IMatchService | undefined,
+    mapService?: IMapService,
     private readonly eventNotificationService?: IEventNotificationService,
   ) {
-    super(repository, logger, matchService)
+    super(repository, logger, matchService, mapService)
   }
 
   async handle(event: PlayerEvent): Promise<HandlerResult> {

@@ -24,7 +24,6 @@ import {
   isActionTeamEvent,
   isWorldActionEvent,
 } from "@/modules/action/action.types"
-import type { IMatchService } from "@/modules/match/match.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 
 export class ActionEventHandler extends BaseModuleEventHandler {
@@ -32,13 +31,11 @@ export class ActionEventHandler extends BaseModuleEventHandler {
     logger: ILogger,
     private readonly actionService: IActionService,
     private readonly sessionService: IPlayerSessionService,
-    private readonly matchService?: IMatchService,
     metrics?: EventMetrics,
   ) {
     super(logger, metrics)
   }
 
-  // Queue-compatible handler methods (called by RabbitMQConsumer)
   async handleActionPlayer(event: BaseEvent): Promise<void> {
     this.logger.debug(`Action module handling ACTION_PLAYER for server ${event.serverId}`)
 
@@ -51,21 +48,6 @@ export class ActionEventHandler extends BaseModuleEventHandler {
     this.logPlayerInfo(resolvedEvent)
 
     await this.actionService.handleActionEvent(resolvedEvent)
-
-    // Inform match service for objective scoring when applicable
-    try {
-      const { actionCode, team } = resolvedEvent.data
-
-      // Bomb-related or key objective actions
-      await this.matchService?.handleObjectiveAction(
-        actionCode,
-        resolvedEvent.serverId,
-        resolvedEvent.data.playerId,
-        team,
-      )
-    } catch {
-      // non-fatal
-    }
   }
 
   async handleActionPlayerPlayer(event: BaseEvent): Promise<void> {
@@ -91,13 +73,6 @@ export class ActionEventHandler extends BaseModuleEventHandler {
     }
 
     await this.actionService.handleActionEvent(event)
-
-    try {
-      const { actionCode, team } = event.data
-      await this.matchService?.handleObjectiveAction(actionCode, event.serverId, undefined, team)
-    } catch {
-      // non-fatal
-    }
   }
 
   async handleActionWorld(event: BaseEvent): Promise<void> {
@@ -170,7 +145,7 @@ export class ActionEventHandler extends BaseModuleEventHandler {
 
           if (fallbackSession) {
             this.logger.debug(
-              `Created fallback session for gameUserId ${gameUserId} -> playerId ${fallbackSession.databasePlayerId}`,
+              `Created fallback session for gameUserId ${gameUserId} → playerId ${fallbackSession.databasePlayerId}`,
             )
 
             return {

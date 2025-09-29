@@ -9,24 +9,23 @@ import type {
   IMatchRepository,
   MatchEvent,
   MatchStats,
-  PlayerRoundStats,
   RoundStartEvent,
   RoundEndEvent,
   TeamWinEvent,
   MapChangeEvent,
 } from "./match.types"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { IMapService } from "@/modules/map/map.service"
 import type { HandlerResult } from "@/shared/types/common"
-import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
-import { GameConfig } from "@/config/game.config"
 
 export class MatchService implements IMatchService {
-  private currentMatches: Map<number, MatchStats> = new Map() // serverId -> MatchStats
+  private currentMatches: Map<number, MatchStats> = new Map() // serverId → MatchStats
 
   constructor(
     private readonly repository: IMatchRepository,
     private readonly logger: ILogger,
+    private readonly mapService?: IMapService,
   ) {}
 
   async handleMatchEvent(event: MatchEvent): Promise<HandlerResult> {
@@ -51,206 +50,14 @@ export class MatchService implements IMatchService {
     }
   }
 
-  // Objective events are now handled via ACTION_* paths and DB codes
+  // Kill events are handled by PlayerService - no match-level tracking needed
 
-  async handleKillInMatch(event: BaseEvent): Promise<HandlerResult> {
-    const serverId = event.serverId
+  // MVP calculation removed - feature not used in production
 
-    try {
-      let matchStats = this.currentMatches.get(serverId)
-      if (!matchStats) {
-        this.logger.info(`Auto-initializing match context for server ${serverId}`)
-        matchStats = {
-          duration: 0,
-          totalRounds: 0,
-          teamScores: {},
-          startTime: new Date(),
-          playerStats: new Map(),
-          currentMap: "",
-          playerTeams: new Map(),
-        }
-        this.currentMatches.set(serverId, matchStats)
-      }
-
-      const { killerId, victimId, headshot } = event.data as {
-        killerId: number
-        victimId: number
-        headshot: boolean
-      }
-
-      // Update killer stats and server aggregated kills
-      const killerStats =
-        matchStats.playerStats.get(killerId) ?? this.createEmptyPlayerStats(killerId)
-      killerStats.kills += 1
-      if (headshot) {
-        killerStats.headshots += 1
-      }
-      matchStats.playerStats.set(killerId, killerStats)
-
-      // Update victim stats
-      const victimStats =
-        matchStats.playerStats.get(victimId) ?? this.createEmptyPlayerStats(victimId)
-      victimStats.deaths += 1
-      matchStats.playerStats.set(victimId, victimStats)
-
-      // Best-effort: update server aggregated kills and lastEvent
-      try {
-        await this.repository.updateServerStats(serverId, {
-          kills: { increment: 1 },
-          lastEvent: new Date(),
-        })
-      } catch {
-        // ignore
-      }
-
-      this.logger.debug(
-        `Kill event processed in match: player ${killerId} killed player ${victimId}${headshot ? " (headshot)" : ""}`,
-      )
-
-      return { success: true }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
-
-  async initializeMapForServer(serverId: number): Promise<string> {
-    try {
-      // Check if we already have match stats for this server
-      const existingStats = this.currentMatches.get(serverId)
-      if (existingStats && existingStats.currentMap) {
-        return existingStats.currentMap
-      }
-
-      // Try to get the last known map from the database
-      const lastKnownMap = await this.repository.getLastKnownMap(serverId)
-
-      if (lastKnownMap) {
-        // Initialize match stats with the detected map
-        const matchStats: MatchStats = {
-          duration: 0,
-          totalRounds: 0,
-          teamScores: {},
-          startTime: new Date(),
-          playerStats: new Map(),
-          currentMap: lastKnownMap,
-          playerTeams: new Map(),
-        }
-        this.currentMatches.set(serverId, matchStats)
-
-        this.logger.info(`Detected map from database for server ${serverId}: ${lastKnownMap}`)
-        return lastKnownMap
-      }
-
-      // No map found - use fallback
-      const fallbackMap = "unknown"
-      const matchStats: MatchStats = {
-        duration: 0,
-        totalRounds: 0,
-        teamScores: {},
-        startTime: new Date(),
-        playerStats: new Map(),
-        currentMap: fallbackMap,
-        playerTeams: new Map(),
-      }
-      this.currentMatches.set(serverId, matchStats)
-
-      this.logger.warn(`No map found for server ${serverId} - using fallback: ${fallbackMap}`)
-      return fallbackMap
-    } catch (error) {
-      this.logger.error(`Failed to initialize map for server ${serverId}: ${error}`)
-      return "unknown"
-    }
-  }
-
-  async calculateMatchMVP(serverId: number): Promise<number | undefined> {
-    const matchStats = this.currentMatches.get(serverId)
-    if (!matchStats || matchStats.playerStats.size === 0) return undefined
-
-    let mvpPlayerId: number | undefined
-    let highestScore = 0
-
-    // Calculate MVP based on scoring algorithm
-    for (const [playerId, stats] of matchStats.playerStats) {
-      const score = this.calculatePlayerScore(stats)
-      if (score > highestScore) {
-        highestScore = score
-        mvpPlayerId = playerId
-      }
-    }
-
-    return mvpPlayerId
-  }
-
-  async handleObjectiveAction(
-    actionCode: string,
-    serverId: number,
-    actorPlayerId?: number,
-    team?: string,
-  ): Promise<HandlerResult> {
-    try {
-      let matchStats = this.currentMatches.get(serverId)
-      if (!matchStats) {
-        this.logger.info(`Auto-initializing match context for server ${serverId}`)
-        matchStats = {
-          duration: 0,
-          totalRounds: 0,
-          teamScores: {},
-          startTime: new Date(),
-          playerStats: new Map(),
-          currentMap: "",
-          playerTeams: new Map(),
-        }
-        this.currentMatches.set(serverId, matchStats)
-      }
-
-      // Award points per canonical action code (can be externalized to config later)
-      const pointsByActionCode: Record<string, number> = {
-        Planted_The_Bomb: 3,
-        Defused_The_Bomb: 3,
-        All_Hostages_Rescued: 2,
-      }
-      const awardedPoints = pointsByActionCode[actionCode] ?? 1
-
-      if (typeof actorPlayerId === "number") {
-        const playerStats =
-          matchStats.playerStats.get(actorPlayerId) ?? this.createEmptyPlayerStats(actorPlayerId)
-        playerStats.objectiveScore += awardedPoints
-        matchStats.playerStats.set(actorPlayerId, playerStats)
-      }
-
-      // Update server bomb stats for common codes
-      if (actionCode === "Planted_The_Bomb") {
-        await this.repository.updateBombStats(serverId, "plant")
-      } else if (actionCode === "Defused_The_Bomb") {
-        await this.repository.updateBombStats(serverId, "defuse")
-      }
-
-      this.logger.debug(
-        `Objective action processed: ${actionCode}${actorPlayerId ? ` by player ${actorPlayerId}` : team ? ` by team ${team}` : ""}`,
-      )
-
-      return { success: true }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
+  // Objective/action events are handled by ActionService - no match-level tracking needed
 
   getMatchStats(serverId: number): MatchStats | undefined {
     return this.currentMatches.get(serverId)
-  }
-
-  getCurrentMap(serverId: number): string {
-    const matchStats = this.currentMatches.get(serverId)
-    const currentMap = matchStats?.currentMap || ""
-
-    // If no map is set, use a fallback to indicate unknown map
-    return currentMap || GameConfig.getUnknownMap()
   }
 
   resetMatchStats(serverId: number): void {
@@ -258,43 +65,9 @@ export class MatchService implements IMatchService {
     this.logger.info(`Reset match statistics for server ${serverId}`)
   }
 
-  updatePlayerWeaponStats(
-    serverId: number,
-    playerId: number,
-    stats: { shots?: number; hits?: number; damage?: number },
-  ): void {
-    const matchStats = this.currentMatches.get(serverId)
-    if (!matchStats) return
+  // Weapon stats tracking removed - not used in production
 
-    const playerStats =
-      matchStats.playerStats.get(playerId) ?? this.createEmptyPlayerStats(playerId)
-
-    if (stats.shots) playerStats.shots += stats.shots
-    if (stats.hits) playerStats.hits += stats.hits
-    if (stats.damage) playerStats.damage += stats.damage
-
-    matchStats.playerStats.set(playerId, playerStats)
-
-    this.logger.debug(
-      `Updated weapon stats for player ${playerId}: +${stats.shots || 0} shots, +${stats.hits || 0} hits, +${stats.damage || 0} damage`,
-    )
-  }
-
-  calculatePlayerScore(stats: PlayerRoundStats): number {
-    // MVP scoring algorithm:
-    // - Kills: 2 points each
-    // - Deaths: -1 point each
-    // - Assists: 1 point each
-    // - Objective score: 3 points each (bomb plants/defuses, etc.)
-    // - Clutch wins: 5 points each
-    return (
-      stats.kills * 2 -
-      stats.deaths * 1 +
-      stats.assists * 1 +
-      stats.objectiveScore * 3 +
-      stats.clutchWins * 5
-    )
-  }
+  // Player scoring removed - was only used for MVP calculation
 
   async getServerGame(serverId: number): Promise<string | null> {
     try {
@@ -321,22 +94,20 @@ export class MatchService implements IMatchService {
     return players
   }
 
-  // getObjectivePoints removed; scoring to be based on action codes in later phase
+  // Player stats creation removed - handled by PlayerService
 
-  private createEmptyPlayerStats(playerId: number): PlayerRoundStats {
-    return {
-      playerId,
-      kills: 0,
-      deaths: 0,
-      assists: 0,
-      damage: 0,
-      objectiveScore: 0,
-      clutchWins: 0,
-      headshots: 0,
-      shots: 0,
-      hits: 0,
-      suicides: 0,
-      teamkills: 0,
+  /**
+   * Ensure match stats are initialized for a server
+   */
+  private ensureMatchStatsInitialized(serverId: number): void {
+    if (!this.currentMatches.has(serverId)) {
+      this.currentMatches.set(serverId, {
+        duration: 0,
+        totalRounds: 0,
+        teamScores: {},
+        startTime: new Date(),
+        playerTeams: new Map(),
+      })
     }
   }
 
@@ -344,23 +115,20 @@ export class MatchService implements IMatchService {
     const serverId = event.serverId
 
     try {
-      // Initialize match stats if not exists
-      if (!this.currentMatches.has(serverId)) {
-        this.currentMatches.set(serverId, {
-          duration: 0,
-          totalRounds: 0,
-          teamScores: {},
-          startTime: new Date(),
-          playerStats: new Map(),
-          currentMap: event.data.map,
-        })
+      // Ensure match stats are initialized
+      this.ensureMatchStatsInitialized(serverId)
+
+      // Notify MapService about potential map change and get authoritative map
+      let currentMap = "unknown"
+      if (this.mapService) {
+        await this.mapService.handleMapChange(serverId, event.data.map, undefined)
+        currentMap = await this.mapService.getCurrentMap(serverId)
       } else {
-        // Update the current map if it has changed
-        const matchStats = this.currentMatches.get(serverId)!
-        matchStats.currentMap = event.data.map
+        // Fallback to event data if MapService unavailable
+        currentMap = event.data.map
       }
 
-      this.logger.debug(`Round started on server ${serverId}`)
+      this.logger.debug(`Round started on server ${serverId}, map: ${currentMap}`)
 
       return { success: true, affected: 1 }
     } catch (error) {
@@ -376,19 +144,9 @@ export class MatchService implements IMatchService {
     const { winningTeam, duration, score } = event.data
 
     try {
-      let matchStats = this.currentMatches.get(serverId)
-      if (!matchStats) {
-        this.logger.info(`Auto-initializing match context for server ${serverId}`)
-        matchStats = {
-          duration: 0,
-          totalRounds: 0,
-          teamScores: {},
-          startTime: new Date(),
-          playerStats: new Map(),
-          currentMap: "",
-        }
-        this.currentMatches.set(serverId, matchStats)
-      }
+      // Ensure match stats are initialized
+      this.ensureMatchStatsInitialized(serverId)
+      const matchStats = this.currentMatches.get(serverId)!
 
       // Update match statistics
       matchStats.totalRounds++
@@ -417,20 +175,8 @@ export class MatchService implements IMatchService {
     const { winningTeam, triggerName, score } = event.data
 
     try {
-      const matchStats = this.currentMatches.get(serverId)
-      if (!matchStats) {
-        // Initialize match stats if not exists
-        this.currentMatches.set(serverId, {
-          duration: 0,
-          totalRounds: 0,
-          teamScores: {},
-          startTime: new Date(),
-          playerStats: new Map(),
-          currentMap: "",
-          playerTeams: new Map(),
-        })
-      }
-
+      // Ensure match stats are initialized
+      this.ensureMatchStatsInitialized(serverId)
       const currentMatchStats = this.currentMatches.get(serverId)!
 
       // Update match statistics
@@ -480,21 +226,26 @@ export class MatchService implements IMatchService {
         totalRounds: 0,
         teamScores: {},
         startTime: new Date(),
-        playerStats: new Map(),
-        currentMap: newMap, // Set the current map
         playerTeams: new Map(),
       }
       this.currentMatches.set(serverId, newMatchStats)
 
-      // Update server record for the new map
+      // Notify MapService about map change and get authoritative map
+      let authoritativeMap = newMap // fallback
+      if (this.mapService) {
+        await this.mapService.handleMapChange(serverId, newMap, previousMap)
+        authoritativeMap = await this.mapService.getCurrentMap(serverId)
+      }
+
+      // Update server record with authoritative map
       if (typeof playerCount === "number") {
-        await this.repository.resetMapStats(serverId, newMap, playerCount)
+        await this.repository.resetMapStats(serverId, authoritativeMap, playerCount)
       } else {
-        await this.repository.resetMapStats(serverId, newMap)
+        await this.repository.resetMapStats(serverId, authoritativeMap)
       }
 
       this.logger.debug(
-        `Map changed on server ${serverId}: ${previousMap} -> ${newMap} (${playerCount} players)`,
+        `Map changed on server ${serverId}: ${previousMap} → ${authoritativeMap} (${playerCount} players)`,
       )
 
       return { success: true }
@@ -508,15 +259,11 @@ export class MatchService implements IMatchService {
 
   private async finalizeMatch(serverId: number, mapName: string, stats: MatchStats): Promise<void> {
     try {
-      // Calculate final MVP for the match
-      const mvpPlayerId = await this.calculateMatchMVP(serverId)
-      stats.mvpPlayer = mvpPlayerId
-
       // Save match statistics to database
-      await this.saveMatchToDatabase(serverId, mapName, stats)
+      await this.saveMatchToDatabase(serverId)
 
       this.logger.debug(
-        `Match finalized on server ${serverId} for map ${mapName}: ${stats.totalRounds} rounds, ${stats.duration}s, MVP: ${mvpPlayerId}, scores: ${JSON.stringify(
+        `Match finalized on server ${serverId} for map ${mapName}: ${stats.totalRounds} rounds, ${stats.duration}s, scores: ${JSON.stringify(
           stats.teamScores,
         )}`,
       )
@@ -528,53 +275,12 @@ export class MatchService implements IMatchService {
     }
   }
 
-  private async saveMatchToDatabase(
-    serverId: number,
-    mapName: string,
-    stats: MatchStats,
-  ): Promise<void> {
+  private async saveMatchToDatabase(serverId: number): Promise<void> {
     try {
       const server = await this.repository.findServerById(serverId)
       if (!server) return
 
-      let totalKills = 0
-      let totalHeadshots = 0
-
-      // Create a player history snapshot for each participant
-      for (const [, playerStats] of stats.playerStats) {
-        totalKills += playerStats.kills
-        totalHeadshots += playerStats.headshots
-
-        try {
-          // Use starting/ending rating approximation: current player skill if available, otherwise score
-          const currentSkill = await this.repository.getPlayerSkill(playerStats.playerId)
-          await this.repository.createPlayerHistory({
-            playerId: playerStats.playerId,
-            eventTime: new Date(),
-            game: server.game || GameConfig.getDefaultGame(),
-            kills: playerStats.kills,
-            deaths: playerStats.deaths,
-            suicides: playerStats.suicides,
-            skill:
-              typeof currentSkill === "number"
-                ? currentSkill
-                : this.calculatePlayerScore(playerStats),
-            shots: playerStats.shots,
-            hits: playerStats.hits,
-            headshots: playerStats.headshots,
-            teamkills: playerStats.teamkills,
-          })
-        } catch (error) {
-          this.logger.warn(
-            `Failed to create player history for player ${playerStats.playerId}: ${error instanceof Error ? error.message : String(error)}`,
-          )
-          // Continue with other players instead of failing the entire operation
-        }
-      }
-
-      if (totalKills > 0 || totalHeadshots > 0) {
-        await this.repository.updateMapCount(server.game, mapName, totalKills, totalHeadshots)
-      }
+      // Player history is managed by PlayerService - no match-level tracking needed
 
       this.logger.info(`Match statistics saved to database for server ${serverId}`)
     } catch (error) {

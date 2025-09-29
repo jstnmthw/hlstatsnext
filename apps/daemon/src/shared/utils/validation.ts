@@ -12,9 +12,13 @@ export function normalizeSteamId(steamId: unknown): string | null {
     return null
   }
 
-  // BOT special-case - support both "BOT" and "BOT:name" format
-  if (raw.toUpperCase() === "BOT" || raw.toUpperCase().startsWith("BOT:")) {
-    return raw.toUpperCase()
+  // BOT special-case - support "BOT", "BOT:name", and "BOT_serverId_name" formats
+  if (
+    raw.toUpperCase() === "BOT" ||
+    raw.toUpperCase().startsWith("BOT:") ||
+    /^BOT_\d+_/.test(raw)
+  ) {
+    return raw
   }
 
   // Steam64: 17 digits

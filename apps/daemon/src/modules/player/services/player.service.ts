@@ -71,7 +71,12 @@ export class PlayerService implements IPlayerService {
     return this.eventHandlerFactory
   }
 
-  async getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number> {
+  async getOrCreatePlayer(
+    steamId: string,
+    playerName: string,
+    game: string,
+    serverId?: number,
+  ): Promise<number> {
     const normalized = normalizeSteamId(steamId)
     if (!normalized) {
       throw new Error(`Invalid Steam ID: ${steamId}`)
@@ -83,7 +88,7 @@ export class PlayerService implements IPlayerService {
 
     const isBot = normalized.toUpperCase() === "BOT"
     const normalizedName = sanitizePlayerName(playerName)
-    const effectiveId = isBot ? `BOT_${normalizedName}` : normalized
+    const effectiveId = isBot ? `BOT_${serverId || 0}_${normalizedName}` : normalized
 
     // Create cache key to prevent concurrent calls for the same player
     const cacheKey = `${effectiveId}:${game}`

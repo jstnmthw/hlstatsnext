@@ -115,6 +115,7 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
           playerMeta.steamId,
           playerMeta.playerName,
           serverGame,
+          event.serverId,
         )
         const eventData = (event.data as Record<string, unknown>) ?? {}
 
@@ -157,11 +158,13 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
           meta.killer.steamId,
           meta.killer.playerName,
           serverGame,
+          event.serverId,
         ),
         this.playerService.getOrCreatePlayer(
           meta.victim.steamId,
           meta.victim.playerName,
           serverGame,
+          event.serverId,
         ),
       ])
 
@@ -229,11 +232,13 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
           meta.killer.steamId,
           meta.killer.playerName,
           serverGame,
+          event.serverId,
         ),
         this.playerService.getOrCreatePlayer(
           meta.victim.steamId,
           meta.victim.playerName,
           serverGame,
+          event.serverId,
         ),
       ])
 

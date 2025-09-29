@@ -16,29 +16,38 @@ export class SimplePlayerResolverService implements IPlayerResolver {
     private readonly logger: ILogger,
   ) {}
 
-  async getOrCreatePlayer(steamId: string, playerName: string, game: string): Promise<number> {
+  async getOrCreatePlayer(
+    steamId: string,
+    playerName: string,
+    game: string,
+    serverId?: number,
+  ): Promise<number> {
     // Simple implementation that creates/gets player without complex dependencies
     const normalized = normalizeSteamId(steamId)
     if (!normalized) {
       throw new Error(`Invalid Steam ID: ${steamId}`)
     }
 
+    const isBot = normalized.toUpperCase() === "BOT"
+    const normalizedName = sanitizePlayerName(playerName)
+    const effectiveId = isBot ? `BOT_${serverId || 0}_${normalizedName}` : normalized
+
     try {
       // Try to find existing player
-      const existing = await this.playerRepository.findByUniqueId(normalized, game)
+      const existing = await this.playerRepository.findByUniqueId(effectiveId, game)
       if (existing) {
         return existing.playerId
       }
 
       // Create new player
       const created = await this.playerRepository.upsertPlayer({
-        lastName: sanitizePlayerName(playerName),
+        lastName: normalizedName,
         game,
-        steamId: normalized,
+        steamId: effectiveId,
       })
 
       this.logger.debug(
-        `Created new player: ${playerName} (${normalized}) - ID: ${created.playerId}`,
+        `Created new player: ${playerName} (${effectiveId}) - ID: ${created.playerId}`,
       )
       return created.playerId
     } catch (error) {

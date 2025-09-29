@@ -209,9 +209,9 @@ export class DisconnectEventHandler extends BasePlayerEventHandler {
         const server = await this.serverRepository.findById(serverId)
         const game = server?.game || "csgo"
 
-        // Try to find a bot with the BOT_ prefix
+        // Try to find a bot with the BOT_ prefix (server-specific)
         const normalizedName = sanitizePlayerName(meta.playerName)
-        const botUniqueId = `BOT_${normalizedName}`
+        const botUniqueId = `BOT_${serverId}_${normalizedName}`
 
         const existingBot = await this.repository.findByUniqueId(botUniqueId, game)
         if (existingBot) {

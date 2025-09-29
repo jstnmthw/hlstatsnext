@@ -78,9 +78,9 @@ export class PlayerResolver {
       const server = await this.serverRepository.findById(serverId)
       const game = server?.game || "csgo"
 
-      // Strategy 1a: Try to find a bot with the BOT_ prefix
+      // Strategy 1a: Try to find a bot with the BOT_ prefix (server-specific)
       const normalizedName = sanitizePlayerName(playerName)
-      const botUniqueId = `BOT_${normalizedName}`
+      const botUniqueId = `BOT_${serverId}_${normalizedName}`
 
       const existingBot = await this.playerRepository.findByUniqueId(botUniqueId, game)
       if (existingBot) {

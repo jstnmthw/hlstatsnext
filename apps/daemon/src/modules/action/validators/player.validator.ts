@@ -72,6 +72,7 @@ export class PlayerValidator {
     actionCode: string,
     meta?: { steamId?: string; playerName?: string },
     game?: string,
+    serverId?: number,
   ): Promise<PlayerValidationResult> {
     if (!this.playerService) {
       return { playerId, shouldEarlyReturn: false }
@@ -89,6 +90,7 @@ export class PlayerValidator {
           meta.steamId,
           meta.playerName,
           game,
+          serverId,
         )
         return { playerId: resolvedId, shouldEarlyReturn: false }
       } catch {

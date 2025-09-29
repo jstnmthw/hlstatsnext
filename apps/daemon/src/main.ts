@@ -8,7 +8,7 @@
  * The daemon is responsible for:
  * - Receiving UDP packets from Half-Life game servers
  * - Processing game events and statistics
- * - Managing RCON connections for server monitoring
+ * - Managing RCON connections for scheduled commands and monitoring
  * - Publishing events to message queues for processing
  *
  * @author HLStatsNext Team
@@ -26,7 +26,6 @@ import type { BaseEvent } from "@/shared/types/events"
 import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
 import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { getEnvironmentConfig } from "@/config/environment.config"
-import { RconMonitorService } from "@/modules/rcon/services/rcon-monitor.service"
 import { DatabaseConnectionService } from "@/database/connection.service"
 import { getUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 
@@ -61,9 +60,6 @@ export class HLStatsDaemon {
   /** Structured logger instance for daemon operations */
   private logger: ILogger
 
-  /** RCON monitoring service for server status checks */
-  private rconMonitor: RconMonitorService
-
   /** RCON scheduled command service for automated tasks */
   private rconScheduler: IRconScheduleService
 
@@ -77,7 +73,7 @@ export class HLStatsDaemon {
    * configuration. The constructor handles:
    * - Environment configuration parsing
    * - Application context creation with dependency injection
-   * - Service instantiation (RCON monitor, database connection)
+   * - Service instantiation (RCON scheduler, database connection)
    *
    * @throws {Error} When environment configuration is invalid
    * @throws {Error} When required services cannot be initialized
@@ -85,13 +81,7 @@ export class HLStatsDaemon {
   private constructor(context: AppContext) {
     this.context = context
     this.logger = this.context.logger
-    const config = getEnvironmentConfig()
 
-    this.rconMonitor = new RconMonitorService(
-      this.context,
-      config.rconConfig,
-      this.context.serverStatusEnricher,
-    )
     this.rconScheduler = this.context.rconScheduleService
     this.databaseConnection = new DatabaseConnectionService(this.context)
 
@@ -234,8 +224,7 @@ export class HLStatsDaemon {
    *
    * This private method handles the orchestrated startup of:
    * - Ingress service (UDP packet reception)
-   * - RCON monitoring service (server status checks)
-   * - RCON scheduler service (scheduled command execution)
+   * - RCON scheduler service (scheduled command execution and monitoring)
    *
    * Services are started with proper dependency ordering to ensure
    * the system comes online in a stable state.
@@ -246,10 +235,7 @@ export class HLStatsDaemon {
   private async startServices(): Promise<void> {
     await Promise.all([this.context.ingressService.start()])
 
-    // Start RCON services after ingress is ready
-    this.rconMonitor.start()
-
-    // Start RCON scheduler after RCON monitoring is established
+    // Start RCON scheduler for scheduled commands and monitoring
     await this.rconScheduler.start()
   }
 
@@ -257,7 +243,7 @@ export class HLStatsDaemon {
    * Gracefully shuts down the daemon and all its services.
    *
    * This method performs a clean shutdown sequence:
-   * 1. Stops RCON scheduler and monitoring
+   * 1. Stops RCON scheduler
    * 2. Stops ingress service and disconnects RCON connections
    * 3. Shuts down message queue infrastructure
    * 4. Closes database connections
@@ -282,7 +268,6 @@ export class HLStatsDaemon {
     try {
       // Stop RCON services first
       await this.rconScheduler.stop()
-      this.rconMonitor.stop()
 
       await Promise.all([
         this.context.ingressService.stop(),

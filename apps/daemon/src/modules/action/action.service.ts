@@ -146,6 +146,7 @@ export class ActionService implements IActionService {
         actionCode,
         event.meta as { steamId?: string; playerName?: string } | undefined,
         game,
+        event.serverId,
       )
       if (playerValidation.shouldEarlyReturn) {
         return playerValidation.earlyResult!

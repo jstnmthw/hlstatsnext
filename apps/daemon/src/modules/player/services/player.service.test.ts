@@ -769,7 +769,7 @@ describe("PlayerService", () => {
 
       const result = await playerService.handlePlayerEvent(disconnectEvent)
       expect(result.success).toBe(true)
-      expect(mockRepository.findByUniqueId).toHaveBeenCalledWith("BOT_TestBot", "cstrike")
+      expect(mockRepository.findByUniqueId).toHaveBeenCalledWith("BOT_2_TestBot", "cstrike")
       expect(repoSpy).toHaveBeenCalledWith(123, 2, expect.any(String))
     })
 
@@ -877,6 +877,71 @@ describe("PlayerService", () => {
 
       // But upsert should only be called once due to caching
       expect(upsertSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it("should generate server-specific BOT unique IDs when serverId is provided", async () => {
+      const steamId = "BOT"
+      const botName = "TestBot"
+      const game = "cstrike"
+      const serverId = 5
+
+      // Mock the upsert method to capture the unique ID used
+      const upsertSpy = vi
+        .spyOn(mockRepository, "upsertPlayer")
+        .mockResolvedValue({ playerId: 123 } as Player)
+
+      const result = await playerService.getOrCreatePlayer(steamId, botName, game, serverId)
+
+      expect(result).toBe(123)
+      expect(upsertSpy).toHaveBeenCalledWith({
+        lastName: botName,
+        game,
+        skill: 1000,
+        steamId: "BOT_5_TestBot", // Should use server-specific format with original name
+      })
+    })
+
+    it("should use default server (0) for BOT unique IDs when serverId is not provided", async () => {
+      const steamId = "BOT"
+      const botName = "TestBot"
+      const game = "cstrike"
+
+      // Mock the upsert method to capture the unique ID used
+      const upsertSpy = vi
+        .spyOn(mockRepository, "upsertPlayer")
+        .mockResolvedValue({ playerId: 124 } as Player)
+
+      const result = await playerService.getOrCreatePlayer(steamId, botName, game)
+
+      expect(result).toBe(124)
+      expect(upsertSpy).toHaveBeenCalledWith({
+        lastName: botName,
+        game,
+        skill: 1000,
+        steamId: "BOT_0_TestBot", // Should use default server 0
+      })
+    })
+
+    it("should not modify non-BOT Steam IDs when serverId is provided", async () => {
+      const steamId = "76561198000123456"
+      const playerName = "RealPlayer"
+      const game = "cstrike"
+      const serverId = 3
+
+      // Mock the upsert method to capture the unique ID used
+      const upsertSpy = vi
+        .spyOn(mockRepository, "upsertPlayer")
+        .mockResolvedValue({ playerId: 125 } as Player)
+
+      const result = await playerService.getOrCreatePlayer(steamId, playerName, game, serverId)
+
+      expect(result).toBe(125)
+      expect(upsertSpy).toHaveBeenCalledWith({
+        lastName: playerName,
+        game,
+        skill: 1000,
+        steamId: "76561198000123456", // Should remain unchanged for real players
+      })
     })
   })
 })

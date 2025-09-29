@@ -189,8 +189,17 @@ export class RconScheduleService implements IRconScheduleService {
       return // Skip invalid schedules instead of crashing the daemon
     }
 
+    // Check if executor exists for the command type
+    const commandType = schedule.command.type
+    const executor = this.executors.get(commandType)
+    if (!executor) {
+      this.logger.warn(
+        `No executor found for command type: ${commandType} (schedule: ${schedule.id}), skipping this schedule`,
+      )
+      return // Skip schedules with missing executors instead of crashing the daemon
+    }
+
     // Validate the command
-    const executor = this.getExecutorForSchedule(schedule)
     if (!(await executor.validate(schedule))) {
       this.logger.warn(`Schedule validation failed: ${schedule.id}, skipping this schedule`)
       return // Skip invalid schedules instead of crashing the daemon
@@ -590,6 +599,8 @@ export class RconScheduleService implements IRconScheduleService {
 
     const executor = this.executors.get(commandType)
     if (!executor) {
+      // This should not happen during execution since we validate during registration
+      // but we still throw an error here for safety
       throw new ScheduleError(
         `No executor found for command type: ${commandType}`,
         ScheduleErrorCode.INVALID_COMMAND,

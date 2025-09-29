@@ -290,6 +290,27 @@ describe("RconScheduleService", () => {
       const schedules = service.getSchedules()
       expect(schedules).toHaveLength(0)
     })
+
+    it("should handle missing command executors gracefully", async () => {
+      const scheduleWithMissingExecutor: ScheduledCommand = {
+        id: "missing-executor",
+        name: "Missing Executor Schedule",
+        cronExpression: "0 * * * * *",
+        command: { type: "stats_snapshot", param1: "test" },
+        enabled: true,
+      }
+
+      // This should not throw, but should log a warning
+      await service.registerSchedule(scheduleWithMissingExecutor)
+
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        "No executor found for command type: stats_snapshot (schedule: missing-executor), skipping this schedule",
+      )
+
+      // Schedule should not be registered
+      const schedules = service.getSchedules()
+      expect(schedules).toHaveLength(0)
+    })
   })
 
   describe("unregisterSchedule", () => {

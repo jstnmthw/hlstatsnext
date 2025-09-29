@@ -125,26 +125,6 @@ const defaultScheduledCommands: ScheduledCommand[] = [
   },
 
   {
-    id: "daily-stats-snapshot",
-    name: "Daily Statistics Snapshot",
-    cronExpression: "0 0 0 * * *", // Daily at midnight
-    command: {
-      type: "stats_snapshot",
-      command: "status",
-    },
-    enabled: true,
-    timeoutMs: DEFAULT_TIMEOUT_MS,
-    ...DEFAULT_RETRY_SETTINGS,
-    metadata: {
-      category: "monitoring",
-      priority: "high",
-      description: "Captures daily server statistics",
-      captureStats: true,
-      logToFile: true,
-    },
-  },
-
-  {
     id: "peak-hours-welcome",
     name: "Peak Hours Welcome Message",
     cronExpression: "0 0 18-23 * * *", // Every hour from 6 PM to 11 PM
@@ -203,46 +183,6 @@ const defaultScheduledCommands: ScheduledCommand[] = [
       category: "maintenance",
       priority: "critical",
       description: "Warns players about scheduled server restart",
-    },
-  },
-
-  {
-    id: "hourly-server-status",
-    name: "Hourly Server Status Check",
-    cronExpression: "0 0 * * * *", // Every hour on the hour
-    command: {
-      type: "stats_snapshot",
-      command: "stats",
-    },
-    enabled: true,
-    timeoutMs: DEFAULT_TIMEOUT_MS,
-    ...DEFAULT_RETRY_SETTINGS,
-    metadata: {
-      category: "monitoring",
-      priority: "normal",
-      description: "Regular server health check",
-      captureStats: true,
-    },
-  },
-
-  {
-    id: "performance-check",
-    name: "Server Performance Check",
-    cronExpression: "0 */15 * * * *", // Every 15 minutes
-    command: {
-      type: "stats_snapshot",
-      command: "fps_max",
-    },
-    enabled: true,
-    timeoutMs: DEFAULT_TIMEOUT_MS,
-    retryOnFailure: false,
-    maxRetries: 1,
-    metadata: {
-      category: "monitoring",
-      priority: "high",
-      description: "Monitors server performance metrics",
-      captureStats: true,
-      internal: true, // Not visible to players
     },
   },
 

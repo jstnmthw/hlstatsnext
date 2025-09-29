@@ -23,16 +23,16 @@ export class PlayerSessionRepository implements IPlayerSessionRepository {
   // Primary storage: Map of session key to session
   private readonly sessions = new Map<string, PlayerSession>()
 
-  // Index: serverId + gameUserId -> session key
+  // Index: serverId + gameUserId → session key
   private readonly gameUserIdIndex = new Map<string, string>()
 
-  // Index: serverId + databasePlayerId -> session key
+  // Index: serverId + databasePlayerId → session key
   private readonly playerIdIndex = new Map<string, string>()
 
-  // Index: serverId + steamId -> session key
+  // Index: serverId + steamId → session key
   private readonly steamIdIndex = new Map<string, string>()
 
-  // Index: serverId -> Set of session keys
+  // Index: serverId → Set of session keys
   private readonly serverIndex = new Map<number, Set<string>>()
 
   constructor(logger: ILogger) {

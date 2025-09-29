@@ -124,7 +124,7 @@ export class ServerStatusEnricher implements IServerStatusEnricher {
     if (mapChanged) {
       await this.handleMapChange(serverId, newMap, update.activePlayers)
       this.logger.ok(
-        `Map changed for server ${serverId}: ${currentMap} → ${newMap} (${update.activePlayers} players)`,
+        `Map changed for server ${serverId}: ${currentMap} →  ${newMap} (${update.activePlayers} players)`,
       )
     } else {
       await this.serverRepository.updateServerStatusFromRcon(serverId, update)

@@ -450,7 +450,7 @@ export class PlayerRepository extends BatchedRepository<Player> implements IPlay
         })
       }, options)
       this.logger.debug(
-        `Created teamkill event: ${killerId} -> ${victimId} (${weapon}) on server ${serverId}`,
+        `Created teamkill event: ${killerId} → ${victimId} (${weapon}) on server ${serverId}`,
       )
     } catch (error) {
       this.handleError("createTeamkillEvent", error)
@@ -661,7 +661,7 @@ export class PlayerRepository extends BatchedRepository<Player> implements IPlay
         })
       }, options)
 
-      this.logger.debug(`Logged EventFrag: ${killerId} → ${victimId} (${weapon}) on ${map}`)
+      this.logger.debug(`Logged EventFrag: ${killerId} →  ${victimId} (${weapon}) on ${map}`)
     } catch (error) {
       this.handleError("logEventFrag", error)
     }

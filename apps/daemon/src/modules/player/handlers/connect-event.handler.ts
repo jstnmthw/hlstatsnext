@@ -15,6 +15,7 @@ import type { PlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IMapService } from "@/modules/map/map.service"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
@@ -26,10 +27,11 @@ export class ConnectEventHandler extends BasePlayerEventHandler {
     private readonly sessionService: IPlayerSessionService,
     private readonly serverService: IServerService,
     matchService?: IMatchService,
+    mapService?: IMapService,
     private readonly geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
     private readonly eventNotificationService?: IEventNotificationService,
   ) {
-    super(repository, logger, matchService)
+    super(repository, logger, matchService, mapService)
   }
 
   async handle(event: PlayerEvent): Promise<HandlerResult> {

@@ -868,6 +868,7 @@ export class CsParser extends BaseParser {
     // "-------- Mapchange to cs_havana --------"
     // "Started map "cs_havana" (CRC "-1352213912")"
     // "changelevel: de_mirage"
+    // "Cmd: "<host>" changelevel "de_aztec""
 
     let mapName = ""
 
@@ -875,6 +876,7 @@ export class CsParser extends BaseParser {
     const mapchangeToMatch = logLine.match(/Mapchange to (\w+)/)
     const startedMapMatch = logLine.match(/Started map "(\w+)"/)
     const changelevelMatch = logLine.match(/changelevel:?\s+(\w+)/)
+    const adminCmdMatch = logLine.match(/Cmd: "([^"]+)" changelevel "(\w+)"/)
 
     if (mapchangeToMatch && mapchangeToMatch[1]) {
       mapName = mapchangeToMatch[1]
@@ -882,6 +884,8 @@ export class CsParser extends BaseParser {
       mapName = startedMapMatch[1]
     } else if (changelevelMatch && changelevelMatch[1]) {
       mapName = changelevelMatch[1]
+    } else if (adminCmdMatch && adminCmdMatch[2]) {
+      mapName = adminCmdMatch[2]
     } else {
       return { event: null, success: false, error: "Could not extract map name from change event" }
     }
@@ -901,7 +905,6 @@ export class CsParser extends BaseParser {
       correlationId: generateCorrelationId(),
       data: {
         newMap: mapName,
-        playerCount: 0, // Would need additional parsing to get player count
         previousMap: mapChange.previousMap,
       },
     }

@@ -11,6 +11,7 @@ import type { PlayerMeta } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IMapService } from "@/modules/map/map.service"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import { BasePlayerEventHandler } from "./base-player-event.handler"
 import { EventType } from "@/shared/types/events"
@@ -22,8 +23,9 @@ export class EntryEventHandler extends BasePlayerEventHandler {
     logger: ILogger,
     private readonly sessionService: IPlayerSessionService,
     matchService?: IMatchService,
+    mapService?: IMapService,
   ) {
-    super(repository, logger, matchService)
+    super(repository, logger, matchService, mapService)
   }
 
   async handle(event: PlayerEvent): Promise<HandlerResult> {

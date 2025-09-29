@@ -1,10 +1,6 @@
 /**
  * MatchService Unit Tests
  */
-
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { MatchService } from "./match.service"
-import { EventType } from "@/shared/types/events"
 import type {
   IMatchRepository,
   RoundStartEvent,
@@ -12,7 +8,9 @@ import type {
   TeamWinEvent,
   MapChangeEvent,
 } from "./match.types"
-import type { BaseEvent } from "@/shared/types/events"
+import { describe, it, expect, beforeEach, vi } from "vitest"
+import { MatchService } from "./match.service"
+import { EventType } from "@/shared/types/events"
 import { createMockLogger } from "@/tests/mocks/logger"
 
 const mockRepository: IMatchRepository = {
@@ -24,7 +22,9 @@ const mockRepository: IMatchRepository = {
   findServerById: vi.fn(),
   createPlayerHistory: vi.fn(),
   updateMapCount: vi.fn(),
-} as unknown as IMatchRepository
+  updateServerStats: vi.fn(),
+  getPlayerSkill: vi.fn(),
+}
 
 const mockLogger = createMockLogger()
 
@@ -67,7 +67,7 @@ describe("MatchService", () => {
 
       expect(result.success).toBe(true)
       expect(result.affected).toBe(1)
-      expect(mockLogger.debug).toHaveBeenCalledWith("Round started on server 1")
+      expect(mockLogger.debug).toHaveBeenCalledWith("Round started on server 1, map: de_dust2")
     })
 
     it("should handle ROUND_END events", async () => {
@@ -171,158 +171,13 @@ describe("MatchService", () => {
   })
 
   // Objective events are now handled via ACTION_* flows; legacy tests removed
+  // Kill events are now handled by PlayerService; legacy tests removed
 
-  describe("handleKillInMatch", () => {
-    it("should handle kill events and update player stats", async () => {
-      const event: BaseEvent = {
-        eventType: EventType.PLAYER_KILL,
-        serverId: 1,
-        timestamp: new Date(),
-        data: {
-          killerId: 123,
-          victimId: 456,
-          headshot: true,
-        },
-      }
+  // Map initialization is now handled by MapService; legacy tests removed
 
-      const result = await matchService.handleKillInMatch(event)
+  // MVP calculation was removed as it's not used in production
 
-      expect(result.success).toBe(true)
-      expect(mockLogger.debug).toHaveBeenCalledWith(
-        "Kill event processed in match: player 123 killed player 456 (headshot)",
-      )
-    })
-
-    it("should handle kill events without headshot", async () => {
-      const event: BaseEvent = {
-        eventType: EventType.PLAYER_KILL,
-        serverId: 1,
-        timestamp: new Date(),
-        data: {
-          killerId: 123,
-          victimId: 456,
-          headshot: false,
-        },
-      }
-
-      const result = await matchService.handleKillInMatch(event)
-
-      expect(result.success).toBe(true)
-      expect(mockLogger.debug).toHaveBeenCalledWith(
-        "Kill event processed in match: player 123 killed player 456",
-      )
-    })
-
-    it("should auto-initialize match context for kills", async () => {
-      const event: BaseEvent = {
-        eventType: EventType.PLAYER_KILL,
-        serverId: 3,
-        timestamp: new Date(),
-        data: {
-          killerId: 111,
-          victimId: 222,
-          headshot: false,
-        },
-      }
-
-      const result = await matchService.handleKillInMatch(event)
-
-      expect(result.success).toBe(true)
-      expect(mockLogger.info).toHaveBeenCalledWith("Auto-initializing match context for server 3")
-    })
-  })
-
-  describe("initializeMapForServer", () => {
-    it("should return existing map if available", async () => {
-      // First set up a match with an existing map
-      await matchService.handleMatchEvent({
-        eventType: EventType.ROUND_START,
-        serverId: 1,
-        timestamp: new Date(),
-        data: { map: "de_dust2", roundNumber: 1, maxPlayers: 20 },
-      })
-
-      const map = await matchService.initializeMapForServer(1)
-
-      expect(map).toBe("de_dust2")
-    })
-
-    it("should get map from database if no current match", async () => {
-      vi.mocked(mockRepository.getLastKnownMap).mockResolvedValue("de_mirage")
-
-      const map = await matchService.initializeMapForServer(2)
-
-      expect(map).toBe("de_mirage")
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        "Detected map from database for server 2: de_mirage",
-      )
-    })
-
-    it("should use fallback when no map found", async () => {
-      vi.mocked(mockRepository.getLastKnownMap).mockResolvedValue(null)
-
-      const map = await matchService.initializeMapForServer(3)
-
-      expect(map).toBe("unknown")
-      expect(mockLogger.warn).toHaveBeenCalledWith(
-        "No map found for server 3 - using fallback: unknown",
-      )
-    })
-
-    it("should handle errors gracefully", async () => {
-      vi.mocked(mockRepository.getLastKnownMap).mockRejectedValue(new Error("Database error"))
-
-      const map = await matchService.initializeMapForServer(4)
-
-      expect(map).toBe("unknown")
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "Failed to initialize map for server 4: Error: Database error",
-      )
-    })
-  })
-
-  describe("calculateMatchMVP", () => {
-    it("should return undefined for servers with no match stats", async () => {
-      const mvp = await matchService.calculateMatchMVP(999)
-      expect(mvp).toBeUndefined()
-    })
-
-    it("should return undefined for matches with no players", async () => {
-      // Initialize empty match
-      await matchService.handleMatchEvent({
-        eventType: EventType.ROUND_START,
-        serverId: 1,
-        timestamp: new Date(),
-        data: { map: "de_dust2", roundNumber: 1, maxPlayers: 20 },
-      })
-
-      const mvp = await matchService.calculateMatchMVP(1)
-      expect(mvp).toBeUndefined()
-    })
-
-    it("should calculate MVP based on player scores", async () => {
-      // Initialize match and add player stats
-      await matchService.handleKillInMatch({
-        eventType: EventType.PLAYER_KILL,
-        serverId: 1,
-        timestamp: new Date(),
-        data: { killerId: 123, victimId: 456, headshot: true },
-      })
-
-      await matchService.handleKillInMatch({
-        eventType: EventType.PLAYER_KILL,
-        serverId: 1,
-        timestamp: new Date(),
-        data: { killerId: 789, victimId: 456, headshot: false },
-      })
-
-      const mvp = await matchService.calculateMatchMVP(1)
-      expect(mvp).toBeDefined()
-      expect([123, 789]).toContain(mvp)
-    })
-  })
-
-  describe("getMatchStats and getCurrentMap", () => {
+  describe("getMatchStats", () => {
     it("should return undefined for non-existent server", () => {
       const stats = matchService.getMatchStats(999)
       expect(stats).toBeUndefined()
@@ -338,24 +193,8 @@ describe("MatchService", () => {
 
       const stats = matchService.getMatchStats(1)
       expect(stats).toBeDefined()
-      expect(stats?.currentMap).toBe("de_dust2")
-    })
-
-    it("should return current map for server", async () => {
-      await matchService.handleMatchEvent({
-        eventType: EventType.ROUND_START,
-        serverId: 1,
-        timestamp: new Date(),
-        data: { map: "de_mirage", roundNumber: 1, maxPlayers: 20 },
-      })
-
-      const map = matchService.getCurrentMap(1)
-      expect(map).toBe("de_mirage")
-    })
-
-    it("should return unknown map for server without match", () => {
-      const map = matchService.getCurrentMap(999)
-      expect(map).toBe("unknown")
+      expect(stats!.totalRounds).toBe(0)
+      expect(stats!.teamScores).toEqual({})
     })
   })
 
@@ -378,137 +217,5 @@ describe("MatchService", () => {
     })
   })
 
-  describe("updatePlayerWeaponStats", () => {
-    it("should update player weapon statistics", () => {
-      // First create a match with a player
-      matchService.handleKillInMatch({
-        eventType: EventType.PLAYER_KILL,
-        serverId: 1,
-        timestamp: new Date(),
-        data: { killerId: 123, victimId: 456, headshot: false },
-      })
-
-      matchService.updatePlayerWeaponStats(1, 123, {
-        shots: 10,
-        hits: 3,
-        damage: 75,
-      })
-
-      expect(mockLogger.debug).toHaveBeenCalledWith(
-        "Updated weapon stats for player 123: +10 shots, +3 hits, +75 damage",
-      )
-    })
-
-    it("should handle partial stats updates", () => {
-      matchService.handleKillInMatch({
-        eventType: EventType.PLAYER_KILL,
-        serverId: 1,
-        timestamp: new Date(),
-        data: { killerId: 123, victimId: 456, headshot: false },
-      })
-
-      matchService.updatePlayerWeaponStats(1, 123, { hits: 2 })
-
-      expect(mockLogger.debug).toHaveBeenCalledWith(
-        "Updated weapon stats for player 123: +0 shots, +2 hits, +0 damage",
-      )
-    })
-
-    it("should not update stats for non-existent match", () => {
-      matchService.updatePlayerWeaponStats(999, 123, { shots: 10 })
-      // Should not throw or log debug message
-      expect(mockLogger.debug).not.toHaveBeenCalled()
-    })
-  })
-
-  describe("calculatePlayerScore", () => {
-    it("should calculate player score correctly", () => {
-      const stats = {
-        playerId: 123,
-        kills: 10,
-        deaths: 3,
-        assists: 5,
-        objectiveScore: 2,
-        clutchWins: 1,
-        damage: 0,
-        headshots: 0,
-        shots: 0,
-        hits: 0,
-        suicides: 0,
-        teamkills: 0,
-      }
-
-      const score = matchService.calculatePlayerScore(stats)
-      // (10 * 2) - (3 * 1) + (5 * 1) + (2 * 3) + (1 * 5) = 20 - 3 + 5 + 6 + 5 = 33
-      expect(score).toBe(33)
-    })
-
-    it("should handle zero stats", () => {
-      const stats = {
-        playerId: 123,
-        kills: 0,
-        deaths: 0,
-        assists: 0,
-        objectiveScore: 0,
-        clutchWins: 0,
-        damage: 0,
-        headshots: 0,
-        shots: 0,
-        hits: 0,
-        suicides: 0,
-        teamkills: 0,
-      }
-
-      const score = matchService.calculatePlayerScore(stats)
-      expect(score).toBe(0)
-    })
-  })
-
-  describe("handleObjectiveAction", () => {
-    it("should award points for Planted_The_Bomb and update bomb stats", async () => {
-      const serverId = 10
-      // Ensure no match exists to test auto-initialize
-      const result = await matchService.handleObjectiveAction(
-        "Planted_The_Bomb",
-        serverId,
-        123,
-        "TERRORIST",
-      )
-
-      expect(result.success).toBe(true)
-      // Points map awards +3
-      const stats = matchService.getMatchStats(serverId)!
-      expect(stats.playerStats.get(123)?.objectiveScore).toBe(3)
-      expect(mockRepository.updateBombStats).toHaveBeenCalledWith(serverId, "plant")
-    })
-
-    it("should award points for Defused_The_Bomb and update bomb stats", async () => {
-      const serverId = 11
-      await matchService.handleMatchEvent({
-        eventType: EventType.ROUND_START,
-        serverId,
-        timestamp: new Date(),
-        data: { map: "de_dust2", roundNumber: 1, maxPlayers: 10 },
-      })
-
-      const result = await matchService.handleObjectiveAction(
-        "Defused_The_Bomb",
-        serverId,
-        456,
-        "CT",
-      )
-      expect(result.success).toBe(true)
-      const stats = matchService.getMatchStats(serverId)!
-      expect(stats.playerStats.get(456)?.objectiveScore).toBe(3)
-      expect(mockRepository.updateBombStats).toHaveBeenCalledWith(serverId, "defuse")
-    })
-
-    it("should default to +1 for unknown action codes", async () => {
-      const serverId = 12
-      const result = await matchService.handleObjectiveAction("Some_Custom_Action", serverId, 999)
-      expect(result.success).toBe(true)
-      const stats = matchService.getMatchStats(serverId)!
-      expect(stats.playerStats.get(999)?.objectiveScore).toBe(1)
-    })
-  })
+  // Weapon stats, player scoring, and objective actions are now handled by other services
 })

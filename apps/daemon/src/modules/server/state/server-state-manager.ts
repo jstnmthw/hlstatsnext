@@ -3,6 +3,20 @@
  *
  * Centralized state management for game servers including round tracking,
  * map changes, and match state. Extracted from parsers for better separation of concerns.
+ *
+ * ## Map Tracking Architecture
+ *
+ * This service works alongside MapService with distinct responsibilities:
+ *
+ * **ServerStateManager**: Tracks parser context during log processing
+ *   - Maintains round numbers, team wins, and map context for parsing
+ *   - State tracking only, no logging (handled by MapService)
+ *   - Used by parsers to understand context (what round are we in?)
+ *
+ * **MapService**: Authoritative source of current map via RCON
+ *   - Single source of truth for current map data
+ *   - Handles all map change logging with proper messaging
+ *   - Provides caching with TTL to prevent RCON spam
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
@@ -103,8 +117,6 @@ export class ServerStateManager {
         newState: { currentMap: newMap, currentRound: 0 },
         timestamp: new Date(),
       })
-
-      this.logger.info(`Map changed for server ${serverId}: ${previousMap} -> ${newMap}`)
 
       return { changed: true, previousMap }
     }

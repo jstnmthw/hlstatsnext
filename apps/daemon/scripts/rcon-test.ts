@@ -103,7 +103,7 @@ async function getChallenge(): Promise<string> {
     ])
 
     console.log(`${colors.yellow}[1/3] Requesting challenge...${colors.reset}`)
-    console.log(`${colors.gray}  → Sending: challenge rcon${colors.reset}`)
+    console.log(`${colors.gray}  →  Sending: challenge rcon${colors.reset}`)
 
     const timer = setTimeout(() => {
       socket.removeAllListeners("message")
@@ -140,7 +140,7 @@ async function sendRconCommand(challenge: string, cmd: string): Promise<string> 
     ])
 
     console.log(`${colors.yellow}[2/3] Sending RCON command...${colors.reset}`)
-    console.log(`${colors.gray}  → Command: ${cmd}${colors.reset}`)
+    console.log(`${colors.gray}  →  Command: ${cmd}${colors.reset}`)
 
     const timer = setTimeout(() => {
       socket.removeAllListeners("message")
@@ -234,7 +234,7 @@ async function main() {
     console.log(`\n${colors.yellow}Troubleshooting tips:${colors.reset}`)
     console.log(`  1. Check if the server is running and accessible`)
     console.log(`  2. Verify the RCON port (often different from game port)`)
-    console.log(`     - CS 1.6 default: game port -1 (e.g., 27016 → 27015 for RCON)`)
+    console.log(`     - CS 1.6 default: game port -1 (e.g., 27016 →  27015 for RCON)`)
     console.log(`  3. Confirm the RCON password is correct`)
     console.log(`  4. Check server.cfg for rcon_password setting`)
     console.log(`  5. Try connecting to the game server first to verify connectivity`)

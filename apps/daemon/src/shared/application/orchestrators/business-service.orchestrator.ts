@@ -13,6 +13,7 @@ import type { ScheduleConfig } from "@/modules/rcon/types/schedule.types"
 
 import { RankingService } from "@/modules/ranking/ranking.service"
 import { MatchService } from "@/modules/match/match.service"
+import { MapService } from "@/modules/map/map.service"
 import { GeoIPService } from "@/modules/geoip/geoip.service"
 import { PlayerService } from "@/modules/player/services/player.service"
 import { WeaponService } from "@/modules/weapon/weapon.service"
@@ -32,6 +33,7 @@ import { PlayerStatusEnricher } from "@/modules/player/enrichers/player-status-e
 import { PlayerSessionService } from "@/modules/player/services/player-session.service"
 import { SimplePlayerResolverService } from "@/modules/player/services/simple-player-resolver.service"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IMapService } from "@/modules/map/map.service"
 import type { IWeaponService } from "@/modules/weapon/weapon.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IActionService } from "@/modules/action/action.types"
@@ -47,6 +49,7 @@ import type { IPlayerSessionService } from "@/modules/player/types/player-sessio
 export interface BusinessServiceCollection {
   playerService: IPlayerService
   matchService: IMatchService
+  mapService: IMapService
   weaponService: IWeaponService
   rankingService: IRankingService
   actionService: IActionService
@@ -82,7 +85,6 @@ export function createBusinessServices(
 ): BusinessServiceCollection {
   // First tier - services with minimal dependencies
   const rankingService = new RankingService(logger, repositories.weaponRepository, database.prisma)
-  const matchService = new MatchService(repositories.matchRepository, logger)
   const geoipService = new GeoIPService(database, logger)
   const weaponService = new WeaponService(repositories.weaponRepository, logger)
   const gameDetectionService = new GameDetectionService(logger)
@@ -91,6 +93,12 @@ export function createBusinessServices(
   // Second tier - RCON base services
   const rconService = new RconService(repositories.rconRepository, logger, rconConfig)
   const commandResolverService = new CommandResolverService(repositories.serverRepository, logger)
+
+  // Create map service as single source of truth for maps
+  const mapService = new MapService(rconService, repositories.matchRepository, logger)
+
+  // Create match service with map service dependency
+  const matchService = new MatchService(repositories.matchRepository, logger, mapService)
 
   // Session management services
   const sessionRepository = new PlayerSessionRepository(logger)
@@ -141,6 +149,7 @@ export function createBusinessServices(
     serverService,
     sessionService,
     matchService,
+    mapService,
     geoipService,
     eventNotificationService,
   )
@@ -152,7 +161,7 @@ export function createBusinessServices(
     playerService,
     matchService,
     eventNotificationService,
-    rconService,
+    mapService,
   )
 
   // Fifth tier - enrichers dependent on multiple services
@@ -185,6 +194,7 @@ export function createBusinessServices(
   return {
     playerService,
     matchService,
+    mapService,
     weaponService,
     rankingService,
     actionService,

@@ -24,6 +24,7 @@ import { normalizeSteamId, validatePlayerName, sanitizePlayerName } from "@/shar
 import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builder"
 import { PlayerEventHandlerFactory } from "../handlers/player-event-handler.factory"
 import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
+import type { IMapService } from "@/modules/map/map.service"
 
 export class PlayerService implements IPlayerService {
   private readonly DEFAULT_RATING = 1000
@@ -45,6 +46,7 @@ export class PlayerService implements IPlayerService {
     private readonly serverService: IServerService,
     private readonly sessionService: IPlayerSessionService,
     private readonly matchService?: IMatchService,
+    private readonly mapService?: IMapService,
     private readonly geoipService?: { lookup(ipWithPort: string): Promise<unknown | null> },
     private readonly eventNotificationService?: IEventNotificationService,
   ) {
@@ -64,6 +66,7 @@ export class PlayerService implements IPlayerService {
         this.serverService,
         this.sessionService,
         this.matchService,
+        this.mapService,
         this.geoipService,
         this.eventNotificationService,
       )

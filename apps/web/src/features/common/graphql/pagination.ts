@@ -33,7 +33,7 @@ export function buildPaginationVariables(
 
   // Add sorting
   if (params.sortField) {
-    // Handle nested field names for relations (e.g., "player.lastName" -> { player: { lastName: "asc" } })
+    // Handle nested field names for relations (e.g., "player.lastName" → { player: { lastName: "asc" } })
     if (params.sortField.includes(".")) {
       const [relation, field] = params.sortField.split(".", 2)
       if (relation && field) {

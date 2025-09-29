@@ -184,7 +184,7 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
         }
 
         this.logger.debug(
-          `Resolved ${event.eventType} player IDs: attacker ${meta.killer.steamId} -> ${attackerId}, victim ${meta.victim.steamId} -> ${victimId}`,
+          `Resolved ${event.eventType} player IDs: attacker ${meta.killer.steamId} → ${attackerId}, victim ${meta.victim.steamId} → ${victimId}`,
         )
 
         return resolvedEvent as PlayerEvent
@@ -202,7 +202,7 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
       }
 
       this.logger.debug(
-        `Resolved ${event.eventType} player IDs: attacker ${meta.killer.steamId} -> ${attackerId}, victim ${meta.victim.steamId} -> ${victimId}`,
+        `Resolved ${event.eventType} player IDs: attacker ${meta.killer.steamId} → ${attackerId}, victim ${meta.victim.steamId} → ${victimId}`,
       )
 
       return resolvedEvent as PlayerEvent
@@ -256,7 +256,7 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
       }
 
       this.logger.debug(
-        `Resolved PLAYER_KILL player IDs: killer ${meta.killer.steamId} -> ${killerId}, victim ${meta.victim.steamId} -> ${victimId}`,
+        `Resolved PLAYER_KILL player IDs: killer ${meta.killer.steamId} → ${killerId}, victim ${meta.victim.steamId} → ${victimId}`,
       )
 
       return resolvedEvent as PlayerEvent

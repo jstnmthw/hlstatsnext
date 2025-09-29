@@ -2,9 +2,8 @@
  * ActionService Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { ActionService } from "./action.service"
-import { createMockLogger } from "@/tests/mocks/logger"
+import type { IPlayerService } from "@/modules/player/types/player.types"
+import type { IMatchService } from "@/modules/match/match.types"
 import type { IActionRepository, ActionDefinition, ActionEvent } from "./action.types"
 import type {
   ActionPlayerEvent,
@@ -13,8 +12,9 @@ import type {
   WorldActionEvent,
 } from "./action.types"
 import { EventType } from "@/shared/types/events"
-import type { IPlayerService } from "@/modules/player/types/player.types"
-import type { IMatchService } from "@/modules/match/match.types"
+import { describe, it, expect, beforeEach, vi } from "vitest"
+import { ActionService } from "./action.service"
+import { createMockLogger } from "@/tests/mocks/logger"
 
 // Create mock repository
 const createMockActionRepository = (): IActionRepository => ({
@@ -49,17 +49,10 @@ describe("ActionService", () => {
     mockMatchService = {
       getPlayersByTeam: vi.fn().mockReturnValue([]),
       handleMatchEvent: vi.fn(),
-      handleKillInMatch: vi.fn(),
-      handleObjectiveAction: vi.fn(),
       getMatchStats: vi.fn(),
-      getCurrentMap: vi.fn().mockReturnValue(""),
-      initializeMapForServer: vi.fn().mockResolvedValue(""),
-      resetMatchStats: vi.fn(),
-      updatePlayerWeaponStats: vi.fn(),
-      calculateMatchMVP: vi.fn(),
-      calculatePlayerScore: vi.fn(),
-      setPlayerTeam: vi.fn(),
       getServerGame: vi.fn().mockResolvedValue("cstrike"),
+      resetMatchStats: vi.fn(),
+      setPlayerTeam: vi.fn(),
     }
     actionService = new ActionService(
       mockRepository,

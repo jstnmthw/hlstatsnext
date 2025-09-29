@@ -102,8 +102,8 @@ export class RankingService implements IRankingService {
       `Skill calculation: ${context.weapon} kill, ` +
         `${context.headshot ? "headshot, " : ""}` +
         `weapon multiplier: ${weaponMultiplier}, ` +
-        `killer: ${killerRating.rating} → ${killerRating.rating + adjustment.killerChange} (${adjustment.killerChange > 0 ? "+" : ""}${adjustment.killerChange}), ` +
-        `victim: ${victimRating.rating} → ${victimRating.rating + adjustment.victimChange} (${adjustment.victimChange})`,
+        `killer: ${killerRating.rating} →  ${killerRating.rating + adjustment.killerChange} (${adjustment.killerChange > 0 ? "+" : ""}${adjustment.killerChange}), ` +
+        `victim: ${victimRating.rating} →  ${victimRating.rating + adjustment.victimChange} (${adjustment.victimChange})`,
     )
 
     return adjustment
@@ -264,7 +264,7 @@ export class RankingService implements IRankingService {
 
   /**
    * Get rank positions for multiple players efficiently
-   * Returns a Map of playerId -> rank position
+   * Returns a Map of playerId → rank position
    */
   async getBatchPlayerRanks(playerIds: number[]): Promise<Map<number, number>> {
     const rankMap = new Map<number, number>()

@@ -20,11 +20,11 @@ import type { HandlerResult } from "@/shared/types/common"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IServerRepository, IServerService } from "@/modules/server/server.types"
+import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
+import type { IMapService } from "@/modules/map/map.service"
 import { normalizeSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
 import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builder"
 import { PlayerEventHandlerFactory } from "../handlers/player-event-handler.factory"
-import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
-import type { IMapService } from "@/modules/map/map.service"
 
 export class PlayerService implements IPlayerService {
   private readonly DEFAULT_RATING = 1000

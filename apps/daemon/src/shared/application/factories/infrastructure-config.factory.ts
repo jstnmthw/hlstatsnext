@@ -15,22 +15,27 @@ import {
   getCacheConfigFromEnv,
   type ICacheService,
 } from "@/shared/infrastructure/caching"
+import { PrometheusMetricsExporter, createPrismaWithMetrics } from "@repo/observability"
 
 export interface InfrastructureComponents {
   database: DatabaseClient
   logger: ILogger
   crypto: ICryptoService
   cache: ICacheService
+  metrics: PrometheusMetricsExporter
 }
 
 /**
  * Creates core infrastructure components with standardized configuration
  *
- * @returns Configured database client, logger instance, and crypto service
+ * @returns Configured database client, logger instance, crypto service, cache, and metrics
  */
 export function createInfrastructureComponents(): InfrastructureComponents {
   const database = new DatabaseClient()
   const logger = new Logger()
+
+  // Create metrics exporter
+  const metrics = new PrometheusMetricsExporter(logger)
 
   // Configure connection pooling (lazy initialization)
   database.configureConnectionPool(logger as DatabaseLogger, {
@@ -58,10 +63,23 @@ export function createInfrastructureComponents(): InfrastructureComponents {
   const cacheConfig = getCacheConfigFromEnv()
   const cache = createCacheService(cacheConfig, logger)
 
+  // Create Prisma client with metrics extension using factory pattern
+  // This returns a properly-typed extended client without unsafe casts
+  const prismaWithMetrics = createPrismaWithMetrics(database.prisma, metrics, logger, {
+    logSlowQueries: process.env.NODE_ENV !== "production",
+    slowQueryThresholdMs: 1000,
+    logAllQueries: false,
+  })
+
+  // Set the extended client on the database wrapper
+  // All repositories will now use the metrics-enabled client transparently
+  database.setExtendedClient(prismaWithMetrics)
+
   return {
     database,
     logger,
     crypto,
     cache,
+    metrics,
   }
 }

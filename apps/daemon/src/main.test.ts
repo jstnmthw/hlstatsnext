@@ -14,6 +14,12 @@ import { SystemClock } from "@/shared/infrastructure/time/system-clock"
 vi.mock("@/context")
 vi.mock("@/config/environment.config")
 vi.mock("@/database/connection.service")
+vi.mock("@repo/observability", () => ({
+  MetricsServer: vi.fn().mockImplementation(() => ({
+    start: vi.fn().mockResolvedValue(undefined),
+    stop: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
 vi.mock("@/shared/infrastructure/messaging/queue/utils/message-utils", () => {
   let currentUuidService: unknown = null
   return {
@@ -62,6 +68,9 @@ const mockContext = {
   },
   cache: {
     disconnect: vi.fn(),
+  },
+  metrics: {
+    getMetrics: vi.fn().mockReturnValue(""),
   },
 } as unknown as AppContext
 

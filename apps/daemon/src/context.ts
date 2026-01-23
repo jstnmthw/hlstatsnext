@@ -24,6 +24,7 @@ import type { CommandResolverService } from "@/modules/rcon/services/command-res
 import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { ICacheService } from "@/shared/infrastructure/caching"
+import type { PrometheusMetricsExporter } from "@repo/observability"
 
 import { DatabaseClient } from "@/database/client"
 import { QueueModule } from "@/shared/infrastructure/messaging/module"
@@ -59,6 +60,7 @@ export interface AppContext {
   logger: ILogger
   eventBus: IEventBus
   cache: ICacheService
+  metrics: PrometheusMetricsExporter
 
   // Queue Infrastructure (migration to queue-first)
   queueModule?: QueueModule
@@ -172,6 +174,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     logger: infrastructure.logger,
     eventBus,
     cache: infrastructure.cache,
+    metrics: infrastructure.metrics,
 
     // Queue Infrastructure
     queueModule: queueResult.queueModule,

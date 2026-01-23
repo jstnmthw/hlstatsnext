@@ -1,12 +1,13 @@
+import type { PrismaClient as BasePrismaClient } from "../generated"
 import { PrismaClient } from "../generated"
 import { ConnectionPool, type ConnectionPoolConfig, type DatabaseLogger } from "./connection-pool"
 
 declare global {
-  var cachedPrisma: PrismaClient
+  var cachedPrisma: BasePrismaClient
   var cachedConnectionPool: ConnectionPool
 }
 
-let prisma: PrismaClient
+let prisma: BasePrismaClient
 if (process.env.NODE_ENV === "production") {
   prisma = new PrismaClient()
 } else {
@@ -20,16 +21,18 @@ export const db = prisma
 
 /**
  * Enhanced database client with connection pooling support
+ * Note: When using extensions, the extended client is stored internally
+ * but returned as BasePrismaClient type for compatibility
  */
 export class DatabaseClient {
-  private client: PrismaClient
+  private client: BasePrismaClient
   private connectionPool?: ConnectionPool
   private isUsingPool = false
-  private connectionMap = new Map<PrismaClient, string>()
+  private connectionMap = new Map<BasePrismaClient, string>()
   private poolLogger?: DatabaseLogger
   private poolConfig?: Partial<ConnectionPoolConfig>
 
-  constructor(client: PrismaClient = db) {
+  constructor(client: BasePrismaClient = db) {
     this.client = client
   }
 
@@ -74,14 +77,14 @@ export class DatabaseClient {
   /**
    * Get the default Prisma client instance
    */
-  get prisma(): PrismaClient {
+  get prisma(): BasePrismaClient {
     return this.client
   }
 
   /**
    * Get a pooled connection (if pooling is enabled)
    */
-  async getPooledConnection(): Promise<PrismaClient> {
+  async getPooledConnection(): Promise<BasePrismaClient> {
     // Lazy initialization of connection pool
     if (!this.connectionPool && this.poolLogger) {
       this.initializeConnectionPoolSync(this.poolLogger, this.poolConfig)
@@ -99,7 +102,7 @@ export class DatabaseClient {
   /**
    * Release a pooled connection
    */
-  releasePooledConnection(client: PrismaClient): void {
+  releasePooledConnection(client: BasePrismaClient): void {
     if (!this.connectionPool) {
       // No-op if pooling not enabled
       return
@@ -111,7 +114,7 @@ export class DatabaseClient {
     }
 
     // Find and release the connection
-    const connections = (this.connectionPool as any).connections
+    const connections = this.connectionPool.connections
     const connection = connections.get(connectionId)
 
     if (connection) {
@@ -148,7 +151,7 @@ export class DatabaseClient {
    */
   async transaction<T>(
     callback: (
-      tx: Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">,
+      tx: Omit<BasePrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">,
     ) => Promise<T>,
   ): Promise<T> {
     return this.client.$transaction(callback)

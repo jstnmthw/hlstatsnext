@@ -1,0 +1,62 @@
+# Prometheus Configuration for HLStatsNext
+# Scrapes metrics from the daemon and other services
+
+global:
+  scrape_interval: 15s # How frequently to scrape targets
+  evaluation_interval: 15s # How frequently to evaluate rules
+  scrape_timeout: 10s # Timeout for each scrape
+
+  # Attach these labels to all metrics
+  external_labels:
+    monitor: 'hlstatsnext'
+    environment: 'production'
+
+# Alertmanager configuration (optional, for future use)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#           - alertmanager:9093
+
+# Rules configuration (optional, for future use)
+# rule_files:
+#   - "alerts.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # HLStatsNext Daemon
+  - job_name: 'hlstats-daemon'
+    static_configs:
+      - targets: ['host.docker.internal:9091'] # When daemon runs on host
+        labels:
+          service: 'daemon'
+          app: 'hlstatsnext'
+
+  # MySQL Database (via mysqld_exporter - optional, requires setup)
+  # - job_name: 'mysql'
+  #   static_configs:
+  #     - targets: ['mysqld-exporter:9104']
+  #       labels:
+  #         service: 'mysql'
+
+  # RabbitMQ (built-in metrics endpoint)
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq:15692'] # RabbitMQ Prometheus plugin port
+        labels:
+          service: 'rabbitmq'
+    # Note: Requires rabbitmq_prometheus plugin enabled
+
+  # Node Exporter (system metrics - optional, requires setup)
+  # - job_name: 'node'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']
+  #       labels:
+  #         service: 'host'

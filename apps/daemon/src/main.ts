@@ -28,6 +28,7 @@ import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { getEnvironmentConfig } from "@/config/environment.config"
 import { DatabaseConnectionService } from "@/database/connection.service"
 import { getUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import { MetricsServer } from "@repo/observability"
 
 /**
  * Main daemon class for the HLStatsNext statistics collection system.
@@ -66,6 +67,9 @@ export class HLStatsDaemon {
   /** Database connection management service */
   private databaseConnection: DatabaseConnectionService
 
+  /** Metrics HTTP server for Prometheus scraping */
+  private metricsServer: MetricsServer
+
   /**
    * Creates a new HLStatsDaemon instance.
    *
@@ -84,6 +88,20 @@ export class HLStatsDaemon {
 
     this.rconScheduler = this.context.rconScheduleService
     this.databaseConnection = new DatabaseConnectionService(this.context)
+
+    // Create metrics server for Prometheus scraping
+    const metricsPort = Number(process.env.METRICS_PORT) || 9091
+    this.metricsServer = new MetricsServer(
+      this.context.metrics,
+      this.logger,
+      async () => ({
+        status: await this.getHealthStatus(),
+        database: await this.databaseConnection.testConnection(),
+        rabbitmq: !!this.context.queueModule,
+        uptime: process.uptime(),
+      }),
+      { port: metricsPort },
+    )
 
     this.logger.info("Initializing HLStatsNext Daemon...")
   }
@@ -223,6 +241,7 @@ export class HLStatsDaemon {
    * Starts all daemon services in the correct order.
    *
    * This private method handles the orchestrated startup of:
+   * - Metrics HTTP server (Prometheus scraping endpoint)
    * - Ingress service (UDP packet reception)
    * - RCON scheduler service (scheduled command execution and monitoring)
    *
@@ -233,6 +252,9 @@ export class HLStatsDaemon {
    * @returns Promise that resolves when all services are started
    */
   private async startServices(): Promise<void> {
+    // Start metrics server first
+    await this.metricsServer.start()
+
     await Promise.all([this.context.ingressService.start()])
 
     // Start RCON scheduler for scheduled commands and monitoring
@@ -246,7 +268,8 @@ export class HLStatsDaemon {
    * 1. Stops RCON scheduler
    * 2. Stops ingress service and disconnects RCON connections
    * 3. Shuts down message queue infrastructure
-   * 4. Closes database connections
+   * 4. Stops metrics server
+   * 5. Closes database connections
    *
    * The shutdown process is designed to be graceful, allowing ongoing
    * operations to complete where possible while preventing new work.
@@ -274,6 +297,7 @@ export class HLStatsDaemon {
         this.context.rconService.disconnectAll(),
         this.context.queueModule?.shutdown() || Promise.resolve(),
         this.context.cache.disconnect(),
+        this.metricsServer.stop(),
       ])
 
       await this.databaseConnection.disconnect()
@@ -339,6 +363,22 @@ export class HLStatsDaemon {
    */
   getContext(): AppContext {
     return this.context
+  }
+
+  /**
+   * Gets the current health status of the daemon.
+   *
+   * @private
+   * @returns Health status string
+   */
+  private async getHealthStatus(): Promise<string> {
+    try {
+      const dbHealthy = await this.databaseConnection.testConnection()
+      const queueHealthy = !!this.context.queueModule
+      return dbHealthy && queueHealthy ? "healthy" : "degraded"
+    } catch {
+      return "unhealthy"
+    }
   }
 }
 

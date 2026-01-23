@@ -81,6 +81,58 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: hlstatsnext-prometheus
+    hostname: hlstatsnext-prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Enable host.docker.internal on Linux
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090" # Prometheus UI
+    networks:
+      - default
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: hlstatsnext-grafana
+    hostname: hlstatsnext-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-piechart-panel
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3001:3000" # Grafana UI (using 3001 to avoid conflict with web app on 3000)
+    networks:
+      - default
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   # daemon:
   #   build:
   #     context: .
@@ -95,6 +147,7 @@ services:
   #     - RABBITMQ_URL=amqp://${RABBITMQ_USER:-hlstats}:${RABBITMQ_PASSWORD:-hlstats}@rabbitmq:5672/${RABBITMQ_VHOST:-hlstats}
   #     - UDP_PORT=27500
   #     - LOG_LEVEL=${LOG_LEVEL:-info}
+  #     - METRICS_PORT=9091 # Metrics endpoint for Prometheus
   #   working_dir: /app/apps/daemon
   #   depends_on:
   #     db:
@@ -103,7 +156,7 @@ services:
   #       condition: service_healthy
   #   ports:
   #     - "27500:27500/udp" # UDP port for game server logs
-  #     - "3001:3001" # HTTP port for API/health checks
+  #     - "9091:9091" # Metrics endpoint
   #   networks:
   #     - default
   #   restart: unless-stopped
@@ -153,3 +206,5 @@ volumes:
   db-volume:
   rabbitmq-data:
   garnet-data:
+  prometheus-data:
+  grafana-data:

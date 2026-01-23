@@ -38,7 +38,9 @@
     "CACHE_KEY_PREFIX",
     "CACHE_DEFAULT_TTL",
     "CACHE_RETRY_DELAY",
-    "CACHE_MAX_RETRIES"
+    "CACHE_MAX_RETRIES",
+    "METRICS_PORT",
+    "APP_VERSION"
   ],
   "tasks": {
     "build": {

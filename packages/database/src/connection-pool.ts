@@ -76,7 +76,12 @@ interface PooledConnection {
 export class ConnectionPool {
   private readonly config: ConnectionPoolConfig
   private readonly logger: DatabaseLogger
-  private readonly connections = new Map<string, PooledConnection>()
+  private readonly _connections = new Map<string, PooledConnection>()
+
+  /** Public read-only access to connections for external monitoring */
+  get connections(): ReadonlyMap<string, PooledConnection> {
+    return this._connections
+  }
   private readonly waitingQueue: Array<{
     resolve: (connection: PooledConnection) => void
     reject: (error: Error) => void
@@ -123,7 +128,7 @@ export class ConnectionPool {
       this.startHealthChecks()
 
       this.logger.ok(
-        `Database connection pool initialized with ${this.connections.size} connections`,
+        `Database connection pool initialized with ${this._connections.size} connections`,
       )
     } catch (error) {
       this.logger.error("Failed to initialize connection pool", {
@@ -164,7 +169,7 @@ export class ConnectionPool {
       }
 
       // Create new connection if under limit
-      if (this.connections.size < this.config.maxConnections) {
+      if (this._connections.size < this.config.maxConnections) {
         const newConnection = await this.createConnection()
         newConnection.isActive = true
 
@@ -195,7 +200,7 @@ export class ConnectionPool {
    * Release a connection back to the pool
    */
   release(connection: PooledConnection): void {
-    const poolConnection = this.connections.get(connection.id)
+    const poolConnection = this._connections.get(connection.id)
     if (!poolConnection) {
       this.logger.warn("Attempted to release unknown connection", {
         connectionId: connection.id,
@@ -256,7 +261,7 @@ export class ConnectionPool {
     }
 
     // Close all connections
-    const disconnectPromises = Array.from(this.connections.values()).map(async (conn) => {
+    const disconnectPromises = Array.from(this._connections.values()).map(async (conn) => {
       try {
         await conn.client.$disconnect()
       } catch (error) {
@@ -268,7 +273,7 @@ export class ConnectionPool {
     })
 
     await Promise.allSettled(disconnectPromises)
-    this.connections.clear()
+    this._connections.clear()
 
     this.logger.info("Connection pool shutdown complete")
   }
@@ -293,12 +298,12 @@ export class ConnectionPool {
         isHealthy: true,
       }
 
-      this.connections.set(connectionId, connection)
+      this._connections.set(connectionId, connection)
       this.updateMetrics()
 
       this.logger.debug("Created database connection", {
         connectionId,
-        totalConnections: this.connections.size,
+        totalConnections: this._connections.size,
       })
 
       return connection
@@ -315,7 +320,7 @@ export class ConnectionPool {
    * Find an idle connection
    */
   private findIdleConnection(): PooledConnection | null {
-    for (const connection of this.connections.values()) {
+    for (const connection of this._connections.values()) {
       if (!connection.isActive && connection.isHealthy) {
         return connection
       }
@@ -369,7 +374,7 @@ export class ConnectionPool {
    * Perform health check on all connections
    */
   private async performHealthCheck(): Promise<void> {
-    const healthCheckPromises = Array.from(this.connections.values()).map(async (conn) => {
+    const healthCheckPromises = Array.from(this._connections.values()).map(async (conn) => {
       if (!conn.isActive) {
         try {
           await conn.client.$queryRaw`SELECT 1`
@@ -395,27 +400,27 @@ export class ConnectionPool {
     const now = Date.now()
     const connectionsToRemove: string[] = []
 
-    for (const [id, connection] of this.connections) {
+    for (const [id, connection] of this._connections) {
       if (
         !connection.isActive &&
         now - connection.lastUsed.getTime() > this.config.idleTimeout &&
-        this.connections.size > this.config.minConnections
+        this._connections.size > this.config.minConnections
       ) {
         connectionsToRemove.push(id)
       }
     }
 
     for (const id of connectionsToRemove) {
-      const connection = this.connections.get(id)
+      const connection = this._connections.get(id)
       if (connection) {
         connection.client.$disconnect().catch(() => {
           // Ignore disconnect errors during cleanup
         })
-        this.connections.delete(id)
+        this._connections.delete(id)
 
         this.logger.debug("Cleaned up idle connection", {
           connectionId: id,
-          totalConnections: this.connections.size,
+          totalConnections: this._connections.size,
         })
       }
     }
@@ -444,14 +449,14 @@ export class ConnectionPool {
    * Update connection metrics
    */
   private updateMetrics(): void {
-    this.metrics.totalConnections = this.connections.size
-    this.metrics.activeConnections = Array.from(this.connections.values()).filter(
+    this.metrics.totalConnections = this._connections.size
+    this.metrics.activeConnections = Array.from(this._connections.values()).filter(
       (c) => c.isActive,
     ).length
     this.metrics.idleConnections = this.metrics.totalConnections - this.metrics.activeConnections
 
     // Determine health status
-    const healthyConnections = Array.from(this.connections.values()).filter(
+    const healthyConnections = Array.from(this._connections.values()).filter(
       (c) => c.isHealthy,
     ).length
     const healthRatio = healthyConnections / this.metrics.totalConnections

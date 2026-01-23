@@ -8,7 +8,7 @@
     "check-types": "tsc --noEmit",
     "clean": "rm -rf node_modules dist .turbo",
     "lint": "eslint src/**/*.ts",
-    "test": "vitest run --silent --passWithNoTests",
+    "test": "vitest run --silent",
     "test:watch": "vitest --watch"
   },
   "main": "./dist/index.js",

@@ -37,6 +37,11 @@ yarn-error.log*
 .DS_Store
 *.pem
 
+# IDE/Editor
+.vscode
+.cursor
+.claude
+
 # Generated Prisma files
 generated/
 ref/

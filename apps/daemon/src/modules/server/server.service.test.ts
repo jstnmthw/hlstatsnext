@@ -13,10 +13,16 @@ const createMockServerRepository = () => ({
   getServerConfig: vi.fn(),
   hasRconCredentials: vi.fn().mockResolvedValue(false),
   findActiveServersWithRcon: vi.fn().mockResolvedValue([]),
+  findServersByIds: vi.fn().mockResolvedValue([]),
+  findAllServersWithRcon: vi.fn().mockResolvedValue([]),
   updateServerStatusFromRcon: vi.fn(),
   resetMapStats: vi.fn(),
   getModDefault: vi.fn().mockResolvedValue(null),
   getServerConfigDefault: vi.fn().mockResolvedValue(null),
+  createServer: vi.fn(),
+  updateLastEvent: vi.fn(),
+  updateServer: vi.fn(),
+  findOrCreate: vi.fn(),
 })
 
 describe("ServerService", () => {
@@ -318,6 +324,201 @@ describe("ServerService", () => {
 
       await expect(serverService.findActiveServersWithRcon()).rejects.toThrow("Database error")
       expect(mockRepository.findActiveServersWithRcon).toHaveBeenCalledWith(undefined)
+    })
+  })
+
+  describe("getServerConfigBoolean", () => {
+    it.each([
+      ["1", true],
+      ["true", true],
+      ["TRUE", true],
+      ["yes", true],
+      ["YES", true],
+      ["on", true],
+      ["ON", true],
+    ])('should return true for truthy value "%s"', async (value, expected) => {
+      mockRepository.getServerConfig.mockResolvedValue(value)
+
+      const result = await serverService.getServerConfigBoolean(1, "EnableFeature", false)
+
+      expect(result).toBe(expected)
+    })
+
+    it.each([
+      ["0", false],
+      ["false", false],
+      ["FALSE", false],
+      ["no", false],
+      ["NO", false],
+      ["off", false],
+      ["OFF", false],
+    ])('should return false for falsy value "%s"', async (value, expected) => {
+      mockRepository.getServerConfig.mockResolvedValue(value)
+
+      const result = await serverService.getServerConfigBoolean(1, "DisableFeature", true)
+
+      expect(result).toBe(expected)
+    })
+
+    it("should return fallback when config is null", async () => {
+      mockRepository.getServerConfig.mockResolvedValue(null)
+
+      const result = await serverService.getServerConfigBoolean(1, "MissingConfig", true)
+
+      expect(result).toBe(true)
+    })
+
+    it("should return fallback for unrecognized values", async () => {
+      mockRepository.getServerConfig.mockResolvedValue("maybe")
+
+      const result = await serverService.getServerConfigBoolean(1, "WeirdConfig", false)
+
+      expect(result).toBe(false)
+    })
+
+    it("should handle whitespace in config values", async () => {
+      mockRepository.getServerConfig.mockResolvedValue("  true  ")
+
+      const result = await serverService.getServerConfigBoolean(1, "SpacedConfig", false)
+
+      expect(result).toBe(true)
+    })
+  })
+
+  describe("hasRconCredentials", () => {
+    it("should return true when server has RCON credentials", async () => {
+      mockRepository.hasRconCredentials.mockResolvedValue(true)
+
+      const result = await serverService.hasRconCredentials(1)
+
+      expect(result).toBe(true)
+      expect(mockRepository.hasRconCredentials).toHaveBeenCalledWith(1)
+    })
+
+    it("should return false when server has no RCON credentials", async () => {
+      mockRepository.hasRconCredentials.mockResolvedValue(false)
+
+      const result = await serverService.hasRconCredentials(1)
+
+      expect(result).toBe(false)
+    })
+  })
+
+  describe("findServersByIds", () => {
+    it("should return servers matching IDs", async () => {
+      const servers = [
+        { ...mockServerInfo, serverId: 1 },
+        { ...mockServerInfo, serverId: 3 },
+      ]
+      mockRepository.findServersByIds.mockResolvedValue(servers)
+
+      const result = await serverService.findServersByIds([1, 3])
+
+      expect(result).toEqual(servers)
+      expect(mockRepository.findServersByIds).toHaveBeenCalledWith([1, 3])
+    })
+
+    it("should return empty array for no matching IDs", async () => {
+      mockRepository.findServersByIds.mockResolvedValue([])
+
+      const result = await serverService.findServersByIds([999, 998])
+
+      expect(result).toEqual([])
+    })
+  })
+
+  describe("findAllServersWithRcon", () => {
+    it("should return all servers with RCON", async () => {
+      const servers = [mockServerInfo]
+      mockRepository.findAllServersWithRcon.mockResolvedValue(servers)
+
+      const result = await serverService.findAllServersWithRcon()
+
+      expect(result).toEqual(servers)
+    })
+  })
+
+  describe("getServerConfig", () => {
+    it("should return config value when found", async () => {
+      mockRepository.getServerConfig.mockResolvedValue("some-value")
+
+      const result = await serverService.getServerConfig(1, "SomeParameter")
+
+      expect(result).toBe("some-value")
+      expect(mockRepository.getServerConfig).toHaveBeenCalledWith(1, "SomeParameter")
+    })
+
+    it("should return null when config not found", async () => {
+      mockRepository.getServerConfig.mockResolvedValue(null)
+
+      const result = await serverService.getServerConfig(1, "MissingParam")
+
+      expect(result).toBeNull()
+    })
+  })
+
+  describe("getServerModType", () => {
+    it("should return uppercase mod type when configured", async () => {
+      mockRepository.getServerConfig.mockResolvedValue("instagib")
+
+      const result = await serverService.getServerModType(1)
+
+      expect(result).toBe("INSTAGIB")
+      expect(mockRepository.getServerConfig).toHaveBeenCalledWith(1, "Mod")
+    })
+
+    it("should return empty string when mod config is null", async () => {
+      mockRepository.getServerConfig.mockResolvedValue(null)
+
+      const result = await serverService.getServerModType(1)
+
+      expect(result).toBe("")
+    })
+
+    it("should return empty string when mod config is empty", async () => {
+      mockRepository.getServerConfig.mockResolvedValue("   ")
+
+      const result = await serverService.getServerModType(1)
+
+      expect(result).toBe("")
+    })
+
+    it("should handle error and return empty string", async () => {
+      mockRepository.getServerConfig.mockRejectedValue(new Error("Database error"))
+
+      const result = await serverService.getServerModType(1)
+
+      expect(result).toBe("")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to get MOD type for server 1"),
+      )
+    })
+
+    it("should trim whitespace from mod type", async () => {
+      mockRepository.getServerConfig.mockResolvedValue("  gungame  ")
+
+      const result = await serverService.getServerModType(1)
+
+      expect(result).toBe("GUNGAME")
+    })
+  })
+
+  describe("findById", () => {
+    it("should return server info when found", async () => {
+      mockRepository.findById.mockResolvedValue(mockServerInfo)
+
+      const result = await serverService.findById(1)
+
+      expect(result).toEqual(mockServerInfo)
+      expect(mockRepository.findById).toHaveBeenCalledWith(1)
+    })
+
+    it("should return null when server not found", async () => {
+      mockRepository.findById.mockResolvedValue(null)
+
+      const result = await serverService.findById(999)
+
+      expect(result).toBeNull()
     })
   })
 })

@@ -120,4 +120,78 @@ describe("WeaponEventHandler", () => {
       expect(weaponService.handleWeaponEvent).not.toHaveBeenCalled()
     })
   })
+
+  describe("handleWeaponFire", () => {
+    it("should delegate WEAPON_FIRE events to weapon service", async () => {
+      const event: BaseEvent = {
+        eventType: EventType.WEAPON_FIRE,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "test-fire-1",
+        data: {
+          playerId: 100,
+          weapon: "ak47",
+          game: "cstrike",
+        },
+      }
+
+      await handler.handleWeaponFire(event)
+
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.stringContaining("Weapon module handling WEAPON_FIRE for server 1"),
+      )
+      expect(weaponService.handleWeaponEvent).toHaveBeenCalledWith(event)
+    })
+  })
+
+  describe("handleWeaponHit", () => {
+    it("should delegate WEAPON_HIT events to weapon service", async () => {
+      const event: BaseEvent = {
+        eventType: EventType.WEAPON_HIT,
+        timestamp: new Date(),
+        serverId: 2,
+        eventId: "test-hit-1",
+        data: {
+          playerId: 100,
+          victimId: 200,
+          weapon: "m4a1",
+          hitgroup: "head",
+          damage: 100,
+          game: "cstrike",
+        },
+      }
+
+      await handler.handleWeaponHit(event)
+
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.stringContaining("Weapon module handling WEAPON_HIT for server 2"),
+      )
+      expect(weaponService.handleWeaponEvent).toHaveBeenCalledWith(event)
+    })
+  })
+
+  describe("handlePlayerKill", () => {
+    it("should delegate PLAYER_KILL events to weapon service for weapon stats", async () => {
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 3,
+        eventId: "test-kill-1",
+        data: {
+          playerId: 100,
+          victimId: 200,
+          weapon: "awp",
+          headshot: true,
+          game: "cstrike",
+        },
+      }
+
+      await handler.handlePlayerKill(event)
+
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.stringContaining("Weapon module handling PLAYER_KILL for server 3"),
+      )
+      expect(weaponService.handleWeaponEvent).toHaveBeenCalledWith(event)
+    })
+  })
 })

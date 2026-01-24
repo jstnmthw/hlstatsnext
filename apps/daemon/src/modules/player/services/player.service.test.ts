@@ -9,11 +9,12 @@ import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockDatabaseClient } from "@/tests/mocks/database"
 import { createMockServerService } from "@/tests/mocks/server.service.mock"
 import { createMockSessionService } from "@/tests/mocks/session.service.mock"
+import { EventType } from "@/shared/types/events"
 import type { Player } from "@repo/database/client"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
-import { EventType } from "@/shared/types/events"
 import type { PlayerKillEvent, PlayerEvent } from "../types/player.types"
+import type { IMapService } from "@/modules/map/map.service"
 
 describe("PlayerService", () => {
   let playerService: PlayerService
@@ -22,11 +23,7 @@ describe("PlayerService", () => {
   let mockDatabase: ReturnType<typeof createMockDatabaseClient>
   let mockRankingService: IRankingService
   let mockMatchService: IMatchService
-  let mockMapService: {
-    getCurrentMap: ReturnType<typeof vi.fn>
-    getLastKnownMap: ReturnType<typeof vi.fn>
-    handleMapChange: ReturnType<typeof vi.fn>
-  }
+  let mockMapService: IMapService
 
   beforeEach(() => {
     mockLogger = createMockLogger()

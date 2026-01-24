@@ -37,7 +37,8 @@ const getBadgeStyles = (
 
 // Define the props type using the new variants
 interface BadgeProps
-  extends Omit<React.ComponentProps<"span">, "color">, // Omit HTML 'color' prop
+  extends
+    Omit<React.ComponentProps<"span">, "color">, // Omit HTML 'color' prop
     VariantProps<typeof badgeVariants> {
   asChild?: boolean
   colorScheme?: ColorScheme // Add colorScheme prop

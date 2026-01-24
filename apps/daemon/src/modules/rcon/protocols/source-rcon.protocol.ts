@@ -107,7 +107,7 @@ export class SourceRconProtocol extends BaseRconProtocol {
     if (!this.socket) return
 
     this.socket.on("data", (data) => {
-      this.handleIncomingData(data)
+      this.handleIncomingData(Buffer.isBuffer(data) ? data : Buffer.from(data))
     })
 
     this.socket.on("error", (error) => {

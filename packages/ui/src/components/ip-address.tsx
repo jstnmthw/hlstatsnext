@@ -4,15 +4,19 @@ import { Input } from "./input"
 import { cn } from "../lib/utils"
 import { useState, useRef, useEffect } from "react"
 
-interface IPAddressProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value"> {
+interface IPAddressProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "onChange" | "value"
+> {
   name?: string
   defaultValue?: string
   mode?: "ip-address" | "docker-host"
 }
 
-interface PortProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value"> {
+interface PortProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "onChange" | "value"
+> {
   name?: string
   defaultValue?: string
 }

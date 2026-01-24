@@ -47,6 +47,9 @@ export const nextJsConfig = [
       ...pluginReactHooks.configs.recommended.rules,
       // React scope no longer necessary with new JSX transform.
       "react/react-in-jsx-scope": "off",
+      // Disable React Compiler rules that produce excessive warnings for valid patterns
+      "react-hooks/error-boundaries": "off",
+      "react-hooks/incompatible-library": "off",
     },
   },
 ]

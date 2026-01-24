@@ -1,18 +1,21 @@
 # HLStatsNext
 
-A modern game statistics platform for Half-Life engine games — rebuilt from the ground up.
+![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/jstnmthw/219301cadcc7f71b0c68504a429be810/raw/hlstatsnext-coverage.json)
 
-⚠️ **Early Development** — This project is under active development.
+> ⚠️ **Early Development** — This project is under active development.
+
+A modern game statistics platform for Half-Life engine games — rebuilt from the ground up.
 
 HLStatsNext is a complete modernization of HLstatsX:CE, replacing the legacy PHP/Perl stack with a TypeScript-first architecture. Real-time stats, GraphQL API, Next.js frontend, and seamless Docker deployment.
 
 ## Features
 
 - **Real-time Statistics** — Node.js daemon processes game events instantly
-- **Modern Stack** — TypeScript, Next.js, GraphQL (Yoga), MySQL 8.4
+- **Modern Stack** — TypeScript, Next.js 15, GraphQL Yoga, Prisma, MySQL 8.4
 - **Turborepo Monorepo** — Shared packages, optimized builds, hot-reload dev
-- **Docker Ready** — Full containerization with LinuxGSM game server integration
+- **Docker Ready** — MySQL, RabbitMQ, Garnet (Redis), Prometheus, Grafana
 - **Type-Safe API** — End-to-end type safety with GraphQL code generation
+- **GeoIP Support** — Player geolocation via MaxMind GeoLite2
 
 ## Quick Start
 
@@ -20,41 +23,48 @@ HLStatsNext is a complete modernization of HLstatsX:CE, replacing the legacy PHP
 git clone https://github.com/jstnmthw/hlstatsnext.git
 cd hlstatsnext
 pnpm install
-cp .env.example .env
+
+# Copy environment files (minimum required)
+cp env.example .env
+cp packages/database/env.example packages/database/.env
+cp apps/daemon/env.example apps/daemon/.env
+cp apps/api/env.example apps/api/.env
+cp apps/web/env.example apps/web/.env
+
+# Start infrastructure and initialize database
+docker compose up -d
+pnpm db:generate && pnpm db:push && pnpm db:seed
 pnpm dev
 ```
 
-**Prerequisites:** Node.js 24+, pnpm, Docker & Docker Compose
+**Prerequisites:** Node.js 24+, pnpm 10.x, Docker & Docker Compose
+
+> **Note:** The daemon and API require an encryption key for RCON passwords. Generate one with `openssl rand -base64 32` and add it to `apps/daemon/.env` and `apps/api/.env`. See **[INSTALLATION.md](./INSTALLATION.md)** for complete setup.
 
 ## Development
 
 ```bash
-pnpm dev        # Start development server
-pnpm build      # Build all apps and packages
-pnpm lint       # Lint codebase
-pnpm test       # Run tests
-pnpm codegen    # Generate GraphQL types (requires API running)
+pnpm dev           # Start all apps with hot-reload
+pnpm build         # Build all apps and packages
+pnpm lint          # Lint codebase
+pnpm test          # Run tests
+pnpm codegen       # Generate GraphQL types (requires API running)
+```
+
+Database commands:
+
+```bash
+pnpm db:generate   # Generate Prisma client
+pnpm db:push       # Push schema to database
+pnpm db:seed       # Seed default data
+pnpm db:seed:geo   # Seed GeoIP data (requires MaxMind account)
+pnpm db:studio     # Open Prisma Studio GUI
 ```
 
 Add UI components:
 
 ```bash
-cd packages/ui && pnpm ui add button
-```
-
-## Project Structure
-
-```
-├── apps/
-│   ├── api/            # GraphQL Yoga API
-│   ├── daemon/         # Real-time statistics daemon
-│   └── web/            # Next.js frontend
-├── packages/
-│   ├── ui/             # Shared UI components (shadcn/ui)
-│   ├── database/       # Database schemas and utilities
-│   └── *-config/       # Shared configurations
-├── docker/             # Docker configuration
-└── servers/            # Game server data (cs1, cs2)
+pnpm ui add button
 ```
 
 ## Docker
@@ -71,12 +81,13 @@ make status       # Container status
 
 ### Services
 
-| Service | Port          | Description       |
-| ------- | ------------- | ----------------- |
-| daemon  | 27500/udp     | Statistics daemon |
-| db      | 3306          | MySQL 8.4         |
-| cs1     | 27015/tcp+udp | Example CS server |
-| cs2     | 27016/tcp+udp | Example CS server |
+| Service    | Port(s)     | Description                         |
+| ---------- | ----------- | ----------------------------------- |
+| db         | 3306        | MySQL 8.4 database                  |
+| rabbitmq   | 5672, 15672 | Message queue + management UI       |
+| garnet     | 6379        | Redis-compatible cache              |
+| prometheus | 9090        | Metrics collection                  |
+| grafana    | 3001        | Metrics visualization (admin/admin) |
 
 ### Service Commands
 
@@ -84,54 +95,40 @@ make status       # Container status
 # Database
 make db-logs      make db-shell     make db-backup
 
-# Daemon
+# Daemon (when containerized)
 make daemon-logs  make daemon-shell make daemon-restart
-
-# Game servers (cs1/cs2)
-make cs1-restart  make cs1-logs     make cs1-shell
-make cs2-restart  make cs2-logs     make cs2-shell
 ```
 
 ### Environment Variables
 
-```bash
-# Database
-DB_HOST=db:3306
-DB_NAME=hlstatsnext
-DB_USER=hlstatsnext
-DB_PASS=hlstatsnext
+The project uses multiple `.env` files for different components:
 
-# Game servers
-USER_ID=1000
-GROUP_ID=1000
-```
+| File                     | Purpose                                        |
+| ------------------------ | ---------------------------------------------- |
+| `.env`                   | Docker Compose (database, cache, queues)       |
+| `packages/database/.env` | Prisma connection, MaxMind credentials         |
+| `packages/crypto/.env`   | Shared encryption key                          |
+| `apps/daemon/.env`       | Daemon config (RCON, RabbitMQ, cache, logging) |
+| `apps/api/.env`          | API server (port, CORS)                        |
+| `apps/web/.env`          | Frontend (GraphQL endpoint)                    |
+
+See **[INSTALLATION.md](./INSTALLATION.md)** for complete configuration details.
 
 ### Network
 
-Custom bridge network `hlstatsnext-network` on subnet `10.5.0.0/16` with static daemon IP `10.5.0.50`.
+Custom bridge network `hlstatsnext-network` on subnet `10.5.0.0/16`.
 
-## Adding Game Servers
+## Connecting Game Servers
 
-1. Add service to `docker-compose.yml` (follow `cs1`/`cs2` pattern)
-2. Create directory in `./servers/`
-3. Add Makefile targets
-4. Configure unique port mappings
+Configure your game server to forward logs to the daemon:
 
-Example:
-
-```yaml
-cs3:
-  image: gameservermanagers/gameserver:cs
-  container_name: hlstatsnext-cs-3
-  environment:
-    - UID=${USER_ID:-1000}
-    - GID=${GROUP_ID:-1000}
-  volumes:
-    - ./servers/cs3:/data
-  ports:
-    - "27017:27015/udp"
-    - "27017:27015/tcp"
 ```
+// server.cfg (Source Engine)
+logaddress_add <daemon_ip>:27500
+log on
+```
+
+See **[INSTALLATION.md](./INSTALLATION.md#game-server-configuration)** for detailed setup.
 
 ## Contributing
 
@@ -142,7 +139,11 @@ cs3:
 
 ## License
 
-TBD
+This project is source-available under the Business Source License (BSL). Free for personal and community game servers.
+
+Commercial hosting or offering this software as a service is not permitted without a commercial license.
+
+For licensing inquiries: support@hlstatsnext.com
 
 ## Acknowledgments
 

@@ -1,0 +1,87 @@
+name: Test Workflow
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  NODE_ENV: test
+
+jobs:
+  # Unit Tests: Fast, mocked dependencies, no external services
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    outputs:
+      coverage: ${{ steps.coverage.outputs.coverage }}
+      color: ${{ steps.coverage.outputs.color }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run unit tests with coverage
+        run: pnpm test:coverage
+
+      - name: Aggregate coverage
+        id: coverage
+        run: node scripts/aggregate-coverage.mjs
+
+  # Type Checking and Linting
+  quality-checks:
+    name: Type Check & Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+  # Update Coverage Badge: Publish badge to gist on main branch
+  update-badge:
+    name: Update Coverage Badge
+    runs-on: ubuntu-latest
+    needs: [unit-tests]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Update coverage badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ vars.COVERAGE_GIST_ID }}
+          filename: romdler-coverage.json
+          label: coverage
+          message: ${{ needs.unit-tests.outputs.coverage }}%
+          valColorRange: ${{ needs.unit-tests.outputs.coverage }}
+          maxColorRange: 100
+          minColorRange: 0

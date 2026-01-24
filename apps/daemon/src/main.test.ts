@@ -4,21 +4,24 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { HLStatsDaemon } from "./main"
 import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { getEnvironmentConfig } from "@/config/environment.config"
-import { DatabaseConnectionService } from "@/database/connection.service"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockDatabaseClient } from "@/tests/mocks/database"
 import { DeterministicUuidService } from "@/shared/infrastructure/identifiers/deterministic-uuid.service"
 import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 import { SystemClock } from "@/shared/infrastructure/time/system-clock"
 
+const mockDatabaseConnection = {
+  testConnection: vi.fn(),
+  disconnect: vi.fn(),
+}
+
 vi.mock("@/context")
 vi.mock("@/config/environment.config")
-vi.mock("@/database/connection.service")
 vi.mock("@repo/observability", () => ({
-  MetricsServer: vi.fn().mockImplementation(() => ({
-    start: vi.fn().mockResolvedValue(undefined),
-    stop: vi.fn().mockResolvedValue(undefined),
-  })),
+  MetricsServer: class {
+    start = vi.fn().mockResolvedValue(undefined)
+    stop = vi.fn().mockResolvedValue(undefined)
+  },
 }))
 vi.mock("@/shared/infrastructure/messaging/queue/utils/message-utils", () => {
   let currentUuidService: unknown = null
@@ -29,15 +32,16 @@ vi.mock("@/shared/infrastructure/messaging/queue/utils/message-utils", () => {
     },
   }
 })
+vi.mock("@/database/connection.service", () => ({
+  DatabaseConnectionService: class {
+    testConnection = mockDatabaseConnection.testConnection
+    disconnect = mockDatabaseConnection.disconnect
+  },
+}))
 
 const mockEventPublisher = {
   publish: vi.fn(),
   publishBatch: vi.fn(),
-}
-
-const mockDatabaseConnection = {
-  testConnection: vi.fn(),
-  disconnect: vi.fn(),
 }
 
 const mockContext = {
@@ -94,11 +98,6 @@ describe("HLStatsDaemon", () => {
         maxConcurrentPerServer: 3,
       },
     })
-
-    const MockedDatabaseConnectionService = vi.mocked(DatabaseConnectionService, true)
-    MockedDatabaseConnectionService.mockImplementation(
-      () => mockDatabaseConnection as unknown as InstanceType<typeof DatabaseConnectionService>,
-    )
 
     daemon = await HLStatsDaemon.create()
   })

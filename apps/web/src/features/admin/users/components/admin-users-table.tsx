@@ -4,18 +4,17 @@ import { DataTable, DataTableProps } from "@/features/common/components/data-tab
 import { useDataTableUrl } from "@/features/common/hooks/use-data-table-url"
 import { userColumns, userFilterConfig, UserListItem } from "./user-columns"
 
-interface AdminUsersTableProps
-  extends Omit<
-    DataTableProps<UserListItem>,
-    | "columns"
-    | "filterPlaceholder"
-    | "serverConfig"
-    | "onPageChange"
-    | "onSort"
-    | "onSearch"
-    | "onRefresh"
-    | "isLoading"
-  > {
+interface AdminUsersTableProps extends Omit<
+  DataTableProps<UserListItem>,
+  | "columns"
+  | "filterPlaceholder"
+  | "serverConfig"
+  | "onPageChange"
+  | "onSort"
+  | "onSearch"
+  | "onRefresh"
+  | "isLoading"
+> {
   data: UserListItem[]
   totalCount: number
   currentPage: number

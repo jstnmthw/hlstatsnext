@@ -13,6 +13,7 @@ import type { Player } from "@repo/database/client"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IMatchService } from "@/modules/match/match.types"
 import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
+import type { IMapService } from "@/modules/map/map.service"
 
 describe("KillEventHandler", () => {
   let handler: KillEventHandler
@@ -20,11 +21,7 @@ describe("KillEventHandler", () => {
   let mockLogger: ReturnType<typeof createMockLogger>
   let mockRankingService: IRankingService
   let mockMatchService: IMatchService
-  let mockMapService: {
-    getCurrentMap: ReturnType<typeof vi.fn>
-    getLastKnownMap: ReturnType<typeof vi.fn>
-    handleMapChange: ReturnType<typeof vi.fn>
-  }
+  let mockMapService: IMapService
   let mockEventNotificationService: IEventNotificationService
 
   const DEFAULT_RATING = 1000

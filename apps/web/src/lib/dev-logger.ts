@@ -56,11 +56,11 @@ export function logDevError(message: string, ...data: unknown[]): void {
 function isApolloError(error: unknown): boolean {
   return Boolean(
     error &&
-      typeof error === "object" &&
-      "networkError" in error &&
-      error.networkError &&
-      typeof error.networkError === "object" &&
-      "result" in error.networkError,
+    typeof error === "object" &&
+    "networkError" in error &&
+    error.networkError &&
+    typeof error.networkError === "object" &&
+    "result" in error.networkError,
   )
 }
 

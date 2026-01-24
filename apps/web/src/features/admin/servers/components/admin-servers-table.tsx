@@ -4,18 +4,17 @@ import { DataTable, DataTableProps } from "@/features/common/components/data-tab
 import { useDataTableUrl } from "@/features/common/hooks/use-data-table-url"
 import { serverColumns, serverFilterConfig, ServerListItem } from "./server-columns"
 
-interface AdminServersTableProps
-  extends Omit<
-    DataTableProps<ServerListItem>,
-    | "columns"
-    | "filterPlaceholder"
-    | "serverConfig"
-    | "onPageChange"
-    | "onSort"
-    | "onSearch"
-    | "onRefresh"
-    | "isLoading"
-  > {
+interface AdminServersTableProps extends Omit<
+  DataTableProps<ServerListItem>,
+  | "columns"
+  | "filterPlaceholder"
+  | "serverConfig"
+  | "onPageChange"
+  | "onSort"
+  | "onSearch"
+  | "onRefresh"
+  | "isLoading"
+> {
   data: ServerListItem[]
   totalCount: number
   currentPage: number

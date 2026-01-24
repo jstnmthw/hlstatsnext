@@ -16,9 +16,9 @@ import { logDevError } from "@/lib/dev-logger"
 export function isRedirectError(error: unknown): boolean {
   return Boolean(
     error &&
-      typeof error === "object" &&
-      "message" in error &&
-      (error as Error).message === "NEXT_REDIRECT",
+    typeof error === "object" &&
+    "message" in error &&
+    (error as Error).message === "NEXT_REDIRECT",
   )
 }
 

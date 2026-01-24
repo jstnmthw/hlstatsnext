@@ -4,18 +4,17 @@ import { DataTable, DataTableProps } from "@/features/common/components/data-tab
 import { useDataTableUrl } from "@/features/common/hooks/use-data-table-url"
 import { gameColumns, gameFilterConfig, GameListItem } from "./game-columns"
 
-interface AdminGamesTableProps
-  extends Omit<
-    DataTableProps<GameListItem>,
-    | "columns"
-    | "filterPlaceholder"
-    | "serverConfig"
-    | "onPageChange"
-    | "onSort"
-    | "onSearch"
-    | "onRefresh"
-    | "isLoading"
-  > {
+interface AdminGamesTableProps extends Omit<
+  DataTableProps<GameListItem>,
+  | "columns"
+  | "filterPlaceholder"
+  | "serverConfig"
+  | "onPageChange"
+  | "onSort"
+  | "onSearch"
+  | "onRefresh"
+  | "isLoading"
+> {
   data: GameListItem[]
   totalCount: number
   currentPage: number

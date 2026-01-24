@@ -119,7 +119,8 @@ const getButtonStyles = (variant: Variant, colorScheme: ColorScheme): string[] =
 
 // Define the props type using the new variants
 interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color">, // Omit HTML 'color' prop
+  extends
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color">, // Omit HTML 'color' prop
     VariantProps<typeof buttonVariants> {
   // Includes 'variant' and 'size' from cva
   asChild?: boolean

@@ -26,21 +26,21 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^5.0.7",
-    "@graphql-codegen/client-preset": "^4.8.3",
+    "@graphql-codegen/cli": "^6.1.1",
+    "@graphql-codegen/client-preset": "^5.2.2",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@repo/database": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@tailwindcss/postcss": "^4.1.12",
-    "@types/node": "^24.3.0",
-    "@types/react": "19.1.0",
-    "@types/react-dom": "19.1.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^25.0.10",
+    "@types/react": "19.2.9",
+    "@types/react-dom": "19.2.3",
     "date-fns": "^4.1.0",
-    "eslint": "^9.34.0",
+    "eslint": "^9.39.2",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.12",
-    "typescript": "^5.9.2"
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3"
   }
 }

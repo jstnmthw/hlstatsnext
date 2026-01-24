@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf node_modules dist .turbo",
     "lint": "eslint src/**/*.ts",

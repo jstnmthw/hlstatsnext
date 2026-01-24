@@ -19,7 +19,6 @@
     "db:run-sql": "tsx src/scripts/run-sql.ts",
     "db:test:prepare": "dotenv -e .env.test -- prisma db push --skip-generate",
     "db:test:reset": "dotenv -e .env.test -- prisma migrate reset --force --skip-generate && dotenv -e .env.test -- prisma db push --skip-generate",
-    "dev": "tsc --watch",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix"
   },

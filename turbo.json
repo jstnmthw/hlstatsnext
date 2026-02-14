@@ -52,7 +52,7 @@
       "dependsOn": ["^lint"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^check-types", "db:generate"]
     },
     "graphql:codegen": {
       "cache": false
@@ -72,8 +72,9 @@
       "cache": false
     },
     "db:generate": {
-      "cache": false,
-      "dependsOn": ["^db:generate"]
+      "dependsOn": ["^db:generate"],
+      "inputs": ["prisma/schema.prisma"],
+      "outputs": ["generated/**"]
     },
     "db:push": {
       "cache": false

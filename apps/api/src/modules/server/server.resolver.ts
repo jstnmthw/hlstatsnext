@@ -88,7 +88,7 @@ builder.mutationField("updateServerWithConfig", (t) =>
         const serverService = context.services.server
 
         // Filter out null/undefined values and convert to the format expected by service
-        const updateData: Record<string, string | number> = {}
+        const updateData: Record<string, string | number | null> = {}
 
         if (data.name !== null && data.name !== undefined) updateData.name = data.name
         if (data.address !== null && data.address !== undefined) updateData.address = data.address
@@ -98,6 +98,15 @@ builder.mutationField("updateServerWithConfig", (t) =>
         if (data.statusUrl !== null && data.statusUrl !== undefined)
           updateData.statusUrl = data.statusUrl
         if (data.game !== null && data.game !== undefined) updateData.game = data.game
+        if (data.mod !== null && data.mod !== undefined) updateData.mod = data.mod
+        if (data.rconPassword !== null && data.rconPassword !== undefined)
+          updateData.rconPassword = data.rconPassword
+        if (data.connectionType !== null && data.connectionType !== undefined)
+          updateData.connectionType = data.connectionType
+        if (data.dockerHost !== null && data.dockerHost !== undefined)
+          updateData.dockerHost = data.dockerHost
+        if (data.sortOrder !== null && data.sortOrder !== undefined)
+          updateData.sortOrder = data.sortOrder
 
         const server = await serverService.updateServer(serverId, updateData)
 

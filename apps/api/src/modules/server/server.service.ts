@@ -7,7 +7,7 @@
 import type { ICryptoService } from "@repo/crypto"
 import type { Server } from "@repo/database/client"
 import { ServerRepository } from "./server.repository"
-import type { CreateServerInput, CreateServerResult } from "./server.types"
+import type { CreateServerInput, CreateServerResult, UpdateServerInput } from "./server.types"
 
 export class ServerService {
   private readonly serverRepository: ServerRepository
@@ -131,17 +131,15 @@ export class ServerService {
   }
 
   /**
-   * Update server details (excluding RCON password)
+   * Update server details with optional mod and encrypted RCON password
    */
-  async updateServer(
-    serverId: number,
-    updates: Partial<
-      Pick<Server, "name" | "address" | "port" | "publicAddress" | "statusUrl" | "game">
-    >,
-  ): Promise<Server> {
-    const updatedServer = await this.serverRepository.updateServerWithConfig(serverId, updates)
+  async updateServer(serverId: number, updates: UpdateServerInput): Promise<Server> {
+    // Encrypt RCON password if provided
+    if (updates.rconPassword) {
+      updates.rconPassword = await this.crypto.encrypt(updates.rconPassword)
+    }
 
-    return updatedServer
+    return await this.serverRepository.updateServerWithConfig(serverId, updates)
   }
 
   /**

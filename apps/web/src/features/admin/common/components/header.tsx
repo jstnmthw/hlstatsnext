@@ -3,6 +3,7 @@ import { Badge, Button, cn } from "@repo/ui"
 import { PaintbrushIcon, SettingsIcon } from "lucide-react"
 import { AppLogo } from "@/features/common/components/app-logo"
 import { Navbar } from "./navbar"
+import { UserMenu } from "./user-menu"
 
 const navItems = [
   {
@@ -39,22 +40,25 @@ export function AdminHeader({ className, currentPath }: AdminHeaderProps) {
               Admin
             </Badge>
           </div>
-          <nav className="flex items-center gap-1">
-            {navItems.map((item) => (
-              <Button key={item.href} variant="outline" colorScheme="zinc" size="icon-sm" asChild>
-                <Link key={item.href} href={item.href} aria-label={item.label}>
-                  {item.iconOnly ? (
-                    item.icon
-                  ) : (
-                    <>
-                      {item.icon}
-                      {item.label}
-                    </>
-                  )}
-                </Link>
-              </Button>
-            ))}
-          </nav>
+          <div className="flex items-center gap-3">
+            <nav className="flex items-center gap-1">
+              {navItems.map((item) => (
+                <Button key={item.href} variant="outline" colorScheme="zinc" size="icon-sm" asChild>
+                  <Link href={item.href} aria-label={item.label}>
+                    {item.iconOnly ? (
+                      item.icon
+                    ) : (
+                      <>
+                        {item.icon}
+                        {item.label}
+                      </>
+                    )}
+                  </Link>
+                </Button>
+              ))}
+            </nav>
+            <UserMenu />
+          </div>
         </div>
       </header>
       <Navbar currentPath={currentPath} />

@@ -3,14 +3,14 @@ import { graphql } from "@/lib/gql"
 export const GET_USERS_QUERY = graphql(`
   query GetUsers {
     findManyUser {
-      username
-      acclevel
-      playerId
-      player {
-        lastName
-        email
-        lastEvent
-      }
+      id
+      name
+      email
+      emailVerified
+      role
+      banned
+      createdAt
+      updatedAt
     }
   }
 `)
@@ -23,14 +23,14 @@ export const GET_USERS_WITH_PAGINATION = graphql(`
     $where: UserWhereInput
   ) {
     findManyUser(take: $take, skip: $skip, orderBy: $orderBy, where: $where) {
-      username
-      acclevel
-      playerId
-      player {
-        lastName
-        email
-        lastEvent
-      }
+      id
+      name
+      email
+      emailVerified
+      role
+      banned
+      createdAt
+      updatedAt
     }
   }
 `)

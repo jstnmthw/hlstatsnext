@@ -24,15 +24,14 @@ interface ExtendedHeaderContext<TData, TValue> extends HeaderContext<TData, TVal
 }
 
 export type UserListItem = {
-  username: string
-  acclevel: number
-  playerId: number
-  player: {
-    lastName: string
-    email?: string | null
-    lastEvent?: string | Date | null
-    __typename?: string
-  }
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  role?: string | null
+  banned?: boolean | null
+  createdAt: string | Date | null
+  updatedAt: string | Date | null
   __typename?: string
 }
 
@@ -70,11 +69,11 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
     enableHiding: false,
   },
   {
-    accessorKey: "username",
+    accessorKey: "name",
     header: (props: ExtendedHeaderContext<UserListItem, unknown>) => (
       <DataTableColumnHeader
-        title="Username"
-        field="username"
+        title="Name"
+        field="name"
         sortField={props.sortField}
         sortOrder={props.sortOrder}
         onSort={props.onSort}
@@ -82,76 +81,15 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
     ),
     cell: ({ row }) => {
       const user = row.original
-      return <span className="pl-2 font-medium">{user.username}</span>
+      return <span className="pl-2 font-medium">{user.name}</span>
     },
   },
   {
-    accessorKey: "acclevel",
-    header: (props: ExtendedHeaderContext<UserListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Access Level"
-        field="acclevel"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
-    cell: ({ row }) => {
-      const user = row.original
-      const getLevelBadge = (level: number) => {
-        if (level >= 100)
-          return <span className="px-2 py-1 text-xs bg-red-900 text-red-100 rounded">Admin</span>
-        if (level >= 50)
-          return (
-            <span className="px-2 py-1 text-xs bg-orange-900 text-orange-100 rounded">
-              Moderator
-            </span>
-          )
-        if (level >= 10)
-          return <span className="px-2 py-1 text-xs bg-blue-900 text-blue-100 rounded">User</span>
-        return <span className="px-2 py-1 text-xs bg-gray-700 text-gray-300 rounded">Guest</span>
-      }
-      return getLevelBadge(user.acclevel)
-    },
-  },
-  {
-    accessorKey: "playerId",
-    header: (props: ExtendedHeaderContext<UserListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Player ID"
-        field="playerId"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
-    cell: ({ row }) => {
-      const user = row.original
-      return <span>{user.playerId}</span>
-    },
-  },
-  {
-    accessorKey: "player.lastName",
-    header: (props: ExtendedHeaderContext<UserListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Player Name"
-        field="player.lastName"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
-    cell: ({ row }) => {
-      const user = row.original
-      return <span>{user.player?.lastName || "-"}</span>
-    },
-  },
-  {
-    accessorKey: "player.email",
+    accessorKey: "email",
     header: (props: ExtendedHeaderContext<UserListItem, unknown>) => (
       <DataTableColumnHeader
         title="Email"
-        field="player.email"
+        field="email"
         sortField={props.sortField}
         sortOrder={props.sortOrder}
         onSort={props.onSort}
@@ -159,15 +97,15 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
     ),
     cell: ({ row }) => {
       const user = row.original
-      return <span>{user.player?.email || "-"}</span>
+      return <span>{user.email}</span>
     },
   },
   {
-    accessorKey: "player.lastEvent",
+    accessorKey: "role",
     header: (props: ExtendedHeaderContext<UserListItem, unknown>) => (
       <DataTableColumnHeader
-        title="Last Event"
-        field="player.lastEvent"
+        title="Role"
+        field="role"
         sortField={props.sortField}
         sortOrder={props.sortOrder}
         onSort={props.onSort}
@@ -175,8 +113,48 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
     ),
     cell: ({ row }) => {
       const user = row.original
-      if (!user.player?.lastEvent) return <span>-</span>
-      return <span>{formatDate(user.player.lastEvent)}</span>
+      const getRoleBadge = (role: string | null | undefined) => {
+        if (role === "admin")
+          return <span className="px-2 py-1 text-xs bg-red-900 text-red-100 rounded">Admin</span>
+        return <span className="px-2 py-1 text-xs bg-blue-900 text-blue-100 rounded">User</span>
+      }
+      return getRoleBadge(user.role)
+    },
+  },
+  {
+    accessorKey: "banned",
+    header: (props: ExtendedHeaderContext<UserListItem, unknown>) => (
+      <DataTableColumnHeader
+        title="Status"
+        field="banned"
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
+      />
+    ),
+    cell: ({ row }) => {
+      const user = row.original
+      if (user.banned) {
+        return <span className="px-2 py-1 text-xs bg-red-900 text-red-100 rounded">Banned</span>
+      }
+      return <span className="px-2 py-1 text-xs bg-green-900 text-green-100 rounded">Active</span>
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: (props: ExtendedHeaderContext<UserListItem, unknown>) => (
+      <DataTableColumnHeader
+        title="Created"
+        field="createdAt"
+        sortField={props.sortField}
+        sortOrder={props.sortOrder}
+        onSort={props.onSort}
+      />
+    ),
+    cell: ({ row }) => {
+      const user = row.original
+      if (!user.createdAt) return <span>-</span>
+      return <span>{formatDate(user.createdAt)}</span>
     },
   },
   {
@@ -214,8 +192,8 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.username)}>
-              Copy username
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.email)}>
+              Copy email
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View user</DropdownMenuItem>

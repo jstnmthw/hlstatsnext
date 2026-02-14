@@ -40,7 +40,9 @@
     "CACHE_RETRY_DELAY",
     "CACHE_MAX_RETRIES",
     "METRICS_PORT",
-    "APP_VERSION"
+    "APP_VERSION",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET"
   ],
   "tasks": {
     "build": {

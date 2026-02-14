@@ -173,7 +173,6 @@ model Player {
   history                     PlayerHistory[]
   ribbons                     PlayerRibbon[]
   names                       PlayerName[]
-  user                        User?
 
   // Indexes for performance
   @@index([clanId], name: "playerclan")
@@ -891,15 +890,76 @@ model Team {
   @@map("teams")
 }
 
+// Better Auth models
+
 model User {
-  username String @id @db.VarChar(16)
-  password String @db.VarChar(255)
-  acclevel Int    @default(0)
-  playerId Int    @unique @default(0) @map("player_id") @db.UnsignedInt
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false) @map("email_verified")
+  image         String?   @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  player Player @relation(fields: [playerId], references: [playerId], onDelete: Cascade)
+  // Admin plugin fields
+  role      String?   @default("user")
+  banned    Boolean?  @default(false)
+  banReason String?   @map("ban_reason") @db.Text
+  banExpires DateTime? @map("ban_expires")
 
-  @@map("users")
+  sessions  Session[]
+  accounts  Account[]
+
+  @@map("user")
+}
+
+model Session {
+  id             String    @id
+  userId         String    @map("user_id")
+  token          String    @unique
+  expiresAt      DateTime  @map("expires_at")
+  ipAddress      String?   @map("ip_address") @db.VarChar(255)
+  userAgent      String?   @map("user_agent") @db.Text
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  // Admin plugin fields
+  impersonatedBy String?   @map("impersonated_by")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  userId                String    @map("user_id")
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  accessToken           String?   @map("access_token") @db.Text
+  refreshToken          String?   @map("refresh_token") @db.Text
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  scope                 String?   @db.Text
+  idToken               String?   @map("id_token") @db.Text
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String   @db.Text
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime? @default(now()) @map("created_at")
+  updatedAt  DateTime? @updatedAt @map("updated_at")
+
+  @@map("verification")
 }
 
 model Weapon {

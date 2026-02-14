@@ -2,7 +2,9 @@
 
 import { z } from "zod"
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import { getClient } from "@/lib/apollo-client"
+import { auth } from "@/lib/auth"
 import { CREATE_SERVER_MUTATION } from "@/features/admin/servers/graphql/server-mutations"
 import {
   CreateServerSchema,
@@ -29,6 +31,19 @@ export async function createServer(
   formData: FormData,
 ): Promise<CreateServerResult> {
   try {
+    // Auth guard
+    const session = await auth.api.getSession({ headers: await headers() })
+    if (!session) {
+      return { success: false, message: "Authentication required." }
+    }
+
+    const hasPermission = await auth.api.userHasPermission({
+      body: { userId: session.user.id, permission: { server: ["create"] } },
+    })
+    if (!hasPermission.success) {
+      return { success: false, message: "Insufficient permissions." }
+    }
+
     // Extract and validate form data
     const rawData = extractFormDataForCreate(formData)
     const validation = CreateServerSchema.safeParse(rawData)

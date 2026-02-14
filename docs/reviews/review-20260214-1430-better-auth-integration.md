@@ -227,14 +227,17 @@ export const { GET, POST } = toNextJsHandler(auth)
 
 **Better Auth reference**: [https://www.better-auth.com/docs/adapters/prisma](https://www.better-auth.com/docs/adapters/prisma)
 
+**Decision**: No backward compatibility required (early dev stage). Refactor the existing `User` model to conform to Better Auth's requirements. The daemon must be updated to use the correct fields from the new schema.
+
 **Proposed change**:
 
-1. Keep existing `User` model renamed to `LegacyUser` (or keep as `users` table for backward compatibility with daemon)
-2. Add new Better Auth models via CLI: `npx @better-auth/cli generate`
-3. The Better Auth `user` table becomes the new auth identity, with an optional relation to `Player` for game stats linking
-4. Run Prisma migration after schema generation
+1. Remove the existing `User` model entirely
+2. Add new Better Auth models via CLI: `npx @better-auth/cli generate` — creates `user`, `session`, `account`, `verification` tables
+3. The Better Auth `user` table becomes the sole auth identity, with an optional relation to `Player` for game stats linking
+4. Update the daemon's auth service to use the new `user`/`account` schema (passwords are in `account` table)
+5. Run Prisma migration after schema generation
 
-**Risk/complexity**: High. Schema changes affect the daemon and API app. Must be carefully coordinated. The legacy `users` table and auth service in `apps/api` must be preserved for backward compatibility during migration.
+**Risk/complexity**: Medium. Schema changes affect the daemon and API app, but since we're in early dev with no backward compatibility requirement, this is a clean-break migration.
 
 **Expected impact**: Enables Better Auth's full feature set. Clean separation between auth identity and game player data.
 
@@ -436,10 +439,8 @@ export async function seedDefaultAdmin(auth: typeof import("@/lib/auth").auth) {
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { admin } from "better-auth/plugins"
-import { PrismaClient } from "@repo/database/client"
+import { prisma } from "@repo/database"
 import { ac, adminRole, userRole } from "./auth-permissions"
-
-const prisma = new PrismaClient()
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "mysql" }),
@@ -514,7 +515,8 @@ GOOGLE_CLIENT_SECRET=
 
 ### P0: Measurement & Guardrails
 
-- [ ] **P0-1**: Install Better Auth and dependencies (F-010)
+- [x] **P0-1**: Install Better Auth and dependencies (F-010)
+  - Installed `better-auth` in `apps/web` (+14 packages)
 
   ```bash
   pnpm --filter web add better-auth
@@ -523,88 +525,102 @@ GOOGLE_CLIENT_SECRET=
   - Next.js docs: [https://nextjs.org/docs/app/guides/authentication#auth-libraries](https://nextjs.org/docs/app/guides/authentication#auth-libraries)
   - Better Auth docs: [https://www.better-auth.com/docs/installation](https://www.better-auth.com/docs/installation)
 
-- [ ] **P0-2**: Set up environment variables (F-011)
-  - Generate `BETTER_AUTH_SECRET` via `openssl rand -base64 32`
-  - Add Google OAuth credentials placeholder
+- [x] **P0-2**: Set up environment variables (F-011)
+  - Generated `BETTER_AUTH_SECRET` via `openssl rand -base64 32`
+  - Added `DATABASE_URL` (required for Prisma adapter — was missing from web .env)
+  - Added `BETTER_AUTH_URL`, Google OAuth placeholders
   - Next.js docs: [https://nextjs.org/docs/app/guides/environment-variables](https://nextjs.org/docs/app/guides/environment-variables)
 
-- [ ] **P0-3**: Generate Better Auth Prisma schema models (F-005)
-  - Create `auth.ts` config with Prisma adapter
-  - Run `npx @better-auth/cli generate` to add models to `schema.prisma`
-  - Review generated schema: `user`, `session`, `account`, `verification` tables
-  - Ensure no `password` field on `user` model (Better Auth uses `account` table)
-  - Run `pnpm --filter database db:push` to apply schema
+- [x] **P0-3**: Refactor Prisma schema for Better Auth (F-005)
+  - Removed old `User` model (username PK, password, acclevel, playerId)
+  - Added Better Auth models: `User` (id, name, email, role, banned), `Session`, `Account`, `Verification`
+  - Removed `user User?` relation from `Player` model
+  - Updated API `AuthRepository` and `AuthService` for new schema (email-based, account table for passwords)
+  - Updated admin users GraphQL queries and columns for new fields (name, email, role, banned, createdAt)
+  - Regenerated: Prisma client, Pothos types, GraphQL codegen
+  - Schema pushed to database via `prisma db push`
+  - All packages pass typecheck (web, api, database)
   - Better Auth Prisma docs: [https://www.better-auth.com/docs/adapters/prisma](https://www.better-auth.com/docs/adapters/prisma)
 
 ### P1: Quick Wins (Core Auth)
 
-- [ ] **P1-1**: Create shared permissions/access control file (F-006)
-  - `apps/web/src/lib/auth-permissions.ts` — client-safe, no server imports
-  - Define `statement`, `ac`, `adminRole`, `userRole` using `createAccessControl`
+- [x] **P1-1**: Create shared permissions/access control file (F-006)
+  - Created `apps/web/src/lib/auth-permissions.ts` — client-safe, no server imports
+  - Defines `statement` (server, game, player, dashboard resources), `ac`, `adminRole`, `userRole`
+  - Merges `defaultStatements` and `adminAc.statements` for admin role
   - Better Auth admin docs: [https://www.better-auth.com/docs/plugins/admin#custom-permissions](https://www.better-auth.com/docs/plugins/admin#custom-permissions)
 
-- [ ] **P1-2**: Create Better Auth server config (F-010)
-  - `apps/web/src/lib/auth.ts` with Prisma adapter, email/password, Google OAuth, admin plugin
+- [x] **P1-2**: Create Better Auth server config (F-010)
+  - Updated `apps/web/src/lib/auth.ts` with full config: Prisma adapter (`db` from `@repo/database/client`), email/password, Google OAuth, admin plugin with RBAC, session cookie cache (5min)
   - Better Auth Next.js docs: [https://www.better-auth.com/docs/integrations/next](https://www.better-auth.com/docs/integrations/next)
 
-- [ ] **P1-3**: Create Better Auth client config (F-010)
-  - `apps/web/src/lib/auth-client.ts` with `createAuthClient` and `adminClient` plugin
+- [x] **P1-3**: Create Better Auth client config (F-010)
+  - Created `apps/web/src/lib/auth-client.ts` with `createAuthClient`, `adminClient` plugin, exports `useSession`, `signIn`, `signUp`, `signOut`
   - Better Auth client docs: [https://www.better-auth.com/docs/basic-usage#session](https://www.better-auth.com/docs/basic-usage#session)
 
-- [ ] **P1-4**: Create catch-all API route handler (F-004)
-  - `apps/web/src/app/api/auth/[...all]/route.ts`
-  - Uses `toNextJsHandler(auth)`
+- [x] **P1-4**: Create catch-all API route handler (F-004)
+  - Created `apps/web/src/app/api/auth/[...all]/route.ts` with `toNextJsHandler(auth)`
   - Next.js Route Handlers: [https://nextjs.org/docs/app/getting-started/route-handlers](https://nextjs.org/docs/app/getting-started/route-handlers)
   - Better Auth handler docs: [https://www.better-auth.com/docs/integrations/next#create-api-route](https://www.better-auth.com/docs/integrations/next#create-api-route)
 
-- [ ] **P1-5**: Create `proxy.ts` for optimistic auth checks (F-003)
-  - Use `getSessionCookie()` from `better-auth/cookies`
-  - Redirect `/admin/*` to `/login` if no session cookie
-  - Redirect `/login` and `/register` to `/admin` if session cookie exists
+- [x] **P1-5**: Create `proxy.ts` for optimistic auth checks (F-003)
+  - Created `apps/web/src/proxy.ts` with `getSessionCookie()` from `better-auth/cookies`
+  - Redirects `/admin/*` to `/login` if no session cookie
+  - Redirects `/login` and `/register` to `/admin` if session cookie exists
+  - Matcher excludes api, \_next/static, \_next/image, favicon, sitemap, robots
   - Next.js Proxy docs: [https://nextjs.org/docs/app/api-reference/file-conventions/proxy](https://nextjs.org/docs/app/api-reference/file-conventions/proxy)
-  - Next.js auth proxy pattern: [https://nextjs.org/docs/app/guides/authentication#optimistic-checks-with-proxy-optional](https://nextjs.org/docs/app/guides/authentication#optimistic-checks-with-proxy-optional)
 
 ### P2: Architectural Refactors
 
-- [ ] **P2-1**: Restructure routes with route groups (F-002)
-  - Create `(public)`, `(auth)`, and `(admin)` route groups
-  - Move existing pages into appropriate groups
-  - Create group-specific layouts
+- [x] **P2-1**: Restructure routes with route groups (F-002)
+  - Created `(public)`, `(auth)`, and `(admin)` route groups
+  - Moved homepage + `/servers` to `(public)/`, admin pages to `(admin)/admin/`
+  - Created `(auth)/layout.tsx` with centered card layout and AppLogo
+  - URLs unchanged: route groups don't affect URL paths
   - Next.js Route Groups: [https://nextjs.org/docs/app/api-reference/file-conventions/route-groups](https://nextjs.org/docs/app/api-reference/file-conventions/route-groups)
 
-- [ ] **P2-2**: Create admin layout with server-side auth guard (F-001)
-  - `app/(admin)/layout.tsx` — calls `auth.api.getSession()`, redirects if not authenticated or not admin
+- [x] **P2-2**: Create admin layout with server-side auth guard (F-001)
+  - Created `app/(admin)/layout.tsx` — calls `auth.api.getSession()` with `headers()`
+  - Redirects to `/login` if no session, redirects to `/` if not admin role
+  - Layered security: proxy (optimistic cookie check) + layout (real session verification)
   - Next.js auth in layouts: [https://nextjs.org/docs/app/guides/authentication#layouts-and-auth-checks](https://nextjs.org/docs/app/guides/authentication#layouts-and-auth-checks)
-  - Better Auth session: [https://www.better-auth.com/docs/concepts/session-management](https://www.better-auth.com/docs/concepts/session-management)
 
-- [ ] **P2-3**: Create login page (F-008)
-  - `app/(auth)/login/page.tsx`
-  - Email/password form using `authClient.signIn.email()`
-  - Google OAuth button using `authClient.signIn.social({ provider: 'google' })`
-  - Redirect to `/admin` on success
+- [x] **P2-3**: Create login page (F-008)
+  - Created `app/(auth)/login/page.tsx` + `features/auth/components/login-form.tsx`
+  - Email/password form using `signIn.email()` from auth client
+  - Google OAuth button (`features/auth/components/google-button.tsx`) using `signIn.social()`
+  - Error display, loading states, link to register
   - Better Auth sign-in docs: [https://www.better-auth.com/docs/basic-usage#sign-in](https://www.better-auth.com/docs/basic-usage#sign-in)
 
-- [ ] **P2-4**: Create register page (F-008)
-  - `app/(auth)/register/page.tsx`
-  - Name, email, password form using `authClient.signUp.email()`
-  - Google OAuth button
-  - Redirect to `/admin` on success (if admin role) or `/` (if user role)
+- [x] **P2-4**: Create register page (F-008)
+  - Created `app/(auth)/register/page.tsx` + `features/auth/components/register-form.tsx`
+  - Name, email, password form using `signUp.email()` from auth client
+  - Shared Google OAuth button component
+  - Error display, loading states, link to login
   - Better Auth sign-up docs: [https://www.better-auth.com/docs/basic-usage#sign-up](https://www.better-auth.com/docs/basic-usage#sign-up)
 
-- [ ] **P2-5**: Add auth guards to all server actions (F-007)
-  - Add `auth.api.getSession()` + `auth.api.userHasPermission()` to `create-server.ts` and `update-server.ts`
+- [x] **P2-5**: Add auth guards to all server actions (F-007)
+  - Added `auth.api.getSession()` + `auth.api.userHasPermission()` to both `create-server.ts` and `update-server.ts`
+  - `create-server.ts` checks `server: ["create"]` permission
+  - `update-server.ts` checks `server: ["update"]` permission
+  - Returns `{ success: false, message }` if auth fails (no redirect/throw)
   - Next.js Server Actions auth: [https://nextjs.org/docs/app/guides/authentication#server-actions](https://nextjs.org/docs/app/guides/authentication#server-actions)
 
-- [ ] **P2-6**: Add user session display to admin header
-  - Show logged-in user's name/email in admin navbar
-  - Add sign-out button using `authClient.signOut()`
+- [x] **P2-6**: Add user session display to admin header
+  - Created `features/admin/common/components/user-menu.tsx` (client component)
+  - Shows user name/email + sign-out button with `LogOutIcon`
+  - Uses `useSession()` for session data, `signOut()` for logout
+  - Integrated into admin header alongside existing nav items
   - Better Auth sign-out: [https://www.better-auth.com/docs/basic-usage#signout](https://www.better-auth.com/docs/basic-usage#signout)
 
-- [ ] **P2-7**: Create admin seeder with default admin + permissions (F-009)
-  - Add to `packages/database/src/seeders/auth.ts`
-  - Generate random password, create admin user, assign `admin` role
-  - Echo credentials to console
-  - Integrate into existing `seed.ts` pipeline
+- [x] **P2-7**: Create admin seeder with default admin + permissions (F-009)
+  - Created `apps/web/src/scripts/seed-admin.ts` (standalone script)
+  - Uses `auth.api.signUpEmail()` for proper password hashing in account table
+  - Sets admin role via Prisma directly (avoids authenticated session requirement)
+  - Generates random 32-char hex password, echoes credentials to console
+  - Skips if admin already exists (idempotent)
+  - Added `seed:admin` script to web package.json (`tsx src/scripts/seed-admin.ts`)
+  - Added `tsx` to web devDependencies
 
 ### P3: Deeper / Optional
 
@@ -619,35 +635,53 @@ GOOGLE_CLIENT_SECRET=
   - Use `authClient.admin.checkRolePermission()` for client-side checks
   - Better Auth permission checks: [https://www.better-auth.com/docs/plugins/admin#access-control-usage](https://www.better-auth.com/docs/plugins/admin#access-control-usage)
 
-- [ ] **P3-3**: Session cookie caching optimization
-  - Enable `cookieCache` with appropriate strategy (`compact` for minimal overhead)
-  - Reduces database lookups for session validation
-  - Better Auth cookie cache: [https://www.better-auth.com/docs/concepts/session-management#cookie-cache](https://www.better-auth.com/docs/concepts/session-management#cookie-cache)
-
-- [ ] **P3-4**: Account linking (Google + credentials)
+- [ ] **P3-3**: Account linking (Google + credentials)
   - Enable `accountLinking` so users who sign in with Google can later set a password
   - Better Auth account linking: [https://www.better-auth.com/docs/concepts/users-accounts#account-linking](https://www.better-auth.com/docs/concepts/users-accounts#account-linking)
 
-- [ ] **P3-5**: Migrate legacy `users` table data
-  - Create migration script to move existing `User` records to Better Auth `user` + `account` tables
-  - Preserve `acclevel` mapping to new role system
-  - Link migrated users to their `Player` records
+- [ ] **P3-4**: Email verification with OTP (F-008)
+  - Set up mail adapter system via env variable: `MAIL_PROVIDER=console|resend`
+  - `console` adapter logs OTP codes to stdout (development)
+  - `resend` adapter sends real emails via Resend API (production)
+  - Enable `requireEmailVerification: true` in Better Auth config
+  - Use Better Auth OTP code verification (not magic link)
+  - Create standalone email verification page at `(auth)/verify-email/page.tsx`
+  - Add proxy/middleware check: redirect unverified users to verification page
+  - Better Auth email verification: [https://www.better-auth.com/docs/plugins/email-otp](https://www.better-auth.com/docs/plugins/email-otp)
+  - Environment variables: `MAIL_PROVIDER`, `RESEND_API_KEY`
+
+- [ ] **P3-5**: Forgotten password flow
+  - Create `(auth)/forgot-password/page.tsx` — email input form
+  - Create `(auth)/reset-password/page.tsx` — new password form with OTP token
+  - Uses same mail adapter as email verification
+  - Better Auth forgot password: [https://www.better-auth.com/docs/authentication/email-password#forget-password](https://www.better-auth.com/docs/authentication/email-password#forget-password)
 
 - [ ] **P3-6**: Add auth to GraphQL API
   - Forward Better Auth session to Apollo Server context
   - Add auth checks to GraphQL resolvers
   - Consider Better Auth session validation in API middleware
 
+- [ ] **P3-7**: Rate limiting tuning
+  - Use Better Auth defaults initially (disabled in dev, enabled in production)
+  - Tune sign-in attempt limits for production deployment
+  - Better Auth rate limiting: [https://www.better-auth.com/docs/concepts/rate-limiting](https://www.better-auth.com/docs/concepts/rate-limiting)
+
 ---
 
 ## Open Questions / Follow-ups
 
-1. **Legacy `users` table**: Should the existing `User` model (used by daemon for RCON auth) be kept as-is alongside Better Auth tables, or migrated? The daemon currently authenticates users separately. **Recommendation**: Keep both systems during transition, add a migration path in P3-5.
+All original open questions have been resolved:
 
-2. **Prisma client sharing**: Better Auth needs its own Prisma client instance. Should it share the existing `@repo/database` client or create a separate one? **Recommendation**: Share the existing client from `@repo/database` to avoid connection pool fragmentation.
+1. **Legacy `users` table**: **RESOLVED** — No backward compatibility needed (early dev). Remove existing `User` model entirely and refactor to Better Auth schema. Daemon will be updated to use the new `user`/`account` tables.
 
-3. **Google OAuth redirect URI**: For local development, Google Cloud Console needs `http://localhost:3000/api/auth/callback/google`. For production, the domain must be configured. **Action**: Document this in `INSTALLATION.md`.
+2. **Prisma client sharing**: **RESOLVED** — Use the shared `@repo/database` exported client. Better Auth's `auth.ts` will `import { prisma } from "@repo/database"`.
 
-4. **Email verification**: Should email verification be required for credential signups? Better Auth supports it but requires an email sending service. **Recommendation**: Defer to P3. Start with `requireEmailVerification: false`.
+3. **Google OAuth redirect URI**: **RESOLVED** — Document `http://localhost:3000/api/auth/callback/google` (dev) and production domain in `INSTALLATION.md`.
 
-5. **Rate limiting**: Better Auth has built-in rate limiting (disabled in development by default, enabled in production). Should custom rules be configured for sign-in attempts? **Recommendation**: Use defaults initially, tune in production.
+4. **Email verification**: **RESOLVED** — Deferred to P3-4 as its own phase. Will implement:
+   - Mail adapter system via env variable (`MAIL_PROVIDER=console|resend`)
+   - Better Auth OTP code verification (not magic link)
+   - Standalone verification page with proxy redirect for unverified users
+   - Forgotten password flow (P3-5) using same mail adapter
+
+5. **Rate limiting**: **RESOLVED** — Use Better Auth defaults. Tune in production (P3-7).

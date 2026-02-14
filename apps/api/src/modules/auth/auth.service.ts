@@ -2,6 +2,8 @@
  * Authentication Service
  *
  * Handles user authentication using the crypto service for password verification.
+ * Note: Primary authentication is now handled by Better Auth in the web app.
+ * This service provides auxiliary auth utilities for the GraphQL API.
  */
 
 import type { ICryptoService } from "@repo/crypto"
@@ -16,24 +18,25 @@ export class AuthService {
   }
 
   /**
-   * Authenticate a user with username and password
+   * Authenticate a user with email and password
+   * Checks the account table for credential-based passwords.
    */
-  async authenticate(username: string, password: string): Promise<User | null> {
-    if (!username || !password) {
-      throw new Error("Username and password are required")
+  async authenticate(email: string, password: string): Promise<User | null> {
+    if (!email || !password) {
+      throw new Error("Email and password are required")
     }
 
-    // Find user by username
-    const user = await this.authRepository.findUserByUsername(username)
-
+    const user = await this.authRepository.findUserByEmail(email)
     if (!user) {
-      // Return null for non-existent users (don't reveal if user exists)
       return null
     }
 
-    // Verify password using crypto service
-    const isValidPassword = await this.crypto.verifyPassword(password, user.password)
+    const account = await this.authRepository.findAccountCredential(user.id)
+    if (!account?.password) {
+      return null
+    }
 
+    const isValidPassword = await this.crypto.verifyPassword(password, account.password)
     if (!isValidPassword) {
       return null
     }
@@ -42,102 +45,17 @@ export class AuthService {
   }
 
   /**
-   * Create a new user account
+   * Check if user has required role
    */
-  async createUser(
-    username: string,
-    password: string,
-    playerId?: number,
-    acclevel: number = 0,
-  ): Promise<User> {
-    if (!username || !password) {
-      throw new Error("Username and password are required")
+  async checkRole(email: string, requiredRole: string): Promise<boolean> {
+    const role = await this.authRepository.getUserRole(email)
+    if (!role) {
+      return false
     }
 
-    if (username.length < 3 || username.length > 16) {
-      throw new Error("Username must be between 3 and 16 characters")
+    if (requiredRole === "admin") {
+      return role === "admin"
     }
-
-    if (password.length < 6) {
-      throw new Error("Password must be at least 6 characters long")
-    }
-
-    // Check if username already exists
-    const existingUser = await this.authRepository.findUserByUsername(username)
-
-    if (existingUser) {
-      throw new Error("Username already exists")
-    }
-
-    // Hash the password
-    const hashedPassword = await this.crypto.hashPassword(password)
-
-    // Create the user
-    const newUser = await this.authRepository.createUser({
-      username,
-      password: hashedPassword,
-      playerId,
-      acclevel,
-    })
-
-    return newUser
-  }
-
-  /**
-   * Update user password
-   */
-  async updatePassword(
-    username: string,
-    oldPassword: string,
-    newPassword: string,
-  ): Promise<boolean> {
-    if (!username || !oldPassword || !newPassword) {
-      throw new Error("Username, old password, and new password are required")
-    }
-
-    if (newPassword.length < 6) {
-      throw new Error("New password must be at least 6 characters long")
-    }
-
-    // Verify current password
-    const user = await this.authenticate(username, oldPassword)
-    if (!user) {
-      throw new Error("Current password is incorrect")
-    }
-
-    // Hash the new password
-    const hashedPassword = await this.crypto.hashPassword(newPassword)
-
-    // Update the user's password
-    await this.authRepository.updateUserPassword(username, hashedPassword)
-
-    return true
-  }
-
-  /**
-   * Reset user password (admin function)
-   */
-  async resetPassword(username: string, newPassword: string): Promise<boolean> {
-    if (!username || !newPassword) {
-      throw new Error("Username and new password are required")
-    }
-
-    if (newPassword.length < 6) {
-      throw new Error("New password must be at least 6 characters long")
-    }
-
-    // Check if user exists
-    const user = await this.authRepository.findUserByUsername(username)
-
-    if (!user) {
-      throw new Error("User not found")
-    }
-
-    // Hash the new password
-    const hashedPassword = await this.crypto.hashPassword(newPassword)
-
-    // Update the user's password
-    await this.authRepository.updateUserPassword(username, hashedPassword)
 
     return true
   }
@@ -168,7 +86,6 @@ export class AuthService {
       errors.push("Password must contain at least one number")
     }
 
-    // Allow special characters but don't require them
     if (!/^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]*$/.test(password)) {
       errors.push("Password contains invalid characters")
     }
@@ -177,18 +94,5 @@ export class AuthService {
       isValid: errors.length === 0,
       errors,
     }
-  }
-
-  /**
-   * Check if user has required access level
-   */
-  async checkAccess(username: string, requiredLevel: number): Promise<boolean> {
-    const userAccessLevel = await this.authRepository.getUserAccessLevel(username)
-
-    if (userAccessLevel === null) {
-      return false
-    }
-
-    return userAccessLevel >= requiredLevel
   }
 }

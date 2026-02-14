@@ -9,7 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui"
-import { User } from "@repo/database/client"
 import { ColumnDef, HeaderContext } from "@tanstack/react-table"
 import { formatDate } from "@/lib/datetime-util"
 import { FilterConfig } from "@/features/common/types/data-table"
@@ -24,12 +23,16 @@ interface ExtendedHeaderContext<TData, TValue> extends HeaderContext<TData, TVal
   isPending?: boolean
 }
 
-export type UserListItem = Pick<User, "username" | "acclevel" | "playerId"> & {
-  player?: {
+export type UserListItem = {
+  username: string
+  acclevel: number
+  playerId: number
+  player: {
     lastName: string
-    email: string | null
-    lastEvent: Date | null
-  } | null
+    email?: string | null
+    lastEvent?: string | Date | null
+    __typename?: string
+  }
   __typename?: string
 }
 

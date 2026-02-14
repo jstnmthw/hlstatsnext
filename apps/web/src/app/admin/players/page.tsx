@@ -48,8 +48,8 @@ export default async function PlayersPage(props: AdminPageProps) {
     variables: countVariables,
   })
 
-  const players = data.findManyPlayer || []
-  const totalCount = countData.countPlayer || 0
+  const players = data?.findManyPlayer || []
+  const totalCount = countData?.countPlayer || 0
 
   return (
     <PageWrapper>
@@ -69,7 +69,7 @@ export default async function PlayersPage(props: AdminPageProps) {
                 size="default"
                 colorScheme="green"
                 asChild
-                className="!pl-2.5"
+                className="pl-2.5!"
               >
                 <Link href="/admin/players/add">
                   <UserIcon data-slot="icon" />

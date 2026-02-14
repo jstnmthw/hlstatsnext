@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client"
+import { graphql } from "@/lib/gql"
 
-export const GET_USERS_QUERY = gql`
+export const GET_USERS_QUERY = graphql(`
   query GetUsers {
     findManyUser {
       username
@@ -13,9 +13,9 @@ export const GET_USERS_QUERY = gql`
       }
     }
   }
-`
+`)
 
-export const GET_USERS_WITH_PAGINATION = gql`
+export const GET_USERS_WITH_PAGINATION = graphql(`
   query GetUsersWithPagination(
     $take: Int
     $skip: Int
@@ -33,10 +33,10 @@ export const GET_USERS_WITH_PAGINATION = gql`
       }
     }
   }
-`
+`)
 
-export const GET_USER_COUNT = gql`
+export const GET_USER_COUNT = graphql(`
   query GetUserCount($where: UserWhereInput) {
     countUser(where: $where)
   }
-`
+`)

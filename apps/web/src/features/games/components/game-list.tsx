@@ -18,7 +18,7 @@ export async function GameList() {
     <div>
       <h1>Games</h1>
       <ul>
-        {data.findManyGame.map((game) => (
+        {data?.findManyGame.map((game) => (
           <li key={game.code}>
             {game.name} {game.hidden === "0" ? "visible" : "hidden"}
           </li>

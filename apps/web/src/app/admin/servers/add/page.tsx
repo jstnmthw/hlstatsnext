@@ -23,8 +23,8 @@ export default async function CreateServerPage() {
     }),
   ])
 
-  const games = gamesResult.data.findManyGame || []
-  const mods = modsResult.data.findManyModSupported || []
+  const games = gamesResult.data?.findManyGame || []
+  const mods = modsResult.data?.findManyModSupported || []
 
   return (
     <PageWrapper>

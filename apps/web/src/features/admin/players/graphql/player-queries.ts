@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client"
+import { graphql } from "@/lib/gql"
 
-export const GET_PLAYERS_QUERY = gql`
+export const GET_PLAYERS_QUERY = graphql(`
   query GetPlayers {
     findManyPlayer {
       playerId
@@ -13,9 +13,9 @@ export const GET_PLAYERS_QUERY = gql`
       lastSkillChange
     }
   }
-`
+`)
 
-export const GET_PLAYERS_WITH_PAGINATION = gql`
+export const GET_PLAYERS_WITH_PAGINATION = graphql(`
   query GetPlayersWithPagination(
     $take: Int
     $skip: Int
@@ -33,10 +33,10 @@ export const GET_PLAYERS_WITH_PAGINATION = gql`
       lastSkillChange
     }
   }
-`
+`)
 
-export const GET_PLAYER_COUNT = gql`
+export const GET_PLAYER_COUNT = graphql(`
   query GetPlayerCount($where: PlayerWhereInput) {
     countPlayer(where: $where)
   }
-`
+`)

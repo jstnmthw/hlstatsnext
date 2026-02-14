@@ -23,19 +23,18 @@ type CacheMetadata = {
 }
 
 type LocationRecord = {
-  locId: bigint
+  locId: number
   country: string
-  region?: string | null
-  city?: string | null
-  postalCode?: string | null
-  latitude?: number | null
-  longitude?: number | null
+  region: string | null
+  city: string | null
+  latitude: number | null
+  longitude: number | null
 }
 
 type BlockRecord = {
-  startIpNum: bigint
-  endIpNum: bigint
-  locId: bigint
+  startIpNum: number
+  endIpNum: number
+  locId: number
 }
 
 // Optional env reader – returns undefined if missing
@@ -43,6 +42,27 @@ function readEnv(name: string): string | undefined {
   const value = process.env[name]
   if (!value || !value.trim()) return undefined
   return value.trim()
+}
+
+function escapeSql(str: string): string {
+  return str.replace(/[\0\x08\x09\x1a\n\r"'\\%]/g, (ch) => {
+    switch (ch) {
+      case "'":
+        return "''"
+      case "\\":
+        return "\\\\"
+      case "\0":
+        return "\\0"
+      case "\n":
+        return "\\n"
+      case "\r":
+        return "\\r"
+      case "\x1a":
+        return "\\Z"
+      default:
+        return ch
+    }
+  })
 }
 
 function ipv4ToNum(ip: string): number {
@@ -353,17 +373,18 @@ async function seedGeoLite(): Promise<void> {
   }
 
   console.log("Preparing GeoLite tables (clearing existing data)...")
-  await db.$transaction([db.geoLiteCityBlock.deleteMany(), db.geoLiteCityLocation.deleteMany()])
+  await db.$executeRawUnsafe("DELETE FROM `geo_lite_city_block`")
+  await db.$executeRawUnsafe("DELETE FROM `geo_lite_city_location`")
 
   // First pass over blocks to gather representative lat/lon per geoname_id
-  const locIdToCoords = new Map<bigint, { lat: number; lon: number }>()
+  const locIdToCoords = new Map<number, { lat: number; lon: number }>()
   console.log("Scanning blocks for representative coordinates...")
-  await parseCsv(blocksCsv, async (row) => {
+  await parseCsv(blocksCsv, (row) => {
     const geonameIdStr = row["geoname_id"]?.trim()
     const latStr = row["latitude"]?.trim()
     const lonStr = row["longitude"]?.trim()
     if (!geonameIdStr) return
-    const locId = BigInt(geonameIdStr)
+    const locId = Number(geonameIdStr)
     if (!locIdToCoords.has(locId)) {
       const lat = latStr ? Number(latStr) : NaN
       const lon = lonStr ? Number(lonStr) : NaN
@@ -373,18 +394,30 @@ async function seedGeoLite(): Promise<void> {
     }
   })
 
-  // Parse locations and insert
+  // Parse locations and insert using raw SQL to avoid Prisma v7 adapter OOM
   console.log("Inserting locations (this may take a while)...")
-  const locationBatch: LocationRecord[] = []
+  let locationBatch: LocationRecord[] = []
   const flushLocations = async () => {
     if (locationBatch.length === 0) return
-    await db.geoLiteCityLocation.createMany({ data: locationBatch, skipDuplicates: true })
-    locationBatch.length = 0
+    const values = locationBatch
+      .map((l) => {
+        const lat = l.latitude !== null ? l.latitude.toFixed(4) : "NULL"
+        const lon = l.longitude !== null ? l.longitude.toFixed(4) : "NULL"
+        const country = escapeSql(l.country)
+        const region = l.region !== null ? `'${escapeSql(l.region)}'` : "NULL"
+        const city = l.city !== null ? `'${escapeSql(l.city)}'` : "NULL"
+        return `(${l.locId},'${country}',${region},${city},NULL,${lat},${lon})`
+      })
+      .join(",")
+    await db.$executeRawUnsafe(
+      `INSERT IGNORE INTO \`geo_lite_city_location\` (\`loc_id\`,\`country\`,\`region\`,\`city\`,\`postal_code\`,\`latitude\`,\`longitude\`) VALUES ${values}`,
+    )
+    locationBatch = []
   }
   await parseCsv(locationsCsv, async (row) => {
     const geonameIdStr = row["geoname_id"]?.trim()
     if (!geonameIdStr) return
-    const locId = BigInt(geonameIdStr)
+    const locId = Number(geonameIdStr)
     const country = (row["country_iso_code"] || "").trim()
     const city = (row["city_name"] || "").trim() || null
     const region = (row["subdivision_1_name"] || row["subdivision_1_iso_code"] || "").trim() || null
@@ -394,7 +427,6 @@ async function seedGeoLite(): Promise<void> {
       country,
       city,
       region,
-      postalCode: null,
       latitude: coords?.lat ?? null,
       longitude: coords?.lon ?? null,
     })
@@ -404,13 +436,24 @@ async function seedGeoLite(): Promise<void> {
   })
   await flushLocations()
 
-  // Parse blocks and insert
+  // Free coordinate lookup memory before processing blocks
+  locIdToCoords.clear()
+
+  // Parse blocks and insert using raw SQL to avoid Prisma v7 adapter OOM
   console.log("Inserting IPv4 blocks (this will take a while)...")
-  const blockBatch: BlockRecord[] = []
+  let blockBatch: BlockRecord[] = []
+  let blockCount = 0
   const flushBlocks = async () => {
     if (blockBatch.length === 0) return
-    await db.geoLiteCityBlock.createMany({ data: blockBatch, skipDuplicates: true })
-    blockBatch.length = 0
+    const values = blockBatch.map((b) => `(${b.startIpNum},${b.endIpNum},${b.locId})`).join(",")
+    await db.$executeRawUnsafe(
+      `INSERT IGNORE INTO \`geo_lite_city_block\` (\`start_ip_num\`,\`end_ip_num\`,\`loc_id\`) VALUES ${values}`,
+    )
+    blockCount += blockBatch.length
+    if (blockCount % 500_000 === 0) {
+      console.log(`  ... ${blockCount.toLocaleString()} blocks inserted`)
+    }
+    blockBatch = []
   }
   await parseCsv(blocksCsv, async (row) => {
     const network = row["network"]?.trim()
@@ -418,12 +461,11 @@ async function seedGeoLite(): Promise<void> {
     if (!network || !geonameIdStr) return
     try {
       const { start, end } = cidrToRange(network)
-      const record: BlockRecord = {
-        startIpNum: BigInt(start >>> 0),
-        endIpNum: BigInt(end >>> 0),
-        locId: BigInt(geonameIdStr),
-      }
-      blockBatch.push(record)
+      blockBatch.push({
+        startIpNum: start >>> 0,
+        endIpNum: end >>> 0,
+        locId: Number(geonameIdStr),
+      })
       if (blockBatch.length >= 10_000) {
         await flushBlocks()
       }
@@ -432,6 +474,7 @@ async function seedGeoLite(): Promise<void> {
     }
   })
   await flushBlocks()
+  console.log(`  Total: ${blockCount.toLocaleString()} blocks inserted`)
 
   console.log("✅ GeoLite2 CSV seeding completed successfully.")
 }

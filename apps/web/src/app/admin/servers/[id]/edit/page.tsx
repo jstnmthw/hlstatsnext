@@ -47,18 +47,16 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
       }),
     ])
 
-    const server = serverResult.data.findUniqueServer
-    const games = gamesResult.data.findManyGame || []
-    const mods = modsResult.data.findManyModSupported || []
+    const server = serverResult.data?.findUniqueServer
+    const games = gamesResult.data?.findManyGame || []
+    const mods = modsResult.data?.findManyModSupported || []
 
     if (!server) {
       notFound()
     }
 
     // Extract the mod config value
-    const modConfig = server.configs?.find(
-      (config: { parameter: string; value: string }) => config.parameter === "Mod",
-    )
+    const modConfig = server.configs?.find((config) => config.parameter === "Mod")
     const currentMod = modConfig?.value || ""
 
     return (
@@ -74,7 +72,7 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
                 </p>
                 <ServerEditForm
                   server={{
-                    serverId: server.serverId,
+                    serverId: Number(server.serverId),
                     name: server.name || "",
                     address: server.address || "",
                     port: server.port || 27015,

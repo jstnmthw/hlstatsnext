@@ -208,7 +208,6 @@ export class RconScheduleService implements IRconScheduleService {
     try {
       // Create the cron task
       const task = cron.schedule(schedule.cronExpression, () => this.executeSchedule(schedule.id), {
-        scheduled: false,
         timezone: "UTC",
       })
 

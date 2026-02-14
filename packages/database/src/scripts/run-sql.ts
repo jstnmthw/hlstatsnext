@@ -1,11 +1,14 @@
-import { PrismaClient } from "../../generated"
+import "dotenv/config"
+import { PrismaClient } from "../../generated/prisma/client"
+import { PrismaMariaDb } from "@prisma/adapter-mariadb"
 import fs from "fs/promises"
 import path from "path"
 import { mysqlSplitterOptions, splitQuery } from "dbgate-query-splitter"
 
 type SqlStatement = string | { text: string }
 
-const prisma = new PrismaClient()
+const adapter = new PrismaMariaDb(process.env.DATABASE_URL!)
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
   const filePath = process.argv[process.argv.length - 1]

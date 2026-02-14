@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client"
+import { graphql } from "@/lib/gql"
 
-export const GET_SERVERS_QUERY = gql`
+export const GET_SERVERS_QUERY = graphql(`
   query GetServers {
     findManyServer {
       serverId
@@ -16,9 +16,9 @@ export const GET_SERVERS_QUERY = gql`
       country
     }
   }
-`
+`)
 
-export const GET_SERVERS_WITH_PAGINATION = gql`
+export const GET_SERVERS_WITH_PAGINATION = graphql(`
   query GetServersWithPagination(
     $take: Int
     $skip: Int
@@ -39,15 +39,15 @@ export const GET_SERVERS_WITH_PAGINATION = gql`
       country
     }
   }
-`
+`)
 
-export const GET_SERVER_COUNT = gql`
+export const GET_SERVER_COUNT = graphql(`
   query GetServerCount($where: ServerWhereInput) {
     countServer(where: $where)
   }
-`
+`)
 
-export const GET_SERVER_BY_ID = gql`
+export const GET_SERVER_BY_ID = graphql(`
   query GetServerByIdWithConfigs($serverId: Int!) {
     findUniqueServer(where: { serverId: $serverId }) {
       serverId
@@ -67,4 +67,4 @@ export const GET_SERVER_BY_ID = gql`
       }
     }
   }
-`
+`)

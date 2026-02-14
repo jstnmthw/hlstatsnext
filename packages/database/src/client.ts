@@ -1,6 +1,12 @@
-import type { PrismaClient as BasePrismaClient } from "../generated"
-import { PrismaClient } from "../generated"
+import "dotenv/config"
+import type { PrismaClient as BasePrismaClient } from "../generated/prisma/client"
+import { PrismaClient } from "../generated/prisma/client"
+import { PrismaMariaDb } from "@prisma/adapter-mariadb"
 import { ConnectionPool, type ConnectionPoolConfig, type DatabaseLogger } from "./connection-pool"
+
+export function createAdapter(): PrismaMariaDb {
+  return new PrismaMariaDb(process.env.DATABASE_URL!)
+}
 
 declare global {
   var cachedPrisma: BasePrismaClient
@@ -9,10 +15,10 @@ declare global {
 
 let prisma: BasePrismaClient
 if (process.env.NODE_ENV === "production") {
-  prisma = new PrismaClient()
+  prisma = new PrismaClient({ adapter: createAdapter() })
 } else {
   if (!global.cachedPrisma) {
-    global.cachedPrisma = new PrismaClient()
+    global.cachedPrisma = new PrismaClient({ adapter: createAdapter() })
   }
   prisma = global.cachedPrisma
 }
@@ -172,7 +178,7 @@ export class DatabaseClient {
   }
 }
 
-export { PrismaClient } from "../generated"
-export { Prisma } from "../generated"
-export type * from "../generated"
+export { PrismaClient } from "../generated/prisma/client"
+export { Prisma } from "../generated/prisma/client"
+export type * from "../generated/prisma/client"
 export { ConnectionPool, type ConnectionPoolConfig, type DatabaseLogger } from "./connection-pool"

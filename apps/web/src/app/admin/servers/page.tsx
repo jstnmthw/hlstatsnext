@@ -48,8 +48,8 @@ export default async function ServersPage(props: AdminPageProps) {
     variables: countVariables,
   })
 
-  const servers = data.findManyServer || []
-  const totalCount = countData.countServer || 0
+  const servers = data?.findManyServer || []
+  const totalCount = countData?.countServer || 0
 
   return (
     <PageWrapper>
@@ -63,7 +63,7 @@ export default async function ServersPage(props: AdminPageProps) {
                 Manage your game servers and track player statistics and activities.
               </p>
             </div>
-            <Button variant="solid" size="default" colorScheme="green" asChild className="!pl-2.5">
+            <Button variant="solid" size="default" colorScheme="green" asChild className="pl-2.5!">
               <Link href="/admin/servers/add">
                 <ServerIcon data-slot="icon" />
                 <span>Add server</span>

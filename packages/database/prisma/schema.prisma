@@ -3,18 +3,17 @@
 
 generator client {
   provider      = "prisma-client-js"
-  output        = "../generated"
+  output        = "../generated/prisma"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 generator pothos {
   provider     = "prisma-pothos-types"
-  clientImport = "../generated"
+  clientImport = "../generated/prisma"
   output       = "../generated/graphql/pothos-types.ts"
 }
 

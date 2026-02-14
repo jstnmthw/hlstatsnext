@@ -4,6 +4,7 @@ import RelayPlugin from "@pothos/plugin-relay"
 import WithInputPlugin from "@pothos/plugin-with-input"
 import { db, Prisma } from "@repo/database/client"
 import type PrismaTypes from "@repo/database/graphql/types"
+import { getDatamodel } from "@repo/database/graphql/types"
 import type { Context } from "./context"
 
 export const builder = new SchemaBuilder<{
@@ -18,6 +19,7 @@ export const builder = new SchemaBuilder<{
   plugins: [PrismaPlugin, RelayPlugin, WithInputPlugin],
   prisma: {
     client: db,
+    dmmf: getDatamodel(),
     exposeDescriptions: true,
     onUnusedQuery: process.env.NODE_ENV === "production" ? null : "warn",
   },

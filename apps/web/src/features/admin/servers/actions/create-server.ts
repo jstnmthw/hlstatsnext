@@ -1,6 +1,5 @@
 "use server"
 
-import type { DocumentNode } from "graphql"
 import { z } from "zod"
 import { redirect } from "next/navigation"
 import { getClient } from "@/lib/apollo-client"
@@ -44,7 +43,7 @@ export async function createServer(
     // Execute GraphQL mutation
     const client = getClient()
     const result = await client.mutate({
-      mutation: CREATE_SERVER_MUTATION as DocumentNode,
+      mutation: CREATE_SERVER_MUTATION,
       variables: {
         data: cleanedInput,
       },

@@ -1,6 +1,5 @@
 "use server"
 
-import type { DocumentNode } from "graphql"
 import { z } from "zod"
 import { redirect } from "next/navigation"
 import { getClient } from "@/lib/apollo-client"
@@ -55,7 +54,7 @@ export async function updateServer(
     // Execute GraphQL mutation
     const client = getClient()
     const result = await client.mutate({
-      mutation: UPDATE_SERVER_WITH_CONFIG_MUTATION as DocumentNode,
+      mutation: UPDATE_SERVER_WITH_CONFIG_MUTATION,
       variables: {
         serverId: validation.data.serverId,
         data: serverInput,

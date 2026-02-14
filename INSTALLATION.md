@@ -23,13 +23,13 @@ Complete installation and setup guide for HLStatsNext — a modern game statisti
 
 ### Required Software
 
-| Software           | Version | Purpose                                       |
-| ------------------ | ------- | --------------------------------------------- |
-| **Node.js**        | 24.0.0+ | JavaScript runtime                            |
-| **pnpm**           | 10.x    | Package manager (10.17.1 pinned via Corepack) |
-| **Docker**         | Latest  | Container runtime                             |
-| **Docker Compose** | v2+     | Container orchestration                       |
-| **Git**            | Latest  | Version control                               |
+| Software           | Version | Purpose                                    |
+| ------------------ | ------- | ------------------------------------------ |
+| **Node.js**        | 24.0.0+ | JavaScript runtime                         |
+| **pnpm**           | 10.x    | Package manager (10.x pinned via Corepack) |
+| **Docker**         | Latest  | Container runtime                          |
+| **Docker Compose** | v2+     | Container orchestration                    |
+| **Git**            | Latest  | Version control                            |
 
 ### Optional Tools
 
@@ -794,4 +794,8 @@ pnpm db:seed
 
 ## License
 
-TBD
+This project is source-available under the Business Source License (BSL). Free for personal and community game servers.
+
+Commercial hosting or offering this software as a service is not permitted without a commercial license.
+
+For licensing inquiries: support@hlstatsnext.com

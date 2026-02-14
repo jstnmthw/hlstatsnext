@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client"
+import { graphql } from "@/lib/gql"
 
-export const GET_SERVER_BY_ID = gql`
+export const GET_SERVER_BY_ID = graphql(`
   query GetServerById($serverId: Int!) {
     findUniqueServer(where: { serverId: $serverId }) {
       serverId
@@ -16,4 +16,4 @@ export const GET_SERVER_BY_ID = gql`
       sortOrder
     }
   }
-`
+`)

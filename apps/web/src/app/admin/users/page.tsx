@@ -48,8 +48,8 @@ export default async function UsersPage(props: AdminPageProps) {
     variables: countVariables,
   })
 
-  const users = data.findManyUser || []
-  const totalCount = countData.countUser || 0
+  const users = data?.findManyUser || []
+  const totalCount = countData?.countUser || 0
 
   return (
     <PageWrapper>
@@ -69,7 +69,7 @@ export default async function UsersPage(props: AdminPageProps) {
                 size="default"
                 colorScheme="green"
                 asChild
-                className="!pl-2.5"
+                className="pl-2.5!"
               >
                 <Link href="/admin/users/add">
                   <UserIcon data-slot="icon" />

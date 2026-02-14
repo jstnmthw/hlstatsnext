@@ -48,8 +48,8 @@ export default async function GamesPage(props: AdminPageProps) {
     variables: countVariables,
   })
 
-  const games = data.findManyGame || []
-  const totalCount = countData.countGame || 0
+  const games = data?.findManyGame || []
+  const totalCount = countData?.countGame || 0
 
   return (
     <PageWrapper>

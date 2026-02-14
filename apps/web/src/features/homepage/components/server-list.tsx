@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { query } from "@/lib/apollo-client"
-import { Server } from "@repo/database/client"
 import { Button, PlayIcon, cn } from "@repo/ui"
 import { GET_SERVERS_QUERY } from "@/features/admin/servers/graphql/server-queries"
 import {
@@ -16,7 +15,7 @@ export async function ServerList({ className }: { className?: string }) {
     <VerticalList className={cn("mb-10", className)}>
       <VerticalListHeader>Game Servers</VerticalListHeader>
       <ul>
-        {data.findManyServer?.map((server: Server) => (
+        {data?.findManyServer?.map((server) => (
           <VerticalListItem key={server.serverId}>
             <div className="flex items-center justify-between">
               <div className="flex items-center justify-between w-full">

@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client"
+import { graphql } from "@/lib/gql"
 
-export const GET_GAMES_QUERY = gql`
+export const GET_GAMES_QUERY = graphql(`
   query GetGames {
     findManyGame {
       code
@@ -9,9 +9,9 @@ export const GET_GAMES_QUERY = gql`
       realgame
     }
   }
-`
+`)
 
-export const GET_GAMES_WITH_PAGINATION = gql`
+export const GET_GAMES_WITH_PAGINATION = graphql(`
   query GetGamesWithPagination(
     $take: Int
     $skip: Int
@@ -25,10 +25,10 @@ export const GET_GAMES_WITH_PAGINATION = gql`
       realgame
     }
   }
-`
+`)
 
-export const GET_GAME_COUNT = gql`
+export const GET_GAME_COUNT = graphql(`
   query GetGameCount($where: GameWhereInput) {
     countGame(where: $where)
   }
-`
+`)

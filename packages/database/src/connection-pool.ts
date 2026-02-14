@@ -4,7 +4,8 @@
  * Manages database connections with pooling, health checks, and metrics.
  */
 
-import { db, type PrismaClient } from "./client"
+import { type PrismaClient, createAdapter } from "./client"
+import { PrismaClient as PrismaClientConstructor } from "../generated/prisma/client"
 
 // Minimal logger interface that applications must implement
 // This allows the database package to be logger-agnostic
@@ -285,8 +286,8 @@ export class ConnectionPool {
     const connectionId = `conn_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 
     try {
-      // Create new Prisma client instance
-      const client = new (db.constructor as typeof PrismaClient)() as PrismaClient
+      // Create new Prisma client instance with adapter
+      const client = new PrismaClientConstructor({ adapter: createAdapter() }) as PrismaClient
       await client.$connect()
 
       const connection: PooledConnection = {

@@ -9,7 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui"
-import { Player } from "@repo/database/client"
 import { ColumnDef, HeaderContext } from "@tanstack/react-table"
 import { formatDate } from "@/lib/datetime-util"
 import { FilterConfig } from "@/features/common/types/data-table"
@@ -24,12 +23,16 @@ interface ExtendedHeaderContext<TData, TValue> extends HeaderContext<TData, TVal
   isPending?: boolean
 }
 
-export type PlayerListItem = Pick<
-  Player,
-  "playerId" | "lastName" | "email" | "skill" | "kills" | "deaths" | "lastEvent" | "lastSkillChange"
-> & {
-  playerId: string // GraphQL returns this as string
-  __typename?: string // GraphQL metadata field
+export type PlayerListItem = {
+  playerId: string
+  lastName: string
+  email?: string | null
+  skill: number
+  kills: number
+  deaths: number
+  lastEvent?: string | Date | null
+  lastSkillChange?: string | Date | null
+  __typename?: string
 }
 
 export const columns: ColumnDef<PlayerListItem>[] = [

@@ -26,7 +26,7 @@ export default async function ServerPage({ params }: ServerPageProps) {
       variables: { serverId },
     })
 
-    if (!data.findUniqueServer) {
+    if (!data?.findUniqueServer) {
       notFound()
     }
 

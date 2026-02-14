@@ -5,6 +5,7 @@
  * following separation of concerns and single responsibility principles.
  */
 
+import type { CreateServerInput } from "@/lib/gql/graphql"
 import type { CreateServerFormData } from "@/features/admin/servers/actions/create-server"
 import type { UpdateServerFormData } from "@/features/admin/servers/actions/update-server"
 
@@ -52,25 +53,21 @@ export function extractFormDataForUpdate(formData: FormData) {
  * @param data - Validated form data
  * @returns GraphQL input object, cleaned of null/undefined values
  */
-export function prepareCreateServerInput(data: CreateServerFormData) {
-  const serverInput = {
-    ...(data.connection_type === "docker"
-      ? { dockerHost: data.docker_host }
-      : { address: data.address }),
+export function prepareCreateServerInput(data: CreateServerFormData): CreateServerInput {
+  const input: CreateServerInput = {
     port: data.port,
     game: data.game,
     connectionType: data.connection_type,
-    // Only include optional fields if they're provided
-    ...(data.mod && { mod: data.mod }),
-    ...(data.rconPassword && { rconPassword: data.rconPassword }),
+    rconPassword: data.rconPassword || "",
   }
 
-  // Clean up any undefined or null values that might cause GraphQL issues
-  return Object.fromEntries(
-    Object.entries(serverInput).filter(
-      ([, value]) => value !== undefined && value !== null && value !== "",
-    ),
-  )
+  if (data.connection_type === "docker") {
+    input.dockerHost = data.docker_host
+  } else {
+    input.address = data.address
+  }
+
+  return input
 }
 
 /**

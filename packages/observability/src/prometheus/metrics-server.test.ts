@@ -124,11 +124,12 @@ describe("MetricsServer", () => {
         expect(response.body).toContain("test_metric")
       })
 
-      it("should return empty metrics when none recorded", async () => {
+      it("should only contain process metrics when none recorded", async () => {
         const response = await makeRequest("/metrics")
 
         expect(response.statusCode).toBe(200)
-        expect(response.body.trim()).toBe("")
+        expect(response.body).toContain("process_resident_memory_bytes")
+        expect(response.body).toContain("process_heap_bytes")
       })
     })
 

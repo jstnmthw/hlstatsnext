@@ -10,7 +10,7 @@ const baseButtonStyles = [
   "relative cursor-pointer isolate inline-flex items-baseline items-center justify-center gap-x-2 rounded-md text-base font-semibold",
 
   // Reduce gap when there's both icon and text
-  "has-[>[data-slot=icon]+*]:gap-x-1.5",
+  "has-[>svg+*]:gap-x-1.5",
 
   // Focus
   "focus:outline-none data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-blue-500",
@@ -19,10 +19,10 @@ const baseButtonStyles = [
   "disabled:opacity-50 disabled:pointer-events-none",
 
   // Icon Base Styling (Sizing/Margins handled in size variants)
-  "[&>[data-slot=icon]]:shrink-0 [&>[data-slot=icon]]:self-center",
+  "[&>svg]:shrink-0 [&>svg]:self-center",
 
   // Icon colors handled per variant/scheme below
-  "forced-colors:[&>[data-slot=icon]]:text-[ButtonText]",
+  "forced-colors:[&>svg]:text-[ButtonText]",
 ]
 
 // Solid button base styles - Explicit border control
@@ -51,44 +51,48 @@ const ghostBaseStyles = [
 ]
 
 // Use types from shared color variants system
-type Variant = StyleVariant
+type Variant = StyleVariant | "primary" | "secondary" | "destructive"
 
 // cva for base styles and sizing (Remove icon color styles)
 const buttonVariants = cva(baseButtonStyles, {
   variants: {
     variant: {
-      // Markers for the getButtonStyles logic
+      // Original variants (use colorScheme system)
       solid: "",
       outline: "",
       ghost: "",
+      // Semantic variants (use CSS theme variables directly)
+      primary:
+        "border border-transparent bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 active:bg-primary/80",
+      secondary:
+        "border border-input bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80 active:bg-secondary/70",
+      destructive:
+        "border border-transparent bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 active:bg-destructive/80",
     },
     size: {
       // Regular sizes with automatic icon-only detection - now using 2px increment font scale
-      xs: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.1)-1px)] text-xs has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.2)-1px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]:only-child]:px-[calc(theme(spacing.1)-1px)] has-[>[data-slot=icon]:only-child]:py-[calc(theme(spacing.1)-1px)] [&>[data-slot=icon]]:size-4",
-      sm: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.1)-1px)] text-sm has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.2)-1px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]:only-child]:px-[calc(theme(spacing.2)-1.5px)] has-[>[data-slot=icon]:only-child]:py-[calc(theme(spacing.2)-1.5px)] [&>[data-slot=icon]]:size-4",
+      xs: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.1)-1px)] text-xs has-[>svg+*]:pl-[calc(theme(spacing.2)-1px)] has-[>svg+*]:pr-[calc(theme(spacing.3)-1px)] has-[>svg:only-child]:px-[calc(theme(spacing.1)-1px)] has-[>svg:only-child]:py-[calc(theme(spacing.1)-1px)] [&>svg]:size-4",
+      sm: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.1)-1px)] text-sm has-[>svg+*]:pl-[calc(theme(spacing.2)-1px)] has-[>svg+*]:pr-[calc(theme(spacing.3)-1px)] has-[>svg:only-child]:px-[calc(theme(spacing.2)-1.5px)] has-[>svg:only-child]:py-[calc(theme(spacing.2)-1.5px)] [&>svg]:size-4",
       default:
-        "px-[calc(theme(spacing.3)-2px)] py-[calc(theme(spacing.1)-1px)] text-base has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.2)-2px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]:only-child]:px-[calc(theme(spacing.2)-1px)] has-[>[data-slot=icon]:only-child]:py-[calc(theme(spacing.2)-1px)] [&>[data-slot=icon]]:size-4",
-      lg: "px-[calc(theme(spacing.4)-1px)] py-[calc(theme(spacing.2)-1px)] text-lg has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.4)-1px)] has-[>[data-slot=icon]:only-child]:px-[calc(theme(spacing.2)-1px)] has-[>[data-slot=icon]:only-child]:py-[calc(theme(spacing.2)-1px)] [&>[data-slot=icon]]:size-5",
-      xl: "px-[calc(theme(spacing.5)-1px)] py-[calc(theme(spacing.3)-1px)] text-xl has-[>[data-slot=icon]+*]:pl-[calc(theme(spacing.4)-1px)] has-[>[data-slot=icon]+*]:pr-[calc(theme(spacing.5)-1px)] has-[>[data-slot=icon]:only-child]:px-[calc(theme(spacing.3)-1px)] has-[>[data-slot=icon]:only-child]:py-[calc(theme(spacing.3)-1px)] [&>[data-slot=icon]]:size-6",
-      "icon-xs":
-        "px-[calc(theme(spacing.1)-1px)] py-[calc(theme(spacing.1)-1px)] [&>[data-slot=icon]]:size-4",
+        "px-[calc(theme(spacing.3)-2px)] py-[calc(theme(spacing.1)-1px)] text-base has-[>svg+*]:pl-[calc(theme(spacing.2)-2px)] has-[>svg+*]:pr-[calc(theme(spacing.3)-1px)] has-[>svg:only-child]:px-[calc(theme(spacing.2)-1px)] has-[>svg:only-child]:py-[calc(theme(spacing.2)-1px)] [&>svg]:size-4",
+      lg: "px-[calc(theme(spacing.4)-1px)] py-[calc(theme(spacing.2)-1px)] text-lg has-[>svg+*]:pl-[calc(theme(spacing.3)-1px)] has-[>svg+*]:pr-[calc(theme(spacing.4)-1px)] has-[>svg:only-child]:px-[calc(theme(spacing.2)-1px)] has-[>svg:only-child]:py-[calc(theme(spacing.2)-1px)] [&>svg]:size-5",
+      xl: "px-[calc(theme(spacing.5)-1px)] py-[calc(theme(spacing.3)-1px)] text-xl has-[>svg+*]:pl-[calc(theme(spacing.4)-1px)] has-[>svg+*]:pr-[calc(theme(spacing.5)-1px)] has-[>svg:only-child]:px-[calc(theme(spacing.3)-1px)] has-[>svg:only-child]:py-[calc(theme(spacing.3)-1px)] [&>svg]:size-6",
+      "icon-xs": "px-[calc(theme(spacing.1)-1px)] py-[calc(theme(spacing.1)-1px)] [&>svg]:size-4",
       "icon-sm":
-        "px-[calc(theme(spacing.2)-1.5px)] py-[calc(theme(spacing.2)-1.5px)] [&>[data-slot=icon]]:size-4",
-      icon: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.2)-1px)] [&>[data-slot=icon]]:size-5",
-      "icon-lg":
-        "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.2)-1px)] [&>[data-slot=icon]]:size-5",
-      "icon-xl":
-        "px-[calc(theme(spacing.3)-1px)] py-[calc(theme(spacing.3)-1px)] [&>[data-slot=icon]]:size-6",
+        "px-[calc(theme(spacing.2)-1.5px)] py-[calc(theme(spacing.2)-1.5px)] [&>svg]:size-4",
+      icon: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.2)-1px)] [&>svg]:size-5",
+      "icon-lg": "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.2)-1px)] [&>svg]:size-5",
+      "icon-xl": "px-[calc(theme(spacing.3)-1px)] py-[calc(theme(spacing.3)-1px)] [&>svg]:size-6",
     },
   },
   defaultVariants: {
-    variant: "solid",
+    variant: "primary",
     size: "default",
   },
 })
 
 // Helper function for button-specific styling
-const getButtonStyles = (variant: Variant, colorScheme: ColorScheme): string[] => {
+const getButtonStyles = (variant: StyleVariant, colorScheme: ColorScheme): string[] => {
   // Get styles from shared system
   const colorStyles = getComponentStyles(colorScheme, variant, {
     componentType: "button",
@@ -129,13 +133,17 @@ interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant = "solid", size, colorScheme = "dark/white", asChild = false, ...props },
+    { className, variant = "primary", size, colorScheme = "dark/white", asChild = false, ...props },
     ref,
   ) => {
     const Comp = asChild ? Slot : "button"
 
-    // Get the specific variant+colorScheme styles
-    const dynamicStyles = getButtonStyles(variant!, colorScheme)
+    // Semantic variants use CSS theme variables directly; original variants use colorScheme system
+    const isSemanticVariant =
+      variant === "primary" || variant === "secondary" || variant === "destructive"
+    const dynamicStyles = isSemanticVariant
+      ? []
+      : getButtonStyles(variant as StyleVariant, colorScheme)
 
     return (
       <Comp

@@ -106,7 +106,7 @@ describe("PrometheusMetricsExporter", () => {
       expect(metrics).toContain('latency_bucket{le="0.001"} 1')
       expect(metrics).toContain('latency_bucket{le="0.005"} 2')
       expect(metrics).toContain('latency_bucket{le="0.1"} 3')
-      expect(metrics).toContain('latency_bucket{le="1"} 4')
+      expect(metrics).toContain('latency_bucket{le="1.0"} 4')
       expect(metrics).toContain('latency_bucket{le="+Inf"} 4')
     })
 
@@ -300,15 +300,17 @@ describe("PrometheusMetricsExporter", () => {
       const metrics = exporter.exportMetrics()
       const stats = exporter.getDatabaseQueryStats()
 
-      expect(metrics.trim()).toBe("")
+      expect(metrics).not.toContain("database_query_duration_seconds")
       expect(stats.totalQueries).toBe(0)
     })
   })
 
   describe("exportMetrics", () => {
-    it("should export empty string when no metrics", () => {
+    it("should only contain process metrics when no user metrics added", () => {
       const metrics = exporter.exportMetrics()
-      expect(metrics.trim()).toBe("")
+      expect(metrics).toContain("process_resident_memory_bytes")
+      expect(metrics).toContain("process_heap_bytes")
+      expect(metrics).not.toContain("my_counter")
     })
 
     it("should include HELP and TYPE comments", () => {

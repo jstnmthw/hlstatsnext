@@ -1,4 +1,5 @@
 /* Component-specific styles only - web app handles base Tailwind compilation */
+@import "tw-animate-css";
 
 :root {
   /* UI package specific CSS variables */

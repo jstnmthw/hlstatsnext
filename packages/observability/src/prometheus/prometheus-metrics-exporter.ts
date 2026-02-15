@@ -77,9 +77,20 @@ export class PrometheusMetricsExporter {
   }
 
   /**
+   * Collect Node.js process metrics (called automatically before export)
+   */
+  private collectProcessMetrics(): void {
+    const mem = process.memoryUsage()
+    this.setGauge("process_resident_memory_bytes", {}, mem.rss)
+    this.setGauge("process_heap_bytes", {}, mem.heapUsed)
+  }
+
+  /**
    * Export metrics in Prometheus text format
    */
   exportMetrics(): string {
+    this.collectProcessMetrics()
+
     const lines: string[] = []
 
     // Export counters
@@ -126,7 +137,10 @@ export class PrometheusMetricsExporter {
         const bucket = buckets[i]
         const count = counts[i]
         if (bucket !== undefined && count !== undefined) {
-          const bucketLabels = { ...labels, le: bucket.toString() }
+          const bucketLabels = {
+            ...labels,
+            le: Number.isInteger(bucket) ? bucket.toFixed(1) : bucket.toString(),
+          }
           const bucketLabelStr = this.formatLabels(bucketLabels)
           lines.push(`${name}_bucket${bucketLabelStr} ${count}`)
         }

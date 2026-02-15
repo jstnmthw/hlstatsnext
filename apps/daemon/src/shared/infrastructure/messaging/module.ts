@@ -20,6 +20,7 @@ import type {
 import { RabbitMQConsumer } from "./queue/rabbitmq/consumer"
 import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
+import type { PrometheusMetricsExporter } from "@repo/observability"
 
 /**
  * Configuration for the queue module
@@ -117,12 +118,21 @@ export class QueueModule {
   async startRabbitMQConsumer(
     moduleRegistry: ModuleRegistry,
     coordinators: EventCoordinator[] = [],
+    metrics?: PrometheusMetricsExporter,
   ): Promise<RabbitMQConsumer> {
     if (!this.client) {
       throw new Error("Queue module not initialized - client not available")
     }
 
-    const consumer = new RabbitMQConsumer(this.client, this.logger, moduleRegistry, coordinators)
+    const consumer = new RabbitMQConsumer(
+      this.client,
+      this.logger,
+      moduleRegistry,
+      coordinators,
+      undefined,
+      undefined,
+      metrics,
+    )
     await consumer.start()
     this.rabbitmqConsumer = consumer
     return consumer

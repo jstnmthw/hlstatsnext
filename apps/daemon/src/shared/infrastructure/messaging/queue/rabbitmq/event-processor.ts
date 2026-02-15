@@ -12,6 +12,7 @@ import type { IEventProcessor } from "@/shared/infrastructure/messaging/queue/co
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import type { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
+import type { PrometheusMetricsExporter } from "@repo/observability"
 import {
   generateMessageId,
   generateCorrelationId,
@@ -34,6 +35,7 @@ export class RabbitMQEventProcessor implements IEventProcessor {
     private readonly logger: ILogger,
     private readonly moduleRegistry: ModuleRegistry,
     private readonly coordinators: EventCoordinator[] = [],
+    private readonly metrics?: PrometheusMetricsExporter,
   ) {}
 
   async processEvent(event: BaseEvent): Promise<void> {
@@ -64,6 +66,18 @@ export class RabbitMQEventProcessor implements IEventProcessor {
       await this.processCoordinators(processedEvent)
 
       const processingTime = Date.now() - startTime
+
+      // Record event metrics for Prometheus
+      this.metrics?.incrementCounter("events_processed_total", {
+        event_type: processedEvent.eventType,
+        status: "success",
+      })
+      this.metrics?.recordHistogram(
+        "event_processing_duration_seconds",
+        { event_type: processedEvent.eventType },
+        processingTime / 1000,
+      )
+
       this.logger.info(
         `Event processed: ${processedEvent.eventType} (Server ID: ${processedEvent.serverId}, Event ID: ${processedEvent.eventId?.slice(-6)})`,
         {
@@ -76,6 +90,18 @@ export class RabbitMQEventProcessor implements IEventProcessor {
       )
     } catch (error) {
       const processingTime = Date.now() - startTime
+
+      // Record failed event metrics for Prometheus
+      this.metrics?.incrementCounter("events_processed_total", {
+        event_type: processedEvent.eventType,
+        status: "failed",
+      })
+      this.metrics?.recordHistogram(
+        "event_processing_duration_seconds",
+        { event_type: processedEvent.eventType },
+        processingTime / 1000,
+      )
+
       this.logger.error(
         `Event processing failed: ${processedEvent.eventType} (Server ID: ${processedEvent.serverId})`,
         {

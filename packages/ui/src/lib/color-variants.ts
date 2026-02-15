@@ -668,7 +668,7 @@ export function getComponentStyles(
   // Add icon styles if requested
   if (options.includeIcon && config.icon) {
     if (options.componentType === "button") {
-      styles.push(`[&>[data-slot=icon]]:${config.icon}`)
+      styles.push(`[&>svg]:${config.icon}`)
     } else if (options.componentType === "badge") {
       styles.push(`[&>svg]:${config.icon}`)
     }

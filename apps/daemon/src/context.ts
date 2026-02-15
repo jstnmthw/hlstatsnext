@@ -257,7 +257,11 @@ export async function initializeQueueInfrastructure(context: AppContext): Promis
         context.logger,
       ),
     ]
-    await context.queueModule.startRabbitMQConsumer(context.moduleRegistry, coordinators)
+    await context.queueModule.startRabbitMQConsumer(
+      context.moduleRegistry,
+      coordinators,
+      context.metrics,
+    )
 
     // Keep a reference for shutdown if needed
     context.rabbitmqConsumer = context.queueModule.getRabbitMQConsumer()

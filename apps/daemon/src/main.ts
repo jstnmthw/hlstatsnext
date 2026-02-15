@@ -70,6 +70,9 @@ export class HLStatsDaemon {
   /** Metrics HTTP server for Prometheus scraping */
   private metricsServer: MetricsServer
 
+  /** Interval handle for periodic metrics gauge collection */
+  private metricsCollectionInterval: ReturnType<typeof setInterval> | null = null
+
   /**
    * Creates a new HLStatsDaemon instance.
    *
@@ -255,10 +258,42 @@ export class HLStatsDaemon {
     // Start metrics server first
     await this.metricsServer.start()
 
+    // Start periodic metrics gauge collection (every 15s to match Prometheus scrape interval)
+    this.startMetricsCollection()
+
     await Promise.all([this.context.ingressService.start()])
 
     // Start RCON scheduler for scheduled commands and monitoring
     await this.rconScheduler.start()
+  }
+
+  /**
+   * Starts periodic collection of gauge metrics (queue depth, active players).
+   */
+  private startMetricsCollection(): void {
+    const collectMetrics = async () => {
+      try {
+        // Queue depth from consumer stats
+        if (this.context.rabbitmqConsumer) {
+          const stats = this.context.rabbitmqConsumer.getConsumerStats()
+          this.context.metrics.setGauge("queue_depth", {}, stats.queueDepth)
+        }
+
+        // Active players from database (sum across all servers)
+        const result = await this.context.database.prisma.server.aggregate({
+          _sum: { activePlayers: true },
+        })
+        this.context.metrics.setGauge("active_players_count", {}, result._sum.activePlayers ?? 0)
+      } catch (error) {
+        this.logger.debug("Metrics collection error", {
+          error: error instanceof Error ? error.message : String(error),
+        })
+      }
+    }
+
+    // Collect immediately, then every 15 seconds
+    collectMetrics()
+    this.metricsCollectionInterval = setInterval(collectMetrics, 15_000)
   }
 
   /**
@@ -289,6 +324,12 @@ export class HLStatsDaemon {
     this.logger.shutdown()
 
     try {
+      // Stop metrics collection interval
+      if (this.metricsCollectionInterval) {
+        clearInterval(this.metricsCollectionInterval)
+        this.metricsCollectionInterval = null
+      }
+
       // Stop RCON services first
       await this.rconScheduler.stop()
 

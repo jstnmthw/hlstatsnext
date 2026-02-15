@@ -14,6 +14,7 @@ import type { ConsumerConfig } from "@/shared/infrastructure/messaging/queue/cor
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
+import type { PrometheusMetricsExporter } from "@repo/observability"
 import {
   EventConsumer,
   defaultConsumerConfig,
@@ -47,12 +48,14 @@ export class RabbitMQConsumer {
     private readonly coordinators: EventCoordinator[] = [],
     private readonly config: RabbitMQConsumerConfig = defaultRabbitMQConsumerConfig,
     private readonly messageValidator: MessageValidator = defaultMessageValidator,
+    metrics?: PrometheusMetricsExporter,
   ) {
     // Create the queue-specific event processor
     this.eventProcessor = new RabbitMQEventProcessor(
       this.logger,
       this.moduleRegistry,
       this.coordinators,
+      metrics,
     )
 
     // Create the underlying consumer

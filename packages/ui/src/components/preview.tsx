@@ -172,8 +172,77 @@ export function CoverExample() {
         <InputGroupExamples />
         <SheetExample />
         <BadgeExamples />
+        <ButtonVariantExamples />
       </ExampleWrapper>
     </TooltipProvider>
+  )
+}
+
+function ButtonVariantExamples() {
+  return (
+    <Example title="Buttons">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button>Primary</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="destructive">Destructive</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm">Primary</Button>
+          <Button variant="secondary" size="sm">
+            Secondary
+          </Button>
+          <Button variant="destructive" size="sm">
+            Destructive
+          </Button>
+          <Button variant="outline" size="sm">
+            Outline
+          </Button>
+          <Button variant="ghost" size="sm">
+            Ghost
+          </Button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button>
+            <IconPlus /> Create
+          </Button>
+          <Button variant="secondary">
+            <IconArrowLeft /> Back
+          </Button>
+          <Button variant="destructive">
+            <IconTrash /> Delete
+          </Button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="icon" aria-label="Add">
+            <IconPlus />
+          </Button>
+          <Button variant="secondary" size="icon" aria-label="Search">
+            <IconSearch />
+          </Button>
+          <Button variant="destructive" size="icon" aria-label="Delete">
+            <IconTrash />
+          </Button>
+          <Button variant="outline" size="icon" aria-label="Copy">
+            <IconCopy />
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="More">
+            <IconDots />
+          </Button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button disabled>Disabled</Button>
+          <Button variant="secondary" disabled>
+            Disabled
+          </Button>
+          <Button variant="destructive" disabled>
+            Disabled
+          </Button>
+        </div>
+      </div>
+    </Example>
   )
 }
 
@@ -296,7 +365,7 @@ function FieldExamples() {
           </Field>
           <Field orientation="horizontal">
             <Button type="submit">Submit</Button>
-            <Button variant="outline" type="button">
+            <Button variant="secondary" type="button">
               Cancel
             </Button>
           </Field>
@@ -1185,7 +1254,7 @@ export function EmptyWithSpinner() {
         <EmptyContent>
           <div className="flex gap-2">
             <Button size="sm">Submit</Button>
-            <Button variant="outline" size="sm">
+            <Button variant="secondary" size="sm">
               Cancel
             </Button>
           </div>
@@ -1236,7 +1305,7 @@ function SheetExample() {
               <SheetFooter>
                 <Button type="submit">Save changes</Button>
                 <SheetClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="secondary">Cancel</Button>
                 </SheetClose>
               </SheetFooter>
             </SheetContent>

@@ -1,4 +1,5 @@
 import { builder } from "../../builder"
+import { requireAdmin } from "../../context"
 import type { Server } from "@repo/database/client"
 
 // Input type for updating servers
@@ -83,8 +84,9 @@ builder.mutationField("updateServerWithConfig", (t) =>
       data: t.arg({ type: UpdateServerInput, required: true }),
     },
     resolve: async (_, { serverId, data }, context) => {
+      requireAdmin(context)
+
       try {
-        // Use injected server service
         const serverService = context.services.server
 
         // Filter out null/undefined values and convert to the format expected by service
@@ -140,11 +142,9 @@ builder.mutationField("createServerWithConfig", (t) =>
       data: t.arg({ type: CreateServerInput, required: true }),
     },
     resolve: async (_, { data }, context) => {
-      console.log("=== CREATE SERVER MUTATION START ===")
-      console.log("Input data:", JSON.stringify(data, null, 2))
-      console.log("Context services available:", Object.keys(context.services))
+      requireAdmin(context)
+
       try {
-        // Use injected server service
         const serverService = context.services.server
 
         // Prepare input for createServerWithConfig
@@ -162,9 +162,7 @@ builder.mutationField("createServerWithConfig", (t) =>
           sortOrder: data.sortOrder || undefined,
         }
 
-        console.log("Creating server with config using input:", input)
         const result = await serverService.createServerWithConfig(input)
-        console.log("Server created successfully with configs:", result.configsCount)
 
         // Remove RCON password from response for security
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -177,11 +175,6 @@ builder.mutationField("createServerWithConfig", (t) =>
           configsCount: result.configsCount,
         }
       } catch (error) {
-        console.error("Error creating server:", error)
-        console.error("Error details:", JSON.stringify(error, null, 2))
-        if (error instanceof Error) {
-          console.error("Error stack:", error.stack)
-        }
         return {
           success: false,
           message: `Failed to create server: ${error instanceof Error ? error.message : "Unknown error"}`,

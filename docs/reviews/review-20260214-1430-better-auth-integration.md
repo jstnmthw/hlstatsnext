@@ -679,14 +679,23 @@ GOOGLE_CLIENT_SECRET=
   - Typecheck passes
   - Better Auth email OTP reset: [https://www.better-auth.com/docs/plugins/email-otp](https://www.better-auth.com/docs/plugins/email-otp)
 
-- [ ] **P3-6**: Add auth to GraphQL API
-  - Forward Better Auth session to Apollo Server context
-  - Add auth checks to GraphQL resolvers
-  - Consider Better Auth session validation in API middleware
+- [x] **P3-6**: Add auth to GraphQL API
+  - Added `@repo/auth` workspace dependency to `apps/api`
+  - Updated `context.ts`: async context factory extracts session from request headers via `auth.api.getSession()`
+  - Added `requireAuth()` and `requireAdmin()` helpers that throw `GraphQLError` with proper codes (UNAUTHENTICATED/FORBIDDEN)
+  - Singleton services pattern avoids re-creating services per request
+  - Added `requireAdmin(context)` guard to `createServerWithConfig` and `updateServerWithConfig` mutations
+  - Removed debug console.log statements from create mutation
+  - Queries remain public (read-only data)
+  - Typecheck passes
 
-- [ ] **P3-7**: Rate limiting tuning
-  - Use Better Auth defaults initially (disabled in dev, enabled in production)
-  - Tune sign-in attempt limits for production deployment
+- [x] **P3-7**: Rate limiting tuning
+  - Added explicit `rateLimit` config to `packages/auth/src/server.ts`
+  - Defaults: 60s window, 100 max requests (disabled in dev, enabled in production automatically)
+  - Custom rules for sensitive endpoints: sign-up (3/60s), OTP send (3/60s), password reset (3/60s)
+  - Built-in Better Auth rule for `/sign-in/email` already limits to 3 req/10s
+  - Storage: in-memory (default) — suitable for single-instance deployment
+  - Typecheck passes
   - Better Auth rate limiting: [https://www.better-auth.com/docs/concepts/rate-limiting](https://www.better-auth.com/docs/concepts/rate-limiting)
 
 ---

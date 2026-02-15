@@ -40,6 +40,15 @@ export const auth = betterAuth({
       maxAge: 5 * 60,
     },
   },
+  rateLimit: {
+    window: 60,
+    max: 100,
+    customRules: {
+      "/sign-up/email": { window: 60, max: 3 },
+      "/email-otp/send-verification-otp": { window: 60, max: 3 },
+      "/forget-password/*": { window: 60, max: 3 },
+    },
+  },
   plugins: [
     admin({
       ac,

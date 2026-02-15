@@ -22,7 +22,7 @@ INSERT INTO `servers_config_default` (`parameter`, `value`, `description`) VALUE
 ('IgnoreBots', '0', 'If enabled, bots are not tracked 1=on(default) 0=off.'),
 ('MinimumPlayersRank', '0', 'Required players position to be allowed playing on the server (e.g Top500-Server).'),
 ('MinPlayers', '4', 'Specifies the minimum number of players required in the server for most player events (objectives, frags, etc.) to be recorded.\r\nThis prevents players from hopping on an empty server and boosting their skill rating by capturing the flag, etc., with no opposition.'),
-('Mod', 'SOURCEMOD', 'Valid values are SOURCEMOD, MINISTATS, BEETLE, MANI, and AMXX if one of such plugins are installed.'),
+('Mod', 'AMXX', 'Valid values are SOURCEMOD, MINISTATS, BEETLE, MANI, and AMXX if one of such plugins are installed.'),
 ('PlayerEvents', '1', 'Determine if players can get player-specific display ingame (f.e. /skill)'),
 ('PlayerEventsAdminCommand', '', 'Some messages (f.e. team-balancer) are only for admins. here you can specify a admin-command. Default is "".'),
 ('PlayerEventsCommand', 'hlx_sm_psay', 'The command to display player events. Default is the "say"-command.'),

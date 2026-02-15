@@ -6,6 +6,15 @@ import { createWriteStream, createReadStream } from "node:fs"
 import { createInterface } from "node:readline"
 import { db } from "../client"
 import unzipper from "unzipper"
+import {
+  log,
+  logStep,
+  logSuccess,
+  logWarning,
+  logError,
+  logHeader,
+  logDivider,
+} from "../seeders/fake/logger"
 
 // Archive extraction helpers prefer system tools to avoid extra dependencies.
 // - For .zip: uses `unzip`
@@ -194,12 +203,12 @@ async function checkRemoteFileModified(
       redirect: "follow",
     })
     if (!response.ok) {
-      console.warn(`Failed to check remote file: ${response.status} ${response.statusText}`)
+      logWarning(`Failed to check remote file: ${response.status} ${response.statusText}`)
       return null
     }
     return response.headers.get("last-modified")
   } catch (error) {
-    console.warn("Failed to check remote file modification time:", error)
+    logWarning(`Failed to check remote file modification time: ${error}`)
     return null
   }
 }
@@ -229,17 +238,17 @@ async function shouldDownloadFile(
   const remoteLastModified = await checkRemoteFileModified(url, headers)
   if (!remoteLastModified) {
     // If we can't check remote, use cached file if it exists
-    console.log("Using cached file (unable to check remote modification time)")
+    log("Using cached file (unable to check remote modification time)")
     return { shouldDownload: false, cachedFilePath: metadata.filePath }
   }
 
   // Compare modification times
   if (metadata.lastModified && metadata.lastModified === remoteLastModified) {
-    console.log("Using cached file (up to date)")
+    log("Using cached file (up to date)")
     return { shouldDownload: false, cachedFilePath: metadata.filePath }
   }
 
-  console.log("Remote file has been updated, downloading new version")
+  log("Remote file has been updated, downloading new version")
   return { shouldDownload: true }
 }
 
@@ -261,7 +270,7 @@ async function downloadWithCache(
     return existingFile
   }
 
-  console.log(`Downloading ${edition} from MaxMind...`)
+  log(`Downloading ${edition} from MaxMind...`)
   await download(url, cachedFilePath, headers)
 
   // Get the last-modified header after successful download
@@ -343,9 +352,7 @@ async function seedGeoLite(): Promise<void> {
   const accountId = readEnv("MAXMIND_ACCOUNT_ID") || readEnv("MAXMIND_ACCOUNT")
   const licenseKey = readEnv("MAXMIND_LICENSE_KEY")
   if (!accountId || !licenseKey) {
-    console.warn(
-      "[GeoIP] MAXMIND_ACCOUNT_ID and MAXMIND_LICENSE_KEY not set (or missing). Skipping GeoLite2 CSV seeding.",
-    )
+    logWarning("MAXMIND_ACCOUNT_ID and MAXMIND_LICENSE_KEY not set. Skipping GeoIP seeding.")
     return
   }
   const EDITION = "GeoLite2-City-CSV"
@@ -358,7 +365,7 @@ async function seedGeoLite(): Promise<void> {
 
   const tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "geolite2-extract-"))
 
-  console.log("Extracting archive...")
+  log("Extracting archive...")
   await extractArchive(archivePath, tmpDir)
 
   // Locate CSV files (English locations + IPv4 blocks)
@@ -372,13 +379,13 @@ async function seedGeoLite(): Promise<void> {
     throw new Error("Could not find required CSV files in the extracted archive")
   }
 
-  console.log("Preparing GeoLite tables (clearing existing data)...")
+  logStep("Preparing GeoLite tables...")
   await db.$executeRawUnsafe("DELETE FROM `geo_lite_city_block`")
   await db.$executeRawUnsafe("DELETE FROM `geo_lite_city_location`")
 
   // First pass over blocks to gather representative lat/lon per geoname_id
   const locIdToCoords = new Map<number, { lat: number; lon: number }>()
-  console.log("Scanning blocks for representative coordinates...")
+  log("Scanning blocks for representative coordinates...")
   await parseCsv(blocksCsv, (row) => {
     const geonameIdStr = row["geoname_id"]?.trim()
     const latStr = row["latitude"]?.trim()
@@ -395,7 +402,7 @@ async function seedGeoLite(): Promise<void> {
   })
 
   // Parse locations and insert using raw SQL to avoid Prisma v7 adapter OOM
-  console.log("Inserting locations (this may take a while)...")
+  logStep("Inserting locations...")
   let locationBatch: LocationRecord[] = []
   const flushLocations = async () => {
     if (locationBatch.length === 0) return
@@ -440,7 +447,7 @@ async function seedGeoLite(): Promise<void> {
   locIdToCoords.clear()
 
   // Parse blocks and insert using raw SQL to avoid Prisma v7 adapter OOM
-  console.log("Inserting IPv4 blocks (this will take a while)...")
+  logStep("Inserting IPv4 blocks...")
   let blockBatch: BlockRecord[] = []
   let blockCount = 0
   const flushBlocks = async () => {
@@ -451,7 +458,7 @@ async function seedGeoLite(): Promise<void> {
     )
     blockCount += blockBatch.length
     if (blockCount % 500_000 === 0) {
-      console.log(`  ... ${blockCount.toLocaleString()} blocks inserted`)
+      log(`${blockCount.toLocaleString()} blocks inserted...`)
     }
     blockBatch = []
   }
@@ -474,28 +481,29 @@ async function seedGeoLite(): Promise<void> {
     }
   })
   await flushBlocks()
-  console.log(`  Total: ${blockCount.toLocaleString()} blocks inserted`)
+  log(`Total: ${blockCount.toLocaleString()} blocks inserted`)
 
-  console.log("✅ GeoLite2 CSV seeding completed successfully.")
+  logDivider()
+  logSuccess("GeoIP seeding completed")
 }
 
 async function forceUpdate(): Promise<void> {
-  console.log("🔄 Force updating GeoIP data...")
+  logHeader("HLStatsNext GeoIP Seeder")
+  logStep("Force updating GeoIP data...")
   try {
-    // Remove existing cache to force download
     const metadata = await loadCacheMetadata()
     if (metadata?.filePath) {
       try {
         await fs.promises.unlink(metadata.filePath)
         await fs.promises.unlink(METADATA_FILE)
-        console.log("Cleared existing cache")
+        log("Cleared existing cache")
       } catch {
         // Ignore errors if files don't exist
       }
     }
     await seedGeoLite()
   } catch (err) {
-    console.error("GeoIP force update failed:", err)
+    logError(`GeoIP force update failed: ${err}`)
     process.exit(1)
   } finally {
     await db.$disconnect()
@@ -503,11 +511,12 @@ async function forceUpdate(): Promise<void> {
 }
 
 async function updateIfNeeded(): Promise<void> {
-  console.log("🔍 Checking for GeoIP data updates...")
+  logHeader("HLStatsNext GeoIP Seeder")
+  logStep("Checking for GeoIP data updates...")
   try {
     await seedGeoLite()
   } catch (err) {
-    console.error("GeoIP update check failed:", err)
+    logError(`GeoIP update check failed: ${err}`)
     process.exit(1)
   } finally {
     await db.$disconnect()

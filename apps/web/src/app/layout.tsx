@@ -1,18 +1,10 @@
-import { ApolloWrapper } from "@/lib/apollo-wrapper"
-import type { Metadata } from "next"
-import localFont from "next/font/local"
 import "./globals.css"
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  display: "swap",
-})
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  display: "swap",
-})
+import type { Metadata } from "next"
+import { ApolloWrapper } from "@/lib/apollo-wrapper"
+import { JetBrains_Mono } from "next/font/google"
+
+const fontSans = JetBrains_Mono({ subsets: ["latin"], variable: "--font-sans" })
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,8 +17,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className={fontSans.variable}>
+      <body>
         <ApolloWrapper>{children}</ApolloWrapper>
       </body>
     </html>

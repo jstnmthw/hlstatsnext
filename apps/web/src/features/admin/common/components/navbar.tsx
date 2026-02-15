@@ -4,13 +4,12 @@ import Link from "next/link"
 import {
   cn,
   Button,
-  ScrollTextIcon,
-  ServerIcon,
-  SettingsIcon,
-  User2Icon,
-  UserIcon,
-  GaugeIcon,
-  GamepadIcon,
+  IconFileText,
+  IconServer,
+  IconSettings,
+  IconUser,
+  IconGauge,
+  IconDeviceGamepad2,
 } from "@repo/ui"
 import { usePermission } from "@/features/auth/hooks/use-permission"
 
@@ -26,41 +25,41 @@ const navItems: NavItem[] = [
   {
     label: "Dashboard",
     href: "/admin",
-    icon: <GaugeIcon className="size-5" data-slot="icon" />,
+    icon: <IconGauge className="size-5" data-slot="icon" />,
   },
   {
     label: "Servers",
     href: "/admin/servers",
-    icon: <ServerIcon className="size-5" data-slot="icon" />,
+    icon: <IconServer className="size-5" data-slot="icon" />,
     permission: { server: ["read"] },
   },
   {
     label: "Players",
     href: "/admin/players",
-    icon: <User2Icon className="size-5" data-slot="icon" />,
+    icon: <IconUser className="size-5" data-slot="icon" />,
     permission: { player: ["read"] },
   },
   {
     label: "Users",
     href: "/admin/users",
-    icon: <UserIcon className="size-5" data-slot="icon" />,
+    icon: <IconUser className="size-5" data-slot="icon" />,
     permission: { user: ["list"] },
   },
   {
     label: "Games",
     href: "/admin/games",
-    icon: <GamepadIcon className="size-5" data-slot="icon" />,
+    icon: <IconDeviceGamepad2 className="size-5" data-slot="icon" />,
     permission: { game: ["read"] },
   },
   {
     label: "Logs",
     href: "/admin/logs",
-    icon: <ScrollTextIcon className="size-5" data-slot="icon" />,
+    icon: <IconFileText className="size-5" data-slot="icon" />,
   },
   {
     label: "Settings",
     href: "/admin/settings",
-    icon: <SettingsIcon className="size-5" data-slot="icon" />,
+    icon: <IconSettings className="size-5" data-slot="icon" />,
   },
 ]
 

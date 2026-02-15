@@ -23,8 +23,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuCheckboxItem,
-  Settings2Icon,
-  SearchIcon,
+  IconAdjustments,
+  IconSearch,
 } from "@repo/ui"
 
 import { useDataTableUrl, DataTableConfig } from "@/features/common/hooks/use-data-table-url"
@@ -221,7 +221,7 @@ export function DataTable<T>({
               onClick={handleSearchSubmit}
               disabled={loading}
             >
-              <SearchIcon className="size-4" data-slot="icon" />
+              <IconSearch className="size-4" data-slot="icon" />
             </Button>
           </div>
         )}
@@ -230,7 +230,7 @@ export function DataTable<T>({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" colorScheme="light" className="ml-auto">
-                <Settings2Icon className="size-4" data-slot="icon" /> View
+                <IconAdjustments className="size-4" data-slot="icon" /> View
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

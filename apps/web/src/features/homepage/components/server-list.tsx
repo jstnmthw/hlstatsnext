@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { query } from "@/lib/apollo-client"
-import { Button, PlayIcon, cn } from "@repo/ui"
+import { Button, IconPlayerPlay, cn } from "@repo/ui"
 import { GET_SERVERS_QUERY } from "@/features/admin/servers/graphql/server-queries"
 import {
   VerticalList,
@@ -49,7 +49,7 @@ export async function ServerList({ className }: { className?: string }) {
                 <div className="flex items-center px-3">
                   <Button variant="outline" className="text-xs cursor-pointer" size="icon-sm">
                     <a href={`steam://connect/${server.address}:${server.port}`}>
-                      <PlayIcon className="size-3" fill="currentColor" />
+                      <IconPlayerPlay className="size-3" fill="currentColor" />
                     </a>
                   </Button>
                 </div>

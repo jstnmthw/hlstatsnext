@@ -13,7 +13,7 @@ import { ColumnDef, HeaderContext } from "@tanstack/react-table"
 import { formatDate } from "@/lib/datetime-util"
 import { FilterConfig } from "@/features/common/types/data-table"
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
-import { MoreHorizontal, RotateCw } from "lucide-react"
+import { IconDots, IconRefresh } from "@repo/ui"
 
 interface ExtendedHeaderContext<TData, TValue> extends HeaderContext<TData, TValue> {
   sortField?: string
@@ -130,7 +130,7 @@ export const columns: ColumnDef<PlayerListItem>[] = [
       return (
         <div className="flex items-center justify-end pr-3 pl-1">
           <Button variant="ghost" className="size-8 p-0">
-            <RotateCw className="size-4" />
+            <IconRefresh className="size-4" />
           </Button>
         </div>
       )
@@ -144,7 +144,7 @@ export const columns: ColumnDef<PlayerListItem>[] = [
             <div className="flex items-center justify-end pr-3 pl-1">
               <Button variant="ghost" className="size-8 p-0">
                 <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="size-4" />
+                <IconDots className="size-4" />
               </Button>
             </div>
           </DropdownMenuTrigger>
@@ -316,7 +316,7 @@ export const playerColumns = (): ColumnDef<PlayerListItem>[] => [
           onClick={props.onRefresh}
           disabled={props.isPending}
         >
-          <RotateCw
+          <IconRefresh
             className={cn(
               "size-4",
               props.isPending ? "animate-spin" : "",
@@ -335,7 +335,7 @@ export const playerColumns = (): ColumnDef<PlayerListItem>[] => [
             <div className="flex items-center justify-end pr-3 pl-1">
               <Button variant="ghost" className="size-8 p-0">
                 <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="size-4" />
+                <IconDots className="size-4" />
               </Button>
             </div>
           </DropdownMenuTrigger>

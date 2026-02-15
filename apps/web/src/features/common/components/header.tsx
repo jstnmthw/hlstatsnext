@@ -1,4 +1,4 @@
-import { SettingsIcon } from "lucide-react"
+import { IconSettings } from "@repo/ui"
 import { AppLogo } from "@/features/common/components/app-logo"
 import Link from "next/link"
 import { cn } from "@repo/ui"
@@ -42,7 +42,7 @@ export function Header({ className, isFixed = false }: { className?: string; isF
             </Link>
           ))}
           <Link href="/admin" className="text-zinc-400 hover:text-white transition-colors">
-            <SettingsIcon className="size-4" />
+            <IconSettings className="size-4" />
           </Link>
         </nav>
       </div>

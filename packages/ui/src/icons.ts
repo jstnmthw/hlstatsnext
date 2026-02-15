@@ -1,2 +1,2 @@
-// Re-export all lucide-react icons for use across the monorepo
-export * from "lucide-react"
+// Re-export all tabler icons for use across the monorepo
+export * from "@tabler/icons-react"

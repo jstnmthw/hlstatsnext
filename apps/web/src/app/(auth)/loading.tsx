@@ -1,9 +1,9 @@
-import { LoaderCircleIcon } from "@repo/ui"
+import { IconLoader2 } from "@repo/ui"
 
 export default function AuthLoading() {
   return (
     <div className="flex items-center justify-center">
-      <LoaderCircleIcon className="size-8 animate-spin text-zinc-400" />
+      <IconLoader2 className="size-8 animate-spin text-zinc-400" />
     </div>
   )
 }

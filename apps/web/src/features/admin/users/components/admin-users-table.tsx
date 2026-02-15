@@ -34,7 +34,7 @@ export function AdminUsersTable({
   ...otherProps
 }: AdminUsersTableProps) {
   const config = {
-    defaultSortField: "username",
+    defaultSortField: "name",
     defaultSortOrder: "asc" as const,
     defaultPageSize: 10,
   }

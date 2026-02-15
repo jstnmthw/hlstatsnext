@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Metadata } from "next"
-import { Button, ServerIcon } from "@repo/ui"
+import { Button, IconServer } from "@repo/ui"
 import { query } from "@/lib/apollo-client"
 import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
@@ -73,7 +73,7 @@ export default async function ServersPage(props: AdminPageProps) {
                 className="pl-2.5!"
               >
                 <Link href="/admin/servers/add">
-                  <ServerIcon data-slot="icon" />
+                  <IconServer data-slot="icon" />
                   <span>Add server</span>
                 </Link>
               </Button>

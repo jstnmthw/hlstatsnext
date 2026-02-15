@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { Button } from "@repo/ui"
-import { LogOutIcon } from "lucide-react"
+import { IconLogout } from "@repo/ui"
 import { signOut, useSession } from "@repo/auth/client"
 
 export function UserMenu() {
@@ -21,7 +21,7 @@ export function UserMenu() {
     <div className="flex items-center gap-3">
       <span className="text-sm text-zinc-400">{session.user.name || session.user.email}</span>
       <Button variant="outline" colorScheme="zinc" size="icon-sm" onClick={handleSignOut}>
-        <LogOutIcon className="size-4" aria-label="Sign out" />
+        <IconLogout className="size-4" aria-label="Sign out" />
       </Button>
     </div>
   )

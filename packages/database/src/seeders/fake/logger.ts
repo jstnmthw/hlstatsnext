@@ -14,6 +14,7 @@ const colors = {
   error: "\u001b[31m", // Red
   success: "\u001b[32m", // Green
   step: "\u001b[1m", // Bold
+  dim: "\u001b[2m", // Dim
   reset: "\u001b[0m",
 }
 
@@ -45,4 +46,15 @@ export function logSuccess(message: string) {
 
 export function logStep(message: string) {
   console.log(`\n${colors.step}${icons.step} ${message}${colors.reset}`)
+}
+
+export function logHeader(title: string) {
+  const line = "─".repeat(42)
+  console.log(`  ${colors.dim}${line}${colors.reset}`)
+  console.log(`  ${colors.step}${title}${colors.reset}`)
+  console.log(`  ${colors.dim}${line}${colors.reset}`)
+}
+
+export function logDivider() {
+  console.log(`\n  ${colors.dim}${"─".repeat(42)}${colors.reset}`)
 }

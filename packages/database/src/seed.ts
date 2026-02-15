@@ -1,67 +1,48 @@
+import fs from "fs/promises"
+import path from "path"
+import { splitQuery, mysqlSplitterOptions } from "dbgate-query-splitter"
 import { db } from "./client"
-import {
-  seedClans,
-  seedPlayers,
-  seedPlayerUniqueIds,
-  getSeedConfig,
-  seedServers,
-  logDatabaseStats,
-} from "./seeders"
-import { log, logError, logStep, logSuccess, logInfo } from "./seeders/fake/logger"
+import { seedAdmin } from "./seeders"
+import { log, logStep, logSuccess, logError, logHeader, logDivider } from "./seeders/fake/logger"
+
+type SqlStatement = string | { text: string }
 
 async function main() {
-  logStep("🌱 Starting database seeding...")
+  logHeader("HLStatsNext Default Seeder")
 
-  // Show current configuration
-  const config = getSeedConfig()
-  const env = process.env.NODE_ENV || "development"
-  logInfo(`Using ${env} configuration:`)
-  log(`  Clans: ${config.clans.count}`)
-  log(`  Players: ${config.players.count}`)
-  log(
-    `  Multi-game players: ${Math.round(config.playerUniqueIds.multiGamePlayersPercentage * 100)}%`,
-  )
-  log(`  Servers: ${config.servers.count}`)
+  const startTime = Date.now()
 
   try {
-    const startTime = Date.now()
+    logStep("Seeding default data...")
+    const sqlPath = path.resolve("src/sql/default-seeder.sql")
+    const sql = await fs.readFile(sqlPath, "utf-8")
+    const statements = splitQuery(sql, mysqlSplitterOptions) as SqlStatement[]
 
-    // Seed in dependency order
-    logStep("Step 1: Seeding core data (Games, Countries)...")
-    // await seedGames();
-    // await seedCountries();
+    let executed = 0
+    await db.$transaction(async (tx) => {
+      for (const statement of statements) {
+        const text = typeof statement === "string" ? statement : statement.text
+        if (text.trim().length === 0) continue
+        await tx.$executeRawUnsafe(text)
+        executed++
+      }
+    })
+    log(`✔ ${executed} SQL statements executed`)
 
-    logStep("Step 2: Seeding game-specific data (Servers, Teams, etc.)...")
-    await seedServers()
-    // await seedTeams();
-    // await seedWeapons();
-    // await seedActions()
-    // await seedRanks();
-    // await seedAwards();
-
-    logStep("Step 3: Seeding community data (Clans, Players)...")
-    await seedClans()
-    await seedPlayers()
-    await seedPlayerUniqueIds()
+    logStep("Seeding admin account...")
+    await seedAdmin()
 
     const duration = Math.round((Date.now() - startTime) / 1000)
-    logSuccess(`Database seeding completed successfully in ${duration}s!`)
 
-    // Show final stats
-    await logDatabaseStats("Final database statistics:")
+    logDivider()
+    logSuccess(`Completed in ${duration}s`)
   } catch (error) {
-    logError("Seeding failed:")
+    logError("Default seeding failed:")
     console.error(error)
-    throw error
+    process.exit(1)
   }
 }
 
-main()
-  .catch((e) => {
-    logError("Seeding failed with unhandled error.")
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
-    await db.$disconnect()
-  })
+main().finally(async () => {
+  await db.$disconnect()
+})

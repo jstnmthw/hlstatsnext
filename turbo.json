@@ -70,9 +70,6 @@
     "clean": {
       "cache": false
     },
-    "db:fresh": {
-      "cache": false
-    },
     "db:generate": {
       "dependsOn": ["^db:generate"],
       "inputs": ["prisma/schema.prisma"],
@@ -98,6 +95,12 @@
       "cache": false
     },
     "db:reset": {
+      "cache": false
+    },
+    "db:reset:dev": {
+      "cache": false
+    },
+    "db:seed:dev": {
       "cache": false
     },
     "db:test:prepare": {

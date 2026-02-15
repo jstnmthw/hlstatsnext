@@ -21,18 +21,18 @@ import {
 } from "@repo/ui"
 
 import {
-  BellIcon,
-  PaperclipIcon,
-  CheckIcon,
-  XIcon,
-  StarIcon,
-  AlertTriangleIcon,
-  InfoIcon,
-  CrownIcon,
-  FlameIcon,
-  HeartIcon,
-  ZapIcon,
-} from "lucide-react"
+  IconBell,
+  IconPaperclip,
+  IconCheck,
+  IconX,
+  IconStar,
+  IconAlertTriangle,
+  IconInfoCircle,
+  IconCrown,
+  IconFlame,
+  IconHeart,
+  IconBolt,
+} from "@repo/ui"
 
 export function KitchenSinkContent({ className }: { className?: string }) {
   return (
@@ -179,41 +179,41 @@ export function KitchenSinkContent({ className }: { className?: string }) {
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-4">
               <Button variant="solid" colorScheme="blue" size="xs">
-                <BellIcon data-slot="icon" />
+                <IconBell data-slot="icon" />
                 <span>Extra Small Button</span>
               </Button>
               <Button variant="solid" colorScheme="blue" size="sm">
-                <BellIcon data-slot="icon" />
+                <IconBell data-slot="icon" />
                 <span>Small Button</span>
               </Button>
               <Button variant="solid" colorScheme="blue" size="default">
-                <BellIcon data-slot="icon" />
+                <IconBell data-slot="icon" />
                 <span>Default Button</span>
               </Button>
               <Button variant="solid" colorScheme="blue" size="lg">
-                <BellIcon data-slot="icon" />
+                <IconBell data-slot="icon" />
                 <span>Large Button</span>
               </Button>
               <Button variant="solid" colorScheme="blue" size="xl">
-                <BellIcon data-slot="icon" />
+                <IconBell data-slot="icon" />
                 <span>Extra Large Button</span>
               </Button>
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-4">
               <Button variant="solid" colorScheme="blue" size="xs">
-                <BellIcon data-slot="icon" />
+                <IconBell data-slot="icon" />
               </Button>
               <Button variant="solid" colorScheme="blue" size="sm">
-                <BellIcon data-slot="icon" />
+                <IconBell data-slot="icon" />
               </Button>
               <Button variant="solid" colorScheme="blue" size="default">
-                <BellIcon data-slot="icon" />
+                <IconBell data-slot="icon" />
               </Button>
               <Button variant="solid" colorScheme="blue" size="lg">
-                <BellIcon data-slot="icon" />
+                <IconBell data-slot="icon" />
               </Button>
               <Button variant="solid" colorScheme="blue" size="xl">
-                <BellIcon data-slot="icon" />
+                <IconBell data-slot="icon" />
               </Button>
             </div>
 
@@ -361,41 +361,41 @@ export function KitchenSinkContent({ className }: { className?: string }) {
               </div>
               <div className="mt-4 flex flex-wrap items-center gap-4">
                 <Button variant="outline" colorScheme="indigo" size="xs">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                   <span>Extra Small Button</span>
                 </Button>
                 <Button variant="outline" colorScheme="indigo" size="sm">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                   <span>Small Button</span>
                 </Button>
                 <Button variant="outline" colorScheme="indigo">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                   <span>Default Button</span>
                 </Button>
                 <Button variant="outline" colorScheme="indigo" size="lg">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                   <span>Large Button</span>
                 </Button>
                 <Button variant="outline" colorScheme="indigo" size="xl">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                   <span>Extra Large Button</span>
                 </Button>
               </div>
               <div className="mt-4 flex flex-wrap items-center gap-4">
                 <Button variant="outline" colorScheme="blue" size="icon-xs">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                 </Button>
                 <Button variant="outline" colorScheme="indigo" size="icon-sm">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                 </Button>
                 <Button variant="outline" colorScheme="purple" size="icon">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                 </Button>
                 <Button variant="outline" colorScheme="fuchsia" size="icon-lg">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                 </Button>
                 <Button variant="outline" colorScheme="pink" size="icon-xl">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                 </Button>
               </div>
             </div>
@@ -472,41 +472,41 @@ export function KitchenSinkContent({ className }: { className?: string }) {
               </div>
               <div className="mt-4 flex flex-wrap items-center gap-4">
                 <Button variant="ghost" colorScheme="purple" size="xs">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                   <span>Extra Small Button</span>
                 </Button>
                 <Button variant="ghost" colorScheme="purple" size="sm">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                   <span>Small Button</span>
                 </Button>
                 <Button variant="ghost" colorScheme="purple">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                   <span>Default Button</span>
                 </Button>
                 <Button variant="ghost" colorScheme="purple" size="lg">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                   <span>Large Button</span>
                 </Button>
                 <Button variant="ghost" colorScheme="purple" size="xl">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                   <span>Extra Large Button</span>
                 </Button>
               </div>
               <div className="mt-4 flex flex-wrap items-center gap-4">
                 <Button variant="ghost" colorScheme="blue" size="icon-xs">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                 </Button>
                 <Button variant="ghost" colorScheme="indigo" size="icon-sm">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                 </Button>
                 <Button variant="ghost" colorScheme="purple" size="icon">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                 </Button>
                 <Button variant="ghost" colorScheme="fuchsia" size="icon-lg">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                 </Button>
                 <Button variant="ghost" colorScheme="pink" size="icon-xl">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                 </Button>
               </div>
             </div>
@@ -518,19 +518,19 @@ export function KitchenSinkContent({ className }: { className?: string }) {
               </h3>
               <div className="flex flex-wrap items-center gap-4">
                 <Button variant="solid" colorScheme="blue">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                   Button with Icon
                 </Button>
                 <Button variant="outline" colorScheme="blue">
-                  <PaperclipIcon data-slot="icon" />
+                  <IconPaperclip data-slot="icon" />
                   Button with Icon
                 </Button>
                 <Button variant="ghost" colorScheme="blue">
-                  <StarIcon data-slot="icon" />
+                  <IconStar data-slot="icon" />
                   Button with Icon
                 </Button>
                 <Button variant="ghost" colorScheme="purple">
-                  <BellIcon data-slot="icon" />
+                  <IconBell data-slot="icon" />
                 </Button>
               </div>
             </div>
@@ -714,22 +714,22 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                 </h4>
                 <div className="flex flex-wrap items-center gap-3">
                   <Badge variant="solid" colorScheme="blue">
-                    <BellIcon />
+                    <IconBell />
                   </Badge>
                   <Badge variant="solid" colorScheme="green">
-                    <CheckIcon />
+                    <IconCheck />
                   </Badge>
                   <Badge variant="solid" colorScheme="red">
-                    <XIcon />
+                    <IconX />
                   </Badge>
                   <Badge variant="solid" colorScheme="amber">
-                    <AlertTriangleIcon />
+                    <IconAlertTriangle />
                   </Badge>
                   <Badge variant="solid" colorScheme="purple">
-                    <StarIcon />
+                    <IconStar />
                   </Badge>
                   <Badge variant="solid" colorScheme="indigo">
-                    <InfoIcon />
+                    <IconInfoCircle />
                   </Badge>
                 </div>
               </div>
@@ -741,27 +741,27 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                 </h4>
                 <div className="flex flex-wrap items-center gap-3">
                   <Badge variant="solid" colorScheme="green">
-                    <CheckIcon />
+                    <IconCheck />
                     Verified
                   </Badge>
                   <Badge variant="solid" colorScheme="blue">
-                    <BellIcon />
+                    <IconBell />
                     Notifications
                   </Badge>
                   <Badge variant="solid" colorScheme="purple">
-                    <CrownIcon />
+                    <IconCrown />
                     Premium
                   </Badge>
                   <Badge variant="solid" colorScheme="orange">
-                    <FlameIcon />
+                    <IconFlame />
                     Hot
                   </Badge>
                   <Badge variant="solid" colorScheme="pink">
-                    <HeartIcon />
+                    <IconHeart />
                     Favorite
                   </Badge>
                   <Badge variant="solid" colorScheme="yellow">
-                    <ZapIcon />
+                    <IconBolt />
                     Fast
                   </Badge>
                 </div>
@@ -774,19 +774,19 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                 </h4>
                 <div className="flex flex-wrap items-center gap-3">
                   <Badge variant="outline" colorScheme="green">
-                    <CheckIcon />
+                    <IconCheck />
                     Success
                   </Badge>
                   <Badge variant="outline" colorScheme="red">
-                    <XIcon />
+                    <IconX />
                     Error
                   </Badge>
                   <Badge variant="outline" colorScheme="amber">
-                    <AlertTriangleIcon />
+                    <IconAlertTriangle />
                     Warning
                   </Badge>
                   <Badge variant="outline" colorScheme="blue">
-                    <InfoIcon />
+                    <IconInfoCircle />
                     Info
                   </Badge>
                 </div>
@@ -887,19 +887,19 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                 </h4>
                 <div className="flex flex-wrap items-center gap-3">
                   <Badge variant="outline" colorScheme="green">
-                    <CheckIcon />
+                    <IconCheck />
                     Operational
                   </Badge>
                   <Badge variant="outline" colorScheme="amber">
-                    <AlertTriangleIcon />
+                    <IconAlertTriangle />
                     Degraded
                   </Badge>
                   <Badge variant="outline" colorScheme="red">
-                    <XIcon />
+                    <IconX />
                     Down
                   </Badge>
                   <Badge variant="outline" colorScheme="blue">
-                    <InfoIcon />
+                    <IconInfoCircle />
                     Maintenance
                   </Badge>
                 </div>
@@ -940,7 +940,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                   </Badge>
                   <Badge asChild variant="outline" colorScheme="purple">
                     <a href="#" className="cursor-pointer">
-                      <StarIcon />
+                      <IconStar />
                       Featured
                     </a>
                   </Badge>

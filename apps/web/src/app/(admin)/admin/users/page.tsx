@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Metadata } from "next"
-import { Button, UserIcon } from "@repo/ui"
+import { Button, IconUser } from "@repo/ui"
 import { query } from "@/lib/apollo-client"
 import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
@@ -28,14 +28,14 @@ export default async function UsersPage(props: AdminPageProps) {
 
   // Parse URL parameters using shared utility
   const params = parseUrlParams(searchParams, {
-    sortField: "username",
+    sortField: "name",
     sortOrder: "asc",
     pageSize: 10,
   })
 
   // Build GraphQL variables using shared utility
-  const queryVariables = buildPaginationVariables(params, ["username", "player.lastName"])
-  const countVariables = buildCountVariables(params, ["username", "player.lastName"])
+  const queryVariables = buildPaginationVariables(params, ["name", "email"])
+  const countVariables = buildCountVariables(params, ["name", "email"])
 
   // Fetch data on server
   const { data } = await query({
@@ -72,7 +72,7 @@ export default async function UsersPage(props: AdminPageProps) {
                 className="pl-2.5!"
               >
                 <Link href="/admin/users/add">
-                  <UserIcon data-slot="icon" />
+                  <IconUser data-slot="icon" />
                   <span>Add user</span>
                 </Link>
               </Button>

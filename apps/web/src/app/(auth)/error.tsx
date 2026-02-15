@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { Button, Card, AlertTriangleIcon } from "@repo/ui"
+import { Button, Card, IconAlertTriangle } from "@repo/ui"
 
 export default function AuthError({
   error,
@@ -16,7 +16,7 @@ export default function AuthError({
 
   return (
     <Card className="p-6 text-center">
-      <AlertTriangleIcon className="mx-auto mb-4 size-10 text-destructive" />
+      <IconAlertTriangle className="mx-auto mb-4 size-10 text-destructive" />
       <h2 className="mb-2 text-lg font-semibold">Something went wrong</h2>
       <p className="mb-4 text-sm text-muted-foreground">
         {error.message || "An unexpected error occurred."}

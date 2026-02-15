@@ -1,5 +1,5 @@
 import { Column } from "@tanstack/react-table"
-import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react"
+import { IconArrowDown, IconArrowUp, IconSelector } from "@repo/ui"
 import { cn, Button } from "@repo/ui"
 
 interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
@@ -44,11 +44,11 @@ export function DataTableColumnHeader<TData, TValue>({
           {title}
         </span>
         {isCurrentSort && sortOrder === "desc" ? (
-          <ArrowDown className="size-4 text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200" />
+          <IconArrowDown className="size-4 text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200" />
         ) : isCurrentSort && sortOrder === "asc" ? (
-          <ArrowUp className="size-4 text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200" />
+          <IconArrowUp className="size-4 text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200" />
         ) : (
-          <ChevronsUpDown className="size-4 text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200" />
+          <IconSelector className="size-4 text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200" />
         )}
       </Button>
     )
@@ -73,11 +73,11 @@ export function DataTableColumnHeader<TData, TValue>({
     <Button variant="ghost" size="sm" className={cn("-ml-3 h-8", className)} onClick={handleClick}>
       <span>{title}</span>
       {column.getIsSorted() === "desc" ? (
-        <ArrowDown className="size-3" />
+        <IconArrowDown className="size-3" />
       ) : column.getIsSorted() === "asc" ? (
-        <ArrowUp className="size-3" />
+        <IconArrowUp className="size-3" />
       ) : (
-        <ChevronsUpDown className="size-3" />
+        <IconSelector className="size-3" />
       )}
     </Button>
   )

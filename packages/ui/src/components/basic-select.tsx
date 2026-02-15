@@ -1,5 +1,5 @@
 import { forwardRef, ComponentProps } from "react"
-import { ChevronDown } from "lucide-react"
+import { IconChevronDown } from "@tabler/icons-react"
 import { cn } from "@repo/ui/lib/utils"
 
 export interface BasicSelectProps extends ComponentProps<"select"> {
@@ -41,7 +41,7 @@ const BasicSelect = forwardRef<HTMLSelectElement, BasicSelectProps>(
           {children}
         </select>
         {/* Custom arrow icon */}
-        <ChevronDown
+        <IconChevronDown
           className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground pointer-events-none"
           aria-hidden="true"
         />

@@ -5,7 +5,7 @@
 
 /* Base configuration - applies to all themes */
 :root {
-  --radius: 0.625rem;
+  --radius: 0;
 }
 
 /* Tailwind theme configuration */
@@ -49,8 +49,8 @@
 
   /* Simple 2px increment font scale */
   --text-size-xs: 10px;
-  --text-size-sm: 12px;
-  --text-size-base: 14px;
+  --text-size-sm: 11px;
+  --text-size-base: 12px;
   --text-size-lg: 16px;
   --text-size-xl: 18px;
   --text-size-2xl: 20px;
@@ -76,6 +76,12 @@
   --line-height-7xl: 38px; /* 30px * 1.27 */
   --line-height-8xl: 40px; /* 32px * 1.25 */
   --line-height-9xl: 42px; /* 34px * 1.24 */
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
 }
 
 body {

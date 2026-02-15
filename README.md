@@ -11,7 +11,7 @@ HLStatsNext is a complete modernization of HLstatsX:CE, replacing the legacy PHP
 ## Features
 
 - **Real-time Statistics** — Node.js daemon processes game events instantly
-- **Modern Stack** — TypeScript, Next.js 15, GraphQL Yoga, Prisma, MySQL 8.4
+- **Modern Stack** — TypeScript, Next.js 16, GraphQL Yoga, Prisma, MySQL 8.4
 - **Turborepo Monorepo** — Shared packages, optimized builds, hot-reload dev
 - **Docker Ready** — MySQL, RabbitMQ, Garnet (Redis), Prometheus, Grafana
 - **Type-Safe API** — End-to-end type safety with GraphQL code generation
@@ -39,7 +39,7 @@ pnpm dev
 
 **Prerequisites:** Node.js 24+, pnpm 10.x, Docker & Docker Compose
 
-> **Note:** The daemon and API require an encryption key for RCON passwords. Generate one with `openssl rand -base64 32` and add it to `apps/daemon/.env` and `apps/api/.env`. See **[INSTALLATION.md](./INSTALLATION.md)** for complete setup.
+> **Note:** The daemon and API require an encryption key for RCON passwords. Generate one with `openssl rand -base64 32` and add it to `apps/daemon/.env` and `apps/api/.env`. See **[INSTALLATION.md](./INSTALLATION.md)** for complete setup or **[DEVELOPMENT.md](./DEVELOPMENT.md)** for full dev environment details.
 
 ## Development
 
@@ -112,7 +112,7 @@ The project uses multiple `.env` files for different components:
 | `apps/api/.env`          | API server (port, CORS)                        |
 | `apps/web/.env`          | Frontend (GraphQL endpoint)                    |
 
-See **[INSTALLATION.md](./INSTALLATION.md)** for complete configuration details.
+See **[INSTALLATION.md](./INSTALLATION.md)** for complete configuration details and **[DEVELOPMENT.md](./DEVELOPMENT.md)** for dev workflows.
 
 ### Network
 
@@ -131,6 +131,8 @@ log on
 See **[INSTALLATION.md](./INSTALLATION.md#game-server-configuration)** for detailed setup.
 
 ## Contributing
+
+See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for detailed guidelines.
 
 1. Fork the repository
 2. Create feature branch (`git checkout -b feature/amazing-feature`)

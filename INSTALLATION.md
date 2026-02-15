@@ -2,17 +2,17 @@
 
 Complete installation and setup guide for HLStatsNext — a modern game statistics platform for Half-Life engine games.
 
+> Looking for local development setup? See [DEVELOPMENT.md](./DEVELOPMENT.md).
+
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
 - [Project Structure](#project-structure)
-- [Quick Start](#quick-start)
 - [Environment Configuration](#environment-configuration)
 - [Docker Services](#docker-services)
 - [Database Setup](#database-setup)
 - [GeoIP Setup (MaxMind)](#geoip-setup-maxmind)
 - [Running the Application](#running-the-application)
-- [Development Workflow](#development-workflow)
 - [Game Server Configuration](#game-server-configuration)
 - [Observability](#observability)
 - [Troubleshooting](#troubleshooting)
@@ -88,57 +88,6 @@ hlstatsnext/
 ├── Makefile              # Docker management shortcuts
 └── turbo.json            # Turborepo build configuration
 ```
-
----
-
-## Quick Start
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/jstnmthw/hlstatsnext.git
-cd hlstatsnext
-
-# 2. Install dependencies
-pnpm install
-
-# 3. Copy environment files
-cp env.example .env
-cp packages/database/env.example packages/database/.env
-cp packages/crypto/env.example packages/crypto/.env
-cp apps/daemon/env.example apps/daemon/.env
-cp apps/api/env.example apps/api/.env
-cp apps/web/env.example apps/web/.env
-
-# 4. Generate encryption key and update .env files
-openssl rand -base64 32
-# Copy the output to ENCRYPTION_KEY in:
-#   - packages/crypto/.env
-#   - apps/daemon/.env
-#   - apps/api/.env
-
-# 5. Start Docker services
-docker compose up -d
-
-# 6. Initialize database
-pnpm db:generate
-pnpm db:push
-pnpm db:seed
-
-# 7. (Optional) Setup GeoIP data - requires MaxMind account
-# Edit packages/database/.env with your MaxMind credentials first
-pnpm db:seed:geo
-
-# 8. Start development servers
-pnpm dev
-```
-
-**Access Points:**
-
-- Web UI: http://localhost:3000
-- GraphQL API: http://localhost:4000/graphql
-- Grafana: http://localhost:3001 (admin/admin)
-- RabbitMQ Management: http://localhost:15672 (hlstats/hlstats)
-- Prometheus: http://localhost:9090
 
 ---
 
@@ -491,33 +440,6 @@ The seeding process will:
 
 ## Running the Application
 
-### Development Mode
-
-Starts all apps with hot-reload:
-
-```bash
-pnpm dev
-```
-
-This launches:
-
-- **Web:** http://localhost:3000 (Next.js with Turbopack)
-- **API:** http://localhost:4000/graphql (GraphQL Yoga)
-- **Daemon:** UDP listener on port 27500
-
-### Running Individual Apps
-
-```bash
-# Web only
-cd apps/web && pnpm dev
-
-# API only
-cd apps/api && pnpm dev
-
-# Daemon only
-cd apps/daemon && pnpm dev
-```
-
 ### Production Build
 
 ```bash
@@ -530,79 +452,7 @@ cd apps/web && pnpm start
 cd apps/daemon && pnpm start
 ```
 
----
-
-## Development Workflow
-
-### Common Commands
-
-```bash
-# Install dependencies
-pnpm install
-
-# Development (all apps)
-pnpm dev
-
-# Build all packages and apps
-pnpm build
-
-# Run tests
-pnpm test
-pnpm test:coverage
-
-# Linting
-pnpm lint
-
-# Type checking
-pnpm check-types
-
-# Format code
-pnpm format:fix
-
-# Generate GraphQL types (API must be running)
-pnpm codegen
-```
-
-### Adding UI Components
-
-The project uses shadcn/ui for components:
-
-```bash
-# Add a component
-pnpm ui add button
-pnpm ui add card
-pnpm ui add dialog
-
-# Or from the ui package
-cd packages/ui && pnpm ui add [component]
-```
-
-### Database Workflow
-
-After schema changes in `packages/database/prisma/schema.prisma`:
-
-```bash
-# Regenerate Prisma client
-pnpm db:generate
-
-# Push changes to database
-pnpm db:push
-
-# (Production) Create migration
-pnpm db:migrate
-```
-
-### GraphQL Workflow
-
-After API schema changes:
-
-```bash
-# Start the API server
-cd apps/api && pnpm dev
-
-# In another terminal, regenerate types
-pnpm codegen
-```
+> For development mode with hot-reload, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 
 ---
 

@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Metadata } from "next"
-import { Button, GamepadIcon } from "@repo/ui"
+import { Button, IconDeviceGamepad2 } from "@repo/ui"
 import { query } from "@/lib/apollo-client"
 import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
@@ -72,7 +72,7 @@ export default async function GamesPage(props: AdminPageProps) {
                 className="!pl-2.5"
               >
                 <Link href="/admin/games/add">
-                  <GamepadIcon data-slot="icon" />
+                  <IconDeviceGamepad2 data-slot="icon" />
                   <span>Add game</span>
                 </Link>
               </Button>

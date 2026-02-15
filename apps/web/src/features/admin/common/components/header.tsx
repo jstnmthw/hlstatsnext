@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Badge, Button, cn } from "@repo/ui"
-import { PaintbrushIcon, SettingsIcon } from "lucide-react"
+import { IconBrush, IconSettings } from "@repo/ui"
 import { AppLogo } from "@/features/common/components/app-logo"
 import { Navbar } from "./navbar"
 import { UserMenu } from "./user-menu"
@@ -9,16 +9,14 @@ const navItems = [
   {
     label: "UI Kit",
     href: "/admin/ui-kit",
-    icon: (
-      <PaintbrushIcon className="size-4" aria-label="UI Kit" aria-hidden="true" data-slot="icon" />
-    ),
+    icon: <IconBrush className="size-4" aria-label="UI Kit" aria-hidden="true" data-slot="icon" />,
     iconOnly: true,
   },
   {
     label: "Settings",
     href: "/admin/settings",
     icon: (
-      <SettingsIcon className="size-4" aria-label="Settings" aria-hidden="true" data-slot="icon" />
+      <IconSettings className="size-4" aria-label="Settings" aria-hidden="true" data-slot="icon" />
     ),
     iconOnly: true,
   },

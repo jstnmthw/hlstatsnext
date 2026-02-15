@@ -28,6 +28,8 @@ export const VerticalListHeader = ({ className, children }: VerticalListHeaderPr
 
 export const VerticalListItem = ({ className, children }: VerticalListItemProps) => {
   return (
-    <li className={cn("border-t border-border py-1.5 hover:bg-muted/25", className)}>{children}</li>
+    <li className={cn("border-b border-border py-1.5 last:border-0 hover:bg-muted/25", className)}>
+      {children}
+    </li>
   )
 }

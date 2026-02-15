@@ -8,12 +8,14 @@ import {
   CardTitle,
   IconDownload,
 } from "@repo/ui"
+import { cn } from "@repo/ui/lib/utils"
 import Image from "next/image"
+import { ComponentProps } from "react"
 
-export function VersionAnnounce() {
+export function VersionAnnounce({ className, ...props }: ComponentProps<"div">) {
   return (
-    <Card className="relative w-full max-w-sm overflow-hidden">
-      <div className="relative px-6">
+    <Card className={cn("overflow-hidden px-6", className)} {...props}>
+      <div className="relative">
         <div className="absolute inset-0 z-30" />
         <Image
           width={768}
@@ -24,14 +26,14 @@ export function VersionAnnounce() {
           className="relative z-20 aspect-video w-full rounded-md object-cover object-[center_80%]"
         />
       </div>
-      <CardHeader>
+      <CardHeader className="px-0">
         <CardTitle>HLStatsNext v0.1.0</CardTitle>
         <CardDescription>
           Real-time player rankings, stats tracking, and server monitoring for Source and GoldSrc
           game servers.
         </CardDescription>
       </CardHeader>
-      <CardFooter>
+      <CardFooter className="px-0">
         <Badge variant="outline">v0.1.0</Badge>
         <Button className="ml-auto">
           Download <IconDownload data-icon="inline-end" />

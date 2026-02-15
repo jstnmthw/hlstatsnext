@@ -1,4 +1,4 @@
-import { cn, IconFileLambda } from "@repo/ui"
+import { cn, IconSlashes } from "@repo/ui"
 import Link from "next/link"
 
 export function AppLogo({
@@ -14,7 +14,7 @@ export function AppLogo({
         href="/"
         className="flex items-center gap-2 text-base font-bold tracking-tight uppercase"
       >
-        <IconFileLambda className="size-5 text-primary-bright" />
+        <IconSlashes className="size-5 text-primary-bright" />
         {process.env.NEXT_PUBLIC_APP_NAME}{" "}
         {showVersion && <span className="text-xs text-muted-foreground">v1.0.0</span>}
       </Link>

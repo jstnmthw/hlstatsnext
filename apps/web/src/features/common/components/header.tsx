@@ -1,7 +1,8 @@
-import { IconSettings } from "@repo/ui"
-import { AppLogo } from "@/features/common/components/app-logo"
 import Link from "next/link"
-import { cn } from "@repo/ui"
+import { Button, cn } from "@repo/ui"
+import { getSession } from "@repo/auth/session"
+import { AppLogo } from "@/features/common/components/app-logo"
+import { AccountMenu } from "@/features/common/components/account-menu"
 
 const navItems = [
   {
@@ -18,7 +19,15 @@ const navItems = [
   },
 ]
 
-export function Header({ className, isFixed = false }: { className?: string; isFixed?: boolean }) {
+export async function Header({
+  className,
+  isFixed = false,
+}: {
+  className?: string
+  isFixed?: boolean
+}) {
+  const session = await getSession()
+
   return (
     <header
       className={cn(
@@ -31,20 +40,33 @@ export function Header({ className, isFixed = false }: { className?: string; isF
         <div className="flex items-center gap-2">
           <AppLogo />
         </div>
-        <nav className="flex items-center gap-8">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="uppercase tracking-tight text-sm font-semibold text-zinc-400 hover:text-white transition-colors"
-            >
-              {item.label}
-            </Link>
-          ))}
-          <Link href="/admin" className="text-zinc-400 hover:text-white transition-colors">
-            <IconSettings className="size-4" />
-          </Link>
-        </nav>
+        <div className="flex items-center gap-8">
+          <nav className="flex items-center gap-8">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="uppercase font-semibold text-zinc-400 hover:text-primary-bright transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          {session ? (
+            <AccountMenu
+              user={{
+                name: session.user.name,
+                email: session.user.email,
+                image: session.user.image,
+              }}
+              isAdmin={session.user.role === "admin"}
+            />
+          ) : (
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/login">Sign in</Link>
+            </Button>
+          )}
+        </div>
       </div>
     </header>
   )

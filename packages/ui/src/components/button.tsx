@@ -30,11 +30,11 @@ const solidBaseStyles = [
   "border border-transparent", // Explicit border for solid (transparent by default)
 
   // Structural before/after for solid buttons (backgrounds applied in colorVariants)
-  "before:absolute before:inset-0 before:-z-10 before:rounded-[calc(theme(borderRadius.md)-1px)]",
+  "before:absolute before:inset-0 before:-z-10 before:rounded-[inherit]",
   "before:shadow-sm", // Shadow for solid buttons
   "dark:before:hidden", // Hides the light-mode shadow in dark mode
   "dark:border-white/5", // Add subtle border in dark mode for solid
-  "after:absolute after:inset-0 after:-z-10 after:rounded-[calc(theme(borderRadius.md)-1px)]",
+  "after:absolute after:inset-0 after:-z-10 after:rounded-[inherit]",
   "after:shadow-[inset_0_1px_theme(colors.white/15%)]", // Inner highlight
   "dark:after:-inset-px", // Dark mode adjustment for highlight
   "disabled:before:shadow-none disabled:after:shadow-none", // Disabled state

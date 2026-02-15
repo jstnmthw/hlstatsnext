@@ -618,7 +618,7 @@ function InputGroupExamples() {
               >
                 <IconStar
                   data-favorite={isFavorite}
-                  className="data-[favorite=true]:fill-primary data-[favorite=true]:stroke-primary"
+                  className="data-[favorite=true]:fill-primary-bright data-[favorite=true]:stroke-primary-bright"
                 />
               </InputGroupButton>
             </InputGroupAddon>
@@ -679,9 +679,13 @@ function InputGroupExamples() {
             </DropdownMenu>
             <InputGroupText className="ml-auto">52% used</InputGroupText>
             <Separator orientation="vertical" className="h-4!" />
-            <InputGroupButton variant="primary" className="style-lyra:rounded-none rounded-full">
+            <InputGroupButton
+              variant="solid"
+              className="style-lyra:rounded-none rounded-full"
+              size="icon-xs"
+              aria-label="Send"
+            >
               <IconArrowUp />
-              <span className="sr-only">Send</span>
             </InputGroupButton>
           </InputGroupAddon>
         </InputGroup>

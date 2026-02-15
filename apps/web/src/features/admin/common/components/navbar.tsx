@@ -83,16 +83,16 @@ export function Navbar({ currentPath }: NavbarProps) {
           return (
             <li key={item.href} className="relative py-2">
               {isActive && (
-                <span className="absolute inset-0 bg-radial-[at_50%_75%] from-indigo-500 from-0% to-transparent to-75% opacity-20"></span>
+                <span className="absolute inset-0 bg-radial-[at_50%_75%] from-green-500 from-0% to-transparent to-75% opacity-20"></span>
               )}
               <Button
                 variant="ghost"
                 colorScheme="light"
                 asChild
                 className={cn(
-                  "font-semibold tracking-tight text-zinc-500 dark:text-zinc-300 [&>[data-slot=icon]]:text-zinc-500",
+                  "font-semibold tracking-tight text-zinc-500 *:data-[slot=icon]:text-zinc-500 dark:text-zinc-300",
                   isActive &&
-                    "text-zinc-500 after:absolute after:-bottom-[9px] after:left-0 after:h-px after:w-full after:bg-primary after:content-[''] dark:text-zinc-300 [&>[data-slot=icon]]:text-primary",
+                    "text-zinc-500 after:absolute after:-bottom-2.25 after:left-0 after:h-px after:w-full after:bg-primary after:content-[''] *:data-[slot=icon]:text-primary dark:text-zinc-300",
                 )}
               >
                 <Link href={item.href}>

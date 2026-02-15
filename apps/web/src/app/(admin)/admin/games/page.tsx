@@ -58,18 +58,18 @@ export default async function GamesPage(props: AdminPageProps) {
         <div className="container">
           <div className="mt-8 mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight uppercase">Manage Games</h1>
+              <h1 className="text-2xl font-bold tracking-tight uppercase">Manage Games</h1>
               <p className="text-muted-foreground">
                 Manage supported games and their configurations.
               </p>
             </div>
             <div>
               <Button
+                asChild
                 variant="solid"
                 size="default"
                 colorScheme="green"
-                asChild
-                className="!pl-2.5"
+                className="pl-2.5!"
               >
                 <Link href="/admin/games/add">
                   <IconDeviceGamepad2 data-slot="icon" />

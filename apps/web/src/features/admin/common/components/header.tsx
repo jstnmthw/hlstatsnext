@@ -33,9 +33,7 @@ export function AdminHeader({ className, currentPath }: AdminHeaderProps) {
         <div className={cn("container flex items-center justify-between py-6")}>
           <div className="flex items-center gap-2">
             <AppLogo showVersion={false} />
-            <Badge variant="outline" colorScheme="indigo">
-              Admin
-            </Badge>
+            <Badge variant="primary">Admin</Badge>
           </div>
           <div className="flex items-center gap-3">
             <nav className="flex items-center gap-1">

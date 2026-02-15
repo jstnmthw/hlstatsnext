@@ -20,7 +20,7 @@ export async function ServerList({ className }: { className?: string }) {
 
   return (
     <VerticalList className={className}>
-      <VerticalListHeader>Recently Active</VerticalListHeader>
+      <VerticalListHeader className="mb-1.5">Recently Active Servers</VerticalListHeader>
       <ul>
         {data?.findManyServer?.map((server) => {
           const isOnline = getOnlineStatus(server.lastEvent) === "Online"
@@ -36,7 +36,7 @@ export async function ServerList({ className }: { className?: string }) {
                       )}
                     />
                     <div>
-                      <h3 className="font-mono">
+                      <h3>
                         <Link
                           href={`/servers/${server.serverId}`}
                           className="hover:text-primary-bright hover:underline"

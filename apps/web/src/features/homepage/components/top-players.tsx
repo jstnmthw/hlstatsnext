@@ -39,12 +39,15 @@ export async function TopPlayers({ className, ...props }: ComponentProps<"div">)
               const deaths = player.deaths || 1
               const kd = (player.kills / deaths).toFixed(2)
               return (
-                <tr key={player.playerId} className="border-b border-border last:border-0">
+                <tr
+                  key={player.playerId}
+                  className="border-b border-border last:border-0 hover:bg-accent/50"
+                >
                   <td className="py-2 text-muted-foreground">{i + 1}.</td>
                   <td className="py-2 font-medium">
                     <Link
                       href={`/players/${player.playerId}`}
-                      className="inline-flex items-center hover:text-primary-bright hover:underline"
+                      className="inline-flex h-4 items-center hover:text-primary-bright hover:underline"
                     >
                       {i < 3 && <IconTrophy className={cn("mr-1.5 size-4", trophyColors[i])} />}
                       {player.lastName}

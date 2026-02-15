@@ -14,11 +14,11 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
       <div className="mb-8">
         <AppLogo />
       </div>
-      <div className="w-full max-w-md">{children}</div>
+      <div className="w-full max-w-sm">{children}</div>
     </div>
   )
 }

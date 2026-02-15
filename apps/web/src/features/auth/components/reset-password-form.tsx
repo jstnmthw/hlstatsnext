@@ -3,7 +3,9 @@
 import { authClient } from "@repo/auth/client"
 import { Button, Card, Input, Label } from "@repo/ui"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
+
+const RESEND_COOLDOWN = 60
 
 interface ResetPasswordFormProps {
   email: string
@@ -16,6 +18,41 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
   const [resending, setResending] = useState(false)
+  const [resendSuccess, setResendSuccess] = useState("")
+  const [cooldown, setCooldown] = useState(RESEND_COOLDOWN)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  function startCooldown() {
+    setCooldown(RESEND_COOLDOWN)
+    if (intervalRef.current) clearInterval(intervalRef.current)
+    intervalRef.current = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current!)
+          intervalRef.current = null
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
+  // Start countdown on mount (code was just sent)
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current!)
+          intervalRef.current = null
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -39,11 +76,19 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
 
   async function handleResend() {
     setError("")
+    setResendSuccess("")
     setResending(true)
 
-    await authClient.emailOtp.requestPasswordReset({ email })
+    const { error: resendError } = await authClient.emailOtp.requestPasswordReset({ email })
+
+    if (resendError) {
+      setError(resendError.message ?? "Failed to resend code. Please try again.")
+    } else {
+      setResendSuccess("A new code has been sent to your email.")
+    }
 
     setResending(false)
+    startCooldown()
   }
 
   if (success) {
@@ -51,7 +96,7 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
       <Card className="p-6 text-center">
         <h2 className="mb-2 text-xl font-semibold tracking-tight">Password reset</h2>
         <p className="mb-4 text-muted-foreground">Your password has been reset successfully.</p>
-        <Button variant="solid" colorScheme="indigo" asChild className="w-full">
+        <Button variant="primary" asChild className="w-full">
           <Link href="/login">Sign in</Link>
         </Button>
       </Card>
@@ -70,6 +115,9 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
           <div className="rounded-md bg-destructive/10 px-3 py-2 text-destructive">{error}</div>
+        )}
+        {resendSuccess && (
+          <div className="rounded-md bg-green-500/10 px-3 py-2 text-green-500">{resendSuccess}</div>
         )}
 
         <div className="space-y-2">
@@ -104,8 +152,7 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
 
         <Button
           type="submit"
-          variant="solid"
-          colorScheme="indigo"
+          variant="primary"
           className="w-full"
           disabled={loading || otp.length !== 6}
         >
@@ -117,15 +164,19 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
         <button
           type="button"
           onClick={handleResend}
-          disabled={resending}
-          className="text-primary hover:underline disabled:opacity-50"
+          disabled={resending || cooldown > 0}
+          className="text-primary-bright hover:underline disabled:opacity-50"
         >
-          {resending ? "Sending..." : "Didn't receive a code? Resend"}
+          {resending
+            ? "Sending..."
+            : cooldown > 0
+              ? `Resend code in ${cooldown}s`
+              : "Didn't receive a code? Resend"}
         </button>
       </div>
 
-      <p className="mt-4 text-center text-muted-foreground">
-        <Link href="/login" className="text-primary hover:underline">
+      <p className="text-center text-muted-foreground">
+        <Link href="/login" className="text-muted-foreground hover:underline">
           Back to sign in
         </Link>
       </p>

@@ -30,49 +30,44 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <Card className="p-6">
+    <>
       <div className="mb-6">
-        <h2 className="text-xl font-semibold tracking-tight">Forgot password</h2>
-        <p className="mt-1 text-muted-foreground">
+        <h2 className="text-lg font-bold tracking-tight uppercase">Forgot password</h2>
+        <p className="text-sm text-muted-foreground">
           Enter your email address and we&apos;ll send you a code to reset your password.
         </p>
       </div>
+      <Card className="p-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="rounded-md bg-destructive/10 px-3 py-2 text-destructive">{error}</div>
+          )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <div className="rounded-md bg-destructive/10 px-3 py-2 text-destructive">{error}</div>
-        )}
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-          />
-        </div>
+          <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+            {loading ? "Sending..." : "Send reset code"}
+          </Button>
+        </form>
 
-        <Button
-          type="submit"
-          variant="solid"
-          colorScheme="indigo"
-          className="w-full"
-          disabled={loading}
-        >
-          {loading ? "Sending..." : "Send reset code"}
-        </Button>
-      </form>
-
-      <p className="mt-6 text-center text-muted-foreground">
-        Remember your password?{" "}
-        <Link href="/login" className="text-primary hover:underline">
-          Sign in
-        </Link>
-      </p>
-    </Card>
+        <p className="mt-6 text-center text-muted-foreground">
+          Remember your password?{" "}
+          <Link href="/login" className="text-primary hover:underline">
+            Sign in
+          </Link>
+        </p>
+      </Card>
+    </>
   )
 }

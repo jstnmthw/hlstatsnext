@@ -148,7 +148,7 @@ export const serverColumns = (): ColumnDef<ServerListItem>[] => [
     cell: ({ row }) => {
       const server = row.original
       return (
-        <span className="font-mono">
+        <span>
           {server.address}:{server.port}
         </span>
       )

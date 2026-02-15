@@ -3,7 +3,9 @@
 import { authClient } from "@repo/auth/client"
 import { Button, Card, Input, Label } from "@repo/ui"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
+
+const RESEND_COOLDOWN = 60
 
 interface VerifyEmailFormProps {
   email: string
@@ -16,6 +18,39 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
   const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
   const [resending, setResending] = useState(false)
+  const [cooldown, setCooldown] = useState(RESEND_COOLDOWN)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  function startCooldown() {
+    setCooldown(RESEND_COOLDOWN)
+    if (intervalRef.current) clearInterval(intervalRef.current)
+    intervalRef.current = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current!)
+          intervalRef.current = null
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current!)
+          intervalRef.current = null
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [])
 
   async function handleVerify(e: React.FormEvent) {
     e.preventDefault()
@@ -54,6 +89,7 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
     }
 
     setResending(false)
+    startCooldown()
   }
 
   return (
@@ -93,8 +129,7 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
 
         <Button
           type="submit"
-          variant="solid"
-          colorScheme="indigo"
+          variant="primary"
           className="w-full"
           disabled={loading || otp.length !== 6}
         >
@@ -106,10 +141,14 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
         <button
           type="button"
           onClick={handleResend}
-          disabled={resending}
+          disabled={resending || cooldown > 0}
           className="text-primary hover:underline disabled:opacity-50"
         >
-          {resending ? "Sending..." : "Didn't receive a code? Resend"}
+          {resending
+            ? "Sending..."
+            : cooldown > 0
+              ? `Resend code in ${cooldown}s`
+              : "Didn't receive a code? Resend"}
         </button>
       </div>
     </Card>

@@ -28,10 +28,10 @@ async function seedAdmin() {
     process.exit(1)
   }
 
-  // Set admin role directly via Prisma (avoids needing an authenticated session)
+  // Set admin role and mark email as verified (avoids needing an authenticated session)
   await db.user.update({
     where: { id: result.user.id },
-    data: { role: "admin" },
+    data: { role: "admin", emailVerified: true },
   })
 
   console.log("=".repeat(50))

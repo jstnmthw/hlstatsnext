@@ -25,6 +25,11 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     })
 
     if (signInError) {
+      // 403 means email not verified — redirect to verification page
+      if (signInError.status === 403) {
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`)
+        return
+      }
       setError(signInError.message ?? "Sign in failed. Please try again.")
       setLoading(false)
       return
@@ -64,7 +69,15 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <Link
+              href="/forgot-password"
+              className="text-xs text-muted-foreground hover:text-primary"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <Input
             id="password"
             type="password"

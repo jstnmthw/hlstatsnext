@@ -32,8 +32,8 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
       return
     }
 
-    router.push("/admin")
-    router.refresh()
+    // Redirect to email verification page
+    router.push(`/verify-email?email=${encodeURIComponent(email)}`)
   }
 
   return (

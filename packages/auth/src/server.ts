@@ -1,15 +1,29 @@
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
-import { admin } from "better-auth/plugins"
+import { admin, emailOTP } from "better-auth/plugins"
 import { db } from "@repo/database/client"
 import { ac, adminRole, userRole } from "./permissions"
+import { sendOTP } from "./mail"
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET
 
 export const auth = betterAuth({
   database: prismaAdapter(db, { provider: "mysql" }),
-  emailAndPassword: { enabled: true },
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+  },
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google"],
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+  },
   ...(googleClientId && googleClientSecret
     ? {
         socialProviders: {
@@ -32,6 +46,15 @@ export const auth = betterAuth({
       roles: {
         admin: adminRole,
         user: userRole,
+      },
+    }),
+    emailOTP({
+      otpLength: 6,
+      expiresIn: 300,
+      sendVerificationOnSignUp: true,
+      async sendVerificationOTP({ email, otp, type }) {
+        // Fire-and-forget to avoid timing attacks
+        void sendOTP({ email, otp, type })
       },
     }),
   ],

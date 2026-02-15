@@ -2,6 +2,7 @@ import { AdminHeader } from "@/features/admin/common/components/header"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
+import { PermissionGate } from "@/features/auth/components/permission-gate"
 import { Button, Card } from "@repo/ui"
 import { PlusCircleIcon, ServerIcon } from "lucide-react"
 import Link from "next/link"
@@ -33,12 +34,14 @@ export default function Page() {
               <p className="text-muted-foreground mb-4">
                 Add your first Half-Life server to begin tracking player statistics and activities.
               </p>
-              <Button variant="solid" size="default" colorScheme="green" asChild>
-                <Link href="/admin/servers/add">
-                  <PlusCircleIcon data-slot="icon" />
-                  <span>Add server</span>
-                </Link>
-              </Button>
+              <PermissionGate permissions={{ server: ["create"] }}>
+                <Button variant="solid" size="default" colorScheme="green" asChild>
+                  <Link href="/admin/servers/add">
+                    <PlusCircleIcon data-slot="icon" />
+                    <span>Add server</span>
+                  </Link>
+                </Button>
+              </PermissionGate>
             </div>
           </Card>
         </div>

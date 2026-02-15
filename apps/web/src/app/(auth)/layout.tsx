@@ -5,13 +5,11 @@ import { AppLogo } from "@/features/common/components/app-logo"
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
 
-  // Redirect already-authenticated admin users to admin dashboard
-  if (session?.user.role === "admin") {
-    redirect("/admin")
-  }
-
-  // Redirect authenticated non-admin users to homepage
-  if (session) {
+  // Only redirect verified users — unverified users need access to /verify-email
+  if (session?.user.emailVerified) {
+    if (session.user.role === "admin") {
+      redirect("/admin")
+    }
     redirect("/")
   }
 

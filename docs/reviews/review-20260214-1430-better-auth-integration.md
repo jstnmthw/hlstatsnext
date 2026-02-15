@@ -624,37 +624,60 @@ GOOGLE_CLIENT_SECRET=
 
 ### P3: Deeper / Optional
 
-- [ ] **P3-1**: Add `loading.tsx` and `error.tsx` boundaries
-  - Create `app/(admin)/loading.tsx` for admin section loading state
-  - Create `app/(auth)/loading.tsx` for auth pages loading state
+- [x] **P3-1**: Add `loading.tsx` and `error.tsx` boundaries
+  - Created `app/(admin)/loading.tsx` — centered spinning loader icon for admin section
+  - Created `app/(auth)/loading.tsx` — centered spinning loader icon for auth pages
+  - Created `app/(admin)/error.tsx` — Card-based error UI with retry button (Client Component)
+  - Created `app/(auth)/error.tsx` — Card-based error UI matching auth layout (Client Component)
+  - All use `@repo/ui` components (Card, Button, lucide icons)
+  - Typecheck passes
   - Next.js loading UI: [https://nextjs.org/docs/app/api-reference/file-conventions/loading](https://nextjs.org/docs/app/api-reference/file-conventions/loading)
+  - Next.js error handling: [https://nextjs.org/docs/app/api-reference/file-conventions/error](https://nextjs.org/docs/app/api-reference/file-conventions/error)
 
-- [ ] **P3-2**: Add permission-based UI filtering
-  - Conditionally render admin nav items based on user role/permissions
-  - Hide create/edit/delete buttons for users without appropriate permissions
-  - Use `authClient.admin.checkRolePermission()` for client-side checks
+- [x] **P3-2**: Add permission-based UI filtering
+  - Created `usePermission` hook (`features/auth/hooks/use-permission.ts`) — wraps `checkRolePermission()` with session role
+  - Created `PermissionGate` component (`features/auth/components/permission-gate.tsx`) — conditionally renders children based on permissions
+  - Converted Navbar to client component with permission-based filtering on nav items (server, player, user, game)
+  - Wrapped "Add server" buttons on dashboard and servers pages with `PermissionGate { server: ["create"] }`
+  - All synchronous checks via `authClient.admin.checkRolePermission()` — no server calls
+  - Typecheck passes
   - Better Auth permission checks: [https://www.better-auth.com/docs/plugins/admin#access-control-usage](https://www.better-auth.com/docs/plugins/admin#access-control-usage)
 
-- [ ] **P3-3**: Account linking (Google + credentials)
-  - Enable `accountLinking` so users who sign in with Google can later set a password
+- [x] **P3-3**: Account linking (Google + credentials)
+  - Added `account.accountLinking` config to `packages/auth/src/server.ts`
+  - `enabled: true` with `trustedProviders: ["google"]`
+  - Users who sign in with Google can later set a password (via `setPassword` API)
+  - Users with email/password can link their Google account (via `linkSocial`)
+  - Typecheck passes
   - Better Auth account linking: [https://www.better-auth.com/docs/concepts/users-accounts#account-linking](https://www.better-auth.com/docs/concepts/users-accounts#account-linking)
 
-- [ ] **P3-4**: Email verification with OTP (F-008)
-  - Set up mail adapter system via env variable: `MAIL_PROVIDER=console|resend`
-  - `console` adapter logs OTP codes to stdout (development)
-  - `resend` adapter sends real emails via Resend API (production)
-  - Enable `requireEmailVerification: true` in Better Auth config
-  - Use Better Auth OTP code verification (not magic link)
-  - Create standalone email verification page at `(auth)/verify-email/page.tsx`
-  - Add proxy/middleware check: redirect unverified users to verification page
-  - Better Auth email verification: [https://www.better-auth.com/docs/plugins/email-otp](https://www.better-auth.com/docs/plugins/email-otp)
-  - Environment variables: `MAIL_PROVIDER`, `RESEND_API_KEY`
+- [x] **P3-4**: Email verification with OTP (F-008)
+  - Created mail adapter (`packages/auth/src/mail.ts`) — dispatches via `MAIL_PROVIDER` env var
+  - `console` adapter: logs OTP to stdout with formatted output (development default)
+  - `resend` adapter: sends via Resend SDK with graceful fallback to console if API key missing
+  - Added `emailOTP` plugin to server config with `sendVerificationOnSignUp: true`, 6-digit OTP, 5min expiry
+  - Added `emailOTPClient()` to client config
+  - Enabled `emailAndPassword.requireEmailVerification: true` — blocks sign-in without verified email
+  - Enabled `emailVerification.sendOnSignUp: true` + `autoSignInAfterVerification: true`
+  - Created `(auth)/verify-email/page.tsx` — accepts `?email=` query param
+  - Created `VerifyEmailForm` component — OTP input with verify + resend functionality
+  - Updated auth layout: only redirects verified users (unverified can access verify-email page)
+  - Updated register form: redirects to `/verify-email?email=...` after signup
+  - Updated login form: handles 403 (unverified email) by redirecting to verify-email page, added "Forgot password?" link
+  - Updated seed-admin script: sets `emailVerified: true` for seeded admin
+  - Added env vars: `MAIL_PROVIDER`, `RESEND_API_KEY`, `MAIL_FROM`
+  - Typecheck passes (auth + web)
+  - Better Auth email OTP: [https://www.better-auth.com/docs/plugins/email-otp](https://www.better-auth.com/docs/plugins/email-otp)
 
-- [ ] **P3-5**: Forgotten password flow
-  - Create `(auth)/forgot-password/page.tsx` — email input form
-  - Create `(auth)/reset-password/page.tsx` — new password form with OTP token
-  - Uses same mail adapter as email verification
-  - Better Auth forgot password: [https://www.better-auth.com/docs/authentication/email-password#forget-password](https://www.better-auth.com/docs/authentication/email-password#forget-password)
+- [x] **P3-5**: Forgotten password flow
+  - Created `(auth)/forgot-password/page.tsx` + `ForgotPasswordForm` component — email input, always redirects to reset-password (prevents user enumeration)
+  - Created `(auth)/reset-password/page.tsx` + `ResetPasswordForm` component — OTP code + new password form with resend capability
+  - Uses `authClient.emailOtp.requestPasswordReset()` to send OTP, `authClient.emailOtp.resetPassword()` to reset
+  - Shows success state with sign-in link after successful reset
+  - Uses same mail adapter system from P3-4 (console/resend)
+  - Added "Forgot password?" link to login form
+  - Typecheck passes
+  - Better Auth email OTP reset: [https://www.better-auth.com/docs/plugins/email-otp](https://www.better-auth.com/docs/plugins/email-otp)
 
 - [ ] **P3-6**: Add auth to GraphQL API
   - Forward Better Auth session to Apollo Server context

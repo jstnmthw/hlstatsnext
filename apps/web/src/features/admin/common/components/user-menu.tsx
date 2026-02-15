@@ -19,7 +19,7 @@ export function UserMenu() {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-zinc-400">{session.user.name || session.user.email}</span>
+      <span className="text-zinc-400">{session.user.name || session.user.email}</span>
       <Button variant="outline" colorScheme="zinc" size="icon-sm" onClick={handleSignOut}>
         <IconLogout className="size-4" aria-label="Sign out" />
       </Button>

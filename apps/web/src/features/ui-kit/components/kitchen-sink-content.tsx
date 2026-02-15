@@ -80,56 +80,56 @@ export function KitchenSinkContent({ className }: { className?: string }) {
           {/* Background Colors */}
           <div className="space-y-2">
             <div className="h-20 rounded-md bg-background border border-border flex items-center justify-center">
-              <span className="text-sm font-medium">background</span>
+              <span className="font-medium">background</span>
             </div>
             <p className="text-xs text-center text-muted-foreground">bg-background</p>
           </div>
 
           <div className="space-y-2">
             <div className="h-20 rounded-md bg-foreground flex items-center justify-center">
-              <span className="text-sm font-medium text-background">foreground</span>
+              <span className="font-medium text-background">foreground</span>
             </div>
             <p className="text-xs text-center text-muted-foreground">bg-foreground</p>
           </div>
 
           <div className="space-y-2">
             <div className="h-20 rounded-md bg-card border border-border flex items-center justify-center">
-              <span className="text-sm font-medium">card</span>
+              <span className="font-medium">card</span>
             </div>
             <p className="text-xs text-center text-muted-foreground">bg-card</p>
           </div>
 
           <div className="space-y-2">
             <div className="h-20 rounded-md bg-primary flex items-center justify-center">
-              <span className="text-sm font-medium text-primary-foreground">primary</span>
+              <span className="font-medium text-primary-foreground">primary</span>
             </div>
             <p className="text-xs text-center text-muted-foreground">bg-primary</p>
           </div>
 
           <div className="space-y-2">
             <div className="h-20 rounded-md bg-secondary flex items-center justify-center">
-              <span className="text-sm font-medium text-secondary-foreground">secondary</span>
+              <span className="font-medium text-secondary-foreground">secondary</span>
             </div>
             <p className="text-xs text-center text-muted-foreground">bg-secondary</p>
           </div>
 
           <div className="space-y-2">
             <div className="h-20 rounded-md bg-muted flex items-center justify-center">
-              <span className="text-sm font-medium text-muted-foreground">muted</span>
+              <span className="font-medium text-muted-foreground">muted</span>
             </div>
             <p className="text-xs text-center text-muted-foreground">bg-muted</p>
           </div>
 
           <div className="space-y-2">
             <div className="h-20 rounded-md bg-accent flex items-center justify-center">
-              <span className="text-sm font-medium text-accent-foreground">accent</span>
+              <span className="font-medium text-accent-foreground">accent</span>
             </div>
             <p className="text-xs text-center text-muted-foreground">bg-accent</p>
           </div>
 
           <div className="space-y-2">
             <div className="h-20 rounded-md bg-destructive flex items-center justify-center">
-              <span className="text-sm font-medium text-destructive-foreground">destructive</span>
+              <span className="font-medium text-destructive-foreground">destructive</span>
             </div>
             <p className="text-xs text-center text-muted-foreground">bg-destructive</p>
           </div>
@@ -709,9 +709,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
             <div className="space-y-4">
               {/* Icons Only */}
               <div>
-                <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
-                  Icon Only
-                </h4>
+                <h4 className="mb-2 font-medium text-gray-600 dark:text-gray-300">Icon Only</h4>
                 <div className="flex flex-wrap items-center gap-3">
                   <Badge variant="solid" colorScheme="blue">
                     <IconBell />
@@ -736,9 +734,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
 
               {/* Icon + Text */}
               <div>
-                <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
-                  Icon + Text
-                </h4>
+                <h4 className="mb-2 font-medium text-gray-600 dark:text-gray-300">Icon + Text</h4>
                 <div className="flex flex-wrap items-center gap-3">
                   <Badge variant="solid" colorScheme="green">
                     <IconCheck />
@@ -769,7 +765,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
 
               {/* Outline Variants with Icons */}
               <div>
-                <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <h4 className="mb-2 font-medium text-gray-600 dark:text-gray-300">
                   Outline + Icons
                 </h4>
                 <div className="flex flex-wrap items-center gap-3">
@@ -801,7 +797,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
             </h3>
             <div className="space-y-4">
               <div>
-                <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <h4 className="mb-2 font-medium text-gray-600 dark:text-gray-300">
                   Notification Counts
                 </h4>
                 <div className="flex flex-wrap items-center gap-3">
@@ -827,7 +823,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
               </div>
 
               <div>
-                <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <h4 className="mb-2 font-medium text-gray-600 dark:text-gray-300">
                   Versions & Numbers
                 </h4>
                 <div className="flex flex-wrap items-center gap-3">
@@ -858,9 +854,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
             </h3>
             <div className="space-y-4">
               <div>
-                <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
-                  User Status
-                </h4>
+                <h4 className="mb-2 font-medium text-gray-600 dark:text-gray-300">User Status</h4>
                 <div className="flex flex-wrap items-center gap-3">
                   <Badge variant="solid" colorScheme="green">
                     <span className="w-1.5 h-1.5 bg-white rounded-full mr-1"></span>
@@ -882,9 +876,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
               </div>
 
               <div>
-                <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
-                  System Status
-                </h4>
+                <h4 className="mb-2 font-medium text-gray-600 dark:text-gray-300">System Status</h4>
                 <div className="flex flex-wrap items-center gap-3">
                   <Badge variant="outline" colorScheme="green">
                     <IconCheck />
@@ -906,7 +898,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
               </div>
 
               <div>
-                <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <h4 className="mb-2 font-medium text-gray-600 dark:text-gray-300">
                   Priority Levels
                 </h4>
                 <div className="flex flex-wrap items-center gap-3">
@@ -929,7 +921,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
               </div>
 
               <div>
-                <h4 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <h4 className="mb-2 font-medium text-gray-600 dark:text-gray-300">
                   As Links (hover to see effect)
                 </h4>
                 <div className="flex flex-wrap items-center gap-3">
@@ -967,35 +959,35 @@ export function KitchenSinkContent({ className }: { className?: string }) {
             <h3 className="text-xl font-medium">Input Fields</h3>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1 flex flex-col">
-                <label htmlFor="text-input" className="text-sm font-medium">
+                <label htmlFor="text-input" className="font-medium">
                   Text Input
                 </label>
                 <Input id="text-input" type="text" placeholder="Enter text..." />
               </div>
 
               <div className="space-y-1 flex flex-col">
-                <label htmlFor="email-input" className="text-sm font-medium">
+                <label htmlFor="email-input" className="font-medium">
                   Email Input
                 </label>
                 <Input id="email-input" type="email" placeholder="email@example.com" />
               </div>
 
               <div className="space-y-1 flex flex-col">
-                <label htmlFor="password-input" className="text-sm font-medium">
+                <label htmlFor="password-input" className="font-medium">
                   Password Input
                 </label>
                 <Input id="password-input" type="password" placeholder="••••••••" />
               </div>
 
               <div className="space-y-1 flex flex-col">
-                <label htmlFor="disabled-input" className="text-sm font-medium">
+                <label htmlFor="disabled-input" className="font-medium">
                   Disabled Input
                 </label>
                 <Input id="disabled-input" type="text" placeholder="Disabled" disabled />
               </div>
 
               <div className="space-y-1 flex flex-col">
-                <label htmlFor="ip-address" className="text-sm font-medium">
+                <label htmlFor="ip-address" className="font-medium">
                   IP Address & Port
                 </label>
                 <div className="flex">
@@ -1011,7 +1003,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
 
           {/* Textarea */}
           <div id="textarea" className="space-y-1 flex flex-col">
-            <label htmlFor="textarea-field" className="text-sm font-medium">
+            <label htmlFor="textarea-field" className="font-medium">
               Textarea
             </label>
             <Textarea id="textarea-field" placeholder="Enter your message..." rows={4} />
@@ -1021,11 +1013,11 @@ export function KitchenSinkContent({ className }: { className?: string }) {
           <div id="select" className="space-y-4 flex flex-col">
             <div>
               Client Side Select
-              <label htmlFor="select-field" className="text-sm font-medium">
+              <label htmlFor="select-field" className="font-medium">
                 Select
               </label>
               <Select>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-45">
                   <SelectValue placeholder="Select a game" />
                 </SelectTrigger>
                 <SelectContent>
@@ -1062,7 +1054,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
               <Checkbox id="terms-2" defaultChecked />
               <div className="grid gap-2">
                 <Label htmlFor="terms-2">Accept terms and conditions</Label>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground">
                   By clicking this checkbox, you agree to the terms and conditions.
                 </p>
               </div>
@@ -1071,11 +1063,11 @@ export function KitchenSinkContent({ className }: { className?: string }) {
               <Checkbox id="toggle" disabled />
               <Label htmlFor="toggle">Enable notifications</Label>
             </div>
-            <Label className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-primary has-[[aria-checked=true]]:bg-primary/10 dark:has-[[aria-checked=true]]:border-primary dark:has-[[aria-checked=true]]:bg-primary/10">
+            <Label className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-aria-checked:border-primary has-aria-checked:bg-primary/10 dark:has-aria-checked:border-primary dark:has-aria-checked:bg-primary/10">
               <Checkbox id="toggle-2" defaultChecked />
               <div className="grid gap-1.5 font-normal">
-                <p className="text-sm leading-none font-medium">Enable notifications</p>
-                <p className="text-muted-foreground text-sm">
+                <p className="leading-none font-medium">Enable notifications</p>
+                <p className="text-muted-foreground">
                   You can enable or disable notifications at any time.
                 </p>
               </div>
@@ -1115,7 +1107,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
           <div className="grid gap-4 md:grid-cols-3">
             <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
               <h4 className="mb-2 text-lg font-semibold">Card Title</h4>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground">
                 This is a basic card component with border and shadow.
               </p>
             </div>
@@ -1124,16 +1116,14 @@ export function KitchenSinkContent({ className }: { className?: string }) {
               <h4 className="mb-2 text-lg font-semibold text-secondary-foreground">
                 Secondary Card
               </h4>
-              <p className="text-sm text-secondary-foreground">
+              <p className="text-secondary-foreground">
                 This card uses the secondary background color.
               </p>
             </div>
 
             <div className="rounded-lg bg-muted p-6">
               <h4 className="mb-2 text-lg font-semibold text-muted-foreground">Muted Card</h4>
-              <p className="text-sm text-muted-foreground">
-                This card uses the muted background color.
-              </p>
+              <p className="text-muted-foreground">This card uses the muted background color.</p>
             </div>
           </div>
         </div>
@@ -1159,11 +1149,11 @@ export function KitchenSinkContent({ className }: { className?: string }) {
         <div id="padding-examples" className="space-y-4">
           <h3 className="text-xl font-medium">Padding Examples</h3>
           <div className="space-y-2">
-            <div className="bg-muted p-1 text-sm rounded-md">p-1 (0.25rem)</div>
-            <div className="bg-muted p-2 text-sm rounded-md">p-2 (0.5rem)</div>
-            <div className="bg-muted p-4 text-sm rounded-md">p-4 (1rem)</div>
-            <div className="bg-muted p-6 text-sm rounded-md">p-6 (1.5rem)</div>
-            <div className="bg-muted p-8 text-sm rounded-md">p-8 (2rem)</div>
+            <div className="bg-muted p-1 rounded-md">p-1 (0.25rem)</div>
+            <div className="bg-muted p-2 rounded-md">p-2 (0.5rem)</div>
+            <div className="bg-muted p-4 rounded-md">p-4 (1rem)</div>
+            <div className="bg-muted p-6 rounded-md">p-6 (1.5rem)</div>
+            <div className="bg-muted p-8 rounded-md">p-8 (2rem)</div>
           </div>
         </div>
       </section>
@@ -1190,7 +1180,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
           </div>
           <div id="code-blocks">
             <h3 className="mb-4 text-xl font-medium">Code Blocks</h3>
-            <pre className="rounded-md bg-muted p-4 text-sm border border-border">
+            <pre className="rounded-md bg-muted p-4 border border-border">
               <code>{`const example = {
   theme: "dark",
   variant: "default",
@@ -1208,21 +1198,21 @@ export function KitchenSinkContent({ className }: { className?: string }) {
           <table className="w-full">
             <thead className="border-b border-border bg-muted/50">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium">Name</th>
-                <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
-                <th className="px-4 py-3 text-left text-sm font-medium">Role</th>
-                <th className="px-4 py-3 text-right text-sm font-medium">Actions</th>
+                <th className="px-4 py-3 text-left font-medium">Name</th>
+                <th className="px-4 py-3 text-left font-medium">Status</th>
+                <th className="px-4 py-3 text-left font-medium">Role</th>
+                <th className="px-4 py-3 text-right font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr className="border-b border-border">
-                <td className="px-4 py-3 text-sm">John Doe</td>
-                <td className="px-4 py-3 text-sm">
+                <td className="px-4 py-3">John Doe</td>
+                <td className="px-4 py-3">
                   <span className="inline-flex rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
                     Active
                   </span>
                 </td>
-                <td className="px-4 py-3 text-sm text-muted-foreground">Admin</td>
+                <td className="px-4 py-3 text-muted-foreground">Admin</td>
                 <td className="px-4 py-3 text-right">
                   <Button size="sm" variant="outline">
                     Edit
@@ -1230,13 +1220,13 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                 </td>
               </tr>
               <tr className="border-b border-border">
-                <td className="px-4 py-3 text-sm">Jane Smith</td>
-                <td className="px-4 py-3 text-sm">
+                <td className="px-4 py-3">Jane Smith</td>
+                <td className="px-4 py-3">
                   <span className="inline-flex rounded-full bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
                     Inactive
                   </span>
                 </td>
-                <td className="px-4 py-3 text-sm text-muted-foreground">User</td>
+                <td className="px-4 py-3 text-muted-foreground">User</td>
                 <td className="px-4 py-3 text-right">
                   <Button size="sm" variant="outline">
                     Edit
@@ -1256,7 +1246,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
         <div className="grid gap-6 md:grid-cols-2">
           <div id="unordered-list" className="space-y-4">
             <h3 className="text-xl font-medium">Unordered List</h3>
-            <ul className="list-disc space-y-2 pl-6 text-sm">
+            <ul className="list-disc space-y-2 pl-6">
               <li>First item in the list</li>
               <li>Second item with more text</li>
               <li>Third item</li>
@@ -1268,7 +1258,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
 
           <div id="ordered-list" className="space-y-4">
             <h3 className="text-xl font-medium">Ordered List</h3>
-            <ol className="list-decimal space-y-2 pl-6 text-sm">
+            <ol className="list-decimal space-y-2 pl-6">
               <li>First step in the process</li>
               <li>Second step with details</li>
               <li>Third step</li>

@@ -60,7 +60,7 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
     <Card className="p-6">
       <div className="mb-6">
         <h2 className="text-xl font-semibold tracking-tight">Verify your email</h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1">
           We sent a 6-digit code to <strong>{email}</strong>. Enter it below to verify your email
           address.
         </p>
@@ -68,14 +68,10 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
 
       <form onSubmit={handleVerify} className="space-y-4">
         {error && (
-          <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            {error}
-          </div>
+          <div className="rounded-md bg-destructive/10 px-3 py-2 text-destructive">{error}</div>
         )}
         {success && (
-          <div className="rounded-md bg-green-500/10 px-3 py-2 text-sm text-green-500">
-            {success}
-          </div>
+          <div className="rounded-md bg-green-500/10 px-3 py-2 text-green-500">{success}</div>
         )}
 
         <div className="space-y-2">
@@ -111,7 +107,7 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
           type="button"
           onClick={handleResend}
           disabled={resending}
-          className="text-sm text-primary hover:underline disabled:opacity-50"
+          className="text-primary hover:underline disabled:opacity-50"
         >
           {resending ? "Sending..." : "Didn't receive a code? Resend"}
         </button>

@@ -106,7 +106,7 @@ export const gameColumns = (): ColumnDef<GameListItem>[] => [
     ),
     cell: ({ row }) => {
       const game = row.original
-      return <span className="font-mono text-sm">{game.realgame}</span>
+      return <span className="font-mono">{game.realgame}</span>
     },
   },
   {

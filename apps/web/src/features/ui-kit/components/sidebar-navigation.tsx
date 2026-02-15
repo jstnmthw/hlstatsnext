@@ -82,7 +82,7 @@ export function SidebarNavigation({ tableOfContents, className }: SidebarNavigat
               <button
                 onClick={() => scrollToSection(section.id)}
                 className={cn(
-                  "block w-full cursor-pointer text-left text-sm font-medium transition-all duration-200 rounded-md px-2 py-1 hover:text-white hover:bg-white/10",
+                  "block w-full cursor-pointer text-left font-medium transition-all duration-200 rounded-md px-2 py-1 hover:text-white hover:bg-white/10",
                   activeSection === section.id
                     ? "text-white bg-white/15 font-semibold"
                     : "text-muted-foreground",
@@ -96,7 +96,7 @@ export function SidebarNavigation({ tableOfContents, className }: SidebarNavigat
                     <li key={subsection.id}>
                       <button
                         onClick={() => scrollToSection(subsection.id)}
-                        className="block w-full cursor-pointer text-left text-sm transition-all duration-200 rounded-md px-2 py-1 text-muted-foreground hover:text-white hover:bg-white/10"
+                        className="block w-full cursor-pointer text-left transition-all duration-200 rounded-md px-2 py-1 text-muted-foreground hover:text-white hover:bg-white/10"
                       >
                         {subsection.title}
                       </button>

@@ -540,7 +540,7 @@ function ButtonGroupExamples() {
                       and open a pull request.
                     </PopoverDescription>
                   </PopoverHeader>
-                  <div className="text-sm *:[p:not(:last-child)]:mb-2">
+                  <div className="*:[p:not(:last-child)]:mb-2">
                     <Textarea
                       placeholder="Describe your task in natural language."
                       className="min-h-32 resize-none"
@@ -603,7 +603,7 @@ function InputGroupExamples() {
               <PopoverContent
                 align="start"
                 alignOffset={10}
-                className="flex flex-col gap-1 rounded-xl text-sm"
+                className="flex flex-col gap-1 rounded-xl"
               >
                 <p className="font-medium">Your connection is not secure.</p>
                 <p>You should not enter any sensitive information on this site.</p>
@@ -1295,7 +1295,7 @@ function SheetExample() {
                   Make changes to your profile here. Click save when you&apos;re done.
                 </SheetDescription>
               </SheetHeader>
-              <div className="overflow-y-auto px-4 text-sm">
+              <div className="overflow-y-auto px-4">
                 {Array.from({ length: 10 }).map((_, index) => (
                   <p
                     key={index}

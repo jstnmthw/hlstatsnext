@@ -322,7 +322,7 @@ export function DataTable<T>({
 
       {enablePagination && (
         <div className="flex items-center justify-between space-x-2 py-4">
-          <div className="text-sm text-muted-foreground">
+          <div className="text-muted-foreground">
             Showing {paginationInfo.startItem} to {paginationInfo.endItem} of{" "}
             {paginationInfo.totalCount} results
           </div>

@@ -15,7 +15,7 @@ export function FormField({ children, className }: FormFieldProps) {
 }
 
 export function ErrorMessage({ children, className }: ErrorMessageProps) {
-  return <p className={cn("text-sm text-red-500", className)}>{children}</p>
+  return <p className={cn("text-red-500", className)}>{children}</p>
 }
 
 export function ErrorDisplay({
@@ -31,7 +31,7 @@ export function ErrorDisplay({
 
   return (
     <div className="px-3 py-2 border rounded-md !border-red-500/20 flex items-center justify-between transition-opacity duration-200 opacity-100">
-      <p className="text-red-800 text-sm dark:text-red-500">{state.message}</p>
+      <p className="text-red-800 dark:text-red-500">{state.message}</p>
     </div>
   )
 }

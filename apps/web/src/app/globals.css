@@ -17,6 +17,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-bright: var(--primary-bright);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -47,35 +48,33 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Simple 2px increment font scale */
-  --text-size-xs: 10px;
-  --text-size-sm: 11px;
-  --text-size-base: 12px;
-  --text-size-lg: 16px;
-  --text-size-xl: 18px;
-  --text-size-2xl: 20px;
-  --text-size-3xl: 22px;
-  --text-size-4xl: 24px;
-  --text-size-5xl: 26px;
-  --text-size-6xl: 28px;
-  --text-size-7xl: 30px;
-  --text-size-8xl: 32px;
-  --text-size-9xl: 34px;
-
-  /* Line heights for readability */
-  --line-height-xs: 16px; /* 10px * 1.6 */
-  --line-height-sm: 18px; /* 12px * 1.5 */
-  --line-height-base: 21px; /* 14px * 1.5 */
-  --line-height-lg: 24px; /* 16px * 1.5 */
-  --line-height-xl: 26px; /* 18px * 1.44 */
-  --line-height-2xl: 28px; /* 20px * 1.4 */
-  --line-height-3xl: 30px; /* 22px * 1.36 */
-  --line-height-4xl: 32px; /* 24px * 1.33 */
-  --line-height-5xl: 34px; /* 26px * 1.31 */
-  --line-height-6xl: 36px; /* 28px * 1.29 */
-  --line-height-7xl: 38px; /* 30px * 1.27 */
-  --line-height-8xl: 40px; /* 32px * 1.25 */
-  --line-height-9xl: 42px; /* 34px * 1.24 */
+  /* Font scale - overrides Tailwind v4 defaults */
+  --text-xs: 10px;
+  --text-xs--line-height: 16px;
+  --text-sm: 11px;
+  --text-sm--line-height: 18px;
+  --text-base: 12px;
+  --text-base--line-height: 20px;
+  --text-lg: 16px;
+  --text-lg--line-height: 24px;
+  --text-xl: 18px;
+  --text-xl--line-height: 26px;
+  --text-2xl: 20px;
+  --text-2xl--line-height: 28px;
+  --text-3xl: 22px;
+  --text-3xl--line-height: 30px;
+  --text-4xl: 24px;
+  --text-4xl--line-height: 32px;
+  --text-5xl: 26px;
+  --text-5xl--line-height: 34px;
+  --text-6xl: 28px;
+  --text-6xl--line-height: 36px;
+  --text-7xl: 30px;
+  --text-7xl--line-height: 38px;
+  --text-8xl: 32px;
+  --text-8xl--line-height: 40px;
+  --text-9xl: 34px;
+  --text-9xl--line-height: 42px;
 }
 
 @layer base {
@@ -88,7 +87,8 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-geist-sans);
-  font-size: var(--font-size-base);
+  font-size: 12px;
+  line-height: 20px;
 }
 
 @layer utilities {
@@ -105,46 +105,5 @@ body {
 
   .font-sans {
     font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  }
-
-  /* Override Tailwind's default font sizes with custom variables */
-  .text-xs {
-    font-size: var(--text-size-xs);
-  }
-  .text-sm {
-    font-size: var(--text-size-sm);
-  }
-  .text-base {
-    font-size: var(--text-size-base);
-  }
-  .text-lg {
-    font-size: var(--text-size-lg);
-  }
-  .text-xl {
-    font-size: var(--text-size-xl);
-  }
-  .text-2xl {
-    font-size: var(--text-size-2xl);
-  }
-  .text-3xl {
-    font-size: var(--text-size-3xl);
-  }
-  .text-4xl {
-    font-size: var(--text-size-4xl);
-  }
-  .text-5xl {
-    font-size: var(--text-size-5xl);
-  }
-  .text-6xl {
-    font-size: var(--text-size-6xl);
-  }
-  .text-7xl {
-    font-size: var(--text-size-7xl);
-  }
-  .text-8xl {
-    font-size: var(--text-size-8xl);
-  }
-  .text-9xl {
-    font-size: var(--text-size-9xl);
   }
 }

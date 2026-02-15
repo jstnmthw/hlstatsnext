@@ -29,7 +29,7 @@ export async function ServerList({ className }: { className?: string }) {
                     )}
                   />
                   <div>
-                    <h3 className="text-sm font-mono">
+                    <h3 className="font-mono">
                       <Link
                         href={`/servers/${server.serverId}`}
                         className="hover:underline hover:text-blue-400 transition-colors"
@@ -37,7 +37,7 @@ export async function ServerList({ className }: { className?: string }) {
                         {server.name}
                       </Link>
                     </h3>
-                    <ul className="flex flex-row text-sm font-mono space-x-2">
+                    <ul className="flex flex-row font-mono space-x-2">
                       {server.activeMap && <li>{server.activeMap}</li>}
                       <li className="text-muted-foreground">
                         {server.activePlayers}/{server.maxPlayers}

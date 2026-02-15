@@ -67,7 +67,7 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
             <div className="py-10">
               <Card className="p-6 max-w-2xl mx-auto">
                 <h1 className="text-3xl font-medium tracking-tight mb-2">Edit Server</h1>
-                <p className="text-muted-foreground mb-6 text-sm">
+                <p className="text-muted-foreground mb-6">
                   Update server configuration and settings for {server.name || "Unnamed Server"}.
                 </p>
                 <ServerEditForm

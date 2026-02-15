@@ -50,9 +50,7 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
     return (
       <Card className="p-6 text-center">
         <h2 className="text-xl font-semibold tracking-tight mb-2">Password reset</h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          Your password has been reset successfully.
-        </p>
+        <p className="text-muted-foreground mb-4">Your password has been reset successfully.</p>
         <Button variant="solid" colorScheme="indigo" asChild className="w-full">
           <Link href="/login">Sign in</Link>
         </Button>
@@ -64,16 +62,14 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
     <Card className="p-6">
       <div className="mb-6">
         <h2 className="text-xl font-semibold tracking-tight">Reset password</h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1">
           Enter the code sent to <strong>{email}</strong> and choose a new password.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            {error}
-          </div>
+          <div className="rounded-md bg-destructive/10 px-3 py-2 text-destructive">{error}</div>
         )}
 
         <div className="space-y-2">
@@ -122,13 +118,13 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
           type="button"
           onClick={handleResend}
           disabled={resending}
-          className="text-sm text-primary hover:underline disabled:opacity-50"
+          className="text-primary hover:underline disabled:opacity-50"
         >
           {resending ? "Sending..." : "Didn't receive a code? Resend"}
         </button>
       </div>
 
-      <p className="mt-4 text-center text-sm text-muted-foreground">
+      <p className="mt-4 text-center text-muted-foreground">
         <Link href="/login" className="text-primary hover:underline">
           Back to sign in
         </Link>

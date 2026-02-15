@@ -40,16 +40,12 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
     <Card className="p-6">
       <div className="mb-6">
         <h2 className="text-xl font-semibold tracking-tight">Create an account</h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Enter your details to create a new account.
-        </p>
+        <p className="text-muted-foreground mt-1">Enter your details to create a new account.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            {error}
-          </div>
+          <div className="rounded-md bg-destructive/10 px-3 py-2 text-destructive">{error}</div>
         )}
 
         <div className="space-y-2">
@@ -117,7 +113,7 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
         </>
       )}
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <p className="mt-6 text-center text-muted-foreground">
         Already have an account?{" "}
         <Link href="/login" className="text-primary hover:underline">
           Sign in

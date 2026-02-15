@@ -43,16 +43,14 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     <Card className="p-6">
       <div className="mb-6">
         <h2 className="text-xl font-semibold tracking-tight">Sign in</h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1">
           Enter your credentials to access the admin panel.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            {error}
-          </div>
+          <div className="rounded-md bg-destructive/10 px-3 py-2 text-destructive">{error}</div>
         )}
 
         <div className="space-y-2">
@@ -114,7 +112,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
         </>
       )}
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <p className="mt-6 text-center text-muted-foreground">
         Don&apos;t have an account?{" "}
         <Link href="/register" className="text-primary hover:underline">
           Register

@@ -6,20 +6,20 @@
  * Uses "QUEUE" prefix logging to distinguish from EventBus processing.
  */
 
-import type {
-  IQueueClient,
-  MessageValidator,
-} from "@/shared/infrastructure/messaging/queue/core/types"
-import type { ConsumerConfig } from "@/shared/infrastructure/messaging/queue/core/consumer"
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
-import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
-import type { PrometheusMetricsExporter } from "@repo/observability"
+import type { ConsumerConfig } from "@/shared/infrastructure/messaging/queue/core/consumer"
 import {
   EventConsumer,
   defaultConsumerConfig,
   defaultMessageValidator,
 } from "@/shared/infrastructure/messaging/queue/core/consumer"
+import type {
+  IQueueClient,
+  MessageValidator,
+} from "@/shared/infrastructure/messaging/queue/core/types"
+import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
+import type { ILogger } from "@/shared/utils/logger.types"
+import type { PrometheusMetricsExporter } from "@repo/observability"
 import { RabbitMQEventProcessor } from "./event-processor"
 
 /**

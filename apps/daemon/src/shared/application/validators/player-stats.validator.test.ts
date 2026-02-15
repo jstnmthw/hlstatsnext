@@ -4,15 +4,15 @@
  * Tests for player statistics validation utilities.
  */
 
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import {
-  validateStatValue,
-  validateSkillChange,
-  validateStreakValue,
+  sanitizePlayerStatsUpdate,
   validateConnectionTime,
   validatePlayerName,
   validatePlayerStatsUpdate,
-  sanitizePlayerStatsUpdate,
+  validateSkillChange,
+  validateStatValue,
+  validateStreakValue,
 } from "./player-stats.validator"
 
 describe("validateStatValue", () => {

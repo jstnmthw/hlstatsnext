@@ -3,7 +3,52 @@
 import * as React from "react"
 import { useState } from "react"
 
-import { Example, ExampleWrapper } from "./example"
+import {
+  IconAlertTriangle,
+  IconArchive,
+  IconArrowLeft,
+  IconArrowRight,
+  IconArrowUp,
+  IconBluetooth,
+  IconCalendarPlus,
+  IconCheck,
+  IconChevronDown,
+  IconClock,
+  IconCopy,
+  IconDeviceDesktop,
+  IconDeviceFloppy,
+  IconDots,
+  IconDotsVertical,
+  IconDownload,
+  IconEye,
+  IconFile,
+  IconFileCode,
+  IconFileText,
+  IconFilterPlus,
+  IconFolder,
+  IconFolderOpen,
+  IconFolderSearch,
+  IconHelpCircle,
+  IconInfoCircle,
+  IconLayout,
+  IconLogout,
+  IconMailCheck,
+  IconMinus,
+  IconMoon,
+  IconPalette,
+  IconPlus,
+  IconRobot,
+  IconSearch,
+  IconShare,
+  IconShoppingBag,
+  IconStar,
+  IconSun,
+  IconTag,
+  IconTrash,
+  IconUserX,
+  IconVolume,
+  IconWaveSine,
+} from "@tabler/icons-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,6 +101,7 @@ import {
   DropdownMenuTrigger,
 } from "./dropdown-menu"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "./empty"
+import { Example, ExampleWrapper } from "./example"
 import {
   Field,
   FieldContent,
@@ -111,52 +157,6 @@ import { Spinner } from "./spinner"
 import { Switch } from "./switch"
 import { Textarea } from "./textarea"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip"
-import {
-  IconMinus,
-  IconPlus,
-  IconArrowLeft,
-  IconChevronDown,
-  IconMailCheck,
-  IconArchive,
-  IconClock,
-  IconCalendarPlus,
-  IconFilterPlus,
-  IconTag,
-  IconTrash,
-  IconArrowRight,
-  IconVolume,
-  IconCheck,
-  IconUserX,
-  IconShare,
-  IconCopy,
-  IconAlertTriangle,
-  IconRobot,
-  IconSearch,
-  IconInfoCircle,
-  IconStar,
-  IconWaveSine,
-  IconArrowUp,
-  IconBluetooth,
-  IconDotsVertical,
-  IconFile,
-  IconFolder,
-  IconFolderOpen,
-  IconFileCode,
-  IconDots,
-  IconFolderSearch,
-  IconDeviceFloppy,
-  IconDownload,
-  IconEye,
-  IconLayout,
-  IconPalette,
-  IconSun,
-  IconMoon,
-  IconDeviceDesktop,
-  IconHelpCircle,
-  IconFileText,
-  IconLogout,
-  IconShoppingBag,
-} from "@tabler/icons-react"
 
 export function CoverExample() {
   return (
@@ -609,7 +609,7 @@ function InputGroupExamples() {
                 <p>You should not enter any sensitive information on this site.</p>
               </PopoverContent>
             </Popover>
-            <InputGroupAddon className="text-muted-foreground pl-1!">https://</InputGroupAddon>
+            <InputGroupAddon className="pl-1! text-muted-foreground">https://</InputGroupAddon>
             <InputGroupAddon align="inline-end">
               <InputGroupButton
                 onClick={() => setIsFavorite(!isFavorite)}
@@ -679,11 +679,7 @@ function InputGroupExamples() {
             </DropdownMenu>
             <InputGroupText className="ml-auto">52% used</InputGroupText>
             <Separator orientation="vertical" className="h-4!" />
-            <InputGroupButton
-              variant="solid"
-              className="style-lyra:rounded-none rounded-full"
-              size="icon-xs"
-            >
+            <InputGroupButton variant="primary" className="style-lyra:rounded-none rounded-full">
               <IconArrowUp />
               <span className="sr-only">Send</span>
             </InputGroupButton>
@@ -1127,7 +1123,7 @@ function ObservabilityCard() {
   return (
     <Example title="Card" className="items-center justify-center">
       <Card className="relative w-full max-w-sm overflow-hidden pt-0">
-        <div className="bg-primary absolute inset-0 z-30 aspect-video opacity-50 mix-blend-color" />
+        <div className="absolute inset-0 z-30 aspect-video bg-primary opacity-50 mix-blend-color" />
         <img
           src="https://images.unsplash.com/photo-1604076850742-4c7221f3101b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="Photo by mymind on Unsplash"

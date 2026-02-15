@@ -6,8 +6,8 @@
  */
 
 export { CryptoService } from "./encryption"
-export type { ICryptoService, CryptoConfig, EncryptedData } from "./types"
 export { CryptoError, CryptoErrorCode, DEFAULT_CRYPTO_CONFIG } from "./types"
+export type { CryptoConfig, EncryptedData, ICryptoService } from "./types"
 
 // Convenience factory function
 import { CryptoService } from "./encryption"

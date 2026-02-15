@@ -1,9 +1,8 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { Button } from "@repo/ui"
-import { IconLogout } from "@repo/ui"
 import { signOut, useSession } from "@repo/auth/client"
+import { Button, IconLogout } from "@repo/ui"
+import { useRouter } from "next/navigation"
 
 export function UserMenu() {
   const router = useRouter()

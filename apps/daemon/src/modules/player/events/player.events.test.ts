@@ -2,13 +2,13 @@
  * PlayerEventHandler Unit Tests
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { PlayerEventHandler } from "./player.events"
-import { createMockLogger } from "@/tests/mocks/logger"
+import type { IServerService } from "@/modules/server/server.types"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { IPlayerService } from "../types/player.types"
-import type { IServerService } from "@/modules/server/server.types"
+import { PlayerEventHandler } from "./player.events"
 
 // Create mock services
 const createMockPlayerService = (): IPlayerService => ({

@@ -4,8 +4,8 @@
  * Manages database connections with pooling, health checks, and metrics.
  */
 
-import { type PrismaClient, createAdapter } from "./client"
 import { PrismaClient as PrismaClientConstructor } from "../generated/prisma/client"
+import { type PrismaClient, createAdapter } from "./client"
 
 // Minimal logger interface that applications must implement
 // This allows the database package to be logger-agnostic

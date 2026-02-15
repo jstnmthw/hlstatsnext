@@ -4,16 +4,16 @@
  * Wraps amqplib types to match our queue interfaces
  */
 
-import type * as amqp from "amqplib"
 import type {
-  QueueChannel,
-  QueueConnection,
-  ConsumeMessage,
-  PublishOptions,
-  ConsumeOptions,
   AssertExchangeOptions,
   AssertQueueOptions,
+  ConsumeMessage,
+  ConsumeOptions,
+  PublishOptions,
+  QueueChannel,
+  QueueConnection,
 } from "@/shared/infrastructure/messaging/queue/core/types"
+import type * as amqp from "amqplib"
 
 /**
  * Adapter class that wraps amqplib Channel to match our QueueChannel interface

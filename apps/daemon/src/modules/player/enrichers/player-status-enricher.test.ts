@@ -2,15 +2,15 @@
  * Player Status Enricher Tests
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { PlayerStatusEnricher } from "./player-status-enricher"
+import type { GeoIPService } from "@/modules/geoip/geoip.service"
+import type { PlayerInfo } from "@/modules/rcon/types/rcon.types"
+import { createMockGeoIPService } from "@/tests/mocks/geoip.service.mock"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
 import { createMockServerService } from "@/tests/mocks/server.service.mock"
-import { createMockGeoIPService } from "@/tests/mocks/geoip.service.mock"
-import type { PlayerInfo } from "@/modules/rcon/types/rcon.types"
 import type { Player } from "@repo/database/client"
-import type { GeoIPService } from "@/modules/geoip/geoip.service"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { PlayerStatusEnricher } from "./player-status-enricher"
 
 describe("PlayerStatusEnricher", () => {
   let enricher: PlayerStatusEnricher

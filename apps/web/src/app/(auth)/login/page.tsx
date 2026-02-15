@@ -1,5 +1,5 @@
-import type { Metadata } from "next"
 import { LoginForm } from "@/features/auth/components/login-form"
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Sign In - " + process.env.NEXT_PUBLIC_APP_NAME,

@@ -5,9 +5,9 @@
  * Provides caching and efficient retrieval of notification settings.
  */
 
-import type { NotificationConfig, Prisma } from "@repo/database/client"
 import type { TransactionalPrisma } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { NotificationConfig, Prisma } from "@repo/database/client"
 
 export interface INotificationConfigRepository {
   /**

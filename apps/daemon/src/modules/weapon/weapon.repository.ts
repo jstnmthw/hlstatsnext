@@ -2,13 +2,13 @@
  * Weapon Repository
  */
 
-import { BaseRepository } from "@/shared/infrastructure/persistence/repository.base"
-import type { DatabaseClient } from "@/database/client"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IWeaponRepository } from "./weapon.types"
-import type { FindOptions, UpdateOptions } from "@/shared/types/database"
-import type { Prisma } from "@repo/database/client"
 import { GameConfig } from "@/config/game.config"
+import type { DatabaseClient } from "@/database/client"
+import { BaseRepository } from "@/shared/infrastructure/persistence/repository.base"
+import type { FindOptions, UpdateOptions } from "@/shared/types/database"
+import type { ILogger } from "@/shared/utils/logger.types"
+import type { Prisma } from "@repo/database/client"
+import type { IWeaponRepository } from "./weapon.types"
 
 export class WeaponRepository
   extends BaseRepository<Record<string, unknown>>

@@ -2,18 +2,18 @@
  * RabbitMQ Client Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { RabbitMQClient } from "./client"
 import type {
-  RabbitMQConfig,
   QueueChannel,
+  RabbitMQConfig,
 } from "@/shared/infrastructure/messaging/queue/core/types"
 import {
   QueueConnectionError,
   QueueError,
 } from "@/shared/infrastructure/messaging/queue/core/types"
-import type { Connection } from "amqplib"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { Connection } from "amqplib"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { RabbitMQClient } from "./client"
 
 // Mock amqplib
 const mockConnect = vi.fn()

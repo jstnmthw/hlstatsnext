@@ -3,14 +3,14 @@
  *
  * Handles server authentication logic using database lookups and caching.
  */
-import type { IServerAuthenticator } from "../ingress.dependencies"
 import type { DatabaseClient } from "@/database/client"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { AuthenticationResult } from "../types/ingress.types"
-import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import { validateAddress } from "@/shared/application/validators/address-validator"
 import { validatePort } from "@/shared/application/validators/port-validator"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import { EventType, type ServerAuthenticatedEvent } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import type { IServerAuthenticator } from "../ingress.dependencies"
+import type { AuthenticationResult } from "../types/ingress.types"
 
 /**
  * Server authenticator implementation using database

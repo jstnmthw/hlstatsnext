@@ -2,14 +2,14 @@
  * RankingService Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { RankingService, type KillContext } from "./ranking.service"
+import type { TransactionalPrisma } from "@/database/client"
+import { createMockDatabaseClient } from "@/tests/mocks/database"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockWeaponRepository } from "@/tests/mocks/weapon.repository"
-import { createMockDatabaseClient } from "@/tests/mocks/database"
-import type { SkillRating } from "./ranking.types"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { IWeaponRepository } from "../weapon/weapon.types"
-import type { TransactionalPrisma } from "@/database/client"
+import { RankingService, type KillContext } from "./ranking.service"
+import type { SkillRating } from "./ranking.types"
 
 describe("RankingService", () => {
   let rankingService: RankingService

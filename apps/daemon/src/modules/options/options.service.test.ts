@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, type Mock } from "vitest"
 import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest"
 import { OptionsService } from "./options.service"
 
 type OptionRow = { keyname: string; value: string }

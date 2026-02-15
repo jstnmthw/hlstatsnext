@@ -18,12 +18,12 @@ interface VerticalListItemProps {
 
 export const VerticalList = ({ className, children }: VerticalListProps) => {
   return (
-    <div className={cn("col-span-2 border border-border rounded-lg", className)}>{children}</div>
+    <div className={cn("col-span-2 rounded-lg border border-border", className)}>{children}</div>
   )
 }
 
 export const VerticalListHeader = ({ className, children }: VerticalListHeaderProps) => {
-  return <h2 className={cn("uppercase tracking-tight font-bold p-2", className)}>{children}</h2>
+  return <h2 className={cn("p-2 font-bold tracking-tight uppercase", className)}>{children}</h2>
 }
 
 export const VerticalListItem = ({ className, children }: VerticalListItemProps) => {

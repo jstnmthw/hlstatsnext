@@ -1,5 +1,5 @@
+export { getSessionCookie } from "better-auth/cookies"
+export { ac, adminRole, statement, userRole } from "./permissions"
 export { auth } from "./server"
 export type { Auth, Session } from "./server"
-export { getSession, requireAuth, AuthError } from "./session"
-export { ac, adminRole, userRole, statement } from "./permissions"
-export { getSessionCookie } from "better-auth/cookies"
+export { AuthError, getSession, requireAuth } from "./session"

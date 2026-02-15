@@ -52,8 +52,8 @@
  */
 
 import type { IPlayerService } from "@/modules/player/types/player.types"
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 export interface PlayerValidationResult {
   playerId: number

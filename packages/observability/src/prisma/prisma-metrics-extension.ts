@@ -8,8 +8,8 @@
  */
 
 import type { PrismaClient } from "@repo/database/client"
-import type { ILogger, PrismaQueryInfo } from "../types"
 import type { PrometheusMetricsExporter } from "../prometheus/prometheus-metrics-exporter"
+import type { ILogger, PrismaQueryInfo } from "../types"
 
 export interface PrismaMetricsOptions {
   logSlowQueries?: boolean

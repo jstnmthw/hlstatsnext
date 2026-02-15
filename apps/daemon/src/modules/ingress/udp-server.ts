@@ -4,9 +4,9 @@
  * High-performance UDP server that receives game server logs.
  */
 
-import { EventEmitter } from "events"
-import { createSocket, Socket } from "dgram"
 import type { ILogger } from "@/shared/utils/logger.types"
+import { createSocket, Socket } from "dgram"
+import { EventEmitter } from "events"
 
 export interface UdpServerOptions {
   port: number

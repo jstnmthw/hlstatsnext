@@ -2,11 +2,11 @@
  * Base Module Event Handler Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { BaseModuleEventHandler } from "./event-handler.base"
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { BaseModuleEventHandler } from "./event-handler.base"
 
 // Test implementation for testing base functionality
 class TestModuleEventHandler extends BaseModuleEventHandler {

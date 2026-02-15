@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button, Card, Input, Label } from "@repo/ui"
 import { authClient } from "@repo/auth/client"
+import { Button, Card, Input, Label } from "@repo/ui"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 export function ForgotPasswordForm() {
   const router = useRouter()
@@ -33,7 +33,7 @@ export function ForgotPasswordForm() {
     <Card className="p-6">
       <div className="mb-6">
         <h2 className="text-xl font-semibold tracking-tight">Forgot password</h2>
-        <p className="text-muted-foreground mt-1">
+        <p className="mt-1 text-muted-foreground">
           Enter your email address and we&apos;ll send you a code to reset your password.
         </p>
       </div>

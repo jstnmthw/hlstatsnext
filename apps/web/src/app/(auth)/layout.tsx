@@ -1,6 +1,6 @@
+import { AppLogo } from "@/features/common/components/app-logo"
 import { getSession } from "@repo/auth/session"
 import { redirect } from "next/navigation"
-import { AppLogo } from "@/features/common/components/app-logo"
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()

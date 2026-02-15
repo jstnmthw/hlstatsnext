@@ -1,6 +1,5 @@
+import { Button, cn, IconArrowDown, IconArrowUp, IconSelector } from "@repo/ui"
 import { Column } from "@tanstack/react-table"
-import { IconArrowDown, IconArrowUp, IconSelector } from "@repo/ui"
-import { cn, Button } from "@repo/ui"
 
 interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
   column?: Column<TData, TValue>
@@ -37,18 +36,18 @@ export function DataTableColumnHeader<TData, TValue>({
       <Button
         variant="ghost"
         size="sm"
-        className={cn("-ml-3 h-8 group", className)}
+        className={cn("group -ml-3 h-8", className)}
         onClick={handleClick}
       >
-        <span className="text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200">
+        <span className="text-zinc-500 transition-colors duration-200 group-hover:text-zinc-100">
           {title}
         </span>
         {isCurrentSort && sortOrder === "desc" ? (
-          <IconArrowDown className="size-4 text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200" />
+          <IconArrowDown className="size-4 text-zinc-500 transition-colors duration-200 group-hover:text-zinc-100" />
         ) : isCurrentSort && sortOrder === "asc" ? (
-          <IconArrowUp className="size-4 text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200" />
+          <IconArrowUp className="size-4 text-zinc-500 transition-colors duration-200 group-hover:text-zinc-100" />
         ) : (
-          <IconSelector className="size-4 text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200" />
+          <IconSelector className="size-4 text-zinc-500 transition-colors duration-200 group-hover:text-zinc-100" />
         )}
       </Button>
     )

@@ -2,19 +2,21 @@
  * ActionService Unit Tests
  */
 
-import type { IPlayerService } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
-import type { IActionRepository, ActionDefinition, ActionEvent } from "./action.types"
+import type { IPlayerService } from "@/modules/player/types/player.types"
+import { EventType } from "@/shared/types/events"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { ActionService } from "./action.service"
 import type {
+  ActionDefinition,
+  ActionEvent,
   ActionPlayerEvent,
   ActionPlayerPlayerEvent,
   ActionTeamEvent,
+  IActionRepository,
   WorldActionEvent,
 } from "./action.types"
-import { EventType } from "@/shared/types/events"
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { ActionService } from "./action.service"
-import { createMockLogger } from "@/tests/mocks/logger"
 
 // Create mock repository
 const createMockActionRepository = (): IActionRepository => ({

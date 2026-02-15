@@ -2,20 +2,20 @@
  * Event Notification Service Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { EventNotificationService } from "./event-notification.service"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import type { INotificationConfigRepository } from "../repositories/notification-config.repository"
 import type {
+  ActionEventNotificationData,
   KillEventNotificationData,
   SuicideEventNotificationData,
   TeamKillEventNotificationData,
-  ActionEventNotificationData,
 } from "../types/notification.types"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { INotificationConfigRepository } from "../repositories/notification-config.repository"
-import type { PlayerNotificationService } from "./player-notification.service"
 import type { CommandResolverService } from "./command-resolver.service"
-import { createMockLogger } from "@/tests/mocks/logger"
-import { EventType } from "@/shared/types/events"
+import { EventNotificationService } from "./event-notification.service"
+import type { PlayerNotificationService } from "./player-notification.service"
 
 describe("EventNotificationService", () => {
   let service: EventNotificationService

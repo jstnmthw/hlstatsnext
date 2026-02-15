@@ -6,15 +6,15 @@
  */
 
 // Types
-export type { ILogger, DatabaseQueryMetric, PrometheusMetric, PrismaQueryInfo } from "./types"
+export type { DatabaseQueryMetric, ILogger, PrismaQueryInfo, PrometheusMetric } from "./types"
 
 // Prometheus metrics
-export { PrometheusMetricsExporter } from "./prometheus/prometheus-metrics-exporter"
 export { MetricsServer, type MetricsServerOptions } from "./prometheus/metrics-server"
+export { PrometheusMetricsExporter } from "./prometheus/prometheus-metrics-exporter"
 
 // Prisma extensions
 export {
   createPrismaWithMetrics,
-  type PrismaWithMetrics,
   type PrismaMetricsOptions,
+  type PrismaWithMetrics,
 } from "./prisma/prisma-metrics-extension"

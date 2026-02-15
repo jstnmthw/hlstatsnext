@@ -4,14 +4,14 @@
  * Handles UDP server, log parsing, server authentication, and event processing.
  */
 
-import type { IIngressService, IngressOptions, IngressStats } from "./ingress.types"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { BaseEvent } from "@/shared/types/events"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
+import type { BaseEvent } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { IngressDependencies } from "./ingress.dependencies"
+import type { IIngressService, IngressOptions, IngressStats } from "./ingress.types"
 import type { BaseParser } from "./parsers/base.parser"
-import { UdpServer, type ISocketFactory } from "./udp-server"
 import { ParserFactory } from "./parsers/parser-factory"
+import { UdpServer, type ISocketFactory } from "./udp-server"
 
 export class IngressService implements IIngressService {
   private readonly udpServer: UdpServer

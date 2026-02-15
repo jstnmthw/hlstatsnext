@@ -2,8 +2,8 @@
  * Ingress Module Types
  */
 
-import type { BaseEvent } from "@/shared/types/events"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
+import type { BaseEvent } from "@/shared/types/events"
 
 export interface IngressOptions {
   port?: number

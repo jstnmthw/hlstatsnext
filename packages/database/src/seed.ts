@@ -1,9 +1,9 @@
+import { mysqlSplitterOptions, splitQuery } from "dbgate-query-splitter"
 import fs from "fs/promises"
 import path from "path"
-import { splitQuery, mysqlSplitterOptions } from "dbgate-query-splitter"
 import { db } from "./client"
 import { seedAdmin } from "./seeders"
-import { log, logStep, logSuccess, logError, logHeader, logDivider } from "./seeders/fake/logger"
+import { log, logDivider, logError, logHeader, logStep, logSuccess } from "./seeders/fake/logger"
 
 type SqlStatement = string | { text: string }
 

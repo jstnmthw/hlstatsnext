@@ -1,4 +1,4 @@
-import type { Result, AppError } from "@/shared/types"
+import type { AppError, Result } from "@/shared/types"
 import { mapAppErrorToGraphQLError } from "@/shared/utils/graphql-errors"
 
 /**

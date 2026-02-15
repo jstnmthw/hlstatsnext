@@ -6,9 +6,9 @@
  */
 
 import type { DatabaseClient } from "@/database/client"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { FindOptions, CreateOptions, UpdateOptions } from "@/shared/types/database"
 import { BaseRepository } from "@/shared/infrastructure/persistence/repository.base"
+import type { CreateOptions, FindOptions, UpdateOptions } from "@/shared/types/database"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 export interface BatchUpdateOperation<T> {
   id: number

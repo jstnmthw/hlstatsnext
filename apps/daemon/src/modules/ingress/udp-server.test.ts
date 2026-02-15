@@ -2,12 +2,12 @@
  * UdpServer Unit Tests
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { EventEmitter } from "events"
-import { UdpServer } from "./udp-server"
 import { createMockLogger } from "@/tests/mocks/logger"
-import type { UdpServerOptions, ISocketFactory } from "./udp-server"
-import type { Socket, RemoteInfo } from "dgram"
+import type { RemoteInfo, Socket } from "dgram"
+import { EventEmitter } from "events"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import type { ISocketFactory, UdpServerOptions } from "./udp-server"
+import { UdpServer } from "./udp-server"
 
 // Create mock event handlers to capture registered callbacks
 let registeredMessageHandler: ((buffer: Buffer, rinfo: RemoteInfo) => void) | null = null

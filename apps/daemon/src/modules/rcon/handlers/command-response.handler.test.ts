@@ -2,10 +2,10 @@
  * Command Response Handler Tests
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { CommandResponseHandler } from "./command-response.handler"
-import { RconErrorCode } from "../types/rcon.types"
 import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { RconErrorCode } from "../types/rcon.types"
+import { CommandResponseHandler } from "./command-response.handler"
 
 describe("CommandResponseHandler", () => {
   let handler: CommandResponseHandler

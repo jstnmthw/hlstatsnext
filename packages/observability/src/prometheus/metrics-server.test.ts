@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import http from "node:http"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import type { ILogger } from "../types"
 import { MetricsServer } from "./metrics-server"
 import { PrometheusMetricsExporter } from "./prometheus-metrics-exporter"
-import type { ILogger } from "../types"
 
 describe("MetricsServer", () => {
   let server: MetricsServer

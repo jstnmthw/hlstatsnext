@@ -4,7 +4,7 @@
  * Provides mock implementations for player service and resolver interfaces
  */
 
-import type { IPlayerService, IPlayerResolver } from "@/modules/player/types/player.types"
+import type { IPlayerResolver, IPlayerService } from "@/modules/player/types/player.types"
 import { vi } from "vitest"
 
 export function createMockPlayerResolver(): IPlayerResolver {

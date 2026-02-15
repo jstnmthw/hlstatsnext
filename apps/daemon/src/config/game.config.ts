@@ -5,21 +5,21 @@
  */
 
 import {
-  GameConfigService,
   BOOTSTRAP_CONFIG,
+  GameConfigService,
   getDefaultGame,
   getUnknownMap,
-  type GameRecord,
   type GamePattern,
+  type GameRecord,
 } from "./game-config.service"
 
 export {
-  GameConfigService,
   BOOTSTRAP_CONFIG,
+  GameConfigService,
   getDefaultGame,
   getUnknownMap,
-  type GameRecord,
   type GamePattern,
+  type GameRecord,
 }
 
 // Commonly used game codes

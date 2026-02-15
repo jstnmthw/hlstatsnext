@@ -1,3 +1,6 @@
+import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
+import { FilterConfig } from "@/features/common/types/data-table"
+import { formatDate } from "@/lib/datetime-util"
 import {
   Button,
   Checkbox,
@@ -8,12 +11,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  IconDots,
+  IconRefresh,
 } from "@repo/ui"
 import { ColumnDef, HeaderContext } from "@tanstack/react-table"
-import { formatDate } from "@/lib/datetime-util"
-import { FilterConfig } from "@/features/common/types/data-table"
-import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
-import { IconDots, IconRefresh } from "@repo/ui"
 
 interface ExtendedHeaderContext<TData, TValue> extends HeaderContext<TData, TValue> {
   sortField?: string
@@ -39,7 +40,7 @@ export const columns: ColumnDef<PlayerListItem>[] = [
   {
     id: "select",
     header: ({ table }) => (
-      <div className="flex items-center justify-center pr-3 pl-1 max-w-10">
+      <div className="flex max-w-10 items-center justify-center pr-3 pl-1">
         <Checkbox
           checked={
             table.getIsAllPageRowsSelected() ||
@@ -51,7 +52,7 @@ export const columns: ColumnDef<PlayerListItem>[] = [
       </div>
     ),
     cell: ({ row }) => (
-      <div className="flex items-center justify-center pr-3 pl-1 max-w-10">
+      <div className="flex max-w-10 items-center justify-center pr-3 pl-1">
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -173,7 +174,7 @@ export const playerColumns = (): ColumnDef<PlayerListItem>[] => [
   {
     id: "select",
     header: ({ table }) => (
-      <div className="flex items-center justify-center pr-3 pl-1 max-w-10">
+      <div className="flex max-w-10 items-center justify-center pr-3 pl-1">
         <Checkbox
           checked={
             table.getIsAllPageRowsSelected() ||
@@ -185,7 +186,7 @@ export const playerColumns = (): ColumnDef<PlayerListItem>[] => [
       </div>
     ),
     cell: ({ row }) => (
-      <div className="flex items-center justify-center pr-3 pl-1 max-w-10">
+      <div className="flex max-w-10 items-center justify-center pr-3 pl-1">
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -312,7 +313,7 @@ export const playerColumns = (): ColumnDef<PlayerListItem>[] => [
       <div className="flex items-center justify-end pr-3 pl-1">
         <Button
           variant="ghost"
-          className="size-8 p-0 group"
+          className="group size-8 p-0"
           onClick={props.onRefresh}
           disabled={props.isPending}
         >
@@ -320,7 +321,7 @@ export const playerColumns = (): ColumnDef<PlayerListItem>[] => [
             className={cn(
               "size-4",
               props.isPending ? "animate-spin" : "",
-              "text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200",
+              "text-zinc-500 transition-colors duration-200 group-hover:text-zinc-100",
             )}
           />
         </Button>

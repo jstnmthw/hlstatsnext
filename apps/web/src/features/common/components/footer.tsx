@@ -1,6 +1,6 @@
 export function Footer() {
   return (
-    <footer className="w-full mt-auto py-4">
+    <footer className="mt-auto w-full py-4">
       <div className="container">
         <div className="flex items-center">
           <div className="text-muted-foreground/80">

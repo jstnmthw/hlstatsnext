@@ -2,12 +2,12 @@
  * PlayerRepository Unit Tests
  */
 
-import { describe, it, expect, beforeEach } from "vitest"
-import { PlayerRepository } from "./player.repository"
-import { createMockLogger } from "@/tests/mocks/logger"
-import { createMockDatabaseClient, type MockDatabaseClient } from "@/tests/mocks/database"
-import type { Player, EventConnect } from "@repo/database/client"
 import type { DatabaseClient } from "@/database/client"
+import { createMockDatabaseClient, type MockDatabaseClient } from "@/tests/mocks/database"
+import { createMockLogger } from "@/tests/mocks/logger"
+import type { EventConnect, Player } from "@repo/database/client"
+import { beforeEach, describe, expect, it } from "vitest"
+import { PlayerRepository } from "./player.repository"
 
 // Helper function to create a complete Player object with defaults
 function createMockPlayer(overrides: Partial<Player> = {}): Player {

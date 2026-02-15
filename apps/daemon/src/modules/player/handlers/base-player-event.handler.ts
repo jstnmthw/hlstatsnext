@@ -4,12 +4,11 @@
  * Provides common functionality for all player event handlers
  */
 
-import type { HandlerResult } from "@/shared/types/common"
-import type { PlayerEvent } from "@/modules/player/types/player.types"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerRepository } from "@/modules/player/types/player.types"
-import type { IMatchService } from "@/modules/match/match.types"
 import type { IMapService } from "@/modules/map/map.service"
+import type { IMatchService } from "@/modules/match/match.types"
+import type { IPlayerRepository, PlayerEvent } from "@/modules/player/types/player.types"
+import type { HandlerResult } from "@/shared/types/common"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 export abstract class BasePlayerEventHandler {
   constructor(

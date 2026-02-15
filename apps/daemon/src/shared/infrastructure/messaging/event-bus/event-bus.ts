@@ -4,15 +4,15 @@
  * Implements a decoupled event handling system.
  */
 
-import type {
-  IEventBus,
-  EventHandler,
-  EventHandlerRegistration,
-  EventBusStats,
-  HandlerResult,
-} from "./event-bus.types"
 import type { BaseEvent, EventType } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type {
+  EventBusStats,
+  EventHandler,
+  EventHandlerRegistration,
+  HandlerResult,
+  IEventBus,
+} from "./event-bus.types"
 
 export class EventBus implements IEventBus {
   private readonly handlers: Map<EventType, Set<EventHandlerRegistration>> = new Map()

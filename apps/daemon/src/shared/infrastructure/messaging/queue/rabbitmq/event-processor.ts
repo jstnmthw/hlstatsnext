@@ -6,17 +6,17 @@
  * logging to distinguish from EventBus processing.
  */
 
+import type { EventCoordinator } from "@/shared/application/event-coordinator"
+import type { IEventProcessor } from "@/shared/infrastructure/messaging/queue/core/consumer"
+import {
+  generateCorrelationId,
+  generateMessageId,
+} from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import type { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
+import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IEventProcessor } from "@/shared/infrastructure/messaging/queue/core/consumer"
-import type { EventCoordinator } from "@/shared/application/event-coordinator"
-import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
-import type { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
 import type { PrometheusMetricsExporter } from "@repo/observability"
-import {
-  generateMessageId,
-  generateCorrelationId,
-} from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 
 /**
  * RabbitMQ Event Processor implementation that routes events through

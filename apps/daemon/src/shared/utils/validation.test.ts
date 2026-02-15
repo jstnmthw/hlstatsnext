@@ -2,13 +2,13 @@
  * Validation Utilities Unit Tests
  */
 
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import {
-  validateSteamId,
+  sanitizePlayerName,
+  validateEventType,
   validatePlayerName,
   validateServerId,
-  validateEventType,
-  sanitizePlayerName,
+  validateSteamId,
 } from "./validation"
 
 describe("Validation Utilities", () => {

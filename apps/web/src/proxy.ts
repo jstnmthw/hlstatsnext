@@ -1,6 +1,6 @@
+import { getSessionCookie } from "@repo/auth/cookies"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
-import { getSessionCookie } from "@repo/auth/cookies"
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl

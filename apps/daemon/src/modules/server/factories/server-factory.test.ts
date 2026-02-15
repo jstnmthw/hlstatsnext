@@ -4,11 +4,11 @@
  * Tests for server creation with default configuration seeding.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { ServerFactory } from "./server-factory"
-import { createMockLogger } from "@/tests/mocks/logger"
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { DatabaseClient } from "@/database/client"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { ServerFactory } from "./server-factory"
 
 // Mock the seeder functions
 vi.mock("../seeders/seed-server-defaults", () => ({
@@ -22,10 +22,6 @@ vi.mock("../seeders/seed-game-defaults", () => ({
 vi.mock("../seeders/seed-mod-defaults", () => ({
   seedModDefaults: vi.fn().mockResolvedValue(undefined),
 }))
-
-import { seedServerDefaults as _seedServerDefaults } from "../seeders/seed-server-defaults"
-import { seedGameDefaults as _seedGameDefaults } from "../seeders/seed-game-defaults"
-import { seedModDefaults as _seedModDefaults } from "../seeders/seed-mod-defaults"
 
 function createMockDatabaseClient() {
   const mockTx = {

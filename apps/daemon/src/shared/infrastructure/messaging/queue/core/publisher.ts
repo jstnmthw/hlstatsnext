@@ -5,23 +5,23 @@
  * priority-based publishing, and metrics integration.
  */
 
-import { EventType } from "@/shared/types/events"
-import { MessagePriority, QueuePublishError } from "./types"
-import type { BaseEvent } from "@/shared/types/events"
-import type { ILogger } from "@/shared/utils/logger.types"
 import {
-  generateMessageId,
   generateCorrelationId,
+  generateMessageId,
 } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import type { BaseEvent } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type {
+  EventMessage,
   IEventPublisher,
   IQueueClient,
-  QueueChannel,
-  EventMessage,
   MessageMetadata,
-  RoutingKeyMapper,
   PriorityMapper,
+  QueueChannel,
+  RoutingKeyMapper,
 } from "./types"
+import { MessagePriority, QueuePublishError } from "./types"
 
 /**
  * Event publisher for RabbitMQ with comprehensive message handling

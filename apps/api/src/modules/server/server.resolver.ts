@@ -1,6 +1,6 @@
+import type { Server } from "@repo/database/client"
 import { builder } from "../../builder"
 import { requireAdmin } from "../../context"
-import type { Server } from "@repo/database/client"
 
 // Input type for updating servers
 const UpdateServerInput = builder.inputType("UpdateServerInput", {

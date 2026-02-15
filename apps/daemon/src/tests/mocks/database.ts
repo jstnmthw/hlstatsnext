@@ -4,9 +4,9 @@
  * Mock implementations for database operations in tests.
  */
 
-import type { TransactionalPrisma, DatabaseClient } from "@/database/client"
-import { mockDeep } from "vitest-mock-extended"
+import type { DatabaseClient, TransactionalPrisma } from "@/database/client"
 import { vi, type MockedFunction } from "vitest"
+import { mockDeep } from "vitest-mock-extended"
 
 // Type definitions for transaction callbacks
 export type TransactionCallback<T = unknown> = (tx: TransactionalPrisma) => Promise<T>

@@ -1,5 +1,5 @@
 import { db } from "@repo/database/client"
-import type { CreateServerInput, UpdateServerInput, ServerConfigCopyResult } from "./server.types"
+import type { CreateServerInput, ServerConfigCopyResult, UpdateServerInput } from "./server.types"
 
 export class ServerRepository {
   async createServer(data: CreateServerInput) {

@@ -1,7 +1,7 @@
+import { PrismaMariaDb } from "@prisma/adapter-mariadb"
 import "dotenv/config"
 import type { PrismaClient as BasePrismaClient } from "../generated/prisma/client"
 import { PrismaClient } from "../generated/prisma/client"
-import { PrismaMariaDb } from "@prisma/adapter-mariadb"
 import { ConnectionPool, type ConnectionPoolConfig, type DatabaseLogger } from "./connection-pool"
 
 export function createAdapter(): PrismaMariaDb {
@@ -178,7 +178,6 @@ export class DatabaseClient {
   }
 }
 
-export { PrismaClient } from "../generated/prisma/client"
-export { Prisma } from "../generated/prisma/client"
 export type * from "../generated/prisma/client"
+export { Prisma, PrismaClient } from "../generated/prisma/client"
 export { ConnectionPool, type ConnectionPoolConfig, type DatabaseLogger } from "./connection-pool"

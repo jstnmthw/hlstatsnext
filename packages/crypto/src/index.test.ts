@@ -2,7 +2,7 @@
  * Crypto Package Index Tests
  */
 
-import { describe, it, expect, beforeEach, afterEach } from "vitest"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { createCryptoService, CryptoService } from "./index"
 
 describe("Crypto Package Index", () => {

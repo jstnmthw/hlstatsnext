@@ -4,10 +4,10 @@
  * Tests for the no-op cache implementation.
  */
 
-import { describe, it, expect, beforeEach } from "vitest"
-import { NullCacheService } from "./null-cache.service"
-import { createMockLogger } from "@/tests/mocks/logger"
 import type { ILogger } from "@/shared/utils/logger.types"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it } from "vitest"
+import { NullCacheService } from "./null-cache.service"
 
 describe("NullCacheService", () => {
   let service: NullCacheService

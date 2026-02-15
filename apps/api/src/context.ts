@@ -1,9 +1,9 @@
-import { db } from "@repo/database/client"
-import { createCryptoService, type ICryptoService } from "@repo/crypto"
 import { auth, type Session } from "@repo/auth"
+import { createCryptoService, type ICryptoService } from "@repo/crypto"
+import { db } from "@repo/database/client"
 import { GraphQLError } from "graphql"
-import { ServerService } from "./modules/server/server.service"
 import { AuthService } from "./modules/auth/auth.service"
+import { ServerService } from "./modules/server/server.service"
 
 /**
  * Services container for dependency injection

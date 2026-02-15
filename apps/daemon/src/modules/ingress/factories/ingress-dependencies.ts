@@ -3,17 +3,17 @@
  *
  * Creates and wires ingress dependencies from existing services.
  */
-import type { IngressDependencies } from "../ingress.dependencies"
 import type { DatabaseClient } from "@/database/client"
-import type { IServerService } from "@/modules/server/server.types"
 import type { IGameDetectionService } from "@/modules/game/game-detection.types"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IClock } from "@/shared/infrastructure/time/clock.interface"
-import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
+import { ServerOrchestrator } from "@/modules/server/orchestrators/server-orchestrator"
+import type { IServerService } from "@/modules/server/server.types"
 import type { ServerStateManager } from "@/modules/server/state/server-state-manager"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
+import type { IClock } from "@/shared/infrastructure/time/clock.interface"
+import type { ILogger } from "@/shared/utils/logger.types"
 import { DatabaseServerAuthenticator } from "../adapters/database-server-authenticator"
 import { GameDetectorAdapter } from "../adapters/game-detector-adapter"
-import { ServerOrchestrator } from "@/modules/server/orchestrators/server-orchestrator"
+import type { IngressDependencies } from "../ingress.dependencies"
 
 /**
  * Create ingress dependencies from existing services

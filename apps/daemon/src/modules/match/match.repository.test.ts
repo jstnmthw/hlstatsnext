@@ -2,14 +2,14 @@
  * MatchRepository Unit Tests
  */
 
-import { describe, it, expect, beforeEach } from "vitest"
-import { MatchRepository } from "./match.repository"
-import { createMockLogger } from "@/tests/mocks/logger"
-import { createMockDatabaseClient, type MockDatabaseClient } from "@/tests/mocks/database"
-import type { DatabaseClient } from "@/database/client"
 import { GameConfig } from "@/config/game.config"
-import type { Player, PlayerHistory } from "@repo/database/client"
+import type { DatabaseClient } from "@/database/client"
+import { createMockDatabaseClient, type MockDatabaseClient } from "@/tests/mocks/database"
+import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockServerRecord } from "@/tests/mocks/server"
+import type { Player, PlayerHistory } from "@repo/database/client"
+import { beforeEach, describe, expect, it } from "vitest"
+import { MatchRepository } from "./match.repository"
 
 describe("MatchRepository", () => {
   let matchRepository: MatchRepository

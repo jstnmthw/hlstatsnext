@@ -4,20 +4,20 @@
  * Business logic for match management, rounds, and MVP calculations.
  */
 
-import type {
-  IMatchService,
-  IMatchRepository,
-  MatchEvent,
-  MatchStats,
-  RoundStartEvent,
-  RoundEndEvent,
-  TeamWinEvent,
-  MapChangeEvent,
-} from "./match.types"
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { IMapService } from "@/modules/map/map.service"
 import type { HandlerResult } from "@/shared/types/common"
 import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import type {
+  IMatchRepository,
+  IMatchService,
+  MapChangeEvent,
+  MatchEvent,
+  MatchStats,
+  RoundEndEvent,
+  RoundStartEvent,
+  TeamWinEvent,
+} from "./match.types"
 
 export class MatchService implements IMatchService {
   private currentMatches: Map<number, MatchStats> = new Map() // serverId → MatchStats

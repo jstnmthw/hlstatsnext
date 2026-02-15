@@ -4,13 +4,13 @@
  * Tests for action database operations.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { ActionRepository } from "./action.repository"
-import { createMockDatabaseClient } from "@/tests/mocks/database"
-import { createMockLogger } from "@/tests/mocks/logger"
+import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { MockDatabaseClient } from "@/tests/mocks/database"
-import type { DatabaseClient } from "@/database/client"
+import { createMockDatabaseClient } from "@/tests/mocks/database"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { ActionRepository } from "./action.repository"
 
 describe("ActionRepository", () => {
   let repository: ActionRepository

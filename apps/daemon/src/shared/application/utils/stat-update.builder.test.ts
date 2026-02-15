@@ -2,7 +2,7 @@
  * StatUpdateBuilder Unit Tests
  */
 
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import { StatUpdateBuilder } from "./stat-update.builder"
 
 describe("StatUpdateBuilder", () => {

@@ -4,27 +4,27 @@
  * Business logic for player management, statistics, and ratings.
  */
 
-import type {
-  IPlayerService,
-  IPlayerRepository,
-  PlayerStatsUpdate,
-  SkillRating,
-  RatingUpdate,
-  PlayerEvent,
-  PlayerWithCounts,
-} from "../types/player.types"
-import type { IPlayerSessionService } from "../types/player-session.types"
-import type { Player } from "@repo/database/client"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { HandlerResult } from "@/shared/types/common"
-import type { IRankingService } from "@/modules/ranking/ranking.types"
-import type { IMatchService } from "@/modules/match/match.types"
-import type { IServerRepository, IServerService } from "@/modules/server/server.types"
-import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 import type { IMapService } from "@/modules/map/map.service"
-import { normalizeSteamId, validatePlayerName, sanitizePlayerName } from "@/shared/utils/validation"
+import type { IMatchService } from "@/modules/match/match.types"
+import type { IRankingService } from "@/modules/ranking/ranking.types"
+import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
+import type { IServerRepository, IServerService } from "@/modules/server/server.types"
 import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builder"
+import type { HandlerResult } from "@/shared/types/common"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { normalizeSteamId, sanitizePlayerName, validatePlayerName } from "@/shared/utils/validation"
+import type { Player } from "@repo/database/client"
 import { PlayerEventHandlerFactory } from "../handlers/player-event-handler.factory"
+import type { IPlayerSessionService } from "../types/player-session.types"
+import type {
+  IPlayerRepository,
+  IPlayerService,
+  PlayerEvent,
+  PlayerStatsUpdate,
+  PlayerWithCounts,
+  RatingUpdate,
+  SkillRating,
+} from "../types/player.types"
 
 export class PlayerService implements IPlayerService {
   private readonly DEFAULT_RATING = 1000

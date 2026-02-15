@@ -1,9 +1,9 @@
-import "dotenv/config"
-import { PrismaClient } from "../../generated/prisma/client"
 import { PrismaMariaDb } from "@prisma/adapter-mariadb"
+import { mysqlSplitterOptions, splitQuery } from "dbgate-query-splitter"
+import "dotenv/config"
 import fs from "fs/promises"
 import path from "path"
-import { mysqlSplitterOptions, splitQuery } from "dbgate-query-splitter"
+import { PrismaClient } from "../../generated/prisma/client"
 
 type SqlStatement = string | { text: string }
 

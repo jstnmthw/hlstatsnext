@@ -4,8 +4,8 @@
  * Test implementation that generates predictable IDs for testing.
  */
 
-import type { IUuidService } from "./uuid.interface"
 import type { IClock } from "../time/clock.interface"
+import type { IUuidService } from "./uuid.interface"
 
 export class DeterministicUuidService implements IUuidService {
   private messageIdCounter = 0

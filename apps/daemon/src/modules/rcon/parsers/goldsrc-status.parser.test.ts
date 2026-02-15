@@ -2,9 +2,9 @@
  * GoldSrc Status Response Parser Tests
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { GoldSrcStatusParser } from "./goldsrc-status.parser"
 import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { GoldSrcStatusParser } from "./goldsrc-status.parser"
 
 describe("GoldSrcStatusParser", () => {
   let parser: GoldSrcStatusParser

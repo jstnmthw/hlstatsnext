@@ -5,24 +5,24 @@
  * retry logic with exponential backoff, and dead letter queue handling.
  */
 
-import type {
-  IEventConsumer,
-  IQueueClient,
-  QueueChannel,
-  ConsumeMessage,
-  EventMessage,
-  ConsumerStats,
-  MessageValidator,
-} from "./types"
-import { QueueConsumeError } from "./types"
+import {
+  addJitter,
+  calculateRetryDelay,
+  formatDuration,
+  safeJsonParse,
+} from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import {
-  safeJsonParse,
-  calculateRetryDelay,
-  addJitter,
-  formatDuration,
-} from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import type {
+  ConsumeMessage,
+  ConsumerStats,
+  EventMessage,
+  IEventConsumer,
+  IQueueClient,
+  MessageValidator,
+  QueueChannel,
+} from "./types"
+import { QueueConsumeError } from "./types"
 
 /**
  * Event processor interface for handling consumed events

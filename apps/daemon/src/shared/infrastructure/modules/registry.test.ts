@@ -2,11 +2,11 @@
  * Module Registry Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { ModuleRegistry, type ModuleEventHandler } from "./registry"
-import type { BaseModuleEventHandler } from "./event-handler.base"
-import type { ILogger } from "@/shared/utils/logger.types"
 import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import type { BaseModuleEventHandler } from "./event-handler.base"
+import { ModuleRegistry, type ModuleEventHandler } from "./registry"
 
 describe("ModuleRegistry", () => {
   let registry: ModuleRegistry

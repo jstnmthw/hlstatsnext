@@ -1,14 +1,14 @@
-import { describe, it, expect } from "vitest"
-import { StructuredCommandBuilder } from "./structured-command.builder"
+import { describe, expect, it } from "vitest"
 import type {
-  KillEventNotificationData,
-  SuicideEventNotificationData,
-  TeamKillEventNotificationData,
   ActionEventNotificationData,
-  TeamActionEventNotificationData,
   ConnectEventNotificationData,
   DisconnectEventNotificationData,
+  KillEventNotificationData,
+  SuicideEventNotificationData,
+  TeamActionEventNotificationData,
+  TeamKillEventNotificationData,
 } from "../types/notification.types"
+import { StructuredCommandBuilder } from "./structured-command.builder"
 
 describe("StructuredCommandBuilder", () => {
   describe("escapeString", () => {

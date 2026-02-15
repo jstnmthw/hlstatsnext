@@ -2,25 +2,25 @@
  * Message Utils Tests
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import {
-  generateMessageId,
-  generateCorrelationId,
-  isValidMessageId,
-  isValidCorrelationId,
-  extractTimestampFromMessageId,
-  calculateMessageAge,
-  sanitizeRoutingKey,
-  calculateRetryDelay,
-  addJitter,
-  formatBytes,
-  formatDuration,
-  safeJsonStringify,
-  safeJsonParse,
-  setUuidService,
-} from "./message-utils"
 import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
 import { systemClock } from "@/shared/infrastructure/time"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import {
+  addJitter,
+  calculateMessageAge,
+  calculateRetryDelay,
+  extractTimestampFromMessageId,
+  formatBytes,
+  formatDuration,
+  generateCorrelationId,
+  generateMessageId,
+  isValidCorrelationId,
+  isValidMessageId,
+  safeJsonParse,
+  safeJsonStringify,
+  sanitizeRoutingKey,
+  setUuidService,
+} from "./message-utils"
 
 describe("Message Utils", () => {
   beforeEach(() => {

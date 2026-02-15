@@ -4,17 +4,17 @@
  * Parses Counter-Strike game server logs into structured events.
  */
 
-import type { ParseResult } from "./base.parser"
-import type { BaseEvent } from "@/shared/types/events"
-import type { IClock } from "@/shared/infrastructure/time/clock.interface"
-import type { ServerStateManager } from "@/modules/server/state/server-state-manager"
-import { BaseParser } from "./base.parser"
-import { EventType } from "@/shared/types/events"
 import { GameConfig } from "@/config/game.config"
+import type { ServerStateManager } from "@/modules/server/state/server-state-manager"
 import {
-  generateMessageId,
   generateCorrelationId,
+  generateMessageId,
 } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import type { IClock } from "@/shared/infrastructure/time/clock.interface"
+import type { BaseEvent } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
+import type { ParseResult } from "./base.parser"
+import { BaseParser } from "./base.parser"
 
 export class CsParser extends BaseParser {
   // Parser strategy map for different log line patterns

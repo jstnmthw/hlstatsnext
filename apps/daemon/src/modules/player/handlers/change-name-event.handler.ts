@@ -5,16 +5,19 @@
  * last known name and tracking name usage statistics.
  */
 
-import { BasePlayerEventHandler } from "./base-player-event.handler"
-import { EventType } from "@/shared/types/events"
-import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builder"
-import { PlayerNameUpdateBuilder } from "@/shared/application/utils/player-name-update.builder"
-import type { HandlerResult } from "@/shared/types/common"
-import type { PlayerEvent, PlayerChangeNameEvent } from "@/modules/player/types/player.types"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerRepository } from "@/modules/player/types/player.types"
-import type { IMatchService } from "@/modules/match/match.types"
 import type { IMapService } from "@/modules/map/map.service"
+import type { IMatchService } from "@/modules/match/match.types"
+import type {
+  IPlayerRepository,
+  PlayerChangeNameEvent,
+  PlayerEvent,
+} from "@/modules/player/types/player.types"
+import { PlayerNameUpdateBuilder } from "@/shared/application/utils/player-name-update.builder"
+import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builder"
+import type { HandlerResult } from "@/shared/types/common"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { BasePlayerEventHandler } from "./base-player-event.handler"
 
 export class ChangeNameEventHandler extends BasePlayerEventHandler {
   constructor(

@@ -1,14 +1,14 @@
-import type { AppContext } from "@/context"
-import type { BaseEvent, EventType } from "@/shared/types/events"
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { HLStatsDaemon } from "./main"
-import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { getEnvironmentConfig } from "@/config/environment.config"
-import { createMockLogger } from "@/tests/mocks/logger"
-import { createMockDatabaseClient } from "@/tests/mocks/database"
+import type { AppContext } from "@/context"
+import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { DeterministicUuidService } from "@/shared/infrastructure/identifiers/deterministic-uuid.service"
 import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 import { SystemClock } from "@/shared/infrastructure/time/system-clock"
+import type { BaseEvent, EventType } from "@/shared/types/events"
+import { createMockDatabaseClient } from "@/tests/mocks/database"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { HLStatsDaemon } from "./main"
 
 const mockDatabaseConnection = {
   testConnection: vi.fn(),

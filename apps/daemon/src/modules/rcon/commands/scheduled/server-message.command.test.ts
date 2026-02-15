@@ -4,11 +4,11 @@
  * Tests for the scheduled server message command implementation.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { mockDeep, type MockProxy } from "vitest-mock-extended"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IRconService } from "../../types/rcon.types"
 import type { IServerService } from "@/modules/server/server.types"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { mockDeep, type MockProxy } from "vitest-mock-extended"
+import type { IRconService } from "../../types/rcon.types"
 import type { ScheduledCommand, ScheduleExecutionContext } from "../../types/schedule.types"
 import { ServerMessageCommand } from "./server-message.command"
 

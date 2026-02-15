@@ -4,14 +4,14 @@
  * Tests for the BatchedRepository base class functionality
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
 import type { DatabaseClient } from "@/database/client"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
   BatchedRepository,
-  type BatchUpdateOperation,
   type BatchCreateOperation,
+  type BatchUpdateOperation,
 } from "./batch-repository"
-import { createMockLogger } from "@/tests/mocks/logger"
 
 // Test entity type
 interface TestEntity extends Record<string, unknown> {

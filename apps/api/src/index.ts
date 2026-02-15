@@ -3,8 +3,8 @@ import "dotenv/config"
 
 import { createYoga } from "graphql-yoga"
 import { createServer } from "node:http"
-import { schema } from "./pothos-schema"
 import { createContext } from "./context"
+import { schema } from "./pothos-schema"
 
 // Create GraphQL Yoga server
 const yoga = createYoga({

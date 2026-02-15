@@ -1,5 +1,5 @@
-import { vi } from "vitest"
 import type { IServerRepository } from "@/modules/server/server.types"
+import { vi } from "vitest"
 
 export function createMockServerRepository(): IServerRepository {
   return {

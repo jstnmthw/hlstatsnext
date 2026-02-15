@@ -5,9 +5,9 @@
  * Supports message formatting, player count filtering, and customizable content.
  */
 
+import type { IServerService } from "@/modules/server/server.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IRconService } from "../../types/rcon.types"
-import type { IServerService } from "@/modules/server/server.types"
 import type { ScheduledCommand, ScheduleExecutionContext } from "../../types/schedule.types"
 import { BaseScheduledCommand } from "./base-scheduled.command"
 

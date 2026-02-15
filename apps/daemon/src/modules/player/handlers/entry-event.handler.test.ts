@@ -4,17 +4,17 @@
  * Tests for player entry event handling.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { EntryEventHandler } from "./entry-event.handler"
+import type { IMapService } from "@/modules/map/map.service"
+import type { IMatchService } from "@/modules/match/match.types"
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
+import type { IPlayerRepository, PlayerEvent } from "@/modules/player/types/player.types"
 import { EventType } from "@/shared/types/events"
 import { createMockLogger } from "@/tests/mocks/logger"
+import { createMockMatchService } from "@/tests/mocks/match.service.mock"
 import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
 import { createMockSessionService } from "@/tests/mocks/session.service.mock"
-import { createMockMatchService } from "@/tests/mocks/match.service.mock"
-import type { IPlayerRepository, PlayerEvent } from "@/modules/player/types/player.types"
-import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
-import type { IMatchService } from "@/modules/match/match.types"
-import type { IMapService } from "@/modules/map/map.service"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { EntryEventHandler } from "./entry-event.handler"
 
 function createMockMapService(): IMapService {
   return {

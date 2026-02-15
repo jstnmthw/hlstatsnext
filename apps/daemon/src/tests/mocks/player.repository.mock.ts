@@ -2,9 +2,9 @@
  * Mock Player Repository for Testing
  */
 
-import { vi } from "vitest"
 import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import type { Player } from "@repo/database/client"
+import { vi } from "vitest"
 
 export function createMockPlayerRepository(): IPlayerRepository {
   const mockPlayer = {

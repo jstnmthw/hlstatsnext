@@ -5,19 +5,19 @@
  * event processing maintains system integrity
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
-import { EventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus"
-import { EventType } from "@/shared/types/events"
-import { PlayerEventHandler } from "@/modules/player/events/player.events"
-import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
 import { MatchEventHandler } from "@/modules/match/match.events"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerService } from "@/modules/player/types/player.types"
 import type { IMatchService } from "@/modules/match/match.types"
-import type { IWeaponService } from "@/modules/weapon/weapon.types"
+import { PlayerEventHandler } from "@/modules/player/events/player.events"
+import type { IPlayerService } from "@/modules/player/types/player.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { IServerService } from "@/modules/server/server.types"
-import type { BaseEvent, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
+import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
+import type { IWeaponService } from "@/modules/weapon/weapon.types"
+import { EventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus"
+import type { BaseEvent, DualPlayerMeta, PlayerMeta } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 describe.skip("Distributed Event Processing", () => {
   let eventBus: EventBus

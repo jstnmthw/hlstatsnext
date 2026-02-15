@@ -1,13 +1,13 @@
 import { db } from "./client"
 import {
+  getSeedConfig,
+  logDatabaseStats,
   seedClans,
   seedPlayers,
   seedPlayerUniqueIds,
-  getSeedConfig,
   seedServers,
-  logDatabaseStats,
 } from "./seeders"
-import { log, logStep, logSuccess, logError, logHeader, logDivider } from "./seeders/fake/logger"
+import { log, logDivider, logError, logHeader, logStep, logSuccess } from "./seeders/fake/logger"
 
 async function main() {
   const config = getSeedConfig()

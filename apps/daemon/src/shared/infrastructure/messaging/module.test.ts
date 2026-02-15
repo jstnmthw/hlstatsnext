@@ -2,24 +2,24 @@
  * Queue Module Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
   QueueModule,
-  createQueueModule,
   createDevelopmentRabbitMQConfig,
+  createQueueModule,
   type QueueModuleConfig,
 } from "./module"
-import type { ILogger } from "@/shared/utils/logger.types"
+import type { IEventProcessor } from "./queue/core/consumer"
+import { EventConsumer } from "./queue/core/consumer"
+import { EventPublisher } from "./queue/core/publisher"
 import type {
-  IQueueClient,
-  IEventPublisher,
   IEventConsumer,
+  IEventPublisher,
+  IQueueClient,
   RabbitMQConfig,
 } from "./queue/core/types"
-import type { IEventProcessor } from "./queue/core/consumer"
 import { RabbitMQClient } from "./queue/rabbitmq/client"
-import { EventPublisher } from "./queue/core/publisher"
-import { EventConsumer } from "./queue/core/consumer"
 
 // Mock the imported modules
 vi.mock("./queue/rabbitmq/client", () => ({

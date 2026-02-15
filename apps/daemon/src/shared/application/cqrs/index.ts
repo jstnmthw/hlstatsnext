@@ -8,24 +8,24 @@
 export * from "./command.types"
 
 // Bus implementations
-export { CommandBus } from "./command-bus"
-export { QueryBus } from "./query-bus"
 export {
+  CacheKeyPatterns,
   CachedQueryBus,
   createCachedQuery,
-  CacheKeyPatterns,
-  type CachedQuery,
   type CacheOptions,
+  type CachedQuery,
 } from "./cached-query-bus"
+export { CommandBus } from "./command-bus"
+export { QueryBus } from "./query-bus"
 
 // Re-export for convenience
 export type {
-  ICommand,
-  IQuery,
-  ICommandHandler,
-  IQueryHandler,
-  ICommandBus,
-  IQueryBus,
   CommandResult,
+  ICommand,
+  ICommandBus,
+  ICommandHandler,
+  IQuery,
+  IQueryBus,
+  IQueryHandler,
   QueryResult,
 } from "./command.types"

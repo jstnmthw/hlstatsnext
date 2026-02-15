@@ -4,7 +4,7 @@
  * Tests for environment variable parsing and validation logic
  */
 
-import { describe, it, expect, beforeEach, afterEach } from "vitest"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { createRconConfig } from "./rcon-config.factory"
 
 describe("createRconConfig", () => {

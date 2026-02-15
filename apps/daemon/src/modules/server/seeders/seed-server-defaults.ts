@@ -3,8 +3,8 @@
  *
  * Seeds server configuration defaults within a transaction.
  */
-import type { Prisma } from "@repo/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { Prisma } from "@repo/database/client"
 
 /**
  * Seeds server configuration defaults within a transaction

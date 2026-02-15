@@ -5,16 +5,16 @@
  * like database clients and loggers with proper environment setup.
  */
 
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { DatabaseLogger } from "@repo/database/client"
-import Logger from "@/shared/utils/logger"
 import { DatabaseClient } from "@/database/client"
-import { createCryptoService, type ICryptoService } from "@repo/crypto"
 import {
   createCacheService,
   getCacheConfigFromEnv,
   type ICacheService,
 } from "@/shared/infrastructure/caching"
+import Logger from "@/shared/utils/logger"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { createCryptoService, type ICryptoService } from "@repo/crypto"
+import type { DatabaseLogger } from "@repo/database/client"
 import { PrometheusMetricsExporter, createPrismaWithMetrics } from "@repo/observability"
 
 export interface InfrastructureComponents {

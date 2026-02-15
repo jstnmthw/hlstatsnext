@@ -1,7 +1,7 @@
 import "./globals.css"
 
-import type { Metadata } from "next"
 import { ApolloWrapper } from "@/lib/apollo-wrapper"
+import type { Metadata } from "next"
 import { JetBrains_Mono } from "next/font/google"
 
 const fontSans = JetBrains_Mono({ subsets: ["latin"], variable: "--font-sans" })

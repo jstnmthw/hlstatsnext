@@ -2,16 +2,16 @@
  * Weapon Service
  */
 
+import type { HandlerResult } from "@/shared/types/common"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type {
-  IWeaponService,
   IWeaponRepository,
+  IWeaponService,
   WeaponEvent,
   WeaponFireEvent,
   WeaponHitEvent,
 } from "./weapon.types"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { HandlerResult } from "@/shared/types/common"
-import { EventType } from "@/shared/types/events"
 
 export class WeaponService implements IWeaponService {
   constructor(

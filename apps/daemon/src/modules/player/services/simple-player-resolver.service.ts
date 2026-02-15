@@ -5,10 +5,9 @@
  * Used to break circular dependency between PlayerService and SessionService.
  */
 
-import type { IPlayerResolver } from "../types/player.types"
-import type { IPlayerRepository } from "../types/player.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import { normalizeSteamId, sanitizePlayerName } from "@/shared/utils/validation"
+import type { IPlayerRepository, IPlayerResolver } from "../types/player.types"
 
 export class SimplePlayerResolverService implements IPlayerResolver {
   constructor(

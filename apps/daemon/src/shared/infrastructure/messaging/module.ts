@@ -5,22 +5,23 @@
  * Provides factory methods for creating and configuring queue services.
  */
 
-import type { ILogger } from "@/shared/utils/logger.types"
-import { RabbitMQClient } from "./queue/rabbitmq/client"
-import { EventPublisher } from "./queue/core/publisher"
-import { EventConsumer, type IEventProcessor } from "./queue/core/consumer"
-import type { ConnectionStats, ConsumerStats } from "./queue/core/types"
-import type {
-  IQueueClient,
-  IEventPublisher,
-  IEventConsumer,
-  RabbitMQConfig,
-  QueueModuleDependencies,
-} from "./queue/core/types"
-import { RabbitMQConsumer } from "./queue/rabbitmq/consumer"
-import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
+import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { PrometheusMetricsExporter } from "@repo/observability"
+import { EventConsumer, type IEventProcessor } from "./queue/core/consumer"
+import { EventPublisher } from "./queue/core/publisher"
+import type {
+  ConnectionStats,
+  ConsumerStats,
+  IEventConsumer,
+  IEventPublisher,
+  IQueueClient,
+  QueueModuleDependencies,
+  RabbitMQConfig,
+} from "./queue/core/types"
+import { RabbitMQClient } from "./queue/rabbitmq/client"
+import { RabbitMQConsumer } from "./queue/rabbitmq/consumer"
 
 /**
  * Configuration for the queue module

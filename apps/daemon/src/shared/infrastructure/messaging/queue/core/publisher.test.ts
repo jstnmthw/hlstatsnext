@@ -2,22 +2,22 @@
  * Event Publisher Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { EventPublisher, defaultRoutingKeyMapper, defaultPriorityMapper } from "./publisher"
-import type {
-  IQueueClient,
-  QueueChannel,
-  EventMessage,
-  RoutingKeyMapper,
-  PriorityMapper,
-} from "./types"
-import { MessagePriority, QueuePublishError } from "./types"
-import type { ILogger } from "@/shared/utils/logger.types"
+import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
+import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import { systemClock } from "@/shared/infrastructure/time"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
-import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
-import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
-import { systemClock } from "@/shared/infrastructure/time"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { EventPublisher, defaultPriorityMapper, defaultRoutingKeyMapper } from "./publisher"
+import type {
+  EventMessage,
+  IQueueClient,
+  PriorityMapper,
+  QueueChannel,
+  RoutingKeyMapper,
+} from "./types"
+import { MessagePriority, QueuePublishError } from "./types"
 
 describe("EventPublisher", () => {
   let publisher: EventPublisher

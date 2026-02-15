@@ -2,9 +2,9 @@
  * Fragmented Response Handler Tests
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { FragmentedResponseHandler } from "./fragment-response.handler"
 import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { FragmentedResponseHandler } from "./fragment-response.handler"
 
 describe("FragmentedResponseHandler", () => {
   let handler: FragmentedResponseHandler

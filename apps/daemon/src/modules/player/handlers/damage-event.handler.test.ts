@@ -4,15 +4,15 @@
  * Tests for player damage event handling.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { DamageEventHandler } from "./damage-event.handler"
+import type { IMapService } from "@/modules/map/map.service"
+import type { IMatchService } from "@/modules/match/match.types"
+import type { IPlayerRepository, PlayerDamageEvent } from "@/modules/player/types/player.types"
 import { EventType } from "@/shared/types/events"
 import { createMockLogger } from "@/tests/mocks/logger"
-import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
 import { createMockMatchService } from "@/tests/mocks/match.service.mock"
-import type { IPlayerRepository, PlayerDamageEvent } from "@/modules/player/types/player.types"
-import type { IMatchService } from "@/modules/match/match.types"
-import type { IMapService } from "@/modules/map/map.service"
+import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { DamageEventHandler } from "./damage-event.handler"
 
 function createMockMapService(): IMapService {
   return {

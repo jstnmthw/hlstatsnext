@@ -5,13 +5,13 @@
  * Extracts IP addresses from connected players and updates their geographic data.
  */
 
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { PlayerInfo } from "@/modules/rcon/types/rcon.types"
-import type { IPlayerRepository } from "@/modules/player/types/player.types"
-import type { IServerService } from "@/modules/server/server.types"
 import type { GeoIPService } from "@/modules/geoip/geoip.service"
-import type { Player } from "@repo/database/client"
+import type { IPlayerRepository } from "@/modules/player/types/player.types"
+import type { PlayerInfo } from "@/modules/rcon/types/rcon.types"
+import type { IServerService } from "@/modules/server/server.types"
 import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builder"
+import type { ILogger } from "@/shared/utils/logger.types"
+import type { Player } from "@repo/database/client"
 
 export interface IPlayerStatusEnricher {
   /**

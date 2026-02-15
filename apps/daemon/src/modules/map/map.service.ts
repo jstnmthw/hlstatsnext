@@ -22,8 +22,8 @@
  *   - Used by parsers to understand game state context
  */
 
-import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import type { IMatchRepository } from "@/modules/match/match.types"
+import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 
 export interface IMapService {

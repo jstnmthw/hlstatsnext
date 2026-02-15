@@ -5,14 +5,17 @@
  * for historical tracking and analysis.
  */
 
-import { BasePlayerEventHandler } from "./base-player-event.handler"
-import { EventType } from "@/shared/types/events"
-import type { HandlerResult } from "@/shared/types/common"
-import type { PlayerEvent, PlayerChatEvent } from "@/modules/player/types/player.types"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerRepository } from "@/modules/player/types/player.types"
-import type { IMatchService } from "@/modules/match/match.types"
 import type { IMapService } from "@/modules/map/map.service"
+import type { IMatchService } from "@/modules/match/match.types"
+import type {
+  IPlayerRepository,
+  PlayerChatEvent,
+  PlayerEvent,
+} from "@/modules/player/types/player.types"
+import type { HandlerResult } from "@/shared/types/common"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { BasePlayerEventHandler } from "./base-player-event.handler"
 
 export class ChatEventHandler extends BasePlayerEventHandler {
   constructor(

@@ -5,26 +5,26 @@
  * and world actions. This handler manages all action event types independently.
  */
 
-import { EventType } from "@/shared/types/events"
-import { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
-import type { BaseEvent } from "@/shared/types/events"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import type {
-  IActionService,
   ActionEvent,
-  RawActionPlayerEvent,
-  RawActionPlayerPlayerEvent,
   ActionPlayerEvent,
   ActionPlayerPlayerEvent,
+  IActionService,
+  RawActionPlayerEvent,
+  RawActionPlayerPlayerEvent,
 } from "@/modules/action/action.types"
 import {
+  isActionTeamEvent,
   isRawActionPlayerEvent,
   isRawActionPlayerPlayerEvent,
-  isActionTeamEvent,
   isWorldActionEvent,
 } from "@/modules/action/action.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
+import { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
+import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
+import type { BaseEvent } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 export class ActionEventHandler extends BaseModuleEventHandler {
   constructor(

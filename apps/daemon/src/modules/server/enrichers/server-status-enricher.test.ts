@@ -2,11 +2,11 @@
  * Server Status Enricher Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { ServerStatusEnricher } from "./server-status-enricher"
-import { createMockLogger } from "@/tests/mocks/logger"
 import type { IRconService, ServerStatus } from "@/modules/rcon/types/rcon.types"
 import type { IServerRepository, IServerService } from "@/modules/server/server.types"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { ServerStatusEnricher } from "./server-status-enricher"
 
 // Mock implementations
 const mockRconService: IRconService = {

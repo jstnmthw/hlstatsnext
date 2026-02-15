@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
-import { Button, Card, Input, Label } from "@repo/ui"
 import { authClient } from "@repo/auth/client"
+import { Button, Card, Input, Label } from "@repo/ui"
+import Link from "next/link"
+import { useState } from "react"
 
 interface ResetPasswordFormProps {
   email: string
@@ -49,8 +49,8 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
   if (success) {
     return (
       <Card className="p-6 text-center">
-        <h2 className="text-xl font-semibold tracking-tight mb-2">Password reset</h2>
-        <p className="text-muted-foreground mb-4">Your password has been reset successfully.</p>
+        <h2 className="mb-2 text-xl font-semibold tracking-tight">Password reset</h2>
+        <p className="mb-4 text-muted-foreground">Your password has been reset successfully.</p>
         <Button variant="solid" colorScheme="indigo" asChild className="w-full">
           <Link href="/login">Sign in</Link>
         </Button>
@@ -62,7 +62,7 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
     <Card className="p-6">
       <div className="mb-6">
         <h2 className="text-xl font-semibold tracking-tight">Reset password</h2>
-        <p className="text-muted-foreground mt-1">
+        <p className="mt-1 text-muted-foreground">
           Enter the code sent to <strong>{email}</strong> and choose a new password.
         </p>
       </div>

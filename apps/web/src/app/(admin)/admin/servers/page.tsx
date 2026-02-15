@@ -1,23 +1,23 @@
-import Link from "next/link"
-import { Metadata } from "next"
-import { Button, IconServer } from "@repo/ui"
-import { query } from "@/lib/apollo-client"
-import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
-import { MainContent } from "@/features/common/components/main-content"
-import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { AdminServersTable } from "@/features/admin/servers/components/admin-servers-table"
-import { PermissionGate } from "@/features/auth/components/permission-gate"
 import { AdminPageProps } from "@/features/admin/common/types/admin-page"
+import { AdminServersTable } from "@/features/admin/servers/components/admin-servers-table"
 import {
   GET_SERVERS_WITH_PAGINATION,
   GET_SERVER_COUNT,
 } from "@/features/admin/servers/graphql/server-queries"
+import { PermissionGate } from "@/features/auth/components/permission-gate"
+import { Footer } from "@/features/common/components/footer"
+import { MainContent } from "@/features/common/components/main-content"
+import { PageWrapper } from "@/features/common/components/page-wrapper"
 import {
-  parseUrlParams,
-  buildPaginationVariables,
   buildCountVariables,
+  buildPaginationVariables,
+  parseUrlParams,
 } from "@/features/common/graphql/pagination"
+import { query } from "@/lib/apollo-client"
+import { Button, IconServer } from "@repo/ui"
+import { Metadata } from "next"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Manage Servers - " + process.env.NEXT_PUBLIC_APP_NAME,
@@ -57,9 +57,9 @@ export default async function ServersPage(props: AdminPageProps) {
       <AdminHeader currentPath="/admin/servers" />
       <MainContent>
         <div className="container">
-          <div className="mt-8 mb-8 flex justify-between items-center">
+          <div className="mt-8 mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-medium tracking-tight">Manage Servers</h1>
+              <h1 className="text-3xl font-bold tracking-tight uppercase">Manage Servers</h1>
               <p className="text-muted-foreground">
                 Manage your game servers and track player statistics and activities.
               </p>

@@ -4,13 +4,13 @@
  * Handles server creation with default configuration seeding.
  */
 import type { DatabaseClient } from "@/database/client"
+import { INGRESS_CONSTANTS } from "@/modules/ingress/types/ingress.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { Prisma } from "@repo/database/client"
-import type { ServerRecord } from "../types/server.types"
-import { INGRESS_CONSTANTS } from "@/modules/ingress/types/ingress.types"
-import { seedServerDefaults } from "../seeders/seed-server-defaults"
 import { seedGameDefaults } from "../seeders/seed-game-defaults"
 import { seedModDefaults } from "../seeders/seed-mod-defaults"
+import { seedServerDefaults } from "../seeders/seed-server-defaults"
+import type { ServerRecord } from "../types/server.types"
 
 /**
  * Factory for creating new servers with default configurations

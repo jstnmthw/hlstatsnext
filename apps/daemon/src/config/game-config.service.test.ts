@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import type { DatabaseClient } from "@/database/client"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {
-  GameConfigService,
   BOOTSTRAP_CONFIG,
+  GameConfigService,
   getDefaultGame,
   getUnknownMap,
 } from "./game-config.service"
-import type { DatabaseClient } from "@/database/client"
-import { createMockLogger } from "@/tests/mocks/logger"
 
 const mockDb = {
   prisma: {

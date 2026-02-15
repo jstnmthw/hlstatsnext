@@ -1,9 +1,9 @@
 import { db, Prisma } from "@repo/database/client"
 import type {
   GetServerPlayersFilters,
+  PlayerOrderByInput,
   PlayerServerStats,
   PlayerWhereInput,
-  PlayerOrderByInput,
 } from "./player.types"
 
 export class PlayerRepository {

@@ -5,11 +5,11 @@
  * with proper error handling and fallback behavior.
  */
 
-import type { ILogger } from "@/shared/utils/logger.types"
 import {
   QueueModule,
   createDevelopmentRabbitMQConfig,
 } from "@/shared/infrastructure/messaging/module"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 export interface QueueModuleResult {
   queueModule?: QueueModule

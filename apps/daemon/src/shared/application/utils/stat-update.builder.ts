@@ -6,12 +6,12 @@
  * by encapsulating conditional field building logic.
  */
 
-import type { Player } from "@repo/database/client"
 import type { PlayerStatsUpdate } from "@/modules/player/types/player.types"
 import {
-  validatePlayerStatsUpdate,
   sanitizePlayerStatsUpdate,
+  validatePlayerStatsUpdate,
 } from "@/shared/application/validators/player-stats.validator"
+import type { Player } from "@repo/database/client"
 
 /**
  * Builder class for constructing player statistics updates

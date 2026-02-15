@@ -1,6 +1,6 @@
 import { builder } from "../../builder"
 import { PlayerService } from "./player.service"
-import type { GetServerPlayersFilters, GetPlayersFilters, PlayerServerStats } from "./player.types"
+import type { GetPlayersFilters, GetServerPlayersFilters, PlayerServerStats } from "./player.types"
 
 const playerService = new PlayerService()
 

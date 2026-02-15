@@ -5,8 +5,8 @@
  * Handles the specific format used by these older engines.
  */
 
-import type { ServerStatus, PlayerInfo } from "../types/rcon.types"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { PlayerInfo, ServerStatus } from "../types/rcon.types"
 import { BaseStatusParser, type StatusLine } from "./base-status.parser"
 
 /**

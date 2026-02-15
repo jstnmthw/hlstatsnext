@@ -6,8 +6,8 @@
  * Events are processed via RabbitMQ queues and no longer require registration.
  */
 
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 export abstract class BaseModuleEventHandler {
   constructor(

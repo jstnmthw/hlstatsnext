@@ -2,17 +2,17 @@
  * RabbitMQ Consumer Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { RabbitMQConsumer, defaultRabbitMQConsumerConfig } from "./consumer"
-import { RabbitMQEventProcessor } from "./event-processor"
+import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import { EventConsumer } from "@/shared/infrastructure/messaging/queue/core/consumer"
 import type {
   IQueueClient,
   MessageValidator,
 } from "@/shared/infrastructure/messaging/queue/core/types"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { RabbitMQConsumer, defaultRabbitMQConsumerConfig } from "./consumer"
+import { RabbitMQEventProcessor } from "./event-processor"
 
 // Mock the dependencies
 vi.mock("./event-processor", () => ({

@@ -4,11 +4,11 @@
  * Tests for event processing metrics collection.
  */
 
-import { describe, it, expect, beforeEach } from "vitest"
-import { EventMetrics } from "./event-metrics"
 import { EventType } from "@/shared/types/events"
-import { createMockLogger } from "@/tests/mocks/logger"
 import type { ILogger } from "@/shared/utils/logger.types"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it } from "vitest"
+import { EventMetrics } from "./event-metrics"
 
 describe("EventMetrics", () => {
   let metrics: EventMetrics

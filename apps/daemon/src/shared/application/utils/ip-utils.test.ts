@@ -4,8 +4,8 @@
  * Tests for IP address utility functions.
  */
 
-import { describe, it, expect } from "vitest"
-import { ipv4ToBigInt, isIPv4, isIPv6, extractIpFromAddress, sanitizeIpAddress } from "./ip-utils"
+import { describe, expect, it } from "vitest"
+import { extractIpFromAddress, ipv4ToBigInt, isIPv4, isIPv6, sanitizeIpAddress } from "./ip-utils"
 
 describe("IP Utils", () => {
   describe("ipv4ToBigInt", () => {

@@ -6,13 +6,13 @@
  * resolving player IDs and delegating to the player service.
  */
 
-import type { BaseEvent, PlayerMeta } from "@/shared/types/events"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import type { IPlayerService, PlayerEvent } from "@/modules/player/types/player.types"
 import type { IServerService } from "@/modules/server/server.types"
 import { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
+import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
+import type { BaseEvent, PlayerMeta } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 interface KillEventMeta {
   killer: {

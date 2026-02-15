@@ -1,7 +1,7 @@
 import { db, Prisma } from "../../client"
 import { getSeedConfig } from "./config"
-import { generateClanData } from "./utils"
 import { log } from "./logger"
+import { generateClanData } from "./utils"
 
 export async function seedClans() {
   const config = getSeedConfig()

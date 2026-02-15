@@ -4,14 +4,14 @@
  * Tests for player team change event handling.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { ChangeTeamEventHandler } from "./change-team-event.handler"
+import type { IMapService } from "@/modules/map/map.service"
+import type { IMatchService } from "@/modules/match/match.types"
+import type { IPlayerRepository, PlayerChangeTeamEvent } from "@/modules/player/types/player.types"
 import { EventType } from "@/shared/types/events"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
-import type { IPlayerRepository, PlayerChangeTeamEvent } from "@/modules/player/types/player.types"
-import type { IMatchService } from "@/modules/match/match.types"
-import type { IMapService } from "@/modules/map/map.service"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { ChangeTeamEventHandler } from "./change-team-event.handler"
 
 function createMockMatchService(): IMatchService {
   return {

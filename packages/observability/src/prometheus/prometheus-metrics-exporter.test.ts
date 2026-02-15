@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { PrometheusMetricsExporter } from "./prometheus-metrics-exporter"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { ILogger } from "../types"
+import { PrometheusMetricsExporter } from "./prometheus-metrics-exporter"
 
 describe("PrometheusMetricsExporter", () => {
   let exporter: PrometheusMetricsExporter

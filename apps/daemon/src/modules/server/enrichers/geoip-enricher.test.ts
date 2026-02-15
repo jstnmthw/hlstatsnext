@@ -4,14 +4,14 @@
  * Tests for GeoIP location enrichment service.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { Prisma } from "@repo/database/client"
-import { GeoIpEnricher } from "./geoip-enricher"
-import { createMockDatabaseClient } from "@/tests/mocks/database"
-import { createMockLogger } from "@/tests/mocks/logger"
+import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { MockDatabaseClient } from "@/tests/mocks/database"
-import type { DatabaseClient } from "@/database/client"
+import { createMockDatabaseClient } from "@/tests/mocks/database"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { Prisma } from "@repo/database/client"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { GeoIpEnricher } from "./geoip-enricher"
 
 describe("GeoIpEnricher", () => {
   let enricher: GeoIpEnricher

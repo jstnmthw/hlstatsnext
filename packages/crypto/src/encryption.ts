@@ -5,11 +5,14 @@
  * Uses Argon2id for password hashing and AES-256-GCM for encryption.
  */
 
-import { randomBytes, createCipheriv, createDecipheriv, pbkdf2Sync } from "crypto"
 import { hash, verify } from "argon2"
-import type { ICryptoService, CryptoConfig, EncryptedData } from "./types"
-import { DEFAULT_CRYPTO_CONFIG } from "./types"
-import { CryptoError as CryptoErrorClass, CryptoErrorCode as ErrorCodes } from "./types"
+import { createCipheriv, createDecipheriv, pbkdf2Sync, randomBytes } from "crypto"
+import type { CryptoConfig, EncryptedData, ICryptoService } from "./types"
+import {
+  CryptoError as CryptoErrorClass,
+  DEFAULT_CRYPTO_CONFIG,
+  CryptoErrorCode as ErrorCodes,
+} from "./types"
 
 export class CryptoService implements ICryptoService {
   private readonly config: CryptoConfig

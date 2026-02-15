@@ -4,17 +4,17 @@
  * Tests for player suicide event handling.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { SuicideEventHandler } from "./suicide-event.handler"
-import { EventType } from "@/shared/types/events"
-import { createMockLogger } from "@/tests/mocks/logger"
-import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
-import { createMockMatchService } from "@/tests/mocks/match.service.mock"
+import type { IMapService } from "@/modules/map/map.service"
+import type { IMatchService } from "@/modules/match/match.types"
 import type { IPlayerRepository, PlayerSuicideEvent } from "@/modules/player/types/player.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
-import type { IMatchService } from "@/modules/match/match.types"
-import type { IMapService } from "@/modules/map/map.service"
 import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
+import { EventType } from "@/shared/types/events"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { createMockMatchService } from "@/tests/mocks/match.service.mock"
+import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { SuicideEventHandler } from "./suicide-event.handler"
 
 function createMockRankingService(): IRankingService {
   return {

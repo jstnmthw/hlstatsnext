@@ -4,10 +4,10 @@
  * Comprehensive tests for both SystemClock and TestClock implementations
  */
 
-import { describe, it, expect, beforeEach } from "vitest"
+import { beforeEach, describe, expect, it } from "vitest"
+import type { IClock } from "./clock.interface"
 import { SystemClock } from "./system-clock"
 import { TestClock } from "./test-clock"
-import type { IClock } from "./clock.interface"
 
 describe("SystemClock", () => {
   let systemClock: SystemClock

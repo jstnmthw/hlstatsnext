@@ -1,17 +1,17 @@
 /**
  * MatchService Unit Tests
  */
-import type {
-  IMatchRepository,
-  RoundStartEvent,
-  RoundEndEvent,
-  TeamWinEvent,
-  MapChangeEvent,
-} from "./match.types"
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { MatchService } from "./match.service"
 import { EventType } from "@/shared/types/events"
 import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { MatchService } from "./match.service"
+import type {
+  IMatchRepository,
+  MapChangeEvent,
+  RoundEndEvent,
+  RoundStartEvent,
+  TeamWinEvent,
+} from "./match.types"
 
 const mockRepository: IMatchRepository = {
   updateBombStats: vi.fn(),

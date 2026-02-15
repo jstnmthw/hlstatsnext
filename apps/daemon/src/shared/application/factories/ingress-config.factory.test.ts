@@ -4,7 +4,7 @@
  * Tests for options resolution and environment variable fallbacks
  */
 
-import { describe, it, expect, beforeEach, afterEach } from "vitest"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { createIngressConfig } from "./ingress-config.factory"
 
 describe("createIngressConfig", () => {

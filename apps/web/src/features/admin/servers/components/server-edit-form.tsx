@@ -1,10 +1,10 @@
 "use client"
 
-import { useActionState, useState } from "react"
 import { updateServer } from "@/features/admin/servers/actions/update-server"
-import { FormField, ErrorMessage, ErrorDisplay } from "@/features/common/components/form"
-import { Button, Input, Switch, Label, IPAddress, Port, BasicSelect } from "@repo/ui"
+import { ErrorDisplay, ErrorMessage, FormField } from "@/features/common/components/form"
 import type { Game, ModSupported } from "@repo/database/client"
+import { BasicSelect, Button, Input, IPAddress, Label, Port, Switch } from "@repo/ui"
+import { useActionState, useState } from "react"
 
 type GameProps = Pick<Game, "code" | "name">
 type ModProps = Pick<ModSupported, "code" | "name">
@@ -39,7 +39,7 @@ export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
       <input type="hidden" name="serverId" value={server.serverId} />
       <input type="hidden" name="connection_type" value={isDockerMode ? "docker" : "external"} />
 
-      <div className="grid md:grid-cols-1 gap-4">
+      <div className="grid gap-4 md:grid-cols-1">
         <FormField>
           <Label htmlFor="name">Server Name</Label>
           <Input
@@ -53,7 +53,7 @@ export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
         </FormField>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <FormField>
           <Label htmlFor="game" required>
             Game Type
@@ -84,7 +84,7 @@ export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
         </FormField>
       </div>
 
-      <div className="grid md:grid-cols-1 gap-4">
+      <div className="grid gap-4 md:grid-cols-1">
         <FormField>
           <Label htmlFor="connection-type">Docker</Label>
           <Switch
@@ -99,7 +99,7 @@ export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
         </FormField>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <FormField>
           <Label htmlFor={isDockerMode ? "docker_host" : "address"} required>
             {isDockerMode ? "Docker Host" : "Server Address"}
@@ -113,7 +113,7 @@ export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
               defaultValue={isDockerMode ? server.dockerHost || "" : server.address}
             />
             <Port
-              className="rounded-l-none -ml-px border-l-transparent max-w-18"
+              className="-ml-px max-w-18 rounded-l-none border-l-transparent"
               name="port"
               required
               placeholder="27015"
@@ -144,7 +144,7 @@ export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
         </FormField>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <FormField>
           <Label htmlFor="statusUrl">Status URL</Label>
           <Input

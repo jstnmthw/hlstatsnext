@@ -6,7 +6,7 @@
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { RetryBackoffCalculator, ServerFailureState, RconConfig } from "../types/rcon.types"
+import type { RconConfig, RetryBackoffCalculator, ServerFailureState } from "../types/rcon.types"
 import { ServerRetryStatus } from "../types/rcon.types"
 
 export class RetryBackoffCalculatorService implements RetryBackoffCalculator {

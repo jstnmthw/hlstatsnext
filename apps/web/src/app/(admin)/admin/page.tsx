@@ -1,10 +1,9 @@
 import { AdminHeader } from "@/features/admin/common/components/header"
+import { PermissionGate } from "@/features/auth/components/permission-gate"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { PermissionGate } from "@/features/auth/components/permission-gate"
-import { Button, Card } from "@repo/ui"
-import { IconCirclePlus, IconServer } from "@repo/ui"
+import { Button, Card, IconCirclePlus, IconServer } from "@repo/ui"
 import Link from "next/link"
 
 export const metadata = {
@@ -19,19 +18,19 @@ export default function Page() {
       <MainContent>
         <div className="container">
           <div className="py-10">
-            <h2 className="text-2xl font-medium tracking-tight">Admin Dashboard</h2>
+            <h2 className="text-3xl font-bold tracking-tight uppercase">Admin Dashboard</h2>
             <p className="text-muted-foreground">
               Get started by creating your first Half-Life server to begin tracking player
               statistics and activities.
             </p>
           </div>
-          <Card className="flex items-center flex-col gap-4 py-10 border-dashed">
+          <Card className="flex flex-col items-center gap-4 border-dashed py-10">
             <div className="rounded-full bg-muted p-4">
               <IconServer className="size-6" />
             </div>
-            <div className="text-center max-w-xs gap-2 flex flex-col items-center">
+            <div className="flex max-w-xs flex-col items-center gap-2 text-center">
               <h3 className="text-lg font-semibold">No servers configured</h3>
-              <p className="text-muted-foreground mb-4">
+              <p className="mb-4 text-muted-foreground">
                 Add your first Half-Life server to begin tracking player statistics and activities.
               </p>
               <PermissionGate permissions={{ server: ["create"] }}>

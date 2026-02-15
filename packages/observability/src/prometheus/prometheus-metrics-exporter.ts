@@ -5,7 +5,7 @@
  * Integrates with the existing EventMetrics system.
  */
 
-import type { ILogger, DatabaseQueryMetric } from "../types"
+import type { DatabaseQueryMetric, ILogger } from "../types"
 
 export class PrometheusMetricsExporter {
   private counters = new Map<string, number>()

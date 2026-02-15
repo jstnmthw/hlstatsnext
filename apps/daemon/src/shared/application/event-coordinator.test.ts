@@ -2,7 +2,7 @@
  * Event Coordinator Tests
  */
 
-import { describe, it, expect, vi } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import type { EventCoordinator } from "./event-coordinator"
 
 describe("EventCoordinator interface", () => {

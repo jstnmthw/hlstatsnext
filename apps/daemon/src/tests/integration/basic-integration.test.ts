@@ -4,7 +4,7 @@
  * Simple tests to verify basic functionality.
  */
 
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 
 describe("Basic Integration", () => {
   describe("Test infrastructure", () => {

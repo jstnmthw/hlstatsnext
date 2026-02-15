@@ -4,11 +4,11 @@
  * Tests for server finding and creation operations.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import type { IServerService } from "@/modules/server/server.types"
+import type { ILogger } from "@/shared/utils/logger.types"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockServerService } from "@/tests/mocks/server.service.mock"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IServerService } from "@/modules/server/server.types"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("ServerOrchestrator", () => {
   let mockLogger: ILogger

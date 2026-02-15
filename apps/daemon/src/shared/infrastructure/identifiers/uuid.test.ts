@@ -4,12 +4,12 @@
  * Comprehensive tests for both SystemUuidService and DeterministicUuidService
  */
 
-import { describe, it, expect, beforeEach } from "vitest"
-import { SystemUuidService } from "./system-uuid.service"
-import { DeterministicUuidService } from "./deterministic-uuid.service"
-import { TestClock } from "../time/test-clock"
-import type { IUuidService } from "./uuid.interface"
+import { beforeEach, describe, expect, it } from "vitest"
 import type { IClock } from "../time/clock.interface"
+import { TestClock } from "../time/test-clock"
+import { DeterministicUuidService } from "./deterministic-uuid.service"
+import { SystemUuidService } from "./system-uuid.service"
+import type { IUuidService } from "./uuid.interface"
 
 describe("SystemUuidService", () => {
   let clock: IClock

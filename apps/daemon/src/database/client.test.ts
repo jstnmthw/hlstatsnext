@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { DatabaseClient, databaseClient, type TransactionalPrisma } from "./client"
 import { DatabaseClient as SharedDatabaseClient } from "@repo/database/client"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { DatabaseClient, databaseClient, type TransactionalPrisma } from "./client"
 
 vi.mock("@repo/database/client", () => ({
   DatabaseClient: vi.fn().mockImplementation(() => ({

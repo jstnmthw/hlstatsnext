@@ -1,5 +1,5 @@
-import { randomBytes, randomUUID } from "crypto"
 import { hashPassword } from "better-auth/crypto"
+import { randomBytes, randomUUID } from "crypto"
 import { db } from "../../client"
 import { log, logSuccess, logWarning } from "./logger"
 

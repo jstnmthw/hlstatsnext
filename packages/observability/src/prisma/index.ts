@@ -4,6 +4,6 @@
 
 export {
   createPrismaWithMetrics,
-  type PrismaWithMetrics,
   type PrismaMetricsOptions,
+  type PrismaWithMetrics,
 } from "./prisma-metrics-extension"

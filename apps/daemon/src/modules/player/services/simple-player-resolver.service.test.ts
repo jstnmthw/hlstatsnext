@@ -4,11 +4,11 @@
  * Tests for lightweight player resolution.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { SimplePlayerResolverService } from "./simple-player-resolver.service"
+import type { IPlayerRepository } from "@/modules/player/types/player.types"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
-import type { IPlayerRepository } from "@/modules/player/types/player.types"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { SimplePlayerResolverService } from "./simple-player-resolver.service"
 
 describe("SimplePlayerResolverService", () => {
   let service: SimplePlayerResolverService

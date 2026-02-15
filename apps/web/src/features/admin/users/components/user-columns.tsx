@@ -1,3 +1,6 @@
+import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
+import { FilterConfig } from "@/features/common/types/data-table"
+import { formatDate } from "@/lib/datetime-util"
 import {
   Button,
   Checkbox,
@@ -8,12 +11,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  IconDots,
+  IconRefresh,
 } from "@repo/ui"
 import { ColumnDef, HeaderContext } from "@tanstack/react-table"
-import { formatDate } from "@/lib/datetime-util"
-import { FilterConfig } from "@/features/common/types/data-table"
-import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
-import { IconDots, IconRefresh } from "@repo/ui"
 
 interface ExtendedHeaderContext<TData, TValue> extends HeaderContext<TData, TValue> {
   sortField?: string
@@ -45,7 +46,7 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
   {
     id: "select",
     header: ({ table }) => (
-      <div className="flex items-center justify-center pr-3 pl-1 max-w-10">
+      <div className="flex max-w-10 items-center justify-center pr-3 pl-1">
         <Checkbox
           checked={
             table.getIsAllPageRowsSelected() ||
@@ -57,7 +58,7 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
       </div>
     ),
     cell: ({ row }) => (
-      <div className="flex items-center justify-center pr-3 pl-1 max-w-10">
+      <div className="flex max-w-10 items-center justify-center pr-3 pl-1">
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -115,8 +116,8 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
       const user = row.original
       const getRoleBadge = (role: string | null | undefined) => {
         if (role === "admin")
-          return <span className="px-2 py-1 text-xs bg-red-900 text-red-100 rounded">Admin</span>
-        return <span className="px-2 py-1 text-xs bg-blue-900 text-blue-100 rounded">User</span>
+          return <span className="rounded bg-red-900 px-2 py-1 text-xs text-red-100">Admin</span>
+        return <span className="rounded bg-blue-900 px-2 py-1 text-xs text-blue-100">User</span>
       }
       return getRoleBadge(user.role)
     },
@@ -135,9 +136,9 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
     cell: ({ row }) => {
       const user = row.original
       if (user.banned) {
-        return <span className="px-2 py-1 text-xs bg-red-900 text-red-100 rounded">Banned</span>
+        return <span className="rounded bg-red-900 px-2 py-1 text-xs text-red-100">Banned</span>
       }
-      return <span className="px-2 py-1 text-xs bg-green-900 text-green-100 rounded">Active</span>
+      return <span className="rounded bg-green-900 px-2 py-1 text-xs text-green-100">Active</span>
     },
   },
   {
@@ -163,7 +164,7 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
       <div className="flex items-center justify-end pr-3 pl-1">
         <Button
           variant="ghost"
-          className="size-8 p-0 group"
+          className="group size-8 p-0"
           onClick={props.onRefresh}
           disabled={props.isPending}
         >
@@ -171,7 +172,7 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
             className={cn(
               "size-4",
               props.isPending ? "animate-spin" : "",
-              "text-zinc-500 group-hover:text-zinc-100 transition-colors duration-200",
+              "text-zinc-500 transition-colors duration-200 group-hover:text-zinc-100",
             )}
           />
         </Button>

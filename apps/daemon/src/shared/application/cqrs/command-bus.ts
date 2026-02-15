@@ -5,7 +5,7 @@
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { ICommand, ICommandHandler, ICommandBus } from "./command.types"
+import type { ICommand, ICommandBus, ICommandHandler } from "./command.types"
 
 /**
  * Command Bus

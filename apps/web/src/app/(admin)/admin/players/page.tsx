@@ -1,22 +1,22 @@
-import Link from "next/link"
-import { Metadata } from "next"
-import { Button, IconUser } from "@repo/ui"
-import { query } from "@/lib/apollo-client"
-import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
-import { MainContent } from "@/features/common/components/main-content"
-import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { AdminPlayersTable } from "@/features/admin/players/components/admin-players-table"
 import { AdminPageProps } from "@/features/admin/common/types/admin-page"
+import { AdminPlayersTable } from "@/features/admin/players/components/admin-players-table"
 import {
   GET_PLAYERS_WITH_PAGINATION,
   GET_PLAYER_COUNT,
 } from "@/features/admin/players/graphql/player-queries"
+import { Footer } from "@/features/common/components/footer"
+import { MainContent } from "@/features/common/components/main-content"
+import { PageWrapper } from "@/features/common/components/page-wrapper"
 import {
-  parseUrlParams,
-  buildPaginationVariables,
   buildCountVariables,
+  buildPaginationVariables,
+  parseUrlParams,
 } from "@/features/common/graphql/pagination"
+import { query } from "@/lib/apollo-client"
+import { Button, IconUser } from "@repo/ui"
+import { Metadata } from "next"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Manage Players - " + process.env.NEXT_PUBLIC_APP_NAME,
@@ -56,9 +56,9 @@ export default async function PlayersPage(props: AdminPageProps) {
       <AdminHeader currentPath="/admin/players" />
       <MainContent>
         <div className="container">
-          <div className="mt-8 mb-8 flex justify-between items-center">
+          <div className="mt-8 mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-medium tracking-tight">Manage Players</h1>
+              <h1 className="text-3xl font-bold tracking-tight uppercase">Manage Players</h1>
               <p className="text-muted-foreground">
                 Manage your game players and track their statistics and activities.
               </p>

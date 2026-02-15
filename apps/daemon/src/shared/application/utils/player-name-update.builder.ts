@@ -7,11 +7,11 @@
  */
 
 import type { PlayerNameStatsUpdate } from "@/modules/player/types/player.types"
-import type { Prisma } from "@repo/database/client"
 import {
-  validatePlayerNameStatsUpdate,
   sanitizePlayerNameStatsUpdate,
+  validatePlayerNameStatsUpdate,
 } from "@/shared/application/validators/player-name.validator"
+import type { Prisma } from "@repo/database/client"
 
 /**
  * Builder class for constructing player name statistics updates

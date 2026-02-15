@@ -7,20 +7,20 @@
  */
 
 import { EventType } from "@/shared/types/events"
-import { PlayerNotificationService } from "./player-notification.service"
-import { StructuredCommandBuilder } from "../builders/structured-command.builder"
-import { CommandResolverService } from "./command-resolver.service"
 import type { ILogger } from "@/shared/utils/logger.types"
+import { StructuredCommandBuilder } from "../builders/structured-command.builder"
 import type { INotificationConfigRepository } from "../repositories/notification-config.repository"
 import type {
-  KillEventNotificationData,
-  SuicideEventNotificationData,
-  TeamKillEventNotificationData,
   ActionEventNotificationData,
-  TeamActionEventNotificationData,
   ConnectEventNotificationData,
   DisconnectEventNotificationData,
+  KillEventNotificationData,
+  SuicideEventNotificationData,
+  TeamActionEventNotificationData,
+  TeamKillEventNotificationData,
 } from "../types/notification.types"
+import { CommandResolverService } from "./command-resolver.service"
+import { PlayerNotificationService } from "./player-notification.service"
 
 export interface IEventNotificationService {
   /**

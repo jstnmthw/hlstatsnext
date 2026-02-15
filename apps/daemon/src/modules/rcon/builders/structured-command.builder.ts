@@ -7,13 +7,13 @@
  */
 
 import type {
-  KillEventNotificationData,
-  SuicideEventNotificationData,
-  TeamKillEventNotificationData,
   ActionEventNotificationData,
-  TeamActionEventNotificationData,
   ConnectEventNotificationData,
   DisconnectEventNotificationData,
+  KillEventNotificationData,
+  SuicideEventNotificationData,
+  TeamActionEventNotificationData,
+  TeamKillEventNotificationData,
 } from "../types/notification.types"
 
 export class StructuredCommandBuilder {

@@ -65,22 +65,22 @@
  * ```
  */
 
+import type { IMapService } from "@/modules/map/map.service"
+import type { IMatchService } from "@/modules/match/match.types"
+import type { IPlayerService } from "@/modules/player/types/player.types"
+import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
+import type { HandlerResult } from "@/shared/types/common"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type {
-  IActionService,
   ActionEvent,
   ActionPlayerEvent,
   ActionPlayerPlayerEvent,
   ActionTeamEvent,
+  IActionRepository,
+  IActionService,
   WorldActionEvent,
 } from "./action.types"
-import type { IActionRepository } from "./action.types"
-import type { IPlayerService } from "@/modules/player/types/player.types"
-import type { IMatchService } from "@/modules/match/match.types"
-import type { IMapService } from "@/modules/map/map.service"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
-import type { HandlerResult } from "@/shared/types/common"
-import { EventType } from "@/shared/types/events"
 import { ActionDefinitionValidator } from "./validators/action-definition.validator"
 import { PlayerValidator } from "./validators/player.validator"
 

@@ -3,11 +3,11 @@
  *
  * Thin wrapper adapter for the game detection service.
  */
-import type { IGameDetector } from "../ingress.dependencies"
 import type {
-  IGameDetectionService,
   GameDetectionResult,
+  IGameDetectionService,
 } from "@/modules/game/game-detection.types"
+import type { IGameDetector } from "../ingress.dependencies"
 
 /**
  * Game detector adapter

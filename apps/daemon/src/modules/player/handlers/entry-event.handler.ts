@@ -5,17 +5,16 @@
  * for bots and updating player last event timestamps.
  */
 
-import type { HandlerResult } from "@/shared/types/common"
-import type { PlayerEvent } from "@/modules/player/types/player.types"
-import type { PlayerMeta } from "@/shared/types/events"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerRepository } from "@/modules/player/types/player.types"
-import type { IMatchService } from "@/modules/match/match.types"
 import type { IMapService } from "@/modules/map/map.service"
+import type { IMatchService } from "@/modules/match/match.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
-import { BasePlayerEventHandler } from "./base-player-event.handler"
-import { EventType } from "@/shared/types/events"
+import type { IPlayerRepository, PlayerEvent } from "@/modules/player/types/player.types"
 import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builder"
+import type { HandlerResult } from "@/shared/types/common"
+import type { PlayerMeta } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { BasePlayerEventHandler } from "./base-player-event.handler"
 
 export class EntryEventHandler extends BasePlayerEventHandler {
   constructor(

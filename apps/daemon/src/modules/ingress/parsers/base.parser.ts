@@ -4,8 +4,8 @@
  * Abstract base class for game log parsers.
  */
 
-import type { BaseEvent } from "@/shared/types/events"
 import type { IClock } from "@/shared/infrastructure/time/clock.interface"
+import type { BaseEvent } from "@/shared/types/events"
 
 export interface ParseResult {
   event: BaseEvent | null

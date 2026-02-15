@@ -20,14 +20,14 @@
 import dotenv from "dotenv"
 dotenv.config()
 
-import type { AppContext } from "@/context"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { BaseEvent } from "@/shared/types/events"
-import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
-import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { getEnvironmentConfig } from "@/config/environment.config"
+import type { AppContext } from "@/context"
+import { getAppContext, initializeQueueInfrastructure } from "@/context"
 import { DatabaseConnectionService } from "@/database/connection.service"
+import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
 import { getUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import type { BaseEvent } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
 import { MetricsServer } from "@repo/observability"
 
 /**

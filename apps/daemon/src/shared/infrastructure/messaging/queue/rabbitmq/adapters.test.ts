@@ -2,15 +2,15 @@
  * RabbitMQ Adapters Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { AmqpChannelAdapter, AmqpConnectionAdapter } from "./adapters"
-import type * as amqp from "amqplib"
-import type { Connection } from "amqplib"
 import type {
   ConsumeMessage,
-  PublishOptions,
   ConsumeOptions,
+  PublishOptions,
 } from "@/shared/infrastructure/messaging/queue/core/types"
+import type * as amqp from "amqplib"
+import type { Connection } from "amqplib"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { AmqpChannelAdapter, AmqpConnectionAdapter } from "./adapters"
 
 describe("AmqpChannelAdapter", () => {
   let adapter: AmqpChannelAdapter

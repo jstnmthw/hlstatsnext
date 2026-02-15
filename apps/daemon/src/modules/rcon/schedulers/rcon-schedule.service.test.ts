@@ -4,17 +4,17 @@
  * Tests for the scheduled RCON command execution service.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach, type MockedFunction } from "vitest"
-import { mockDeep, type MockProxy } from "vitest-mock-extended"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IRconService } from "../types/rcon.types"
-import type { IServerService } from "@/modules/server/server.types"
-import type { ScheduleConfig, ScheduledCommand } from "../types/schedule.types"
-import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
-import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
-import { RconScheduleService } from "./rcon-schedule.service"
+import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
+import type { IServerService } from "@/modules/server/server.types"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
+import type { ILogger } from "@/shared/utils/logger.types"
 import * as cron from "node-cron"
+import { afterEach, beforeEach, describe, expect, it, vi, type MockedFunction } from "vitest"
+import { mockDeep, type MockProxy } from "vitest-mock-extended"
+import type { IRconService } from "../types/rcon.types"
+import type { ScheduleConfig, ScheduledCommand } from "../types/schedule.types"
+import { RconScheduleService } from "./rcon-schedule.service"
 
 // Mock the command classes
 vi.mock("../commands/scheduled/server-message.command", () => ({

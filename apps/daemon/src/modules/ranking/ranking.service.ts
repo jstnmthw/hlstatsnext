@@ -3,20 +3,20 @@
  * Based on the legacy HLStats skill calculation algorithm
  */
 
-import type { IRankingService, SkillRating } from "./ranking.types"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IWeaponRepository } from "../weapon/weapon.types"
-import type { Weapon } from "@repo/database/client"
-import type { TransactionalPrisma } from "@/database/client"
 import { GameConfig } from "@/config/game.config"
+import type { TransactionalPrisma } from "@/database/client"
 import {
   calculateKillSkillAdjustment,
   calculateStandardRatingAdjustment,
   calculateSuicidePenalty as calculateSuicidePenaltyPure,
-  type SkillRatingInput,
   type KillContextInput,
   type SkillCalculationConfig,
+  type SkillRatingInput,
 } from "@/shared/application/utils/skill-calculator"
+import type { ILogger } from "@/shared/utils/logger.types"
+import type { Weapon } from "@repo/database/client"
+import type { IWeaponRepository } from "../weapon/weapon.types"
+import type { IRankingService, SkillRating } from "./ranking.types"
 
 export interface KillContext {
   weapon: string

@@ -2,7 +2,7 @@
  * Crypto Service Unit Tests
  */
 
-import { describe, it, expect, beforeEach } from "vitest"
+import { beforeEach, describe, expect, it } from "vitest"
 import { CryptoService } from "./encryption"
 import { CryptoError, CryptoErrorCode } from "./types"
 

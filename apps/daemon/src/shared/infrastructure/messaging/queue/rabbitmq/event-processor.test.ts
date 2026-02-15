@@ -2,17 +2,17 @@
  * RabbitMQ Event Processor Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { RabbitMQEventProcessor } from "./event-processor"
+import type { EventCoordinator } from "@/shared/application/event-coordinator"
+import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
+import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import type { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
+import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
+import { systemClock } from "@/shared/infrastructure/time"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { EventCoordinator } from "@/shared/application/event-coordinator"
-import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
-import type { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
-import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
-import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
-import { systemClock } from "@/shared/infrastructure/time"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { RabbitMQEventProcessor } from "./event-processor"
 
 describe("RabbitMQEventProcessor", () => {
   let processor: RabbitMQEventProcessor

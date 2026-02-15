@@ -1,22 +1,22 @@
-import Link from "next/link"
-import { Metadata } from "next"
-import { Button, IconDeviceGamepad2 } from "@repo/ui"
-import { query } from "@/lib/apollo-client"
-import { Footer } from "@/features/common/components/footer"
 import { AdminHeader } from "@/features/admin/common/components/header"
-import { MainContent } from "@/features/common/components/main-content"
-import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { AdminGamesTable } from "@/features/admin/games/components/admin-games-table"
 import { AdminPageProps } from "@/features/admin/common/types/admin-page"
+import { AdminGamesTable } from "@/features/admin/games/components/admin-games-table"
 import {
   GET_GAMES_WITH_PAGINATION,
   GET_GAME_COUNT,
 } from "@/features/admin/games/graphql/game-queries"
+import { Footer } from "@/features/common/components/footer"
+import { MainContent } from "@/features/common/components/main-content"
+import { PageWrapper } from "@/features/common/components/page-wrapper"
 import {
-  parseUrlParams,
-  buildPaginationVariables,
   buildCountVariables,
+  buildPaginationVariables,
+  parseUrlParams,
 } from "@/features/common/graphql/pagination"
+import { query } from "@/lib/apollo-client"
+import { Button, IconDeviceGamepad2 } from "@repo/ui"
+import { Metadata } from "next"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Manage Games - " + process.env.NEXT_PUBLIC_APP_NAME,
@@ -56,9 +56,9 @@ export default async function GamesPage(props: AdminPageProps) {
       <AdminHeader currentPath="/admin/games" />
       <MainContent>
         <div className="container">
-          <div className="mt-8 mb-8 flex justify-between items-center">
+          <div className="mt-8 mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-medium tracking-tight">Manage Games</h1>
+              <h1 className="text-3xl font-bold tracking-tight uppercase">Manage Games</h1>
               <p className="text-muted-foreground">
                 Manage supported games and their configurations.
               </p>

@@ -2,7 +2,9 @@
  * Event Consumer Tests
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {
   EventConsumer,
   defaultConsumerConfig,
@@ -11,15 +13,13 @@ import {
   type IEventProcessor,
 } from "./consumer"
 import type {
-  IQueueClient,
-  QueueChannel,
   ConsumeMessage,
   EventMessage,
+  IQueueClient,
   MessageValidator,
+  QueueChannel,
 } from "./types"
 import { QueueConsumeError } from "./types"
-import type { ILogger } from "@/shared/utils/logger.types"
-import { EventType } from "@/shared/types/events"
 
 describe("EventConsumer", () => {
   let consumer: EventConsumer

@@ -3,12 +3,12 @@
  */
 
 import type { DatabaseClient } from "@/database/client"
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { DatabaseServerAuthenticator } from "./database-server-authenticator"
-import { createMockLogger } from "@/tests/mocks/logger"
-import { createMockDatabaseClient } from "@/tests/mocks/database"
 import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import { EventType } from "@/shared/types/events"
+import { createMockDatabaseClient } from "@/tests/mocks/database"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { DatabaseServerAuthenticator } from "./database-server-authenticator"
 
 describe("DatabaseServerAuthenticator", () => {
   let authenticator: DatabaseServerAuthenticator

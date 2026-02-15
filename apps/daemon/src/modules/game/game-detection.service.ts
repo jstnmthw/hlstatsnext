@@ -1,6 +1,6 @@
+import { GameConfig, GAMES } from "@/config/game.config"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { GameDetectionResult, IGameDetectionService } from "./game-detection.types"
-import { GameConfig, GAMES } from "@/config/game.config"
 
 export class GameDetectionService implements IGameDetectionService {
   private readonly gameCache = new Map<string, { result: GameDetectionResult; timestamp: number }>()

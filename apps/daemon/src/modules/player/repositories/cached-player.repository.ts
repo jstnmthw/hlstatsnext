@@ -5,12 +5,12 @@
  * frequently accessed player data using Garnet.
  */
 
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { ICacheService } from "@/shared/infrastructure/caching"
-import { PlayerRepository } from "./player.repository"
 import type { DatabaseClient } from "@/database/client"
+import type { ICacheService } from "@/shared/infrastructure/caching"
+import type { CreateOptions, FindOptions, UpdateOptions } from "@/shared/types/database"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { Player, PlayerCreateData } from "../types/player.types"
-import type { FindOptions, CreateOptions, UpdateOptions } from "@/shared/types/database"
+import { PlayerRepository } from "./player.repository"
 
 /**
  * Player repository with automatic caching

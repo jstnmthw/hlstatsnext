@@ -1,8 +1,8 @@
-import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react"
+import { getComponentStyles, type ColorScheme, type StyleVariant } from "../lib/color-variants"
 import { cn } from "../lib/utils"
-import { type ColorScheme, type StyleVariant, getComponentStyles } from "../lib/color-variants"
 
 // Use types from shared color variants system
 type Variant = StyleVariant | "primary" | "secondary" | "destructive"

@@ -1,7 +1,7 @@
 "use client"
 
+import { usePathname, useRouter } from "next/navigation"
 import { useCallback, useTransition } from "react"
-import { useRouter, usePathname } from "next/navigation"
 
 export interface DataTableConfig {
   defaultSortField: string

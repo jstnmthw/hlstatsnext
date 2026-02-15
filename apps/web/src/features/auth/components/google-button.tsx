@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@repo/ui"
 import { signIn } from "@repo/auth/client"
+import { Button } from "@repo/ui"
+import { useState } from "react"
 
 export function GoogleButton() {
   const [loading, setLoading] = useState(false)

@@ -1,8 +1,8 @@
 "use client"
 
-import { Input } from "./input"
+import { useEffect, useRef, useState } from "react"
 import { cn } from "../lib/utils"
-import { useState, useRef, useEffect } from "react"
+import { Input } from "./input"
 
 interface IPAddressProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,

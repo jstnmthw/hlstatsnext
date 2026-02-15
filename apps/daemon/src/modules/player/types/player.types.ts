@@ -2,9 +2,9 @@
  * Player Module Types
  */
 
-import type { BaseEvent, EventType, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
 import type { HandlerResult } from "@/shared/types/common"
-import type { FindOptions, UpdateOptions, CreateOptions } from "@/shared/types/database"
+import type { CreateOptions, FindOptions, UpdateOptions } from "@/shared/types/database"
+import type { BaseEvent, DualPlayerMeta, EventType, PlayerMeta } from "@/shared/types/events"
 import type { Player, Prisma } from "@repo/database/client"
 
 // Re-export Player type for convenience

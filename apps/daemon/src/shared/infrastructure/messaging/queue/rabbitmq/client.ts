@@ -5,20 +5,20 @@
  * topology setup, and error handling.
  */
 
-import * as amqp from "amqplib"
 import type {
-  IQueueClient,
-  QueueConnection,
-  QueueChannel,
-  RabbitMQConfig,
   ConnectionStats,
+  IQueueClient,
+  QueueChannel,
+  QueueConnection,
+  RabbitMQConfig,
 } from "@/shared/infrastructure/messaging/queue/core/types"
 import {
   QueueConnectionError,
   QueueError,
 } from "@/shared/infrastructure/messaging/queue/core/types"
-import { AmqpConnectionAdapter } from "./adapters"
 import type { ILogger } from "@/shared/utils/logger.types"
+import * as amqp from "amqplib"
+import { AmqpConnectionAdapter } from "./adapters"
 
 /**
  * RabbitMQ client implementation with connection management and topology setup

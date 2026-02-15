@@ -5,6 +5,6 @@ interface PageWrapperProps {
 
 export function PageWrapper({ children, hasFixedHeader = false }: PageWrapperProps) {
   return (
-    <div className={`min-h-screen flex flex-col ${hasFixedHeader ? "pt-16" : ""}`}>{children}</div>
+    <div className={`flex min-h-screen flex-col ${hasFixedHeader ? "pt-16" : ""}`}>{children}</div>
   )
 }

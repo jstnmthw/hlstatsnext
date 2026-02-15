@@ -1,19 +1,18 @@
-import fs from "node:fs"
-import path from "node:path"
+import fs, { createReadStream, createWriteStream } from "node:fs"
 import os from "node:os"
-import { pipeline } from "node:stream/promises"
-import { createWriteStream, createReadStream } from "node:fs"
+import path from "node:path"
 import { createInterface } from "node:readline"
-import { db } from "../client"
+import { pipeline } from "node:stream/promises"
 import unzipper from "unzipper"
+import { db } from "../client"
 import {
   log,
+  logDivider,
+  logError,
+  logHeader,
   logStep,
   logSuccess,
   logWarning,
-  logError,
-  logHeader,
-  logDivider,
 } from "../seeders/fake/logger"
 
 // Archive extraction helpers prefer system tools to avoid extra dependencies.

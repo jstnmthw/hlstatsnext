@@ -5,15 +5,15 @@
  * ensuring all services are properly initialized and integrated.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { createAppContext } from "@/context"
-import { createMockLogger } from "../mocks/logger"
+import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
+import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import { systemClock } from "@/shared/infrastructure/time"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
-import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
-import { SystemUuidService } from "@/shared/infrastructure/identifiers/system-uuid.service"
-import { systemClock } from "@/shared/infrastructure/time"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { createMockLogger } from "../mocks/logger"
 
 // Type for testing ingress service internal access
 interface TestIngressService {

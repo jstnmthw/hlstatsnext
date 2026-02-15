@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { createPrismaWithMetrics } from "./prisma-metrics-extension"
+import type { PrismaClient } from "@repo/database/client"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import { PrometheusMetricsExporter } from "../prometheus/prometheus-metrics-exporter"
 import type { ILogger } from "../types"
-import type { PrismaClient } from "@repo/database/client"
+import { createPrismaWithMetrics } from "./prisma-metrics-extension"
 
 describe("createPrismaWithMetrics", () => {
   let mockPrismaClient: PrismaClient

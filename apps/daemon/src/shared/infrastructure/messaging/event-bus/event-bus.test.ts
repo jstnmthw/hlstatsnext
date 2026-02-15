@@ -2,11 +2,11 @@
  * Event Bus Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { EventBus } from "./event-bus"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { EventBus } from "./event-bus"
 
 describe("EventBus", () => {
   let eventBus: EventBus

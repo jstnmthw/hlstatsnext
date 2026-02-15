@@ -5,8 +5,8 @@
  */
 
 import type { DatabaseClient } from "@/database/client"
-import type { IActionRepository, ActionDefinition } from "./action.types"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { ActionDefinition, IActionRepository } from "./action.types"
 
 export class ActionRepository implements IActionRepository {
   constructor(

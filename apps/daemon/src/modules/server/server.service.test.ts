@@ -2,9 +2,9 @@
  * ServerService Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { ServerService } from "./server.service"
 import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { ServerService } from "./server.service"
 import type { IServerRepository, ServerInfo } from "./server.types"
 
 const createMockServerRepository = () => ({

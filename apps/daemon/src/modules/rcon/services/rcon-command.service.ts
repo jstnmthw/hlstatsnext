@@ -5,9 +5,9 @@
  * Handles batch optimization, message formatting, and player session mapping automatically.
  */
 
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IRconService } from "../types/rcon.types"
-import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import { CommandResolverService, type CommandType } from "./command-resolver.service"
 
 export interface RconCommandOptions {

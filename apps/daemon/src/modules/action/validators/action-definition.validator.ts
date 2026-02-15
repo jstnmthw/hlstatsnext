@@ -33,9 +33,9 @@
  * ```
  */
 
-import type { IActionRepository } from "../action.types"
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { HandlerResult } from "@/shared/types/common"
+import type { ILogger } from "@/shared/utils/logger.types"
+import type { IActionRepository } from "../action.types"
 
 export interface ActionDefinitionResult {
   actionDef: {

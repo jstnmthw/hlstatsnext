@@ -5,14 +5,14 @@
  * Updates server information that can be queried directly from the game server.
  */
 
-import type { ILogger } from "@/shared/utils/logger.types"
+import type { IPlayerStatusEnricher } from "@/modules/player/enrichers/player-status-enricher"
 import type { IRconService, ServerStatus } from "@/modules/rcon/types/rcon.types"
 import type {
   IServerRepository,
   IServerService,
   ServerStatusUpdate,
 } from "@/modules/server/server.types"
-import type { IPlayerStatusEnricher } from "@/modules/player/enrichers/player-status-enricher"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 export interface IServerStatusEnricher {
   /**

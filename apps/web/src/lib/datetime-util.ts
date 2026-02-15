@@ -1,4 +1,4 @@
-import { formatDistanceToNow, format, isToday, isYesterday, isThisYear } from "date-fns"
+import { format, formatDistanceToNow, isThisYear, isToday, isYesterday } from "date-fns"
 
 /**
  * Formats a date in a human-friendly way:

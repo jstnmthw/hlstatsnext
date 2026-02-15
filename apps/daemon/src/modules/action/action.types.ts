@@ -2,9 +2,9 @@
  * Action Module Types
  */
 
-import type { BaseEvent, PlayerMeta, DualPlayerMeta } from "@/shared/types/events"
-import { EventType } from "@/shared/types/events"
 import type { HandlerResult } from "@/shared/types/common"
+import type { BaseEvent, DualPlayerMeta, PlayerMeta } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
 
 // Raw event types (as parsed from logs, contain gameUserId)
 export interface RawActionPlayerEvent extends BaseEvent {

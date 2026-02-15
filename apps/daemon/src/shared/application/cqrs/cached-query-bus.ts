@@ -5,8 +5,8 @@
  * Automatically caches query results and invalidates based on patterns.
  */
 
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { ICacheService } from "@/shared/infrastructure/caching"
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { IQuery, IQueryBus, IQueryHandler } from "./command.types"
 import { QueryBus } from "./query-bus"
 

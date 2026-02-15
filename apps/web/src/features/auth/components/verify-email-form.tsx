@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button, Card, Input, Label } from "@repo/ui"
 import { authClient } from "@repo/auth/client"
+import { Button, Card, Input, Label } from "@repo/ui"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 interface VerifyEmailFormProps {
   email: string
@@ -60,7 +60,7 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
     <Card className="p-6">
       <div className="mb-6">
         <h2 className="text-xl font-semibold tracking-tight">Verify your email</h2>
-        <p className="text-muted-foreground mt-1">
+        <p className="mt-1 text-muted-foreground">
           We sent a 6-digit code to <strong>{email}</strong>. Enter it below to verify your email
           address.
         </p>

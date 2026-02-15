@@ -2,15 +2,15 @@
  * IngressService Unit Tests
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { IngressService } from "./ingress.service"
-import { createMockLogger } from "@/tests/mocks/logger"
-import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
-import type { IngressDependencies } from "./ingress.dependencies"
-import type { ISocketFactory } from "./udp-server"
-import { TestClock } from "@/shared/infrastructure/time/test-clock"
 import { ServerStateManager } from "@/modules/server/state/server-state-manager"
+import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
+import { TestClock } from "@/shared/infrastructure/time/test-clock"
+import { createMockLogger } from "@/tests/mocks/logger"
 import type { Socket } from "dgram"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import type { IngressDependencies } from "./ingress.dependencies"
+import { IngressService } from "./ingress.service"
+import type { ISocketFactory } from "./udp-server"
 
 // Mock socket for UDP server
 const createMockSocket = () => ({

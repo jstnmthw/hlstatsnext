@@ -4,10 +4,10 @@
  * Tests for centralized server state management.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
-import { ServerStateManager } from "./server-state-manager"
-import { createMockLogger } from "@/tests/mocks/logger"
 import type { ILogger } from "@/shared/utils/logger.types"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { ServerStateManager } from "./server-state-manager"
 
 describe("ServerStateManager", () => {
   let stateManager: ServerStateManager

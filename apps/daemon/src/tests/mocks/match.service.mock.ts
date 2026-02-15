@@ -1,5 +1,5 @@
-import { vi } from "vitest"
 import type { IMatchService } from "@/modules/match/match.types"
+import { vi } from "vitest"
 
 export function createMockMatchService(): IMatchService {
   return {

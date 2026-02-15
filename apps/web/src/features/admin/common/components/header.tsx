@@ -1,7 +1,6 @@
-import Link from "next/link"
-import { Badge, Button, cn } from "@repo/ui"
-import { IconBrush, IconSettings } from "@repo/ui"
 import { AppLogo } from "@/features/common/components/app-logo"
+import { Badge, Button, cn, IconBrush, IconSettings } from "@repo/ui"
+import Link from "next/link"
 import { Navbar } from "./navbar"
 import { UserMenu } from "./user-menu"
 
@@ -31,7 +30,7 @@ export function AdminHeader({ className, currentPath }: AdminHeaderProps) {
   return (
     <>
       <header className={cn("w-full bg-zinc-950", className)}>
-        <div className={cn("py-6 flex justify-between items-center container")}>
+        <div className={cn("container flex items-center justify-between py-6")}>
           <div className="flex items-center gap-2">
             <AppLogo showVersion={false} />
             <Badge variant="outline" colorScheme="indigo">

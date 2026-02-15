@@ -2,8 +2,8 @@
 
 import { HttpLink } from "@apollo/client"
 import {
-  ApolloNextAppProvider,
   ApolloClient,
+  ApolloNextAppProvider,
   InMemoryCache,
 } from "@apollo/client-integration-nextjs"
 

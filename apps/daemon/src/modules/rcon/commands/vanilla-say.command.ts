@@ -6,9 +6,9 @@
  * to make them effectively "targeted".
  */
 
-import { BaseChatCommand } from "./base-chat.command"
-import type { IRconService } from "../types/rcon.types"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { IRconService } from "../types/rcon.types"
+import { BaseChatCommand } from "./base-chat.command"
 
 export class VanillaSayCommand extends BaseChatCommand {
   constructor(rconService: IRconService, logger: ILogger) {

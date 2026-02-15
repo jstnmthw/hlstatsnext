@@ -1,8 +1,8 @@
-import Link from "next/link"
-import { Button, cn } from "@repo/ui"
-import { getSession } from "@repo/auth/session"
-import { AppLogo } from "@/features/common/components/app-logo"
 import { AccountMenu } from "@/features/common/components/account-menu"
+import { AppLogo } from "@/features/common/components/app-logo"
+import { getSession } from "@repo/auth/session"
+import { Button, cn } from "@repo/ui"
+import Link from "next/link"
 
 const navItems = [
   {
@@ -33,10 +33,10 @@ export async function Header({
       className={cn(
         "w-full",
         className,
-        isFixed && "fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-background/50",
+        isFixed && "fixed top-0 right-0 left-0 z-50 bg-background/50 backdrop-blur-sm",
       )}
     >
-      <div className={cn("py-6 flex justify-between items-center container")}>
+      <div className={cn("container flex items-center justify-between py-6")}>
         <div className="flex items-center gap-2">
           <AppLogo />
         </div>
@@ -46,7 +46,7 @@ export async function Header({
               <Link
                 key={item.href}
                 href={item.href}
-                className="uppercase font-semibold text-zinc-400 hover:text-primary-bright transition-colors"
+                className="font-semibold text-zinc-400 uppercase transition-colors hover:text-primary-bright"
               >
                 {item.label}
               </Link>
@@ -62,7 +62,7 @@ export async function Header({
               isAdmin={session.user.role === "admin"}
             />
           ) : (
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="primary" size="sm" asChild className="uppercase">
               <Link href="/login">Sign in</Link>
             </Button>
           )}

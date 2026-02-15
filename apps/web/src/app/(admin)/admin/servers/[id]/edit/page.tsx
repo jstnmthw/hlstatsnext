@@ -1,15 +1,15 @@
-import { Metadata } from "next"
-import { notFound } from "next/navigation"
-import { query } from "@/lib/apollo-client"
 import { AdminHeader } from "@/features/admin/common/components/header"
+import { ServerEditForm } from "@/features/admin/servers/components/server-edit-form"
+import { GET_GAMES_FOR_SELECT } from "@/features/admin/servers/graphql/game-queries"
+import { GET_MODS_FOR_SELECT } from "@/features/admin/servers/graphql/mod-queries"
+import { GET_SERVER_BY_ID } from "@/features/admin/servers/graphql/server-queries"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { ServerEditForm } from "@/features/admin/servers/components/server-edit-form"
-import { GET_SERVER_BY_ID } from "@/features/admin/servers/graphql/server-queries"
-import { GET_GAMES_FOR_SELECT } from "@/features/admin/servers/graphql/game-queries"
-import { GET_MODS_FOR_SELECT } from "@/features/admin/servers/graphql/mod-queries"
+import { query } from "@/lib/apollo-client"
 import { Card } from "@repo/ui"
+import { Metadata } from "next"
+import { notFound } from "next/navigation"
 
 interface EditServerPageProps {
   params: Promise<{ id: string }>
@@ -65,9 +65,9 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
         <MainContent>
           <div className="container">
             <div className="py-10">
-              <Card className="p-6 max-w-2xl mx-auto">
-                <h1 className="text-3xl font-medium tracking-tight mb-2">Edit Server</h1>
-                <p className="text-muted-foreground mb-6">
+              <Card className="mx-auto max-w-2xl p-6">
+                <h1 className="mb-2 text-3xl font-bold tracking-tight uppercase">Edit Server</h1>
+                <p className="mb-6 text-muted-foreground">
                   Update server configuration and settings for {server.name || "Unnamed Server"}.
                 </p>
                 <ServerEditForm

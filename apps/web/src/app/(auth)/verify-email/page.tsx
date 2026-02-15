@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation"
 import { VerifyEmailForm } from "@/features/auth/components/verify-email-form"
+import { redirect } from "next/navigation"
 
 interface VerifyEmailPageProps {
   searchParams: Promise<{ email?: string }>

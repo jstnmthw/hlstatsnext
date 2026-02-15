@@ -1,6 +1,5 @@
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IServerService } from "./server.types"
-import type { IServerRepository, ServerInfo } from "./server.types"
+import type { IServerRepository, IServerService, ServerInfo } from "./server.types"
 
 export class ServerService implements IServerService {
   constructor(

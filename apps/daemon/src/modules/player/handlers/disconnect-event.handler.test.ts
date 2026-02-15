@@ -4,20 +4,20 @@
  * Tests for player disconnection event handling.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { DisconnectEventHandler } from "./disconnect-event.handler"
+import type { IMapService } from "@/modules/map/map.service"
+import type { IMatchService } from "@/modules/match/match.types"
+import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
+import type { IPlayerRepository, PlayerDisconnectEvent } from "@/modules/player/types/player.types"
+import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
+import type { IServerRepository } from "@/modules/server/server.types"
 import { EventType } from "@/shared/types/events"
 import { createMockLogger } from "@/tests/mocks/logger"
-import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
-import { createMockSessionService } from "@/tests/mocks/session.service.mock"
-import { createMockServerRepository } from "@/tests/mocks/server.repository.mock"
 import { createMockMatchService } from "@/tests/mocks/match.service.mock"
-import type { IPlayerRepository, PlayerDisconnectEvent } from "@/modules/player/types/player.types"
-import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
-import type { IServerRepository } from "@/modules/server/server.types"
-import type { IMatchService } from "@/modules/match/match.types"
-import type { IMapService } from "@/modules/map/map.service"
-import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
+import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
+import { createMockServerRepository } from "@/tests/mocks/server.repository.mock"
+import { createMockSessionService } from "@/tests/mocks/session.service.mock"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { DisconnectEventHandler } from "./disconnect-event.handler"
 
 function createMockMapService(): IMapService {
   return {

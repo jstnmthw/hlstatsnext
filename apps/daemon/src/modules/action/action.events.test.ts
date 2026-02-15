@@ -4,13 +4,13 @@
  * Tests for action-specific event handling.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { ActionEventHandler } from "./action.events"
-import { EventType } from "@/shared/types/events"
-import { createMockLogger } from "@/tests/mocks/logger"
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { IActionService } from "@/modules/action/action.types"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { ActionEventHandler } from "./action.events"
 
 function createMockActionService(): IActionService {
   return {

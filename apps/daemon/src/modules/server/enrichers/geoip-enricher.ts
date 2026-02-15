@@ -7,7 +7,7 @@ import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { GeoEnrichmentOptions } from "../types/server.types"
 
-import { isIPv4, ipv4ToBigInt, extractIpFromAddress } from "@/shared/application/utils/ip-utils"
+import { extractIpFromAddress, ipv4ToBigInt, isIPv4 } from "@/shared/application/utils/ip-utils"
 
 /**
  * GeoIP enrichment service for server location data

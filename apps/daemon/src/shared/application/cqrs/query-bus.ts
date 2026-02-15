@@ -4,9 +4,9 @@
  * Dispatches queries to their registered handlers with caching support.
  */
 
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IQuery, IQueryHandler, IQueryBus } from "./command.types"
 import type { CacheEntry } from "@/shared/infrastructure/caching/cache.types"
+import type { ILogger } from "@/shared/utils/logger.types"
+import type { IQuery, IQueryBus, IQueryHandler } from "./command.types"
 
 /**
  * Query Bus

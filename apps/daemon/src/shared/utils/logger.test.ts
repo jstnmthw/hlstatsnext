@@ -2,10 +2,10 @@
  * Logger Implementation Unit Tests - Optimized
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { Logger, LogLevel, logger, type LogStatus } from "./logger"
-import type { ILogger } from "./logger.types"
 import type { MockInstance } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { Logger, logger, LogLevel, type LogStatus } from "./logger"
+import type { ILogger } from "./logger.types"
 
 describe("Logger", () => {
   let testLogger: Logger

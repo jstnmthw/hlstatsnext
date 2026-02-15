@@ -4,10 +4,10 @@
  * Tests for server configuration default seeding.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { seedServerDefaults } from "./seed-server-defaults"
-import { createMockLogger } from "@/tests/mocks/logger"
 import type { ILogger } from "@/shared/utils/logger.types"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { seedServerDefaults } from "./seed-server-defaults"
 
 function createMockTransaction() {
   return {

@@ -1,8 +1,8 @@
 import { Slot } from "@radix-ui/react-slot"
-import { cn } from "../lib/utils"
 import { cva, type VariantProps } from "class-variance-authority"
 import * as React from "react"
-import { type ColorScheme, type StyleVariant, getComponentStyles } from "../lib/color-variants"
+import { getComponentStyles, type ColorScheme, type StyleVariant } from "../lib/color-variants"
+import { cn } from "../lib/utils"
 
 // Base styles that apply to all button variants
 const baseButtonStyles = [

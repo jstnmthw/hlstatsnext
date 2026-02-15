@@ -4,10 +4,10 @@
  * Tests for validation utilities.
  */
 
-import { describe, it, expect } from "vitest"
-import { validateAddress, isValidAddress } from "./address-validator"
-import { validatePort, isValidPort } from "./port-validator"
-import { validateGameCode, isValidGameCode } from "./game-code-validator"
+import { describe, expect, it } from "vitest"
+import { isValidAddress, validateAddress } from "./address-validator"
+import { isValidGameCode, validateGameCode } from "./game-code-validator"
+import { isValidPort, validatePort } from "./port-validator"
 
 describe("Address Validator", () => {
   describe("validateAddress", () => {

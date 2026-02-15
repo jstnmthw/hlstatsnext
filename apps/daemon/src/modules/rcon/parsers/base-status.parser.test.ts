@@ -2,10 +2,10 @@
  * Base Status Response Parser Tests
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { BaseStatusParser, type StatusLine } from "./base-status.parser"
-import type { ServerStatus } from "../types/rcon.types"
 import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import type { ServerStatus } from "../types/rcon.types"
+import { BaseStatusParser, type StatusLine } from "./base-status.parser"
 
 // Concrete implementation for testing the abstract base class
 class TestStatusParser extends BaseStatusParser {

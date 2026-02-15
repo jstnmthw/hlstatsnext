@@ -1,9 +1,9 @@
+import { db } from "@repo/database/client"
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { admin, emailOTP } from "better-auth/plugins"
-import { db } from "@repo/database/client"
-import { ac, adminRole, userRole } from "./permissions"
 import { sendOTP } from "./mail"
+import { ac, adminRole, userRole } from "./permissions"
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET

@@ -4,9 +4,9 @@
  * Provides common functionality and enforces interface for all RCON protocol implementations.
  */
 
+import type { ILogger } from "@/shared/utils/logger.types"
 import type { IRconProtocol, RconProtocolType } from "../types/rcon.types"
 import { RconError, RconErrorCode } from "../types/rcon.types"
-import type { ILogger } from "@/shared/utils/logger.types"
 
 export abstract class BaseRconProtocol implements IRconProtocol {
   protected isConnectedState = false

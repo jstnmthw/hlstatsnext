@@ -5,8 +5,8 @@
  */
 
 import type { GameDetectionResult } from "@/modules/game/game-detection.types"
-import type { IClock } from "@/shared/infrastructure/time/clock.interface"
 import type { ServerStateManager } from "@/modules/server/state/server-state-manager"
+import type { IClock } from "@/shared/infrastructure/time/clock.interface"
 
 /**
  * Server authentication service interface

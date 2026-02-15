@@ -1,7 +1,7 @@
+import { faker } from "@faker-js/faker"
 import { db, Prisma } from "../../client"
 import { getSeedConfig } from "./config"
 import { log } from "./logger"
-import { faker } from "@faker-js/faker"
 
 export async function seedActions() {
   const config = getSeedConfig()

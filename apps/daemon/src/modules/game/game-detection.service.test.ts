@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { GameDetectionService } from "./game-detection.service"
 import { GAMES } from "@/config/game.config"
 import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { GameDetectionService } from "./game-detection.service"
 
 const mockLogger = createMockLogger()
 

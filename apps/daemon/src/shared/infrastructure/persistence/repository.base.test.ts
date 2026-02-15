@@ -2,19 +2,19 @@
  * BaseRepository Unit Tests
  */
 
-import type { Player } from "@repo/database/client"
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { DatabaseClient, TransactionalPrisma } from "@/database/client"
 import type { RepositoryOptions } from "@/shared/types/database"
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { BaseRepository } from "./repository.base"
-import { createMockLogger } from "@/tests/mocks/logger"
+import type { ILogger } from "@/shared/utils/logger.types"
 import {
   createMockDatabaseClient,
-  type TransactionCallback,
   type MockDatabaseClient,
+  type TransactionCallback,
 } from "@/tests/mocks/database"
+import { createMockLogger } from "@/tests/mocks/logger"
+import type { Player } from "@repo/database/client"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import { mockDeep as deepMock } from "vitest-mock-extended"
+import { BaseRepository } from "./repository.base"
 
 // Concrete implementation for testing
 interface TestRecord extends Record<string, unknown> {

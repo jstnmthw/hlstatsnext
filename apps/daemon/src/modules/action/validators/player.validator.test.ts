@@ -4,10 +4,10 @@
  * Tests for player validation in action handlers.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { PlayerValidator } from "./player.validator"
-import { createMockLogger } from "@/tests/mocks/logger"
 import type { IPlayerService } from "@/modules/player/types/player.types"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { PlayerValidator } from "./player.validator"
 
 function createMockPlayerService(): IPlayerService {
   return {

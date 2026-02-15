@@ -1,17 +1,17 @@
 "use client"
 
-import Link from "next/link"
+import { usePermission } from "@/features/auth/hooks/use-permission"
 import {
-  cn,
   Button,
+  cn,
+  IconDeviceGamepad2,
   IconFileText,
+  IconGauge,
   IconServer,
   IconSettings,
   IconUser,
-  IconGauge,
-  IconDeviceGamepad2,
 } from "@repo/ui"
-import { usePermission } from "@/features/auth/hooks/use-permission"
+import Link from "next/link"
 
 interface NavItem {
   label: string
@@ -74,7 +74,7 @@ export function Navbar({ currentPath }: NavbarProps) {
 
   return (
     <nav className="flex items-center justify-between border-b border-zinc-700 bg-zinc-950">
-      <ul className="flex items-center gap-6 container">
+      <ul className="container flex items-center gap-6">
         {visibleItems.map((item) => {
           const isActive =
             item.href === "/admin"
@@ -83,7 +83,7 @@ export function Navbar({ currentPath }: NavbarProps) {
           return (
             <li key={item.href} className="relative py-2">
               {isActive && (
-                <span className="absolute inset-0 bg-radial-[at_50%_75%] from-indigo-500 to-transparent from-0% to-75% opacity-20"></span>
+                <span className="absolute inset-0 bg-radial-[at_50%_75%] from-indigo-500 from-0% to-transparent to-75% opacity-20"></span>
               )}
               <Button
                 variant="ghost"
@@ -92,7 +92,7 @@ export function Navbar({ currentPath }: NavbarProps) {
                 className={cn(
                   "font-semibold tracking-tight text-zinc-500 dark:text-zinc-300 [&>[data-slot=icon]]:text-zinc-500",
                   isActive &&
-                    "after:content-[''] text-zinc-500 dark:text-zinc-300 [&>[data-slot=icon]]:text-primary after:absolute after:-bottom-[9px] after:left-0 after:w-full after:h-px after:bg-primary",
+                    "text-zinc-500 after:absolute after:-bottom-[9px] after:left-0 after:h-px after:w-full after:bg-primary after:content-[''] dark:text-zinc-300 [&>[data-slot=icon]]:text-primary",
                 )}
               >
                 <Link href={item.href}>

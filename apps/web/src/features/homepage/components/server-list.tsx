@@ -1,12 +1,12 @@
-import Link from "next/link"
-import { query } from "@/lib/apollo-client"
-import { Button, IconPlayerPlay, cn } from "@repo/ui"
 import { GET_SERVERS_QUERY } from "@/features/admin/servers/graphql/server-queries"
 import {
   VerticalList,
   VerticalListHeader,
   VerticalListItem,
 } from "@/features/common/components/vertical-list"
+import { query } from "@/lib/apollo-client"
+import { Button, IconPlayerPlay, cn } from "@repo/ui"
+import Link from "next/link"
 
 export async function ServerList({ className }: { className?: string }) {
   const { data } = await query({ query: GET_SERVERS_QUERY })
@@ -18,11 +18,11 @@ export async function ServerList({ className }: { className?: string }) {
         {data?.findManyServer?.map((server) => (
           <VerticalListItem key={server.serverId}>
             <div className="flex items-center justify-between">
-              <div className="flex items-center justify-between w-full">
+              <div className="flex w-full items-center justify-between">
                 <div className="flex items-center">
                   <div
                     className={cn(
-                      "w-2 h-2 rounded-full mx-3",
+                      "mx-3 h-2 w-2 rounded-full",
                       getOnlineStatus(server.lastEvent) === "Online"
                         ? "bg-emerald-500"
                         : "bg-red-500/50",
@@ -32,12 +32,12 @@ export async function ServerList({ className }: { className?: string }) {
                     <h3 className="font-mono">
                       <Link
                         href={`/servers/${server.serverId}`}
-                        className="hover:underline hover:text-blue-400 transition-colors"
+                        className="transition-colors hover:text-blue-400 hover:underline"
                       >
                         {server.name}
                       </Link>
                     </h3>
-                    <ul className="flex flex-row font-mono space-x-2">
+                    <ul className="flex flex-row space-x-2 font-mono">
                       {server.activeMap && <li>{server.activeMap}</li>}
                       <li className="text-muted-foreground">
                         {server.activePlayers}/{server.maxPlayers}
@@ -47,7 +47,7 @@ export async function ServerList({ className }: { className?: string }) {
                   </div>
                 </div>
                 <div className="flex items-center px-3">
-                  <Button variant="outline" className="text-xs cursor-pointer" size="icon-sm">
+                  <Button variant="outline" className="cursor-pointer text-xs" size="icon-sm">
                     <a href={`steam://connect/${server.address}:${server.port}`}>
                       <IconPlayerPlay className="size-3" fill="currentColor" />
                     </a>

@@ -4,10 +4,10 @@
  * Tests for action definition validation.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { ActionDefinitionValidator } from "./action-definition.validator"
 import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { IActionRepository } from "../action.types"
+import { ActionDefinitionValidator } from "./action-definition.validator"
 
 function createMockRepository(): IActionRepository {
   return {

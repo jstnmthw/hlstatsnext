@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect } from "react"
 import { Button, Card, IconAlertTriangle } from "@repo/ui"
+import { useEffect } from "react"
 
 export default function AuthError({
   error,

@@ -4,10 +4,15 @@
  * Comprehensive test suite for the CS parser covering all event types
  */
 
-import { describe, it, expect, beforeEach } from "vitest"
-import { CsParser } from "./cs.parser"
-import { EventType } from "@/shared/types/events"
+import type { MapChangeEvent, RoundStartEvent } from "@/modules/match/match.types"
+import type { ServerState, ServerStateManager } from "@/modules/server/state/server-state-manager"
+import { DeterministicUuidService } from "@/shared/infrastructure/identifiers/deterministic-uuid.service"
+import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import { TestClock } from "@/shared/infrastructure/time/test-clock"
 import type { BaseEvent, DualPlayerMeta } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
+import { beforeEach, describe, expect, it } from "vitest"
+import { CsParser } from "./cs.parser"
 
 // Parser output types (before ID resolution)
 interface RawDamageEventData {
@@ -28,11 +33,6 @@ interface RawDamageEvent extends BaseEvent {
   data: RawDamageEventData
   meta?: DualPlayerMeta
 }
-import type { MapChangeEvent, RoundStartEvent } from "@/modules/match/match.types"
-import { TestClock } from "@/shared/infrastructure/time/test-clock"
-import { DeterministicUuidService } from "@/shared/infrastructure/identifiers/deterministic-uuid.service"
-import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
-import type { ServerStateManager, ServerState } from "@/modules/server/state/server-state-manager"
 
 describe("CsParser", () => {
   const serverId = 1

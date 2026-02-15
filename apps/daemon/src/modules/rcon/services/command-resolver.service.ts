@@ -8,8 +8,8 @@
  * 4. Hard fallback ("say")
  */
 
-import type { ILogger } from "@/shared/utils/logger.types"
 import type { IServerRepository } from "@/modules/server/server.types"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 export type CommandType =
   | "BroadCastEventsCommand"

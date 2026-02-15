@@ -9,12 +9,12 @@ import type { DatabaseClient } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { ICryptoService } from "@repo/crypto"
 
-import { PlayerRepository } from "@/modules/player/repositories/player.repository"
-import { MatchRepository } from "@/modules/match/match.repository"
-import { WeaponRepository } from "@/modules/weapon/weapon.repository"
 import { ActionRepository } from "@/modules/action/action.repository"
-import { ServerRepository } from "@/modules/server/server.repository"
+import { MatchRepository } from "@/modules/match/match.repository"
+import { PlayerRepository } from "@/modules/player/repositories/player.repository"
 import { RconRepository } from "@/modules/rcon/repositories/rcon.repository"
+import { ServerRepository } from "@/modules/server/server.repository"
+import { WeaponRepository } from "@/modules/weapon/weapon.repository"
 
 export interface RepositoryCollection {
   playerRepository: PlayerRepository

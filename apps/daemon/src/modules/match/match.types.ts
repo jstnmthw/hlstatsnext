@@ -2,9 +2,9 @@
  * Match Module Types
  */
 
-import type { BaseEvent, EventType } from "@/shared/types/events"
 import type { HandlerResult } from "@/shared/types/common"
-import type { FindOptions, UpdateOptions, CreateOptions } from "@/shared/types/database"
+import type { CreateOptions, FindOptions, UpdateOptions } from "@/shared/types/database"
+import type { BaseEvent, EventType } from "@/shared/types/events"
 
 // Match-specific event types
 export interface RoundStartEvent extends BaseEvent {

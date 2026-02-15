@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, type Mock } from "vitest"
 import type { DatabaseClient } from "@/database/client"
 import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest"
 import { GeoIPService } from "./geoip.service"
 
 type BlockRow = { locId: bigint }

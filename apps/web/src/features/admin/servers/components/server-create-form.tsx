@@ -1,10 +1,10 @@
 "use client"
 
-import { useActionState, useState } from "react"
 import { createServer } from "@/features/admin/servers/actions/create-server"
-import { FormField, ErrorMessage, ErrorDisplay } from "@/features/common/components/form"
-import { Button, Input, Label, IPAddress, Port, Switch, BasicSelect } from "@repo/ui"
+import { ErrorDisplay, ErrorMessage, FormField } from "@/features/common/components/form"
 import type { Game, ModSupported } from "@repo/database/client"
+import { BasicSelect, Button, Input, IPAddress, Label, Port, Switch } from "@repo/ui"
+import { useActionState, useState } from "react"
 
 type GameProps = Pick<Game, "code" | "name">
 type ModProps = Pick<ModSupported, "code" | "name">
@@ -17,7 +17,7 @@ export function ServerCreateForm({ games, mods }: { games: GameProps[]; mods: Mo
     <form action={formAction} className="space-y-6">
       <ErrorDisplay state={state} pending={pending} />
 
-      <div className="grid md:grid-cols-1 gap-4">
+      <div className="grid gap-4 md:grid-cols-1">
         <FormField>
           <Label htmlFor="connection-type">Docker</Label>
           <Switch
@@ -34,7 +34,7 @@ export function ServerCreateForm({ games, mods }: { games: GameProps[]; mods: Mo
 
       <input type="hidden" name="connection_type" value={isDockerMode ? "docker" : "external"} />
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <FormField>
           <Label htmlFor="game" required>
             Game Type
@@ -65,7 +65,7 @@ export function ServerCreateForm({ games, mods }: { games: GameProps[]; mods: Mo
         </FormField>
       </div>
 
-      <div className="grid md:grid-cols-1 gap-4">
+      <div className="grid gap-4 md:grid-cols-1">
         <FormField>
           <Label htmlFor={isDockerMode ? "docker_host" : "address"} required>
             {isDockerMode ? "Docker Host" : "Server Address"}
@@ -78,7 +78,7 @@ export function ServerCreateForm({ games, mods }: { games: GameProps[]; mods: Mo
               required
             />
             <Port
-              className="rounded-l-none -ml-px border-l-transparent max-w-18"
+              className="-ml-px max-w-18 rounded-l-none border-l-transparent"
               name="port"
               required
               placeholder="27015"

@@ -4,13 +4,13 @@
  * Tests for match-specific event handling.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { MatchEventHandler } from "./match.events"
-import { EventType } from "@/shared/types/events"
-import { createMockLogger } from "@/tests/mocks/logger"
-import type { ILogger } from "@/shared/utils/logger.types"
-import type { IMatchService } from "@/modules/match/match.types"
 import type { IActionService } from "@/modules/action/action.types"
+import type { IMatchService } from "@/modules/match/match.types"
+import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { createMockLogger } from "@/tests/mocks/logger"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { MatchEventHandler } from "./match.events"
 
 function createMockMatchService(): IMatchService {
   return {

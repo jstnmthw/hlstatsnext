@@ -1,18 +1,23 @@
 "use client"
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button, IconLogout, IconSettings, IconShield } from "@repo/ui"
-import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui"
+import { signOut } from "@repo/auth/client"
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  IconLogout,
+  IconSettings,
+  IconShield,
 } from "@repo/ui"
-import { signOut } from "@repo/auth/client"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export interface AccountMenuProps {
   user: {

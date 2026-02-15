@@ -1,10 +1,10 @@
-import { GET_SERVER_BY_ID } from "@/features/servers/graphql/servers-queries"
-import { query } from "@/lib/apollo-client"
 import { Footer } from "@/features/common/components/footer"
 import { Header } from "@/features/common/components/header"
-import { notFound } from "next/navigation"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
+import { GET_SERVER_BY_ID } from "@/features/servers/graphql/servers-queries"
+import { query } from "@/lib/apollo-client"
+import { notFound } from "next/navigation"
 
 interface ServerPageProps {
   params: Promise<{ id: string }>
@@ -34,7 +34,7 @@ export default async function ServerPage({ params }: ServerPageProps) {
       <PageWrapper>
         <Header />
         <MainContent className="container">
-          <div className="py-10 border-t border-border">
+          <div className="border-t border-border py-10">
             <h1 className="text-2xl font-semibold tracking-tight">{data.findUniqueServer.name}</h1>
           </div>
         </MainContent>

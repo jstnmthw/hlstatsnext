@@ -3,17 +3,17 @@
  * Comprehensive test coverage for skill adjustment display fix and all handler functionality
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { KillEventHandler } from "./kill-event.handler"
+import type { IMapService } from "@/modules/map/map.service"
+import type { IMatchService } from "@/modules/match/match.types"
+import type { IPlayerRepository, PlayerKillEvent } from "@/modules/player/types/player.types"
+import type { IRankingService } from "@/modules/ranking/ranking.types"
+import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
 import { EventType } from "@/shared/types/events"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
-import type { PlayerKillEvent, IPlayerRepository } from "@/modules/player/types/player.types"
 import type { Player } from "@repo/database/client"
-import type { IRankingService } from "@/modules/ranking/ranking.types"
-import type { IMatchService } from "@/modules/match/match.types"
-import type { IEventNotificationService } from "@/modules/rcon/services/event-notification.service"
-import type { IMapService } from "@/modules/map/map.service"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { KillEventHandler } from "./kill-event.handler"
 
 describe("KillEventHandler", () => {
   let handler: KillEventHandler

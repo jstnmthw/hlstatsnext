@@ -6,8 +6,8 @@
  * and system health indicators.
  */
 
-import type { ILogger } from "@/shared/utils/logger.types"
 import { EventType } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
 
 export interface EventProcessingMetrics {
   readonly totalEvents: number

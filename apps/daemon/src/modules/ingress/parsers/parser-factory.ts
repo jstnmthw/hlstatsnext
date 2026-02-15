@@ -1,9 +1,9 @@
-import type { IClock } from "@/shared/infrastructure/time/clock.interface"
-import type { ServerStateManager } from "@/modules/server/state/server-state-manager"
-import { CsParser } from "./cs.parser"
-import type { BaseParser } from "./base.parser"
-import { NoopParser } from "./noop.parser"
 import { GameConfig } from "@/config/game.config"
+import type { ServerStateManager } from "@/modules/server/state/server-state-manager"
+import type { IClock } from "@/shared/infrastructure/time/clock.interface"
+import type { BaseParser } from "./base.parser"
+import { CsParser } from "./cs.parser"
+import { NoopParser } from "./noop.parser"
 
 export class ParserFactory {
   static create(

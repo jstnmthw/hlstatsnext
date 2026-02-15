@@ -5,8 +5,8 @@
  */
 
 import { randomBytes, randomUUID } from "crypto"
-import type { IUuidService } from "./uuid.interface"
 import type { IClock } from "../time/clock.interface"
+import type { IUuidService } from "./uuid.interface"
 
 export class SystemUuidService implements IUuidService {
   constructor(private readonly clock: IClock) {}

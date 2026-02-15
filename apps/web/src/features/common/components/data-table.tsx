@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useCallback } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import {
   ColumnDef,
@@ -12,6 +12,12 @@ import {
 
 import {
   Button,
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  IconAdjustments,
+  IconSearch,
   Input,
   Table,
   TableBody,
@@ -19,15 +25,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuCheckboxItem,
-  IconAdjustments,
-  IconSearch,
 } from "@repo/ui"
 
-import { useDataTableUrl, DataTableConfig } from "@/features/common/hooks/use-data-table-url"
+import { DataTableConfig, useDataTableUrl } from "@/features/common/hooks/use-data-table-url"
 
 export interface DataTableProps<T> {
   // Data

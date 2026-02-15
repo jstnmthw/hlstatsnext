@@ -1,5 +1,5 @@
-import { Header } from "@/features/common/components/header"
 import { Footer } from "@/features/common/components/footer"
+import { Header } from "@/features/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
 

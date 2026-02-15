@@ -2,13 +2,13 @@
  * BaseParser Unit Tests
  */
 
-import { describe, it, expect, beforeEach } from "vitest"
-import { BaseParser } from "./base.parser"
-import type { ParseResult } from "./base.parser"
-import type { BaseEvent } from "@/shared/types/events"
-import { EventType } from "@/shared/types/events"
 import type { IClock } from "@/shared/infrastructure/time/clock.interface"
 import { TestClock } from "@/shared/infrastructure/time/test-clock"
+import type { BaseEvent } from "@/shared/types/events"
+import { EventType } from "@/shared/types/events"
+import { beforeEach, describe, expect, it } from "vitest"
+import type { ParseResult } from "./base.parser"
+import { BaseParser } from "./base.parser"
 
 // Helper type for accessing protected methods
 type ParserWithMethods = {

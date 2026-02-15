@@ -1,8 +1,8 @@
+import { faker } from "@faker-js/faker"
 import { db, Prisma } from "../../client"
 import { getSeedConfig } from "./config"
-import { generateSteamId } from "./utils"
 import { log } from "./logger"
-import { faker } from "@faker-js/faker"
+import { generateSteamId } from "./utils"
 
 export async function seedPlayerUniqueIds() {
   const config = getSeedConfig()

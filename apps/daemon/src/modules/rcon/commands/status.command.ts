@@ -4,8 +4,8 @@
  * Implements the "status" RCON command to retrieve server information.
  */
 
-import { BaseRconCommand } from "./command.types"
 import type { ServerStatus } from "../types/rcon.types"
+import { BaseRconCommand } from "./command.types"
 
 export class StatusCommand extends BaseRconCommand<ServerStatus> {
   constructor() {

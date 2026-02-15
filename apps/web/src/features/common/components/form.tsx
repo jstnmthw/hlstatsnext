@@ -30,7 +30,7 @@ export function ErrorDisplay({
   }
 
   return (
-    <div className="px-3 py-2 border rounded-md border-red-500/20! flex items-center justify-between transition-opacity duration-200 opacity-100">
+    <div className="flex items-center justify-between rounded-md border border-red-500/20! px-3 py-2 opacity-100 transition-opacity duration-200">
       <p className="text-red-800 dark:text-red-500">{state.message}</p>
     </div>
   )

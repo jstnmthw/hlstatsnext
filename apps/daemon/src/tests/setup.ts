@@ -5,7 +5,7 @@
  * connection, cleanup, and global mocks.
  */
 
-import { beforeAll, afterAll, beforeEach, afterEach, vi } from "vitest"
+import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest"
 import { resetAppContext } from "../context"
 import { cleanupDatabase, seedTestDatabase } from "../tests/fixtures/database"
 

@@ -6,15 +6,14 @@
  * This runs after module handlers have processed the chat event.
  */
 
-import { EventType } from "@/shared/types/events"
+import type { IPlayerRepository, PlayerChatEvent } from "@/modules/player/types/player.types"
 import { StructuredCommandBuilder } from "@/modules/rcon/builders/structured-command.builder"
 import { CommandResolverService } from "@/modules/rcon/services/command-resolver.service"
+import type { IRconService } from "@/modules/rcon/types/rcon.types"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import type { BaseEvent, PlayerMeta } from "@/shared/types/events"
-import type { PlayerChatEvent } from "@/modules/player/types/player.types"
+import { EventType } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { IPlayerRepository } from "@/modules/player/types/player.types"
-import type { IRconService } from "@/modules/rcon/types/rcon.types"
 
 export class PlayerCommandCoordinator implements EventCoordinator {
   constructor(

@@ -5,21 +5,21 @@
  * These tests ensure mathematical correctness and edge case handling.
  */
 
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import {
-  calculateExpectedScore,
-  getKFactor,
+  applyKillModifiers,
   applyRatingBounds,
   calculateBaseRatingChange,
-  applyKillModifiers,
+  calculateExpectedScore,
   calculateKillSkillAdjustment,
   calculateStandardRatingAdjustment,
   calculateSuicidePenalty,
   calculateTeamKillPenalty,
+  getKFactor,
   validateSkillConfig,
-  type SkillRatingInput,
   type KillContextInput,
   type SkillCalculationConfig,
+  type SkillRatingInput,
 } from "./skill-calculator"
 
 describe("Skill Calculator", () => {

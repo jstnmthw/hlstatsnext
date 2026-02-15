@@ -2,19 +2,19 @@
  * PlayerService Unit Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import { PlayerService } from "./player.service"
-import { PlayerRepository } from "../repositories/player.repository"
-import { createMockLogger } from "@/tests/mocks/logger"
+import type { IMapService } from "@/modules/map/map.service"
+import type { IMatchService } from "@/modules/match/match.types"
+import type { IRankingService } from "@/modules/ranking/ranking.types"
+import { EventType } from "@/shared/types/events"
 import { createMockDatabaseClient } from "@/tests/mocks/database"
+import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockServerService } from "@/tests/mocks/server.service.mock"
 import { createMockSessionService } from "@/tests/mocks/session.service.mock"
-import { EventType } from "@/shared/types/events"
 import type { Player } from "@repo/database/client"
-import type { IRankingService } from "@/modules/ranking/ranking.types"
-import type { IMatchService } from "@/modules/match/match.types"
-import type { PlayerKillEvent, PlayerEvent } from "../types/player.types"
-import type { IMapService } from "@/modules/map/map.service"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { PlayerRepository } from "../repositories/player.repository"
+import type { PlayerEvent, PlayerKillEvent } from "../types/player.types"
+import { PlayerService } from "./player.service"
 
 describe("PlayerService", () => {
   let playerService: PlayerService

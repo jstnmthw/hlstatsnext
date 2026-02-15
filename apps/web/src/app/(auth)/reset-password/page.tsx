@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation"
 import { ResetPasswordForm } from "@/features/auth/components/reset-password-form"
+import { redirect } from "next/navigation"
 
 interface ResetPasswordPageProps {
   searchParams: Promise<{ email?: string }>

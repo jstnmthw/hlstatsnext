@@ -51,7 +51,7 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint", "^db:generate"]
     },
     "check-types": {
       "dependsOn": ["^check-types", "db:generate"]

@@ -4,19 +4,27 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../lib/utils"
 import { type ColorScheme, type StyleVariant, getComponentStyles } from "../lib/color-variants"
 
+// Use types from shared color variants system
+type Variant = StyleVariant | "primary" | "secondary" | "destructive"
+
 const badgeVariants = cva(
-  "inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  "inline-flex items-center justify-center rounded-[4px] border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
   {
     variants: {
       variant: {
-        // Markers for the getBadgeStyles logic
+        // Original variants (use colorScheme system)
         solid: "",
         outline: "",
         ghost: "",
+        // Semantic variants (use CSS theme variables directly)
+        primary: "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
+        secondary: "border-input bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground [a&]:hover:bg-destructive/90",
       },
     },
     defaultVariants: {
-      variant: "solid",
+      variant: "primary",
     },
   },
 )
@@ -46,15 +54,19 @@ interface BadgeProps
 
 function Badge({
   className,
-  variant = "solid",
+  variant = "primary",
   colorScheme = "dark/white",
   asChild = false,
   ...props
 }: BadgeProps) {
   const Comp = asChild ? Slot : "span"
 
-  // Get the specific variant+colorScheme styles using the helper
-  const dynamicStyles = getBadgeStyles(variant!, colorScheme, asChild)
+  // Semantic variants use CSS theme variables directly; original variants use colorScheme system
+  const isSemanticVariant =
+    variant === "primary" || variant === "secondary" || variant === "destructive"
+  const dynamicStyles = isSemanticVariant
+    ? []
+    : getBadgeStyles(variant as StyleVariant, colorScheme, asChild)
 
   return (
     <Comp
@@ -70,4 +82,4 @@ function Badge({
 }
 
 export { Badge, badgeVariants }
-export type { BadgeProps, StyleVariant as BadgeVariant, ColorScheme } // Export relevant types
+export type { BadgeProps, Variant as BadgeVariant, ColorScheme } // Export relevant types

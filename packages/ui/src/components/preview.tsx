@@ -1216,23 +1216,31 @@ function ItemExample() {
 function BadgeExamples() {
   return (
     <Example title="Badge" className="items-center justify-center">
-      <div className="flex items-center justify-center gap-2">
-        <Badge>
-          <Spinner data-icon="inline-start" />
-          Syncing
-        </Badge>
-        <Badge variant="outline">
-          <Spinner data-icon="inline-start" />
-          Updating
-        </Badge>
-        <Badge variant="outline">
-          <Spinner data-icon="inline-start" />
-          Loading
-        </Badge>
-        <Badge variant="ghost" className="hidden sm:flex">
-          <Spinner data-icon="inline-start" />
-          Ghost
-        </Badge>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Badge>Primary</Badge>
+          <Badge variant="secondary">Secondary</Badge>
+          <Badge variant="destructive">Destructive</Badge>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Badge>
+            <Spinner data-icon="inline-start" />
+            Syncing
+          </Badge>
+          <Badge variant="secondary">
+            <Spinner data-icon="inline-start" />
+            Updating
+          </Badge>
+          <Badge variant="destructive">
+            <Spinner data-icon="inline-start" />
+            Error
+          </Badge>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Badge variant="outline">Outline</Badge>
+          <Badge variant="ghost">Ghost</Badge>
+          <Badge variant="solid">Solid</Badge>
+        </div>
       </div>
     </Example>
   )

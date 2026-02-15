@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@repo/ui"
-import { signIn } from "@/lib/auth-client"
+import { signIn } from "@repo/auth/client"
 
 export function GoogleButton() {
   const [loading, setLoading] = useState(false)

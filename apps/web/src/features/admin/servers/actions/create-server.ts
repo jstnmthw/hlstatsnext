@@ -2,9 +2,9 @@
 
 import { z } from "zod"
 import { redirect } from "next/navigation"
-import { headers } from "next/headers"
 import { getClient } from "@/lib/apollo-client"
-import { auth } from "@/lib/auth"
+import { auth } from "@repo/auth"
+import { getSession } from "@repo/auth/session"
 import { CREATE_SERVER_MUTATION } from "@/features/admin/servers/graphql/server-mutations"
 import {
   CreateServerSchema,
@@ -32,7 +32,7 @@ export async function createServer(
 ): Promise<CreateServerResult> {
   try {
     // Auth guard
-    const session = await auth.api.getSession({ headers: await headers() })
+    const session = await getSession()
     if (!session) {
       return { success: false, message: "Authentication required." }
     }

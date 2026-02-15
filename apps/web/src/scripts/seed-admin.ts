@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto"
-import { auth } from "../lib/auth"
+import { auth } from "@repo/auth"
 import { db } from "@repo/database/client"
 
 const ADMIN_EMAIL = "admin@hlstatsnext.local"

@@ -1,10 +1,9 @@
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
+import { getSession } from "@repo/auth/session"
 import { redirect } from "next/navigation"
 import { AppLogo } from "@/features/common/components/app-logo"
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const session = await getSession()
 
   // Redirect already-authenticated admin users to admin dashboard
   if (session?.user.role === "admin") {

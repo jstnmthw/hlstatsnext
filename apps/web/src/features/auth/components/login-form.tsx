@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button, Card, Input, Label } from "@repo/ui"
-import { signIn } from "@/lib/auth-client"
+import { signIn } from "@repo/auth/client"
 import { GoogleButton } from "./google-button"
 
 export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {

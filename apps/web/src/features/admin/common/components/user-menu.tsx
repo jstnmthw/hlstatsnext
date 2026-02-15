@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { Button } from "@repo/ui"
 import { LogOutIcon } from "lucide-react"
-import { signOut, useSession } from "@/lib/auth-client"
+import { signOut, useSession } from "@repo/auth/client"
 
 export function UserMenu() {
   const router = useRouter()

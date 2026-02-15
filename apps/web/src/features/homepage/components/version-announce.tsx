@@ -12,16 +12,18 @@ import Image from "next/image"
 
 export function VersionAnnounce() {
   return (
-    <Card className="relative w-full max-w-sm overflow-hidden pt-0">
-      <div className="absolute inset-0 z-30 aspect-video" />
-      <Image
-        width={768}
-        height={432}
-        src="https://images.unsplash.com/photo-1607853827120-6847830b38b0?w=768&auto=format&q=80"
-        alt="Photo by mymind on Unsplash"
-        title="Photo by mymind on Unsplash"
-        className="relative z-20 aspect-video w-full object-cover object-[center_80%]"
-      />
+    <Card className="relative w-full max-w-sm overflow-hidden">
+      <div className="relative px-6">
+        <div className="absolute inset-0 z-30" />
+        <Image
+          width={768}
+          height={432}
+          src="https://images.unsplash.com/photo-1607853827120-6847830b38b0?w=768&auto=format&q=80"
+          alt="Photo by @martinkatler on Unsplash"
+          title="Photo by @martinkatler on Unsplash"
+          className="relative z-20 aspect-video w-full rounded-md object-cover object-[center_80%]"
+        />
+      </div>
       <CardHeader>
         <CardTitle>HLStatsNext v0.1.0</CardTitle>
         <CardDescription>

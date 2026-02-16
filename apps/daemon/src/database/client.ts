@@ -1,11 +1,11 @@
 /**
  * Database Client for HLStats Daemon
  *
- * Re-exports the shared DatabaseClient from @repo/database/client.
- * Provides type-safe access to Prisma client with optional extensions.
+ * Wraps the shared singleton PrismaClient from @repo/database/client
+ * with optional support for extended clients (e.g., with metrics).
  */
 
-import { DatabaseClient as SharedDatabaseClient, type PrismaClient } from "@repo/database/client"
+import { db, type PrismaClient } from "@repo/database/client"
 import type { PrismaWithMetrics } from "@repo/observability"
 
 export type TransactionalPrisma = Omit<
@@ -16,13 +16,11 @@ export type TransactionalPrisma = Omit<
 /**
  * Daemon-specific database client wrapper
  *
- * Provides a simple wrapper around the shared DatabaseClient with
+ * Provides a wrapper around the shared db singleton with
  * optional support for extended Prisma clients (e.g., with metrics).
  */
 export class DatabaseClient {
   private _prismaWithMetrics?: PrismaWithMetrics
-
-  constructor(private sharedClient: SharedDatabaseClient = new SharedDatabaseClient()) {}
 
   /**
    * Set the extended Prisma client (with metrics or other extensions)
@@ -34,49 +32,37 @@ export class DatabaseClient {
   /**
    * Get the Prisma client instance
    * Returns extended client if available, otherwise base client
-   * The return type is always treated as base PrismaClient for compatibility
    */
   get prisma(): PrismaClient {
-    return (this._prismaWithMetrics || this.sharedClient.prisma) as PrismaClient
-  }
-
-  /**
-   * Get the Prisma client instance for transactions
-   */
-  get transactionalPrisma(): TransactionalPrisma {
-    const client = this._prismaWithMetrics || this.sharedClient.prisma
-    return client as unknown as TransactionalPrisma
+    return (this._prismaWithMetrics || db) as PrismaClient
   }
 
   /**
    * Execute a transaction with proper typing
    */
   async transaction<T>(callback: (tx: TransactionalPrisma) => Promise<T>): Promise<T> {
-    const client = (this._prismaWithMetrics || this.sharedClient.prisma) as PrismaClient
+    const client = (this._prismaWithMetrics || db) as PrismaClient
     return client.$transaction(callback)
-  }
-
-  /**
-   * Configure connection pooling
-   */
-  configureConnectionPool(
-    ...args: Parameters<SharedDatabaseClient["configureConnectionPool"]>
-  ): void {
-    this.sharedClient.configureConnectionPool(...args)
   }
 
   /**
    * Test database connectivity
    */
   async testConnection(): Promise<boolean> {
-    return this.sharedClient.testConnection()
+    try {
+      await db.$queryRaw`SELECT 1`
+      return true
+    } catch (error) {
+      console.error("Database connection test failed:", error)
+      return false
+    }
   }
 
   /**
    * Close database connection
    */
   async disconnect(): Promise<void> {
-    return this.sharedClient.disconnect()
+    await db.$disconnect()
   }
 }
 

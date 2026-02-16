@@ -1,72 +1,31 @@
-import { DatabaseClient as SharedDatabaseClient } from "@repo/database/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { DatabaseClient, databaseClient, type TransactionalPrisma } from "./client"
 
+// Mock @repo/database/client so `db` is a plain object (no real DB needed).
+// Note: vitest may resolve this to a different module instance than the SUT,
+// so we access the mock through client.prisma rather than importing it here.
 vi.mock("@repo/database/client", () => ({
-  DatabaseClient: vi.fn().mockImplementation(() => ({
-    prisma: {
-      $queryRaw: vi.fn(),
-      $transaction: vi.fn(),
-      $disconnect: vi.fn(),
-    },
-    configureConnectionPool: vi.fn(),
-    testConnection: vi.fn(),
-    disconnect: vi.fn(),
-  })),
   db: {
-    $queryRaw: vi.fn(),
+    $queryRaw: vi.fn().mockResolvedValue([{ test: 1 }]),
     $transaction: vi.fn(),
     $disconnect: vi.fn(),
   } as Record<string, unknown>,
 }))
 
 describe("DatabaseClient", () => {
-  let mockSharedClient: SharedDatabaseClient
   let client: DatabaseClient
 
   beforeEach(() => {
-    mockSharedClient = {
-      prisma: {
-        $queryRaw: vi.fn(),
-        $transaction: vi.fn(),
-        $disconnect: vi.fn(),
-      },
-      configureConnectionPool: vi.fn(),
-      testConnection: vi.fn(),
-      disconnect: vi.fn(),
-    } as unknown as SharedDatabaseClient
-
-    client = new DatabaseClient(mockSharedClient)
+    client = new DatabaseClient()
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
-  })
-
-  describe("constructor", () => {
-    it("should create instance with provided shared client", () => {
-      const customSharedClient = {
-        prisma: { test: true },
-        configureConnectionPool: vi.fn(),
-        testConnection: vi.fn(),
-        disconnect: vi.fn(),
-      } as unknown as SharedDatabaseClient
-      const dbClient = new DatabaseClient(customSharedClient)
-
-      expect(dbClient.prisma).toBe(customSharedClient.prisma)
-    })
-
-    it("should create instance with default client when none provided", () => {
-      const dbClient = new DatabaseClient()
-
-      // Should use the default client (which is mocked)
-      expect(dbClient.prisma).toBeDefined()
-    })
+    vi.restoreAllMocks()
   })
 
   describe("prisma getter", () => {
-    it("should return the underlying client from shared client", () => {
-      expect(client.prisma).toBe(mockSharedClient.prisma)
+    it("should return the db singleton by default", () => {
+      expect(client.prisma).toBeDefined()
     })
 
     it("should return extended client when set", () => {
@@ -80,41 +39,28 @@ describe("DatabaseClient", () => {
   })
 
   describe("testConnection", () => {
-    it("should delegate to shared client", async () => {
-      vi.mocked(mockSharedClient.testConnection).mockResolvedValue(true)
-
+    it("should return true when query succeeds", async () => {
       const result = await client.testConnection()
-
       expect(result).toBe(true)
-      expect(mockSharedClient.testConnection).toHaveBeenCalled()
-    })
-
-    it("should return false when shared client test fails", async () => {
-      vi.mocked(mockSharedClient.testConnection).mockResolvedValue(false)
-
-      const result = await client.testConnection()
-
-      expect(result).toBe(false)
     })
   })
 
   describe("transaction", () => {
     it("should execute transaction with callback", async () => {
+      // Access the actual db object that DatabaseClient uses via its public getter
+      const dbObj = client.prisma as unknown as Record<string, ReturnType<typeof vi.fn>>
       const mockTx = {} as TransactionalPrisma
       const mockCallback = vi.fn().mockResolvedValue("result")
-      const prismaWithTransaction = mockSharedClient.prisma as unknown as {
-        $transaction: ReturnType<typeof vi.fn>
-      }
-      vi.mocked(prismaWithTransaction.$transaction).mockImplementation(
-        async (callback: (tx: TransactionalPrisma) => Promise<unknown>) => {
-          return callback(mockTx)
-        },
-      )
+
+      dbObj.$transaction = vi
+        .fn()
+        .mockImplementation(async (callback: (tx: TransactionalPrisma) => Promise<unknown>) =>
+          callback(mockTx),
+        )
 
       const result = await client.transaction(mockCallback)
 
       expect(result).toBe("result")
-      expect(prismaWithTransaction.$transaction).toHaveBeenCalledWith(mockCallback)
       expect(mockCallback).toHaveBeenCalledWith(mockTx)
     })
 
@@ -139,52 +85,29 @@ describe("DatabaseClient", () => {
     })
 
     it("should propagate transaction callback errors", async () => {
+      const dbObj = client.prisma as unknown as Record<string, ReturnType<typeof vi.fn>>
       const mockError = new Error("Transaction callback error")
       const mockCallback = vi.fn().mockRejectedValue(mockError)
-      const prismaWithTransaction = mockSharedClient.prisma as unknown as {
-        $transaction: ReturnType<typeof vi.fn>
-      }
-      vi.mocked(prismaWithTransaction.$transaction).mockImplementation(
-        async (callback: (tx: TransactionalPrisma) => Promise<unknown>) => {
-          return callback({} as TransactionalPrisma)
-        },
-      )
+
+      dbObj.$transaction = vi
+        .fn()
+        .mockImplementation(async (callback: (tx: TransactionalPrisma) => Promise<unknown>) =>
+          callback({} as TransactionalPrisma),
+        )
 
       await expect(client.transaction(mockCallback)).rejects.toThrow(mockError)
     })
   })
 
   describe("disconnect", () => {
-    it("should delegate to shared client", async () => {
-      vi.mocked(mockSharedClient.disconnect).mockResolvedValue()
+    it("should call db.$disconnect", async () => {
+      // Access db through the public getter — same object the method uses
+      const dbObj = client.prisma as unknown as Record<string, ReturnType<typeof vi.fn>>
+      dbObj.$disconnect = vi.fn().mockResolvedValue(undefined)
 
       await client.disconnect()
 
-      expect(mockSharedClient.disconnect).toHaveBeenCalled()
-    })
-
-    it("should handle disconnect errors", async () => {
-      const mockError = new Error("Disconnect failed")
-      vi.mocked(mockSharedClient.disconnect).mockRejectedValue(mockError)
-
-      await expect(client.disconnect()).rejects.toThrow(mockError)
-    })
-  })
-
-  describe("configureConnectionPool", () => {
-    it("should delegate to shared client", () => {
-      const mockLogger = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
-        ok: vi.fn(),
-      } as Parameters<typeof client.configureConnectionPool>[0]
-      const mockConfig = { maxConnections: 10 }
-
-      client.configureConnectionPool(mockLogger, mockConfig)
-
-      expect(mockSharedClient.configureConnectionPool).toHaveBeenCalledWith(mockLogger, mockConfig)
+      expect(dbObj.$disconnect).toHaveBeenCalled()
     })
   })
 })

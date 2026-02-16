@@ -14,7 +14,6 @@ import {
 import Logger from "@/shared/utils/logger"
 import type { ILogger } from "@/shared/utils/logger.types"
 import { createCryptoService, type ICryptoService } from "@repo/crypto"
-import type { DatabaseLogger } from "@repo/database/client"
 import { PrometheusMetricsExporter, createPrismaWithMetrics } from "@repo/observability"
 
 export interface InfrastructureComponents {
@@ -36,16 +35,6 @@ export function createInfrastructureComponents(): InfrastructureComponents {
 
   // Create metrics exporter
   const metrics = new PrometheusMetricsExporter(logger)
-
-  // Configure connection pooling (lazy initialization)
-  database.configureConnectionPool(logger as DatabaseLogger, {
-    maxConnections: Number(process.env.DB_MAX_CONNECTIONS) || 10,
-    minConnections: Number(process.env.DB_MIN_CONNECTIONS) || 2,
-    connectionTimeout: Number(process.env.DB_CONNECTION_TIMEOUT) || 30000,
-    idleTimeout: Number(process.env.DB_IDLE_TIMEOUT) || 300000,
-    healthCheckInterval: Number(process.env.DB_HEALTH_CHECK_INTERVAL) || 60000,
-    maxRetries: Number(process.env.DB_MAX_RETRIES) || 3,
-  })
 
   // In test environment, provide a fallback encryption key if not provided
   if (process.env.NODE_ENV === "test" && !process.env.ENCRYPTION_KEY) {

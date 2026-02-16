@@ -414,8 +414,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-turbo:
-        specifier: ^2.8.8
-        version: 2.8.8(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.9)
+        specifier: ^2.8.9
+        version: 2.8.9(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.9)
       globals:
         specifier: ^17.3.0
         version: 17.3.0
@@ -509,8 +509,8 @@ importers:
         specifier: ^19
         version: 19.2.4
       tailwind-merge:
-        specifier: ^3.4.0
-        version: 3.4.0
+        specifier: ^3.4.1
+        version: 3.4.1
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
@@ -3200,8 +3200,8 @@ packages:
   camel-case@4.1.2:
     resolution: {integrity: sha512-gxGWBrTT1JuMx6R+o5PTXMmUnhnVzLQ9SNutD4YqKtI6ap897t3tKECYla6gCWEkplXnlNybEkZg9GEGxKFCgw==}
 
-  caniuse-lite@1.0.30001769:
-    resolution: {integrity: sha512-BCfFL1sHijQlBGWBMuJyhZUhzo7wer5sVj9hqekB/7xn0Ypy+pER/edCYQm4exbXj4WiySGp40P8UuTh6w1srg==}
+  caniuse-lite@1.0.30001770:
+    resolution: {integrity: sha512-x/2CLQ1jHENRbHg5PSId2sXq1CIO1CISvwWAj027ltMVG2UNgW+w9oH2+HzgEIRFembL8bUlXtfbBHR1fCg2xw==}
 
   capital-case@1.0.4:
     resolution: {integrity: sha512-ds37W8CytHgwnhGGTi88pcPyR15qoNkOpYwmMMfnWqqWgESapLqvDx6huFjQ5vqWSn2Z06173XNA7LtMOeUh1A==}
@@ -3588,8 +3588,8 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9.7
 
-  eslint-plugin-turbo@2.8.8:
-    resolution: {integrity: sha512-6VOzrWbW9SqpItlh8Z+PgWnG1zzG3LEgT2BKC3Jt75uDTobsyc2Smnvo7Im9aV/xgDFWX6UziLzydJOWStjzhQ==}
+  eslint-plugin-turbo@2.8.9:
+    resolution: {integrity: sha512-gmhdR1SNrPxdXu00xxdhnt32SayUBjHbnhw3YpB939D9ZQjsK9Mthw7mPBrafifwb06kx0VqaFzxaP1JLCbh3g==}
     peerDependencies:
       eslint: '>6.6.0'
       turbo: '>2.0.0'
@@ -3837,8 +3837,8 @@ packages:
   grammex@3.1.12:
     resolution: {integrity: sha512-6ufJOsSA7LcQehIJNCO7HIBykfM7DXQual0Ny780/DEcJIpBlHRvcqEBWGPYd7hrXL2GJ3oJI1MIhaXjWmLQOQ==}
 
-  graphmatch@1.1.0:
-    resolution: {integrity: sha512-0E62MaTW5rPZVRLyIJZG/YejmdA/Xr1QydHEw3Vt+qOKkMIOE8WDLc9ZX2bmAjtJFZcId4lEdrdmASsEy7D1QA==}
+  graphmatch@1.1.1:
+    resolution: {integrity: sha512-5ykVn/EXM1hF0XCaWh05VbYvEiOL2lY1kBxZtaYsyvjp7cmWOU1XsAdfQBwClraEofXDT197lFbXOEVMHpvQOg==}
 
   graphql-config@5.1.5:
     resolution: {integrity: sha512-mG2LL1HccpU8qg5ajLROgdsBzx/o2M6kgI3uAmoaXiSH9PCUbtIyLomLqUtCFaAeG2YCFsl0M5cfQ9rKmDoMVA==}
@@ -5228,8 +5228,8 @@ packages:
   tabbable@6.4.0:
     resolution: {integrity: sha512-05PUHKSNE8ou2dwIxTngl4EzcnsCDZGJ/iCLtDflR/SHB/ny14rXc+qU5P4mG9JkusiV7EivzY9Mhm55AzAvCg==}
 
-  tailwind-merge@3.4.0:
-    resolution: {integrity: sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g==}
+  tailwind-merge@3.4.1:
+    resolution: {integrity: sha512-2OA0rFqWOkITEAOFWSBSApYkDeH9t2B3XSJuI4YztKBzK3mX0737A2qtxDZ7xkw9Zfh0bWl+r34sF3HXV+Ig7Q==}
 
   tailwindcss@4.1.18:
     resolution: {integrity: sha512-4+Z+0yiYyEtUVCScyfHCxOYP06L5Ne+JiHhY2IjR2KWMIWhJOYZKLSGZaP5HkZ8+bY0cxfzwDE5uOmzFXyIwxw==}
@@ -8455,7 +8455,7 @@ snapshots:
   browserslist@4.28.1:
     dependencies:
       baseline-browser-mapping: 2.9.19
-      caniuse-lite: 1.0.30001769
+      caniuse-lite: 1.0.30001770
       electron-to-chromium: 1.5.286
       node-releases: 2.0.27
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
@@ -8507,7 +8507,7 @@ snapshots:
       pascal-case: 3.1.2
       tslib: 2.8.1
 
-  caniuse-lite@1.0.30001769: {}
+  caniuse-lite@1.0.30001770: {}
 
   capital-case@1.0.4:
     dependencies:
@@ -9006,7 +9006,7 @@ snapshots:
       string.prototype.matchall: 4.0.12
       string.prototype.repeat: 1.0.0
 
-  eslint-plugin-turbo@2.8.8(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.9):
+  eslint-plugin-turbo@2.8.9(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.9):
     dependencies:
       dotenv: 16.0.3
       eslint: 9.39.2(jiti@2.6.1)
@@ -9299,7 +9299,7 @@ snapshots:
 
   grammex@3.1.12: {}
 
-  graphmatch@1.1.0: {}
+  graphmatch@1.1.1: {}
 
   graphql-config@5.1.5(@types/node@25.2.3)(graphql@16.12.0)(typescript@5.9.3):
     dependencies:
@@ -9906,7 +9906,7 @@ snapshots:
       '@next/env': 16.1.6
       '@swc/helpers': 0.5.15
       baseline-browser-mapping: 2.9.19
-      caniuse-lite: 1.0.30001769
+      caniuse-lite: 1.0.30001770
       postcss: 8.4.31
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
@@ -10745,7 +10745,7 @@ snapshots:
 
   tabbable@6.4.0: {}
 
-  tailwind-merge@3.4.0: {}
+  tailwind-merge@3.4.1: {}
 
   tailwindcss@4.1.18: {}
 
@@ -11158,7 +11158,7 @@ snapshots:
   zeptomatch@2.1.0:
     dependencies:
       grammex: 3.1.12
-      graphmatch: 1.1.0
+      graphmatch: 1.1.1
 
   zod-validation-error@4.0.2(zod@4.3.6):
     dependencies:

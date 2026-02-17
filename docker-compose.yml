@@ -1,7 +1,16 @@
+# Local development containers for hlstatsnext.
+# Usage:
+#   pnpm docker:up         - Start local development database
+#   pnpm docker:down       - Stop development database
+#
+# For test database, see docker-compose.test.yml
+# For production, see docker-compose.prod.yml
+name: hlstatsnext-dev
+
 services:
   db:
     image: mysql:8.4
-    container_name: hlstatsnext-db
+    container_name: hlstatsnext-dev-db
     command: mysqld --mysql-native-password=ON
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root}
@@ -35,8 +44,8 @@ services:
 
   rabbitmq:
     image: rabbitmq:4.1.2-management-alpine
-    container_name: hlstatsnext-rabbitmq
-    hostname: hlstatsnext-rabbitmq
+    container_name: hlstatsnext-dev-rabbitmq
+    hostname: hlstatsnext-dev-rabbitmq
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-hlstats}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-hlstats}
@@ -61,8 +70,8 @@ services:
 
   garnet:
     image: ghcr.io/microsoft/garnet:latest
-    container_name: hlstatsnext-garnet
-    hostname: hlstatsnext-garnet
+    container_name: hlstatsnext-dev-garnet
+    hostname: hlstatsnext-dev-garnet
     environment:
       - GARNET_MEMORY=${GARNET_MEMORY:-1g}
       - GARNET_PORT=${GARNET_PORT:-6379}
@@ -74,7 +83,7 @@ services:
       - default
     command: --port 6379 --memory ${GARNET_MEMORY:-1g} --checkpointdir /data
     healthcheck:
-      test: ["CMD", "garnet-cli", "ping"]
+      test: ["CMD-SHELL", "bash -c 'echo PING > /dev/tcp/localhost/6379'"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -83,8 +92,8 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
-    container_name: hlstatsnext-prometheus
-    hostname: hlstatsnext-prometheus
+    container_name: hlstatsnext-dev-prometheus
+    hostname: hlstatsnext-dev-prometheus
     extra_hosts:
       - "host.docker.internal:host-gateway" # Enable host.docker.internal on Linux
     volumes:
@@ -109,8 +118,8 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    container_name: hlstatsnext-grafana
-    hostname: hlstatsnext-grafana
+    container_name: hlstatsnext-dev-grafana
+    hostname: hlstatsnext-dev-grafana
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
@@ -137,8 +146,8 @@ services:
   #   build:
   #     context: .
   #     dockerfile: ./apps/daemon/Dockerfile
-  #   container_name: hlstatsnext-daemon
-  #   hostname: hlstatsnext-daemon
+  #   container_name: hlstatsnext-dev-daemon
+  #   hostname: hlstatsnext-dev-daemon
   #   volumes:
   #     - ./:/app
   #   environment:
@@ -163,8 +172,8 @@ services:
 
   # cstrike:
   #   image: gameservermanagers/gameserver:cs
-  #   container_name: hlstatsnext-cstrike
-  #   hostname: hlstatsnext-cstrike
+  #   container_name: hlstatsnext-dev-cstrike
+  #   hostname: hlstatsnext-dev-cstrike
   #   networks:
   #     - default
   #   environment:
@@ -181,8 +190,8 @@ services:
 
   # tfc:
   #   image: gameservermanagers/gameserver:tfc
-  #   container_name: hlstatsnext-tfc
-  #   hostname: hlstatsnext-tfc
+  #   container_name: hlstatsnext-dev-tfc
+  #   hostname: hlstatsnext-dev-tfc
   #   networks:
   #     - default
   #   environment:

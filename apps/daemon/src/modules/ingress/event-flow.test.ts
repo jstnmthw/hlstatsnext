@@ -67,6 +67,8 @@ vi.mock("@/shared/application/factories/infrastructure-config.factory", () => ({
       encrypt: vi.fn().mockResolvedValue("encrypted_data"),
       decrypt: vi.fn().mockResolvedValue("decrypted_data"),
     },
+    cache: {},
+    metrics: {},
   })),
 }))
 

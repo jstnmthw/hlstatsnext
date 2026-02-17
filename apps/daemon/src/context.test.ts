@@ -37,20 +37,22 @@ vi.mock("@repo/crypto", () => ({
   })),
 }))
 
-// Mock the infrastructure config factory
+// Mock the infrastructure config factory (must use mockReturnValue, not mockResolvedValue —
+// createInfrastructureComponents is synchronous). Factory fn creates new objects per call
+// so context1.database !== context2.database.
 vi.mock("@/shared/application/factories/infrastructure-config.factory", () => ({
-  createInfrastructureComponents: vi.fn().mockResolvedValue({
-    database: {
-      initializeConnectionPool: vi.fn().mockResolvedValue(undefined),
-    },
-    logger: {},
+  createInfrastructureComponents: vi.fn(() => ({
+    database: {},
+    logger: { info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn(), queue: vi.fn() },
     crypto: {
       hashPassword: vi.fn().mockResolvedValue("hashed_password"),
       verifyPassword: vi.fn().mockResolvedValue(true),
       encrypt: vi.fn().mockResolvedValue("encrypted_data"),
       decrypt: vi.fn().mockResolvedValue("decrypted_data"),
     },
-  }),
+    cache: {},
+    metrics: {},
+  })),
 }))
 
 describe("Application Context", () => {

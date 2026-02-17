@@ -54,15 +54,18 @@ export function createInfrastructureComponents(): InfrastructureComponents {
 
   // Create Prisma client with metrics extension using factory pattern
   // This returns a properly-typed extended client without unsafe casts
-  const prismaWithMetrics = createPrismaWithMetrics(database.prisma, metrics, logger, {
-    logSlowQueries: process.env.NODE_ENV !== "production",
-    slowQueryThresholdMs: 1000,
-    logAllQueries: false,
-  })
+  // Guard: database.prisma is undefined when DATABASE_URL is not set (e.g. CI unit tests)
+  if (database.prisma) {
+    const prismaWithMetrics = createPrismaWithMetrics(database.prisma, metrics, logger, {
+      logSlowQueries: process.env.NODE_ENV !== "production",
+      slowQueryThresholdMs: 1000,
+      logAllQueries: false,
+    })
 
-  // Set the extended client on the database wrapper
-  // All repositories will now use the metrics-enabled client transparently
-  database.setExtendedClient(prismaWithMetrics)
+    // Set the extended client on the database wrapper
+    // All repositories will now use the metrics-enabled client transparently
+    database.setExtendedClient(prismaWithMetrics)
+  }
 
   return {
     database,

@@ -63,7 +63,8 @@ export class DatabaseClient {
    * Close database connection
    */
   async disconnect(): Promise<void> {
-    await db.$disconnect()
+    const client = (this._prismaWithMetrics || db) as PrismaClient
+    await client.$disconnect()
   }
 }
 

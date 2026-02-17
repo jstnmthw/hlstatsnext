@@ -1,16 +1,13 @@
+/**
+ * DatabaseClient Tests
+ *
+ * Tests the daemon's DatabaseClient wrapper. Since vi.mock("@repo/db/client")
+ * doesn't work reliably with isolate: false (setup.ts preloads the module),
+ * tests use setExtendedClient() to inject mock Prisma clients instead.
+ */
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { DatabaseClient, databaseClient, type TransactionalPrisma } from "./client"
-
-// Mock @repo/db/client so `db` is a plain object (no real DB needed).
-// Note: vitest may resolve this to a different module instance than the SUT,
-// so we access the mock through client.prisma rather than importing it here.
-vi.mock("@repo/db/client", () => ({
-  db: {
-    $queryRaw: vi.fn().mockResolvedValue([{ test: 1 }]),
-    $transaction: vi.fn(),
-    $disconnect: vi.fn(),
-  } as Record<string, unknown>,
-}))
 
 describe("DatabaseClient", () => {
   let client: DatabaseClient
@@ -24,10 +21,6 @@ describe("DatabaseClient", () => {
   })
 
   describe("prisma getter", () => {
-    it("should return the db singleton by default", () => {
-      expect(client.prisma).toBeDefined()
-    })
-
     it("should return extended client when set", () => {
       const mockExtendedClient = { extended: true } as unknown as Parameters<
         typeof client.setExtendedClient
@@ -40,16 +33,18 @@ describe("DatabaseClient", () => {
 
   describe("testConnection", () => {
     it("should return true when query succeeds", async () => {
-      const dbObj = client.prisma as unknown as Record<string, ReturnType<typeof vi.fn>>
-      dbObj.$queryRaw = vi.fn().mockResolvedValue([{ test: 1 }])
+      const mockPrisma = { $queryRaw: vi.fn().mockResolvedValue([{ test: 1 }]) } as any
+      client.setExtendedClient(mockPrisma)
 
       const result = await client.testConnection()
       expect(result).toBe(true)
     })
 
     it("should return false when query fails", async () => {
-      const dbObj = client.prisma as unknown as Record<string, ReturnType<typeof vi.fn>>
-      dbObj.$queryRaw = vi.fn().mockRejectedValue(new Error("connection refused"))
+      const mockPrisma = {
+        $queryRaw: vi.fn().mockRejectedValue(new Error("connection refused")),
+      } as any
+      client.setExtendedClient(mockPrisma)
 
       const result = await client.testConnection()
       expect(result).toBe(false)
@@ -58,16 +53,16 @@ describe("DatabaseClient", () => {
 
   describe("transaction", () => {
     it("should execute transaction with callback", async () => {
-      // Access the actual db object that DatabaseClient uses via its public getter
-      const dbObj = client.prisma as unknown as Record<string, ReturnType<typeof vi.fn>>
       const mockTx = {} as TransactionalPrisma
       const mockCallback = vi.fn().mockResolvedValue("result")
-
-      dbObj.$transaction = vi
-        .fn()
-        .mockImplementation(async (callback: (tx: TransactionalPrisma) => Promise<unknown>) =>
-          callback(mockTx),
-        )
+      const mockPrisma = {
+        $transaction: vi
+          .fn()
+          .mockImplementation(async (callback: (tx: TransactionalPrisma) => Promise<unknown>) =>
+            callback(mockTx),
+          ),
+      } as any
+      client.setExtendedClient(mockPrisma)
 
       const result = await client.transaction(mockCallback)
 
@@ -96,15 +91,16 @@ describe("DatabaseClient", () => {
     })
 
     it("should propagate transaction callback errors", async () => {
-      const dbObj = client.prisma as unknown as Record<string, ReturnType<typeof vi.fn>>
       const mockError = new Error("Transaction callback error")
       const mockCallback = vi.fn().mockRejectedValue(mockError)
-
-      dbObj.$transaction = vi
-        .fn()
-        .mockImplementation(async (callback: (tx: TransactionalPrisma) => Promise<unknown>) =>
-          callback({} as TransactionalPrisma),
-        )
+      const mockPrisma = {
+        $transaction: vi
+          .fn()
+          .mockImplementation(async (callback: (tx: TransactionalPrisma) => Promise<unknown>) =>
+            callback({} as TransactionalPrisma),
+          ),
+      } as any
+      client.setExtendedClient(mockPrisma)
 
       await expect(client.transaction(mockCallback)).rejects.toThrow(mockError)
     })
@@ -112,13 +108,12 @@ describe("DatabaseClient", () => {
 
   describe("disconnect", () => {
     it("should call db.$disconnect", async () => {
-      // Access db through the public getter — same object the method uses
-      const dbObj = client.prisma as unknown as Record<string, ReturnType<typeof vi.fn>>
-      dbObj.$disconnect = vi.fn().mockResolvedValue(undefined)
+      const mockPrisma = { $disconnect: vi.fn().mockResolvedValue(undefined) } as any
+      client.setExtendedClient(mockPrisma)
 
       await client.disconnect()
 
-      expect(dbObj.$disconnect).toHaveBeenCalled()
+      expect(mockPrisma.$disconnect).toHaveBeenCalled()
     })
   })
 })

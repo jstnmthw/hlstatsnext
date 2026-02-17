@@ -26,7 +26,9 @@
     "prepare": "husky",
     "ui": "pnpm --filter @repo/ui ui",
     "test": "turbo run test",
-    "test:coverage": "turbo run test:coverage"
+    "test:coverage": "turbo run test:coverage",
+    "test:integration": "turbo run test:integration",
+    "test:e2e": "turbo run test:e2e"
   },
   "devDependencies": {
     "dotenv-cli": "^11.0.0",

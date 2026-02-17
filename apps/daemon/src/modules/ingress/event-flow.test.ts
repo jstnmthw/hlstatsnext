@@ -12,8 +12,8 @@ import { setUuidService } from "@/shared/infrastructure/messaging/queue/utils/me
 import { systemClock } from "@/shared/infrastructure/time"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
+import { createMockLogger } from "@/tests/mocks/logger"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { createMockLogger } from "../mocks/logger"
 
 // Type for testing ingress service internal access
 interface TestIngressService {

@@ -1,53 +1,54 @@
 /**
  * RabbitMQ Consumer Tests
+ *
+ * Tests the RabbitMQConsumer wrapper which orchestrates EventConsumer
+ * and RabbitMQEventProcessor. Uses real internal classes with mocked
+ * IQueueClient to avoid vi.mock() issues with isolate: false.
  */
 
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
-import { EventConsumer } from "@/shared/infrastructure/messaging/queue/core/consumer"
 import type {
   IQueueClient,
   MessageValidator,
+  QueueChannel,
 } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import type { ILogger } from "@/shared/utils/logger.types"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { RabbitMQConsumer, defaultRabbitMQConsumerConfig } from "./consumer"
-import { RabbitMQEventProcessor } from "./event-processor"
 
-// Mock the dependencies
-vi.mock("./event-processor", () => ({
-  RabbitMQEventProcessor: vi.fn(),
-}))
-vi.mock("@/shared/infrastructure/messaging/queue/core/consumer", () => ({
-  EventConsumer: vi.fn(),
-  defaultConsumerConfig: {
-    maxRetries: 3,
-    retryDelay: 1000,
-    maxRetryDelay: 30000,
-    concurrency: 10,
-    queues: ["hlstats.events.priority", "hlstats.events.standard", "hlstats.events.bulk"],
-  },
-  defaultMessageValidator: vi.fn().mockResolvedValue(undefined),
-}))
-
-describe.skip("RabbitMQConsumer", () => {
+describe("RabbitMQConsumer", () => {
   let consumer: RabbitMQConsumer
   let mockClient: IQueueClient
   let mockLogger: ILogger
   let mockModuleRegistry: ModuleRegistry
   let mockCoordinators: EventCoordinator[]
-  let mockEventProcessor: RabbitMQEventProcessor
-  let mockEventConsumer: EventConsumer
+  let mockChannel: QueueChannel
   let mockMessageValidator: MessageValidator
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.resetAllMocks()
+    vi.useFakeTimers()
+
+    mockChannel = {
+      consume: vi
+        .fn()
+        .mockImplementation((queueName: string) => Promise.resolve(`${queueName}-test-tag`)),
+      ack: vi.fn(),
+      nack: vi.fn(),
+      cancel: vi.fn().mockResolvedValue(undefined),
+      close: vi.fn().mockResolvedValue(undefined),
+      publish: vi.fn().mockReturnValue(true),
+      prefetch: vi.fn().mockResolvedValue(undefined),
+      assertExchange: vi.fn().mockResolvedValue(undefined),
+      assertQueue: vi.fn().mockResolvedValue(undefined),
+      bindQueue: vi.fn().mockResolvedValue(undefined),
+    } as unknown as QueueChannel
 
     mockClient = {
       connect: vi.fn(),
       disconnect: vi.fn(),
-      createChannel: vi.fn(),
+      createChannel: vi.fn().mockResolvedValue(mockChannel),
       isConnected: vi.fn().mockReturnValue(true),
     } as unknown as IQueueClient
 
@@ -65,155 +66,76 @@ describe.skip("RabbitMQConsumer", () => {
       getAllHandlers: vi.fn().mockReturnValue([]),
     } as unknown as ModuleRegistry
 
-    const mockCoordinator: EventCoordinator = {
-      coordinateEvent: vi.fn().mockResolvedValue(undefined),
-    } as unknown as EventCoordinator
-
-    mockCoordinators = [mockCoordinator]
+    mockCoordinators = []
 
     mockMessageValidator = vi.fn().mockResolvedValue(undefined)
 
-    mockEventProcessor = {
-      processEvent: vi.fn().mockResolvedValue(undefined),
-    } as unknown as RabbitMQEventProcessor
-
-    mockEventConsumer = {
-      start: vi.fn().mockResolvedValue(undefined),
-      stop: vi.fn().mockResolvedValue(undefined),
-      pause: vi.fn().mockResolvedValue(undefined),
-      resume: vi.fn().mockResolvedValue(undefined),
-      getConsumerStats: vi.fn().mockReturnValue({
-        isConsuming: false,
-        messagesProcessed: 0,
-        messagesAcked: 0,
-        messagesNacked: 0,
-        messagesRejected: 0,
-        averageProcessingTime: 0,
-        queueDepth: 0,
-      }),
-    } as unknown as EventConsumer
-
-    // Setup mocks - these need to be set before creating the consumer
-    vi.mocked(RabbitMQEventProcessor).mockImplementation(() => mockEventProcessor)
-    vi.mocked(EventConsumer).mockImplementation(() => mockEventConsumer)
+    consumer = new RabbitMQConsumer(
+      mockClient,
+      mockLogger,
+      mockModuleRegistry,
+      mockCoordinators,
+      defaultRabbitMQConsumerConfig,
+      mockMessageValidator,
+    )
   })
 
-  const createConsumer = (
-    client = mockClient,
-    logger = mockLogger,
-    moduleRegistry = mockModuleRegistry,
-    coordinators = mockCoordinators,
-    config = defaultRabbitMQConsumerConfig,
-    messageValidator = mockMessageValidator,
-  ) => {
-    return new RabbitMQConsumer(
-      client,
-      logger,
-      moduleRegistry,
-      coordinators,
-      config,
-      messageValidator,
-    )
-  }
-
-  describe("Constructor", () => {
-    it("should create RabbitMQEventProcessor with correct parameters", () => {
-      createConsumer()
-
-      expect(RabbitMQEventProcessor).toHaveBeenCalledWith(
-        mockLogger,
-        mockModuleRegistry,
-        mockCoordinators,
-      )
-    })
-
-    it("should create EventConsumer with correct parameters", () => {
-      createConsumer()
-
-      expect(EventConsumer).toHaveBeenCalledWith(
-        mockClient,
-        mockEventProcessor,
-        mockLogger,
-        defaultRabbitMQConsumerConfig,
-        mockMessageValidator,
-      )
-    })
-
-    it("should create consumer with empty coordinators by default", () => {
-      createConsumer(mockClient, mockLogger, mockModuleRegistry, [])
-
-      expect(RabbitMQEventProcessor).toHaveBeenCalledWith(mockLogger, mockModuleRegistry, [])
-    })
-
-    it("should create consumer with custom config", () => {
-      const customConfig = {
-        maxRetries: 5,
-        retryDelay: 2000,
-        maxRetryDelay: 60000,
-        concurrency: 15,
-        queues: ["custom.queue"],
-      }
-
-      new RabbitMQConsumer(
-        mockClient,
-        mockLogger,
-        mockModuleRegistry,
-        mockCoordinators,
-        customConfig,
-      )
-
-      expect(EventConsumer).toHaveBeenCalledWith(
-        mockClient,
-        mockEventProcessor,
-        mockLogger,
-        customConfig,
-        mockMessageValidator,
-      )
-    })
+  afterEach(async () => {
+    // Ensure consumer is stopped to clean up timers
+    try {
+      await consumer.stop()
+    } catch {
+      // Ignore errors during cleanup
+    }
+    vi.useRealTimers()
   })
 
   describe("Lifecycle Management", () => {
-    it("should start consumer successfully", async () => {
-      consumer = createConsumer()
+    it("should start consuming from all configured queues", async () => {
+      await consumer.start()
 
+      // Should create a channel for each queue
+      expect(mockClient.createChannel).toHaveBeenCalledTimes(
+        defaultRabbitMQConsumerConfig.queues.length,
+      )
+
+      // Should set up consumers on each channel
+      expect(mockChannel.consume).toHaveBeenCalledTimes(defaultRabbitMQConsumerConfig.queues.length)
+    })
+
+    it("should log start and success messages", async () => {
       await consumer.start()
 
       expect(mockLogger.queue).toHaveBeenCalledWith("Starting RabbitMQ consumer", {
         queues: defaultRabbitMQConsumerConfig.queues,
         concurrency: defaultRabbitMQConsumerConfig.concurrency,
-        coordinators: mockCoordinators.length,
+        coordinators: 0,
       })
-      expect(mockEventConsumer.start).toHaveBeenCalledTimes(1)
       expect(mockLogger.queue).toHaveBeenCalledWith("RabbitMQ consumer started successfully")
     })
 
-    it("should stop consumer successfully", async () => {
-      consumer = createConsumer()
-
+    it("should stop after starting", async () => {
+      await consumer.start()
       await consumer.stop()
 
       expect(mockLogger.queue).toHaveBeenCalledWith("Stopping RabbitMQ consumer")
-      expect(mockEventConsumer.stop).toHaveBeenCalledTimes(1)
+      expect(mockChannel.cancel).toHaveBeenCalled()
       expect(mockLogger.queue).toHaveBeenCalledWith("RabbitMQ consumer stopped successfully")
     })
 
-    it("should handle start errors", async () => {
-      const error = new Error("Start failed")
-      vi.mocked(mockEventConsumer.start).mockRejectedValueOnce(error)
+    it("should handle stop when not started", async () => {
+      // stop() without start() — EventConsumer.stop() returns early if not consuming
+      await consumer.stop()
 
-      await expect(consumer.start()).rejects.toThrow("Start failed")
-      expect(mockLogger.queue).toHaveBeenCalledWith(
-        "Starting RabbitMQ consumer",
-        expect.any(Object),
-      )
+      expect(mockLogger.queue).toHaveBeenCalledWith("Stopping RabbitMQ consumer")
+      expect(mockChannel.cancel).not.toHaveBeenCalled()
+      expect(mockLogger.queue).toHaveBeenCalledWith("RabbitMQ consumer stopped successfully")
     })
 
-    it("should handle stop errors", async () => {
-      const error = new Error("Stop failed")
-      vi.mocked(mockEventConsumer.stop).mockRejectedValueOnce(error)
+    it("should propagate channel creation errors", async () => {
+      vi.mocked(mockClient.createChannel).mockRejectedValue(new Error("Connection lost"))
 
-      await expect(consumer.stop()).rejects.toThrow("Stop failed")
-      expect(mockLogger.queue).toHaveBeenCalledWith("Stopping RabbitMQ consumer")
+      await expect(consumer.start()).rejects.toThrow()
     })
   })
 
@@ -221,51 +143,20 @@ describe.skip("RabbitMQConsumer", () => {
     it("should pause consumer", async () => {
       await consumer.pause()
 
-      expect(mockEventConsumer.pause).toHaveBeenCalledTimes(1)
+      // EventConsumer.pause() sets isPaused flag
+      expect(mockLogger.info).toHaveBeenCalledWith("Event consumer paused")
     })
 
     it("should resume consumer", async () => {
       await consumer.resume()
 
-      expect(mockEventConsumer.resume).toHaveBeenCalledTimes(1)
-    })
-
-    it("should handle pause errors", async () => {
-      const error = new Error("Pause failed")
-      vi.mocked(mockEventConsumer.pause).mockRejectedValueOnce(error)
-
-      await expect(consumer.pause()).rejects.toThrow("Pause failed")
-    })
-
-    it("should handle resume errors", async () => {
-      const error = new Error("Resume failed")
-      vi.mocked(mockEventConsumer.resume).mockRejectedValueOnce(error)
-
-      await expect(consumer.resume()).rejects.toThrow("Resume failed")
+      // EventConsumer.resume() clears isPaused flag
+      expect(mockLogger.info).toHaveBeenCalledWith("Event consumer resumed")
     })
   })
 
   describe("Statistics", () => {
-    it("should return consumer statistics", () => {
-      const expectedStats = {
-        isConsuming: true,
-        messagesProcessed: 100,
-        messagesAcked: 95,
-        messagesNacked: 3,
-        messagesRejected: 2,
-        averageProcessingTime: 150,
-        queueDepth: 10,
-      }
-
-      vi.mocked(mockEventConsumer.getConsumerStats).mockReturnValue(expectedStats)
-
-      const stats = consumer.getConsumerStats()
-
-      expect(stats).toEqual(expectedStats)
-      expect(mockEventConsumer.getConsumerStats).toHaveBeenCalledTimes(1)
-    })
-
-    it("should return initial stats by default", () => {
+    it("should return initial stats when not started", () => {
       const stats = consumer.getConsumerStats()
 
       expect(stats).toEqual({
@@ -278,48 +169,29 @@ describe.skip("RabbitMQConsumer", () => {
         queueDepth: 0,
       })
     })
+
+    it("should reflect consuming state after start", async () => {
+      await consumer.start()
+      const stats = consumer.getConsumerStats()
+
+      expect(stats.isConsuming).toBe(true)
+    })
+
+    it("should reflect not consuming after stop", async () => {
+      await consumer.start()
+      await consumer.stop()
+      const stats = consumer.getConsumerStats()
+
+      expect(stats.isConsuming).toBe(false)
+    })
   })
 
   describe("Configuration", () => {
-    it("should use default configuration", () => {
-      new RabbitMQConsumer(mockClient, mockLogger, mockModuleRegistry)
-
-      expect(EventConsumer).toHaveBeenCalledWith(
-        mockClient,
-        mockEventProcessor,
-        mockLogger,
-        defaultRabbitMQConsumerConfig,
-        expect.any(Function),
-      )
-    })
-
-    it("should support custom message validator", () => {
-      const customValidator = vi.fn().mockResolvedValue(undefined)
-      new RabbitMQConsumer(
-        mockClient,
-        mockLogger,
-        mockModuleRegistry,
-        [],
-        defaultRabbitMQConsumerConfig,
-        customValidator,
-      )
-
-      expect(EventConsumer).toHaveBeenCalledWith(
-        mockClient,
-        mockEventProcessor,
-        mockLogger,
-        defaultRabbitMQConsumerConfig,
-        customValidator,
-      )
-    })
-
-    it("should start with logging metadata", async () => {
+    it("should use custom queue configuration", async () => {
       const customConfig = {
-        maxRetries: 3,
-        retryDelay: 1000,
-        maxRetryDelay: 30000,
+        ...defaultRabbitMQConsumerConfig,
+        queues: ["custom.queue.1", "custom.queue.2"],
         concurrency: 20,
-        queues: ["test.queue.1", "test.queue.2"],
       }
 
       const customConsumer = new RabbitMQConsumer(
@@ -328,93 +200,85 @@ describe.skip("RabbitMQConsumer", () => {
         mockModuleRegistry,
         mockCoordinators,
         customConfig,
+        mockMessageValidator,
       )
 
       await customConsumer.start()
 
+      expect(mockClient.createChannel).toHaveBeenCalledTimes(2)
       expect(mockLogger.queue).toHaveBeenCalledWith("Starting RabbitMQ consumer", {
-        queues: ["test.queue.1", "test.queue.2"],
+        queues: ["custom.queue.1", "custom.queue.2"],
         concurrency: 20,
+        coordinators: 0,
+      })
+
+      await customConsumer.stop()
+    })
+
+    it("should log coordinator count in metadata", async () => {
+      const coord = { coordinateEvent: vi.fn() } as unknown as EventCoordinator
+      const consumerWithCoords = new RabbitMQConsumer(
+        mockClient,
+        mockLogger,
+        mockModuleRegistry,
+        [coord],
+        defaultRabbitMQConsumerConfig,
+        mockMessageValidator,
+      )
+
+      await consumerWithCoords.start()
+
+      expect(mockLogger.queue).toHaveBeenCalledWith("Starting RabbitMQ consumer", {
+        queues: defaultRabbitMQConsumerConfig.queues,
+        concurrency: defaultRabbitMQConsumerConfig.concurrency,
         coordinators: 1,
       })
+
+      await consumerWithCoords.stop()
     })
   })
 
   describe("Integration", () => {
-    it("should properly integrate event processor and consumer", async () => {
-      // Start the consumer
-      await consumer.start()
+    it("should support multiple coordinators", async () => {
+      const coord1 = { coordinateEvent: vi.fn() } as unknown as EventCoordinator
+      const coord2 = { coordinateEvent: vi.fn() } as unknown as EventCoordinator
 
-      // Verify the components are correctly wired
-      expect(RabbitMQEventProcessor).toHaveBeenCalledWith(
+      const multiCoordConsumer = new RabbitMQConsumer(
+        mockClient,
         mockLogger,
         mockModuleRegistry,
-        mockCoordinators,
-      )
-      expect(EventConsumer).toHaveBeenCalledWith(
-        mockClient,
-        mockEventProcessor,
-        mockLogger,
+        [coord1, coord2],
         defaultRabbitMQConsumerConfig,
         mockMessageValidator,
       )
-      expect(mockEventConsumer.start).toHaveBeenCalledTimes(1)
+
+      await multiCoordConsumer.start()
+
+      const stats = multiCoordConsumer.getConsumerStats()
+      expect(stats.isConsuming).toBe(true)
+
+      await multiCoordConsumer.stop()
     })
 
-    it("should support multiple coordinators", () => {
-      const mockCoordinator1: EventCoordinator = {
-        coordinateEvent: vi.fn().mockResolvedValue(undefined),
-      } as unknown as EventCoordinator
+    it("should work without coordinators", async () => {
+      const noCoordConsumer = new RabbitMQConsumer(
+        mockClient,
+        mockLogger,
+        mockModuleRegistry,
+        [],
+        defaultRabbitMQConsumerConfig,
+        mockMessageValidator,
+      )
 
-      const mockCoordinator2: EventCoordinator = {
-        coordinateEvent: vi.fn().mockResolvedValue(undefined),
-      } as unknown as EventCoordinator
+      await noCoordConsumer.start()
 
-      new RabbitMQConsumer(mockClient, mockLogger, mockModuleRegistry, [
-        mockCoordinator1,
-        mockCoordinator2,
-      ])
+      expect(mockLogger.queue).toHaveBeenCalledWith("Starting RabbitMQ consumer", {
+        queues: defaultRabbitMQConsumerConfig.queues,
+        concurrency: defaultRabbitMQConsumerConfig.concurrency,
+        coordinators: 0,
+      })
 
-      expect(RabbitMQEventProcessor).toHaveBeenCalledWith(mockLogger, mockModuleRegistry, [
-        mockCoordinator1,
-        mockCoordinator2,
-      ])
-    })
-
-    it("should work without coordinators", () => {
-      new RabbitMQConsumer(mockClient, mockLogger, mockModuleRegistry, [])
-
-      expect(RabbitMQEventProcessor).toHaveBeenCalledWith(mockLogger, mockModuleRegistry, [])
-    })
-  })
-
-  describe("Error Handling", () => {
-    it("should propagate event consumer start errors", async () => {
-      const startError = new Error("Consumer start failed")
-      vi.mocked(mockEventConsumer.start).mockRejectedValueOnce(startError)
-
-      await expect(consumer.start()).rejects.toThrow("Consumer start failed")
-    })
-
-    it("should propagate event consumer stop errors", async () => {
-      const stopError = new Error("Consumer stop failed")
-      vi.mocked(mockEventConsumer.stop).mockRejectedValueOnce(stopError)
-
-      await expect(consumer.stop()).rejects.toThrow("Consumer stop failed")
-    })
-
-    it("should propagate pause errors", async () => {
-      const pauseError = new Error("Consumer pause failed")
-      vi.mocked(mockEventConsumer.pause).mockRejectedValueOnce(pauseError)
-
-      await expect(consumer.pause()).rejects.toThrow("Consumer pause failed")
-    })
-
-    it("should propagate resume errors", async () => {
-      const resumeError = new Error("Consumer resume failed")
-      vi.mocked(mockEventConsumer.resume).mockRejectedValueOnce(resumeError)
-
-      await expect(consumer.resume()).rejects.toThrow("Consumer resume failed")
+      await noCoordConsumer.stop()
     })
   })
 })

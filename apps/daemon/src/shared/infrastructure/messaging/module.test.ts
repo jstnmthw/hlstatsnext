@@ -1,5 +1,12 @@
 /**
  * Queue Module Tests
+ *
+ * Tests QueueModule behavior that doesn't require module-level constructor
+ * mocking. Tests requiring initialize() (which internally creates a real
+ * RabbitMQClient) are not included because vi.mock() cannot reliably replace
+ * modules already loaded by the test setup with isolate: false.
+ *
+ * The initialization flow is covered by integration and e2e tests.
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
@@ -10,38 +17,15 @@ import {
   createQueueModule,
   type QueueModuleConfig,
 } from "./module"
-import type { IEventProcessor } from "./queue/core/consumer"
-import { EventConsumer } from "./queue/core/consumer"
-import { EventPublisher } from "./queue/core/publisher"
-import type {
-  IEventConsumer,
-  IEventPublisher,
-  IQueueClient,
-  RabbitMQConfig,
-} from "./queue/core/types"
-import { RabbitMQClient } from "./queue/rabbitmq/client"
+import type { RabbitMQConfig } from "./queue/core/types"
 
-// Mock the imported modules
-vi.mock("./queue/rabbitmq/client", () => ({
-  RabbitMQClient: vi.fn(),
-}))
-vi.mock("./queue/core/publisher", () => ({
-  EventPublisher: vi.fn(),
-}))
-vi.mock("./queue/core/consumer", () => ({
-  EventConsumer: vi.fn(),
-}))
-
-describe.skip("QueueModule", () => {
-  let queueModule: QueueModule
+describe("QueueModule", () => {
   let logger: ILogger
   let config: QueueModuleConfig
-  let mockClient: IQueueClient
-  let mockPublisher: IEventPublisher
-  let mockConsumer: IEventConsumer
-  let mockEventProcessor: IEventProcessor
 
-  beforeEach(async () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+
     logger = {
       debug: vi.fn(),
       info: vi.fn(),
@@ -49,27 +33,6 @@ describe.skip("QueueModule", () => {
       error: vi.fn(),
       queue: vi.fn(),
     } as unknown as ILogger
-
-    mockClient = {
-      connect: vi.fn().mockResolvedValue(undefined),
-      disconnect: vi.fn().mockResolvedValue(undefined),
-      isConnected: vi.fn().mockReturnValue(true),
-      getConnectionStats: vi.fn().mockReturnValue({ connected: true, messages: 0 }),
-    } as unknown as IQueueClient
-
-    mockPublisher = {
-      publish: vi.fn().mockResolvedValue(undefined),
-    } as unknown as IEventPublisher
-
-    mockConsumer = {
-      start: vi.fn().mockResolvedValue(undefined),
-      stop: vi.fn().mockResolvedValue(undefined),
-      getConsumerStats: vi.fn().mockReturnValue({ processed: 0, errors: 0 }),
-    } as unknown as IEventConsumer
-
-    mockEventProcessor = {
-      processEvent: vi.fn().mockResolvedValue(undefined),
-    }
 
     config = {
       rabbitmq: {
@@ -98,176 +61,50 @@ describe.skip("QueueModule", () => {
       autoStartConsumers: false,
       autoSetupTopology: true,
     }
-
-    vi.mocked(RabbitMQClient).mockImplementation(
-      () => mockClient as unknown as typeof RabbitMQClient.prototype,
-    )
-    vi.mocked(EventPublisher).mockImplementation(
-      () => mockPublisher as unknown as typeof EventPublisher.prototype,
-    )
-    vi.mocked(EventConsumer).mockImplementation(
-      () => mockConsumer as unknown as typeof EventConsumer.prototype,
-    )
-
-    queueModule = new QueueModule(config, logger)
   })
 
-  describe.skip("Initialization", () => {
-    it("should initialize successfully without event processor", async () => {
-      const dependencies = await queueModule.initialize()
-
-      expect(mockClient.connect).toHaveBeenCalledTimes(1)
-      expect(dependencies.client).toBe(mockClient)
-      expect(dependencies.publisher).toBe(mockPublisher)
-      expect(dependencies.consumer).toBeNull()
-      expect(logger.info).toHaveBeenCalledWith("Queue module initialized successfully")
-    })
-
-    it("should initialize successfully with event processor", async () => {
-      const dependencies = await queueModule.initialize(mockEventProcessor)
-
-      expect(mockClient.connect).toHaveBeenCalledTimes(1)
-      expect(dependencies.client).toBe(mockClient)
-      expect(dependencies.publisher).toBe(mockPublisher)
-      expect(dependencies.consumer).toBe(mockConsumer)
-      expect(logger.info).toHaveBeenCalledWith("Queue module initialized successfully")
-    })
-
-    it("should auto-start consumer when configured", async () => {
-      const autoStartConfig = { ...config, autoStartConsumers: true }
-      const autoStartModule = new QueueModule(autoStartConfig, logger)
-
-      await autoStartModule.initialize(mockEventProcessor)
-
-      expect(mockConsumer.start).toHaveBeenCalledTimes(1)
-    })
-
-    // Shadow consumer removed
-
-    it("should handle initialization errors", async () => {
-      const error = new Error("Connection failed")
-      vi.mocked(mockClient.connect).mockRejectedValueOnce(error)
-
-      await expect(queueModule.initialize()).rejects.toThrow("Connection failed")
-      expect(logger.error).toHaveBeenCalledWith(
-        "Failed to initialize queue module: Error: Connection failed",
-      )
-    })
-  })
-
-  describe("Service Getters", () => {
-    beforeEach(async () => {
-      await queueModule.initialize(mockEventProcessor)
-    })
-
-    it("should return client when initialized", () => {
-      const client = queueModule.getClient()
-      expect(client).toBe(mockClient)
-    })
-
-    it("should return publisher when initialized", () => {
-      const publisher = queueModule.getPublisher()
-      expect(publisher).toBe(mockPublisher)
-    })
-
-    it("should return consumer when initialized", () => {
-      const consumer = queueModule.getConsumer()
-      expect(consumer).toBe(mockConsumer)
-    })
-
-    // Shadow consumer removed
-
+  describe("Uninitialized Behavior", () => {
     it("should throw error when getting client before initialization", () => {
-      const uninitializedModule = new QueueModule(config, logger)
-      expect(() => uninitializedModule.getClient()).toThrow(
+      const module = new QueueModule(config, logger)
+      expect(() => module.getClient()).toThrow(
         "Queue module not initialized - client not available",
       )
     })
 
     it("should throw error when getting publisher before initialization", () => {
-      const uninitializedModule = new QueueModule(config, logger)
-      expect(() => uninitializedModule.getPublisher()).toThrow(
+      const module = new QueueModule(config, logger)
+      expect(() => module.getPublisher()).toThrow(
         "Queue module not initialized - publisher not available",
       )
     })
 
     it("should throw error when getting consumer before initialization", () => {
-      const uninitializedModule = new QueueModule(config, logger)
-      expect(() => uninitializedModule.getConsumer()).toThrow(
+      const module = new QueueModule(config, logger)
+      expect(() => module.getConsumer()).toThrow(
         "Queue module not initialized - consumer not available",
       )
     })
 
-    // Shadow consumer removed
-  })
-
-  // Shadow consumer removed
-
-  describe("Status and Monitoring", () => {
     it("should return correct status when uninitialized", () => {
-      const status = queueModule.getStatus()
+      const module = new QueueModule(config, logger)
+      const status = module.getStatus()
 
       expect(status.initialized).toBe(false)
       expect(status.connected).toBe(false)
-      // Shadow consumer removed
-    })
-
-    it("should return correct status when initialized", async () => {
-      await queueModule.initialize(mockEventProcessor)
-      const status = queueModule.getStatus()
-
-      expect(status.initialized).toBe(true)
-      expect(status.connected).toBe(true)
-      // Shadow consumer removed
-      expect(status.connectionStats).toEqual({ connected: true, messages: 0 })
-      expect(status.consumerStats).toEqual({ processed: 0, errors: 0 })
-      // Shadow consumer removed
     })
 
     it("should report not initialized correctly", () => {
-      expect(queueModule.isInitialized()).toBe(false)
+      const module = new QueueModule(config, logger)
+      expect(module.isInitialized()).toBe(false)
     })
 
-    it("should report initialized correctly", async () => {
-      await queueModule.initialize()
-      expect(queueModule.isInitialized()).toBe(true)
-    })
-  })
+    it("should shutdown gracefully when not initialized", async () => {
+      const module = new QueueModule(config, logger)
 
-  describe("Shutdown", () => {
-    beforeEach(async () => {
-      await queueModule.initialize(mockEventProcessor)
-    })
-
-    it("should shutdown gracefully", async () => {
-      await queueModule.shutdown()
-
-      // Shadow consumer removed
-      expect(mockConsumer.stop).toHaveBeenCalledTimes(1)
-      expect(mockClient.disconnect).toHaveBeenCalledTimes(1)
-      expect(logger.info).toHaveBeenCalledWith("Shutting down queue module...")
-      expect(logger.info).toHaveBeenCalledWith("Queue module shutdown complete")
-    })
-
-    it("should handle shutdown errors", async () => {
-      const error = new Error("Shutdown failed")
-      vi.mocked(mockClient.disconnect).mockRejectedValueOnce(error)
-
-      await expect(queueModule.shutdown()).rejects.toThrow("Shutdown failed")
-      expect(logger.error).toHaveBeenCalledWith(
-        "Error during queue module shutdown: Error: Shutdown failed",
-      )
-    })
-
-    it("should shutdown gracefully when some services are null", async () => {
-      const partialModule = new QueueModule(config, logger)
-
-      await expect(partialModule.shutdown()).resolves.toBeUndefined()
+      await expect(module.shutdown()).resolves.toBeUndefined()
       expect(logger.info).toHaveBeenCalledWith("Queue module shutdown complete")
     })
   })
-
-  // Shadow consumer removed
 })
 
 describe("Factory Functions", () => {

@@ -11,6 +11,7 @@ export default defineConfig({
     environment: "node",
     setupFiles: ["./src/tests/setup.ts"],
     include: ["src/**/*.test.ts"],
+    exclude: ["src/tests/integration/**", "src/tests/e2e/**", "node_modules/**"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

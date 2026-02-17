@@ -13,6 +13,8 @@
     "check-types": "tsc --noEmit",
     "test": "vitest run --silent",
     "test:coverage": "vitest run --coverage --silent",
+    "test:integration": "vitest run --config vitest.integration.config.mjs",
+    "test:e2e": "vitest run --config vitest.e2e.config.mjs",
     "clean": "rm -rf node_modules dist .turbo"
   },
   "dependencies": {

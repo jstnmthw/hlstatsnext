@@ -1,7 +1,15 @@
 "use client"
 
 import { authClient } from "@repo/auth/client"
-import { Button, Card, Input, Label } from "@repo/ui"
+import {
+  Button,
+  Card,
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+  Label,
+} from "@repo/ui"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { PasswordInput } from "./password-input"
@@ -122,20 +130,20 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="otp">Reset code</Label>
-          <Input
-            id="otp"
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={6}
-            placeholder="000000"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-            required
-            autoComplete="one-time-code"
-            className="text-center text-lg tracking-widest"
-          />
+          <Label>Reset code</Label>
+          <InputOTP maxLength={6} value={otp} onChange={setOtp} autoComplete="one-time-code">
+            <InputOTPGroup>
+              <InputOTPSlot index={0} />
+              <InputOTPSlot index={1} />
+              <InputOTPSlot index={2} />
+            </InputOTPGroup>
+            <InputOTPSeparator />
+            <InputOTPGroup>
+              <InputOTPSlot index={3} />
+              <InputOTPSlot index={4} />
+              <InputOTPSlot index={5} />
+            </InputOTPGroup>
+          </InputOTP>
         </div>
 
         <div className="space-y-2">

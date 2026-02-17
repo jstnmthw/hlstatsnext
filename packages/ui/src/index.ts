@@ -45,6 +45,7 @@ export {
 } from "./components/card"
 export { Checkbox } from "./components/checkbox"
 export { Input } from "./components/input"
+export { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "./components/input-otp"
 export { IPAddress, Port } from "./components/ip-address"
 export { Label } from "./components/label"
 export { RadioGroup, RadioGroupItem } from "./components/radio-group"

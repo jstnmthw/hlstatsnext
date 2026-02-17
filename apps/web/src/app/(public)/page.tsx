@@ -2,8 +2,8 @@ import { Footer } from "@/features/common/components/footer"
 import { Header } from "@/features/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
+import { GeneralStats } from "@/features/homepage/components/general-stats"
 import { ServerList } from "@/features/homepage/components/server-list"
-import { TopPlayers } from "@/features/homepage/components/top-players"
 import { VersionAnnounce } from "@/features/homepage/components/version-announce"
 import { Card } from "@repo/ui"
 
@@ -22,7 +22,7 @@ export default function Page() {
             <ServerList className="border-0" />
           </Card>
           <div className="col-span-full flex flex-col gap-4 md:col-span-1">
-            <TopPlayers />
+            <GeneralStats />
             <VersionAnnounce />
           </div>
         </div>

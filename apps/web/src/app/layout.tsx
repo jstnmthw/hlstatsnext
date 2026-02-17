@@ -3,6 +3,7 @@ import "./globals.css"
 import { ApolloWrapper } from "@/lib/apollo-wrapper"
 import type { Metadata } from "next"
 import { JetBrains_Mono } from "next/font/google"
+import { Toaster } from "sonner"
 
 const fontSans = JetBrains_Mono({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -20,6 +21,7 @@ export default function RootLayout({
     <html lang="en" className={fontSans.variable}>
       <body>
         <ApolloWrapper>{children}</ApolloWrapper>
+        <Toaster theme="dark" richColors />
       </body>
     </html>
   )

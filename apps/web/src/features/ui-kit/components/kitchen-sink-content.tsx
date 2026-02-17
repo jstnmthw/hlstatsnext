@@ -19,6 +19,7 @@ import {
   SelectValue,
   Textarea,
 } from "@repo/ui"
+import Link from "next/dist/client/link"
 
 import {
   IconAlertTriangle,
@@ -42,6 +43,13 @@ export function KitchenSinkContent({ className }: { className?: string }) {
         <h1 className="text-5xl font-bold text-foreground">HlStatsNext - UI Kit</h1>
         <p className="text-lg text-muted-foreground">
           A comprehensive showcase of all UI components and design elements.
+        </p>
+        <p>
+          Checkout the example page{" "}
+          <Link href="/admin/ui-kit/example" className="text-primary-bright hover:underline">
+            here
+          </Link>
+          .
         </p>
       </header>
 

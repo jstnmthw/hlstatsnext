@@ -403,6 +403,209 @@ describe("MatchRepository", () => {
     })
   })
 
+  describe("getPlayerSkill", () => {
+    it("should return player skill when found", async () => {
+      mockDatabase.mockPrisma.player.findUnique.mockResolvedValue(
+        createMockPlayer({ playerId: 1, skill: 1500 }),
+      )
+
+      const skill = await matchRepository.getPlayerSkill(1)
+      expect(skill).toBe(1500)
+    })
+
+    it("should return null when player not found", async () => {
+      mockDatabase.mockPrisma.player.findUnique.mockResolvedValue(null)
+
+      const skill = await matchRepository.getPlayerSkill(999)
+      expect(skill).toBeNull()
+    })
+
+    it("should throw for invalid player ID", async () => {
+      await expect(matchRepository.getPlayerSkill(0)).rejects.toThrow()
+    })
+  })
+
+  describe("incrementServerRounds", () => {
+    it("should increment both mapRounds and rounds", async () => {
+      mockDatabase.mockPrisma.server.update.mockResolvedValue(createMockServerRecord())
+
+      await matchRepository.incrementServerRounds(1)
+
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
+        where: { serverId: 1 },
+        data: expect.objectContaining({
+          mapRounds: { increment: 1 },
+          rounds: { increment: 1 },
+        }),
+      })
+    })
+  })
+
+  describe("updateTeamWins (actual method)", () => {
+    it("should increment tsWins and mapTsWins for TERRORIST", async () => {
+      mockDatabase.mockPrisma.server.update.mockResolvedValue(createMockServerRecord())
+
+      await matchRepository.updateTeamWins(1, "TERRORIST")
+
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
+        where: { serverId: 1 },
+        data: expect.objectContaining({
+          tsWins: { increment: 1 },
+          mapTsWins: { increment: 1 },
+        }),
+      })
+    })
+
+    it("should increment ctWins and mapCtWins for CT", async () => {
+      mockDatabase.mockPrisma.server.update.mockResolvedValue(createMockServerRecord())
+
+      await matchRepository.updateTeamWins(1, "CT")
+
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
+        where: { serverId: 1 },
+        data: expect.objectContaining({
+          ctWins: { increment: 1 },
+          mapCtWins: { increment: 1 },
+        }),
+      })
+    })
+
+    it("should not update anything for unknown team", async () => {
+      mockDatabase.mockPrisma.server.update.mockResolvedValue(createMockServerRecord())
+
+      await matchRepository.updateTeamWins(1, "UNKNOWN")
+
+      // updateServerStats should NOT be called when updates is empty
+      expect(mockDatabase.mockPrisma.server.update).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("updateBombStats (actual method)", () => {
+    it("should increment bombsPlanted for plant events", async () => {
+      mockDatabase.mockPrisma.server.update.mockResolvedValue(createMockServerRecord())
+
+      await matchRepository.updateBombStats(1, "plant")
+
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
+        where: { serverId: 1 },
+        data: expect.objectContaining({
+          bombsPlanted: { increment: 1 },
+        }),
+      })
+    })
+
+    it("should increment bombsDefused for defuse events", async () => {
+      mockDatabase.mockPrisma.server.update.mockResolvedValue(createMockServerRecord())
+
+      await matchRepository.updateBombStats(1, "defuse")
+
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
+        where: { serverId: 1 },
+        data: expect.objectContaining({
+          bombsDefused: { increment: 1 },
+        }),
+      })
+    })
+  })
+
+  describe("resetMapStats (actual method)", () => {
+    it("should reset map stats with player count", async () => {
+      mockDatabase.mockPrisma.server.update.mockResolvedValue(createMockServerRecord())
+
+      await matchRepository.resetMapStats(1, "de_dust2", 16)
+
+      expect(mockDatabase.mockPrisma.server.update).toHaveBeenCalledWith({
+        where: { serverId: 1 },
+        data: expect.objectContaining({
+          activeMap: "de_dust2",
+          mapChanges: { increment: 1 },
+          mapRounds: 0,
+          mapCtWins: 0,
+          mapTsWins: 0,
+          mapCtShots: 0,
+          mapCtHits: 0,
+          mapTsShots: 0,
+          mapTsHits: 0,
+          players: 16,
+        }),
+      })
+    })
+
+    it("should reset map stats without player count", async () => {
+      mockDatabase.mockPrisma.server.update.mockResolvedValue(createMockServerRecord())
+
+      await matchRepository.resetMapStats(1, "de_inferno")
+
+      const callArgs = mockDatabase.mockPrisma.server.update.mock.calls[0]![0]
+      expect(callArgs.data).toHaveProperty("activeMap", "de_inferno")
+      expect(callArgs.data).not.toHaveProperty("players")
+    })
+  })
+
+  describe("getLastKnownMap", () => {
+    it("should return map when found", async () => {
+      mockDatabase.mockPrisma.eventFrag.findFirst.mockResolvedValue({
+        map: "de_dust2",
+      } as any)
+
+      const map = await matchRepository.getLastKnownMap(1)
+      expect(map).toBe("de_dust2")
+    })
+
+    it("should return null when no map found", async () => {
+      mockDatabase.mockPrisma.eventFrag.findFirst.mockResolvedValue(null)
+
+      const map = await matchRepository.getLastKnownMap(1)
+      expect(map).toBeNull()
+    })
+
+    it("should throw for invalid server ID", async () => {
+      await expect(matchRepository.getLastKnownMap(0)).rejects.toThrow()
+    })
+  })
+
+  describe("updateMapCount", () => {
+    it("should upsert map count", async () => {
+      mockDatabase.mockPrisma.mapCount.upsert.mockResolvedValue({} as any)
+
+      await matchRepository.updateMapCount("cstrike", "de_dust2", 10, 3)
+
+      expect(mockDatabase.mockPrisma.mapCount.upsert).toHaveBeenCalledWith({
+        where: { game_map: { game: "cstrike", map: "de_dust2" } },
+        create: { game: "cstrike", map: "de_dust2", kills: 10, headshots: 3 },
+        update: { kills: { increment: 10 }, headshots: { increment: 3 } },
+      })
+    })
+
+    it("should throw for missing game", async () => {
+      await expect(matchRepository.updateMapCount("", "de_dust2", 1, 0)).rejects.toThrow()
+    })
+
+    it("should throw for missing map", async () => {
+      await expect(matchRepository.updateMapCount("cstrike", "", 1, 0)).rejects.toThrow()
+    })
+  })
+
+  describe("createPlayerHistory validation", () => {
+    it("should throw when playerId is missing", async () => {
+      await expect(
+        matchRepository.createPlayerHistory({
+          playerId: 0,
+          eventTime: new Date(),
+        }),
+      ).rejects.toThrow()
+    })
+
+    it("should throw when eventTime is missing", async () => {
+      await expect(
+        matchRepository.createPlayerHistory({
+          playerId: 1,
+          eventTime: undefined as unknown as Date,
+        }),
+      ).rejects.toThrow()
+    })
+  })
+
   describe("Error handling", () => {
     it("should handle database errors in updateServerStats", async () => {
       const serverId = 1

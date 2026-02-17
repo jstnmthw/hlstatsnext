@@ -144,5 +144,178 @@ describe("ServerOrchestrator", () => {
       // Invalid game code should throw
       await expect(orchestrator.findOrCreateServer("192.168.1.1", 27015, "")).rejects.toThrow()
     })
+
+    it("should create a new server when not found", async () => {
+      const { ServerOrchestrator } = await import("./server-orchestrator.js")
+
+      const mockDatabase = {
+        prisma: {
+          server: {
+            findFirst: vi.fn().mockResolvedValue(null), // Not found
+            create: vi.fn().mockResolvedValue({
+              serverId: 99,
+              city: "",
+              country: "",
+              lat: null,
+              lng: null,
+            }),
+          },
+          serverConfigGeneral: {
+            createMany: vi.fn(),
+          },
+        },
+        transaction: vi.fn().mockImplementation(async (cb: any) =>
+          cb({
+            server: {
+              create: vi.fn().mockResolvedValue({
+                serverId: 99,
+                city: "",
+                country: "",
+                lat: null,
+                lng: null,
+              }),
+            },
+            serverConfigGeneral: {
+              createMany: vi.fn(),
+            },
+          }),
+        ),
+      }
+
+      const orchestrator = new ServerOrchestrator(
+        mockDatabase as any,
+        mockServerService,
+        mockLogger,
+      )
+
+      const result = await orchestrator.findOrCreateServer("10.0.0.1", 27015, "cstrike")
+
+      expect(result.serverId).toBe(99)
+      expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining("Auto-created server"))
+    })
+
+    it("should handle P2002 race condition by finding existing server", async () => {
+      const { ServerOrchestrator } = await import("./server-orchestrator.js")
+
+      const p2002Error = Object.assign(new Error("Unique constraint failed"), { code: "P2002" })
+
+      const mockDatabase = {
+        prisma: {
+          server: {
+            findFirst: vi
+              .fn()
+              .mockResolvedValueOnce(null) // First lookup - not found
+              .mockResolvedValueOnce({
+                // After P2002, found
+                serverId: 77,
+                city: "Chicago",
+                country: "US",
+                lat: 41.88,
+                lng: -87.62,
+              }),
+          },
+        },
+        transaction: vi.fn().mockRejectedValue(p2002Error),
+      }
+
+      const orchestrator = new ServerOrchestrator(
+        mockDatabase as any,
+        mockServerService,
+        mockLogger,
+      )
+
+      const result = await orchestrator.findOrCreateServer("10.0.0.1", 27015, "cstrike")
+      expect(result.serverId).toBe(77)
+      expect(mockLogger.debug).toHaveBeenCalledWith(
+        expect.stringContaining("Race condition detected"),
+      )
+    })
+
+    it("should throw when P2002 race condition and server still not found", async () => {
+      const { ServerOrchestrator } = await import("./server-orchestrator.js")
+
+      const p2002Error = Object.assign(new Error("Unique constraint failed"), { code: "P2002" })
+
+      const mockDatabase = {
+        prisma: {
+          server: {
+            findFirst: vi.fn().mockResolvedValue(null), // Never found
+          },
+        },
+        transaction: vi.fn().mockRejectedValue(p2002Error),
+      }
+
+      const orchestrator = new ServerOrchestrator(
+        mockDatabase as any,
+        mockServerService,
+        mockLogger,
+      )
+
+      await expect(orchestrator.findOrCreateServer("10.0.0.1", 27015, "cstrike")).rejects.toThrow(
+        "Failed to find or create server",
+      )
+    })
+
+    it("should rethrow non-P2002 errors", async () => {
+      const { ServerOrchestrator } = await import("./server-orchestrator.js")
+
+      const genericError = new Error("Connection refused")
+
+      const mockDatabase = {
+        prisma: {
+          server: {
+            findFirst: vi.fn().mockResolvedValue(null),
+          },
+        },
+        transaction: vi.fn().mockRejectedValue(genericError),
+      }
+
+      const orchestrator = new ServerOrchestrator(
+        mockDatabase as any,
+        mockServerService,
+        mockLogger,
+      )
+
+      await expect(orchestrator.findOrCreateServer("10.0.0.1", 27015, "cstrike")).rejects.toThrow(
+        "Failed to find or create server",
+      )
+    })
+
+    it("should deduplicate concurrent creations for same server", async () => {
+      const { ServerOrchestrator } = await import("./server-orchestrator.js")
+
+      let resolveFind: (value: any) => void
+      const delayedFind = new Promise((resolve) => {
+        resolveFind = resolve
+      })
+
+      const mockDatabase = {
+        prisma: {
+          server: {
+            findFirst: vi.fn().mockReturnValue(delayedFind),
+          },
+        },
+        transaction: vi.fn(),
+      }
+
+      const orchestrator = new ServerOrchestrator(
+        mockDatabase as any,
+        mockServerService,
+        mockLogger,
+      )
+
+      // Start two concurrent requests for the same server
+      const p1 = orchestrator.findOrCreateServer("10.0.0.1", 27015, "cstrike")
+      const p2 = orchestrator.findOrCreateServer("10.0.0.1", 27015, "cstrike")
+
+      // Resolve the find
+      resolveFind!({ serverId: 42, city: "", country: "", lat: null, lng: null })
+
+      const [r1, r2] = await Promise.all([p1, p2])
+      expect(r1.serverId).toBe(42)
+      expect(r2.serverId).toBe(42)
+      // findFirst should only be called once due to deduplication
+      expect(mockDatabase.prisma.server.findFirst).toHaveBeenCalledTimes(1)
+    })
   })
 })

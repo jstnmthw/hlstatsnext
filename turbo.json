@@ -42,7 +42,10 @@
     "METRICS_PORT",
     "APP_VERSION",
     "GOOGLE_CLIENT_ID",
-    "GOOGLE_CLIENT_SECRET"
+    "GOOGLE_CLIENT_SECRET",
+    "RESEND_API_KEY",
+    "MAIL_FROM",
+    "MAIL_PROVIDER"
   ],
   "tasks": {
     "build": {

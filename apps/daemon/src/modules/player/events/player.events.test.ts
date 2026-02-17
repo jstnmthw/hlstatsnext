@@ -288,5 +288,271 @@ describe("PlayerEventHandler", () => {
         }),
       )
     })
+
+    it("should ignore bot PLAYER_CONNECT when IgnoreBots is enabled", async () => {
+      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_CONNECT,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "bot-connect",
+        data: {},
+        meta: {
+          steamId: "BOT",
+          playerName: "Bot Mike",
+          isBot: true,
+        },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(serverService.getServerConfigBoolean).toHaveBeenCalledWith(1, "IgnoreBots", true)
+      expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
+      expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("Ignoring bot"))
+    })
+
+    it("should process bot PLAYER_CONNECT when IgnoreBots is disabled", async () => {
+      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(false)
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_CONNECT,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "bot-connect-allowed",
+        data: {},
+        meta: {
+          steamId: "BOT",
+          playerName: "Bot Mike",
+          isBot: true,
+        },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(playerService.handlePlayerEvent).toHaveBeenCalled()
+    })
+
+    it("should ignore bot PLAYER_DISCONNECT when IgnoreBots is enabled", async () => {
+      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_DISCONNECT,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "bot-disconnect",
+        data: {},
+        meta: { steamId: "BOT", playerName: "Bot Alice", isBot: true },
+      }
+
+      await handler.handleEvent(event)
+      expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
+    })
+
+    it("should ignore bot PLAYER_ENTRY when IgnoreBots is enabled", async () => {
+      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_ENTRY,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "bot-entry",
+        data: {},
+        meta: { steamId: "BOT", playerName: "Bot Alice", isBot: true },
+      }
+
+      await handler.handleEvent(event)
+      expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
+    })
+
+    it("should not check IgnoreBots for non-lifecycle events (like CHAT_MESSAGE)", async () => {
+      const event: BaseEvent = {
+        eventType: EventType.CHAT_MESSAGE,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "bot-chat",
+        data: {},
+        meta: { steamId: "BOT", playerName: "Bot Mike", isBot: true },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(serverService.getServerConfigBoolean).not.toHaveBeenCalled()
+      expect(playerService.handlePlayerEvent).toHaveBeenCalled()
+    })
+
+    it("should not check IgnoreBots for non-bot players", async () => {
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_CONNECT,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "real-player-connect",
+        data: {},
+        meta: { steamId: "STEAM_1:0:123456", playerName: "RealPlayer", isBot: false },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(serverService.getServerConfigBoolean).not.toHaveBeenCalled()
+      expect(playerService.handlePlayerEvent).toHaveBeenCalled()
+    })
+
+    it("should handle PLAYER_DAMAGE events with dual player resolution", async () => {
+      vi.mocked(playerService.getOrCreatePlayer)
+        .mockResolvedValueOnce(100)
+        .mockResolvedValueOnce(200)
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_DAMAGE,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "damage-event",
+        data: { damage: 50, weapon: "ak47" },
+        meta: {
+          killer: { steamId: "STEAM_1:0:111", playerName: "Attacker", isBot: false },
+          victim: { steamId: "STEAM_1:0:222", playerName: "Victim", isBot: false },
+        },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            attackerId: 100,
+            victimId: 200,
+          }),
+        }),
+      )
+    })
+
+    it("should handle PLAYER_TEAMKILL events with dual player resolution", async () => {
+      vi.mocked(playerService.getOrCreatePlayer)
+        .mockResolvedValueOnce(300)
+        .mockResolvedValueOnce(400)
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_TEAMKILL,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "teamkill-event",
+        data: { weapon: "awp" },
+        meta: {
+          killer: { steamId: "STEAM_1:0:333", playerName: "TKer", isBot: false },
+          victim: { steamId: "STEAM_1:0:444", playerName: "Teammate", isBot: false },
+        },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(playerService.handlePlayerEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            attackerId: 300,
+            victimId: 400,
+          }),
+        }),
+      )
+    })
+
+    it("should handle PLAYER_DAMAGE with missing meta gracefully", async () => {
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_DAMAGE,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "damage-no-meta",
+        data: { damage: 50 },
+        meta: { killer: null, victim: null } as any,
+      }
+
+      await handler.handleEvent(event)
+
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Missing meta data"),
+        expect.any(Object),
+      )
+      expect(playerService.handlePlayerEvent).toHaveBeenCalled()
+    })
+
+    it("should handle resolution errors in single player events", async () => {
+      vi.mocked(playerService.getOrCreatePlayer).mockRejectedValue(new Error("DB error"))
+
+      const event: BaseEvent = {
+        eventType: EventType.CHAT_MESSAGE,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "error-event",
+        data: {},
+        meta: { steamId: "STEAM_1:0:123", playerName: "TestPlayer" },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to resolve player IDs"),
+      )
+      expect(playerService.handlePlayerEvent).toHaveBeenCalled()
+    })
+
+    it("should handle resolution errors in kill events", async () => {
+      vi.mocked(playerService.getOrCreatePlayer).mockRejectedValue(new Error("DB error"))
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "kill-error",
+        data: { weapon: "ak47" },
+        meta: {
+          killer: { steamId: "STEAM_1:0:111", playerName: "K", isBot: false },
+          victim: { steamId: "STEAM_1:0:222", playerName: "V", isBot: false },
+        },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to resolve PLAYER_KILL"),
+      )
+    })
+
+    it("should handle resolution errors in dual player events", async () => {
+      vi.mocked(playerService.getOrCreatePlayer).mockRejectedValue(new Error("DB error"))
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_DAMAGE,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "damage-error",
+        data: { damage: 50 },
+        meta: {
+          killer: { steamId: "STEAM_1:0:111", playerName: "A", isBot: false },
+          victim: { steamId: "STEAM_1:0:222", playerName: "V", isBot: false },
+        },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to resolve PLAYER_DAMAGE"),
+      )
+    })
+
+    it("should handle single player event with meta but no steamId", async () => {
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_CONNECT,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "no-steamid",
+        data: {},
+        meta: { playerName: "Test" }, // no steamId
+      }
+
+      await handler.handleEvent(event)
+
+      // Should not call getOrCreatePlayer without steamId
+      expect(playerService.getOrCreatePlayer).not.toHaveBeenCalled()
+      expect(playerService.handlePlayerEvent).toHaveBeenCalled()
+    })
   })
 })

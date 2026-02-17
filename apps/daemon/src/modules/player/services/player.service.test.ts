@@ -947,4 +947,467 @@ describe("PlayerService", () => {
       })
     })
   })
+
+  // ---------------------------------------------------------------
+  // Additional coverage for getOrCreatePlayer branches
+  // ---------------------------------------------------------------
+  describe("getOrCreatePlayer - error and edge cases", () => {
+    it("should throw for invalid Steam ID", async () => {
+      await expect(
+        playerService.getOrCreatePlayer("INVALID_STEAM_ID", "Player", "csgo"),
+      ).rejects.toThrow("Invalid Steam ID")
+    })
+
+    it("should throw for invalid player name (empty string after trim)", async () => {
+      await expect(
+        playerService.getOrCreatePlayer("76561198000000000", "   ", "csgo"),
+      ).rejects.toThrow()
+    })
+
+    it("should remove failed promise from cache on error and allow retry", async () => {
+      vi.spyOn(mockRepository, "upsertPlayer")
+        .mockRejectedValueOnce(new Error("DB error"))
+        .mockResolvedValueOnce({ playerId: 42 } as Player)
+
+      // First call should fail
+      await expect(
+        playerService.getOrCreatePlayer("76561198000000000", "Player", "csgo"),
+      ).rejects.toThrow("DB error")
+
+      // Second call should succeed (cache was cleared on error)
+      const result = await playerService.getOrCreatePlayer("76561198000000000", "Player", "csgo")
+      expect(result).toBe(42)
+    })
+
+    it("should handle case-insensitive BOT detection (lowercase 'bot')", async () => {
+      vi.spyOn(mockRepository, "upsertPlayer").mockResolvedValue({ playerId: 200 } as Player)
+
+      // normalizeSteamId with "BOT" returns "BOT", and isBot check uses toUpperCase
+      const result = await playerService.getOrCreatePlayer("BOT", "SomeBot", "cstrike", 3)
+      expect(result).toBe(200)
+      expect(mockRepository.upsertPlayer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          steamId: "BOT_3_SomeBot",
+        }),
+      )
+    })
+  })
+
+  // ---------------------------------------------------------------
+  // getPlayerStats
+  // ---------------------------------------------------------------
+  describe("getPlayerStats - coverage", () => {
+    it("should return player stats from repository", async () => {
+      const mockPlayer = { playerId: 1, skill: 1000 } as Player
+      vi.spyOn(mockRepository, "findById").mockResolvedValue(mockPlayer)
+
+      const result = await playerService.getPlayerStats(1)
+      expect(result).toEqual(mockPlayer)
+    })
+
+    it("should return null on repository error", async () => {
+      vi.spyOn(mockRepository, "findById").mockRejectedValue(new Error("DB error"))
+
+      const result = await playerService.getPlayerStats(1)
+      expect(result).toBeNull()
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to get player stats"),
+      )
+    })
+  })
+
+  // ---------------------------------------------------------------
+  // updatePlayerStats
+  // ---------------------------------------------------------------
+  describe("updatePlayerStats - coverage", () => {
+    it("should build and apply stat updates", async () => {
+      vi.spyOn(mockRepository, "update").mockResolvedValue({} as Player)
+
+      await playerService.updatePlayerStats(1, {
+        kills: 5,
+        deaths: 3,
+        suicides: 1,
+        teamkills: 0,
+        skill: 10,
+        shots: 50,
+        hits: 25,
+        headshots: 5,
+        connectionTime: 300,
+        killStreak: 3,
+        deathStreak: 0,
+        lastEvent: new Date(),
+        lastName: "UpdatedName",
+      })
+
+      expect(mockRepository.update).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({
+          kills: { increment: 5 },
+          deaths: { increment: 3 },
+        }),
+      )
+    })
+
+    it("should do nothing when no valid updates are provided (empty object)", async () => {
+      const updateSpy = vi.spyOn(mockRepository, "update").mockResolvedValue({} as Player)
+
+      await playerService.updatePlayerStats(1, {})
+
+      expect(updateSpy).not.toHaveBeenCalled()
+      expect(mockLogger.debug).toHaveBeenCalledWith(expect.stringContaining("No valid updates"))
+    })
+
+    it("should not call builder methods for undefined update fields", async () => {
+      vi.spyOn(mockRepository, "update").mockResolvedValue({} as Player)
+
+      // Only provide kills, nothing else
+      await playerService.updatePlayerStats(1, { kills: 1 })
+
+      expect(mockRepository.update).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({
+          kills: { increment: 1 },
+        }),
+      )
+    })
+
+    it("should throw on repository error", async () => {
+      vi.spyOn(mockRepository, "update").mockRejectedValue(new Error("DB update error"))
+
+      await expect(playerService.updatePlayerStats(1, { kills: 1 })).rejects.toThrow(
+        "DB update error",
+      )
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to update player stats"),
+      )
+    })
+
+    it("should skip kills=0 (builder ignores 0)", async () => {
+      const updateSpy = vi.spyOn(mockRepository, "update").mockResolvedValue({} as Player)
+
+      // kills=0 will not trigger addKills because 0 > 0 is false
+      await playerService.updatePlayerStats(1, { kills: 0, lastName: "Name" })
+
+      // update should still be called because lastName is present
+      expect(updateSpy).toHaveBeenCalled()
+    })
+
+    it("should apply teamkills and skill changes", async () => {
+      vi.spyOn(mockRepository, "update").mockResolvedValue({} as Player)
+
+      await playerService.updatePlayerStats(1, { teamkills: 2, skill: -5 })
+
+      expect(mockRepository.update).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({
+          teamkills: { increment: 2 },
+          skill: { increment: -5 },
+        }),
+      )
+    })
+  })
+
+  // ---------------------------------------------------------------
+  // getPlayerRating
+  // ---------------------------------------------------------------
+  describe("getPlayerRating", () => {
+    it("should return default rating when player not found", async () => {
+      vi.spyOn(mockRepository, "findById").mockResolvedValue(null)
+
+      const rating = await playerService.getPlayerRating(999)
+
+      expect(rating).toEqual({
+        playerId: 999,
+        rating: 1000,
+        confidence: 350,
+        volatility: 0.06,
+        gamesPlayed: 0,
+      })
+    })
+
+    it("should calculate adjusted confidence from games played", async () => {
+      vi.spyOn(mockRepository, "findById").mockResolvedValue({
+        skill: 1200,
+        _count: { fragsAsKiller: 100 },
+      } as unknown as Player)
+
+      const rating = await playerService.getPlayerRating(1)
+
+      expect(rating.playerId).toBe(1)
+      expect(rating.rating).toBe(1200)
+      expect(rating.confidence).toBe(350 - 100) // DEFAULT_CONFIDENCE - fragsAsKiller
+      expect(rating.gamesPlayed).toBe(100)
+    })
+
+    it("should cap confidence reduction at MAX_CONFIDENCE_REDUCTION (300)", async () => {
+      vi.spyOn(mockRepository, "findById").mockResolvedValue({
+        skill: 1500,
+        _count: { fragsAsKiller: 500 },
+      } as unknown as Player)
+
+      const rating = await playerService.getPlayerRating(1)
+
+      // confidence = 350 - min(500, 300) = 350 - 300 = 50
+      expect(rating.confidence).toBe(50)
+    })
+
+    it("should return default rating on error", async () => {
+      vi.spyOn(mockRepository, "findById").mockRejectedValue(new Error("DB error"))
+
+      const rating = await playerService.getPlayerRating(1)
+
+      expect(rating).toEqual({
+        playerId: 1,
+        rating: 1000,
+        confidence: 350,
+        volatility: 0.06,
+        gamesPlayed: 0,
+      })
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to get player rating"),
+      )
+    })
+  })
+
+  // ---------------------------------------------------------------
+  // updatePlayerRatings
+  // ---------------------------------------------------------------
+  describe("updatePlayerRatings", () => {
+    it("should update all player ratings", async () => {
+      vi.spyOn(mockRepository, "update").mockResolvedValue({} as Player)
+
+      const updates = [
+        { playerId: 1, newRating: 1050, gamesPlayed: 10 },
+        { playerId: 2, newRating: 950, gamesPlayed: 8 },
+      ]
+
+      await playerService.updatePlayerRatings(updates)
+
+      expect(mockRepository.update).toHaveBeenCalledTimes(2)
+      expect(mockRepository.update).toHaveBeenCalledWith(1, {
+        skill: 1050,
+        lastSkillChange: expect.any(Date),
+      })
+      expect(mockRepository.update).toHaveBeenCalledWith(2, {
+        skill: 950,
+        lastSkillChange: expect.any(Date),
+      })
+      expect(mockLogger.debug).toHaveBeenCalledWith(
+        expect.stringContaining("Updated ratings for 2 players"),
+      )
+    })
+
+    it("should throw on repository error", async () => {
+      vi.spyOn(mockRepository, "update").mockRejectedValue(new Error("Batch error"))
+
+      await expect(
+        playerService.updatePlayerRatings([{ playerId: 1, newRating: 1000, gamesPlayed: 0 }]),
+      ).rejects.toThrow("Batch error")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to update player ratings"),
+      )
+    })
+  })
+
+  // ---------------------------------------------------------------
+  // handlePlayerEvent - error path (covers the outer catch in handlePlayerEvent)
+  // ---------------------------------------------------------------
+  describe("handlePlayerEvent - error handling", () => {
+    it("should catch handler errors and return error result with Error message", async () => {
+      // Create a service where the event handler factory will be initialized,
+      // then mock getHandler to throw an Error
+      const event: PlayerEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "test-error",
+        data: {
+          killerId: 1,
+          victimId: 2,
+          weapon: "ak47",
+          headshot: false,
+          killerTeam: "TERRORIST",
+          victimTeam: "CT",
+        },
+      }
+
+      // Force the factory to be created by calling once with unknown event
+      await playerService.handlePlayerEvent({
+        // @ts-expect-error - trigger factory init
+        eventType: "INIT_FACTORY",
+        timestamp: new Date(),
+        serverId: 1,
+        data: {} as any,
+      })
+
+      // Now access the private eventHandlerFactory and mock getHandler to throw
+      const factory = (playerService as any).eventHandlerFactory
+      vi.spyOn(factory, "getHandler").mockImplementation(() => {
+        throw new Error("Factory failure")
+      })
+
+      const result = await playerService.handlePlayerEvent(event)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toBe("Factory failure")
+    })
+
+    it("should handle non-Error thrown objects", async () => {
+      // Force factory init
+      await playerService.handlePlayerEvent({
+        // @ts-expect-error - trigger factory init
+        eventType: "INIT_FACTORY2",
+        timestamp: new Date(),
+        serverId: 1,
+        data: {} as any,
+      })
+
+      const factory = (playerService as any).eventHandlerFactory
+      vi.spyOn(factory, "getHandler").mockImplementation(() => {
+        throw "string error"
+      })
+
+      const killEvent: PlayerKillEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "test-string-error",
+        data: {
+          killerId: 1,
+          victimId: 2,
+          weapon: "ak47",
+          headshot: false,
+          killerTeam: "TERRORIST",
+          victimTeam: "CT",
+        },
+      }
+
+      const result = await playerService.handlePlayerEvent(killEvent)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toBe("string error")
+    })
+  })
+
+  // ---------------------------------------------------------------
+  // getPlayerStatsBatch
+  // ---------------------------------------------------------------
+  describe("getPlayerStatsBatch", () => {
+    it("should return player stats map from repository", async () => {
+      const mockMap = new Map<number, Player>([
+        [1, { playerId: 1, skill: 1000 } as Player],
+        [2, { playerId: 2, skill: 900 } as Player],
+      ])
+      vi.spyOn(mockRepository, "getPlayerStatsBatch").mockResolvedValue(mockMap)
+
+      const result = await playerService.getPlayerStatsBatch([1, 2])
+      expect(result.size).toBe(2)
+      expect(result.get(1)?.skill).toBe(1000)
+    })
+
+    it("should return empty map on error", async () => {
+      vi.spyOn(mockRepository, "getPlayerStatsBatch").mockRejectedValue(new Error("Batch error"))
+
+      const result = await playerService.getPlayerStatsBatch([1, 2])
+      expect(result.size).toBe(0)
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to batch get player stats"),
+      )
+    })
+  })
+
+  // ---------------------------------------------------------------
+  // updatePlayerStatsBatch
+  // ---------------------------------------------------------------
+  describe("updatePlayerStatsBatch", () => {
+    it("should call repository for non-empty batch", async () => {
+      vi.spyOn(mockRepository, "updatePlayerStatsBatch").mockResolvedValue(undefined)
+
+      await playerService.updatePlayerStatsBatch([
+        { playerId: 1, skillDelta: 10 },
+        { playerId: 2, skillDelta: -5 },
+      ])
+
+      expect(mockRepository.updatePlayerStatsBatch).toHaveBeenCalledWith([
+        { playerId: 1, skillDelta: 10 },
+        { playerId: 2, skillDelta: -5 },
+      ])
+      expect(mockLogger.debug).toHaveBeenCalledWith(
+        expect.stringContaining("Batch updated stats for 2 players"),
+      )
+    })
+
+    it("should return early for empty updates array", async () => {
+      const batchSpy = vi
+        .spyOn(mockRepository, "updatePlayerStatsBatch")
+        .mockResolvedValue(undefined)
+
+      await playerService.updatePlayerStatsBatch([])
+
+      expect(batchSpy).not.toHaveBeenCalled()
+    })
+
+    it("should throw on repository error", async () => {
+      vi.spyOn(mockRepository, "updatePlayerStatsBatch").mockRejectedValue(
+        new Error("Batch update error"),
+      )
+
+      await expect(
+        playerService.updatePlayerStatsBatch([{ playerId: 1, skillDelta: 10 }]),
+      ).rejects.toThrow("Batch update error")
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to batch update player stats"),
+      )
+    })
+  })
+
+  // ---------------------------------------------------------------
+  // getEventHandlerFactory - lazy init
+  // ---------------------------------------------------------------
+  describe("getEventHandlerFactory - lazy initialization", () => {
+    it("should create event handler factory only once", async () => {
+      // The factory is lazily created on first handlePlayerEvent call
+      // Call handlePlayerEvent twice with unknown event to trigger factory creation
+      const event1: PlayerEvent = {
+        // @ts-expect-error - Testing unknown event type
+        eventType: "SOME_EVENT_1",
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "e1",
+        data: { playerId: 1 },
+      }
+      const event2: PlayerEvent = {
+        // @ts-expect-error - Testing unknown event type
+        eventType: "SOME_EVENT_2",
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "e2",
+        data: { playerId: 1 },
+      }
+
+      const result1 = await playerService.handlePlayerEvent(event1)
+      const result2 = await playerService.handlePlayerEvent(event2)
+
+      // Both should succeed (unhandled events return success: true)
+      expect(result1.success).toBe(true)
+      expect(result2.success).toBe(true)
+    })
+  })
+
+  // ---------------------------------------------------------------
+  // _performPlayerResolution error path
+  // ---------------------------------------------------------------
+  describe("_performPlayerResolution - error handling", () => {
+    it("should log and re-throw when upsertPlayer fails", async () => {
+      vi.spyOn(mockRepository, "upsertPlayer").mockRejectedValue(new Error("Upsert failed"))
+
+      await expect(
+        playerService.getOrCreatePlayer("76561198000000000", "Player", "csgo"),
+      ).rejects.toThrow("Upsert failed")
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to upsert player"),
+      )
+    })
+  })
 })

@@ -524,6 +524,116 @@ describe("RankingService", () => {
     })
   })
 
+  describe("calculateTeamkillPenalty", () => {
+    it("should return double the suicide penalty", () => {
+      const penalty = rankingService.calculateTeamkillPenalty()
+      expect(penalty).toBe(-10) // -5 * 2
+    })
+  })
+
+  describe("getPlayerRankPosition", () => {
+    it("should return rank when player found", async () => {
+      vi.mocked(mockDatabase.$queryRaw).mockResolvedValue([{ rank: BigInt(5) }])
+
+      const rank = await rankingService.getPlayerRankPosition(1)
+      expect(rank).toBe(5)
+    })
+
+    it("should return 0 when player not found", async () => {
+      vi.mocked(mockDatabase.$queryRaw).mockResolvedValue([])
+
+      const rank = await rankingService.getPlayerRankPosition(999)
+      expect(rank).toBe(0)
+      expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining("not found in ranking"))
+    })
+
+    it("should return 0 on database error", async () => {
+      vi.mocked(mockDatabase.$queryRaw).mockRejectedValue(new Error("DB error"))
+
+      const rank = await rankingService.getPlayerRankPosition(1)
+      expect(rank).toBe(0)
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to get rank position"),
+        expect.any(Object),
+      )
+    })
+  })
+
+  describe("getBatchPlayerRanks", () => {
+    it("should return empty map for empty input", async () => {
+      const result = await rankingService.getBatchPlayerRanks([])
+      expect(result.size).toBe(0)
+    })
+
+    it("should return rank map for valid players", async () => {
+      vi.mocked(mockDatabase.$queryRaw).mockResolvedValue([
+        { player_id: 1, rank: BigInt(3) },
+        { player_id: 2, rank: BigInt(7) },
+      ])
+
+      const result = await rankingService.getBatchPlayerRanks([1, 2, 3])
+
+      expect(result.get(1)).toBe(3)
+      expect(result.get(2)).toBe(7)
+      expect(result.get(3)).toBe(0) // Missing player gets 0
+    })
+
+    it("should return all zeros on error", async () => {
+      vi.mocked(mockDatabase.$queryRaw).mockRejectedValue(new Error("DB error"))
+
+      const result = await rankingService.getBatchPlayerRanks([1, 2])
+      expect(result.get(1)).toBe(0)
+      expect(result.get(2)).toBe(0)
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to get batch player ranks"),
+        expect.any(Object),
+      )
+    })
+  })
+
+  describe("Weapon cache expiration", () => {
+    it("should refresh cache after TTL expires", async () => {
+      vi.clearAllMocks()
+
+      const killerRating: SkillRating = {
+        playerId: 1,
+        rating: 1500,
+        confidence: 100,
+        volatility: 0.06,
+        gamesPlayed: 50,
+      }
+
+      const victimRating: SkillRating = {
+        playerId: 2,
+        rating: 1500,
+        confidence: 100,
+        volatility: 0.06,
+        gamesPlayed: 50,
+      }
+
+      const context: KillContext = {
+        weapon: "ak47",
+        headshot: false,
+        killerTeam: "CT",
+        victimTeam: "TERRORIST",
+      }
+
+      // First call populates cache
+      await rankingService.calculateSkillAdjustment(killerRating, victimRating, context)
+      expect(mockWeaponRepository.findWeaponByCode).toHaveBeenCalledTimes(1)
+
+      // Advance time past TTL (5 minutes)
+      vi.useFakeTimers()
+      vi.advanceTimersByTime(6 * 60 * 1000)
+
+      // Second call after TTL should hit DB again
+      await rankingService.calculateSkillAdjustment(killerRating, victimRating, context)
+      expect(mockWeaponRepository.findWeaponByCode).toHaveBeenCalledTimes(2)
+
+      vi.useRealTimers()
+    })
+  })
+
   describe("Database-driven weapon multipliers", () => {
     it("should fetch weapon multiplier from database", async () => {
       const killerRating: SkillRating = {

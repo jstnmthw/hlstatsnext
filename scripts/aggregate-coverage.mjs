@@ -9,7 +9,10 @@
 import { readFileSync, existsSync, appendFileSync } from "node:fs"
 import { resolve } from "node:path"
 
-const COVERAGE_PATHS = ["apps/daemon/coverage/coverage-final.json"]
+const COVERAGE_PATHS = [
+  "apps/daemon/coverage/coverage-final.json",
+  "apps/web/coverage/coverage-final.json",
+]
 
 let totalStatements = 0
 let coveredStatements = 0

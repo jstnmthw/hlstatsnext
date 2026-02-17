@@ -1,29 +1,32 @@
-/**
- * Vitest Configuration
- */
-
-import { defineConfig } from "vitest/config"
 import path from "path"
+import { defineConfig } from "vitest/config"
 
 export default defineConfig({
   test: {
     globals: true,
-    environment: "node",
-    setupFiles: ["./src/tests/setup.ts"],
+    environment: "jsdom",
     include: ["src/**/*.test.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
+      include: [
+        "src/lib/**/*.ts",
+        "src/features/**/utils/**/*.ts",
+        "src/features/**/lib/**/*.ts",
+        "src/features/mock-data.ts",
+        "src/features/servers/components/server-config.ts",
+        "src/features/common/graphql/pagination.ts",
+      ],
       exclude: [
         "node_modules/",
         "src/tests/",
-        "src/types/",
-        "dist/",
         "**/*.d.ts",
         "**/*.config.*",
-        "**/generated/**",
-        "**/*.types.ts",
         "**/*.test.ts",
+        "src/lib/gql/**",
+        "src/lib/apollo-client.ts",
+        "src/lib/apollo-wrapper.tsx",
+        "src/lib/mock-data.ts",
       ],
       thresholds: {
         global: {

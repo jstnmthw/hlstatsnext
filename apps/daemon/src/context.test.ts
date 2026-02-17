@@ -3,7 +3,12 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { createAppContext, getAppContext, resetAppContext } from "./context"
+import {
+  createAppContext,
+  getAppContext,
+  initializeQueueInfrastructure,
+  resetAppContext,
+} from "./context"
 
 // Mock all the imported modules
 vi.mock("@/database/client")
@@ -268,6 +273,176 @@ describe("Application Context", () => {
 
     it("should handle reset operations", () => {
       expect(() => resetAppContext()).not.toThrow()
+    })
+  })
+
+  describe("initializeQueueInfrastructure", () => {
+    it("should skip when no queueModule is available", async () => {
+      const context = createAppContext()
+      context.queueModule = undefined
+      // Replace logger with spy-based mock
+      const mockLogger = {
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        debug: vi.fn(),
+        ok: vi.fn(),
+        event: vi.fn(),
+        chat: vi.fn(),
+        queue: vi.fn(),
+        starting: vi.fn(),
+        started: vi.fn(),
+        stopping: vi.fn(),
+        stopped: vi.fn(),
+        connecting: vi.fn(),
+        connected: vi.fn(),
+        disconnected: vi.fn(),
+        failed: vi.fn(),
+        ready: vi.fn(),
+        received: vi.fn(),
+        shutdown: vi.fn(),
+        shutdownComplete: vi.fn(),
+        fatal: vi.fn(),
+        disableTimestamps: vi.fn(),
+        enableTimestamps: vi.fn(),
+        disableColors: vi.fn(),
+        setColorsEnabled: vi.fn(),
+        getLogLevel: vi.fn(),
+        setLogLevel: vi.fn(),
+        setLogLevelFromString: vi.fn(),
+      } as any
+      context.logger = mockLogger
+
+      await initializeQueueInfrastructure(context)
+
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        "No queue module available - skipping queue initialization",
+      )
+    })
+
+    it("should initialize queue module and set publisher", async () => {
+      const context = createAppContext()
+      const mockPublisher = { publish: vi.fn() }
+      const mockConsumer = { stop: vi.fn() }
+      const mockLogger = {
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        debug: vi.fn(),
+      } as any
+      context.logger = mockLogger
+
+      context.queueModule = {
+        initialize: vi.fn().mockResolvedValue(undefined),
+        getPublisher: vi.fn().mockReturnValue(mockPublisher),
+        startRabbitMQConsumer: vi.fn().mockResolvedValue(undefined),
+        getRabbitMQConsumer: vi.fn().mockReturnValue(mockConsumer),
+      } as any
+
+      context.ingressService = {
+        ...context.ingressService,
+        setPublisher: vi.fn(),
+      } as any
+
+      context.moduleRegistry = {} as any
+      context.metrics = {} as any
+      context.repositories = { playerRepository: {} } as any
+      context.rconService = {} as any
+      context.commandResolverService = {} as any
+
+      await initializeQueueInfrastructure(context)
+
+      expect(context.queueModule!.initialize).toHaveBeenCalled()
+      expect(context.eventPublisher).toBe(mockPublisher)
+      expect(context.rabbitmqConsumer).toBe(mockConsumer)
+    })
+
+    it("should handle queue initialization failure", async () => {
+      const context = createAppContext()
+      const mockLogger = {
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        debug: vi.fn(),
+      } as any
+      context.logger = mockLogger
+
+      context.queueModule = {
+        initialize: vi.fn().mockRejectedValue(new Error("Connection refused")),
+      } as any
+
+      await initializeQueueInfrastructure(context)
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to initialize queue infrastructure"),
+      )
+      expect(context.queueModule).toBeUndefined()
+      expect(context.eventPublisher).toBeUndefined()
+    })
+
+    it("should cleanup consumer on failure", async () => {
+      const context = createAppContext()
+      const mockConsumer = { stop: vi.fn().mockResolvedValue(undefined) }
+      const mockLogger = {
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        debug: vi.fn(),
+      } as any
+      context.logger = mockLogger
+
+      context.queueModule = {
+        initialize: vi.fn().mockResolvedValue(undefined),
+        getPublisher: vi.fn().mockReturnValue({ publish: vi.fn() }),
+        startRabbitMQConsumer: vi.fn().mockRejectedValue(new Error("Consumer failed")),
+        getRabbitMQConsumer: vi.fn().mockReturnValue(mockConsumer),
+      } as any
+
+      context.ingressService = {
+        ...context.ingressService,
+        setPublisher: vi.fn(),
+      } as any
+
+      context.moduleRegistry = {} as any
+      context.metrics = {} as any
+      context.repositories = { playerRepository: {} } as any
+      context.rconService = {} as any
+      context.commandResolverService = {} as any
+
+      // Pre-set the consumer to simulate partial initialization
+      context.rabbitmqConsumer = mockConsumer as any
+
+      await initializeQueueInfrastructure(context)
+
+      expect(mockConsumer.stop).toHaveBeenCalled()
+      expect(context.rabbitmqConsumer).toBeUndefined()
+      expect(context.queueModule).toBeUndefined()
+    })
+
+    it("should handle consumer stop failure during cleanup", async () => {
+      const context = createAppContext()
+      const mockConsumer = { stop: vi.fn().mockRejectedValue(new Error("Stop failed")) }
+      const mockLogger = {
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        debug: vi.fn(),
+      } as any
+      context.logger = mockLogger
+
+      context.queueModule = {
+        initialize: vi.fn().mockRejectedValue(new Error("Init failed")),
+      } as any
+
+      context.rabbitmqConsumer = mockConsumer as any
+
+      await initializeQueueInfrastructure(context)
+
+      expect(mockConsumer.stop).toHaveBeenCalled()
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to stop RabbitMQ consumer during cleanup"),
+      )
+      expect(context.rabbitmqConsumer).toBeUndefined()
     })
   })
 

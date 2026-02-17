@@ -25,13 +25,19 @@ declare global {
 }
 
 let prisma: BasePrismaClient
-if (process.env.NODE_ENV === "production") {
-  prisma = new PrismaClient({ adapter: createAdapter() })
-} else {
-  if (!global.cachedPrisma) {
-    global.cachedPrisma = new PrismaClient({ adapter: createAdapter() })
+if (process.env.DATABASE_URL) {
+  if (process.env.NODE_ENV === "production") {
+    prisma = new PrismaClient({ adapter: createAdapter() })
+  } else {
+    if (!global.cachedPrisma) {
+      global.cachedPrisma = new PrismaClient({ adapter: createAdapter() })
+    }
+    prisma = global.cachedPrisma
   }
-  prisma = global.cachedPrisma
+} else {
+  // Allow module to load without DATABASE_URL (e.g. in unit tests that mock this module).
+  // Any actual usage without mocking will throw at call-site.
+  prisma = undefined as unknown as BasePrismaClient
 }
 
 export const db = prisma

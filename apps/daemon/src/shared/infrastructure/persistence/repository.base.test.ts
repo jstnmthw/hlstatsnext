@@ -11,7 +11,7 @@ import {
   type TransactionCallback,
 } from "@/tests/mocks/database"
 import { createMockLogger } from "@/tests/mocks/logger"
-import type { Player } from "@repo/database/client"
+import type { Player } from "@repo/db/client"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { mockDeep as deepMock } from "vitest-mock-extended"
 import { BaseRepository } from "./repository.base"

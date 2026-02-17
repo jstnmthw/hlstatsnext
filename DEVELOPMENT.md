@@ -28,7 +28,7 @@ pnpm install
 
 # 3. Copy environment files
 cp env.example .env
-cp packages/database/env.example packages/database/.env
+cp packages/db/env.example packages/db/.env
 cp packages/crypto/env.example packages/crypto/.env
 cp apps/daemon/env.example apps/daemon/.env
 cp apps/api/env.example apps/api/.env
@@ -50,7 +50,7 @@ pnpm db:push
 pnpm db:seed
 
 # 7. (Optional) Setup GeoIP data - requires MaxMind account
-# Edit packages/database/.env with your MaxMind credentials first
+# Edit packages/db/.env with your MaxMind credentials first
 pnpm db:seed:geo
 
 # 8. Start development servers
@@ -116,7 +116,7 @@ cd apps/daemon && pnpm dev
 
 ## Database Workflow
 
-After modifying the schema at `packages/database/prisma/schema.prisma`:
+After modifying the schema at `packages/db/prisma/schema.prisma`:
 
 ```bash
 # Regenerate Prisma client

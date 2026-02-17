@@ -26,7 +26,7 @@ Our system is organized around business domains:
 
 ```typescript
 // ✅ GOOD: Clear domain boundaries
-// packages/database/src/domains/player/player.service.ts
+// packages/db/src/domains/player/player.service.ts
 export class PlayerService {
   async calculateSkillRating(playerId: number): Promise<SkillRating> {
     // Domain logic encapsulated
@@ -122,7 +122,7 @@ class PlayerService {
 
 # Example: Adding player statistics calculation
 # ✅ GOOD: Shared logic in database package
-packages/database/src/utils/player-stats.ts
+packages/db/src/utils/player-stats.ts
 
 # ✅ GOOD: App-specific UI logic in web app
 apps/web/src/components/player-stats-chart.tsx
@@ -153,10 +153,10 @@ pnpm --filter @repo/daemon add lodash
 pnpm --filter @repo/web add @types/react
 
 # Add shared package dependency
-pnpm --filter @repo/daemon add @repo/database
+pnpm --filter @repo/daemon add @repo/db
 
 # Generate types (typically in database package)
-pnpm --filter @repo/database db:generate
+pnpm --filter @repo/db db:generate
 ```
 
 **Type-Safe Package Development**:
@@ -390,7 +390,7 @@ hlstatsnext/
 **Shared Database Types with Auto-Generation**:
 
 ```typescript
-// packages/database/src/index.ts
+// packages/db/src/index.ts
 export * from "@prisma/client"
 export { prisma } from "./client"
 
@@ -415,7 +415,7 @@ export type GameEventWithRelations = GameEvent & {
   server: Server
 }
 
-// packages/database/src/types/extensions.ts
+// packages/db/src/types/extensions.ts
 import type { Player, PlayerStats, Prisma } from "@prisma/client"
 
 // Utility types for database operations
@@ -442,14 +442,14 @@ export type PlayerStatsAggregation = {
 
 ```typescript
 // In apps/daemon/src/services/player.service.ts
-import type { Player, PlayerStats, PlayerCreateInput, PlayerWithStats } from "@repo/database"
+import type { Player, PlayerStats, PlayerCreateInput, PlayerWithStats } from "@repo/db"
 
 // In apps/web/src/components/player-card.tsx
-import type { Player, PlayerSummary } from "@repo/database"
+import type { Player, PlayerSummary } from "@repo/db"
 import type { ComponentProps } from "@repo/ui"
 
 // In apps/api/src/resolvers/player.resolver.ts
-import type { Player, PlayerWhereInput, PlayerStatsAggregation } from "@repo/database"
+import type { Player, PlayerWhereInput, PlayerStatsAggregation } from "@repo/db"
 ```
 
 **Interface vs Type - When to Use Each**:
@@ -739,7 +739,7 @@ export type Player = z.infer<typeof PlayerSchema>
 
 ```typescript
 // ✅ GOOD: Shared package exports
-// packages/database/src/index.ts
+// packages/db/src/index.ts
 export { prisma } from "./client"
 export * from "@prisma/client"
 
@@ -762,8 +762,8 @@ export type * from "./types"
 
 // ✅ App-level import organization with monorepo packages
 // apps/daemon/src/services/player.service.ts
-import type { Player, PlayerCreateInput, PlayerWhereInput } from "@repo/database"
-import { prisma, createPlayer } from "@repo/database"
+import type { Player, PlayerCreateInput, PlayerWhereInput } from "@repo/db"
+import { prisma, createPlayer } from "@repo/db"
 import { GAME_CONSTANTS } from "@repo/config"
 
 // Local app types
@@ -772,7 +772,7 @@ import { EventProcessor } from "@/services/event-processor"
 
 // ✅ Web app imports
 // apps/web/src/components/player-leaderboard.tsx
-import type { Player, PlayerSummary } from "@repo/database"
+import type { Player, PlayerSummary } from "@repo/db"
 import { Button, Card } from "@repo/ui"
 import { API_ENDPOINTS } from "@repo/config"
 
@@ -780,7 +780,7 @@ import { API_ENDPOINTS } from "@repo/config"
 import type { LeaderboardProps } from "@/types/ui"
 
 // ❌ BAD: Mixing package boundaries
-import { prisma } from "@repo/database"
+import { prisma } from "@repo/db"
 import { PlayerService } from "@/services/player" // Should be in shared package if used by multiple apps
 ```
 
@@ -796,7 +796,7 @@ import { PlayerService } from "@/services/player" // Should be in shared package
     }
   },
   "references": [
-    { "path": "./packages/database" },
+    { "path": "./packages/db" },
     { "path": "./packages/ui" },
     { "path": "./packages/config" },
     { "path": "./apps/daemon" },
@@ -805,7 +805,7 @@ import { PlayerService } from "@/services/player" // Should be in shared package
   ]
 }
 
-// packages/database/tsconfig.json
+// packages/db/tsconfig.json
 {
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
@@ -828,7 +828,7 @@ import { PlayerService } from "@/services/player" // Should be in shared package
     }
   },
   "references": [
-    { "path": "../../packages/database" },
+    { "path": "../../packages/db" },
     { "path": "../../packages/config" }
   ],
   "include": ["src/**/*"],
@@ -839,9 +839,9 @@ import { PlayerService } from "@/services/player" // Should be in shared package
 **Package Dependency Management**:
 
 ```json
-// packages/database/package.json
+// packages/db/package.json
 {
-  "name": "@repo/database",
+  "name": "@repo/db",
   "dependencies": {
     "@prisma/client": "^6.16.2",
     "prisma": "^6.16.2"
@@ -855,7 +855,7 @@ import { PlayerService } from "@/services/player" // Should be in shared package
 {
   "name": "@repo/daemon",
   "dependencies": {
-    "@repo/database": "workspace:*",
+    "@repo/db": "workspace:*",
     "@repo/config": "workspace:*"
   },
   "devDependencies": {
@@ -868,7 +868,7 @@ import { PlayerService } from "@/services/player" // Should be in shared package
 {
   "name": "@repo/web",
   "dependencies": {
-    "@repo/database": "workspace:*",
+    "@repo/db": "workspace:*",
     "@repo/ui": "workspace:*",
     "@repo/config": "workspace:*",
     "next": "latest"
@@ -879,14 +879,14 @@ import { PlayerService } from "@/services/player" // Should be in shared package
 **Prisma Auto-Generated Types Integration**:
 
 ```typescript
-// packages/database/src/client.ts
+// packages/db/src/client.ts
 import { PrismaClient } from "@prisma/client"
 
 export const prisma = new PrismaClient({
   log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
 })
 
-// packages/database/src/types/computed.ts
+// packages/db/src/types/computed.ts
 import type { Player, PlayerStats, Prisma } from "@prisma/client"
 
 // Leverage Prisma's auto-generated validator types

@@ -5,7 +5,7 @@
 import type { DatabaseClient } from "@/database/client"
 import { createMockDatabaseClient, type MockDatabaseClient } from "@/tests/mocks/database"
 import { createMockLogger } from "@/tests/mocks/logger"
-import type { EventConnect, Player } from "@repo/database/client"
+import type { EventConnect, Player } from "@repo/db/client"
 import { beforeEach, describe, expect, it } from "vitest"
 import { PlayerRepository } from "./player.repository"
 

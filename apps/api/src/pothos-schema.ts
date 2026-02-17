@@ -1,4 +1,4 @@
-import { generateAllCrud } from "@repo/database/graphql/crud"
+import { generateAllCrud } from "@repo/db/graphql/crud"
 import { builder } from "./builder"
 
 // Import custom resolvers

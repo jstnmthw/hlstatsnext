@@ -1,6 +1,6 @@
 ### Legacy HLstatsX data flow mapped to Prisma models
 
-This document maps how legacy HLstatsX (Perl) populated and updated each table corresponding to our Prisma models in `packages/database/prisma/schema.prisma`. It focuses on where data comes from (logs, cron jobs, maintenance scripts), when inserts/updates occur, and notable constraints/derivations. Legacy table names are shown with the `hlstats_` prefix used by HLstatsX.
+This document maps how legacy HLstatsX (Perl) populated and updated each table corresponding to our Prisma models in `packages/db/prisma/schema.prisma`. It focuses on where data comes from (logs, cron jobs, maintenance scripts), when inserts/updates occur, and notable constraints/derivations. Legacy table names are shown with the `hlstats_` prefix used by HLstatsX.
 
 Notes
 

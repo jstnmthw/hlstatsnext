@@ -14,7 +14,7 @@ import {
 } from "@/shared/infrastructure/data/batch-repository"
 import type { CreateOptions, FindOptions, UpdateOptions } from "@/shared/types/database"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { Player, Prisma } from "@repo/database/client"
+import type { Player, Prisma } from "@repo/db/client"
 import type {
   IPlayerRepository,
   PlayerCreateData,

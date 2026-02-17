@@ -10,7 +10,7 @@ import path from "node:path"
 // Get the path to the root .gitignore file
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-const gitignorePath = path.resolve(__dirname, "../../.gitignore")
+const gitignorePath = path.resolve(__dirname, "../../../.gitignore")
 
 /**
  * A shared ESLint configuration for the repository.

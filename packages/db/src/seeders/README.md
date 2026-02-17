@@ -9,7 +9,7 @@ This directory contains database seeders for the HLStatsNext application. The se
 npm run db:seed
 
 # Run specific seeder
-npx tsx packages/database/src/seeds/clans.ts
+npx tsx packages/db/src/seeds/clans.ts
 ```
 
 ## 📁 **Files Overview**

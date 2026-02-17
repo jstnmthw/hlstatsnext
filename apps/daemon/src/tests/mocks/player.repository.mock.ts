@@ -3,7 +3,7 @@
  */
 
 import type { IPlayerRepository } from "@/modules/player/types/player.types"
-import type { Player } from "@repo/database/client"
+import type { Player } from "@repo/db/client"
 import { vi } from "vitest"
 
 export function createMockPlayerRepository(): IPlayerRepository {

@@ -4,7 +4,7 @@
  * Seeds game-specific configuration defaults within a transaction.
  */
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { Prisma } from "@repo/database/client"
+import type { Prisma } from "@repo/db/client"
 
 /**
  * Seeds game-specific configuration defaults within a transaction

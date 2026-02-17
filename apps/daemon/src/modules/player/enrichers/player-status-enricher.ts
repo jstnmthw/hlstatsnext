@@ -11,7 +11,7 @@ import type { PlayerInfo } from "@/modules/rcon/types/rcon.types"
 import type { IServerService } from "@/modules/server/server.types"
 import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builder"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { Player } from "@repo/database/client"
+import type { Player } from "@repo/db/client"
 
 export interface IPlayerStatusEnricher {
   /**

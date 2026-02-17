@@ -28,7 +28,7 @@ Specifically:
 ## Measurement Methodology (DevTools)
 
 - **Next.js MCP**: Server discovered on port 3001 (0 tools exposed -- MCP endpoint not fully active)
-- **Static analysis**: Codebase exploration of `apps/daemon`, `apps/api`, `apps/web`, `packages/database`, `packages/crypto`
+- **Static analysis**: Codebase exploration of `apps/daemon`, `apps/api`, `apps/web`, `packages/db`, `packages/crypto`
 - **Runtime diagnostics**: Not measured (dev server MCP tools unavailable)
 
 ## Baseline Results

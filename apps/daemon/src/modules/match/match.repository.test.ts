@@ -7,7 +7,7 @@ import type { DatabaseClient } from "@/database/client"
 import { createMockDatabaseClient, type MockDatabaseClient } from "@/tests/mocks/database"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockServerRecord } from "@/tests/mocks/server"
-import type { Player, PlayerHistory } from "@repo/database/client"
+import type { Player, PlayerHistory } from "@repo/db/client"
 import { beforeEach, describe, expect, it } from "vitest"
 import { MatchRepository } from "./match.repository"
 

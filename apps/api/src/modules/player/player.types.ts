@@ -1,4 +1,4 @@
-import type { Prisma } from "@repo/database/client"
+import type { Prisma } from "@repo/db/client"
 
 export interface GetPlayersFilters {
   serverId?: number

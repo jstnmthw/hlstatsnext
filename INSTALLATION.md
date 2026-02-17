@@ -146,7 +146,7 @@ GRAFANA_ADMIN_USER=admin
 GRAFANA_ADMIN_PASSWORD=admin
 ```
 
-### Database Package (`packages/database/.env`)
+### Database Package (`packages/db/.env`)
 
 Prisma database connection and MaxMind credentials.
 
@@ -404,7 +404,7 @@ GeoIP data enables player location features (country flags, maps, etc.).
 
 ### 2. Configure Credentials
 
-Edit `packages/database/.env`:
+Edit `packages/db/.env`:
 
 ```bash
 MAXMIND_ACCOUNT_ID=123456
@@ -424,7 +424,7 @@ pnpm db:geo:update force
 The seeding process will:
 
 1. Download GeoLite2-City-CSV from MaxMind
-2. Cache the archive in `packages/database/data/geoip/`
+2. Cache the archive in `packages/db/data/geoip/`
 3. Extract and parse CSV files
 4. Populate `geo_lite_city_location` and `geo_lite_city_block` tables
 5. Convert CIDR ranges to IP number ranges for efficient lookups
@@ -581,7 +581,7 @@ docker logs hlstatsnext-garnet
 
 ### GeoIP Seeding Fails
 
-1. Verify MaxMind credentials in `packages/database/.env`
+1. Verify MaxMind credentials in `packages/db/.env`
 2. Check network connectivity to MaxMind servers
 3. Ensure sufficient disk space for CSV extraction
 4. Try forcing a fresh download: `pnpm db:geo:update force`

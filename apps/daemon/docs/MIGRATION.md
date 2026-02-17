@@ -490,7 +490,7 @@ The daemon has a solid foundation with complete player lifecycle tracking. The n
   - Quality gates: Type-check, lint green; fixed tests remain green after updating code.
 
 - 2025-08-12
-  - GeoIP seeding: Updated `packages/database/src/scripts/seed-geoip.ts` to use MaxMind download permalinks with Basic Auth (Account ID + License Key). Switched CSV download format to `.zip` and added system `unzip`-based extraction with fallback helper. Env example updated to include `MAXMIND_ACCOUNT_ID` and `MAXMIND_LICENSE_KEY`. This resolves 404s from deprecated unauthenticated URLs and aligns with MaxMind's current documentation.
+  - GeoIP seeding: Updated `packages/db/src/scripts/seed-geoip.ts` to use MaxMind download permalinks with Basic Auth (Account ID + License Key). Switched CSV download format to `.zip` and added system `unzip`-based extraction with fallback helper. Env example updated to include `MAXMIND_ACCOUNT_ID` and `MAXMIND_LICENSE_KEY`. This resolves 404s from deprecated unauthenticated URLs and aligns with MaxMind's current documentation.
 
 - 2025-01-XX - **UI Package JIT Restructuring: Adopted TurboRepo JIT pattern for @repo/ui**
   - **Problem**: `@repo/ui` package was using pre-compilation pattern with individual component exports, which was tedious to maintain and inconsistent with monorepo's JIT pattern

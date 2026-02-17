@@ -2,7 +2,7 @@
 
 **Status:** Approved
 **Date:** 2026-02-15
-**Scope:** `apps/daemon`, `apps/web`, `apps/api`, `packages/database`, `packages/crypto`, `packages/plugins`
+**Scope:** `apps/daemon`, `apps/web`, `apps/api`, `packages/db`, `packages/crypto`, `packages/plugins`
 **Supersedes:** `review-20260214-0930-token-based-auth-refactor.md`, `review-20260215-1030-token-auth-rcon-dependency.md`
 
 ---
@@ -803,7 +803,7 @@ packages/crypto/src/
   token.ts                                    # NEW: generateToken, hashToken, isValidTokenFormat
   token.test.ts                               # NEW
 
-packages/database/prisma/
+packages/db/prisma/
   schema.prisma                               # MODIFIED: add ServerToken, Server.tokenId, drop connectionType/dockerHost
   migrations/XXXXXXXX_add_server_tokens/
     migration.sql                             # NEW

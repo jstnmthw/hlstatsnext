@@ -1,4 +1,4 @@
-import { db } from "@repo/database/client"
+import { db } from "@repo/db/client"
 import type { CreateServerInput, ServerConfigCopyResult, UpdateServerInput } from "./server.types"
 
 export class ServerRepository {

@@ -33,9 +33,9 @@ pnpm test         # Run unit/integration tests
 The API schema is defined using Pothos, with types and CRUD resolvers auto-generated from your Prisma schema. To keep everything in sync:
 
 ```bash
-# 1. Update your Prisma schema (packages/database/prisma/schema.prisma)
+# 1. Update your Prisma schema (packages/db/prisma/schema.prisma)
 # 2. Generate Prisma client/types:
-pnpm --filter @repo/database db:generate
+pnpm --filter @repo/db db:generate
 
 # 3. Generate Pothos GraphQL types and schema artifacts:
 pnpm codegen

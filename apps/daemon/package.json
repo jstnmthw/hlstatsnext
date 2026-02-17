@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@repo/crypto": "workspace:*",
-    "@repo/database": "workspace:*",
+    "@repo/db": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/amqplib": "^0.10.8",

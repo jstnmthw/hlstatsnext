@@ -2,9 +2,9 @@
 
 ## Scope
 
-Review of the `packages/database` package architecture, specifically the interaction between:
+Review of the `packages/db` package architecture, specifically the interaction between:
 
-- Custom `ConnectionPool` class (`packages/database/src/connection-pool.ts`)
+- Custom `ConnectionPool` class (`packages/db/src/connection-pool.ts`)
 - `@prisma/adapter-mariadb` v7.4.0 built-in connection pooling
 - Prisma v7 client instantiation patterns
 - Multi-service consumption (web, api, daemon)
@@ -55,7 +55,7 @@ Review of the `packages/database` package architecture, specifically the interac
 
 **Evidence:**
 
-`packages/database/src/connection-pool.ts:285-291`:
+`packages/db/src/connection-pool.ts:285-291`:
 
 ```typescript
 private async createConnection(): Promise<PooledConnection> {
@@ -135,7 +135,7 @@ No file in `apps/daemon/src/` ever calls `getPooledConnection()`.
 
 **Evidence:**
 
-`packages/database/src/client.ts:7-9`:
+`packages/db/src/client.ts:7-9`:
 
 ```typescript
 export function createAdapter(): PrismaMariaDb {
@@ -177,7 +177,7 @@ The `connectTimeout` of 1 second is notably aggressive and could cause connectio
 
 **Evidence:**
 
-`packages/database/src/client.ts:8`:
+`packages/db/src/client.ts:8`:
 
 ```typescript
 return new PrismaMariaDb(process.env.DATABASE_URL!)
@@ -206,7 +206,7 @@ if (!url) throw new Error("DATABASE_URL environment variable is required")
 
 **Evidence:**
 
-`packages/database/src/client.ts:33-179`: The entire `DatabaseClient` class provides:
+`packages/db/src/client.ts:33-179`: The entire `DatabaseClient` class provides:
 
 - `getPooledConnection()` — harmful, unused
 - `releasePooledConnection()` — harmful, unused
@@ -263,12 +263,12 @@ With the adapter accepting `mariadb.PoolConfig`, each service could tune:
 
 ### P1: Quick Wins (Fixes the Pool Timeout Crisis) — **Done**
 
-- [x] **P1-1:** Delete `packages/database/src/connection-pool.ts` entirely
+- [x] **P1-1:** Delete `packages/db/src/connection-pool.ts` entirely
   - Finding: F-001, F-002, F-005
   - Docs: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections/connection-pool
   - _Done: File deleted. Eliminates pool-of-pools anti-pattern._
 
-- [x] **P1-2:** Remove `DatabaseClient` class from `packages/database/src/client.ts`
+- [x] **P1-2:** Remove `DatabaseClient` class from `packages/db/src/client.ts`
   - Finding: F-005
   - Docs: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections
   - _Done: Removed class, all ConnectionPool imports/exports. Package now exports only `db` singleton, `createAdapter()`, `testConnection()`, and Prisma types._
@@ -285,13 +285,13 @@ With the adapter accepting `mariadb.PoolConfig`, each service could tune:
   - Finding: F-002
   - _Done: Removed `DatabaseLogger` import and entire `database.configureConnectionPool(...)` block. Metrics extension setup preserved._
 
-- [x] **P1-6:** Remove `ConnectionPool` imports/exports from `packages/database/src/client.ts`
+- [x] **P1-6:** Remove `ConnectionPool` imports/exports from `packages/db/src/client.ts`
   - Finding: F-001
   - _Done: Completed as part of P1-2._
 
 - [x] **P1-7:** Update `apps/daemon/src/database/client.ts` to remove pool-related code
   - Finding: F-002
-  - _Done: Simplified to use `db` singleton directly from `@repo/database/client`. Kept `DatabaseClient` wrapper in daemon for metrics extension pattern (`setExtendedClient`/`prisma` getter)._
+  - _Done: Simplified to use `db` singleton directly from `@repo/db/client`. Kept `DatabaseClient` wrapper in daemon for metrics extension pattern (`setExtendedClient`/`prisma` getter)._
 
 - [x] **P1-8:** Clean up daemon `database/client.test.ts` pool-related tests
   - Finding: F-002

@@ -9,7 +9,7 @@ import type { DatabaseClient } from "@/database/client"
 import { BaseRepository } from "@/shared/infrastructure/persistence/repository.base"
 import type { CreateOptions, FindOptions, UpdateOptions } from "@/shared/types/database"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { Prisma } from "@repo/database/client"
+import type { Prisma } from "@repo/db/client"
 import type { IMatchRepository, PlayerHistoryData, ServerRecord } from "./match.types"
 
 export class MatchRepository extends BaseRepository<ServerRecord> implements IMatchRepository {

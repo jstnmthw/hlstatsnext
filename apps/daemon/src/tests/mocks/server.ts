@@ -1,4 +1,4 @@
-import type { Server } from "@repo/database/client"
+import type { Server } from "@repo/db/client"
 
 // Helper to create a complete server record for mocking
 export function createMockServerRecord(overrides: Partial<Server> = {}): Server {

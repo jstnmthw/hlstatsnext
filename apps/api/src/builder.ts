@@ -2,9 +2,9 @@ import SchemaBuilder from "@pothos/core"
 import PrismaPlugin from "@pothos/plugin-prisma"
 import RelayPlugin from "@pothos/plugin-relay"
 import WithInputPlugin from "@pothos/plugin-with-input"
-import { db, Prisma } from "@repo/database/client"
-import type PrismaTypes from "@repo/database/graphql/types"
-import { getDatamodel } from "@repo/database/graphql/types"
+import { db, Prisma } from "@repo/db/client"
+import type PrismaTypes from "@repo/db/graphql/types"
+import { getDatamodel } from "@repo/db/graphql/types"
 import type { Context } from "./context"
 
 export const builder = new SchemaBuilder<{

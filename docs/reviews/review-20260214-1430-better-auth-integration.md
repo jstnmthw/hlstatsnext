@@ -368,11 +368,11 @@ export async function createServer(prevState: unknown, formData: FormData) {
 
 ### F-009: No Admin Seeder with Permissions
 
-**Summary**: The existing seed system (`packages/database/src/seed.ts`) seeds games, servers, players, etc. but does not create any auth users, admin accounts, or permission records. There is no way for a fresh install to have an initial admin user.
+**Summary**: The existing seed system (`packages/db/src/seed.ts`) seeds games, servers, players, etc. but does not create any auth users, admin accounts, or permission records. There is no way for a fresh install to have an initial admin user.
 
 **Evidence**:
 
-- `packages/database/src/seed.ts` calls seeders for Games, Servers, Players, etc.
+- `packages/db/src/seed.ts` calls seeders for Games, Servers, Players, etc.
 - No user/auth seeder exists
 - No mention of admin account creation in any seed file
 
@@ -385,7 +385,7 @@ export async function createServer(prevState: unknown, formData: FormData) {
 5. Seeds default permission definitions
 
 ```typescript
-// packages/database/src/seeders/auth.ts
+// packages/db/src/seeders/auth.ts
 import { randomBytes } from "crypto"
 
 export async function seedDefaultAdmin(auth: typeof import("@/lib/auth").auth) {
@@ -439,7 +439,7 @@ export async function seedDefaultAdmin(auth: typeof import("@/lib/auth").auth) {
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { admin } from "better-auth/plugins"
-import { prisma } from "@repo/database"
+import { prisma } from "@repo/db"
 import { ac, adminRole, userRole } from "./auth-permissions"
 
 export const auth = betterAuth({
@@ -551,7 +551,7 @@ GOOGLE_CLIENT_SECRET=
   - Better Auth admin docs: [https://www.better-auth.com/docs/plugins/admin#custom-permissions](https://www.better-auth.com/docs/plugins/admin#custom-permissions)
 
 - [x] **P1-2**: Create Better Auth server config (F-010)
-  - Updated `apps/web/src/lib/auth.ts` with full config: Prisma adapter (`db` from `@repo/database/client`), email/password, Google OAuth, admin plugin with RBAC, session cookie cache (5min)
+  - Updated `apps/web/src/lib/auth.ts` with full config: Prisma adapter (`db` from `@repo/db/client`), email/password, Google OAuth, admin plugin with RBAC, session cookie cache (5min)
   - Better Auth Next.js docs: [https://www.better-auth.com/docs/integrations/next](https://www.better-auth.com/docs/integrations/next)
 
 - [x] **P1-3**: Create Better Auth client config (F-010)
@@ -706,7 +706,7 @@ All original open questions have been resolved:
 
 1. **Legacy `users` table**: **RESOLVED** — No backward compatibility needed (early dev). Remove existing `User` model entirely and refactor to Better Auth schema. Daemon will be updated to use the new `user`/`account` tables.
 
-2. **Prisma client sharing**: **RESOLVED** — Use the shared `@repo/database` exported client. Better Auth's `auth.ts` will `import { prisma } from "@repo/database"`.
+2. **Prisma client sharing**: **RESOLVED** — Use the shared `@repo/db` exported client. Better Auth's `auth.ts` will `import { prisma } from "@repo/db"`.
 
 3. **Google OAuth redirect URI**: **RESOLVED** — Document `http://localhost:3000/api/auth/callback/google` (dev) and production domain in `INSTALLATION.md`.
 

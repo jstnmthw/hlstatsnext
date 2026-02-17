@@ -106,7 +106,7 @@ Impacted references:
 
 ## References
 
-- `packages/database/src/seeders/default/Actions.sql`
+- `packages/db/src/seeders/default/Actions.sql`
 - `apps/daemon/src/modules/ingress/parsers/cs.parser.ts`
 - `apps/daemon/src/modules/action/action.service.ts`
 - `apps/daemon/src/modules/match/match.service.ts`

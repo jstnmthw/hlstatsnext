@@ -47,7 +47,7 @@ generated/
 ref/
 
 # GeoIP cache data
-packages/database/data/
+packages/db/data/
 
 # Servers
 /servers/

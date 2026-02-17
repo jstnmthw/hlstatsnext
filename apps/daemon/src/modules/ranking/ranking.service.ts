@@ -14,7 +14,7 @@ import {
   type SkillRatingInput,
 } from "@/shared/application/utils/skill-calculator"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { Weapon } from "@repo/database/client"
+import type { Weapon } from "@repo/db/client"
 import type { IWeaponRepository } from "../weapon/weapon.types"
 import type { IRankingService, SkillRating } from "./ranking.types"
 

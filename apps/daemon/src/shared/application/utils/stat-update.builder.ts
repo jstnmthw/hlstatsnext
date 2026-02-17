@@ -11,7 +11,7 @@ import {
   sanitizePlayerStatsUpdate,
   validatePlayerStatsUpdate,
 } from "@/shared/application/validators/player-stats.validator"
-import type { Player } from "@repo/database/client"
+import type { Player } from "@repo/db/client"
 
 /**
  * Builder class for constructing player statistics updates

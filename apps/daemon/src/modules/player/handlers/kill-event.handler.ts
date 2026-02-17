@@ -22,7 +22,7 @@ import type { HandlerResult } from "@/shared/types/common"
 import type { DualPlayerMeta } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { Player } from "@repo/database/client"
+import type { Player } from "@repo/db/client"
 import { BasePlayerEventHandler } from "./base-player-event.handler"
 
 export class KillEventHandler extends BasePlayerEventHandler {

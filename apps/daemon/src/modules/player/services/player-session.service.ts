@@ -10,7 +10,7 @@ import type { IRconService, PlayerInfo } from "@/modules/rcon/types/rcon.types"
 import type { IServerService } from "@/modules/server/server.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import { sanitizePlayerName } from "@/shared/utils/validation"
-import type { Player } from "@repo/database/client"
+import type { Player } from "@repo/db/client"
 import type {
   CreatePlayerSessionData,
   IPlayerSessionRepository,

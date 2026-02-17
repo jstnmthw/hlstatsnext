@@ -7,7 +7,7 @@
  */
 
 import type { ICryptoService } from "@repo/crypto"
-import type { User } from "@repo/database/client"
+import type { User } from "@repo/db/client"
 import { AuthRepository } from "./auth.repository"
 
 export class AuthService {

@@ -7,7 +7,7 @@
  * This follows the recommended Prisma pattern for type-safe extensions.
  */
 
-import type { PrismaClient } from "@repo/database/client"
+import type { PrismaClient } from "@repo/db/client"
 import type { PrometheusMetricsExporter } from "../prometheus/prometheus-metrics-exporter"
 import type { ILogger, PrismaQueryInfo } from "../types"
 

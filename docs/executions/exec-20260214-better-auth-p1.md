@@ -27,7 +27,7 @@
 **Files**: `apps/web/src/lib/auth.ts` (updated)
 **Changes**:
 
-- Prisma adapter using `db` from `@repo/database/client` with `provider: "mysql"`
+- Prisma adapter using `db` from `@repo/db/client` with `provider: "mysql"`
 - Email/password authentication enabled
 - Google OAuth social provider (env vars for clientId/clientSecret)
 - Session cookie cache enabled (5 minute maxAge)
@@ -75,7 +75,7 @@
 
 - `pnpm --filter web run check-types` — 0 errors
 - `pnpm --filter api run check-types` — 0 errors
-- `pnpm --filter @repo/database run check-types` — 0 errors
+- `pnpm --filter @repo/db run check-types` — 0 errors
 
 ## Summary
 

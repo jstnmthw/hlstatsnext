@@ -7,7 +7,7 @@ import type { DatabaseClient } from "@/database/client"
 import type { IServerInfoProvider } from "@/modules/ingress/ingress.dependencies"
 import type { IServerService } from "@/modules/server/server.types"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { Prisma } from "@repo/database/client"
+import type { Prisma } from "@repo/db/client"
 
 import { validateAddress } from "@/shared/application/validators/address-validator"
 import { validateGameCode } from "@/shared/application/validators/game-code-validator"

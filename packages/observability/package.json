@@ -19,7 +19,7 @@
     "./types": "./src/types.ts"
   },
   "dependencies": {
-    "@repo/database": "workspace:*"
+    "@repo/db": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

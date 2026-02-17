@@ -1,4 +1,4 @@
-# @repo/database
+# @repo/db
 
 Database package for HLStatsNext - provides Prisma client, types, and GraphQL integrations for game statistics tracking.
 
@@ -61,7 +61,7 @@ pnpm db:migrate deploy
 ### Basic Database Operations
 
 ```typescript
-import { db } from "@repo/database/client"
+import { db } from "@repo/db/client"
 
 // Find players by game
 const tfPlayers = await db.player.findMany({
@@ -161,7 +161,7 @@ await db.player.update({
 ### Advanced Queries with Transactions
 
 ```typescript
-import { databaseClient } from "@repo/database/client"
+import { databaseClient } from "@repo/db/client"
 
 // Complex operations with transaction safety
 const result = await databaseClient.transaction(async (tx) => {
@@ -216,7 +216,7 @@ Understanding the correct order of operations is crucial for development:
 ### Directory Structure
 
 ```
-packages/database/
+packages/db/
 ├── src/                    # Source TypeScript files
 │   ├── index.ts           # Main entry point - exports `db` client
 │   ├── seed.ts            # Database seeding scripts
@@ -270,9 +270,9 @@ pnpm build
 2. **Other packages import from `dist/`**:
    ```typescript
    // apps/daemon/src/database/client.ts
-   import { db, type PrismaClient } from "@repo/database/client"
+   import { db, type PrismaClient } from "@repo/db/client"
    ```
-   This resolves to `packages/database/dist/index.js` via package.json exports.
+   This resolves to `packages/db/dist/index.js` via package.json exports.
 
 ### **Common Issues**
 

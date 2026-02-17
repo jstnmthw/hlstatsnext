@@ -77,7 +77,7 @@ Files:
 
 ### 7. Removed unnecessary Prisma type imports
 
-Removed `Server` import from `@repo/database/client` in `server-list.tsx` and `Player`/`User` imports from column files, since codegen types now provide proper typing.
+Removed `Server` import from `@repo/db/client` in `server-list.tsx` and `Player`/`User` imports from column files, since codegen types now provide proper typing.
 
 Files:
 

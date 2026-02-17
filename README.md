@@ -26,7 +26,7 @@ pnpm install
 
 # Copy environment files (minimum required)
 cp env.example .env
-cp packages/database/env.example packages/database/.env
+cp packages/db/env.example packages/db/.env
 cp apps/daemon/env.example apps/daemon/.env
 cp apps/api/env.example apps/api/.env
 cp apps/web/env.example apps/web/.env
@@ -103,14 +103,14 @@ make daemon-logs  make daemon-shell make daemon-restart
 
 The project uses multiple `.env` files for different components:
 
-| File                     | Purpose                                        |
-| ------------------------ | ---------------------------------------------- |
-| `.env`                   | Docker Compose (database, cache, queues)       |
-| `packages/database/.env` | Prisma connection, MaxMind credentials         |
-| `packages/crypto/.env`   | Shared encryption key                          |
-| `apps/daemon/.env`       | Daemon config (RCON, RabbitMQ, cache, logging) |
-| `apps/api/.env`          | API server (port, CORS)                        |
-| `apps/web/.env`          | Frontend (GraphQL endpoint)                    |
+| File                   | Purpose                                        |
+| ---------------------- | ---------------------------------------------- |
+| `.env`                 | Docker Compose (database, cache, queues)       |
+| `packages/db/.env`     | Prisma connection, MaxMind credentials         |
+| `packages/crypto/.env` | Shared encryption key                          |
+| `apps/daemon/.env`     | Daemon config (RCON, RabbitMQ, cache, logging) |
+| `apps/api/.env`        | API server (port, CORS)                        |
+| `apps/web/.env`        | Frontend (GraphQL endpoint)                    |
 
 See **[INSTALLATION.md](./INSTALLATION.md)** for complete configuration details and **[DEVELOPMENT.md](./DEVELOPMENT.md)** for dev workflows.
 

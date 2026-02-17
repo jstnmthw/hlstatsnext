@@ -1,11 +1,11 @@
 /**
  * Database Client for HLStats Daemon
  *
- * Wraps the shared singleton PrismaClient from @repo/database/client
+ * Wraps the shared singleton PrismaClient from @repo/db/client
  * with optional support for extended clients (e.g., with metrics).
  */
 
-import { db, type PrismaClient } from "@repo/database/client"
+import { db, type PrismaClient } from "@repo/db/client"
 import type { PrismaWithMetrics } from "@repo/observability"
 
 export type TransactionalPrisma = Omit<

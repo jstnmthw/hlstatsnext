@@ -1,4 +1,4 @@
-import { db, Prisma } from "@repo/database/client"
+import { db, Prisma } from "@repo/db/client"
 import type {
   GetServerPlayersFilters,
   PlayerOrderByInput,

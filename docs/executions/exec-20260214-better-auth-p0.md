@@ -9,7 +9,7 @@
 
 ### Database Client Exports
 
-- `@repo/database/client` exports `db` (singleton PrismaClient), `PrismaClient`, `Prisma`, `DatabaseClient`
+- `@repo/db/client` exports `db` (singleton PrismaClient), `PrismaClient`, `Prisma`, `DatabaseClient`
 - The client uses `@prisma/adapter-mariadb` with `DATABASE_URL` env var
 - **Critical**: `apps/web/.env` did NOT have `DATABASE_URL` — added for Better Auth
 
@@ -63,7 +63,7 @@ model User {
 **Status**: Complete
 **Changes**:
 
-### Schema (`packages/database/prisma/schema.prisma`)
+### Schema (`packages/db/prisma/schema.prisma`)
 
 - Removed old `User` model (username PK, password, acclevel, playerId)
 - Removed `user User?` back-reference from `Player` model (line 176)
@@ -90,7 +90,7 @@ model User {
 
 ### Regeneration Pipeline
 
-1. `pnpm --filter @repo/database run db:generate` — Prisma client + Pothos types + Pothos inputs
+1. `pnpm --filter @repo/db run db:generate` — Prisma client + Pothos types + Pothos inputs
 2. `prisma db push` — schema applied to database
 3. Started API server temporarily → `pnpm --filter web run graphql:codegen` → stopped API
 4. All codegen output regenerated successfully
@@ -99,7 +99,7 @@ model User {
 
 - `pnpm --filter web run check-types` — 0 errors
 - `pnpm --filter api run check-types` — 0 errors
-- `pnpm --filter @repo/database run check-types` — 0 errors
+- `pnpm --filter @repo/db run check-types` — 0 errors
 
 ---
 

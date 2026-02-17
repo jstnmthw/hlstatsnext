@@ -1,4 +1,4 @@
-import type { Server } from "@repo/database/client"
+import type { Server } from "@repo/db/client"
 import { builder } from "../../builder"
 import { requireAdmin } from "../../context"
 

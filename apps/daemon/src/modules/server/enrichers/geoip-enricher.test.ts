@@ -9,7 +9,7 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { MockDatabaseClient } from "@/tests/mocks/database"
 import { createMockDatabaseClient } from "@/tests/mocks/database"
 import { createMockLogger } from "@/tests/mocks/logger"
-import { Prisma } from "@repo/database/client"
+import { Prisma } from "@repo/db/client"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { GeoIpEnricher } from "./geoip-enricher"
 

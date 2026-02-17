@@ -6,7 +6,7 @@
 import type { DatabaseClient } from "@/database/client"
 import { INGRESS_CONSTANTS } from "@/modules/ingress/types/ingress.types"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { Prisma } from "@repo/database/client"
+import type { Prisma } from "@repo/db/client"
 import { seedGameDefaults } from "../seeders/seed-game-defaults"
 import { seedModDefaults } from "../seeders/seed-mod-defaults"
 import { seedServerDefaults } from "../seeders/seed-server-defaults"

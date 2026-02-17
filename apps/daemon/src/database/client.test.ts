@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { DatabaseClient, databaseClient, type TransactionalPrisma } from "./client"
 
-// Mock @repo/database/client so `db` is a plain object (no real DB needed).
+// Mock @repo/db/client so `db` is a plain object (no real DB needed).
 // Note: vitest may resolve this to a different module instance than the SUT,
 // so we access the mock through client.prisma rather than importing it here.
-vi.mock("@repo/database/client", () => ({
+vi.mock("@repo/db/client", () => ({
   db: {
     $queryRaw: vi.fn().mockResolvedValue([{ test: 1 }]),
     $transaction: vi.fn(),

@@ -11,7 +11,7 @@ import {
   sanitizePlayerNameStatsUpdate,
   validatePlayerNameStatsUpdate,
 } from "@/shared/application/validators/player-name.validator"
-import type { Prisma } from "@repo/database/client"
+import type { Prisma } from "@repo/db/client"
 
 /**
  * Builder class for constructing player name statistics updates

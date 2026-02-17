@@ -11,7 +11,7 @@ import type { IEventNotificationService } from "@/modules/rcon/services/event-no
 import { EventType } from "@/shared/types/events"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
-import type { Player } from "@repo/database/client"
+import type { Player } from "@repo/db/client"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { KillEventHandler } from "./kill-event.handler"
 

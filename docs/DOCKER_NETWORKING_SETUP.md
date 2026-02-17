@@ -59,7 +59,7 @@ ALTER TABLE servers ADD COLUMN docker_host VARCHAR(255) DEFAULT NULL;
 
 ```bash
 # Run the migration to add new columns
-mysql -u root -p hlstatsnext < packages/database/migrations/001_add_docker_support.sql
+mysql -u root -p hlstatsnext < packages/db/migrations/001_add_docker_support.sql
 ```
 
 ### 2. Configure Docker Servers in Database
@@ -245,6 +245,6 @@ docker exec hlstatsnext-cstrike cat /data/serverfiles/cstrike/server.cfg | grep 
 ## Related Documentation
 
 - [Docker Compose Reference](../docker-compose.yml)
-- [Database Schema](../packages/database/prisma/schema.prisma)
+- [Database Schema](../packages/db/prisma/schema.prisma)
 - [RCON Implementation](../apps/daemon/src/modules/rcon/)
 - [Ingress Authentication](../apps/daemon/src/modules/ingress/adapters/)

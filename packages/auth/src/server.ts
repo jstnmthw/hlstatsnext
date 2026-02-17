@@ -1,4 +1,4 @@
-import { db } from "@repo/database/client"
+import { db } from "@repo/db/client"
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { admin, emailOTP } from "better-auth/plugins"

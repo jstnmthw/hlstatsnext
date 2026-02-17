@@ -13,7 +13,7 @@ import { StatUpdateBuilder } from "@/shared/application/utils/stat-update.builde
 import type { HandlerResult } from "@/shared/types/common"
 import type { ILogger } from "@/shared/utils/logger.types"
 import { normalizeSteamId, sanitizePlayerName, validatePlayerName } from "@/shared/utils/validation"
-import type { Player } from "@repo/database/client"
+import type { Player } from "@repo/db/client"
 import { PlayerEventHandlerFactory } from "../handlers/player-event-handler.factory"
 import type { IPlayerSessionService } from "../types/player-session.types"
 import type {

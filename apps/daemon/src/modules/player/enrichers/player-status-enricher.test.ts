@@ -8,7 +8,7 @@ import { createMockGeoIPService } from "@/tests/mocks/geoip.service.mock"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { createMockPlayerRepository } from "@/tests/mocks/player.repository.mock"
 import { createMockServerService } from "@/tests/mocks/server.service.mock"
-import type { Player } from "@repo/database/client"
+import type { Player } from "@repo/db/client"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { PlayerStatusEnricher } from "./player-status-enricher"
 

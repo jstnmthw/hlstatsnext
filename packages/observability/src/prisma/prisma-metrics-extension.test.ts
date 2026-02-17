@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@repo/database/client"
+import type { PrismaClient } from "@repo/db/client"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { PrometheusMetricsExporter } from "../prometheus/prometheus-metrics-exporter"
 import type { ILogger } from "../types"

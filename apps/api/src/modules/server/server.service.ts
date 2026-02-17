@@ -5,7 +5,7 @@
  */
 
 import type { ICryptoService } from "@repo/crypto"
-import type { Server } from "@repo/database/client"
+import type { Server } from "@repo/db/client"
 import { ServerRepository } from "./server.repository"
 import type { CreateServerInput, CreateServerResult, UpdateServerInput } from "./server.types"
 

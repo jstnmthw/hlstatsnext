@@ -1,5 +1,5 @@
-import type { User } from "@repo/database/client"
-import { db } from "@repo/database/client"
+import type { User } from "@repo/db/client"
+import { db } from "@repo/db/client"
 
 export class AuthRepository {
   async findUserByEmail(email: string): Promise<User | null> {

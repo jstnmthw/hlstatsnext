@@ -601,7 +601,7 @@ Types are organized following the **monorepo best practices**:
 Type Hierarchy (from specific to general):
 1. Module-specific types   (e.g., player.types.ts)
 2. Shared domain types     (e.g., events.ts)
-3. Database types          (@repo/database)
+3. Database types          (@repo/db)
 4. Infrastructure types    (e.g., logger.types.ts)
 5. External library types  (e.g., @types/node)
 ```
@@ -629,7 +629,7 @@ export interface BaseEvent {
   meta?: Record<string, unknown>
 }
 
-// packages/database/src/index.ts (auto-generated)
+// packages/db/src/index.ts (auto-generated)
 export type { Player, PlayerStats } from "@prisma/client"
 ```
 

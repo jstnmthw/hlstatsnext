@@ -6,18 +6,26 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { GoogleButton } from "./google-button"
+import { PasswordInput } from "./password-input"
 
 export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
   const router = useRouter()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.")
+      return
+    }
+
     setLoading(true)
 
     const { error: signUpError } = await signUp.email({
@@ -40,7 +48,7 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
     <>
       <div className="mb-6">
         <h2 className="text-lg font-bold tracking-tight uppercase">Create an account</h2>
-        <p className="text-sm text-muted-foreground">Enter your details to create a new account.</p>
+        <p className="text-muted-foreground">Enter your details to create a new account.</p>
       </div>
       <Card className="p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -76,11 +84,24 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
+            <PasswordInput
+              showToggle
               id="password"
-              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              autoComplete="new-password"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password">Confirm Password</Label>
+            <PasswordInput
+              showToggle
+              id="confirm-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
               minLength={8}
               autoComplete="new-password"
@@ -107,7 +128,7 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
           </>
         )}
 
-        <p className="mt-6 text-center text-muted-foreground">
+        <p className="text-center text-muted-foreground">
           Already have an account?{" "}
           <Link href="/login" className="text-primary-bright hover:underline">
             Sign in

@@ -33,7 +33,7 @@ export function ForgotPasswordForm() {
     <>
       <div className="mb-6">
         <h2 className="text-lg font-bold tracking-tight uppercase">Forgot password</h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground">
           Enter your email address and we&apos;ll send you a code to reset your password.
         </p>
       </div>
@@ -61,7 +61,7 @@ export function ForgotPasswordForm() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-muted-foreground">
+        <p className="text-center text-muted-foreground">
           Remember your password?{" "}
           <Link href="/login" className="text-primary hover:underline">
             Sign in

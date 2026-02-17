@@ -58,7 +58,7 @@ export function AccountMenu({ user, isAdmin = false }: AccountMenuProps) {
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium">{user.username || user.name || "User"}</p>
-            <p className="text-sm text-muted-foreground">{user.email}</p>
+            <p className="text-muted-foreground">{user.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

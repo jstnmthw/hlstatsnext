@@ -58,7 +58,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
           <h5 className="text-xl font-medium">Heading 5 - text-xl</h5>
           <h6 className="text-lg font-medium">Heading 6 - text-lg</h6>
           <p className="text-base">Regular paragraph text - text-base</p>
-          <p className="text-sm text-muted-foreground">Small muted text - text-sm</p>
+          <p className="text-muted-foreground">Small muted text - text-sm</p>
           <p className="text-xs text-muted-foreground">Extra small text - text-xs</p>
           <p className="font-light">Light font weight</p>
           <p className="font-normal">Normal font weight</p>

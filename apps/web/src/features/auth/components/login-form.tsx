@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { GoogleButton } from "./google-button"
+import { PasswordInput } from "./password-input"
 
 export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
   const router = useRouter()
@@ -43,9 +44,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     <>
       <div className="mb-6">
         <h2 className="text-lg font-bold tracking-tight uppercase">Sign in</h2>
-        <p className="text-sm text-muted-foreground">
-          Enter your credentials to access the admin panel.
-        </p>
+        <p className="text-muted-foreground">Enter your credentials to access the admin panel.</p>
       </div>
       <Card className="p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -76,9 +75,9 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
                 Forgot password?
               </Link>
             </div>
-            <Input
+            <PasswordInput
+              showToggle
               id="password"
-              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -86,7 +85,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
             />
           </div>
 
-          <Button type="submit" variant="primary" className="mt-2 w-full py-2" disabled={loading}>
+          <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
             {loading ? "Signing in..." : "Sign in"}
           </Button>
         </form>
@@ -106,7 +105,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
           </>
         )}
 
-        <p className="mt-6 text-center text-muted-foreground">
+        <p className="text-center text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link href="/register" className="text-primary-bright hover:underline">
             Register

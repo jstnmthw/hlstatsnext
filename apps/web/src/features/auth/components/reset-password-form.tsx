@@ -4,6 +4,7 @@ import { authClient } from "@repo/auth/client"
 import { Button, Card, Input, Label } from "@repo/ui"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
+import { PasswordInput } from "./password-input"
 
 const RESEND_COOLDOWN = 60
 
@@ -139,9 +140,9 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="password">New password</Label>
-          <Input
+          <PasswordInput
+            showToggle
             id="password"
-            type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

@@ -10,7 +10,14 @@ export function createAdapter(): PrismaMariaDb {
   if (!url) {
     throw new Error("DATABASE_URL environment variable is required")
   }
-  return new PrismaMariaDb(url)
+
+  // The mariadb driver requires the mariadb:// protocol for URL parsing
+  // (mysql:// is rejected). Also enable allowPublicKeyRetrieval so the
+  // driver can complete MySQL 8.4's caching_sha2_password RSA handshake
+  // on first connection after a fresh server start (e.g. Docker restart).
+  const adapterUrl = url.replace(/^mysql:/, "mariadb:")
+  const separator = adapterUrl.includes("?") ? "&" : "?"
+  return new PrismaMariaDb(`${adapterUrl}${separator}allowPublicKeyRetrieval=true`)
 }
 
 declare global {

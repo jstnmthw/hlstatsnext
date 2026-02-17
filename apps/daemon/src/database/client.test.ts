@@ -20,7 +20,7 @@ describe("DatabaseClient", () => {
   })
 
   afterEach(() => {
-    vi.restoreAllMocks()
+    vi.clearAllMocks()
   })
 
   describe("prisma getter", () => {
@@ -40,8 +40,19 @@ describe("DatabaseClient", () => {
 
   describe("testConnection", () => {
     it("should return true when query succeeds", async () => {
+      const dbObj = client.prisma as unknown as Record<string, ReturnType<typeof vi.fn>>
+      dbObj.$queryRaw = vi.fn().mockResolvedValue([{ test: 1 }])
+
       const result = await client.testConnection()
       expect(result).toBe(true)
+    })
+
+    it("should return false when query fails", async () => {
+      const dbObj = client.prisma as unknown as Record<string, ReturnType<typeof vi.fn>>
+      dbObj.$queryRaw = vi.fn().mockRejectedValue(new Error("connection refused"))
+
+      const result = await client.testConnection()
+      expect(result).toBe(false)
     })
   })
 

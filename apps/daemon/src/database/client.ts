@@ -50,7 +50,8 @@ export class DatabaseClient {
    */
   async testConnection(): Promise<boolean> {
     try {
-      await db.$queryRaw`SELECT 1`
+      const client = (this._prismaWithMetrics || db) as PrismaClient
+      await client.$queryRaw`SELECT 1`
       return true
     } catch (error) {
       console.error("Database connection test failed:", error)

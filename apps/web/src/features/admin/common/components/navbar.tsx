@@ -73,8 +73,8 @@ export function Navbar({ currentPath }: NavbarProps) {
   const visibleItems = navItems.filter((item) => !item.permission || hasPermission(item.permission))
 
   return (
-    <nav className="flex items-center justify-between border-b border-zinc-700 bg-zinc-950">
-      <ul className="container flex items-center gap-6">
+    <nav className="flex items-center justify-between">
+      <ul className="container flex items-center gap-6 border-b">
         {visibleItems.map((item) => {
           const isActive =
             item.href === "/admin"

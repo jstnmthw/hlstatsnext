@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useState } from "react"
 
 import {
   ColumnDef,
@@ -10,340 +10,164 @@ import {
   VisibilityState,
 } from "@tanstack/react-table"
 
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  IconAdjustments,
-  IconSearch,
-  Input,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@repo/ui"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui"
 
-import { DataTableConfig, useDataTableUrl } from "@/features/common/hooks/use-data-table-url"
+import { DataTableProvider } from "@/features/common/components/data-table-context"
+import { DataTablePagination } from "@/features/common/components/data-table-pagination"
+import { DataTableToolbar } from "@/features/common/components/data-table-toolbar"
+import { useDataTableUrl } from "@/features/common/hooks/use-data-table-url"
+import { DataTableConfig } from "@/features/common/types/data-table"
+
+export type DataTableBorderStyle = "default" | "borderless" | "border-bottom" | "border-top"
 
 export interface DataTableProps<T> {
-  // Data
   data: T[]
   columns: ColumnDef<T>[]
+  totalCount: number
+  config: DataTableConfig
+  showToolbar?: boolean
+  showPagination?: boolean
+  borderStyle?: DataTableBorderStyle
+}
 
-  // Server-side props (for server-rendered tables)
-  totalCount?: number
-  currentPage?: number
-  pageSize?: number
-  sortField?: string
-  sortOrder?: "asc" | "desc"
-  searchValue?: string
-
-  // Configuration for server-side behavior
-  serverConfig?: DataTableConfig
-
-  // Features (all optional with sensible defaults)
-  enablePagination?: boolean
-  enableSorting?: boolean
-  enableFiltering?: boolean
-  enableColumnVisibility?: boolean
-  enableRowSelection?: boolean
-  enableActions?: boolean
-
-  // UI Configuration
-  filterPlaceholder?: string
-
-  // Server-side callbacks (when provided, enables server mode)
-  onPageChange?: (page: number) => void
-  onSort?: (field: string, order: "asc" | "desc") => void
-  onSearch?: (value: string) => void
-  onRefresh?: () => void
-
-  // UI state
-  isLoading?: boolean
+const borderStyleClasses: Record<DataTableBorderStyle, string> = {
+  default: "overflow-hidden rounded-md border border-border",
+  borderless: [
+    "[&_[data-slot=table-row]]:border-0",
+    "[&_[data-slot=table-header]_tr]:border-0",
+  ].join(" "),
+  "border-bottom": ["[&_[data-slot=table-header]_tr]:border-0"].join(" "),
+  "border-top": [
+    "[&_[data-slot=table-header]_tr]:border-0",
+    "[&_[data-slot=table-row]]:border-t",
+    "[&_[data-slot=table-row]]:border-b-0",
+    "[&_[data-slot=table-body]_tr:first-child]:border-0",
+  ].join(" "),
 }
 
 export function DataTable<T>({
   data,
   columns,
-  totalCount = 0,
-  currentPage = 1,
-  pageSize = 10,
-  sortField,
-  sortOrder = "asc",
-  searchValue = "",
-  serverConfig,
-  enablePagination = true,
-  enableSorting = true,
-  enableFiltering = true,
-  enableColumnVisibility = true,
-  enableRowSelection = true,
-  enableActions = true,
-  filterPlaceholder = "Search...",
-  onPageChange,
-  onSort,
-  onSearch,
-  isLoading = false,
+  totalCount,
+  config,
+  showToolbar = true,
+  showPagination = true,
+  borderStyle = "default",
 }: DataTableProps<T>) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
-  const [searchInput, setSearchInput] = useState(searchValue)
 
-  // Determine if we're in server mode
-  const isServerMode = !!(onPageChange || onSort || onSearch)
-
-  // Use URL hooks only in server mode
-  const urlHooks = useDataTableUrl(
-    serverConfig || {
-      defaultSortField: sortField || "",
-      defaultSortOrder: sortOrder,
-      defaultPageSize: pageSize,
-    },
-  )
-
-  const { handleSort, handlePageChange, handleSearch, handleRefresh, isPending } = isServerMode
-    ? urlHooks
-    : {
-        handleSort: () => {},
-        handlePageChange: () => {},
-        handleSearch: () => {},
-        handleRefresh: () => {},
-        isPending: false,
-      }
-
-  // Filter out actions column if actions are disabled
-  const filteredColumns = enableActions ? columns : columns.filter((col) => col.id !== "actions")
+  const {
+    currentState,
+    handleSort,
+    handlePageChange,
+    handleSearch,
+    handlePageSizeChange,
+    handleFilterChange,
+    resetFilters,
+    handleRefresh,
+    isPending,
+    isFiltered,
+  } = useDataTableUrl(config)
 
   const table = useReactTable({
     data,
-    columns: filteredColumns,
+    columns,
     getCoreRowModel: getCoreRowModel(),
-    onColumnVisibilityChange: enableColumnVisibility ? setColumnVisibility : undefined,
-    onRowSelectionChange: enableRowSelection ? setRowSelection : undefined,
-    manualPagination: isServerMode,
-    manualSorting: isServerMode && enableSorting,
-    manualFiltering: isServerMode && enableFiltering,
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    manualPagination: true,
+    manualSorting: true,
+    manualFiltering: true,
     state: {
-      sorting: [],
-      columnFilters: [],
       columnVisibility,
       rowSelection,
       pagination: {
-        pageIndex: currentPage - 1,
-        pageSize: pageSize,
+        pageIndex: currentState.page - 1,
+        pageSize: currentState.pageSize,
       },
     },
-    pageCount: isServerMode ? Math.ceil(totalCount / pageSize) : -1,
+    pageCount: Math.ceil(totalCount / currentState.pageSize),
   })
 
-  const paginationInfo = useMemo(() => {
-    const totalItems = isServerMode ? totalCount : data.length
-    const startItem = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0
-    const endItem = Math.min(currentPage * pageSize, totalItems)
-    const canPreviousPage = currentPage > 1
-    const canNextPage = currentPage < Math.ceil(totalItems / pageSize)
-
-    return { startItem, endItem, totalCount: totalItems, canPreviousPage, canNextPage }
-  }, [currentPage, pageSize, totalCount, data.length, isServerMode])
-
-  const handleSearchSubmit = useCallback(() => {
-    if (isServerMode && serverConfig) {
-      const currentState = {
-        page: currentPage,
-        pageSize,
-        sortField: sortField || "",
-        sortOrder,
-        search: searchInput,
-      }
-      handleSearch(searchInput, currentState)
-    }
-  }, [
-    isServerMode,
-    serverConfig,
-    searchInput,
-    currentPage,
-    pageSize,
-    sortField,
-    sortOrder,
-    handleSearch,
-  ])
-
-  const handlePageChangeWrapper = useCallback(
-    (page: number) => {
-      if (isServerMode && serverConfig) {
-        const currentState = {
-          page: currentPage,
-          pageSize,
-          sortField: sortField || "",
-          sortOrder,
-          search: searchValue,
-        }
-        handlePageChange(page, currentState)
-      }
-    },
-    [
-      isServerMode,
-      serverConfig,
-      currentPage,
-      pageSize,
-      sortField,
-      sortOrder,
-      searchValue,
-      handlePageChange,
-    ],
-  )
-
-  const loading = isLoading || (isServerMode ? isPending : false)
-
   return (
-    <>
-      <div className="flex items-center py-4">
-        {enableFiltering && (
-          <div className="flex gap-2">
-            <Input
-              placeholder={filterPlaceholder}
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  handleSearchSubmit()
-                }
-              }}
-              className="max-w-sm dark:bg-zinc-950"
-              disabled={loading}
-            />
-            <Button
-              variant="outline"
-              colorScheme="dark"
-              onClick={handleSearchSubmit}
-              disabled={loading}
-            >
-              <IconSearch className="size-4" data-slot="icon" />
-            </Button>
-          </div>
+    <DataTableProvider
+      value={{
+        sortField: currentState.sortField,
+        sortOrder: currentState.sortOrder,
+        onSort: handleSort,
+        onRefresh: handleRefresh,
+        isPending,
+      }}
+    >
+      <div className="flex flex-col gap-4">
+        {showToolbar && (
+          <DataTableToolbar
+            table={table}
+            config={config}
+            search={currentState.search}
+            filters={currentState.filters}
+            isFiltered={isFiltered}
+            onSearch={handleSearch}
+            onFilterChange={handleFilterChange}
+            onReset={resetFilters}
+            isPending={isPending}
+          />
         )}
 
-        {enableColumnVisibility && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" colorScheme="light" className="ml-auto">
-                <IconAdjustments className="size-4" data-slot="icon" /> View
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  )
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-
-      <div className="overflow-hidden rounded-md border border-border">
-        <div className={`${loading ? "opacity-75" : ""} transition-opacity duration-200`}>
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
+        <div className={borderStyleClasses[borderStyle]}>
+          <div className={`${isPending ? "opacity-75" : ""} transition-opacity duration-200`}>
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
                       <TableHead key={header.id}>
                         {header.isPlaceholder
                           ? null
-                          : flexRender(header.column.columnDef.header, {
-                              ...header.getContext(),
-                              sortField: sortField,
-                              sortOrder: sortOrder,
-                              onSort: isServerMode
-                                ? (field: string) => {
-                                    const currentState = {
-                                      page: currentPage,
-                                      pageSize,
-                                      sortField: sortField || "",
-                                      sortOrder,
-                                      search: searchValue,
-                                    }
-                                    handleSort(field, currentState)
-                                  }
-                                : undefined,
-                              onRefresh: isServerMode
-                                ? () => {
-                                    handleRefresh()
-                                  }
-                                : undefined,
-                              isPending: loading,
-                            })}
+                          : flexRender(header.column.columnDef.header, header.getContext())}
                       </TableHead>
-                    )
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
                     ))}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={filteredColumns.length}
-                    className="h-24 text-center font-medium tracking-tight text-muted-foreground/60"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center font-medium tracking-tight text-muted-foreground/60"
+                    >
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-      </div>
 
-      {enablePagination && (
-        <div className="flex items-center justify-between space-x-2 py-4">
-          <div className="text-muted-foreground">
-            Showing {paginationInfo.startItem} to {paginationInfo.endItem} of{" "}
-            {paginationInfo.totalCount} results
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              onClick={() => handlePageChangeWrapper(currentPage - 1)}
-              disabled={!paginationInfo.canPreviousPage || loading}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handlePageChangeWrapper(currentPage + 1)}
-              disabled={!paginationInfo.canNextPage || loading}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      )}
-    </>
+        {showPagination && (
+          <DataTablePagination
+            totalCount={totalCount}
+            currentPage={currentState.page}
+            pageSize={currentState.pageSize}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            isPending={isPending}
+          />
+        )}
+      </div>
+    </DataTableProvider>
   )
 }

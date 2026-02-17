@@ -16,7 +16,7 @@ export default function AdminError({
 
   return (
     <div className="flex min-h-[50vh] items-center justify-center p-4">
-      <Card className="max-w-md p-6 text-center">
+      <Card className="max-w-md gap-1 p-6 text-center">
         <IconAlertTriangle className="mx-auto mb-4 size-10 text-destructive" />
         <h2 className="mb-2 text-lg font-semibold uppercase">Something went wrong</h2>
         <p className="mb-4 text-muted-foreground">

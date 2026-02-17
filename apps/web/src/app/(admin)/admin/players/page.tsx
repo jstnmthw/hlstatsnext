@@ -1,6 +1,7 @@
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 import { AdminPlayersTable } from "@/features/admin/players/components/admin-players-table"
+import { playerTableConfig } from "@/features/admin/players/components/player-columns"
 import {
   GET_PLAYERS_WITH_PAGINATION,
   GET_PLAYER_COUNT,
@@ -11,6 +12,7 @@ import { PageWrapper } from "@/features/common/components/page-wrapper"
 import {
   buildCountVariables,
   buildPaginationVariables,
+  getConfigDefaults,
   parseUrlParams,
 } from "@/features/common/graphql/pagination"
 import { query } from "@/lib/apollo-client"
@@ -25,19 +27,11 @@ export const metadata: Metadata = {
 
 export default async function PlayersPage(props: AdminPageProps) {
   const searchParams = await props.searchParams
+  const params = parseUrlParams(searchParams, getConfigDefaults(playerTableConfig))
 
-  // Parse URL parameters using shared utility
-  const params = parseUrlParams(searchParams, {
-    sortField: "lastName",
-    sortOrder: "asc",
-    pageSize: 10,
-  })
+  const queryVariables = buildPaginationVariables(params, playerTableConfig.searchFields)
+  const countVariables = buildCountVariables(params, playerTableConfig.searchFields)
 
-  // Build GraphQL variables using shared utility
-  const queryVariables = buildPaginationVariables(params, ["lastName", "email"])
-  const countVariables = buildCountVariables(params, ["lastName", "email"])
-
-  // Fetch data on server
   const { data } = await query({
     query: GET_PLAYERS_WITH_PAGINATION,
     variables: queryVariables,
@@ -78,15 +72,7 @@ export default async function PlayersPage(props: AdminPageProps) {
               </Button>
             </div>
           </div>
-          <AdminPlayersTable
-            data={players}
-            totalCount={totalCount}
-            currentPage={params.page}
-            pageSize={params.pageSize}
-            sortField={params.sortField}
-            sortOrder={params.sortOrder}
-            searchValue={params.search}
-          />
+          <AdminPlayersTable data={players} totalCount={totalCount} />
         </div>
       </MainContent>
       <Footer />

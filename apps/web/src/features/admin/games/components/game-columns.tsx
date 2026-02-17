@@ -1,6 +1,7 @@
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
-import { FilterConfig } from "@/features/common/types/data-table"
-import { Game } from "@repo/database/client"
+import { useDataTableContext } from "@/features/common/components/data-table-context"
+import { DataTableConfig } from "@/features/common/types/data-table"
+import { Game } from "@repo/db/client"
 import {
   Badge,
   Button,
@@ -15,24 +16,45 @@ import {
   IconDots,
   IconRefresh,
 } from "@repo/ui"
-import { ColumnDef, HeaderContext } from "@tanstack/react-table"
-
-interface ExtendedHeaderContext<TData, TValue> extends HeaderContext<TData, TValue> {
-  sortField?: string
-  sortOrder?: "asc" | "desc"
-  onSort?: (field: string) => void
-  onRefresh?: () => void
-  isPending?: boolean
-}
+import { ColumnDef } from "@tanstack/react-table"
 
 export type GameListItem = Pick<Game, "code" | "name" | "hidden" | "realgame"> & {
   __typename?: string
 }
 
-export const gameFilterConfig: FilterConfig = {
-  columnId: "search",
-  placeholder: "Filter games...",
-  label: "Game Search",
+export const gameTableConfig: DataTableConfig = {
+  defaultSortField: "name",
+  defaultSortOrder: "asc",
+  defaultPageSize: 10,
+  searchFields: ["name", "code"],
+  filterPlaceholder: "Filter games...",
+  filters: [
+    {
+      id: "hidden",
+      title: "Visibility",
+      options: [
+        { label: "Visible", value: "0" },
+        { label: "Hidden", value: "1" },
+      ],
+    },
+  ],
+}
+
+function ActionsHeader() {
+  const { onRefresh, isPending } = useDataTableContext()
+  return (
+    <div className="flex items-center justify-end pr-3 pl-1">
+      <Button variant="ghost" className="group size-8 p-0" onClick={onRefresh} disabled={isPending}>
+        <IconRefresh
+          className={cn(
+            "size-4",
+            isPending ? "animate-spin" : "",
+            "text-zinc-500 transition-colors duration-200 group-hover:text-zinc-100",
+          )}
+        />
+      </Button>
+    </div>
+  )
 }
 
 export const gameColumns = (): ColumnDef<GameListItem>[] => [
@@ -64,63 +86,22 @@ export const gameColumns = (): ColumnDef<GameListItem>[] => [
   },
   {
     accessorKey: "code",
-    header: (props: ExtendedHeaderContext<GameListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Code"
-        field="code"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
-    cell: ({ row }) => {
-      const game = row.original
-      return <span className="pl-2 font-mono font-medium">{game.code}</span>
-    },
+    header: () => <DataTableColumnHeader title="Code" field="code" />,
+    cell: ({ row }) => <span className="pl-2 font-mono font-medium">{row.original.code}</span>,
   },
   {
     accessorKey: "name",
-    header: (props: ExtendedHeaderContext<GameListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Name"
-        field="name"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
-    cell: ({ row }) => {
-      const game = row.original
-      return <span className="font-medium">{game.name}</span>
-    },
+    header: () => <DataTableColumnHeader title="Name" field="name" />,
+    cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
   },
   {
     accessorKey: "realgame",
-    header: (props: ExtendedHeaderContext<GameListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Engine"
-        field="realgame"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
-    cell: ({ row }) => {
-      const game = row.original
-      return <span>{game.realgame}</span>
-    },
+    header: () => <DataTableColumnHeader title="Engine" field="realgame" />,
+    cell: ({ row }) => <span>{row.original.realgame}</span>,
   },
   {
     accessorKey: "hidden",
-    header: (props: ExtendedHeaderContext<GameListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Status"
-        field="hidden"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
+    header: () => <DataTableColumnHeader title="Status" field="hidden" />,
     cell: ({ row }) => {
       const game = row.original
       const isHidden = game.hidden === "1"
@@ -137,27 +118,9 @@ export const gameColumns = (): ColumnDef<GameListItem>[] => [
   },
   {
     id: "actions",
-    header: (props: ExtendedHeaderContext<GameListItem, unknown>) => (
-      <div className="flex items-center justify-end pr-3 pl-1">
-        <Button
-          variant="ghost"
-          className="group size-8 p-0"
-          onClick={props.onRefresh}
-          disabled={props.isPending}
-        >
-          <IconRefresh
-            className={cn(
-              "size-4",
-              props.isPending ? "animate-spin" : "",
-              "text-zinc-500 transition-colors duration-200 group-hover:text-zinc-100",
-            )}
-          />
-        </Button>
-      </div>
-    ),
+    header: () => <ActionsHeader />,
     cell: ({ row }) => {
       const game = row.original
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

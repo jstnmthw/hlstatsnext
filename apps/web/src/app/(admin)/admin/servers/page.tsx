@@ -1,9 +1,10 @@
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 import { AdminServersTable } from "@/features/admin/servers/components/admin-servers-table"
+import { serverTableConfig } from "@/features/admin/servers/components/server-columns"
 import {
-  GET_SERVERS_WITH_PAGINATION,
   GET_SERVER_COUNT,
+  GET_SERVERS_WITH_PAGINATION,
 } from "@/features/admin/servers/graphql/server-queries"
 import { PermissionGate } from "@/features/auth/components/permission-gate"
 import { Footer } from "@/features/common/components/footer"
@@ -12,6 +13,8 @@ import { PageWrapper } from "@/features/common/components/page-wrapper"
 import {
   buildCountVariables,
   buildPaginationVariables,
+  FilterTransform,
+  getConfigDefaults,
   parseUrlParams,
 } from "@/features/common/graphql/pagination"
 import { query } from "@/lib/apollo-client"
@@ -24,21 +27,43 @@ export const metadata: Metadata = {
   description: "Manage your game servers and track player statistics and activities.",
 }
 
+const serverFilterTransforms: Record<string, FilterTransform> = {
+  status: (values) => {
+    const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000)
+    const wantOnline = values.includes("online")
+    const wantOffline = values.includes("offline")
+
+    if (wantOnline && !wantOffline) {
+      return { lastEvent: { gt: thirtyMinAgo } }
+    }
+    if (wantOffline && !wantOnline) {
+      return {
+        OR: [{ lastEvent: { lt: thirtyMinAgo } }, { lastEvent: null }],
+      }
+    }
+    return undefined // both selected = no filter
+  },
+}
+
 export default async function ServersPage(props: AdminPageProps) {
   const searchParams = await props.searchParams
+  const params = parseUrlParams(
+    searchParams,
+    getConfigDefaults(serverTableConfig),
+    serverTableConfig.filters,
+  )
 
-  // Parse URL parameters using shared utility
-  const params = parseUrlParams(searchParams, {
-    sortField: "name",
-    sortOrder: "asc",
-    pageSize: 10,
-  })
+  const queryVariables = buildPaginationVariables(
+    params,
+    serverTableConfig.searchFields,
+    serverFilterTransforms,
+  )
+  const countVariables = buildCountVariables(
+    params,
+    serverTableConfig.searchFields,
+    serverFilterTransforms,
+  )
 
-  // Build GraphQL variables using shared utility
-  const queryVariables = buildPaginationVariables(params, ["name", "address", "game"])
-  const countVariables = buildCountVariables(params, ["name", "address", "game"])
-
-  // Fetch data on server
   const { data } = await query({
     query: GET_SERVERS_WITH_PAGINATION,
     variables: queryVariables,
@@ -79,15 +104,7 @@ export default async function ServersPage(props: AdminPageProps) {
               </Button>
             </PermissionGate>
           </div>
-          <AdminServersTable
-            data={servers}
-            totalCount={totalCount}
-            currentPage={params.page}
-            pageSize={params.pageSize}
-            sortField={params.sortField}
-            sortOrder={params.sortOrder}
-            searchValue={params.search}
-          />
+          <AdminServersTable data={servers} totalCount={totalCount} />
         </div>
       </MainContent>
       <Footer />

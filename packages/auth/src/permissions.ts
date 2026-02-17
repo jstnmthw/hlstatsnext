@@ -6,6 +6,7 @@ export const statement = {
   server: ["create", "read", "update", "delete"],
   game: ["read", "update"],
   player: ["read", "update", "ban"],
+  user: ["list", "ban", "set-role", "delete"],
   dashboard: ["read"],
 } as const
 
@@ -16,6 +17,7 @@ export const adminRole = ac.newRole({
   server: ["create", "read", "update", "delete"],
   game: ["read", "update"],
   player: ["read", "update", "ban"],
+  user: ["list", "ban", "set-role", "delete"],
   dashboard: ["read"],
 })
 
@@ -23,5 +25,6 @@ export const userRole = ac.newRole({
   server: ["read"],
   game: ["read"],
   player: ["read"],
+  user: [],
   dashboard: [],
 })

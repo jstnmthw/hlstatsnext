@@ -1,16 +1,20 @@
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 import { AdminUsersTable } from "@/features/admin/users/components/admin-users-table"
+import { userTableConfig } from "@/features/admin/users/components/user-columns"
 import {
-  GET_USERS_WITH_PAGINATION,
   GET_USER_COUNT,
+  GET_USERS_WITH_PAGINATION,
 } from "@/features/admin/users/graphql/user-queries"
+import { statusFilterTransform } from "@/features/admin/users/lib/user-filters"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
 import {
   buildCountVariables,
   buildPaginationVariables,
+  FilterTransform,
+  getConfigDefaults,
   parseUrlParams,
 } from "@/features/common/graphql/pagination"
 import { query } from "@/lib/apollo-client"
@@ -23,21 +27,29 @@ export const metadata: Metadata = {
   description: "Manage your system users and their access levels.",
 }
 
+const userFilterTransforms: Record<string, FilterTransform> = {
+  status: statusFilterTransform,
+}
+
 export default async function UsersPage(props: AdminPageProps) {
   const searchParams = await props.searchParams
+  const params = parseUrlParams(
+    searchParams,
+    getConfigDefaults(userTableConfig),
+    userTableConfig.filters,
+  )
 
-  // Parse URL parameters using shared utility
-  const params = parseUrlParams(searchParams, {
-    sortField: "name",
-    sortOrder: "asc",
-    pageSize: 10,
-  })
+  const queryVariables = buildPaginationVariables(
+    params,
+    userTableConfig.searchFields,
+    userFilterTransforms,
+  )
+  const countVariables = buildCountVariables(
+    params,
+    userTableConfig.searchFields,
+    userFilterTransforms,
+  )
 
-  // Build GraphQL variables using shared utility
-  const queryVariables = buildPaginationVariables(params, ["name", "email"])
-  const countVariables = buildCountVariables(params, ["name", "email"])
-
-  // Fetch data on server
   const { data } = await query({
     query: GET_USERS_WITH_PAGINATION,
     variables: queryVariables,
@@ -78,15 +90,7 @@ export default async function UsersPage(props: AdminPageProps) {
               </Button>
             </div>
           </div>
-          <AdminUsersTable
-            data={users}
-            totalCount={totalCount}
-            currentPage={params.page}
-            pageSize={params.pageSize}
-            sortField={params.sortField}
-            sortOrder={params.sortOrder}
-            searchValue={params.search}
-          />
+          <AdminUsersTable data={users} totalCount={totalCount} />
         </div>
       </MainContent>
       <Footer />

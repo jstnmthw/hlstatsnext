@@ -1,6 +1,7 @@
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 import { AdminGamesTable } from "@/features/admin/games/components/admin-games-table"
+import { gameTableConfig } from "@/features/admin/games/components/game-columns"
 import {
   GET_GAMES_WITH_PAGINATION,
   GET_GAME_COUNT,
@@ -11,6 +12,7 @@ import { PageWrapper } from "@/features/common/components/page-wrapper"
 import {
   buildCountVariables,
   buildPaginationVariables,
+  getConfigDefaults,
   parseUrlParams,
 } from "@/features/common/graphql/pagination"
 import { query } from "@/lib/apollo-client"
@@ -25,19 +27,16 @@ export const metadata: Metadata = {
 
 export default async function GamesPage(props: AdminPageProps) {
   const searchParams = await props.searchParams
+  const params = parseUrlParams(
+    searchParams,
+    getConfigDefaults(gameTableConfig),
+    gameTableConfig.filters,
+  )
 
-  // Parse URL parameters using shared utility
-  const params = parseUrlParams(searchParams, {
-    sortField: "name",
-    sortOrder: "asc",
-    pageSize: 10,
-  })
+  // Games "hidden" is a string field ("0"/"1"), default { in: [] } works
+  const queryVariables = buildPaginationVariables(params, gameTableConfig.searchFields)
+  const countVariables = buildCountVariables(params, gameTableConfig.searchFields)
 
-  // Build GraphQL variables using shared utility
-  const queryVariables = buildPaginationVariables(params, ["name", "code"])
-  const countVariables = buildCountVariables(params, ["name", "code"])
-
-  // Fetch data on server
   const { data } = await query({
     query: GET_GAMES_WITH_PAGINATION,
     variables: queryVariables,
@@ -78,15 +77,7 @@ export default async function GamesPage(props: AdminPageProps) {
               </Button>
             </div>
           </div>
-          <AdminGamesTable
-            data={games}
-            totalCount={totalCount}
-            currentPage={params.page}
-            pageSize={params.pageSize}
-            sortField={params.sortField}
-            sortOrder={params.sortOrder}
-            searchValue={params.search}
-          />
+          <AdminGamesTable data={games} totalCount={totalCount} />
         </div>
       </MainContent>
       <Footer />

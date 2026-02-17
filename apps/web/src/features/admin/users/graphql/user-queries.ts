@@ -9,6 +9,9 @@ export const GET_USERS_QUERY = graphql(`
       emailVerified
       role
       banned
+      banReason
+      banExpires
+      image
       createdAt
       updatedAt
     }
@@ -29,6 +32,9 @@ export const GET_USERS_WITH_PAGINATION = graphql(`
       emailVerified
       role
       banned
+      banReason
+      banExpires
+      image
       createdAt
       updatedAt
     }

@@ -1,13 +1,8 @@
 "use client"
 
-import { usePathname, useRouter } from "next/navigation"
-import { useCallback, useTransition } from "react"
-
-export interface DataTableConfig {
-  defaultSortField: string
-  defaultSortOrder: "asc" | "desc"
-  defaultPageSize: number
-}
+import { DataTableConfig } from "@/features/common/types/data-table"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useCallback, useMemo, useTransition } from "react"
 
 export interface DataTableUrlState {
   page: number
@@ -15,35 +10,70 @@ export interface DataTableUrlState {
   sortOrder: "asc" | "desc"
   search: string
   pageSize: number
+  filters: Record<string, string[]>
 }
 
 export function useDataTableUrl(config: DataTableConfig) {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
 
-  const updateURL = useCallback(
-    (params: Partial<DataTableUrlState>) => {
-      const searchParams = new URLSearchParams()
+  // Parse current state from URL search params
+  const currentState = useMemo((): DataTableUrlState => {
+    const filters: Record<string, string[]> = {}
+    if (config.filters) {
+      for (const filter of config.filters) {
+        const paramName = filter.paramName || filter.id
+        const value = searchParams.get(paramName)
+        if (value) {
+          filters[filter.id] = value.split(",")
+        }
+      }
+    }
 
-      // Add non-default values to URL
-      if (params.page && params.page !== 1) {
-        searchParams.set("page", params.page.toString())
+    return {
+      page: Number(searchParams.get("page")) || 1,
+      pageSize: Number(searchParams.get("pageSize")) || config.defaultPageSize,
+      sortField: searchParams.get("sortField") || config.defaultSortField,
+      sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || config.defaultSortOrder,
+      search: searchParams.get("search") || "",
+      filters,
+    }
+  }, [searchParams, config])
+
+  const pushState = useCallback(
+    (state: DataTableUrlState) => {
+      const params = new URLSearchParams()
+
+      if (state.page > 1) {
+        params.set("page", state.page.toString())
       }
-      if (params.sortField && params.sortField !== config.defaultSortField) {
-        searchParams.set("sortField", params.sortField)
+      if (state.sortField !== config.defaultSortField) {
+        params.set("sortField", state.sortField)
       }
-      if (params.sortOrder && params.sortOrder !== config.defaultSortOrder) {
-        searchParams.set("sortOrder", params.sortOrder)
+      if (state.sortOrder !== config.defaultSortOrder) {
+        params.set("sortOrder", state.sortOrder)
       }
-      if (params.search) {
-        searchParams.set("search", params.search)
+      if (state.search) {
+        params.set("search", state.search)
       }
-      if (params.pageSize && params.pageSize !== config.defaultPageSize) {
-        searchParams.set("pageSize", params.pageSize.toString())
+      if (state.pageSize !== config.defaultPageSize) {
+        params.set("pageSize", state.pageSize.toString())
       }
 
-      const url = searchParams.toString() ? `${pathname}?${searchParams}` : pathname
+      // Serialize filter values as comma-separated
+      if (config.filters) {
+        for (const filter of config.filters) {
+          const values = state.filters[filter.id]
+          if (values && values.length > 0) {
+            const paramName = filter.paramName || filter.id
+            params.set(paramName, values.join(","))
+          }
+        }
+      }
+
+      const url = params.toString() ? `${pathname}?${params}` : pathname
       startTransition(() => {
         router.push(url)
       })
@@ -52,7 +82,7 @@ export function useDataTableUrl(config: DataTableConfig) {
   )
 
   const handleSort = useCallback(
-    (fieldWithDirection: string, currentState: DataTableUrlState) => {
+    (fieldWithDirection: string) => {
       const [field, direction] = fieldWithDirection.includes(":")
         ? fieldWithDirection.split(":")
         : [
@@ -62,64 +92,58 @@ export function useDataTableUrl(config: DataTableConfig) {
               : "asc",
           ]
 
-      updateURL({
-        sortField: field,
+      pushState({
+        ...currentState,
+        sortField: field!,
         sortOrder: direction as "asc" | "desc",
-        search: currentState.search || undefined,
-        pageSize:
-          currentState.pageSize !== config.defaultPageSize ? currentState.pageSize : undefined,
-        page: 1, // Reset to first page when sorting
+        page: 1,
       })
     },
-    [updateURL, config.defaultPageSize],
+    [pushState, currentState],
   )
 
   const handlePageChange = useCallback(
-    (page: number, currentState: DataTableUrlState) => {
-      updateURL({
-        page,
-        sortField:
-          currentState.sortField !== config.defaultSortField ? currentState.sortField : undefined,
-        sortOrder:
-          currentState.sortOrder !== config.defaultSortOrder ? currentState.sortOrder : undefined,
-        search: currentState.search || undefined,
-        pageSize:
-          currentState.pageSize !== config.defaultPageSize ? currentState.pageSize : undefined,
-      })
+    (page: number) => {
+      pushState({ ...currentState, page })
     },
-    [updateURL, config],
+    [pushState, currentState],
   )
 
   const handleSearch = useCallback(
-    (searchValue: string, currentState: DataTableUrlState) => {
-      updateURL({
-        search: searchValue || undefined,
-        sortField:
-          currentState.sortField !== config.defaultSortField ? currentState.sortField : undefined,
-        sortOrder:
-          currentState.sortOrder !== config.defaultSortOrder ? currentState.sortOrder : undefined,
-        pageSize:
-          currentState.pageSize !== config.defaultPageSize ? currentState.pageSize : undefined,
-        page: 1, // Reset to first page when searching
-      })
+    (search: string) => {
+      pushState({ ...currentState, search, page: 1 })
     },
-    [updateURL, config],
+    [pushState, currentState],
   )
 
   const handlePageSizeChange = useCallback(
-    (pageSize: number, currentState: DataTableUrlState) => {
-      updateURL({
-        pageSize: pageSize !== config.defaultPageSize ? pageSize : undefined,
-        sortField:
-          currentState.sortField !== config.defaultSortField ? currentState.sortField : undefined,
-        sortOrder:
-          currentState.sortOrder !== config.defaultSortOrder ? currentState.sortOrder : undefined,
-        search: currentState.search || undefined,
-        page: 1, // Reset to first page when changing page size
+    (pageSize: number) => {
+      pushState({ ...currentState, pageSize, page: 1 })
+    },
+    [pushState, currentState],
+  )
+
+  const handleFilterChange = useCallback(
+    (filterId: string, values: string[]) => {
+      pushState({
+        ...currentState,
+        filters: { ...currentState.filters, [filterId]: values },
+        page: 1,
       })
     },
-    [updateURL, config],
+    [pushState, currentState],
   )
+
+  const resetFilters = useCallback(() => {
+    pushState({
+      page: 1,
+      sortField: config.defaultSortField,
+      sortOrder: config.defaultSortOrder,
+      search: "",
+      pageSize: config.defaultPageSize,
+      filters: {},
+    })
+  }, [pushState, config])
 
   const handleRefresh = useCallback(() => {
     startTransition(() => {
@@ -127,12 +151,24 @@ export function useDataTableUrl(config: DataTableConfig) {
     })
   }, [router])
 
+  const isFiltered = useMemo(() => {
+    if (currentState.search) return true
+    for (const values of Object.values(currentState.filters)) {
+      if (values.length > 0) return true
+    }
+    return false
+  }, [currentState])
+
   return {
+    currentState,
     handleSort,
     handlePageChange,
     handleSearch,
     handlePageSizeChange,
+    handleFilterChange,
+    resetFilters,
     handleRefresh,
     isPending,
+    isFiltered,
   }
 }

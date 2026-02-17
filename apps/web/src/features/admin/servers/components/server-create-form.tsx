@@ -2,7 +2,7 @@
 
 import { createServer } from "@/features/admin/servers/actions/create-server"
 import { ErrorDisplay, ErrorMessage, FormField } from "@/features/common/components/form"
-import type { Game, ModSupported } from "@repo/database/client"
+import type { Game, ModSupported } from "@repo/db/client"
 import { BasicSelect, Button, Input, IPAddress, Label, Port, Switch } from "@repo/ui"
 import { useActionState, useState } from "react"
 

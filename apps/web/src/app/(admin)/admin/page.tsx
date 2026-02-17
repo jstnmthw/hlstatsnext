@@ -25,7 +25,7 @@ export default function Page() {
             </p>
           </div>
           <Card className="flex flex-col items-center gap-4 border-dashed py-10">
-            <div className="rounded-full bg-muted p-4">
+            <div className="rounded-full bg-accent p-4">
               <IconServer className="size-6" />
             </div>
             <div className="flex max-w-xs flex-col items-center gap-2 text-center">

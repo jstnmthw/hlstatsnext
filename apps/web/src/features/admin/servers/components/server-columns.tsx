@@ -1,7 +1,8 @@
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
-import { FilterConfig } from "@/features/common/types/data-table"
+import { useDataTableContext } from "@/features/common/components/data-table-context"
+import { DataTableConfig } from "@/features/common/types/data-table"
 import { formatDate } from "@/lib/datetime-util"
-import { Server } from "@repo/database/client"
+import { Server } from "@repo/db/client"
 import {
   Badge,
   Button,
@@ -16,16 +17,8 @@ import {
   IconDots,
   IconRefresh,
 } from "@repo/ui"
-import { ColumnDef, HeaderContext } from "@tanstack/react-table"
+import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
-
-interface ExtendedHeaderContext<TData, TValue> extends HeaderContext<TData, TValue> {
-  sortField?: string
-  sortOrder?: "asc" | "desc"
-  onSort?: (field: string) => void
-  onRefresh?: () => void
-  isPending?: boolean
-}
 
 export type ServerListItem = Pick<
   Server,
@@ -39,15 +32,44 @@ export type ServerListItem = Pick<
   | "city"
   | "country"
 > & {
-  serverId: string // GraphQL returns this as string
-  lastEvent?: string | Date // GraphQL field is optional, could be string or Date
-  __typename?: string // GraphQL metadata field
+  serverId: string
+  lastEvent?: string | Date
+  __typename?: string
 }
 
-export const serverFilterConfig: FilterConfig = {
-  columnId: "search",
-  placeholder: "Filter servers...",
-  label: "Server Search",
+export const serverTableConfig: DataTableConfig = {
+  defaultSortField: "name",
+  defaultSortOrder: "asc",
+  defaultPageSize: 10,
+  searchFields: ["name", "address", "game"],
+  filterPlaceholder: "Filter servers...",
+  filters: [
+    {
+      id: "status",
+      title: "Status",
+      options: [
+        { label: "Online", value: "online" },
+        { label: "Offline", value: "offline" },
+      ],
+    },
+  ],
+}
+
+function ActionsHeader() {
+  const { onRefresh, isPending } = useDataTableContext()
+  return (
+    <div className="flex items-center justify-end pr-3 pl-1">
+      <Button variant="ghost" className="group size-8 p-0" onClick={onRefresh} disabled={isPending}>
+        <IconRefresh
+          className={cn(
+            "size-4",
+            isPending ? "animate-spin" : "",
+            "text-zinc-500 transition-colors duration-200 group-hover:text-zinc-100",
+          )}
+        />
+      </Button>
+    </div>
+  )
 }
 
 export const serverColumns = (): ColumnDef<ServerListItem>[] => [
@@ -79,38 +101,17 @@ export const serverColumns = (): ColumnDef<ServerListItem>[] => [
   },
   {
     accessorKey: "serverId",
-    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="ID"
-        field="serverId"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
-    cell: ({ row }) => {
-      const server = row.original
-      return <span className="pl-2">{server.serverId}</span>
-    },
+    header: () => <DataTableColumnHeader title="ID" field="serverId" />,
+    cell: ({ row }) => <span className="pl-2">{row.original.serverId}</span>,
   },
   {
     id: "status",
     accessorKey: "lastEvent",
-    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Status"
-        field="lastEvent"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
+    header: () => <DataTableColumnHeader title="Status" field="lastEvent" />,
     cell: ({ row }) => {
       const server = row.original
-      // Consider server online if it has recent activity (within last 30 minutes)
       const isOnline =
         server.lastEvent && new Date(server.lastEvent).getTime() > Date.now() - 30 * 60 * 1000
-
       return (
         <Badge variant="outline" colorScheme={isOnline ? "green" : "light"}>
           {isOnline ? "Online" : "Offline"}
@@ -120,100 +121,40 @@ export const serverColumns = (): ColumnDef<ServerListItem>[] => [
   },
   {
     accessorKey: "name",
-    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Name"
-        field="name"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
-    cell: ({ row }) => {
-      const server = row.original
-      return <span className="font-medium">{server.name || "Unnamed Server"}</span>
-    },
+    header: () => <DataTableColumnHeader title="Name" field="name" />,
+    cell: ({ row }) => <span className="font-medium">{row.original.name || "Unnamed Server"}</span>,
   },
   {
     accessorKey: "address",
-    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Address"
-        field="address"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
+    header: () => <DataTableColumnHeader title="Address" field="address" />,
+    cell: ({ row }) => (
+      <span>
+        {row.original.address}:{row.original.port}
+      </span>
     ),
-    cell: ({ row }) => {
-      const server = row.original
-      return (
-        <span>
-          {server.address}:{server.port}
-        </span>
-      )
-    },
   },
   {
     accessorKey: "game",
-    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Game"
-        field="game"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
+    header: () => <DataTableColumnHeader title="Game" field="game" />,
   },
   {
     accessorKey: "activePlayers",
-    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Players"
-        field="activePlayers"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
+    header: () => <DataTableColumnHeader title="Players" field="activePlayers" />,
+    cell: ({ row }) => (
+      <span>
+        {row.original.activePlayers}/{row.original.maxPlayers}
+      </span>
     ),
-    cell: ({ row }) => {
-      const server = row.original
-      return (
-        <span>
-          {server.activePlayers}/{server.maxPlayers}
-        </span>
-      )
-    },
   },
   {
     accessorKey: "activeMap",
-    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Current Map"
-        field="activeMap"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
-    cell: ({ row }) => {
-      const server = row.original
-      return <span>{server.activeMap || "-"}</span>
-    },
+    header: () => <DataTableColumnHeader title="Current Map" field="activeMap" />,
+    cell: ({ row }) => <span>{row.original.activeMap || "-"}</span>,
   },
   {
     id: "lastEventDate",
     accessorKey: "lastEvent",
-    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
-      <DataTableColumnHeader
-        title="Last Event"
-        field="lastEvent"
-        sortField={props.sortField}
-        sortOrder={props.sortOrder}
-        onSort={props.onSort}
-      />
-    ),
+    header: () => <DataTableColumnHeader title="Last Event" field="lastEvent" />,
     cell: ({ row }) => {
       const server = row.original
       if (!server.lastEvent) return <span>-</span>
@@ -222,27 +163,9 @@ export const serverColumns = (): ColumnDef<ServerListItem>[] => [
   },
   {
     id: "actions",
-    header: (props: ExtendedHeaderContext<ServerListItem, unknown>) => (
-      <div className="flex items-center justify-end pr-3 pl-1">
-        <Button
-          variant="ghost"
-          className="group size-8 p-0"
-          onClick={props.onRefresh}
-          disabled={props.isPending}
-        >
-          <IconRefresh
-            className={cn(
-              "size-4",
-              props.isPending ? "animate-spin" : "",
-              "text-zinc-500 transition-colors duration-200 group-hover:text-zinc-100",
-            )}
-          />
-        </Button>
-      </div>
-    ),
+    header: () => <ActionsHeader />,
     cell: ({ row }) => {
       const server = row.original
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

@@ -1,19 +1,23 @@
-export interface FilterConfig {
-  columnId: string
-  placeholder: string
-  label?: string
+import { ComponentType } from "react"
+
+export interface FacetedFilterOption {
+  label: string
+  value: string
+  icon?: ComponentType<{ className?: string }>
 }
 
-export interface DataTableOptions {
-  totalCount: number
-  currentPage: number
-  pageSize: number
-  sortField?: string
-  sortOrder?: "asc" | "desc"
-  search?: string
-  onPageChange: (page: number) => void
-  onSort: (field: string) => void
-  onSearch: (search: string) => void
-  onRefresh: () => void
-  isPending?: boolean
+export interface FacetedFilterDefinition {
+  id: string
+  title: string
+  options: FacetedFilterOption[]
+  paramName?: string // URL param name, defaults to id
+}
+
+export interface DataTableConfig {
+  defaultSortField: string
+  defaultSortOrder: "asc" | "desc"
+  defaultPageSize: number
+  searchFields?: string[]
+  filterPlaceholder?: string
+  filters?: FacetedFilterDefinition[]
 }

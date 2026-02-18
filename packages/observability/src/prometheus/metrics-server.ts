@@ -20,6 +20,16 @@ export class MetricsServer {
   private server: http.Server | null = null
   private readonly port: number
   private readonly host: string
+
+  /**
+   * Returns the actual bound port. Useful when port 0 is used to let the OS
+   * assign a free ephemeral port (call after start()).
+   */
+  getPort(): number {
+    const addr = this.server?.address()
+    if (addr && typeof addr === "object") return addr.port
+    return this.port
+  }
   private readonly enableHealthCheck: boolean
   private readonly enableQueryStats: boolean
 
@@ -56,16 +66,17 @@ export class MetricsServer {
         })
 
         this.server.listen(this.port, this.host, () => {
+          const boundPort = this.getPort()
           this.logger.info("Metrics server started", {
-            port: this.port,
+            port: boundPort,
             host: this.host,
             endpoints: {
-              metrics: `http://${this.host}:${this.port}/metrics`,
+              metrics: `http://${this.host}:${boundPort}/metrics`,
               health: this.enableHealthCheck
-                ? `http://${this.host}:${this.port}/health`
+                ? `http://${this.host}:${boundPort}/health`
                 : "disabled",
               queryStats: this.enableQueryStats
-                ? `http://${this.host}:${this.port}/query-stats`
+                ? `http://${this.host}:${boundPort}/query-stats`
                 : "disabled",
             },
           })

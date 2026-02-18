@@ -84,7 +84,7 @@ describe("Crypto Package Index", () => {
 
       try {
         // Use the createCryptoService function directly instead of the export
-        const { createCryptoService } = await import("./index")
+        const { createCryptoService } = await import("./index.js")
         const cryptoService = createCryptoService()
 
         expect(cryptoService).toBeInstanceOf(CryptoService)
@@ -108,7 +108,7 @@ describe("Crypto Package Index", () => {
 
   describe("exports", () => {
     it("should export all necessary types and classes", async () => {
-      const exports = await import("./index")
+      const exports = await import("./index.js")
 
       expect(exports.CryptoService).toBeDefined()
       expect(exports.createCryptoService).toBeDefined()

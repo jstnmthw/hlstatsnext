@@ -8,12 +8,8 @@ describe("MetricsServer", () => {
   let server: MetricsServer
   let mockMetrics: PrometheusMetricsExporter
   let mockLogger: ILogger
-  let testPort: number
 
   beforeEach(() => {
-    // Use a random port for testing
-    testPort = 9100 + Math.floor(Math.random() * 900)
-
     mockLogger = {
       info: vi.fn(),
       warn: vi.fn(),
@@ -33,7 +29,7 @@ describe("MetricsServer", () => {
   describe("start and stop", () => {
     it("should start the server successfully", async () => {
       server = new MetricsServer(mockMetrics, mockLogger, undefined, {
-        port: testPort,
+        port: 0,
       })
 
       await server.start()
@@ -41,7 +37,7 @@ describe("MetricsServer", () => {
       expect(mockLogger.info).toHaveBeenCalledWith(
         "Metrics server started",
         expect.objectContaining({
-          port: testPort,
+          port: server.getPort(),
           host: "0.0.0.0",
         }),
       )
@@ -49,7 +45,7 @@ describe("MetricsServer", () => {
 
     it("should stop the server successfully", async () => {
       server = new MetricsServer(mockMetrics, mockLogger, undefined, {
-        port: testPort,
+        port: 0,
       })
 
       await server.start()
@@ -60,7 +56,7 @@ describe("MetricsServer", () => {
 
     it("should handle stop when server is not started", async () => {
       server = new MetricsServer(mockMetrics, mockLogger, undefined, {
-        port: testPort,
+        port: 0,
       })
 
       // Should not throw
@@ -69,7 +65,7 @@ describe("MetricsServer", () => {
 
     it("should use custom host when provided", async () => {
       server = new MetricsServer(mockMetrics, mockLogger, undefined, {
-        port: testPort,
+        port: 0,
         host: "127.0.0.1",
       })
 
@@ -87,7 +83,7 @@ describe("MetricsServer", () => {
   describe("endpoints", () => {
     beforeEach(async () => {
       server = new MetricsServer(mockMetrics, mockLogger, undefined, {
-        port: testPort,
+        port: 0,
         host: "127.0.0.1",
       })
       await server.start()
@@ -98,7 +94,7 @@ describe("MetricsServer", () => {
     ): Promise<{ statusCode: number; body: string; headers: http.IncomingHttpHeaders }> => {
       return new Promise((resolve, reject) => {
         http
-          .get(`http://127.0.0.1:${testPort}${path}`, (res) => {
+          .get(`http://127.0.0.1:${server.getPort()}${path}`, (res) => {
             let body = ""
             res.on("data", (chunk) => (body += chunk))
             res.on("end", () =>
@@ -161,7 +157,7 @@ describe("MetricsServer", () => {
         })
 
         server = new MetricsServer(mockMetrics, mockLogger, customHealthCheck, {
-          port: testPort,
+          port: 0,
           host: "127.0.0.1",
         })
         await server.start()
@@ -181,7 +177,7 @@ describe("MetricsServer", () => {
         await server.stop()
 
         server = new MetricsServer(mockMetrics, mockLogger, undefined, {
-          port: testPort,
+          port: 0,
           host: "127.0.0.1",
           enableHealthCheck: false,
         })
@@ -220,7 +216,7 @@ describe("MetricsServer", () => {
         await server.stop()
 
         server = new MetricsServer(mockMetrics, mockLogger, undefined, {
-          port: testPort,
+          port: 0,
           host: "127.0.0.1",
           enableQueryStats: false,
         })
@@ -263,16 +259,16 @@ describe("MetricsServer", () => {
 
   describe("error handling", () => {
     it("should handle port already in use", async () => {
-      // Start first server
+      // Start first server on a random OS-assigned port
       const server1 = new MetricsServer(mockMetrics, mockLogger, undefined, {
-        port: testPort,
+        port: 0,
         host: "127.0.0.1",
       })
       await server1.start()
 
-      // Try to start second server on same port
+      // Try to start second server on the same bound port
       const server2 = new MetricsServer(mockMetrics, mockLogger, undefined, {
-        port: testPort,
+        port: server1.getPort(),
         host: "127.0.0.1",
       })
 
@@ -285,7 +281,7 @@ describe("MetricsServer", () => {
       const failingHealthCheck = vi.fn().mockRejectedValue(new Error("Health check failed"))
 
       server = new MetricsServer(mockMetrics, mockLogger, failingHealthCheck, {
-        port: testPort,
+        port: 0,
         host: "127.0.0.1",
       })
       await server.start()
@@ -293,7 +289,7 @@ describe("MetricsServer", () => {
       const response = await new Promise<{ statusCode: number; body: string }>(
         (resolve, reject) => {
           http
-            .get(`http://127.0.0.1:${testPort}/health`, (res) => {
+            .get(`http://127.0.0.1:${server.getPort()}/health`, (res) => {
               let body = ""
               res.on("data", (chunk) => (body += chunk))
               res.on("end", () => resolve({ statusCode: res.statusCode || 500, body }))

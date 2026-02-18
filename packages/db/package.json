@@ -43,7 +43,7 @@
     "@types/unzipper": "^0.10.11",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.2",
-    "glob": "^13.0.4",
+    "glob": "^13.0.5",
     "prisma-generator-pothos-codegen": "^0.7.2",
     "ts-deepmerge": "^7.0.3",
     "tsc-alias": "^1.8.16",

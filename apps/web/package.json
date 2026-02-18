@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^6.1.1",
-    "@graphql-codegen/client-preset": "^5.2.2",
+    "@graphql-codegen/client-preset": "^5.2.3",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@repo/db": "workspace:*",
     "@repo/eslint-config": "workspace:*",

@@ -15,15 +15,17 @@ import { getTestDb } from "../integration/helpers/test-db"
 // Type for accessing ingress service internals in tests
 interface TestIngressService {
   dependencies: {
-    serverAuthenticator: {
-      authenticateServer: ReturnType<typeof vi.fn>
+    tokenAuthenticator: {
+      lookupSource: ReturnType<typeof vi.fn>
+      handleBeacon: ReturnType<typeof vi.fn>
+      getAuthenticatedServerIds: ReturnType<typeof vi.fn>
     }
     serverInfoProvider: {
       getServerGame: ReturnType<typeof vi.fn>
     }
   }
   setPublisher: (publisher: IEventPublisher) => void
-  processRawEvent: (logLine: string, host: string, port: number) => Promise<BaseEvent | null>
+  processRawEvent: (logLine: string, serverId: number) => Promise<BaseEvent | null>
   getStats: () => { totalLogsProcessed: number; totalErrors: number }
 }
 
@@ -57,11 +59,12 @@ describe("Event Pipeline (e2e)", () => {
     })
     serverId = server.serverId
 
-    // Mock server authentication to return our test server
+    // Mock token authenticator to return our test server
     const ingress = context.ingressService as unknown as TestIngressService
-    ingress.dependencies.serverAuthenticator.authenticateServer = vi
+    ingress.dependencies.tokenAuthenticator.lookupSource = vi.fn().mockReturnValue(serverId)
+    ingress.dependencies.tokenAuthenticator.handleBeacon = vi
       .fn()
-      .mockResolvedValue(serverId)
+      .mockResolvedValue({ kind: "authenticated", serverId })
     ingress.dependencies.serverInfoProvider.getServerGame = vi.fn().mockResolvedValue("cstrike")
   })
 
@@ -74,7 +77,7 @@ describe("Event Pipeline (e2e)", () => {
       const logLine =
         '"Attacker<2><STEAM_0:1:12345><CT>" killed "Defender<3><STEAM_0:1:67890><TERRORIST>" with "ak47" (headshot)'
 
-      const event = await context.ingressService.processRawEvent(logLine, "127.0.0.1", 27015)
+      const event = await context.ingressService.processRawEvent(logLine, serverId)
 
       expect(event).not.toBeNull()
       expect(event!.eventType).toBe(EventType.PLAYER_KILL)
@@ -98,69 +101,80 @@ describe("Event Pipeline (e2e)", () => {
       const events: (BaseEvent | null)[] = []
 
       // Connect
-      const connectLine = '"Player1<2><STEAM_0:1:11111><>" connected, address "192.168.1.100:27005"'
-      events.push(await context.ingressService.processRawEvent(connectLine, "127.0.0.1", 27015))
+      events.push(
+        await context.ingressService.processRawEvent(
+          '"TestPlayer<2><STEAM_0:1:12345><>" connected, address "192.168.1.100:27015"',
+          serverId,
+        ),
+      )
 
       // Entry
-      const entryLine = '"Player1<2><STEAM_0:1:11111><CT>" entered the game'
-      events.push(await context.ingressService.processRawEvent(entryLine, "127.0.0.1", 27015))
+      events.push(
+        await context.ingressService.processRawEvent(
+          '"TestPlayer<2><STEAM_0:1:12345><>" entered the game',
+          serverId,
+        ),
+      )
 
       // Disconnect
-      const disconnectLine = '"Player1<2><STEAM_0:1:11111><CT>" disconnected'
-      events.push(await context.ingressService.processRawEvent(disconnectLine, "127.0.0.1", 27015))
+      events.push(
+        await context.ingressService.processRawEvent(
+          '"TestPlayer<2><STEAM_0:1:12345><CT>" disconnected',
+          serverId,
+        ),
+      )
 
-      // All events should have been parsed
-      const validEvents = events.filter((e) => e !== null)
-      expect(validEvents.length).toBeGreaterThanOrEqual(2) // connect + entry at minimum
+      // Verify all events were created
+      expect(events[0]).not.toBeNull()
+      expect(events[0]!.eventType).toBe(EventType.PLAYER_CONNECT)
 
-      // Check event types were recognized
-      const eventTypes = validEvents.map((e) => e.eventType)
-      expect(eventTypes).toContain(EventType.PLAYER_CONNECT)
-      expect(eventTypes).toContain(EventType.PLAYER_ENTRY)
+      expect(events[1]).not.toBeNull()
+      expect(events[1]!.eventType).toBe(EventType.PLAYER_ENTRY)
+
+      expect(events[2]).not.toBeNull()
+      expect(events[2]!.eventType).toBe(EventType.PLAYER_DISCONNECT)
+
+      // All should have consistent server ID
+      for (const event of events) {
+        expect(event!.serverId).toBe(serverId)
+      }
     })
   })
 
-  describe("chat event pipeline", () => {
-    it("should parse a chat message", async () => {
-      const logLine = '"Chatter<2><STEAM_0:1:22222><CT>" say "Hello world"'
+  describe("team actions", () => {
+    it("should process team change events", async () => {
+      const logLine = '"TestPlayer<2><STEAM_0:1:12345><Unassigned>" joined team "CT"'
 
-      const event = await context.ingressService.processRawEvent(logLine, "127.0.0.1", 27015)
+      const event = await context.ingressService.processRawEvent(logLine, serverId)
 
       expect(event).not.toBeNull()
-      expect(event!.eventType).toBe(EventType.CHAT_MESSAGE)
+      expect(event!.eventType).toBe(EventType.PLAYER_CHANGE_TEAM)
+      expect(event!.data).toMatchObject({
+        newTeam: "CT",
+        oldTeam: "Unassigned",
+      })
     })
   })
 
-  describe("statistics tracking", () => {
-    it("should track processed log counts", async () => {
-      const lines = [
-        '"P1<2><STEAM_0:1:33333><CT>" killed "P2<3><STEAM_0:1:44444><TERRORIST>" with "m4a1"',
-        '"P1<2><STEAM_0:1:33333><CT>" say "gg"',
-        "This is not a valid log line",
-      ]
+  describe("error handling", () => {
+    it("should handle invalid log lines gracefully", async () => {
+      const invalidLogLine = "this is not a valid log line at all"
 
-      for (const line of lines) {
-        await context.ingressService.processRawEvent(line, "127.0.0.1", 27015)
-      }
+      const event = await context.ingressService.processRawEvent(invalidLogLine, serverId)
 
-      const stats = context.ingressService.getStats()
-      expect(stats.totalLogsProcessed).toBeGreaterThanOrEqual(0)
-    })
-  })
-
-  describe("malformed input handling", () => {
-    it("should return null for unparseable log lines", async () => {
-      const event = await context.ingressService.processRawEvent(
-        "completely invalid garbage",
-        "127.0.0.1",
-        27015,
-      )
+      // Should return null for unparseable lines, not throw
       expect(event).toBeNull()
     })
 
-    it("should handle empty log lines", async () => {
-      const event = await context.ingressService.processRawEvent("", "127.0.0.1", 27015)
-      expect(event).toBeNull()
+    it("should track error count in stats", async () => {
+      const ingress = context.ingressService as unknown as TestIngressService
+
+      // Process several invalid lines
+      await context.ingressService.processRawEvent("invalid 1", serverId)
+      await context.ingressService.processRawEvent("invalid 2", serverId)
+
+      const stats = ingress.getStats()
+      expect(stats.totalErrors).toBeGreaterThan(0)
     })
   })
 })

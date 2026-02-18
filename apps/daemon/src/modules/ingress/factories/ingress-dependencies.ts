@@ -11,9 +11,10 @@ import type { ServerStateManager } from "@/modules/server/state/server-state-man
 import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import type { IClock } from "@/shared/infrastructure/time/clock.interface"
 import type { ILogger } from "@/shared/utils/logger.types"
-import { DatabaseServerAuthenticator } from "../adapters/database-server-authenticator"
 import { GameDetectorAdapter } from "../adapters/game-detector-adapter"
+import { TokenServerAuthenticator } from "../adapters/token-server-authenticator"
 import type { IngressDependencies } from "../ingress.dependencies"
+import { PrismaTokenRepository } from "../repositories"
 
 /**
  * Create ingress dependencies from existing services
@@ -28,9 +29,10 @@ export function createIngressDependencies(
   eventBus: IEventBus,
 ): IngressDependencies {
   const serverOrchestrator = new ServerOrchestrator(database, serverService, logger)
+  const tokenRepository = new PrismaTokenRepository(database, logger)
 
   return {
-    serverAuthenticator: new DatabaseServerAuthenticator(database, logger, eventBus),
+    tokenAuthenticator: new TokenServerAuthenticator(database, tokenRepository, logger, eventBus),
     gameDetector: new GameDetectorAdapter(gameDetectionService),
     serverInfoProvider: serverOrchestrator,
     serverStateManager,

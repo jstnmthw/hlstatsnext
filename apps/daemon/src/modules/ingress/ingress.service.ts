@@ -2,6 +2,7 @@
  * Ingress Service
  *
  * Handles UDP server, log parsing, server authentication, and event processing.
+ * Uses token-based authentication with beacons from game server plugins.
  */
 
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
@@ -12,6 +13,7 @@ import type { IIngressService, IngressOptions, IngressStats } from "./ingress.ty
 import type { BaseParser } from "./parsers/base.parser"
 import { ParserFactory } from "./parsers/parser-factory"
 import { UdpServer, type ISocketFactory } from "./udp-server"
+import { classifyLine } from "./utils/token-extractor"
 
 export class IngressService implements IIngressService {
   private readonly udpServer: UdpServer
@@ -96,18 +98,11 @@ export class IngressService implements IIngressService {
     }
   }
 
-  async processRawEvent(
-    rawData: string,
-    serverAddress: string,
-    serverPort: number,
-  ): Promise<BaseEvent | null> {
-    // Get or authenticate server
-    const serverId = await this.authenticateServer(serverAddress, serverPort)
-    if (serverId === null) {
-      // Server authentication failed - authenticator already logged with rate limiting
-      return null
-    }
-
+  /**
+   * Process a raw log line from an authenticated server.
+   * This method is called after authentication has succeeded.
+   */
+  async processRawEvent(rawData: string, serverId: number): Promise<BaseEvent | null> {
     // Select parser for this server based on its game
     const parser = await this.getOrCreateParserForServer(serverId)
 
@@ -128,12 +123,16 @@ export class IngressService implements IIngressService {
     return parseResult.event
   }
 
-  async authenticateServer(address: string, port: number): Promise<number | null> {
-    return await this.dependencies.serverAuthenticator.authenticateServer(address, port)
+  /**
+   * Look up authenticated server by UDP source.
+   * Used for engine log lines (not beacons).
+   */
+  authenticateSource(address: string, port: number): number | undefined {
+    return this.dependencies.tokenAuthenticator.lookupSource(address, port)
   }
 
   getAuthenticatedServerIds(): number[] {
-    return this.dependencies.serverAuthenticator.getAuthenticatedServerIds()
+    return this.dependencies.tokenAuthenticator.getAuthenticatedServerIds()
   }
 
   private async handleLogLine(
@@ -143,12 +142,30 @@ export class IngressService implements IIngressService {
   ): Promise<void> {
     try {
       // Skip empty lines
-      if (!logLine.trim()) {
+      const trimmedLine = logLine.trim()
+      if (!trimmedLine) {
         return
       }
 
-      // Process the raw event
-      const event = await this.processRawEvent(logLine.trim(), serverAddress, serverPort)
+      // Classify the line as beacon or regular log line
+      const classified = classifyLine(trimmedLine)
+
+      if (classified.kind === "beacon") {
+        // Authentication beacon from plugin
+        await this.handleBeacon(classified.token, classified.gamePort, serverAddress, serverPort)
+        return // Beacons are not game events
+      }
+
+      // Regular engine log line - look up authenticated source
+      const serverId = this.authenticateSource(serverAddress, serverPort)
+      if (serverId === undefined) {
+        // No authentication session - drop silently
+        // (This is normal for servers that haven't sent a beacon yet)
+        return
+      }
+
+      // Process the log line
+      const event = await this.processRawEvent(classified.logLine, serverId)
 
       if (event) {
         if (!this.eventPublisher) {
@@ -175,6 +192,34 @@ export class IngressService implements IIngressService {
         logLine: logLine.substring(0, 100), // First 100 chars for context
         errorMessage: error instanceof Error ? error.message : String(error),
       })
+    }
+  }
+
+  /**
+   * Handle an authentication beacon from the game server plugin.
+   */
+  private async handleBeacon(
+    token: string,
+    gamePort: number,
+    sourceAddress: string,
+    sourcePort: number,
+  ): Promise<void> {
+    const result = await this.dependencies.tokenAuthenticator.handleBeacon(
+      token,
+      gamePort,
+      sourceAddress,
+      sourcePort,
+    )
+
+    if (result.kind === "unauthorized") {
+      this.logger.debug(`Beacon auth failed from ${sourceAddress}:${sourcePort}: ${result.reason}`)
+      return
+    }
+
+    if (result.kind === "auto_registered") {
+      this.logger.ok(
+        `New server auto-registered via beacon: ID ${result.serverId} from ${sourceAddress}`,
+      )
     }
   }
 

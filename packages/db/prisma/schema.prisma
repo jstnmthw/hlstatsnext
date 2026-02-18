@@ -751,48 +751,74 @@ model Role {
   @@map("roles")
 }
 
+/// Server authentication token for beacon-based authentication.
+/// Tokens carry RCON password, game type, and are used for auto-registration.
+model ServerToken {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  tokenHash    String    @unique @map("token_hash") @db.VarChar(64)
+  tokenPrefix  String    @map("token_prefix") @db.VarChar(12)
+  name         String    @db.VarChar(128)
+  rconPassword String    @default("") @map("rcon_password") @db.VarChar(512) // AES-256-GCM encrypted
+  game         String    @default("valve") @db.VarChar(32)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  expiresAt    DateTime? @map("expires_at")
+  revokedAt    DateTime? @map("revoked_at")
+  lastUsedAt   DateTime? @map("last_used_at")
+  createdBy    String    @map("created_by") @db.VarChar(16)
+
+  servers Server[]
+
+  @@index([revokedAt], name: "idx_token_revoked")
+  @@index([lastUsedAt], name: "idx_token_last_used")
+  @@map("server_tokens")
+}
+
 model Server {
-  serverId       Int       @id @default(autoincrement()) @map("server_id") @db.UnsignedInt
-  address        String    @default("") @db.VarChar(32)
-  port           Int       @default(0) @db.UnsignedInt
-  name           String    @default("") @db.VarChar(255)
-  sortOrder      Int       @default(0) @map("sort_order") @db.TinyInt
-  game           String    @default("valve") @db.VarChar(32)
-  publicAddress  String    @default("") @map("public_address") @db.VarChar(128)
-  statusUrl      String?   @map("status_url") @db.VarChar(255)
-  rconPassword   String    @default("") @map("rcon_password") @db.VarChar(512)
-  connectionType String    @default("external") @map("connection_type") @db.VarChar(8) // 'docker' or 'external'
-  dockerHost     String?   @map("docker_host") @db.VarChar(255) // Container hostname or static IP for Docker servers
-  kills         Int       @default(0)
-  players       Int       @default(0)
-  rounds        Int       @default(0)
-  suicides      Int       @default(0)
-  headshots     Int       @default(0)
-  bombsPlanted  Int       @default(0) @map("bombs_planted")
-  bombsDefused  Int       @default(0) @map("bombs_defused")
-  ctWins        Int       @default(0) @map("ct_wins")
-  tsWins        Int       @default(0) @map("ts_wins")
-  maxPlayers    Int       @default(0) @map("max_players") @db.SmallInt
-  activePlayers Int       @default(0) @map("active_players") @db.SmallInt
-  activeMap     String    @default("") @map("active_map") @db.VarChar(64)
-  mapRounds     Int       @default(0) @map("map_rounds")
-  mapCtWins     Int       @default(0) @map("map_ct_wins")
-  mapTsWins     Int       @default(0) @map("map_ts_wins")
-  mapStarted    Int       @default(0) @map("map_started")
-  mapChanges    Int       @default(0) @map("map_changes")
-  ctShots       Int       @default(0) @map("ct_shots")
-  ctHits        Int       @default(0) @map("ct_hits")
-  tsShots       Int       @default(0) @map("ts_shots")
-  tsHits        Int       @default(0) @map("ts_hits")
-  mapCtShots    Int       @default(0) @map("map_ct_shots")
-  mapCtHits     Int       @default(0) @map("map_ct_hits")
-  mapTsShots    Int       @default(0) @map("map_ts_shots")
-  mapTsHits     Int       @default(0) @map("map_ts_hits")
+  serverId      Int          @id @default(autoincrement()) @map("server_id") @db.UnsignedInt
+  address       String       @default("") @db.VarChar(32)
+  port          Int          @default(0) @db.UnsignedInt
+  name          String       @default("") @db.VarChar(255)
+  sortOrder     Int          @default(0) @map("sort_order") @db.TinyInt
+  game          String       @default("valve") @db.VarChar(32)
+  publicAddress String       @default("") @map("public_address") @db.VarChar(128)
+  statusUrl     String?      @map("status_url") @db.VarChar(255)
+  rconPassword   String       @default("") @map("rcon_password") @db.VarChar(512)
+  /// @deprecated - Scheduled for removal. Use token-based authentication instead.
+  connectionType String       @default("external") @map("connection_type") @db.VarChar(8)
+  /// @deprecated - Scheduled for removal. Use token-based authentication instead.
+  dockerHost     String?      @map("docker_host") @db.VarChar(255)
+  authTokenId    Int?         @map("token_id") @db.UnsignedInt
+  authToken      ServerToken? @relation(fields: [authTokenId], references: [id], onDelete: SetNull)
+  kills          Int          @default(0)
+  players       Int          @default(0)
+  rounds        Int          @default(0)
+  suicides      Int          @default(0)
+  headshots     Int          @default(0)
+  bombsPlanted  Int          @default(0) @map("bombs_planted")
+  bombsDefused  Int          @default(0) @map("bombs_defused")
+  ctWins        Int          @default(0) @map("ct_wins")
+  tsWins        Int          @default(0) @map("ts_wins")
+  maxPlayers    Int          @default(0) @map("max_players") @db.SmallInt
+  activePlayers Int          @default(0) @map("active_players") @db.SmallInt
+  activeMap     String       @default("") @map("active_map") @db.VarChar(64)
+  mapRounds     Int          @default(0) @map("map_rounds")
+  mapCtWins     Int          @default(0) @map("map_ct_wins")
+  mapTsWins     Int          @default(0) @map("map_ts_wins")
+  mapStarted    Int          @default(0) @map("map_started")
+  mapChanges    Int          @default(0) @map("map_changes")
+  ctShots       Int          @default(0) @map("ct_shots")
+  ctHits        Int          @default(0) @map("ct_hits")
+  tsShots       Int          @default(0) @map("ts_shots")
+  tsHits        Int          @default(0) @map("ts_hits")
+  mapCtShots    Int          @default(0) @map("map_ct_shots")
+  mapCtHits     Int          @default(0) @map("map_ct_hits")
+  mapTsShots    Int          @default(0) @map("map_ts_shots")
+  mapTsHits     Int          @default(0) @map("map_ts_hits")
   lat           Float?
   lng           Float?
-  city          String    @default("") @db.VarChar(64)
-  country       String    @default("") @db.VarChar(64)
-  lastEvent     DateTime? @map("last_event") @db.DateTime(0)
+  city          String       @default("") @db.VarChar(64)
+  country       String       @default("") @db.VarChar(64)
+  lastEvent     DateTime?    @map("last_event") @db.DateTime(0)
 
   eventsAdmin              EventAdmin[]
   eventsChangeName         EventChangeName[]
@@ -814,9 +840,11 @@ model Server {
   loads                    ServerLoad[]
   notificationConfig       NotificationConfig?
 
-  // Ensure uniqueness across both connection types by including connectionType in constraints
+  // Legacy constraints (will be dropped when connectionType/dockerHost are removed)
   @@unique([connectionType, address, port], name: "servers_external_unique")
   @@unique([connectionType, dockerHost, port], name: "servers_docker_unique")
+  // New token-based index
+  @@index([authTokenId], name: "idx_server_token")
   @@index([game])
   @@index([lastEvent])
   @@index([name])
@@ -893,38 +921,38 @@ model Team {
 // Better Auth models
 
 model User {
-  id            String    @id
+  id            String   @id
   name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false) @map("email_verified")
-  image         String?   @db.Text
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  email         String   @unique
+  emailVerified Boolean  @default(false) @map("email_verified")
+  image         String?  @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   // Admin plugin fields
-  role      String?   @default("user")
-  banned    Boolean?  @default(false)
-  banReason String?   @map("ban_reason") @db.Text
+  role       String?   @default("user")
+  banned     Boolean?  @default(false)
+  banReason  String?   @map("ban_reason") @db.Text
   banExpires DateTime? @map("ban_expires")
 
-  sessions  Session[]
-  accounts  Account[]
+  sessions Session[]
+  accounts Account[]
 
   @@map("user")
 }
 
 model Session {
-  id             String    @id
-  userId         String    @map("user_id")
-  token          String    @unique
-  expiresAt      DateTime  @map("expires_at")
-  ipAddress      String?   @map("ip_address") @db.VarChar(255)
-  userAgent      String?   @map("user_agent") @db.Text
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
+  id        String   @id
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  ipAddress String?  @map("ip_address") @db.VarChar(255)
+  userAgent String?  @map("user_agent") @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Admin plugin fields
-  impersonatedBy String?   @map("impersonated_by")
+  impersonatedBy String? @map("impersonated_by")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -952,10 +980,10 @@ model Account {
 }
 
 model Verification {
-  id         String   @id
-  identifier String   @unique
-  value      String   @db.Text
-  expiresAt  DateTime @map("expires_at")
+  id         String    @id
+  identifier String    @unique
+  value      String    @db.Text
+  expiresAt  DateTime  @map("expires_at")
   createdAt  DateTime? @default(now()) @map("created_at")
   updatedAt  DateTime? @updatedAt @map("updated_at")
 

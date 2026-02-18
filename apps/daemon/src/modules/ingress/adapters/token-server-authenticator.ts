@@ -1,0 +1,307 @@
+/**
+ * Token Server Authenticator
+ *
+ * Authenticates game servers using token-based beacon authentication.
+ * Maintains in-memory caches for tokens and source IP → server mappings.
+ */
+
+import type { DatabaseClient } from "@/database/client"
+import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
+import { EventType, type ServerAuthenticatedEvent } from "@/shared/types/events"
+import type { ILogger } from "@/shared/utils/logger.types"
+import { hashToken, isValidTokenFormat } from "@repo/crypto"
+import type { ServerTokenEntity, SourceCacheEntry, TokenCacheEntry } from "../entities"
+import type { ITokenRepository } from "../repositories"
+import { AuthRateLimiter, type RateLimiterConfig } from "../utils/rate-limiter"
+
+/**
+ * Result of a beacon authentication attempt.
+ */
+export type BeaconAuthResult =
+  | { kind: "authenticated"; serverId: number }
+  | { kind: "auto_registered"; serverId: number; tokenId: number }
+  | { kind: "unauthorized"; reason: string }
+
+/**
+ * Configuration for TokenServerAuthenticator.
+ */
+export interface TokenAuthenticatorConfig {
+  /** Token cache TTL in ms (default: 60000 = 1 minute) */
+  tokenCacheTtlMs: number
+  /** Source cache TTL in ms (default: 300000 = 5 minutes) */
+  sourceCacheTtlMs: number
+  /** Rate limiter config */
+  rateLimiter?: Partial<RateLimiterConfig>
+}
+
+export const DEFAULT_TOKEN_AUTHENTICATOR_CONFIG: TokenAuthenticatorConfig = {
+  tokenCacheTtlMs: 60_000, // 1 minute
+  sourceCacheTtlMs: 300_000, // 5 minutes
+}
+
+/**
+ * Token-based server authenticator.
+ *
+ * Beacons authenticate servers via tokens; subsequent log lines from the
+ * same UDP source are authenticated via the source cache.
+ */
+export class TokenServerAuthenticator {
+  /** Token hash → cached token entity with TTL */
+  private readonly tokenCache = new Map<string, TokenCacheEntry>()
+
+  /** "sourceIP:sourcePort" → cached server ID mapping */
+  private readonly sourceCache = new Map<string, SourceCacheEntry>()
+
+  /** Rate limiter for failed authentication attempts */
+  private readonly rateLimiter: AuthRateLimiter
+
+  private readonly config: TokenAuthenticatorConfig
+
+  constructor(
+    private readonly database: DatabaseClient,
+    private readonly tokenRepository: ITokenRepository,
+    private readonly logger: ILogger,
+    private readonly eventBus: IEventBus,
+    config?: Partial<TokenAuthenticatorConfig>,
+  ) {
+    this.config = { ...DEFAULT_TOKEN_AUTHENTICATOR_CONFIG, ...config }
+    this.rateLimiter = new AuthRateLimiter(config?.rateLimiter)
+  }
+
+  /**
+   * Handle an authentication beacon from a game server plugin.
+   *
+   * @param token - Raw token from the beacon
+   * @param gamePort - Game server port (for RCON connection)
+   * @param sourceAddress - UDP source IP
+   * @param sourcePort - UDP ephemeral source port
+   */
+  async handleBeacon(
+    token: string,
+    gamePort: number,
+    sourceAddress: string,
+    sourcePort: number,
+  ): Promise<BeaconAuthResult> {
+    // Check rate limiting first
+    if (this.rateLimiter.isBlocked(sourceAddress)) {
+      this.logger.debug(`Rate-limited beacon from ${sourceAddress}`)
+      return { kind: "unauthorized", reason: "rate_limited" }
+    }
+
+    // Validate token format
+    if (!isValidTokenFormat(token)) {
+      this.rateLimiter.recordFailure(sourceAddress)
+      this.logger.warn(`Invalid token format from ${sourceAddress}:${sourcePort}`)
+      return { kind: "unauthorized", reason: "invalid_format" }
+    }
+
+    // Hash and validate token
+    const tokenHash = hashToken(token)
+    const validationResult = await this.validateToken(tokenHash)
+
+    if (validationResult.kind !== "valid") {
+      const blocked = this.rateLimiter.recordFailure(sourceAddress)
+      if (blocked) {
+        this.logger.warn(`Source ${sourceAddress} blocked after repeated failures`)
+      }
+      this.logger.debug(
+        `Token validation failed from ${sourceAddress}:${sourcePort}: ${validationResult.kind}`,
+      )
+      return { kind: "unauthorized", reason: validationResult.kind }
+    }
+
+    const tokenEntity = validationResult.token
+
+    // Update lastUsedAt (debounced by repository)
+    await this.tokenRepository.updateLastUsed(tokenEntity.id)
+
+    // Find or auto-register server
+    const serverResult = await this.findOrRegisterServer(tokenEntity, sourceAddress, gamePort)
+
+    // Cache the source → serverId mapping
+    const sourceKey = `${sourceAddress}:${sourcePort}`
+    this.sourceCache.set(sourceKey, {
+      serverId: serverResult.serverId,
+      tokenId: tokenEntity.id,
+      cachedAt: Date.now(),
+    })
+
+    this.logger.debug(`Beacon authenticated: ${sourceKey} → server ${serverResult.serverId}`)
+
+    return serverResult
+  }
+
+  /**
+   * Look up authenticated server by UDP source address.
+   * Used for engine-generated log lines (not beacons).
+   *
+   * @param sourceAddress - UDP source IP
+   * @param sourcePort - UDP ephemeral source port
+   * @returns Server ID if authenticated, undefined if no session
+   */
+  lookupSource(sourceAddress: string, sourcePort: number): number | undefined {
+    const sourceKey = `${sourceAddress}:${sourcePort}`
+    const entry = this.sourceCache.get(sourceKey)
+
+    if (!entry) {
+      return undefined
+    }
+
+    // Check TTL
+    const age = Date.now() - entry.cachedAt
+    if (age > this.config.sourceCacheTtlMs) {
+      this.sourceCache.delete(sourceKey)
+      this.logger.debug(`Source cache expired for ${sourceKey}`)
+      return undefined
+    }
+
+    return entry.serverId
+  }
+
+  /**
+   * Get all currently authenticated server IDs.
+   * Used by RCON monitoring to discover active servers.
+   */
+  getAuthenticatedServerIds(): number[] {
+    const now = Date.now()
+    const serverIds = new Set<number>()
+
+    for (const [key, entry] of this.sourceCache) {
+      const age = now - entry.cachedAt
+      if (age <= this.config.sourceCacheTtlMs) {
+        serverIds.add(entry.serverId)
+      } else {
+        // Clean up expired entry
+        this.sourceCache.delete(key)
+      }
+    }
+
+    return Array.from(serverIds)
+  }
+
+  /**
+   * Clear caches (useful for testing).
+   */
+  clearCaches(): void {
+    this.tokenCache.clear()
+    this.sourceCache.clear()
+    this.rateLimiter.clear()
+  }
+
+  /**
+   * Validate token via cache or database.
+   */
+  private async validateToken(
+    tokenHash: string,
+  ): Promise<
+    | { kind: "valid"; token: ServerTokenEntity }
+    | { kind: "not_found" }
+    | { kind: "revoked" }
+    | { kind: "expired" }
+  > {
+    // Check cache first
+    const cached = this.tokenCache.get(tokenHash)
+    if (cached) {
+      const age = Date.now() - cached.cachedAt
+      if (age <= this.config.tokenCacheTtlMs) {
+        return { kind: "valid", token: cached.tokenEntity }
+      }
+      // Cache expired - remove it
+      this.tokenCache.delete(tokenHash)
+    }
+
+    // Query database via repository
+    const result = await this.tokenRepository.findByHash(tokenHash)
+
+    if (result.kind === "valid") {
+      // Cache the valid token
+      this.tokenCache.set(tokenHash, {
+        tokenId: result.token.id,
+        tokenEntity: result.token,
+        cachedAt: Date.now(),
+      })
+      return result
+    }
+
+    // Map repository result kinds
+    if (result.kind === "revoked") {
+      return { kind: "revoked" }
+    }
+    if (result.kind === "expired") {
+      return { kind: "expired" }
+    }
+
+    return { kind: "not_found" }
+  }
+
+  /**
+   * Find existing server or auto-register a new one.
+   */
+  private async findOrRegisterServer(
+    token: ServerTokenEntity,
+    address: string,
+    gamePort: number,
+  ): Promise<
+    | { kind: "authenticated"; serverId: number }
+    | { kind: "auto_registered"; serverId: number; tokenId: number }
+  > {
+    // Look for existing server with same address + port
+    const existing = await this.database.prisma.server.findFirst({
+      where: {
+        address,
+        port: gamePort,
+      },
+      select: { serverId: true, authTokenId: true },
+    })
+
+    if (existing) {
+      // Update token association if needed
+      if (existing.authTokenId !== token.id) {
+        await this.database.prisma.server.update({
+          where: { serverId: existing.serverId },
+          data: { authTokenId: token.id },
+        })
+        this.logger.info(
+          `Updated server ${existing.serverId} token association from ${existing.authTokenId} to ${token.id}`,
+        )
+      }
+      return { kind: "authenticated", serverId: existing.serverId }
+    }
+
+    // Auto-register new server
+    const newServer = await this.database.prisma.server.create({
+      data: {
+        address,
+        port: gamePort,
+        name: `${address}:${gamePort}`, // Default name - will be updated by RCON status
+        game: token.game,
+        rconPassword: token.rconPassword, // Already encrypted
+        authTokenId: token.id,
+        connectionType: "external", // Legacy field, always external for token auth
+      },
+      select: { serverId: true },
+    })
+
+    this.logger.ok(
+      `Auto-registered new server: ID ${newServer.serverId} at ${address}:${gamePort} (game: ${token.game})`,
+    )
+
+    // Emit SERVER_AUTHENTICATED event for RCON connection
+    try {
+      const event: ServerAuthenticatedEvent = {
+        eventType: EventType.SERVER_AUTHENTICATED,
+        timestamp: new Date(),
+        serverId: newServer.serverId,
+      }
+      await this.eventBus.emit(event)
+    } catch (error) {
+      this.logger.warn(`Error emitting server authentication event: ${error}`)
+    }
+
+    return {
+      kind: "auto_registered",
+      serverId: newServer.serverId,
+      tokenId: token.id,
+    }
+  }
+}

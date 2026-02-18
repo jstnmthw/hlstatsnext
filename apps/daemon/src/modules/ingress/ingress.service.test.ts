@@ -8,6 +8,7 @@ import { TestClock } from "@/shared/infrastructure/time/test-clock"
 import { createMockLogger } from "@/tests/mocks/logger"
 import type { Socket } from "dgram"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import type { TokenServerAuthenticator } from "./adapters/token-server-authenticator"
 import type { IngressDependencies } from "./ingress.dependencies"
 import { IngressService } from "./ingress.service"
 import type { ISocketFactory } from "./udp-server"
@@ -36,14 +37,26 @@ const mockSocketFactory: ISocketFactory = {
   createSocket: vi.fn(() => mockSocket as unknown as Socket),
 }
 
+// Create mock token authenticator
+function createMockTokenAuthenticator(): TokenServerAuthenticator {
+  return {
+    handleBeacon: vi.fn().mockResolvedValue({ kind: "authenticated", serverId: 1 }),
+    lookupSource: vi.fn().mockReturnValue(1),
+    getAuthenticatedServerIds: vi.fn().mockReturnValue([1]),
+    clearCaches: vi.fn(),
+  } as unknown as TokenServerAuthenticator
+}
+
 describe("IngressService", () => {
   let ingressService: IngressService
   let mockLogger: ReturnType<typeof createMockLogger>
   let mockEventPublisher: IEventPublisher
   let mockDependencies: IngressDependencies
+  let mockTokenAuthenticator: TokenServerAuthenticator
 
   beforeEach(() => {
     mockLogger = createMockLogger()
+    mockTokenAuthenticator = createMockTokenAuthenticator()
 
     // Mock EventPublisher
     mockEventPublisher = {
@@ -53,11 +66,7 @@ describe("IngressService", () => {
 
     // Mock dependencies
     mockDependencies = {
-      serverAuthenticator: {
-        authenticateServer: vi.fn().mockResolvedValue(1),
-        cacheServer: vi.fn().mockResolvedValue(undefined),
-        getAuthenticatedServerIds: vi.fn().mockReturnValue([]),
-      },
+      tokenAuthenticator: mockTokenAuthenticator,
       gameDetector: {
         detectGame: vi.fn().mockResolvedValue({
           gameCode: "csgo",
@@ -135,52 +144,45 @@ describe("IngressService", () => {
     it("should process raw events using server's game parser", async () => {
       const event = await ingressService.processRawEvent(
         'L 03/15/2023 - 12:30:45: "Player<1><STEAM_1:1:12345><CT>" connected',
-        "127.0.0.1",
-        27015,
+        1, // serverId
       )
 
       expect(event).toBeDefined()
-      expect(mockDependencies.serverAuthenticator.authenticateServer).toHaveBeenCalledWith(
-        "127.0.0.1",
-        27015,
-      )
       expect(mockDependencies.serverInfoProvider.getServerGame).toHaveBeenCalledWith(1)
     })
 
-    it("should handle server authentication", async () => {
-      const serverId = await ingressService.authenticateServer("127.0.0.1", 27015)
+    it("should lookup source via token authenticator", () => {
+      const serverId = ingressService.authenticateSource("127.0.0.1", 27015)
       expect(serverId).toBe(1)
-      expect(mockDependencies.serverAuthenticator.authenticateServer).toHaveBeenCalledWith(
-        "127.0.0.1",
-        27015,
-      )
+      expect(mockTokenAuthenticator.lookupSource).toHaveBeenCalledWith("127.0.0.1", 27015)
     })
 
-    it("should return null for unauthenticated servers", async () => {
-      const authenticateServerMock = mockDependencies.serverAuthenticator
-        .authenticateServer as ReturnType<typeof vi.fn>
-      authenticateServerMock.mockResolvedValue(null)
+    it("should return undefined for unauthenticated sources", () => {
+      vi.mocked(mockTokenAuthenticator.lookupSource).mockReturnValue(undefined)
 
-      const serverId = await ingressService.authenticateServer("127.0.0.1", 27015)
+      const serverId = ingressService.authenticateSource("127.0.0.1", 27015)
 
-      expect(serverId).toBeNull()
-      expect(mockDependencies.gameDetector.detectGame).not.toHaveBeenCalled()
-      expect(mockDependencies.serverInfoProvider.findOrCreateServer).not.toHaveBeenCalled()
+      expect(serverId).toBeUndefined()
     })
 
     it("should not emit events for unsupported games (noop parser)", async () => {
       // Change game for this server to an unsupported one
-      ;(
-        mockDependencies.serverInfoProvider.getServerGame as ReturnType<typeof vi.fn>
-      ).mockResolvedValueOnce("unknown-game")
+      vi.mocked(mockDependencies.serverInfoProvider.getServerGame).mockResolvedValueOnce(
+        "unknown-game",
+      )
 
       const event = await ingressService.processRawEvent(
         'L 03/15/2023 - 12:30:45: "Player<1><STEAM_1:1:12345><CT>" connected',
-        "127.0.0.1",
-        27015,
+        1, // serverId
       )
 
       expect(event).toBeNull()
+    })
+
+    it("should get authenticated server IDs from token authenticator", () => {
+      const serverIds = ingressService.getAuthenticatedServerIds()
+      expect(serverIds).toEqual([1])
+      expect(mockTokenAuthenticator.getAuthenticatedServerIds).toHaveBeenCalled()
     })
   })
 })

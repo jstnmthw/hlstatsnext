@@ -209,45 +209,7 @@ describe("HLStatsDaemon", () => {
 
       expect(contextWithoutPublisher.logger.failed).toHaveBeenCalledWith(
         "Failed to start daemon",
-        expect.stringContaining("Event publisher not initialized"),
-      )
-      expect(mockExit).toHaveBeenCalledWith(1)
-
-      mockExit.mockRestore()
-    })
-
-    it("should validate parser functionality with sample log line", async () => {
-      vi.mocked(mockDatabaseConnection.testConnection).mockResolvedValue(true)
-      vi.mocked(mockContext.ingressService.start).mockResolvedValue(undefined)
-
-      await daemon.start()
-
-      // Verify processRawEvent was called with test data during preflight
-      expect(mockContext.ingressService.processRawEvent).toHaveBeenCalledWith(
-        'L 01/01/2024 - 12:00:00: "TestPlayer<999><STEAM_TEST><CT>" connected',
-        "127.0.0.1",
-        27015,
-      )
-      expect(mockContext.logger.debug).toHaveBeenCalledWith(
-        "Parser functionality validated successfully",
-      )
-    })
-
-    it("should handle parser errors gracefully during preflight", async () => {
-      vi.mocked(mockDatabaseConnection.testConnection).mockResolvedValue(true)
-
-      // Make processRawEvent throw an error (parser error)
-      vi.mocked(mockContext.ingressService.processRawEvent).mockRejectedValue(
-        new Error("Parser error"),
-      )
-
-      const mockExit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never)
-
-      await daemon.start()
-
-      expect(mockContext.logger.failed).toHaveBeenCalledWith(
-        "Failed to start daemon",
-        expect.stringContaining("Parser preflight check failed: Parser error"),
+        expect.stringContaining("Event publisher not available"),
       )
       expect(mockExit).toHaveBeenCalledWith(1)
 

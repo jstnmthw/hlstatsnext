@@ -35,16 +35,13 @@ describe("RconRepository", () => {
   })
 
   describe("getRconCredentials", () => {
-    it("should return credentials for an external server", async () => {
+    it("should return credentials for a server", async () => {
       mockDb.mockPrisma.server.findUnique.mockResolvedValue({
         serverId: 1,
         address: "192.168.1.100",
         port: 27015,
         rconPassword: "encrypted_pass",
         game: "csgo",
-        connectionType: "external",
-        dockerHost: null,
-        name: "Test Server",
       } as never)
 
       const result = await repository.getRconCredentials(1)
@@ -65,40 +62,10 @@ describe("RconRepository", () => {
           port: true,
           rconPassword: true,
           game: true,
-          connectionType: true,
-          dockerHost: true,
-          name: true,
         },
       })
 
       expect(mockCrypto.decrypt).toHaveBeenCalledWith("encrypted_pass")
-    })
-
-    it("should return credentials for a Docker server", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 2,
-        address: "192.168.1.100",
-        port: 27015,
-        rconPassword: "encrypted_pass",
-        game: "cstrike",
-        connectionType: "docker",
-        dockerHost: "10.0.0.5",
-        name: "Docker Server",
-      } as never)
-
-      const result = await repository.getRconCredentials(2)
-
-      expect(result).toEqual({
-        serverId: 2,
-        address: "10.0.0.5",
-        port: 27015, // Standard game port for Docker
-        rconPassword: "decrypted_password",
-        gameEngine: GameEngine.GOLDSRC,
-      })
-
-      expect(mockLogger.debug).toHaveBeenCalledWith(
-        expect.stringContaining("Using Docker connection"),
-      )
     })
 
     it("should return null when server is not found", async () => {
@@ -117,9 +84,6 @@ describe("RconRepository", () => {
         port: 27015,
         rconPassword: null,
         game: "csgo",
-        connectionType: "external",
-        dockerHost: null,
-        name: "No Password Server",
       } as never)
 
       const result = await repository.getRconCredentials(3)
@@ -135,9 +99,6 @@ describe("RconRepository", () => {
         port: 27015,
         rconPassword: "bad_encrypted_pass",
         game: "csgo",
-        connectionType: "external",
-        dockerHost: null,
-        name: "Bad Password Server",
       } as never)
 
       vi.mocked(mockCrypto.decrypt).mockRejectedValue(new Error("Decryption failed"))
@@ -161,16 +122,15 @@ describe("RconRepository", () => {
       )
     })
 
-    it("should use external connection when connectionType is not docker", async () => {
+    it("should use server address and port directly (token auth)", async () => {
+      // With token-based auth, server.address and server.port are set correctly
+      // during beacon auto-registration
       mockDb.mockPrisma.server.findUnique.mockResolvedValue({
         serverId: 6,
         address: "10.20.30.40",
         port: 27016,
         rconPassword: "enc",
         game: "tf2",
-        connectionType: "external",
-        dockerHost: null,
-        name: "External Server",
       } as never)
 
       const result = await repository.getRconCredentials(6)
@@ -178,46 +138,8 @@ describe("RconRepository", () => {
       expect(result!.address).toBe("10.20.30.40")
       expect(result!.port).toBe(27016)
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        expect.stringContaining("Using external connection"),
+        "RCON connection for server 6: 10.20.30.40:27016",
       )
-    })
-
-    it("should use external connection when docker but no dockerHost", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 7,
-        address: "10.20.30.40",
-        port: 27016,
-        rconPassword: "enc",
-        game: "csgo",
-        connectionType: "docker",
-        dockerHost: null,
-        name: "Docker No Host",
-      } as never)
-
-      const result = await repository.getRconCredentials(7)
-
-      // When docker but no dockerHost, falls through to external
-      expect(result!.address).toBe("10.20.30.40")
-      expect(result!.port).toBe(27016)
-    })
-
-    it("should use empty string dockerHost as falsy -> external", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 8,
-        address: "10.20.30.40",
-        port: 27016,
-        rconPassword: "enc",
-        game: "csgo",
-        connectionType: "docker",
-        dockerHost: "",
-        name: "Docker Empty Host",
-      } as never)
-
-      const result = await repository.getRconCredentials(8)
-
-      // Empty string is falsy, so falls through to external
-      expect(result!.address).toBe("10.20.30.40")
-      expect(result!.port).toBe(27016)
     })
   })
 
@@ -309,226 +231,98 @@ describe("RconRepository", () => {
   describe("mapGameToEngine", () => {
     // Test through getRconCredentials which calls mapGameToEngine internally
 
-    it("should map cstrike to GOLDSRC", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "cstrike",
-        connectionType: "external",
-        dockerHost: null,
-        name: "CS",
-      } as never)
+    const createServerMock = (game: string) => ({
+      serverId: 1,
+      address: "1.2.3.4",
+      port: 27015,
+      rconPassword: "enc",
+      game,
+    })
 
+    it("should map cstrike to GOLDSRC", async () => {
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("cstrike") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.GOLDSRC)
     })
 
     it("should map cs_ prefix to GOLDSRC", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "cs_16",
-        connectionType: "external",
-        dockerHost: null,
-        name: "CS",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("cs_16") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.GOLDSRC)
     })
 
     it("should map css to SOURCE", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "css",
-        connectionType: "external",
-        dockerHost: null,
-        name: "CSS",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("css") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE)
     })
 
     it("should map csgo to SOURCE", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "csgo",
-        connectionType: "external",
-        dockerHost: null,
-        name: "CSGO",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("csgo") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE)
     })
 
     it("should map cs2 to SOURCE", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "cs2",
-        connectionType: "external",
-        dockerHost: null,
-        name: "CS2",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("cs2") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE)
     })
 
     it("should map tf to SOURCE", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "tf",
-        connectionType: "external",
-        dockerHost: null,
-        name: "TF",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("tf") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE)
     })
 
     it("should map tf2 to SOURCE", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "tf2",
-        connectionType: "external",
-        dockerHost: null,
-        name: "TF2",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("tf2") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE)
     })
 
     it("should map hl2 to SOURCE", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "hl2mp",
-        connectionType: "external",
-        dockerHost: null,
-        name: "HL2",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("hl2mp") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE)
     })
 
     it("should map source to SOURCE", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "source_engine",
-        connectionType: "external",
-        dockerHost: null,
-        name: "Source Game",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(
+        createServerMock("source_engine") as never,
+      )
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE)
     })
 
     it("should map l4d to SOURCE_2009", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "l4d2",
-        connectionType: "external",
-        dockerHost: null,
-        name: "L4D2",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("l4d2") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE_2009)
     })
 
     it("should map portal to SOURCE_2009", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "portal2",
-        connectionType: "external",
-        dockerHost: null,
-        name: "Portal",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("portal2") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE_2009)
     })
 
     it("should map ep2 to SOURCE_2009", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "ep2",
-        connectionType: "external",
-        dockerHost: null,
-        name: "EP2",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("ep2") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE_2009)
     })
 
     it("should map dod:s to SOURCE_2009", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "dod:s",
-        connectionType: "external",
-        dockerHost: null,
-        name: "DoD:S",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("dod:s") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE_2009)
     })
 
     it("should default to SOURCE for unknown games and log a warning", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "unknown_game",
-        connectionType: "external",
-        dockerHost: null,
-        name: "Unknown",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(
+        createServerMock("unknown_game") as never,
+      )
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE)
       expect(mockLogger.warn).toHaveBeenCalledWith(
@@ -537,33 +331,13 @@ describe("RconRepository", () => {
     })
 
     it("should be case insensitive when mapping games", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "CSTRIKE",
-        connectionType: "external",
-        dockerHost: null,
-        name: "CS",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("CSTRIKE") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.GOLDSRC)
     })
 
     it("should handle mixed case game names", async () => {
-      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
-        serverId: 1,
-        address: "1.2.3.4",
-        port: 27015,
-        rconPassword: "enc",
-        game: "CsGo",
-        connectionType: "external",
-        dockerHost: null,
-        name: "CSGO",
-      } as never)
-
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue(createServerMock("CsGo") as never)
       const result = await repository.getRconCredentials(1)
       expect(result!.gameEngine).toBe(GameEngine.SOURCE)
     })

@@ -7,28 +7,7 @@
 import type { GameDetectionResult } from "@/modules/game/game-detection.types"
 import type { ServerStateManager } from "@/modules/server/state/server-state-manager"
 import type { IClock } from "@/shared/infrastructure/time/clock.interface"
-
-/**
- * Server authentication service interface
- */
-export interface IServerAuthenticator {
-  /**
-   * Authenticate a server by address and port
-   * @returns Server ID if authenticated, null otherwise
-   */
-  authenticateServer(address: string, port: number): Promise<number | null>
-
-  /**
-   * Cache a server ID for a given address and port
-   */
-  cacheServer(address: string, port: number, serverId: number): Promise<void>
-
-  /**
-   * Get currently authenticated server IDs
-   * Useful for RCON monitoring to discover active servers
-   */
-  getAuthenticatedServerIds(): number[]
-}
+import type { TokenServerAuthenticator } from "./adapters/token-server-authenticator"
 
 /**
  * Game detection service interface for ingress
@@ -59,7 +38,7 @@ export interface IServerInfoProvider {
  * Minimal dependencies required by IngressService
  */
 export interface IngressDependencies {
-  readonly serverAuthenticator: IServerAuthenticator
+  readonly tokenAuthenticator: TokenServerAuthenticator
   readonly gameDetector: IGameDetector
   readonly serverInfoProvider: IServerInfoProvider
   readonly serverStateManager: ServerStateManager

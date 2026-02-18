@@ -32,12 +32,14 @@ export async function disconnectTestDb(): Promise<void> {
 
 /**
  * Delete all transactional/test data between tests.
- * Preserves seed data in reference tables (games, countries, server_config_defaults).
+ * Preserves seed data in reference tables (games, countries, servers_config_default).
  *
  * Runs inside an interactive transaction so that SET FOREIGN_KEY_CHECKS=0 applies
  * on the same connection as all subsequent DELETEs — avoiding the connection-pool
  * issue where the session variable is set on one connection but queries run on
  * another.
+ *
+ * Table names must match the @@map() directives in schema.prisma exactly.
  */
 export async function cleanAllTables(): Promise<void> {
   const db = getTestDb()
@@ -47,38 +49,39 @@ export async function cleanAllTables(): Promise<void> {
 
     // All tables in a single ordered list — child tables before parents so that
     // the deletes would work even without the FK-check override above.
+    // IMPORTANT: names must match @@map() in schema.prisma, not Prisma model names.
     const tables = [
       // Event / transactional tables (reference players, servers, actions)
-      "event_frags",
-      "event_chat",
-      "event_connect",
-      "event_disconnect",
-      "event_entry",
-      "event_change_name",
-      "event_change_role",
-      "event_change_team",
-      "event_suicide",
-      "event_teamkills",
-      "event_player_actions",
-      "event_player_player_actions",
-      "event_team_bonuses",
-      "event_world_actions",
-      "event_rcon",
-      "event_admin",
-      "event_latency",
-      "player_histories",
-      "player_names",
-      "player_awards",
-      "player_ribbons",
+      "events_frag",
+      "events_chat",
+      "events_connect",
+      "events_disconnect",
+      "events_entry",
+      "events_change_name",
+      "events_change_role",
+      "events_change_team",
+      "events_suicide",
+      "events_teamkill",
+      "events_player_action",
+      "events_player_player_action",
+      "events_team_bonus",
+      "events_world_action",
+      "events_rcon",
+      "events_admin",
+      "events_latency",
+      "players_history",
+      "players_names",
+      "players_awards",
+      "players_ribbons",
       "map_counts",
-      "server_loads",
-      "notification_configs",
+      "servers_load",
+      "notification_config",
       // Entity tables — child-to-parent order
       "player_unique_ids",
       "players",
       "weapons",
       "actions",
-      "server_configs",
+      "servers_config",
       "servers",
     ]
 

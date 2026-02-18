@@ -13,7 +13,13 @@ export default defineConfig({
     sequence: {
       concurrent: false,
     },
+    // Run test files one at a time so their beforeEach/afterEach DB
+    // operations don't race against each other on the shared test DB.
+    fileParallelism: false,
     pool: "forks",
+    forks: {
+      singleFork: true,
+    },
   },
   resolve: {
     alias: {

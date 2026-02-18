@@ -166,41 +166,29 @@ export class PlayerRepository extends BatchedRepository<Player> implements IPlay
       return await this.executeWithTransaction(async (client) => {
         // Try to update first, catch any errors and handle them appropriately
         try {
-          // Handle skill underflow protection
+          // Handle skill underflow protection for UNSIGNED column.
+          // Pre-read the current skill value and clamp at the application level
+          // to avoid triggering a MariaDB "BIGINT UNSIGNED out of range" error,
+          // which can invalidate the adapter's transaction connection.
           if (
             cleanData.skill !== undefined &&
             typeof cleanData.skill === "object" &&
             "increment" in cleanData.skill
           ) {
-            try {
+            const delta = (cleanData.skill as { increment: number }).increment
+            const current = await client.player.findUnique({
+              where: { playerId },
+              select: { skill: true },
+            })
+            if (current != null) {
+              const boundedSkill = Math.max(0, Number(current.skill ?? 0) + delta)
               return await client.player.update({
                 where: { playerId },
-                data: cleanData,
+                data: { ...cleanData, skill: boundedSkill },
               })
-            } catch (err: unknown) {
-              // If skill underflowed on an UNSIGNED column, clamp to zero and retry
-              if (
-                typeof err === "object" &&
-                err !== null &&
-                (err as { code?: string; message?: string }).message?.includes("Out of range")
-              ) {
-                return await client.player.update({
-                  where: { playerId },
-                  data: { ...cleanData, skill: 0 },
-                })
-              }
-              // If record not found, fall through to create logic
-              if (
-                typeof err === "object" &&
-                err !== null &&
-                (err as { message?: string }).message?.includes(
-                  "record that were required but not found",
-                )
-              ) {
-                throw err // Let the outer catch handle this
-              }
-              throw err
             }
+            // Player not found — fall through to the normal update which will
+            // throw P2025 and be caught by the outer handler below.
           }
 
           return await client.player.update({

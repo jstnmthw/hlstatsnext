@@ -1205,20 +1205,22 @@ describe("PlayerRepository", () => {
   })
 
   describe("update (extended branch coverage)", () => {
-    it("should clamp skill to 0 when increment causes Out of range error", async () => {
-      const outOfRangeError = new Error("Out of range value for skill")
-
-      // First call (with increment) throws; second call (with skill:0) succeeds
-      mockDatabase.mockPrisma.player.update
-        .mockRejectedValueOnce(outOfRangeError)
-        .mockResolvedValueOnce(createMockPlayer({ playerId: 1, skill: 0 }))
+    it("should clamp skill to 0 when increment would underflow UNSIGNED column", async () => {
+      // Pre-read returns a player with skill=100; increment=-9999 → clamped to 0
+      mockDatabase.mockPrisma.player.findUnique.mockResolvedValueOnce(
+        createMockPlayer({ playerId: 1, skill: 100 }),
+      )
+      mockDatabase.mockPrisma.player.update.mockResolvedValueOnce(
+        createMockPlayer({ playerId: 1, skill: 0 }),
+      )
 
       const result = await playerRepository.update(1, { skill: { increment: -9999 } as any })
 
       expect(result).toBeDefined()
-      expect(mockDatabase.mockPrisma.player.update).toHaveBeenCalledTimes(2)
-      // Second call should have skill: 0
-      expect(mockDatabase.mockPrisma.player.update).toHaveBeenLastCalledWith(
+      // findUnique called once to pre-read; update called once with bounded value
+      expect(mockDatabase.mockPrisma.player.findUnique).toHaveBeenCalledTimes(1)
+      expect(mockDatabase.mockPrisma.player.update).toHaveBeenCalledTimes(1)
+      expect(mockDatabase.mockPrisma.player.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({ skill: 0 }),
         }),

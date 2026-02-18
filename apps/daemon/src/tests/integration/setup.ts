@@ -30,6 +30,9 @@ beforeAll(async () => {
     )
   }
 
+  // Clean transactional tables before seeding in case a previous run left data
+  await cleanAllTables()
+
   // Seed reference data
   await seedMinimalData(db)
 })

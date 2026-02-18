@@ -5,11 +5,7 @@
  * and utilities for table cleanup between tests.
  */
 
-import { createAdapter, type PrismaClient } from "@repo/db/client"
-
-// Import PrismaClient class from the generated output (not the re-export, which is type-only)
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PrismaClient: PrismaClientClass } = require("@repo/db/generated/prisma/client")
+import { createAdapter, PrismaClient } from "@repo/db/client"
 
 let testDb: PrismaClient | null = null
 
@@ -19,7 +15,7 @@ let testDb: PrismaClient | null = null
  */
 export function getTestDb(): PrismaClient {
   if (!testDb) {
-    testDb = new PrismaClientClass({ adapter: createAdapter() }) as PrismaClient
+    testDb = new PrismaClient({ adapter: createAdapter() })
   }
   return testDb
 }

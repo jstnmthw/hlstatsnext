@@ -3,7 +3,7 @@ import "dotenv/config"
 import type { PrismaClient as BasePrismaClient } from "../generated/prisma/client"
 import { PrismaClient } from "../generated/prisma/client"
 
-export type { PrismaClient } from "../generated/prisma/client"
+export { PrismaClient } from "../generated/prisma/client"
 
 export function createAdapter(): PrismaMariaDb {
   const url = process.env.DATABASE_URL

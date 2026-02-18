@@ -26,6 +26,16 @@ export class WeaponRepository
     options?: UpdateOptions,
   ): Promise<void> {
     try {
+      // Transform update operations (e.g. { increment: N }) into plain values for create
+      const createData = Object.fromEntries(
+        Object.entries(updates).map(([k, v]) => [
+          k,
+          v !== null && typeof v === "object" && "increment" in (v as object)
+            ? (v as { increment: number }).increment
+            : v,
+        ]),
+      )
+
       await this.executeWithTransaction(async (client) => {
         await client.weapon.upsert({
           where: {
@@ -41,7 +51,7 @@ export class WeaponRepository
             modifier: 1,
             kills: 0,
             headshots: 0,
-            ...updates,
+            ...createData,
           },
           update: updates,
         })

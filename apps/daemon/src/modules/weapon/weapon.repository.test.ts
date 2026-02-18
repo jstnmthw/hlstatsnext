@@ -70,8 +70,8 @@ describe("WeaponRepository", () => {
           modifier: 1,
           kills: 0,
           headshots: 0,
-          shots: { increment: 5 },
-          hits: { increment: 3 },
+          shots: 5,
+          hits: 3,
         },
         update: updates,
       })
@@ -107,7 +107,7 @@ describe("WeaponRepository", () => {
           modifier: 1,
           kills: 0,
           headshots: 0,
-          shots: { increment: 1 },
+          shots: 1,
         },
         update: updates,
       })
@@ -147,9 +147,9 @@ describe("WeaponRepository", () => {
           modifier: 1,
           kills: 0,
           headshots: 0,
-          shots: { increment: 10 },
-          hits: { increment: 7 },
-          damage: { increment: 350 },
+          shots: 10,
+          hits: 7,
+          damage: 350,
         },
         update: updates,
       })
@@ -312,7 +312,7 @@ describe("WeaponRepository", () => {
           modifier: 1,
           kills: 0,
           headshots: 0,
-          shots: { increment: 1 },
+          shots: 1,
         },
         update: updates,
       })

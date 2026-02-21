@@ -210,29 +210,7 @@ export class HLStatsDaemon {
       )
     }
 
-    // 2. Test parser functionality with sample log line
-    try {
-      if (!this.context.eventPublisher) {
-        throw new Error("Event publisher not initialized - queue infrastructure may have failed")
-      }
-
-      // Test parsing with a sample CS log line
-      await this.context.ingressService.processRawEvent(
-        'L 01/01/2024 - 12:00:00: "TestPlayer<999><STEAM_TEST><CT>" connected',
-        "127.0.0.1",
-        27015,
-      )
-
-      // We expect null here (server not authenticated), but the important thing is it doesn't crash
-      // If it crashes, it means UUID service or parser setup is broken
-      this.logger.debug("Parser functionality validated successfully")
-    } catch (error) {
-      throw new Error(
-        `Parser preflight check failed: ${error instanceof Error ? error.message : String(error)}`,
-      )
-    }
-
-    // 3. Verify event publisher is available
+    // 2. Verify event publisher is available
     if (!this.context.eventPublisher) {
       throw new Error("Event publisher not available - ingress service cannot publish events")
     }

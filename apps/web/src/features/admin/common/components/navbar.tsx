@@ -7,6 +7,7 @@ import {
   IconDeviceGamepad2,
   IconFileText,
   IconGauge,
+  IconKey,
   IconServer,
   IconSettings,
   IconUser,
@@ -32,6 +33,12 @@ const navItems: NavItem[] = [
     href: "/admin/servers",
     icon: <IconServer className="size-5" data-slot="icon" />,
     permission: { server: ["read"] },
+  },
+  {
+    label: "Tokens",
+    href: "/admin/tokens",
+    icon: <IconKey className="size-5" data-slot="icon" />,
+    permission: { server: ["create"] },
   },
   {
     label: "Players",

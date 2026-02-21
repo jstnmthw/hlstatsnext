@@ -9,6 +9,16 @@ export { CryptoService } from "./encryption"
 export { CryptoError, CryptoErrorCode, DEFAULT_CRYPTO_CONFIG } from "./types"
 export type { CryptoConfig, EncryptedData, ICryptoService } from "./types"
 
+// Token utilities for server authentication
+export {
+  extractTokenPrefix,
+  generateToken,
+  hashToken,
+  isValidTokenFormat,
+  TOKEN_CONSTANTS,
+} from "./token"
+export type { GeneratedToken } from "./token"
+
 // Convenience factory function
 import { CryptoService } from "./encryption"
 import type { CryptoConfig } from "./types"

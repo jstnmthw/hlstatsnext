@@ -3,14 +3,15 @@ import { builder } from "./builder"
 
 // Import custom resolvers
 import "./modules/player/player.resolver"
+import "./modules/server-token/server-token.resolver"
 import "./modules/server/server.resolver"
 
 // Define the base Query and Mutation types first
 builder.queryType({})
 builder.mutationType({})
 
-// Generate all CRUD operations
-generateAllCrud()
+// Generate all CRUD operations (excluding models with custom resolvers)
+generateAllCrud({ exclude: ["ServerToken"] })
 
 // Define HealthStatus type
 const HealthStatus = builder.objectRef<{

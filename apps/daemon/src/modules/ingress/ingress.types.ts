@@ -24,12 +24,17 @@ export interface IIngressService {
   isRunning(): boolean
   getStats(): IngressStats
   setPublisher(publisher: IEventPublisher): void
-  processRawEvent(
-    rawData: string,
-    serverAddress: string,
-    serverPort: number,
-  ): Promise<BaseEvent | null>
-  authenticateServer(address: string, port: number): Promise<number | null>
+  /**
+   * Process a raw log line from an authenticated server.
+   */
+  processRawEvent(rawData: string, serverId: number): Promise<BaseEvent | null>
+  /**
+   * Look up authenticated server by UDP source (for engine log lines).
+   */
+  authenticateSource(address: string, port: number): number | undefined
+  /**
+   * Get all currently authenticated server IDs.
+   */
   getAuthenticatedServerIds(): number[]
 }
 

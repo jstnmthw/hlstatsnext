@@ -10,7 +10,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:reset": "prisma migrate reset --force && prisma db push && pnpm db:seed && pnpm db:seed:geo",
+    "db:reset": "prisma db push --force-reset && pnpm db:seed && pnpm db:seed:geo",
     "db:reset:dev": "pnpm db:reset && pnpm db:seed:dev",
     "db:seed": "tsx src/seed.ts",
     "db:seed:dev": "tsx src/seed-dev.ts",
@@ -18,7 +18,7 @@
     "db:geo:update": "tsx src/scripts/seed-geoip.ts update",
     "db:run-sql": "tsx src/scripts/run-sql.ts",
     "db:test:prepare": "dotenv -e .env.test -- prisma db push",
-    "db:test:reset": "dotenv -e .env.test -- prisma migrate reset --force && dotenv -e .env.test -- prisma db push",
+    "db:test:reset": "dotenv -e .env.test -- prisma db push --force-reset",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix"
   },

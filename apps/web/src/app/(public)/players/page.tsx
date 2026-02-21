@@ -1,80 +1,70 @@
+import {
+  GET_PLAYER_COUNT,
+  GET_PLAYERS_WITH_PAGINATION,
+} from "@/features/admin/players/graphql/player-queries"
 import { Footer } from "@/features/common/components/footer"
 import { Header } from "@/features/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { MOCK_PLAYERS } from "@/features/mock-data"
-import { Card, CardContent, CardHeader, CardTitle, cn, IconTrophy } from "@repo/ui"
-import Link from "next/link"
-
-const trophyColors = ["text-amber-400", "text-zinc-400", "text-amber-700"] as const
+import {
+  buildCountVariables,
+  buildPaginationVariables,
+  getConfigDefaults,
+  parseUrlParams,
+} from "@/features/common/graphql/pagination"
+import { playerPageTableConfig } from "@/features/players/components/player-config"
+import { PlayersTable } from "@/features/players/components/players-table"
+import { query } from "@/lib/apollo-client"
 
 export const metadata = {
   title: "Players",
   description: "Browse all ranked players",
 }
 
-export default function PlayersPage() {
+interface PlayersPageProps {
+  searchParams: Promise<{
+    page?: string
+    pageSize?: string
+    sortField?: string
+    sortOrder?: string
+    search?: string
+    [key: string]: string | undefined
+  }>
+}
+
+export default async function PlayersPage(props: PlayersPageProps) {
+  const searchParams = await props.searchParams
+  const params = parseUrlParams(
+    searchParams,
+    getConfigDefaults(playerPageTableConfig),
+    playerPageTableConfig.filters,
+  )
+
+  const queryVariables = buildPaginationVariables(params, playerPageTableConfig.searchFields)
+  const countVariables = buildCountVariables(params, playerPageTableConfig.searchFields)
+
+  const { data } = await query({
+    query: GET_PLAYERS_WITH_PAGINATION,
+    variables: queryVariables,
+  })
+
+  const { data: countData } = await query({
+    query: GET_PLAYER_COUNT,
+    variables: countVariables,
+  })
+
+  const players = data?.findManyPlayer ?? []
+  const totalCount = countData?.countPlayer ?? 0
+
   return (
     <PageWrapper>
       <Header />
       <MainContent className="container">
-        <Card className="px-6">
-          <CardHeader className="px-0">
-            <CardTitle>All Players</CardTitle>
-          </CardHeader>
-          <CardContent className="px-0">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                  <th className="pb-2 font-medium">Rank</th>
-                  <th className="pb-2 font-medium">Player</th>
-                  <th className="pb-2 text-right font-medium">Skill</th>
-                  <th className="pb-2 text-right font-medium">Kills</th>
-                  <th className="pb-2 text-right font-medium">Deaths</th>
-                  <th className="pb-2 text-right font-medium">K/D</th>
-                  <th className="pb-2 text-right font-medium">Headshots</th>
-                  <th className="pb-2 text-right font-medium">Country</th>
-                </tr>
-              </thead>
-              <tbody>
-                {MOCK_PLAYERS.map((player, i) => {
-                  const kd = (player.kills / (player.deaths || 1)).toFixed(2)
-                  return (
-                    <tr
-                      key={player.playerId}
-                      className="border-b border-border last:border-0 hover:bg-accent/50"
-                    >
-                      <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                      <td className="py-2 font-medium">
-                        <Link
-                          href={`/players/${player.playerId}`}
-                          className="inline-flex items-center hover:text-primary-bright hover:underline"
-                        >
-                          {i < 3 && <IconTrophy className={cn("mr-1.5 size-4", trophyColors[i])} />}
-                          {player.lastName}
-                        </Link>
-                      </td>
-                      <td className="py-2 text-right tabular-nums">
-                        {player.skill.toLocaleString()}
-                      </td>
-                      <td className="py-2 text-right tabular-nums">
-                        {player.kills.toLocaleString()}
-                      </td>
-                      <td className="py-2 text-right tabular-nums">
-                        {player.deaths.toLocaleString()}
-                      </td>
-                      <td className="py-2 text-right text-muted-foreground tabular-nums">{kd}</td>
-                      <td className="py-2 text-right tabular-nums">
-                        {player.headshots.toLocaleString()}
-                      </td>
-                      <td className="py-2 text-right text-muted-foreground">{player.country}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
+        <div className="mt-8 mb-8">
+          <h1 className="text-3xl font-bold tracking-tight uppercase">Players</h1>
+          <p className="text-muted-foreground">Browse all ranked players</p>
+        </div>
+        <PlayersTable data={players} totalCount={totalCount} />
       </MainContent>
       <Footer />
     </PageWrapper>

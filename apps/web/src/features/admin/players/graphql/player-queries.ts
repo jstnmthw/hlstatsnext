@@ -29,6 +29,8 @@ export const GET_PLAYERS_WITH_PAGINATION = graphql(`
       skill
       kills
       deaths
+      country
+      flag
       lastEvent
       lastSkillChange
     }

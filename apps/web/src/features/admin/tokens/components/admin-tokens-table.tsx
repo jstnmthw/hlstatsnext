@@ -1,7 +1,8 @@
 "use client"
 
 import { DataTable } from "@/features/common/components/data-table"
-import { tokenColumns, TokenListItem, tokenTableConfig } from "./token-columns"
+import { tokenColumns } from "./token-columns"
+import { TokenListItem, tokenTableConfig } from "./token-config"
 
 export function AdminTokensTable({
   data,

@@ -1,8 +1,20 @@
+"use client"
+
+import { revokeToken } from "@/features/admin/tokens/actions/revoke-token"
+import { TokenListItem } from "@/features/admin/tokens/components/token-config"
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
 import { useDataTableContext } from "@/features/common/components/data-table-context"
-import { DataTableConfig } from "@/features/common/types/data-table"
 import { formatDate, formatHumanFriendlyDate } from "@/lib/datetime-util"
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
   Badge,
   Button,
   Checkbox,
@@ -17,41 +29,8 @@ import {
   IconRefresh,
 } from "@repo/ui"
 import { ColumnDef } from "@tanstack/react-table"
-
-export interface TokenListItem {
-  id: number
-  tokenPrefix: string
-  name: string
-  game: string
-  createdAt: string | Date
-  expiresAt?: string | Date | null
-  revokedAt?: string | Date | null
-  lastUsedAt?: string | Date | null
-  createdBy: string
-  serverCount: number
-  status: string
-  hasRconPassword: boolean
-  __typename?: string
-}
-
-export const tokenTableConfig: DataTableConfig = {
-  defaultSortField: "createdAt",
-  defaultSortOrder: "desc",
-  defaultPageSize: 10,
-  searchFields: ["name", "tokenPrefix", "game"],
-  filterPlaceholder: "Filter tokens...",
-  filters: [
-    {
-      id: "status",
-      title: "Status",
-      options: [
-        { label: "Active", value: "active" },
-        { label: "Revoked", value: "revoked" },
-        { label: "Expired", value: "expired" },
-      ],
-    },
-  ],
-}
+import { useRouter } from "next/navigation"
+import { useTransition } from "react"
 
 function ActionsHeader() {
   const { onRefresh, isPending } = useDataTableContext()
@@ -185,30 +164,69 @@ export const tokenColumns = (): ColumnDef<TokenListItem>[] => [
   {
     id: "actions",
     header: () => <ActionsHeader />,
-    cell: ({ row }) => {
-      const token = row.original
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div className="flex items-center justify-end pr-3 pl-1">
-              <Button variant="ghost" className="size-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <IconDots className="size-4" />
-              </Button>
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(token.tokenPrefix)}>
-              Copy token prefix
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
+    cell: ({ row }) => <TokenActions token={row.original} />,
+  },
+]
+
+function TokenActions({ token }: { token: TokenListItem }) {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+
+  const handleRevoke = () => {
+    startTransition(async () => {
+      const result = await revokeToken(token.id)
+      if (result.success) {
+        router.refresh()
+      }
+    })
+  }
+
+  return (
+    <AlertDialog>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="flex items-center justify-end pr-3 pl-1">
+            <Button variant="ghost" className="size-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <IconDots className="size-4" />
+            </Button>
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem onClick={() => navigator.clipboard.writeText(token.tokenPrefix)}>
+            Copy token prefix
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          {token.status === "active" ? (
+            <AlertDialogTrigger asChild>
+              <DropdownMenuItem className="text-red-400">
+                {isPending ? "Revoking..." : "Revoke token"}
+              </DropdownMenuItem>
+            </AlertDialogTrigger>
+          ) : (
             <DropdownMenuItem disabled className="text-zinc-500">
               Status: {token.status}
             </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
-  },
-]
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Revoke Token</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to revoke <strong>{token.name}</strong> (
+            <code className="text-xs">{token.tokenPrefix}...</code>)? Servers using this token will
+            lose authentication within 60 seconds. This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleRevoke} disabled={isPending}>
+            {isPending ? "Revoking..." : "Revoke Token"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}

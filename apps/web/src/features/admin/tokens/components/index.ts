@@ -1,2 +1,3 @@
 export { AdminTokensTable } from "./admin-tokens-table"
-export { tokenColumns, tokenTableConfig, type TokenListItem } from "./token-columns"
+export { tokenColumns } from "./token-columns"
+export { tokenTableConfig, type TokenListItem } from "./token-config"

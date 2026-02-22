@@ -66,7 +66,7 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
           <div className="container">
             <div className="py-10">
               <Card className="mx-auto max-w-2xl p-6">
-                <h1 className="mb-2 text-3xl font-bold tracking-tight uppercase">Edit Server</h1>
+                <h1 className="mb-2 text-2xl font-bold tracking-tight uppercase">Edit Server</h1>
                 <p className="mb-6 text-muted-foreground">
                   Update server configuration and settings for {server.name || "Unnamed Server"}.
                 </p>
@@ -82,6 +82,12 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
                     rconPassword: server.rconPassword || "",
                     sortOrder: server.sortOrder || 0,
                     mod: currentMod,
+                    authToken: server.authToken?.tokenPrefix
+                      ? {
+                          tokenPrefix: server.authToken.tokenPrefix,
+                          name: server.authToken.name ?? "",
+                        }
+                      : null,
                   }}
                   games={games}
                   mods={mods}

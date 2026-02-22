@@ -63,6 +63,10 @@ export const GET_SERVER_BY_ID = graphql(`
         parameter
         value
       }
+      authToken {
+        tokenPrefix
+        name
+      }
     }
   }
 `)

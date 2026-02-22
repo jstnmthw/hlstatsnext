@@ -585,10 +585,10 @@ public cmd_hlstatsnext_reload(id, level, cid) {
         return PLUGIN_HANDLED;
     }
 
-    // Reload configuration
-    hlstatsnext_load_config();
+    // Re-apply cvar values to plugin state
+    hlstatsnext_apply_config();
 
-    console_print(id, "%s Configuration reloaded", HLSTATSNEXT_TAG);
+    console_print(id, "%s Configuration reloaded from cvars", HLSTATSNEXT_TAG);
     log_amx("%s Configuration reloaded by admin", HLSTATSNEXT_TAG);
 
     return PLUGIN_HANDLED;

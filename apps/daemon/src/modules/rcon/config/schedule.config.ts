@@ -27,7 +27,7 @@ const defaultScheduledCommands: ScheduledCommand[] = [
   {
     id: "server-rules-reminder",
     name: "Server Rules Reminder",
-    cronExpression: "0 */30 * * * *", // Every 30 minutes
+    cronExpression: "0 */1 * * * *", // Every 30 minutes
     command: {
       type: "server-message",
       message: 'say "Type !help for a list of commands"',

@@ -75,9 +75,6 @@ export function Navbar({ currentPath }: NavbarProps) {
               : currentPath === item.href || currentPath?.startsWith(item.href + "/")
           return (
             <li key={item.href} className="relative py-2">
-              {isActive && (
-                <span className="absolute inset-0 bg-radial-[at_50%_75%] from-green-500 from-0% to-transparent to-75% opacity-20"></span>
-              )}
               <Button
                 variant="ghost"
                 colorScheme="light"

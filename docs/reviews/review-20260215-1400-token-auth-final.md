@@ -700,12 +700,18 @@ Doc: https://nextjs.org/docs/app/getting-started/updating-data
 
 ### Phase 1: AMX Mod X Plugin
 
-- [ ] Add `hlx_token` cvar (FCVAR_PROTECTED) to existing `packages/plugins/amx/src/hlstatsnext.sma`
-- [ ] Implement `send_auth_beacon()` using `engfunc(EngFunc_AlertMessage, at_logged, ...)`
-- [ ] Send beacon on `plugin_cfg()` and every 60 seconds via `set_task()`
-- [ ] Read game port from engine cvar `port`
-- [ ] Add `hlx_token` to `packages/plugins/amx/configs/hlstatsnext.cfg` with documentation
-- [ ] Compile and test
+- [x] Add `hlx_token` cvar (FCVAR_PROTECTED) to existing `packages/plugins/amx/src/hlstatsnext.sma`
+  - Created `src/include/hlstatsnext_auth.inc` with `create_cvar("hlx_token", "", FCVAR_PROTECTED | FCVAR_UNLOGGED | FCVAR_SPONLY)`. Pointer-based access via `get_pcvar_string()`. Token value never logged or printed.
+- [x] Implement `send_auth_beacon()` using `engfunc(EngFunc_AlertMessage, at_logged, ...)`
+  - `send_auth_beacon()` emits `HLXTOKEN:<token>:<gamePort>\n` via `engfunc(EngFunc_AlertMessage, at_logged, beacon)`. Validates token length >= 10 before sending. Debug logging only shows port and token length, never the value.
+- [x] Send beacon on `plugin_cfg()` and every 60 seconds via `set_task()`
+  - `hlstatsnext_auth_start()` called from `plugin_cfg()` after config loads. Uses `set_task(60.0, "task_auth_beacon", AUTH_BEACON_TASK_ID, "", 0, "b")` for infinite repeat. `hlstatsnext_auth_stop()` cleans up in `plugin_end()`.
+- [x] Read game port from engine cvar `port`
+  - `g_game_port = get_cvar_num("port")` cached once at beacon start. Validated > 0 before use.
+- [x] Add `hlx_token` to `packages/plugins/amx/configs/hlstatsnext.cfg` with documentation
+  - Added with usage instructions emphasizing credential sensitivity. Default value is empty (beacons skipped when unconfigured).
+- [x] Compile and test
+  - Compiled with amxxpc 1.9.0.5294: 0 warnings, 0 errors. Binary: 16,619 bytes. Compatible with AMX Mod X 1.10-5474 runtime.
 
 ### Phase 2: SourceMod Plugin
 

@@ -159,8 +159,7 @@ export class IngressService implements IIngressService {
       // Regular engine log line - look up authenticated source
       const serverId = this.authenticateSource(serverAddress, serverPort)
       if (serverId === undefined) {
-        // No authentication session - drop silently
-        // (This is normal for servers that haven't sent a beacon yet)
+        // No authentication session — TokenServerAuthenticator logs this with rate limiting
         return
       }
 
@@ -212,7 +211,7 @@ export class IngressService implements IIngressService {
     )
 
     if (result.kind === "unauthorized") {
-      this.logger.debug(`Beacon auth failed from ${sourceAddress}:${sourcePort}: ${result.reason}`)
+      this.logger.warn(`Beacon auth failed from ${sourceAddress}:${sourcePort}: ${result.reason}`)
       return
     }
 

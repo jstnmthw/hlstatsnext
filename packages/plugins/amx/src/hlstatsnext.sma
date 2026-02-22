@@ -20,6 +20,7 @@
 #include "include/hlstatsnext_events.inc"
 #include "include/hlstatsnext_commands.inc"
 #include "include/hlstatsnext_hud.inc"
+#include "include/hlstatsnext_auth.inc"
 
 // Plugin information
 #define PLUGIN_NAME    "HLStatsNext"
@@ -32,10 +33,14 @@ public plugin_init()
   // Register plugin
   register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR);
 
-  // Initialize core systems
+  // Register all cvars (core, auth, HUD)
   hlstatsnext_core_init();
   hlstatsnext_colors_init();
   hlstatsnext_commands_init();
+  hlstatsnext_auth_init();
+
+  // Auto-generate and exec config at configs/hlstatsnext.cfg
+  AutoExecConfig(true, "hlstatsnext", "");
 
   // Register our commands
   register_hlstatsnext_commands();
@@ -50,16 +55,28 @@ public plugin_init()
   return PLUGIN_CONTINUE;
 }
 
-public plugin_cfg()
+// Called after all config files have been executed, including
+// AutoExecConfig files (configs/plugins/hlstatsnext.cfg).
+// Cvars now have their final values — safe to read them.
+//
+// NOTE: OnConfigsExecuted() is the correct forward to pair with
+// AutoExecConfig(). plugin_cfg() fires BEFORE AutoExecConfig files
+// execute, so cvars would still have defaults at that point.
+// Requires AMX Mod X 1.8.3+ (we run 1.10.x).
+public OnConfigsExecuted()
 {
-  // Load configuration after server config is loaded
-  hlstatsnext_load_config();
+  // Apply cvar values to plugin state
+  hlstatsnext_apply_config();
 
-  return PLUGIN_CONTINUE;
+  // Start auth beacon (hlx_token cvar is now populated)
+  hlstatsnext_auth_start();
 }
 
 public plugin_end()
 {
+  // Stop auth beacon before cleanup
+  hlstatsnext_auth_stop();
+
   // Cleanup
   hlstatsnext_cleanup();
   log_amx("[%s] Plugin terminated", PLUGIN_NAME);

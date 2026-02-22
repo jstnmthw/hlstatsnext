@@ -135,6 +135,22 @@ export class CommandResolverService {
    */
   private determineCapabilities(command: string): CommandCapabilities {
     // Analyze command to determine capabilities
+
+    // HLStatsNext AMX Mod X structured event commands
+    if (
+      command.includes("hlx_event") ||
+      command.includes("hlx_csay") ||
+      command.includes("hlx_tsay") ||
+      command.includes("hlx_typehud") ||
+      command.includes("hlx_announce")
+    ) {
+      return {
+        supportsBatch: false,
+        maxBatchSize: 1,
+        requiresHashPrefix: false,
+      }
+    }
+
     if (command.includes("hlx_amx_bulkpsay") || command.includes("amx_bulkpsay")) {
       return {
         supportsBatch: true,

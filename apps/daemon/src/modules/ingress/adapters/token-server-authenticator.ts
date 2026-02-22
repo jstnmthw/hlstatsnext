@@ -55,6 +55,10 @@ export class TokenServerAuthenticator {
   /** Rate limiter for failed authentication attempts */
   private readonly rateLimiter: AuthRateLimiter
 
+  /** Rate-limited log messages (messageKey → lastLogTime) */
+  private readonly loggedMessages = new Map<string, number>()
+  private readonly LOG_COOLDOWN_MS = 5 * 60 * 1000 // 5 minutes
+
   private readonly config: TokenAuthenticatorConfig
 
   constructor(
@@ -126,7 +130,11 @@ export class TokenServerAuthenticator {
       cachedAt: Date.now(),
     })
 
-    this.logger.debug(`Beacon authenticated: ${sourceKey} → server ${serverResult.serverId}`)
+    this.logWithRateLimit(
+      `beacon-ok-${sourceKey}`,
+      `Beacon authenticated: ${sourceKey} → server ${serverResult.serverId}`,
+      "ok",
+    )
 
     return serverResult
   }
@@ -144,6 +152,11 @@ export class TokenServerAuthenticator {
     const entry = this.sourceCache.get(sourceKey)
 
     if (!entry) {
+      this.logWithRateLimit(
+        `source-unknown-${sourceAddress}`,
+        `Unauthenticated log packet from ${sourceKey} — no beacon received. Configure hlx_token on the game server.`,
+        "warn",
+      )
       return undefined
     }
 
@@ -186,6 +199,7 @@ export class TokenServerAuthenticator {
     this.tokenCache.clear()
     this.sourceCache.clear()
     this.rateLimiter.clear()
+    this.loggedMessages.clear()
   }
 
   /**
@@ -272,17 +286,37 @@ export class TokenServerAuthenticator {
       return { kind: "authenticated", serverId: existing.serverId }
     }
 
-    // Auto-register new server
-    const newServer = await this.database.prisma.server.create({
-      data: {
-        address,
-        port: gamePort,
-        name: `${address}:${gamePort}`, // Default name - will be updated by RCON status
-        game: token.game,
-        rconPassword: token.rconPassword, // Already encrypted
-        authTokenId: token.id,
-      },
-      select: { serverId: true },
+    // Auto-register new server and copy default config in a single transaction
+    const newServer = await this.database.transaction(async (tx) => {
+      const server = await tx.server.create({
+        data: {
+          address,
+          port: gamePort,
+          name: `${address}:${gamePort}`, // Default name - will be updated by RCON status
+          game: token.game,
+          rconPassword: token.rconPassword, // Already encrypted
+          authTokenId: token.id,
+        },
+        select: { serverId: true },
+      })
+
+      // Copy server_config_default → server_config for this server
+      const defaults = await tx.serverConfigDefault.findMany()
+      if (defaults.length > 0) {
+        await tx.serverConfig.createMany({
+          data: defaults.map((d) => ({
+            serverId: server.serverId,
+            parameter: d.parameter,
+            value: d.value,
+          })),
+          skipDuplicates: true,
+        })
+        this.logger.debug(
+          `Copied ${defaults.length} config defaults for new server ${server.serverId}`,
+        )
+      }
+
+      return server
     })
 
     this.logger.ok(
@@ -305,6 +339,24 @@ export class TokenServerAuthenticator {
       kind: "auto_registered",
       serverId: newServer.serverId,
       tokenId: token.id,
+    }
+  }
+
+  /**
+   * Log a message with rate limiting to prevent spam.
+   * Matches the pattern from the old DatabaseServerAuthenticator.
+   */
+  private logWithRateLimit(
+    messageKey: string,
+    message: string,
+    level: "info" | "warn" | "debug" | "ok" = "info",
+  ): void {
+    const now = Date.now()
+    const lastLogTime = this.loggedMessages.get(messageKey)
+
+    if (!lastLogTime || now - lastLogTime > this.LOG_COOLDOWN_MS) {
+      this.logger[level](message)
+      this.loggedMessages.set(messageKey, now)
     }
   }
 }

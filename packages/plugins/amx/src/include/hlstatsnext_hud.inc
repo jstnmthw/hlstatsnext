@@ -19,14 +19,23 @@ new g_cvar_hlmsg_fadein;
 new g_cvar_hlmsg_fadeout;
 new g_cvar_hlmsg_channel;
 
-// HUD initialization
+// HUD initialization — registers HUD cvars for AutoExecConfig
 stock hlstatsnext_hud_init()
 {
-  g_cvar_hlmsg_default_color = register_cvar("hlmsg_default_color", "00FF80");
-  g_cvar_hlmsg_holdtime      = register_cvar("hlmsg_holdtime", "3.0");
-  g_cvar_hlmsg_fadein        = register_cvar("hlmsg_fadein", "1");
-  g_cvar_hlmsg_fadeout       = register_cvar("hlmsg_fadeout", "0.6");
-  g_cvar_hlmsg_channel       = register_cvar("hlmsg_channel", "-1");
+  g_cvar_hlmsg_default_color = create_cvar("hlmsg_default_color", "00FF80",
+      FCVAR_NONE, "Default HUD message color in hex RRGGBB format");
+  g_cvar_hlmsg_holdtime = create_cvar("hlmsg_holdtime", "3.0",
+      FCVAR_NONE, "How long HUD messages stay visible (seconds)",
+      true, 0.5, true, 30.0);
+  g_cvar_hlmsg_fadein = create_cvar("hlmsg_fadein", "1.0",
+      FCVAR_NONE, "HUD message fade in duration (seconds)",
+      true, 0.0, true, 5.0);
+  g_cvar_hlmsg_fadeout = create_cvar("hlmsg_fadeout", "0.6",
+      FCVAR_NONE, "HUD message fade out duration (seconds)",
+      true, 0.0, true, 5.0);
+  g_cvar_hlmsg_channel = create_cvar("hlmsg_channel", "-1",
+      FCVAR_NONE, "HUD channel to use (-1 = auto-select)",
+      true, -1.0, true, 6.0);
 
   log_amx("%s HUD system initialized", HLSTATSNEXT_TAG);
 }

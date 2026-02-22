@@ -39,6 +39,16 @@ export class ServerStatusEnricher implements IServerStatusEnricher {
   async enrichServerStatus(serverId: number): Promise<void> {
     try {
       const status = await this.fetchServerStatus(serverId)
+
+      // Guard: if RCON returned unparseable data (defaults), skip DB update
+      // to avoid overwriting good data with map="unknown" and 0 players
+      if (status.map === "unknown" && status.players === 0 && status.maxPlayers === 0) {
+        this.logger.warn(
+          `RCON returned empty/unparseable status for server ${serverId}, skipping DB update`,
+        )
+        return
+      }
+
       const update = await this.buildStatusUpdate(serverId, status)
       await this.updateServerDatabase(serverId, update, status.map)
 

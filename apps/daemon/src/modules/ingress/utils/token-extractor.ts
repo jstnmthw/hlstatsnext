@@ -8,6 +8,9 @@
 /** Prefix for authentication beacon lines */
 const TOKEN_LINE_PREFIX = "HLXTOKEN:"
 
+/** Regex to strip the GoldSrc/Source log timestamp prefix: "L MM/DD/YYYY - HH:MM:SS: " */
+const LOG_TIMESTAMP_RE = /^L \d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}: /
+
 /**
  * Result of classifying a log line.
  * Discriminated union for explicit handling.
@@ -19,20 +22,25 @@ export type LineClassification =
 /**
  * Classify an incoming log line as a beacon or regular log line.
  *
- * Beacon format: `HLXTOKEN:<token>:<gamePort>`
- * Example: `HLXTOKEN:hlxn_K7gNU3sdo-OL0wNhv0-ATkGjQL1qOlRhsGAhK7eo-Xc:27015`
+ * Beacons arrive wrapped in the standard engine log format:
+ *   `L 02/22/2026 - 09:48:09: HLXTOKEN:<token>:<gamePort>`
+ * We strip the timestamp prefix before checking for the HLXTOKEN: marker.
  *
- * @param rawLine - The raw log line received via UDP
+ * @param rawLine - The raw log line received via UDP (after OOB header stripping)
  * @returns Classification result with extracted data
  */
 export function classifyLine(rawLine: string): LineClassification {
+  // Strip timestamp prefix for beacon detection
+  // Engine wraps all log lines (including plugin beacons) in "L MM/DD/YYYY - HH:MM:SS: "
+  const stripped = rawLine.replace(LOG_TIMESTAMP_RE, "")
+
   // Quick check for beacon prefix
-  if (!rawLine.startsWith(TOKEN_LINE_PREFIX)) {
+  if (!stripped.startsWith(TOKEN_LINE_PREFIX)) {
     return { kind: "log_line", logLine: rawLine }
   }
 
   // Extract payload after prefix
-  const payload = rawLine.slice(TOKEN_LINE_PREFIX.length).trim()
+  const payload = stripped.slice(TOKEN_LINE_PREFIX.length).trim()
 
   // Find the last colon to split token from port
   const lastColon = payload.lastIndexOf(":")

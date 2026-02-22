@@ -52,7 +52,7 @@ export default async function PlayersPage(props: AdminPageProps) {
         <div className="container">
           <div className="mt-8 mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight uppercase">Manage Players</h1>
+              <h1 className="text-2xl font-bold tracking-tight uppercase">Manage Players</h1>
               <p className="text-muted-foreground">
                 Manage your game players and track their statistics and activities.
               </p>

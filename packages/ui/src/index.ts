@@ -89,7 +89,14 @@ export {
   ComboboxSeparator,
 } from "./components/combobox"
 
-export { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "./components/empty"
+export {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "./components/empty"
 
 export {
   Field,

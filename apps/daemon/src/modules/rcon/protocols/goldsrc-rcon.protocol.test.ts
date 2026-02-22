@@ -127,6 +127,7 @@ describe("GoldSrcRconProtocol", () => {
   })
 
   afterEach(async () => {
+    vi.useRealTimers()
     // Clean up any pending timers
     internals.isConnectedState = false
     internals.socket = null
@@ -212,15 +213,20 @@ describe("GoldSrcRconProtocol", () => {
     })
 
     it("should handle challenge request timeout", async () => {
+      vi.useFakeTimers()
       mockSocket.send.mockImplementation((...args: unknown[]) => {
         const callback = args[args.length - 1] as ((err: Error | null) => void) | undefined
         if (typeof callback === "function") callback(null)
-        // No response
+        // No response — timeout fires instead
       })
 
-      await expect(protocol.connect("127.0.0.1", 27015, "pass")).rejects.toThrow(RconError)
+      const promise = protocol.connect("127.0.0.1", 27015, "pass")
+      // Attach rejection handler before advancing timers to avoid unhandled rejection
+      const assertRejection = expect(promise).rejects.toThrow(RconError)
+      await vi.advanceTimersByTimeAsync(TEST_TIMEOUT + 10)
+      await assertRejection
       expect(protocol.isConnected()).toBe(false)
-    }, 5000)
+    })
   })
 
   describe("disconnect", () => {
@@ -266,16 +272,21 @@ describe("GoldSrcRconProtocol", () => {
     })
 
     it("should handle command timeout", async () => {
+      vi.useFakeTimers()
       simulateConnected()
 
       mockSocket.send.mockImplementation((...args: unknown[]) => {
         const callback = args[args.length - 1] as ((err: Error | null) => void) | undefined
         if (typeof callback === "function") callback(null)
-        // No response
+        // No response — timeout fires instead
       })
 
-      await expect(protocol.execute("status")).rejects.toThrow(RconError)
-    }, 5000)
+      const promise = protocol.execute("status")
+      // Attach rejection handler before advancing timers to avoid unhandled rejection
+      const assertRejection = expect(promise).rejects.toThrow(RconError)
+      await vi.advanceTimersByTimeAsync(TEST_TIMEOUT + 10)
+      await assertRejection
+    })
 
     it("should handle send error during command execution", async () => {
       simulateConnected()

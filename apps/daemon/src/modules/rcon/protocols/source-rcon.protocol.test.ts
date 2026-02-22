@@ -87,6 +87,7 @@ describe("SourceRconProtocol", () => {
   })
 
   afterEach(async () => {
+    vi.useRealTimers()
     try {
       await protocol.disconnect()
     } catch {
@@ -157,14 +158,17 @@ describe("SourceRconProtocol", () => {
     })
 
     it("should handle connection timeout", async () => {
-      // Never call the connect callback
-      mockSocket.connect.mockImplementation(() => {
-        // No callback
-      })
+      vi.useFakeTimers()
+      // Never call the connect callback — timeout fires instead
+      mockSocket.connect.mockImplementation(() => {})
 
-      await expect(protocol.connect("127.0.0.1", 27015, "pass")).rejects.toThrow(RconError)
+      const promise = protocol.connect("127.0.0.1", 27015, "pass")
+      // Attach rejection handler before advancing timers to avoid unhandled rejection
+      const assertRejection = expect(promise).rejects.toThrow(RconError)
+      await vi.advanceTimersByTimeAsync(TEST_TIMEOUT + 10)
+      await assertRejection
       expect(protocol.isConnected()).toBe(false)
-    }, 5000)
+    })
 
     it("should handle connection error", async () => {
       mockSocket.connect.mockImplementation(() => {
@@ -178,6 +182,7 @@ describe("SourceRconProtocol", () => {
     })
 
     it("should handle auth response with id -1 from processPacket", async () => {
+      vi.useFakeTimers()
       mockSocket.connect.mockImplementation(
         (_port: number, _address: string, callback: () => void) => {
           queueMicrotask(() => callback())
@@ -204,9 +209,13 @@ describe("SourceRconProtocol", () => {
       })
 
       // Will timeout because -1 doesn't match any pending ID
-      await expect(protocol.connect("127.0.0.1", 27015, "pass")).rejects.toThrow(RconError)
+      const promise = protocol.connect("127.0.0.1", 27015, "pass")
+      // Attach rejection handler before advancing timers to avoid unhandled rejection
+      const assertRejection = expect(promise).rejects.toThrow(RconError)
+      await vi.advanceTimersByTimeAsync(TEST_TIMEOUT + 10)
+      await assertRejection
       expect(protocol.isConnected()).toBe(false)
-    }, 5000)
+    })
 
     it("should handle establishConnection with null socket", async () => {
       vi.mocked(net.Socket).mockImplementation(() => null as unknown as net.Socket)

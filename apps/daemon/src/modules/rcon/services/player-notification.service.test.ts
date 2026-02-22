@@ -237,14 +237,17 @@ describe("PlayerNotificationService", () => {
     })
 
     it("should retry on failure using executeWithRetry", async () => {
+      vi.useFakeTimers()
       vi.mocked(mockCommandResolver.supportsBatch).mockResolvedValueOnce(true)
       vi.mocked(mockRconCommand.execute)
         .mockRejectedValueOnce(new Error("Temporary failure"))
         .mockResolvedValueOnce(undefined)
 
-      // maxRetries=2 means 2 attempts. The delay between retries is 1000*attempt ms
-      // which will actually wait, but this test is checking the retry behavior
-      await service.notifyMultiplePlayers(1, [{ playerId: 100 }], "Hello", { maxRetries: 2 })
+      const promise = service.notifyMultiplePlayers(1, [{ playerId: 100 }], "Hello", {
+        maxRetries: 2,
+      })
+      await vi.runAllTimersAsync()
+      await promise
 
       expect(mockRconCommand.execute).toHaveBeenCalledTimes(2)
       expect(mockLogger.warn).toHaveBeenCalledWith(
@@ -624,16 +627,19 @@ describe("PlayerNotificationService", () => {
     })
 
     it("should throw last error after all retries exhausted", async () => {
+      vi.useFakeTimers()
       vi.mocked(mockCommandResolver.supportsBatch).mockResolvedValueOnce(true)
       vi.mocked(mockRconCommand.execute)
         .mockRejectedValueOnce(new Error("Fail 1"))
         .mockRejectedValueOnce(new Error("Fail 2"))
 
-      // Use real timers but with a short delay override - the retry delay is 1000*attempt
-      // The outer notifyMultiplePlayers catches and re-throws, so we expect the rejection
-      await expect(
-        service.notifyMultiplePlayers(1, [{ playerId: 100 }], "Hello", { maxRetries: 2 }),
-      ).rejects.toThrow("Fail 2")
+      const promise = service.notifyMultiplePlayers(1, [{ playerId: 100 }], "Hello", {
+        maxRetries: 2,
+      })
+      // Attach rejection handler before advancing timers to avoid unhandled rejection
+      const assertRejection = expect(promise).rejects.toThrow("Fail 2")
+      await vi.runAllTimersAsync()
+      await assertRejection
 
       expect(mockRconCommand.execute).toHaveBeenCalledTimes(2)
     })

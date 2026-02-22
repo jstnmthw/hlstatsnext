@@ -6,7 +6,7 @@ import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
 import { query } from "@/lib/apollo-client"
-import { Card } from "@repo/ui"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui"
 
 export const metadata = {
   title: "Create Server - Admin - " + process.env.NEXT_PUBLIC_APP_NAME,
@@ -31,15 +31,17 @@ export default async function CreateServerPage() {
       <AdminHeader currentPath="/admin/servers/add" />
       <MainContent>
         <div className="container">
-          <div className="py-10">
-            <Card className="mx-auto max-w-lg p-6">
-              <h1 className="mb-2 text-3xl font-bold tracking-tight uppercase">Add Server</h1>
-              <p className="mb-6 text-muted-foreground">
+          <Card className="mx-auto mt-10 max-w-lg">
+            <CardHeader>
+              <CardTitle>Add Server</CardTitle>
+              <CardDescription>
                 Add a new Half-Life server to begin tracking player statistics and activities.
-              </p>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
               <ServerCreateForm games={games} mods={mods} />
-            </Card>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </MainContent>
       <Footer />

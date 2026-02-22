@@ -77,9 +77,11 @@ describe("TokenServerAuthenticator", () => {
         token: mockTokenEntity,
       })
 
-      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValue(
+      // Upsert returns existing server; configCount > 0 means it's not new
+      vi.mocked(mockDatabase.prisma.server.upsert).mockResolvedValue(
         createMockServerRecord({ serverId: 42, authTokenId: 1 }),
       )
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(5)
 
       const result = await authenticator.handleBeacon(validToken.raw, 27015, "192.168.1.100", 54321)
 
@@ -101,10 +103,11 @@ describe("TokenServerAuthenticator", () => {
         token: mockTokenEntity,
       })
 
-      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValue(null)
-      vi.mocked(mockDatabase.prisma.server.create).mockResolvedValue(
+      // Upsert creates new server; configCount === 0 means it's new
+      vi.mocked(mockDatabase.prisma.server.upsert).mockResolvedValue(
         createMockServerRecord({ serverId: 100 }),
       )
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(0)
 
       // Mock config defaults to be copied
       const mockDefaults = [
@@ -122,8 +125,15 @@ describe("TokenServerAuthenticator", () => {
         tokenId: 1,
       })
 
-      expect(mockDatabase.prisma.server.create).toHaveBeenCalledWith({
-        data: {
+      expect(mockDatabase.prisma.server.upsert).toHaveBeenCalledWith({
+        where: {
+          servers_token_port_unique: {
+            authTokenId: 1,
+            port: 27015,
+          },
+        },
+        update: { address: "192.168.1.100" },
+        create: {
           address: "192.168.1.100",
           port: 27015,
           name: "192.168.1.100:27015",
@@ -207,59 +217,53 @@ describe("TokenServerAuthenticator", () => {
       expect(result).toEqual({ kind: "unauthorized", reason: "rate_limited" })
     })
 
-    it("should update address when server IP changes (e.g. Docker restart)", async () => {
+    it("should update address atomically via upsert when server IP changes", async () => {
       vi.mocked(mockTokenRepository.findByHash).mockResolvedValue({
         kind: "valid",
         token: mockTokenEntity,
       })
 
-      // Server exists with old Docker IP
-      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValue(
-        createMockServerRecord({ serverId: 42, address: "172.18.0.2", authTokenId: 1 }),
+      vi.mocked(mockDatabase.prisma.server.upsert).mockResolvedValue(
+        createMockServerRecord({ serverId: 42, authTokenId: 1 }),
       )
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(5)
 
       // Beacon arrives from new Docker IP after container restart
       const result = await authenticator.handleBeacon(validToken.raw, 27015, "172.18.0.5", 54321)
 
       expect(result).toEqual({ kind: "authenticated", serverId: 42 })
-      expect(mockDatabase.prisma.server.update).toHaveBeenCalledWith({
-        where: { serverId: 42 },
-        data: { address: "172.18.0.5" },
-      })
+      // Upsert's update clause always sets address — atomic and idempotent
+      expect(mockDatabase.prisma.server.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          update: { address: "172.18.0.5" },
+        }),
+      )
     })
 
-    it("should not update address when it has not changed", async () => {
+    it("should use tokenId + port as unique key for upsert", async () => {
       vi.mocked(mockTokenRepository.findByHash).mockResolvedValue({
         kind: "valid",
         token: mockTokenEntity,
       })
 
-      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValue(
-        createMockServerRecord({ serverId: 42, address: "192.168.1.100", authTokenId: 1 }),
+      vi.mocked(mockDatabase.prisma.server.upsert).mockResolvedValue(
+        createMockServerRecord({ serverId: 42, authTokenId: 1 }),
       )
-
-      await authenticator.handleBeacon(validToken.raw, 27015, "192.168.1.100", 54321)
-
-      expect(mockDatabase.prisma.server.update).not.toHaveBeenCalled()
-    })
-
-    it("should find server by tokenId + port, not by address", async () => {
-      vi.mocked(mockTokenRepository.findByHash).mockResolvedValue({
-        kind: "valid",
-        token: mockTokenEntity,
-      })
-
-      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValue(
-        createMockServerRecord({ serverId: 42, address: "172.18.0.2", authTokenId: 1 }),
-      )
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(5)
 
       await authenticator.handleBeacon(validToken.raw, 27015, "172.18.0.5", 54321)
 
-      // Verify lookup uses tokenId + port, NOT address + port
-      expect(mockDatabase.prisma.server.findFirst).toHaveBeenCalledWith({
-        where: { authTokenId: 1, port: 27015 },
-        select: { serverId: true, address: true },
-      })
+      // Verify upsert uses the composite unique key (tokenId + port)
+      expect(mockDatabase.prisma.server.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            servers_token_port_unique: {
+              authTokenId: 1,
+              port: 27015,
+            },
+          },
+        }),
+      )
     })
   })
 
@@ -275,9 +279,10 @@ describe("TokenServerAuthenticator", () => {
         token: mockTokenEntity,
       })
 
-      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValue(
+      vi.mocked(mockDatabase.prisma.server.upsert).mockResolvedValue(
         createMockServerRecord({ serverId: 42, authTokenId: 1 }),
       )
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(5)
 
       await authenticator.handleBeacon(validToken.raw, 27015, "192.168.1.100", 54321)
 
@@ -291,9 +296,10 @@ describe("TokenServerAuthenticator", () => {
         token: mockTokenEntity,
       })
 
-      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValue(
+      vi.mocked(mockDatabase.prisma.server.upsert).mockResolvedValue(
         createMockServerRecord({ serverId: 42, authTokenId: 1 }),
       )
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(5)
 
       await authenticator.handleBeacon(validToken.raw, 27015, "192.168.1.100", 54321)
 
@@ -316,9 +322,10 @@ describe("TokenServerAuthenticator", () => {
         token: mockTokenEntity,
       })
 
-      vi.mocked(mockDatabase.prisma.server.findFirst)
+      vi.mocked(mockDatabase.prisma.server.upsert)
         .mockResolvedValueOnce(createMockServerRecord({ serverId: 42, authTokenId: 1 }))
         .mockResolvedValueOnce(createMockServerRecord({ serverId: 43, authTokenId: 1 }))
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(5)
 
       await authenticator.handleBeacon(validToken.raw, 27015, "192.168.1.100", 54321)
       await authenticator.handleBeacon(validToken.raw, 27016, "192.168.1.100", 54322)
@@ -334,9 +341,10 @@ describe("TokenServerAuthenticator", () => {
         token: mockTokenEntity,
       })
 
-      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValue(
+      vi.mocked(mockDatabase.prisma.server.upsert).mockResolvedValue(
         createMockServerRecord({ serverId: 42, authTokenId: 1 }),
       )
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(5)
 
       await authenticator.handleBeacon(validToken.raw, 27015, "192.168.1.100", 54321)
 
@@ -354,9 +362,10 @@ describe("TokenServerAuthenticator", () => {
         token: mockTokenEntity,
       })
 
-      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValue(
+      vi.mocked(mockDatabase.prisma.server.upsert).mockResolvedValue(
         createMockServerRecord({ serverId: 42, authTokenId: 1 }),
       )
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(5)
 
       // First request - hits repository
       await authenticator.handleBeacon(validToken.raw, 27015, "192.168.1.100", 54321)
@@ -373,9 +382,10 @@ describe("TokenServerAuthenticator", () => {
         token: mockTokenEntity,
       })
 
-      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValue(
+      vi.mocked(mockDatabase.prisma.server.upsert).mockResolvedValue(
         createMockServerRecord({ serverId: 42, authTokenId: 1 }),
       )
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(5)
 
       // First request
       await authenticator.handleBeacon(validToken.raw, 27015, "192.168.1.100", 54321)
@@ -397,9 +407,10 @@ describe("TokenServerAuthenticator", () => {
         token: mockTokenEntity,
       })
 
-      vi.mocked(mockDatabase.prisma.server.findFirst).mockResolvedValue(
+      vi.mocked(mockDatabase.prisma.server.upsert).mockResolvedValue(
         createMockServerRecord({ serverId: 42, authTokenId: 1 }),
       )
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(5)
 
       await authenticator.handleBeacon(validToken.raw, 27015, "192.168.1.100", 54321)
 

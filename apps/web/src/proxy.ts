@@ -1,18 +1,28 @@
-import { getSessionCookie } from "@repo/auth/cookies"
+import { auth } from "@repo/auth"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Redirect unauthenticated users away from admin pages
-  if (pathname.startsWith("/admin") && !getSessionCookie(request)) {
+  if (!pathname.startsWith("/admin")) {
+    return NextResponse.next()
+  }
+
+  // Full session validation — not just cookie presence (RT-007)
+  const session = await auth.api.getSession({ headers: request.headers })
+
+  if (!session) {
     return NextResponse.redirect(new URL("/login", request.url))
+  }
+
+  if (session.user.role !== "admin") {
+    return NextResponse.redirect(new URL("/", request.url))
   }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/((?!api/|_next/static|_next/image|favicon\\.ico|sitemap\\.xml|robots\\.txt).*)"],
+  matcher: ["/admin/:path*"],
 }

@@ -18,6 +18,7 @@ const LOG_TIMESTAMP_RE = /^L \d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}: /
 export type LineClassification =
   | { kind: "beacon"; token: string; gamePort: number }
   | { kind: "log_line"; logLine: string }
+  | { kind: "rejected" }
 
 /**
  * Classify an incoming log line as a beacon or regular log line.
@@ -45,13 +46,12 @@ export function classifyLine(rawLine: string): LineClassification {
   // Find the last colon to split token from port
   const lastColon = payload.lastIndexOf(":")
 
-  // No colon or colon at end - malformed, but try to use as token with default port
+  // No colon or colon at end — malformed beacon
   if (lastColon === -1 || lastColon === payload.length - 1) {
     if (payload.length === 0) {
-      // Empty payload - treat as regular log line (malformed)
-      return { kind: "log_line", logLine: rawLine }
+      return { kind: "rejected" }
     }
-    // No port specified - use default
+    // No port specified — use default
     return { kind: "beacon", token: payload, gamePort: 27015 }
   }
 
@@ -59,10 +59,10 @@ export function classifyLine(rawLine: string): LineClassification {
   const portStr = payload.slice(lastColon + 1)
   const gamePort = parseInt(portStr, 10)
 
-  // Validate extracted values
+  // Validate extracted values — reject ambiguous payloads instead of
+  // falling back to log_line processing (RT-011: prevents data injection)
   if (token.length === 0 || isNaN(gamePort) || gamePort < 1 || gamePort > 65535) {
-    // Malformed beacon - treat as regular log line
-    return { kind: "log_line", logLine: rawLine }
+    return { kind: "rejected" }
   }
 
   return { kind: "beacon", token, gamePort }

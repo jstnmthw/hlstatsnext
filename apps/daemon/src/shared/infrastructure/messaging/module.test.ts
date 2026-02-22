@@ -188,7 +188,7 @@ describe("Factory Functions", () => {
     it("should create development config with default URL", () => {
       const config = createDevelopmentRabbitMQConfig()
 
-      expect(config.url).toBe("amqp://hlstats:hlstats@localhost:5672/hlstats")
+      expect(config.url).toBe("amqp://hlstats:hlstats-mq-dev@localhost:5672/hlstats")
       expect(config.prefetchCount).toBe(10)
       expect(config.heartbeatInterval).toBe(60)
       expect(config.connectionRetry).toEqual({

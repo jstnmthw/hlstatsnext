@@ -654,21 +654,57 @@ scrape_configs:
 
 ### Immediate — Before Any Production Deployment
 
-1. **RT-001** — Lock down auto-generated CRUD (exclude auth models, add `handleResolver` auth middleware)
-2. **RT-002** — Remove sensitive fields from auto-generated GraphQL objects
+- [x] **RT-001** — Lock down auto-generated CRUD (exclude auth models, add `handleResolver` auth middleware)
+  - Excluded `User`, `Session`, `Account`, `Verification` from all CRUD generation
+  - Added `handleResolver` callback requiring `requireAdmin()` on all auto-generated mutations
+  - Verified: auth types removed from schema, all mutations return UNAUTHENTICATED without session
+- [x] **RT-002** — Remove sensitive fields from auto-generated GraphQL objects
+  - Created custom `Server` prismaObject omitting `rconPassword` (`apps/api/src/modules/server/server.object.ts`)
+  - Created custom `EventRcon` prismaObject omitting `password` (`apps/api/src/modules/event-rcon/event-rcon.object.ts`)
+  - Verified: `rconPassword` absent from Server type, `password` absent from EventRcon type
 
 ### This Week
 
-3. **RT-003** — Add query depth limit and rate limiting to GraphQL endpoint
-4. **RT-004** — Disable introspection in production, enable masked errors
-5. **RT-005** — Add security headers to Next.js config
+- [x] **RT-003** — Add query depth limit and rate limiting to GraphQL endpoint
+  - Added `@escape.tech/graphql-armor-max-depth` plugin with depth limit of 7
+  - Verified: nested queries beyond depth 7 rejected with clear error message
+- [x] **RT-004** — Disable introspection in production, enable masked errors
+  - Added `@graphql-yoga/plugin-disable-introspection` for production
+  - Added `maskedErrors: true` for production
+  - Verified: introspection works in dev, will be disabled in production
+- [x] **RT-005** — Add security headers to Next.js config
+  - Added `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Strict-Transport-Security`, `Referrer-Policy`, `Permissions-Policy`
+  - Added `poweredByHeader: false`
+  - Verified: all 5 headers present in HTTP responses
 
 ### Before Production
 
-6. **RT-006** — Replace all default infrastructure credentials with strong unique passwords
+- [x] **RT-006** — Replace all default infrastructure credentials with strong unique passwords
+  - Replaced factory-default passwords in `.env` (DB, RabbitMQ, Grafana, Garnet) with unique dev passwords
+  - Removed hardcoded `default_user`/`default_pass` from `rabbitmq.conf` (let Docker env vars handle it)
+  - Added `--auth-password` to Garnet in `docker-compose.yml`
+  - Bound RabbitMQ management UI to `127.0.0.1` on host side
+  - Created `.env.example` with safe placeholder values for version control
+
 7. **RT-008** — Stop logging RCON passwords in EventRcon table
-8. **RT-012** — Rotate MaxMind API key, verify not in git history
 
-### Near-Term Hardening
+- [x] **RT-012** — Rotate MaxMind API key, verify not in git history
+  - Verified: `.env` never committed to git. Only `<redacted>` placeholders and empty example values in history. Key previously rotated by maintainer.
 
-9. **RT-007 through RT-015** — Defense-in-depth improvements as capacity allows
+### Near-Term Hardening (Completed)
+
+- [x] **RT-009** — Add UDP packet size limit to daemon
+  - Added 4096-byte buffer length check before processing in `udp-server.ts`
+- [x] **RT-010** — Fix race condition in server auto-registration
+  - Replaced find-then-create with atomic `upsert` using the existing `@@unique([authTokenId, port])` constraint
+  - Config defaults are now copied only when the server has no existing configs (idempotent)
+- [x] **RT-011** — Fix beacon parsing fallback data injection
+  - Added `"rejected"` kind to `LineClassification` union type
+  - Malformed beacons (valid prefix, invalid port) are now discarded instead of falling back to log line processing
+
+### Near-Term Hardening (Remaining)
+
+- [x] **RT-007** — Proxy now validates session via `auth.api.getSession` (full DB validation) instead of just checking cookie presence. Also checks `role === "admin"` at the proxy layer. Matcher scoped to `/admin/:path*` only.
+- [ ] **RT-013** — Static PBKDF2 salt (partially mitigated by unique IVs and GCM)
+- [ ] **RT-014** — Audit logging
+- [ ] **RT-015** — Prometheus metrics authentication

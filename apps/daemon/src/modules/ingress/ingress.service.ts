@@ -156,7 +156,11 @@ export class IngressService implements IIngressService {
         return // Beacons are not game events
       }
 
-      // Regular engine log line - look up authenticated source
+      if (classified.kind === "rejected") {
+        return // Malformed beacon — discard to prevent data injection (RT-011)
+      }
+
+      // Regular engine log line — look up authenticated source
       const serverId = this.authenticateSource(serverAddress, serverPort)
       if (serverId === undefined) {
         // No authentication session — TokenServerAuthenticator logs this with rate limiting

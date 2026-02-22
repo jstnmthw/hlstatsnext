@@ -57,7 +57,7 @@ services:
       - ./docker/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
     ports:
       - "5672:5672" # AMQP
-      - "15672:15672" # Management UI
+      - "127.0.0.1:15672:15672" # Management UI (localhost only)
     networks:
       - default
     healthcheck:
@@ -81,7 +81,7 @@ services:
       - "6379:6379" # Redis-compatible port
     networks:
       - default
-    command: --port 6379 --memory ${GARNET_MEMORY:-1g} --checkpointdir /data
+    command: --port 6379 --memory ${GARNET_MEMORY:-1g} --checkpointdir /data --auth Password --password ${CACHE_PASSWORD}
     healthcheck:
       test: ["CMD-SHELL", "bash -c 'echo PING > /dev/tcp/localhost/6379'"]
       interval: 10s

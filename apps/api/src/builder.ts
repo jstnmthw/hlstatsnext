@@ -25,11 +25,7 @@ export const builder = new SchemaBuilder<{
   },
 })
 
-// Add types
-builder.queryType({})
-
-// Add mutations
-// builder.mutationType({})
+// Query and Mutation types are defined in pothos-schema.ts
 
 // Add subscriptions
 // builder.subscriptionType({})

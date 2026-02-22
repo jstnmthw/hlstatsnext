@@ -92,6 +92,9 @@ export class UdpServer extends EventEmitter {
         this.socket = this.socketFactory.createSocket("udp4")
 
         this.socket.on("message", (buffer, rinfo) => {
+          // RT-009: Reject oversized packets to prevent memory exhaustion
+          if (buffer.length > 4096) return
+
           const logLine = stripPacketHeader(buffer)
 
           if (logLine) {

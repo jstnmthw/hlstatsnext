@@ -244,7 +244,7 @@ export function createQueueModule(
  */
 export function createDevelopmentRabbitMQConfig(url?: string): RabbitMQConfig {
   return {
-    url: url || "amqp://hlstats:hlstats@localhost:5672/hlstats",
+    url: url || "amqp://hlstats:hlstats-mq-dev@localhost:5672/hlstats",
     prefetchCount: 10,
     heartbeatInterval: 60,
     connectionRetry: {

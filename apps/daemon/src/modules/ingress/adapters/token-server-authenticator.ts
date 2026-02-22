@@ -277,47 +277,37 @@ export class TokenServerAuthenticator {
     | { kind: "authenticated"; serverId: number }
     | { kind: "auto_registered"; serverId: number; tokenId: number }
   > {
-    // Look for existing server with same token + game port (stable identity)
-    const existing = await this.database.prisma.server.findFirst({
+    // Atomic upsert using the @@unique([authTokenId, port]) constraint (RT-010).
+    // Prevents duplicate servers when concurrent beacons arrive before either commits.
+    const server = await this.database.prisma.server.upsert({
       where: {
-        authTokenId: token.id,
-        port: gamePort,
+        servers_token_port_unique: {
+          authTokenId: token.id,
+          port: gamePort,
+        },
       },
-      select: { serverId: true, address: true },
+      update: { address },
+      create: {
+        address,
+        port: gamePort,
+        name: `${address}:${gamePort}`,
+        game: token.game,
+        rconPassword: token.rconPassword,
+        authTokenId: token.id,
+      },
+      select: { serverId: true },
     })
 
-    if (existing) {
-      // Update address if it changed (e.g. Docker container restart, IP rotation)
-      if (existing.address !== address) {
-        await this.database.prisma.server.update({
-          where: { serverId: existing.serverId },
-          data: { address },
-        })
-        this.logger.info(
-          `Server ${existing.serverId} address updated: ${existing.address} → ${address}`,
-        )
-      }
-      return { kind: "authenticated", serverId: existing.serverId }
-    }
+    // Check if this is a new server that needs default config copied
+    const configCount = await this.database.prisma.serverConfig.count({
+      where: { serverId: server.serverId },
+    })
 
-    // Auto-register new server and copy default config in a single transaction
-    const newServer = await this.database.transaction(async (tx) => {
-      const server = await tx.server.create({
-        data: {
-          address,
-          port: gamePort,
-          name: `${address}:${gamePort}`, // Default name - will be updated by RCON status
-          game: token.game,
-          rconPassword: token.rconPassword, // Already encrypted
-          authTokenId: token.id,
-        },
-        select: { serverId: true },
-      })
-
-      // Copy server_config_default → server_config for this server
-      const defaults = await tx.serverConfigDefault.findMany()
+    if (configCount === 0) {
+      // New server — copy defaults in a transaction
+      const defaults = await this.database.prisma.serverConfigDefault.findMany()
       if (defaults.length > 0) {
-        await tx.serverConfig.createMany({
+        await this.database.prisma.serverConfig.createMany({
           data: defaults.map((d) => ({
             serverId: server.serverId,
             parameter: d.parameter,
@@ -330,18 +320,18 @@ export class TokenServerAuthenticator {
         )
       }
 
-      return server
-    })
+      this.logger.ok(
+        `Auto-registered new server: ID ${server.serverId} at ${address}:${gamePort} (game: ${token.game})`,
+      )
 
-    this.logger.ok(
-      `Auto-registered new server: ID ${newServer.serverId} at ${address}:${gamePort} (game: ${token.game})`,
-    )
-
-    return {
-      kind: "auto_registered",
-      serverId: newServer.serverId,
-      tokenId: token.id,
+      return {
+        kind: "auto_registered",
+        serverId: server.serverId,
+        tokenId: token.id,
+      }
     }
+
+    return { kind: "authenticated", serverId: server.serverId }
   }
 
   /**

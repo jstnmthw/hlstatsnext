@@ -20,4 +20,6 @@ export interface DataTableConfig {
   searchFields?: string[]
   filterPlaceholder?: string
   filters?: FacetedFilterDefinition[]
+  frozenColumnsLeft?: string[]
+  frozenColumnsRight?: string[]
 }

@@ -35,6 +35,8 @@ export const playerTableConfig: DataTableConfig = {
   defaultPageSize: 10,
   searchFields: ["lastName", "email"],
   filterPlaceholder: "Filter players...",
+  frozenColumnsLeft: ["select"],
+  frozenColumnsRight: ["actions"],
 }
 
 function ActionsHeader() {

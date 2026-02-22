@@ -64,6 +64,8 @@ export const userTableConfig: DataTableConfig = {
       ],
     },
   ],
+  frozenColumnsLeft: ["select"],
+  frozenColumnsRight: ["actions"],
 }
 
 function ActionsHeader() {

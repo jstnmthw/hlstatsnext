@@ -21,6 +21,7 @@ interface ServerEditFormProps {
     rconPassword?: string
     sortOrder: number
     mod: string
+    authToken?: { tokenPrefix: string; name: string } | null
   }
   games: GameProps[]
   mods: ModProps[]
@@ -34,6 +35,18 @@ export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
       <ErrorDisplay state={state} pending={pending} />
 
       <input type="hidden" name="serverId" value={server.serverId} />
+
+      {server.authToken && (
+        <div className="rounded-md border border-zinc-700 bg-zinc-800/50 p-3">
+          <p className="mb-1 text-xs font-medium text-muted-foreground">Authenticated via Token</p>
+          <div className="flex items-center gap-2">
+            <code className="rounded bg-zinc-900 px-1.5 py-0.5 font-mono text-xs">
+              {server.authToken.tokenPrefix}...
+            </code>
+            <span className="text-sm">{server.authToken.name}</span>
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-4 md:grid-cols-1">
         <FormField>
@@ -167,7 +180,8 @@ export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
             maxLength={255}
           />
           <p className="text-xs text-muted-foreground">
-            Optional. Used for remote server administration and real-time monitoring.
+            Used for remote server administration and real-time monitoring.
+            {server.authToken && " Overrides the default RCON password from the token."}
           </p>
           {state.errors?.rconPassword && (
             <ErrorMessage>{state.errors.rconPassword[0]}</ErrorMessage>

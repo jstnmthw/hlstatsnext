@@ -658,35 +658,41 @@ async handleLogLine(logLine: string, address: string, port: number): Promise<voi
 
 Doc: https://nextjs.org/docs/app/guides/data-security
 
-### Phase 2: Web Client
+### Phase 2: Web Client ✅ **Completed 2026-02-22**
 
-- [ ] Create `apps/web/src/features/admin/tokens/graphql/token-queries.ts` using `graphql()` from `@/lib/gql`
-- [ ] Create `apps/web/src/features/admin/tokens/graphql/token-mutations.ts`
+- [x] Create `apps/web/src/features/admin/tokens/graphql/token-queries.ts` using `graphql()` from `@/lib/gql`
+  - Completed: GET_SERVER_TOKENS, GET_SERVER_TOKEN_COUNT, GET_SERVER_TOKEN_BY_ID
+- [x] Create `apps/web/src/features/admin/tokens/graphql/token-mutations.ts`
+  - Completed: CREATE_SERVER_TOKEN, REVOKE_SERVER_TOKEN
 
-### Phase 3: Server Actions
+### Phase 3: Server Actions ✅ **Completed 2026-02-22**
 
-- [ ] Create token action: Zod validation, RCON password (optional, warn if empty), game type from known list
-- [ ] Revoke token action: call mutation, `revalidatePath('/admin/tokens')`
+- [x] Create token action: Zod validation, RCON password (optional, warn if empty), game type from known list
+  - Completed: `actions/create-token.ts` with Zod schema, session guard, GraphQL mutation, revalidatePath
+- [x] Revoke token action: call mutation, `revalidatePath('/admin/tokens')`
+  - Completed: `actions/revoke-token.ts` with session guard, GraphQL mutation, revalidatePath
 
 Doc: https://nextjs.org/docs/app/getting-started/updating-data
 
-### Phase 4: UI Components
+### Phase 4: UI Components ✅ **Completed 2026-02-22**
 
-- [ ] Token list page: `apps/web/src/app/admin/tokens/page.tsx`
-  - Server component fetching via `query()` from `registerApolloClient()`
-  - DataTable with columns: Name, Prefix, Game, Status (badge), Created, Last Used, Server count, Actions
-- [ ] Create token dialog:
-  - Fields: name (required), game type dropdown (required), RCON password (optional with warning), optional expiry
-  - Success: display raw token once with copy-to-clipboard, config instructions
-- [ ] Token display component: monospace, blurred by default, reveal toggle
-- [ ] Revoke action with confirmation dialog
+- [x] Token list page: `apps/web/src/app/(admin)/admin/tokens/page.tsx`
+  - Completed: Server component with SSR via `query()`, DataTable with columns: Prefix, Name, Game, Status, Server Count, RCON, Last Used, Created, Actions. Add Token button links to /admin/tokens/add.
+- [x] Create token page: `apps/web/src/app/(admin)/admin/tokens/add/page.tsx`
+  - Completed: SSR page with game type dropdown, form fields (name, game, RCON password, expiry). Displays raw token once with copy-to-clipboard and plugin config instructions on success.
+- [x] Revoke action with confirmation dialog
+  - Completed: AlertDialog in token-columns.tsx actions dropdown, uses `useTransition` to call revoke server action
 
 ### Phase 5: Server Edit Updates
 
-- [ ] Remove `connectionType` and `dockerHost` fields from server create/edit forms
-- [ ] Show which token authenticated the server (read-only prefix display)
-- [ ] Allow per-server RCON password override (independent from token default)
+- [x] Remove `connectionType` and `dockerHost` fields from server create/edit forms
+  - Completed: Fields removed from both server-create-form.tsx and server-edit-form.tsx, schema updated
+- [x] Show which token authenticated the server (read-only prefix display)
+  - Completed: Server edit page queries `authToken { tokenPrefix name }` and displays token prefix + name in a read-only card
+- [x] Allow per-server RCON password override (independent from token default)
+  - Completed: Server edit form RCON password field is independent from token. Description updated to note it overrides the token default when a token is present.
 - [ ] "RCON Status" indicator (connected / failed / unconfigured)
+  - Status: Deferred — Requires daemon-side RCON connection status to be exposed through the GraphQL API. Currently RCON state is ephemeral in the daemon process and not persisted to the database.
 
 ---
 

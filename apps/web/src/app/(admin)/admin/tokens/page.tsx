@@ -4,19 +4,19 @@ import { AdminTokensTable } from "@/features/admin/tokens/components/admin-token
 import {
   tokenTableConfig,
   type TokenListItem,
-} from "@/features/admin/tokens/components/token-columns"
+} from "@/features/admin/tokens/components/token-config"
 import {
   GET_SERVER_TOKENS,
   GET_SERVER_TOKEN_COUNT,
 } from "@/features/admin/tokens/graphql/token-queries"
-import { PermissionGate } from "@/features/auth/components/permission-gate"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
 import { getConfigDefaults, parseUrlParams } from "@/features/common/graphql/pagination"
 import { query } from "@/lib/apollo-client"
-import { IconKey } from "@repo/ui"
+import { Button, IconKey } from "@repo/ui"
 import { Metadata } from "next"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Server Tokens - " + process.env.NEXT_PUBLIC_APP_NAME,
@@ -58,27 +58,19 @@ export default async function TokensPage(props: AdminPageProps) {
         <div className="container">
           <div className="mt-8 mb-8 flex items-center justify-between">
             <div>
-              <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight uppercase">
-                <IconKey className="size-8" />
-                Server Tokens
-              </h1>
+              <h1 className="text-2xl font-bold tracking-tight uppercase">Server Tokens</h1>
               <p className="text-muted-foreground">
                 Manage authentication tokens for game server plugins to connect to the daemon.
               </p>
             </div>
+            <Button variant="solid" size="default" colorScheme="green" asChild className="pl-2.5!">
+              <Link href="/admin/tokens/add">
+                <IconKey data-slot="icon" />
+                <span>Add Token</span>
+              </Link>
+            </Button>
           </div>
-          <PermissionGate
-            permissions={{ server: ["create"] }}
-            fallback={
-              <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-8 text-center">
-                <p className="text-muted-foreground">
-                  You need administrator permissions to manage server tokens.
-                </p>
-              </div>
-            }
-          >
-            <AdminTokensTable data={tokens} totalCount={totalCount} />
-          </PermissionGate>
+          <AdminTokensTable data={tokens} totalCount={totalCount} />
         </div>
       </MainContent>
       <Footer />

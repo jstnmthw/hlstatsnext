@@ -17,11 +17,9 @@ import type { CreateServerInput } from "@/lib/gql/graphql"
 export function extractFormDataForCreate(formData: FormData) {
   return {
     address: formData.get("address"),
-    docker_host: formData.get("docker_host"),
     port: formData.get("port"),
     game: formData.get("game"),
     mod: formData.get("mod"),
-    connection_type: formData.get("connection_type"),
     rconPassword: formData.get("rconPassword"),
   }
 }
@@ -36,14 +34,12 @@ export function extractFormDataForUpdate(formData: FormData) {
     serverId: formData.get("serverId"),
     name: formData.get("name"),
     address: formData.get("address"),
-    docker_host: formData.get("docker_host"),
     port: formData.get("port"),
     game: formData.get("game"),
     mod: formData.get("mod"),
     publicAddress: formData.get("publicAddress"),
     statusUrl: formData.get("statusUrl"),
     rconPassword: formData.get("rconPassword"),
-    connection_type: formData.get("connection_type"),
     sortOrder: formData.get("sortOrder"),
   }
 }
@@ -54,20 +50,12 @@ export function extractFormDataForUpdate(formData: FormData) {
  * @returns GraphQL input object, cleaned of null/undefined values
  */
 export function prepareCreateServerInput(data: CreateServerFormData): CreateServerInput {
-  const input: CreateServerInput = {
+  return {
     port: data.port,
     game: data.game,
-    connectionType: data.connection_type,
+    address: data.address,
     rconPassword: data.rconPassword || "",
   }
-
-  if (data.connection_type === "docker") {
-    input.dockerHost = data.docker_host
-  } else {
-    input.address = data.address
-  }
-
-  return input
 }
 
 /**
@@ -81,19 +69,11 @@ export function prepareUpdateServerInput(
   const serverInput: Record<string, { set: string | number | null }> = {
     port: { set: data.port },
     game: { set: data.game },
-    connectionType: { set: data.connection_type },
     sortOrder: { set: data.sortOrder },
   }
 
-  // Handle connection type specific fields
-  if (data.connection_type === "docker") {
-    // For Docker servers, set dockerHost and clear address
-    serverInput.dockerHost = { set: data.docker_host || "" }
-    serverInput.address = { set: "" } // Set to empty string for Docker servers
-  } else {
-    // For external servers, set address and clear dockerHost
-    serverInput.address = { set: data.address || "" }
-    serverInput.dockerHost = { set: null } // Clear dockerHost for external servers
+  if (data.address) {
+    serverInput.address = { set: data.address }
   }
 
   // Only include optional fields if they have values

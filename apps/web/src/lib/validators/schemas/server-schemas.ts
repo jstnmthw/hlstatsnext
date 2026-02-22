@@ -26,13 +26,6 @@ export const ServerFieldSchemas = {
     .optional()
     .or(z.null()),
 
-  dockerHost: z
-    .string()
-    .min(1, "Docker host is required")
-    .max(255, "Docker host is too long")
-    .optional()
-    .or(z.null()),
-
   port: z.coerce
     .number()
     .int()
@@ -55,71 +48,35 @@ export const ServerFieldSchemas = {
 
   rconPassword: z.string().max(255, "RCON password is too long").optional().or(z.null()),
 
-  connectionType: z.enum(["external", "docker"]).optional().default("external"),
-
   sortOrder: z.coerce.number().int().min(0).max(127).optional().default(0),
-}
-
-/**
- * Shared validation logic for connection type requirements
- */
-export const connectionTypeRefine = (
-  data: { connection_type?: string; address?: string | null; docker_host?: string | null },
-  ctx: z.RefinementCtx,
-) => {
-  if (data.connection_type === "docker") {
-    if (!data.docker_host || data.docker_host.trim() === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Docker host is required for Docker connection type",
-        path: ["docker_host"],
-      })
-    }
-  } else {
-    if (!data.address || data.address.trim() === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Server address is required for external connection type",
-        path: ["address"],
-      })
-    }
-  }
 }
 
 /**
  * Schema for creating a new server
  */
-export const CreateServerSchema = z
-  .object({
-    address: ServerFieldSchemas.address,
-    docker_host: ServerFieldSchemas.dockerHost,
-    port: ServerFieldSchemas.port,
-    game: ServerFieldSchemas.game,
-    mod: ServerFieldSchemas.mod,
-    connection_type: ServerFieldSchemas.connectionType,
-    rconPassword: ServerFieldSchemas.rconPassword,
-  })
-  .superRefine(connectionTypeRefine)
+export const CreateServerSchema = z.object({
+  address: ServerFieldSchemas.address,
+  port: ServerFieldSchemas.port,
+  game: ServerFieldSchemas.game,
+  mod: ServerFieldSchemas.mod,
+  rconPassword: ServerFieldSchemas.rconPassword,
+})
 
 /**
  * Schema for updating an existing server
  */
-export const UpdateServerSchema = z
-  .object({
-    serverId: ServerFieldSchemas.serverId,
-    name: ServerFieldSchemas.name,
-    address: ServerFieldSchemas.address,
-    docker_host: ServerFieldSchemas.dockerHost,
-    port: ServerFieldSchemas.port,
-    game: ServerFieldSchemas.game,
-    mod: ServerFieldSchemas.mod,
-    publicAddress: ServerFieldSchemas.publicAddress,
-    statusUrl: ServerFieldSchemas.statusUrl,
-    rconPassword: ServerFieldSchemas.rconPassword,
-    connection_type: ServerFieldSchemas.connectionType,
-    sortOrder: ServerFieldSchemas.sortOrder,
-  })
-  .superRefine(connectionTypeRefine)
+export const UpdateServerSchema = z.object({
+  serverId: ServerFieldSchemas.serverId,
+  name: ServerFieldSchemas.name,
+  address: ServerFieldSchemas.address,
+  port: ServerFieldSchemas.port,
+  game: ServerFieldSchemas.game,
+  mod: ServerFieldSchemas.mod,
+  publicAddress: ServerFieldSchemas.publicAddress,
+  statusUrl: ServerFieldSchemas.statusUrl,
+  rconPassword: ServerFieldSchemas.rconPassword,
+  sortOrder: ServerFieldSchemas.sortOrder,
+})
 
 /**
  * Type definitions for form data

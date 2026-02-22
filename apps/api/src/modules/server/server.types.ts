@@ -9,8 +9,6 @@ export interface CreateServerInput {
   rconPassword?: string
   publicAddress?: string
   statusUrl?: string
-  connectionType?: string
-  dockerHost?: string
   sortOrder?: number
 }
 
@@ -23,8 +21,6 @@ export interface UpdateServerInput {
   publicAddress?: string
   statusUrl?: string | null
   rconPassword?: string
-  connectionType?: string
-  dockerHost?: string
   sortOrder?: number
 }
 

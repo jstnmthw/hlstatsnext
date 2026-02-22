@@ -14,8 +14,6 @@ export const CREATE_SERVER_MUTATION = graphql(`
         game
         publicAddress
         statusUrl
-        connectionType
-        dockerHost
         sortOrder
       }
     }
@@ -36,8 +34,6 @@ export const UPDATE_SERVER_WITH_CONFIG_MUTATION = graphql(`
         game
         publicAddress
         statusUrl
-        connectionType
-        dockerHost
         sortOrder
       }
     }

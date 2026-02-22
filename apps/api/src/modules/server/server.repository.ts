@@ -3,40 +3,32 @@ import type { CreateServerInput, ServerConfigCopyResult, UpdateServerInput } fro
 
 export class ServerRepository {
   async createServer(data: CreateServerInput) {
-    const connectionType = data.connectionType || "external"
-
     return await db.server.create({
       data: {
-        address: connectionType === "external" ? data.address || "" : "",
+        address: data.address || "",
         port: data.port,
         game: data.game,
         name: data.name || "",
         rconPassword: data.rconPassword || "",
         publicAddress: data.publicAddress || "",
         statusUrl: data.statusUrl,
-        connectionType,
-        dockerHost: connectionType === "docker" ? data.dockerHost : null,
         sortOrder: data.sortOrder || 0,
       },
     })
   }
 
   async createServerWithConfig(data: CreateServerInput) {
-    const connectionType = data.connectionType || "external"
-
     return await db.$transaction(async (tx) => {
       // Step 1: Create the server without configs first
       const server = await tx.server.create({
         data: {
-          address: connectionType === "external" ? data.address || "" : "",
+          address: data.address || "",
           port: data.port,
           game: data.game,
           name: data.name || "",
           rconPassword: data.rconPassword || "",
           publicAddress: data.publicAddress || "",
           statusUrl: data.statusUrl,
-          connectionType,
-          dockerHost: connectionType === "docker" ? data.dockerHost : null,
           sortOrder: data.sortOrder || 0,
         },
       })
@@ -189,8 +181,6 @@ export class ServerRepository {
   }
 
   async updateServerWithConfig(serverId: number, data: UpdateServerInput) {
-    const connectionType = data.connectionType || "external"
-
     return await db.$transaction(async (tx) => {
       // Build update data object with only provided fields
       const updateData: Partial<{
@@ -201,23 +191,16 @@ export class ServerRepository {
         publicAddress: string
         statusUrl: string | null
         rconPassword: string
-        connectionType: string
-        dockerHost: string | null
         sortOrder: number
       }> = {}
 
       if (data.name !== undefined) updateData.name = data.name
-      if (data.address !== undefined) {
-        updateData.address = connectionType === "external" ? data.address || "" : ""
-      }
+      if (data.address !== undefined) updateData.address = data.address || ""
       if (data.port !== undefined) updateData.port = data.port
       if (data.game !== undefined) updateData.game = data.game
       if (data.publicAddress !== undefined) updateData.publicAddress = data.publicAddress
       if (data.statusUrl !== undefined) updateData.statusUrl = data.statusUrl
       if (data.rconPassword !== undefined) updateData.rconPassword = data.rconPassword
-      if (data.connectionType !== undefined) updateData.connectionType = connectionType
-      if (data.dockerHost !== undefined)
-        updateData.dockerHost = connectionType === "docker" ? data.dockerHost : null
       if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder
 
       // Update the server record

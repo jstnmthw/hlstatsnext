@@ -3,36 +3,18 @@
 import { createServer } from "@/features/admin/servers/actions/create-server"
 import { ErrorDisplay, ErrorMessage, FormField } from "@/features/common/components/form"
 import type { Game, ModSupported } from "@repo/db/client"
-import { BasicSelect, Button, Input, IPAddress, Label, Port, Switch } from "@repo/ui"
-import { useActionState, useState } from "react"
+import { BasicSelect, Button, Input, IPAddress, Label, Port } from "@repo/ui"
+import { useActionState } from "react"
 
 type GameProps = Pick<Game, "code" | "name">
 type ModProps = Pick<ModSupported, "code" | "name">
 
 export function ServerCreateForm({ games, mods }: { games: GameProps[]; mods: ModProps[] }) {
   const [state, formAction, pending] = useActionState(createServer, { success: true, message: "" })
-  const [isDockerMode, setIsDockerMode] = useState(false)
 
   return (
     <form action={formAction} className="space-y-6">
       <ErrorDisplay state={state} pending={pending} />
-
-      <div className="grid gap-4 md:grid-cols-1">
-        <FormField>
-          <Label htmlFor="connection-type">Docker</Label>
-          <Switch
-            id="connection-type"
-            name="connection-type"
-            checked={isDockerMode}
-            onCheckedChange={setIsDockerMode}
-          />
-          <p className="text-xs text-muted-foreground">
-            The server is running in the same Docker network as the game server manager.
-          </p>
-        </FormField>
-      </div>
-
-      <input type="hidden" name="connection_type" value={isDockerMode ? "docker" : "external"} />
 
       <div className="grid gap-4 md:grid-cols-2">
         <FormField>
@@ -67,16 +49,11 @@ export function ServerCreateForm({ games, mods }: { games: GameProps[]; mods: Mo
 
       <div className="grid gap-4 md:grid-cols-1">
         <FormField>
-          <Label htmlFor={isDockerMode ? "docker_host" : "address"} required>
-            {isDockerMode ? "Docker Host" : "Server Address"}
+          <Label htmlFor="address" required>
+            Server Address
           </Label>
           <div className="flex">
-            <IPAddress
-              className="rounded-r-none"
-              name={isDockerMode ? "docker_host" : "address"}
-              mode={isDockerMode ? "docker-host" : "ip-address"}
-              required
-            />
+            <IPAddress className="rounded-r-none" name="address" mode="ip-address" required />
             <Port
               className="-ml-px max-w-18 rounded-l-none border-l-transparent"
               name="port"
@@ -86,7 +63,6 @@ export function ServerCreateForm({ games, mods }: { games: GameProps[]; mods: Mo
             />
           </div>
           {state.errors?.address && <ErrorMessage>{state.errors.address[0]}</ErrorMessage>}
-          {state.errors?.docker_host && <ErrorMessage>{state.errors.docker_host[0]}</ErrorMessage>}
           {state.errors?.port && <ErrorMessage>{state.errors.port[0]}</ErrorMessage>}
         </FormField>
       </div>

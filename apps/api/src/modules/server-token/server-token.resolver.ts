@@ -157,8 +157,6 @@ builder.queryField("findManyServerToken", (t) =>
       take: t.arg.int({ required: false }),
     },
     resolve: async (query, _root, { includeRevoked, skip, take }, context) => {
-      requireAdmin(context)
-
       return context.services.serverToken.findManyPrisma({
         ...query,
         where: includeRevoked ? {} : { revokedAt: null },
@@ -176,7 +174,6 @@ builder.queryField("countServerToken", (t) =>
       includeRevoked: t.arg.boolean({ required: false, defaultValue: false }),
     },
     resolve: async (_root, { includeRevoked }, context) => {
-      requireAdmin(context)
       return context.services.serverToken.count(includeRevoked ?? false)
     },
   }),
@@ -191,7 +188,6 @@ builder.queryField("findServerToken", (t) =>
       id: t.arg.int({ required: true }),
     },
     resolve: async (query, _root, { id }, context) => {
-      requireAdmin(context)
       return context.services.serverToken.findByIdPrisma(id, query)
     },
   }),

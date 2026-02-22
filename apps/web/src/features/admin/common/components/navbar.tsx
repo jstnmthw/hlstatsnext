@@ -1,6 +1,3 @@
-"use client"
-
-import { usePermission } from "@/features/auth/hooks/use-permission"
 import {
   Button,
   cn,
@@ -18,8 +15,6 @@ interface NavItem {
   label: string
   href: string
   icon: React.ReactNode
-  /** If set, the item is only shown when the user's role has this permission. */
-  permission?: Record<string, string[]>
 }
 
 const navItems: NavItem[] = [
@@ -32,31 +27,26 @@ const navItems: NavItem[] = [
     label: "Servers",
     href: "/admin/servers",
     icon: <IconServer className="size-5" data-slot="icon" />,
-    permission: { server: ["read"] },
   },
   {
     label: "Tokens",
     href: "/admin/tokens",
     icon: <IconKey className="size-5" data-slot="icon" />,
-    permission: { server: ["create"] },
   },
   {
     label: "Players",
     href: "/admin/players",
     icon: <IconUser className="size-5" data-slot="icon" />,
-    permission: { player: ["read"] },
   },
   {
     label: "Users",
     href: "/admin/users",
     icon: <IconUser className="size-5" data-slot="icon" />,
-    permission: { user: ["list"] },
   },
   {
     label: "Games",
     href: "/admin/games",
     icon: <IconDeviceGamepad2 className="size-5" data-slot="icon" />,
-    permission: { game: ["read"] },
   },
   {
     label: "Logs",
@@ -75,14 +65,10 @@ interface NavbarProps {
 }
 
 export function Navbar({ currentPath }: NavbarProps) {
-  const { hasPermission } = usePermission()
-
-  const visibleItems = navItems.filter((item) => !item.permission || hasPermission(item.permission))
-
   return (
     <nav className="flex items-center justify-between">
       <ul className="container flex items-center gap-6 border-b">
-        {visibleItems.map((item) => {
+        {navItems.map((item) => {
           const isActive =
             item.href === "/admin"
               ? currentPath === "/admin"

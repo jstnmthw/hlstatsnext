@@ -27,8 +27,6 @@ export class ServerService {
     game?: string
     publicAddress?: string
     statusUrl?: string
-    connectionType?: string
-    dockerHost?: string
   }): Promise<Server> {
     // Encrypt the RCON password
     const encryptedRconPassword = await this.crypto.encrypt(serverData.rconPassword)
@@ -41,8 +39,6 @@ export class ServerService {
       game: serverData.game || "valve",
       publicAddress: serverData.publicAddress,
       statusUrl: serverData.statusUrl,
-      connectionType: serverData.connectionType,
-      dockerHost: serverData.dockerHost,
     })
 
     return server

@@ -13,8 +13,6 @@ const UpdateServerInput = builder.inputType("UpdateServerInput", {
     game: t.string({ required: false }),
     mod: t.string({ required: false }),
     rconPassword: t.string({ required: false }),
-    connectionType: t.string({ required: false }),
-    dockerHost: t.string({ required: false }),
     sortOrder: t.int({ required: false }),
   }),
 })
@@ -30,8 +28,6 @@ const CreateServerInput = builder.inputType("CreateServerInput", {
     mod: t.string({ required: false }),
     publicAddress: t.string({ required: false }),
     statusUrl: t.string({ required: false }),
-    connectionType: t.string({ required: false }), // Has database default "external"
-    dockerHost: t.string({ required: false }), // Optional for Docker servers
     sortOrder: t.int({ required: false }),
   }),
 })
@@ -48,8 +44,6 @@ SafeServer.implement({
     game: t.exposeString("game"),
     publicAddress: t.exposeString("publicAddress"),
     statusUrl: t.exposeString("statusUrl", { nullable: true }),
-    connectionType: t.exposeString("connectionType"),
-    dockerHost: t.exposeString("dockerHost", { nullable: true }),
     sortOrder: t.exposeInt("sortOrder"),
   }),
 })
@@ -103,10 +97,6 @@ builder.mutationField("updateServerWithConfig", (t) =>
         if (data.mod !== null && data.mod !== undefined) updateData.mod = data.mod
         if (data.rconPassword !== null && data.rconPassword !== undefined)
           updateData.rconPassword = data.rconPassword
-        if (data.connectionType !== null && data.connectionType !== undefined)
-          updateData.connectionType = data.connectionType
-        if (data.dockerHost !== null && data.dockerHost !== undefined)
-          updateData.dockerHost = data.dockerHost
         if (data.sortOrder !== null && data.sortOrder !== undefined)
           updateData.sortOrder = data.sortOrder
 
@@ -157,8 +147,6 @@ builder.mutationField("createServerWithConfig", (t) =>
           rconPassword: data.rconPassword || undefined,
           publicAddress: data.publicAddress || undefined,
           statusUrl: data.statusUrl || undefined,
-          connectionType: data.connectionType || undefined,
-          dockerHost: data.dockerHost || undefined,
           sortOrder: data.sortOrder || undefined,
         }
 

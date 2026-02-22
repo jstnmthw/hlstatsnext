@@ -3,8 +3,8 @@
 import { updateServer } from "@/features/admin/servers/actions/update-server"
 import { ErrorDisplay, ErrorMessage, FormField } from "@/features/common/components/form"
 import type { Game, ModSupported } from "@repo/db/client"
-import { BasicSelect, Button, Input, IPAddress, Label, Port, Switch } from "@repo/ui"
-import { useActionState, useState } from "react"
+import { BasicSelect, Button, Input, IPAddress, Label, Port } from "@repo/ui"
+import { useActionState } from "react"
 
 type GameProps = Pick<Game, "code" | "name">
 type ModProps = Pick<ModSupported, "code" | "name">
@@ -19,8 +19,6 @@ interface ServerEditFormProps {
     publicAddress?: string
     statusUrl?: string
     rconPassword?: string
-    connectionType: string
-    dockerHost?: string
     sortOrder: number
     mod: string
   }
@@ -30,14 +28,12 @@ interface ServerEditFormProps {
 
 export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
   const [state, formAction, pending] = useActionState(updateServer, { success: true, message: "" })
-  const [isDockerMode, setIsDockerMode] = useState(server.connectionType === "docker")
 
   return (
     <form action={formAction} className="space-y-6">
       <ErrorDisplay state={state} pending={pending} />
 
       <input type="hidden" name="serverId" value={server.serverId} />
-      <input type="hidden" name="connection_type" value={isDockerMode ? "docker" : "external"} />
 
       <div className="grid gap-4 md:grid-cols-1">
         <FormField>
@@ -84,33 +80,18 @@ export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
         </FormField>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-1">
-        <FormField>
-          <Label htmlFor="connection-type">Docker</Label>
-          <Switch
-            id="connection-type"
-            name="connection-type"
-            checked={isDockerMode}
-            onCheckedChange={setIsDockerMode}
-          />
-          <p className="text-xs text-muted-foreground">
-            The server is running in the same Docker network as the game server manager.
-          </p>
-        </FormField>
-      </div>
-
       <div className="grid gap-4 md:grid-cols-2">
         <FormField>
-          <Label htmlFor={isDockerMode ? "docker_host" : "address"} required>
-            {isDockerMode ? "Docker Host" : "Server Address"}
+          <Label htmlFor="address" required>
+            Server Address
           </Label>
           <div className="flex">
             <IPAddress
               className="rounded-r-none"
-              name={isDockerMode ? "docker_host" : "address"}
-              mode={isDockerMode ? "docker-host" : "ip-address"}
+              name="address"
+              mode="ip-address"
               required
-              defaultValue={isDockerMode ? server.dockerHost || "" : server.address}
+              defaultValue={server.address}
             />
             <Port
               className="-ml-px max-w-18 rounded-l-none border-l-transparent"
@@ -122,7 +103,6 @@ export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
             />
           </div>
           {state.errors?.address && <ErrorMessage>{state.errors.address[0]}</ErrorMessage>}
-          {state.errors?.docker_host && <ErrorMessage>{state.errors.docker_host[0]}</ErrorMessage>}
           {state.errors?.port && <ErrorMessage>{state.errors.port[0]}</ErrorMessage>}
         </FormField>
 

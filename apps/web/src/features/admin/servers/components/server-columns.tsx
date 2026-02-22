@@ -53,6 +53,8 @@ export const serverTableConfig: DataTableConfig = {
       ],
     },
   ],
+  frozenColumnsLeft: ["select"],
+  frozenColumnsRight: ["actions"],
 }
 
 function ActionsHeader() {

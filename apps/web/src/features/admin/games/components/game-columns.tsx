@@ -38,6 +38,8 @@ export const gameTableConfig: DataTableConfig = {
       ],
     },
   ],
+  frozenColumnsLeft: ["select"],
+  frozenColumnsRight: ["actions"],
 }
 
 function ActionsHeader() {

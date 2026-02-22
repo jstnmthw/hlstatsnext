@@ -614,10 +614,16 @@ export class RconScheduleService implements IRconScheduleService {
    * Initialize command executors
    */
   private initializeExecutors(): void {
-    this.executors.set(
-      "server-message",
-      new ServerMessageCommand(this.logger, this.rconService, this.serverService),
+    const messageCommand = new ServerMessageCommand(
+      this.logger,
+      this.rconService,
+      this.serverService,
     )
+
+    // Register message executor for supported HUD command types
+    for (const type of ["hlx_csay", "hlx_tsay", "hlx_typehud"]) {
+      this.executors.set(type, messageCommand)
+    }
 
     // Create server monitoring command and store reference for immediate connections
     this.serverMonitoringCommand = new ServerMonitoringCommand(

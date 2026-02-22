@@ -171,7 +171,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test message" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test message" },
         enabled: true,
       }
 
@@ -219,7 +219,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -248,7 +248,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test message" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test message" },
         enabled: true,
       }
 
@@ -265,7 +265,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -281,7 +281,7 @@ describe("RconScheduleService", () => {
         id: "cron-test-schedule",
         name: "Cron Test Schedule",
         cronExpression: "invalid-cron",
-        command: { type: "server-message", message: "Hello players!" },
+        command: { type: "hlx_csay", color: "00FF00", message: "Hello players!" },
         enabled: true,
       }
 
@@ -323,7 +323,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test message" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test message" },
         enabled: true,
       }
 
@@ -358,7 +358,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: false,
       }
 
@@ -382,7 +382,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -423,7 +423,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -445,7 +445,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -476,7 +476,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -524,7 +524,7 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -550,14 +550,14 @@ describe("RconScheduleService", () => {
         id: "test-schedule",
         name: "Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "original" },
+        command: { type: "hlx_csay", color: "00FF00", message: "original" },
         enabled: true,
       }
 
       const updatedSchedule: ScheduledCommand = {
         ...originalSchedule,
         name: "Updated Test Schedule",
-        command: { type: "server-message", message: "updated" },
+        command: { type: "hlx_csay", color: "00FF00", message: "updated" },
       }
 
       await service.registerSchedule(originalSchedule)
@@ -565,7 +565,11 @@ describe("RconScheduleService", () => {
 
       const schedules = service.getSchedules()
       expect(schedules[0]?.name).toBe("Updated Test Schedule")
-      expect(schedules[0]?.command).toEqual({ type: "server-message", message: "updated" })
+      expect(schedules[0]?.command).toEqual({
+        type: "hlx_csay",
+        color: "00FF00",
+        message: "updated",
+      })
     })
 
     it("should register new schedule if it doesn't exist", async () => {
@@ -573,7 +577,7 @@ describe("RconScheduleService", () => {
         id: "new-schedule",
         name: "New Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "new" },
+        command: { type: "hlx_csay", color: "00FF00", message: "new" },
         enabled: true,
       }
 
@@ -595,7 +599,7 @@ describe("RconScheduleService", () => {
         id: "dup-schedule",
         name: "Duplicate Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -624,7 +628,7 @@ describe("RconScheduleService", () => {
         id: "disabled-schedule",
         name: "Disabled Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: false,
       }
 
@@ -632,7 +636,7 @@ describe("RconScheduleService", () => {
         id: "enabled-schedule",
         name: "Enabled Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -681,7 +685,7 @@ describe("RconScheduleService", () => {
         id: "stop-test-schedule",
         name: "Stop Test Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -721,7 +725,7 @@ describe("RconScheduleService", () => {
         id: "meta-schedule",
         name: "Meta Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
         metadata: { category: "announcements" },
       }
@@ -741,7 +745,7 @@ describe("RconScheduleService", () => {
         id: "late-schedule",
         name: "Late Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -766,7 +770,7 @@ describe("RconScheduleService", () => {
         id: "clean-unregister",
         name: "Clean Unregister",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -796,7 +800,7 @@ describe("RconScheduleService", () => {
         id: "no-servers",
         name: "No Servers",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -816,7 +820,7 @@ describe("RconScheduleService", () => {
         id: "filtered-schedule",
         name: "Filtered Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
         serverFilter: {
           serverIds: [1],
@@ -840,7 +844,7 @@ describe("RconScheduleService", () => {
         id: "excluded-schedule",
         name: "Excluded Schedule",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
         serverFilter: {
           excludeServerIds: [2],
@@ -862,7 +866,7 @@ describe("RconScheduleService", () => {
         id: "player-filter-schedule",
         name: "Player Filter",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
         serverFilter: {
           minPlayers: 5,
@@ -905,7 +909,7 @@ describe("RconScheduleService", () => {
         id: "concurrent-test",
         name: "Concurrent Test",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -925,7 +929,7 @@ describe("RconScheduleService", () => {
         id: "default-retry",
         name: "Default Retry",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
         // No maxRetries set - should use config.defaultMaxRetries
       }
@@ -949,7 +953,7 @@ describe("RconScheduleService", () => {
         id: "exec-now-test",
         name: "Exec Now Test",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -975,7 +979,7 @@ describe("RconScheduleService", () => {
         id: "empty-servers",
         name: "Empty Servers",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -1001,7 +1005,7 @@ describe("RconScheduleService", () => {
         id: "multi-server-exec",
         name: "Multi Server Exec",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -1025,7 +1029,7 @@ describe("RconScheduleService", () => {
         id: "disabled-status",
         name: "Disabled Status",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: false,
       }
 
@@ -1049,7 +1053,7 @@ describe("RconScheduleService", () => {
         id: "history-limit",
         name: "History Limit",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -1105,7 +1109,7 @@ describe("RconScheduleService", () => {
         id: "no-filter",
         name: "No Filter",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
         // no serverFilter
       }
@@ -1130,7 +1134,7 @@ describe("RconScheduleService", () => {
         id: "stats-test",
         name: "Stats Test",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -1169,7 +1173,7 @@ describe("RconScheduleService", () => {
         id: "history-test",
         name: "History Test",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -1194,7 +1198,7 @@ describe("RconScheduleService", () => {
         id: "custom-retries",
         name: "Custom Retries",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
         maxRetries: 5,
         retryOnFailure: true,
@@ -1219,7 +1223,7 @@ describe("RconScheduleService", () => {
         id: "no-retry",
         name: "No Retry",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
         maxRetries: 0,
         retryOnFailure: false,
@@ -1243,7 +1247,7 @@ describe("RconScheduleService", () => {
         id: "exec-id-test",
         name: "Execution ID Test",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 
@@ -1264,7 +1268,7 @@ describe("RconScheduleService", () => {
         id: "timing-test",
         name: "Timing Test",
         cronExpression: "0 * * * * *",
-        command: { type: "server-message", message: "test" },
+        command: { type: "hlx_csay", color: "00FF00", message: "test" },
         enabled: true,
       }
 

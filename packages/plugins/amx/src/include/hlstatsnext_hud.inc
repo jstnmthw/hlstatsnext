@@ -119,12 +119,6 @@ stock display_hud_typehud(const message[], r, g, b)
 {
   new Float:holdtime = get_pcvar_float(g_cvar_hlmsg_holdtime);
   new channel = get_pcvar_num(g_cvar_hlmsg_channel);
-  new len = strlen(message);
-  new Float:fxtime = float(len) / 25.0;
-
-  if (fxtime < 0.5) fxtime = 0.5;
-  if (fxtime > 4.0) fxtime = 4.0;
-
-  set_hudmessage(r, g, b, -1.0, 0.65, 2, fxtime, holdtime, 0.15, 0.25, channel);
+  set_hudmessage(r, g, b, -1.0, 0.65, 2, 0.05, holdtime * 1.5, 0.01, 0.5, channel);
   show_hudmessage(0, message);
 }

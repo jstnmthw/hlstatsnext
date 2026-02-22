@@ -120,7 +120,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
 
   // Create configuration objects
   const rconConfig = createRconConfig()
-  const scheduleConfig = getScheduleConfig(process.env.NODE_ENV || "production")
+  const scheduleConfig = getScheduleConfig()
   const resolvedIngressOptions = createIngressConfig(ingressOptions)
 
   // Create repositories

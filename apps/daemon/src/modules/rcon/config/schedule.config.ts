@@ -21,16 +21,22 @@ const DEFAULT_RETRY_SETTINGS = {
 }
 
 /**
- * Predefined scheduled commands for common server management tasks
+ * Predefined scheduled commands for common server management tasks.
+ *
+ * All message commands use the AMX plugin's HUD system:
+ *   "hlx_csay"    → Center HUD message (color required)
+ *   "hlx_tsay"    → Top HUD message (color required)
+ *   "hlx_typehud" → Typewriter HUD message (color required)
  */
 const defaultScheduledCommands: ScheduledCommand[] = [
   {
     id: "server-rules-reminder",
     name: "Server Rules Reminder",
-    cronExpression: "0 */1 * * * *", // Every 30 minutes
+    cronExpression: "0 */10 * * * *",
     command: {
-      type: "server-message",
-      message: 'say "Type !help for a list of commands"',
+      type: "hlx_typehud",
+      color: "00FF80",
+      message: "Type !help for a list of commands",
     },
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
@@ -45,10 +51,11 @@ const defaultScheduledCommands: ScheduledCommand[] = [
   {
     id: "hlstatsnext-promotion",
     name: "HLStatsNext Promotion",
-    cronExpression: "0 */10 * * * *", // Every 10 minutes
+    cronExpression: "0 */15 * * * *",
     command: {
-      type: "server-message",
-      message: "hlx_csay 80ff00 This server is running HLStatsNext Visit hlstatsnext.com",
+      type: "hlx_typehud",
+      color: "ffbf00",
+      message: "This server is running HLStatsNext - Visit hlstatsnext.com",
     },
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
@@ -61,34 +68,13 @@ const defaultScheduledCommands: ScheduledCommand[] = [
   },
 
   {
-    id: "discord-promotion",
-    name: "Discord Server Promotion",
-    cronExpression: "0 */15 * * * *",
-    command: {
-      type: "server-message",
-      message: "hlx_csay 00FF00 Join our Discord community! Link: discord.gg/0x1clan",
-    },
-    enabled: true, // Disabled by default - servers can customize and enable
-    timeoutMs: DEFAULT_TIMEOUT_MS,
-    ...DEFAULT_RETRY_SETTINGS,
-    serverFilter: {
-      minPlayers: 0,
-    },
-    metadata: {
-      category: "promotion",
-      priority: "low",
-      description: "Promotes Discord community",
-      customizable: true, // Indicates this should be customized per server
-    },
-  },
-
-  {
     id: "map-vote-reminder",
     name: "Map Vote Reminder",
-    cronExpression: "0 50 * * * *", // 10 minutes before each hour
+    cronExpression: "0 40 * * * *",
     command: {
-      type: "server-message",
-      message: "hlx_typehud 8000ff Don't forget to vote for the next map! Type !votemap",
+      type: "hlx_typehud",
+      color: "8000ff",
+      message: "Don't forget to vote for the next map! Type !votemap",
     },
     enabled: false,
     timeoutMs: DEFAULT_TIMEOUT_MS,
@@ -106,16 +92,17 @@ const defaultScheduledCommands: ScheduledCommand[] = [
   {
     id: "stats-announcement",
     name: "Stats Information",
-    cronExpression: "0 15 * * * *", // Every hour at 15 minutes past
+    cronExpression: "0 */25 * * * *",
     command: {
-      type: "server-message",
-      message: 'say "Your stats are tracked! Visit hlstatsnext.com to view your progress"',
+      type: "hlx_tsay",
+      color: "00FF80",
+      message: "Your stats are tracked! Visit hlstatsnext.com to view your progress",
     },
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
     serverFilter: {
-      minPlayers: 5, // Only announce when there are at least 5 players
+      minPlayers: 5,
     },
     metadata: {
       category: "announcement",
@@ -127,10 +114,11 @@ const defaultScheduledCommands: ScheduledCommand[] = [
   {
     id: "peak-hours-welcome",
     name: "Peak Hours Welcome Message",
-    cronExpression: "0 0 18-23 * * *", // Every hour from 6 PM to 11 PM
+    cronExpression: "0 0 18-23 * * *",
     command: {
-      type: "server-message",
-      message: 'say "Welcome to peak hours! Have fun and play fair!"',
+      type: "hlx_typehud",
+      color: "FFFF00",
+      message: "Welcome to peak hours! Have fun and play fair!",
     },
     enabled: true,
     timeoutMs: DEFAULT_TIMEOUT_MS,
@@ -148,16 +136,17 @@ const defaultScheduledCommands: ScheduledCommand[] = [
   {
     id: "anti-camp-reminder",
     name: "Anti-Camping Reminder",
-    cronExpression: "0 */45 * * * *", // Every 45 minutes
+    cronExpression: "0 */45 * * * *",
     command: {
-      type: "server-message",
-      message: 'say "Remember: Excessive camping may result in penalties"',
+      type: "hlx_tsay",
+      color: "FF4444",
+      message: "Remember: Excessive camping may result in penalties",
     },
-    enabled: false, // Disabled by default, can be enabled per server
+    enabled: false,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     ...DEFAULT_RETRY_SETTINGS,
     serverFilter: {
-      gameTypes: ["cs", "cs_source"], // Only for Counter-Strike games
+      gameTypes: ["cs", "cs_source"],
       minPlayers: 8,
     },
     metadata: {
@@ -168,28 +157,9 @@ const defaultScheduledCommands: ScheduledCommand[] = [
   },
 
   {
-    id: "server-restart-warning",
-    name: "Server Restart Warning",
-    cronExpression: "0 55 3 * * *", // Daily at 3:55 AM (5 minutes before restart)
-    command: {
-      type: "server-message",
-      message: 'say "Server restart in 5 minutes! Current round will finish normally."',
-    },
-    enabled: false, // Only enable on servers that have scheduled restarts
-    timeoutMs: DEFAULT_TIMEOUT_MS,
-    retryOnFailure: false, // Don't retry restart warnings
-    maxRetries: 0,
-    metadata: {
-      category: "maintenance",
-      priority: "critical",
-      description: "Warns players about scheduled server restart",
-    },
-  },
-
-  {
     id: "server-monitoring",
     name: "Server Status Monitoring",
-    cronExpression: "*/30 * * * * *", // Every 30 seconds for real-time data
+    cronExpression: "*/30 * * * * *",
     command: {
       type: "server-monitoring",
     },
@@ -202,8 +172,8 @@ const defaultScheduledCommands: ScheduledCommand[] = [
       priority: "critical",
       description: "Real-time server status monitoring and RCON health checks",
       captureStats: true,
-      internal: true, // Not visible to players
-      realTime: true, // Indicates this is for real-time monitoring
+      internal: true,
+      realTime: true,
     },
   },
 ]
@@ -216,47 +186,16 @@ export const defaultScheduleConfig: ScheduleConfig = {
   defaultTimeoutMs: DEFAULT_TIMEOUT_MS,
   defaultRetryOnFailure: true,
   defaultMaxRetries: 3,
-  historyRetentionHours: 24 * 7, // Keep 7 days of history
-  maxConcurrentPerServer: 3, // Max 3 concurrent scheduled commands per server
+  historyRetentionHours: 24 * 7,
+  maxConcurrentPerServer: 3,
   schedules: defaultScheduledCommands,
 }
 
 /**
  * Schedule configuration by environment
  */
-export const getScheduleConfig = (environment: string = "production"): ScheduleConfig => {
-  const config = { ...defaultScheduleConfig }
-
-  switch (environment) {
-    case "development":
-      // In development, reduce frequency and enable more verbose schedules
-      config.schedules = config.schedules.map((schedule) => ({
-        ...schedule,
-        // Convert all schedules to run more frequently for testing
-        cronExpression: schedule.cronExpression.includes("*/30")
-          ? "0 */2 * * * *" // Every 2 minutes instead of 30
-          : schedule.cronExpression.includes("*/45")
-            ? "0 */3 * * * *" // Every 3 minutes instead of 45
-            : schedule.cronExpression,
-        enabled: schedule.metadata?.category === "monitoring" ? true : schedule.enabled,
-      }))
-      break
-
-    case "staging":
-      // In staging, enable most schedules but with reduced frequency
-      config.schedules = config.schedules.map((schedule) => ({
-        ...schedule,
-        enabled: schedule.metadata?.category !== "promotion", // Disable promotional messages
-      }))
-      break
-
-    case "production":
-    default:
-      // Production uses default configuration
-      break
-  }
-
-  return config
+export const getScheduleConfig = (): ScheduleConfig => {
+  return { ...defaultScheduleConfig }
 }
 
 /**
@@ -282,8 +221,6 @@ export const getEnabledSchedules = (
  * Validate a cron expression
  */
 export const isValidCronExpression = (expression: string): boolean => {
-  // Basic validation for cron expressions
-  // node-cron supports both 5-field and 6-field (with seconds) expressions
   const parts = expression.trim().split(/\s+/)
   return parts.length === 5 || parts.length === 6
 }

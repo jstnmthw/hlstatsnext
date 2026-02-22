@@ -85,6 +85,14 @@ describe("TokenServerAuthenticator", () => {
 
       expect(result).toEqual({ kind: "authenticated", serverId: 42 })
       expect(mockTokenRepository.updateLastUsed).toHaveBeenCalledWith(1)
+
+      // SERVER_AUTHENTICATED emitted for all successful authentications (not just auto-register)
+      expect(mockEventBus.emit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: "SERVER_AUTHENTICATED",
+          serverId: 42,
+        }),
+      )
     })
 
     it("should auto-register new server with valid token and copy config defaults", async () => {

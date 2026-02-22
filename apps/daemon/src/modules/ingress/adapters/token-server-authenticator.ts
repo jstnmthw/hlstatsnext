@@ -136,6 +136,20 @@ export class TokenServerAuthenticator {
       "ok",
     )
 
+    // Emit SERVER_AUTHENTICATED for ALL successful authentications (not just auto-registered).
+    // This triggers immediate RCON connection — critical after daemon restart when
+    // existing servers re-authenticate and need RCON before the monitoring cron fires.
+    try {
+      const event: ServerAuthenticatedEvent = {
+        eventType: EventType.SERVER_AUTHENTICATED,
+        timestamp: new Date(),
+        serverId: serverResult.serverId,
+      }
+      await this.eventBus.emit(event)
+    } catch (error) {
+      this.logger.warn(`Error emitting server authentication event: ${error}`)
+    }
+
     return serverResult
   }
 
@@ -322,18 +336,6 @@ export class TokenServerAuthenticator {
     this.logger.ok(
       `Auto-registered new server: ID ${newServer.serverId} at ${address}:${gamePort} (game: ${token.game})`,
     )
-
-    // Emit SERVER_AUTHENTICATED event for RCON connection
-    try {
-      const event: ServerAuthenticatedEvent = {
-        eventType: EventType.SERVER_AUTHENTICATED,
-        timestamp: new Date(),
-        serverId: newServer.serverId,
-      }
-      await this.eventBus.emit(event)
-    } catch (error) {
-      this.logger.warn(`Error emitting server authentication event: ${error}`)
-    }
 
     return {
       kind: "auto_registered",

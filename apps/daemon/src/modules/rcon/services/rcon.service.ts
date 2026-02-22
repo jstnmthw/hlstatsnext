@@ -23,6 +23,9 @@ export class RconService implements IRconService {
   private readonly config: RconConfig
   private readonly statusParser: GoldSrcStatusParser
 
+  /** Per-server command queue — serializes RCON commands to prevent half-duplex collisions */
+  private readonly commandQueues = new Map<number, Promise<unknown>>()
+
   constructor(
     private readonly repository: IRconRepository,
     private readonly logger: ILogger,
@@ -130,10 +133,30 @@ export class RconService implements IRconService {
       this.logger.warn(`Error disconnecting RCON from server ${serverId}: ${error}`)
     } finally {
       this.connections.delete(serverId)
+      this.commandQueues.delete(serverId)
     }
   }
 
   async executeCommand(serverId: number, command: string): Promise<string> {
+    // Serialize commands per server — GoldSrc RCON is half-duplex UDP,
+    // concurrent sends corrupt each other's responses.
+    const previous = this.commandQueues.get(serverId) ?? Promise.resolve()
+
+    const resultPromise = previous.then(
+      () => this.doExecuteCommand(serverId, command),
+      () => this.doExecuteCommand(serverId, command), // Continue chain even if previous failed
+    )
+
+    // Keep chain alive regardless of success/failure
+    this.commandQueues.set(
+      serverId,
+      resultPromise.catch(() => {}),
+    )
+
+    return resultPromise
+  }
+
+  private async doExecuteCommand(serverId: number, command: string): Promise<string> {
     const connection = this.getActiveConnection(serverId)
 
     try {
@@ -185,6 +208,7 @@ export class RconService implements IRconService {
 
     await Promise.allSettled(disconnectPromises)
     this.connections.clear()
+    this.commandQueues.clear()
 
     this.logger.info("All RCON connections closed")
   }

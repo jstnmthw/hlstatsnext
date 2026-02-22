@@ -74,15 +74,24 @@ export function DataTableFacetedFilter({
           {options.map((option) => {
             const isSelected = selectedSet.has(option.value)
             return (
-              <button
+              <div
                 key={option.value}
+                role="option"
+                aria-selected={isSelected}
+                tabIndex={0}
                 onClick={() => handleToggle(option.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault()
+                    handleToggle(option.value)
+                  }
+                }}
                 className="flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
               >
                 <Checkbox checked={isSelected} className="pointer-events-none" />
                 {option.icon && <option.icon className="size-4 text-muted-foreground" />}
                 <span>{option.label}</span>
-              </button>
+              </div>
             )
           })}
         </div>

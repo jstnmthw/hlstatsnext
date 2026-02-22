@@ -6,7 +6,6 @@ import {
   GET_SERVER_COUNT,
   GET_SERVERS_WITH_PAGINATION,
 } from "@/features/admin/servers/graphql/server-queries"
-import { PermissionGate } from "@/features/auth/components/permission-gate"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
@@ -84,25 +83,17 @@ export default async function ServersPage(props: AdminPageProps) {
         <div className="container">
           <div className="mt-8 mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight uppercase">Manage Servers</h1>
+              <h1 className="text-2xl font-bold tracking-tight uppercase">Manage Servers</h1>
               <p className="text-muted-foreground">
                 Manage your game servers and track player statistics and activities.
               </p>
             </div>
-            <PermissionGate permissions={{ server: ["create"] }}>
-              <Button
-                variant="solid"
-                size="default"
-                colorScheme="green"
-                asChild
-                className="pl-2.5!"
-              >
-                <Link href="/admin/servers/add">
-                  <IconServer data-slot="icon" />
-                  <span>Add server</span>
-                </Link>
-              </Button>
-            </PermissionGate>
+            <Button variant="solid" size="default" colorScheme="green" asChild className="pl-2.5!">
+              <Link href="/admin/servers/add">
+                <IconServer data-slot="icon" />
+                <span>Add server</span>
+              </Link>
+            </Button>
           </div>
           <AdminServersTable data={servers} totalCount={totalCount} />
         </div>

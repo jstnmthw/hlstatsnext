@@ -66,7 +66,7 @@ export default async function ServersPage(props: ServersPageProps) {
       <Header />
       <MainContent className="container">
         <div className="mt-8 mb-8">
-          <h1 className="text-3xl font-bold tracking-tight uppercase">Servers</h1>
+          <h1 className="text-2xl font-bold tracking-tight uppercase">Servers</h1>
           <p className="text-muted-foreground">Browse all tracked game servers</p>
         </div>
         <ServersTable data={servers} totalCount={totalCount} />

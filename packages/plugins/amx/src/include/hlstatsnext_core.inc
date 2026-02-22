@@ -1,7 +1,8 @@
 /*
  * HLStatsNext Core Module
  *
- * Core functionality and plugin lifecycle management
+ * Core functionality, plugin lifecycle, and cvar registration.
+ * All settings are engine cvars managed by AutoExecConfig.
  */
 
 #if defined _hlstatsnext_core_included
@@ -12,7 +13,6 @@
 // Core constants
 #define HLSTATSNEXT_MAX_MESSAGE_LENGTH 191
 #define HLSTATSNEXT_MAX_PLAYERS 32
-#define HLSTATSNEXT_CONFIG_FILE "hlstatsnext.cfg"
 #define HLSTATSNEXT_TAG "[HLStatsNext]:"
 
 // Plugin state
@@ -23,81 +23,70 @@ enum HLStatsNextState {
     STATE_DISABLED
 }
 
-// Global state variables
+// Plugin state (not a cvar — derived from hlstatsnext_enabled)
 new HLStatsNextState:g_plugin_state = STATE_LOADING;
-new bool:g_plugin_enabled = true;
-new bool:g_debug_mode = false;
-new g_server_id = 0;
 
-// Core initialization
+// Cvar pointers (registered in hlstatsnext_core_init, populated by AutoExecConfig)
+new g_pcvar_enabled;
+new g_pcvar_debug;
+new g_pcvar_server_id;
+new g_pcvar_color_scheme;
+
+// Core initialization — registers cvars. Called from plugin_init().
 stock hlstatsnext_core_init() {
     g_plugin_state = STATE_LOADING;
 
-    // Set default values
-    g_plugin_enabled = true;
-    g_debug_mode = false;
+    g_pcvar_enabled = create_cvar(
+        "hlstatsnext_enabled", "1",
+        FCVAR_NONE,
+        "Enable or disable the HLStatsNext plugin (0 = disabled, 1 = enabled)",
+        true, 0.0, true, 1.0
+    );
+
+    g_pcvar_debug = create_cvar(
+        "hlstatsnext_debug", "0",
+        FCVAR_NONE,
+        "Enable debug logging (0 = off, 1 = on)",
+        true, 0.0, true, 1.0
+    );
+
+    g_pcvar_server_id = create_cvar(
+        "hlstatsnext_server_id", "0",
+        FCVAR_NONE,
+        "Server ID for identification (0 = auto-detect from daemon)"
+    );
+
+    g_pcvar_color_scheme = create_cvar(
+        "hlstatsnext_color_scheme", "default",
+        FCVAR_NONE,
+        "Color scheme for chat messages (default, alternative)"
+    );
 
     log_amx("%s Core initialized", HLSTATSNEXT_TAG);
 }
 
-// Configuration loading
-stock hlstatsnext_load_config() {
-    new config_file[128];
-    get_configsdir(config_file, charsmax(config_file));
-    format(config_file, charsmax(config_file), "%s/%s", config_file, HLSTATSNEXT_CONFIG_FILE);
+// Apply configuration from cvars. Called from OnConfigsExecuted().
+stock hlstatsnext_apply_config() {
+    new bool:enabled = get_pcvar_num(g_pcvar_enabled) != 0;
+    g_plugin_state = enabled ? STATE_ACTIVE : STATE_DISABLED;
 
-    if (file_exists(config_file)) {
-        // Load configuration from file
-        load_config_file(config_file);
-        log_amx("%s Configuration loaded from %s", HLSTATSNEXT_TAG, config_file);
-    } else {
-        log_amx("%s Configuration file not found, using defaults", HLSTATSNEXT_TAG);
-    }
+    // Apply color scheme
+    new scheme[32];
+    get_pcvar_string(g_pcvar_color_scheme, scheme, charsmax(scheme));
+    load_color_scheme(scheme);
 
-    g_plugin_state = g_plugin_enabled ? STATE_ACTIVE : STATE_DISABLED;
-}
-
-// Configuration file parser
-stock load_config_file(const config_file[]) {
-    new file = fopen(config_file, "rt");
-    if (!file) {
-        return;
-    }
-
-    new line[256], key[64], value[192];
-
-    while (fgets(file, line, charsmax(line))) {
-        trim(line);
-
-        // Skip comments and empty lines
-        if (line[0] == '/' && line[1] == '/' || line[0] == '#' || line[0] == EOS) {
-            continue;
-        }
-
-        // Parse key=value pairs
-        if (parse(line, key, charsmax(key), value, charsmax(value)) == 2) {
-            process_config_option(key, value);
-        }
-    }
-
-    fclose(file);
-}
-
-// Process individual configuration options
-stock process_config_option(const key[], const value[]) {
-    if (equal(key, "hlstatsnext_enabled")) {
-        g_plugin_enabled = bool:str_to_num(value);
-    } else if (equal(key, "hlstatsnext_debug")) {
-        g_debug_mode = bool:str_to_num(value);
-    } else if (equal(key, "hlstatsnext_server_id")) {
-        g_server_id = str_to_num(value);
-    }
-    // Add more configuration options as needed
+    log_amx("%s Configuration applied (enabled: %d, debug: %d, server_id: %d, colors: %s)",
+        HLSTATSNEXT_TAG,
+        enabled,
+        get_pcvar_num(g_pcvar_debug),
+        get_pcvar_num(g_pcvar_server_id),
+        scheme
+    );
 }
 
 // Client event handlers
 stock hlstatsnext_client_connect(id) {
-    if (g_debug_mode) {
+    if (is_debug_enabled()) {
         new name[32];
         get_user_name(id, name, charsmax(name));
         log_amx("%s Client connected: %s (ID: %d)", HLSTATSNEXT_TAG, name, id);
@@ -105,7 +94,7 @@ stock hlstatsnext_client_connect(id) {
 }
 
 stock hlstatsnext_client_disconnect(id) {
-    if (g_debug_mode) {
+    if (is_debug_enabled()) {
         new name[32];
         get_user_name(id, name, charsmax(name));
         log_amx("%s Client disconnected: %s (ID: %d)", HLSTATSNEXT_TAG, name, id);
@@ -118,15 +107,15 @@ stock hlstatsnext_cleanup() {
     log_amx("%s Core cleanup completed", HLSTATSNEXT_TAG);
 }
 
-// Utility functions
+// Cvar accessors — read pcvars directly so console changes take effect immediately
 stock bool:is_plugin_active() {
     return g_plugin_state == STATE_ACTIVE;
 }
 
 stock bool:is_debug_enabled() {
-    return g_debug_mode;
+    return get_pcvar_num(g_pcvar_debug) != 0;
 }
 
 stock get_server_id() {
-    return g_server_id;
+    return get_pcvar_num(g_pcvar_server_id);
 }

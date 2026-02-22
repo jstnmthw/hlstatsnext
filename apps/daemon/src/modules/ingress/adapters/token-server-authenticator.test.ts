@@ -87,7 +87,7 @@ describe("TokenServerAuthenticator", () => {
       expect(mockTokenRepository.updateLastUsed).toHaveBeenCalledWith(1)
     })
 
-    it("should auto-register new server with valid token", async () => {
+    it("should auto-register new server with valid token and copy config defaults", async () => {
       vi.mocked(mockTokenRepository.findByHash).mockResolvedValue({
         kind: "valid",
         token: mockTokenEntity,
@@ -97,6 +97,14 @@ describe("TokenServerAuthenticator", () => {
       vi.mocked(mockDatabase.prisma.server.create).mockResolvedValue(
         createMockServerRecord({ serverId: 100 }),
       )
+
+      // Mock config defaults to be copied
+      const mockDefaults = [
+        { parameter: "Mod", value: "AMXX", description: "" },
+        { parameter: "GameEngine", value: "1", description: "" },
+      ]
+      vi.mocked(mockDatabase.prisma.serverConfigDefault.findMany).mockResolvedValue(mockDefaults)
+      vi.mocked(mockDatabase.prisma.serverConfig.createMany).mockResolvedValue({ count: 2 })
 
       const result = await authenticator.handleBeacon(validToken.raw, 27015, "192.168.1.100", 54321)
 
@@ -116,6 +124,16 @@ describe("TokenServerAuthenticator", () => {
           authTokenId: 1,
         },
         select: { serverId: true },
+      })
+
+      // Verify config defaults were copied to server_config
+      expect(mockDatabase.prisma.serverConfigDefault.findMany).toHaveBeenCalled()
+      expect(mockDatabase.prisma.serverConfig.createMany).toHaveBeenCalledWith({
+        data: [
+          { serverId: 100, parameter: "Mod", value: "AMXX" },
+          { serverId: 100, parameter: "GameEngine", value: "1" },
+        ],
+        skipDuplicates: true,
       })
 
       expect(mockEventBus.emit).toHaveBeenCalled()

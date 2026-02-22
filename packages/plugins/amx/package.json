@@ -5,13 +5,14 @@
   "description": "HLStatsNext AMX Mod X Plugin",
   "main": "compiled/hlstatsnext.amxx",
   "scripts": {
-    "build": "pnpm run compile",
-    "compile": "cd scripting && ./amxxpc ../src/hlstatsnext.sma -iinclude -o../compiled/hlstatsnext.amxx",
+    "build": "pnpm run compile && pnpm run generate-config",
+    "compile": "mkdir -p compiled && cd scripting && ./amxxpc ../src/hlstatsnext.sma -iinclude -o../compiled/hlstatsnext.amxx",
+    "generate-config": "node scripts/generate-config.mjs",
     "clean": "rm -rf compiled/*.amxx",
     "test": "echo 'Plugin tests not yet implemented'",
     "dev": "pnpm run compile && pnpm run deploy:dev",
     "deploy:dev": "echo 'Deploy to test server: cp compiled/hlstatsnext.amxx /path/to/server/addons/amxmodx/plugins/'",
-    "package": "tar -czf hlstatsnext-plugin-v$npm_package_version.tar.gz compiled/ configs/ docs/",
+    "package": "tar -czf hlstatsnext-plugin-v$npm_package_version.tar.gz compiled/ docs/",
     "lint": "echo 'Pawn linting not configured - consider using manual code review'",
     "validate": "echo 'Validation requires AMX Mod X compiler'"
   },
@@ -20,7 +21,6 @@
   },
   "files": [
     "compiled/",
-    "configs/",
     "docs/",
     "src/",
     "README.md"

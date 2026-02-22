@@ -93,16 +93,46 @@ export class GoldSrcRconProtocol extends BaseRconProtocol {
       throw new RconError("No challenge available", RconErrorCode.NOT_CONNECTED)
     }
 
+    const trimmedCommand = command.trim()
+
     try {
       const response = await this.withTimeout(
-        this.sendRconCommand(command.trim()),
+        this.sendRconCommand(trimmedCommand),
         this.commandTimeout,
-        `Command execution: ${command}`,
+        `Command execution: ${trimmedCommand}`,
       )
 
-      this.logger.debug(`GoldSource RCON command executed: ${command}`)
+      this.logger.debug(`GoldSource RCON command executed: ${trimmedCommand}`)
       return response
     } catch (error) {
+      // On stale challenge, request a new one and retry once
+      if (error instanceof RconError && error.code === RconErrorCode.AUTH_FAILED && this.socket) {
+        this.logger.info("GoldSrc RCON: Challenge expired, requesting fresh challenge and retrying")
+        try {
+          await this.withTimeout(
+            this.getChallengeFromServer(),
+            this.connectionTimeout,
+            "Challenge refresh",
+          )
+          const response = await this.withTimeout(
+            this.sendRconCommand(trimmedCommand),
+            this.commandTimeout,
+            `Command retry: ${trimmedCommand}`,
+          )
+          this.logger.debug(`GoldSource RCON command succeeded on retry: ${trimmedCommand}`)
+          return response
+        } catch (retryError) {
+          // Retry also failed — propagate the retry error
+          if (retryError instanceof RconError) {
+            throw retryError
+          }
+          throw new RconError(
+            `Command retry failed: ${retryError instanceof Error ? retryError.message : String(retryError)}`,
+            RconErrorCode.COMMAND_FAILED,
+          )
+        }
+      }
+
       if (error instanceof RconError) {
         throw error
       }

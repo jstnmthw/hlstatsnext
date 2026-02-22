@@ -30,6 +30,46 @@ export class DefaultSocketFactory implements ISocketFactory {
   }
 }
 
+/**
+ * Strip GoldSrc/Source OOB header and "log " prefix from UDP packets.
+ *
+ * GoldSrc logaddress_add sends: \xff\xff\xff\xff[type]log <text>\x00
+ * Source logaddress_add sends:  \xff\xff\xff\xffS<text>\x00
+ *
+ * We strip the 4-byte OOB header, any trailing nulls, and the "log " prefix.
+ */
+export function stripPacketHeader(buffer: Buffer): string {
+  let offset = 0
+
+  // Strip \xff\xff\xff\xff OOB connectionless header
+  if (
+    buffer.length >= 4 &&
+    buffer[0] === 0xff &&
+    buffer[1] === 0xff &&
+    buffer[2] === 0xff &&
+    buffer[3] === 0xff
+  ) {
+    offset = 4
+    // Skip additional non-printable header bytes (type byte like 0x52 'R', 0x53 'S', etc.)
+    while (offset < buffer.length && buffer[offset]! !== undefined && buffer[offset]! > 0x7e) {
+      offset++
+    }
+  }
+
+  // Convert remaining bytes to string
+  let logLine = buffer.toString("utf8", offset)
+
+  // Strip null bytes (Source engine terminates with \x00)
+  logLine = logLine.replace(/\0/g, "")
+
+  // Strip "log " prefix from GoldSrc logaddress_add
+  if (logLine.startsWith("log ")) {
+    logLine = logLine.slice(4)
+  }
+
+  return logLine.trim()
+}
+
 export class UdpServer extends EventEmitter {
   private socket: Socket | null = null
   private readonly options: Required<UdpServerOptions>
@@ -52,7 +92,7 @@ export class UdpServer extends EventEmitter {
         this.socket = this.socketFactory.createSocket("udp4")
 
         this.socket.on("message", (buffer, rinfo) => {
-          const logLine = buffer.toString("utf8").trim()
+          const logLine = stripPacketHeader(buffer)
 
           if (logLine) {
             const payload: LogPayload = {

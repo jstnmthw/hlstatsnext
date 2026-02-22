@@ -82,20 +82,22 @@ export class CommandResponseHandler {
   }
 
   /**
-   * Checks response for known error patterns
+   * Checks response for known error patterns (case-insensitive)
    */
   private checkForErrors(response: string, command: string): RconError | null {
-    if (response.includes("Bad rcon_password")) {
+    const lower = response.toLowerCase()
+
+    if (lower.includes("bad rcon_password")) {
       this.logger.error("GoldSrc RCON: Authentication failed - bad password")
       return new RconError("Authentication failed", RconErrorCode.AUTH_FAILED)
     }
 
-    if (response.includes("Bad challenge")) {
+    if (lower.includes("bad challenge")) {
       this.logger.error("GoldSrc RCON: Bad challenge - need to reconnect")
       return new RconError("Bad challenge", RconErrorCode.AUTH_FAILED)
     }
 
-    if (response.includes("Unknown command")) {
+    if (lower.includes("unknown command")) {
       this.logger.warn(`GoldSrc RCON: Unknown command: ${command}`)
       return new RconError(`Unknown command: ${command}`, RconErrorCode.COMMAND_FAILED)
     }

@@ -14,34 +14,62 @@ An event processing plugin for AMX Mod X that handles structured commands from t
 - **Performance Optimized**: Minimal impact on server performance
 - **Security Focused**: Input validation and access control
 
+## Requirements
+
+- AMX Mod X 1.9.0+ (tested with 1.10 build 5474)
+- Metamod installed on the game server
+- HLStatsNext daemon running with `logaddress_add` configured
+
 ## Installation
 
-1. **Compile the Plugin**:
+1. **Compile the Plugin** (or use the pre-built binary from `compiled/`):
 
    ```bash
-   cd packages/plugins/amx
-   # Ensure AMX Mod X compiler is installed
-   amxxpc src/hlstatsnext.sma -iinclude -o=compiled/hlstatsnext.amxx
+   cd packages/plugins/amx/scripting
+   ./amxxpc ../src/hlstatsnext.sma -iinclude -o../compiled/hlstatsnext.amxx
    ```
 
-2. **Install on Server**:
+2. **Copy Plugin to Server**:
 
    ```bash
-   cp compiled/hlstatsnext.amxx /path/to/server/addons/amxmodx/plugins/
-   cp configs/hlstatsnext.cfg /path/to/server/addons/amxmodx/configs/
+   cp compiled/hlstatsnext.amxx <server>/addons/amxmodx/plugins/
    ```
 
 3. **Add to Plugins List**:
-   Add `hlstatsnext.amxx` to `addons/amxmodx/configs/plugins.ini`
 
-4. **Update HLStatsNext Configuration**:
-   The HLStatsNext database configuration will be updated manually by administrators to use the new structured commands:
-   - `BroadCastEventsCommandAnnounce` → `hlx_announce`
-   - `BroadCastEventsCommand` → `hlx_event`
-   - `PlayerEventsCommand` → `hlx_event`
-   - `EnablePublicCommands` → Controls whether public commands are allowed
+   Add `hlstatsnext.amxx` to `<server>/addons/amxmodx/configs/plugins.ini`
 
-5. **Restart Server**
+4. **Start Server Once** — the plugin auto-generates its config file at:
+
+   ```
+   <server>/addons/amxmodx/configs/plugins/hlstatsnext.cfg
+   ```
+
+   This file is created by `AutoExecConfig` with all cvars and their descriptions.
+
+5. **Configure Authentication Token**:
+
+   Edit the generated config and set `hlx_token`:
+
+   ```
+   hlx_token "hlxn_YOUR_TOKEN_HERE"
+   ```
+
+   Generate a token in the HLStatsNext admin panel under **Tokens**. Treat this value as a password — it is protected by `FCVAR_PROTECTED` and hidden from clients.
+
+   The plugin sends an authentication beacon to the daemon every 60 seconds via the `logaddress_add` UDP pipeline.
+
+6. **Configure Log Address**:
+
+   In `<server>/server.cfg`, ensure the daemon receives logs:
+
+   ```
+   logaddress_add <daemon_ip> <daemon_port>
+   ```
+
+7. **Restart Server**
+
+> **Note:** All cvars can also be set in `server.cfg`, `amxx.cfg`, or via RCON console. Changes via console take effect immediately for most settings. Use `hlstatsnext_reload` to re-apply the enabled/color state.
 
 ## Commands
 
@@ -113,12 +141,34 @@ The following commands are typed by players in chat and processed by the HLStats
 
 ## Configuration
 
-Edit `configs/hlstatsnext.cfg` to customize:
+All settings are engine cvars registered via `create_cvar()` and managed by `AutoExecConfig`. The config file is auto-generated at `configs/plugins/hlstatsnext.cfg` on first load. Settings can also be placed in `server.cfg`, `amxx.cfg`, or changed via RCON console.
 
-- **Colors**: Customize color scheme and individual color codes
-- **Messages**: Configure message formatting options
-- **Performance**: Adjust performance and logging settings
-- **Commands**: Enable/disable specific command groups
+### Authentication
+
+| Cvar        | Default | Flags               | Description                                       |
+| ----------- | ------- | ------------------- | ------------------------------------------------- |
+| `hlx_token` | `""`    | PROTECTED, UNLOGGED | Authentication token from HLStatsNext admin panel |
+
+The token is hidden from connected clients (`FCVAR_PROTECTED`) and not logged by the engine (`FCVAR_UNLOGGED`). If empty or too short, beacons are silently skipped.
+
+### Core Settings
+
+| Cvar                       | Default     | Description                              |
+| -------------------------- | ----------- | ---------------------------------------- |
+| `hlstatsnext_enabled`      | `1`         | Enable/disable the plugin (0 or 1)       |
+| `hlstatsnext_debug`        | `0`         | Enable debug logging (0 or 1)            |
+| `hlstatsnext_server_id`    | `0`         | Server ID (0 = auto-detect from daemon)  |
+| `hlstatsnext_color_scheme` | `"default"` | Color scheme: `default` or `alternative` |
+
+### HUD Settings
+
+| Cvar                  | Default  | Description                            |
+| --------------------- | -------- | -------------------------------------- |
+| `hlmsg_default_color` | `00FF80` | Default HUD color in hex RRGGBB        |
+| `hlmsg_holdtime`      | `3.0`    | HUD message display duration (seconds) |
+| `hlmsg_fadein`        | `1.0`    | Fade in duration (seconds)             |
+| `hlmsg_fadeout`       | `0.6`    | Fade out duration (seconds)            |
+| `hlmsg_channel`       | `-1`     | HUD channel (-1 = auto-select)         |
 
 ### HUD Message Configuration
 
@@ -162,7 +212,8 @@ The plugin uses color codes with `client_print_color()` for supported games:
 
 The plugin follows a modular architecture with separate include files for different functionality:
 
-- **hlstatsnext_core.inc**: Core functionality, lifecycle management, and configurable constants
+- **hlstatsnext_core.inc**: Core functionality, lifecycle management, and config file parsing
+- **hlstatsnext_auth.inc**: Authentication beacon system (`hlx_token` cvar, beacon scheduling)
 - **hlstatsnext_events.inc**: Event type definitions and data structures
 - **hlstatsnext_parser.inc**: Structured command parsing logic using `read_argv()`
 - **hlstatsnext_formatter.inc**: Message formatting and color presentation with CS 1.6 compatibility
@@ -191,10 +242,9 @@ The plugin follows a modular architecture with separate include files for differ
 
 ### Prerequisites
 
-- AMX Mod X 1.9.0 or higher
-- AMX Mod X Compiler (amxxpc)
-- Node.js 24.0.0 or higher (for package management)
-- pnpm 10.x(monorepo package manager)
+- AMX Mod X 1.9.0+ compiler (amxxpc) — bundled in `scripting/`
+- Node.js 24.0.0+ (for monorepo package management)
+- pnpm 10.x (monorepo package manager)
 
 ### Building from Source
 

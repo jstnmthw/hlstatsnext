@@ -147,7 +147,7 @@ RevokeServerTokenResult.implement({
   }),
 })
 
-// Query: Find many tokens (uses Prisma relation-aware type)
+// Query: Find many tokens (admin-only — tokens are sensitive credentials)
 builder.queryField("findManyServerToken", (t) =>
   t.prismaField({
     type: ["ServerToken"],
@@ -157,6 +157,7 @@ builder.queryField("findManyServerToken", (t) =>
       take: t.arg.int({ required: false }),
     },
     resolve: async (query, _root, { includeRevoked, skip, take }, context) => {
+      requireAdmin(context)
       return context.services.serverToken.findManyPrisma({
         ...query,
         where: includeRevoked ? {} : { revokedAt: null },
@@ -167,19 +168,20 @@ builder.queryField("findManyServerToken", (t) =>
   }),
 )
 
-// Query: Count tokens
+// Query: Count tokens (admin-only)
 builder.queryField("countServerToken", (t) =>
   t.int({
     args: {
       includeRevoked: t.arg.boolean({ required: false, defaultValue: false }),
     },
     resolve: async (_root, { includeRevoked }, context) => {
+      requireAdmin(context)
       return context.services.serverToken.count(includeRevoked ?? false)
     },
   }),
 )
 
-// Query: Find single token by ID (uses Prisma relation-aware type)
+// Query: Find single token by ID (admin-only)
 builder.queryField("findServerToken", (t) =>
   t.prismaField({
     type: "ServerToken",
@@ -188,6 +190,7 @@ builder.queryField("findServerToken", (t) =>
       id: t.arg.int({ required: true }),
     },
     resolve: async (query, _root, { id }, context) => {
+      requireAdmin(context)
       return context.services.serverToken.findByIdPrisma(id, query)
     },
   }),

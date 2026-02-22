@@ -39,7 +39,7 @@ export default async function TokensPage(props: AdminPageProps) {
     variables: {
       includeRevoked,
       take: params.pageSize,
-      skip: params.page * params.pageSize,
+      skip: (params.page - 1) * params.pageSize,
     },
   })
 

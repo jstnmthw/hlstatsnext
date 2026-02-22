@@ -1,11 +1,5 @@
-import { describe, expect, it, vi } from "vitest"
-import { z } from "zod"
-import {
-  connectionTypeRefine,
-  CreateServerSchema,
-  ServerFieldSchemas,
-  UpdateServerSchema,
-} from "./server-schemas"
+import { describe, expect, it } from "vitest"
+import { CreateServerSchema, ServerFieldSchemas, UpdateServerSchema } from "./server-schemas"
 
 describe("ServerFieldSchemas", () => {
   describe("serverId", () => {
@@ -44,21 +38,6 @@ describe("ServerFieldSchemas", () => {
     })
   })
 
-  describe("connectionType", () => {
-    it("accepts valid types", () => {
-      expect(ServerFieldSchemas.connectionType.parse("external")).toBe("external")
-      expect(ServerFieldSchemas.connectionType.parse("docker")).toBe("docker")
-    })
-
-    it("defaults to external", () => {
-      expect(ServerFieldSchemas.connectionType.parse(undefined)).toBe("external")
-    })
-
-    it("rejects invalid types", () => {
-      expect(() => ServerFieldSchemas.connectionType.parse("invalid")).toThrow()
-    })
-  })
-
   describe("sortOrder", () => {
     it("accepts valid range", () => {
       expect(ServerFieldSchemas.sortOrder.parse(0)).toBe(0)
@@ -92,80 +71,20 @@ describe("ServerFieldSchemas", () => {
   })
 })
 
-describe("connectionTypeRefine", () => {
-  it("requires docker_host for docker type", () => {
-    const ctx = { addIssue: vi.fn() } as unknown as z.RefinementCtx
-    connectionTypeRefine({ connection_type: "docker", docker_host: "", address: "1.2.3.4" }, ctx)
-    expect(ctx.addIssue as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(
-      expect.objectContaining({ path: ["docker_host"] }),
-    )
-  })
-
-  it("requires address for external type", () => {
-    const ctx = { addIssue: vi.fn() } as unknown as z.RefinementCtx
-    connectionTypeRefine({ connection_type: "external", address: "", docker_host: "host" }, ctx)
-    expect(ctx.addIssue as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(
-      expect.objectContaining({ path: ["address"] }),
-    )
-  })
-
-  it("does not add issues for valid docker config", () => {
-    const ctx = { addIssue: vi.fn() } as unknown as z.RefinementCtx
-    connectionTypeRefine(
-      { connection_type: "docker", docker_host: "my-container", address: null },
-      ctx,
-    )
-    expect(ctx.addIssue as ReturnType<typeof vi.fn>).not.toHaveBeenCalled()
-  })
-
-  it("does not add issues for valid external config", () => {
-    const ctx = { addIssue: vi.fn() } as unknown as z.RefinementCtx
-    connectionTypeRefine(
-      { connection_type: "external", address: "192.168.1.1", docker_host: null },
-      ctx,
-    )
-    expect(ctx.addIssue as ReturnType<typeof vi.fn>).not.toHaveBeenCalled()
-  })
-
-  it("handles null docker_host for docker type", () => {
-    const ctx = { addIssue: vi.fn() } as unknown as z.RefinementCtx
-    connectionTypeRefine({ connection_type: "docker", docker_host: null, address: null }, ctx)
-    expect(ctx.addIssue as ReturnType<typeof vi.fn>).toHaveBeenCalled()
-  })
-
-  it("handles null address for external type", () => {
-    const ctx = { addIssue: vi.fn() } as unknown as z.RefinementCtx
-    connectionTypeRefine({ connection_type: "external", address: null, docker_host: null }, ctx)
-    expect(ctx.addIssue as ReturnType<typeof vi.fn>).toHaveBeenCalled()
-  })
-})
-
 describe("CreateServerSchema", () => {
-  it("validates a valid external server", () => {
+  it("validates a valid server", () => {
     const result = CreateServerSchema.safeParse({
       address: "192.168.1.1",
       port: 27015,
       game: "css",
-      connection_type: "external",
     })
     expect(result.success).toBe(true)
   })
 
-  it("validates a valid docker server", () => {
+  it("requires port", () => {
     const result = CreateServerSchema.safeParse({
-      docker_host: "game-server",
-      port: 27015,
+      address: "192.168.1.1",
       game: "css",
-      connection_type: "docker",
-    })
-    expect(result.success).toBe(true)
-  })
-
-  it("fails when docker type has no docker_host", () => {
-    const result = CreateServerSchema.safeParse({
-      port: 27015,
-      game: "css",
-      connection_type: "docker",
     })
     expect(result.success).toBe(false)
   })
@@ -178,7 +97,6 @@ describe("UpdateServerSchema", () => {
       address: "192.168.1.1",
       port: 27015,
       game: "css",
-      connection_type: "external",
     })
     expect(result.success).toBe(true)
   })
@@ -188,7 +106,6 @@ describe("UpdateServerSchema", () => {
       address: "192.168.1.1",
       port: 27015,
       game: "css",
-      connection_type: "external",
     })
     expect(result.success).toBe(false)
   })

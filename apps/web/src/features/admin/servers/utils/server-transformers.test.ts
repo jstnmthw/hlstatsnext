@@ -18,11 +18,9 @@ describe("extractFormDataForCreate", () => {
   it("extracts create fields from FormData", () => {
     const fd = makeFormData({
       address: "192.168.1.1",
-      docker_host: "",
       port: "27015",
       game: "css",
       mod: "",
-      connection_type: "external",
       rconPassword: "secret",
     })
 
@@ -30,7 +28,6 @@ describe("extractFormDataForCreate", () => {
     expect(result.address).toBe("192.168.1.1")
     expect(result.port).toBe("27015")
     expect(result.game).toBe("css")
-    expect(result.connection_type).toBe("external")
     expect(result.rconPassword).toBe("secret")
   })
 
@@ -48,14 +45,12 @@ describe("extractFormDataForUpdate", () => {
       serverId: "1",
       name: "My Server",
       address: "10.0.0.1",
-      docker_host: "",
       port: "27015",
       game: "css",
       mod: "",
       publicAddress: "play.example.com",
       statusUrl: "https://status.example.com",
       rconPassword: "",
-      connection_type: "external",
       sortOrder: "5",
     })
 
@@ -68,64 +63,54 @@ describe("extractFormDataForUpdate", () => {
 })
 
 describe("prepareCreateServerInput", () => {
-  it("prepares input for external connection type", () => {
+  it("prepares input for server creation", () => {
     const data = {
       address: "192.168.1.1",
-      docker_host: null,
       port: 27015,
       game: "css",
       mod: null,
-      connection_type: "external" as const,
       rconPassword: "secret",
     }
 
     const result = prepareCreateServerInput(data)
     expect(result.address).toBe("192.168.1.1")
-    expect(result.dockerHost).toBeUndefined()
     expect(result.port).toBe(27015)
     expect(result.game).toBe("css")
     expect(result.rconPassword).toBe("secret")
   })
 
-  it("prepares input for docker connection type", () => {
+  it("defaults rconPassword to empty string when null", () => {
     const data = {
-      address: null,
-      docker_host: "game-server",
+      address: "192.168.1.1",
       port: 27015,
       game: "css",
       mod: null,
-      connection_type: "docker" as const,
       rconPassword: null,
     }
 
     const result = prepareCreateServerInput(data)
-    expect(result.dockerHost).toBe("game-server")
-    expect(result.address).toBeUndefined()
     expect(result.rconPassword).toBe("")
   })
 })
 
 describe("prepareUpdateServerInput", () => {
-  it("prepares external server update input", () => {
+  it("prepares server update input", () => {
     const data = {
       serverId: 1,
       name: "My Server",
       address: "192.168.1.1",
-      docker_host: null,
       port: 27015,
       game: "css",
       mod: null,
       publicAddress: "play.example.com",
       statusUrl: "https://status.example.com",
       rconPassword: "pass",
-      connection_type: "external" as const,
       sortOrder: 5,
     }
 
     const result = prepareUpdateServerInput(data)
     expect(result.port).toEqual({ set: 27015 })
     expect(result.address).toEqual({ set: "192.168.1.1" })
-    expect(result.dockerHost).toEqual({ set: null })
     expect(result.name).toEqual({ set: "My Server" })
     expect(result.publicAddress).toEqual({ set: "play.example.com" })
     expect(result.statusUrl).toEqual({ set: "https://status.example.com" })
@@ -133,44 +118,17 @@ describe("prepareUpdateServerInput", () => {
     expect(result.sortOrder).toEqual({ set: 5 })
   })
 
-  it("prepares docker server update input", () => {
-    const data = {
-      serverId: 1,
-      name: null,
-      address: null,
-      docker_host: "my-container",
-      port: 27015,
-      game: "tf",
-      mod: null,
-      publicAddress: null,
-      statusUrl: null,
-      rconPassword: null,
-      connection_type: "docker" as const,
-      sortOrder: 0,
-    }
-
-    const result = prepareUpdateServerInput(data)
-    expect(result.dockerHost).toEqual({ set: "my-container" })
-    expect(result.address).toEqual({ set: "" })
-    expect(result.name).toBeUndefined()
-    expect(result.publicAddress).toBeUndefined()
-    expect(result.statusUrl).toBeUndefined()
-    expect(result.rconPassword).toBeUndefined()
-  })
-
   it("trims optional string fields", () => {
     const data = {
       serverId: 1,
       name: "  Trimmed  ",
       address: "10.0.0.1",
-      docker_host: null,
       port: 27015,
       game: "css",
       mod: null,
       publicAddress: "  trimmed.example.com  ",
       statusUrl: "  https://example.com  ",
       rconPassword: "  password  ",
-      connection_type: "external" as const,
       sortOrder: 0,
     }
 
@@ -186,14 +144,12 @@ describe("prepareUpdateServerInput", () => {
       serverId: 1,
       name: "",
       address: "10.0.0.1",
-      docker_host: null,
       port: 27015,
       game: "css",
       mod: null,
       publicAddress: "",
       statusUrl: "",
       rconPassword: "",
-      connection_type: "external" as const,
       sortOrder: 0,
     }
 

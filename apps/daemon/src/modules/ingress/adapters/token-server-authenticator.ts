@@ -236,6 +236,10 @@ export class TokenServerAuthenticator {
 
   /**
    * Find existing server or auto-register a new one.
+   *
+   * Server identity is (tokenId + gamePort), NOT (address + gamePort).
+   * This survives Docker container restarts where the IP changes but
+   * the token and game port remain stable.
    */
   private async findOrRegisterServer(
     token: ServerTokenEntity,
@@ -245,24 +249,24 @@ export class TokenServerAuthenticator {
     | { kind: "authenticated"; serverId: number }
     | { kind: "auto_registered"; serverId: number; tokenId: number }
   > {
-    // Look for existing server with same address + port
+    // Look for existing server with same token + game port (stable identity)
     const existing = await this.database.prisma.server.findFirst({
       where: {
-        address,
+        authTokenId: token.id,
         port: gamePort,
       },
-      select: { serverId: true, authTokenId: true },
+      select: { serverId: true, address: true },
     })
 
     if (existing) {
-      // Update token association if needed
-      if (existing.authTokenId !== token.id) {
+      // Update address if it changed (e.g. Docker container restart, IP rotation)
+      if (existing.address !== address) {
         await this.database.prisma.server.update({
           where: { serverId: existing.serverId },
-          data: { authTokenId: token.id },
+          data: { address },
         })
         this.logger.info(
-          `Updated server ${existing.serverId} token association from ${existing.authTokenId} to ${token.id}`,
+          `Server ${existing.serverId} address updated: ${existing.address} → ${address}`,
         )
       }
       return { kind: "authenticated", serverId: existing.serverId }
@@ -277,7 +281,6 @@ export class TokenServerAuthenticator {
         game: token.game,
         rconPassword: token.rconPassword, // Already encrypted
         authTokenId: token.id,
-        connectionType: "external", // Legacy field, always external for token auth
       },
       select: { serverId: true },
     })

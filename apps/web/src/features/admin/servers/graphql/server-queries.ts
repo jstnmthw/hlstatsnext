@@ -58,8 +58,6 @@ export const GET_SERVER_BY_ID = graphql(`
       publicAddress
       statusUrl
       rconPassword
-      connectionType
-      dockerHost
       sortOrder
       configs {
         parameter

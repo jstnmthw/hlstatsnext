@@ -53,16 +53,13 @@ export async function updateServer(
     // Prepare GraphQL input for server update with config
     const serverInput = {
       name: validation.data.name || undefined,
-      ...(validation.data.connection_type === "docker"
-        ? { dockerHost: validation.data.docker_host }
-        : { address: validation.data.address }),
+      address: validation.data.address || undefined,
       port: validation.data.port,
       game: validation.data.game,
       mod: validation.data.mod || undefined,
       publicAddress: validation.data.publicAddress || undefined,
       statusUrl: validation.data.statusUrl || undefined,
       rconPassword: validation.data.rconPassword || undefined,
-      connectionType: validation.data.connection_type,
       sortOrder: validation.data.sortOrder,
     }
 

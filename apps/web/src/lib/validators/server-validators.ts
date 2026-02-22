@@ -30,21 +30,6 @@ export function isValidPort(port: number): boolean {
 }
 
 /**
- * Validates Docker hostname format
- * @param hostname - The Docker hostname to validate
- * @returns true if valid hostname format, false otherwise
- */
-export function isValidDockerHost(hostname: string): boolean {
-  if (!hostname || typeof hostname !== "string") {
-    return false
-  }
-
-  // Allow alphanumeric, dots, underscores, and hyphens
-  const dockerHostRegex = /^[a-zA-Z0-9._-]+$/
-  return dockerHostRegex.test(hostname) && hostname.length <= 255
-}
-
-/**
  * Validates URL format (for status URLs)
  * @param url - The URL to validate
  * @returns true if valid URL format, false otherwise

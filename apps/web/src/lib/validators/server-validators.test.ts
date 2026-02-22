@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
   extractIPFromAddress,
-  isValidDockerHost,
   isValidIPAddress,
   isValidPort,
   isValidUrl,
@@ -46,31 +45,6 @@ describe("isValidPort", () => {
   it("returns false for non-integer ports", () => {
     expect(isValidPort(1.5)).toBe(false)
     expect(isValidPort(NaN)).toBe(false)
-  })
-})
-
-describe("isValidDockerHost", () => {
-  it("returns true for valid hostnames", () => {
-    expect(isValidDockerHost("my-container")).toBe(true)
-    expect(isValidDockerHost("game.server.local")).toBe(true)
-    expect(isValidDockerHost("host_name")).toBe(true)
-    expect(isValidDockerHost("host123")).toBe(true)
-  })
-
-  it("returns false for invalid hostnames", () => {
-    expect(isValidDockerHost("")).toBe(false)
-    expect(isValidDockerHost("host name")).toBe(false)
-    expect(isValidDockerHost("host@name")).toBe(false)
-  })
-
-  it("returns false for non-string input", () => {
-    expect(isValidDockerHost(null as unknown as string)).toBe(false)
-    expect(isValidDockerHost(undefined as unknown as string)).toBe(false)
-  })
-
-  it("returns false for hostnames over 255 characters", () => {
-    expect(isValidDockerHost("a".repeat(256))).toBe(false)
-    expect(isValidDockerHost("a".repeat(255))).toBe(true)
   })
 })
 

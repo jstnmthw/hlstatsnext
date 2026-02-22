@@ -2198,8 +2198,6 @@ export type CountryWhereUniqueInput = {
 
 export type CreateServerInput = {
   address?: InputMaybe<Scalars['String']['input']>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   game?: InputMaybe<Scalars['String']['input']>;
   mod?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -23518,8 +23516,6 @@ export type RoleWhereUniqueInput = {
 export type SafeServer = {
   __typename?: 'SafeServer';
   address?: Maybe<Scalars['String']['output']>;
-  connectionType?: Maybe<Scalars['String']['output']>;
-  dockerHost?: Maybe<Scalars['String']['output']>;
   game?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   port?: Maybe<Scalars['Int']['output']>;
@@ -23557,14 +23553,10 @@ export type Server = {
   bombsPlanted: Scalars['Int']['output'];
   city: Scalars['String']['output'];
   configs: Array<ServerConfig>;
-  /** @deprecated - Scheduled for removal. Use token-based authentication instead. */
-  connectionType: Scalars['String']['output'];
   country: Scalars['String']['output'];
   ctHits: Scalars['Int']['output'];
   ctShots: Scalars['Int']['output'];
   ctWins: Scalars['Int']['output'];
-  /** @deprecated - Scheduled for removal. Use token-based authentication instead. */
-  dockerHost?: Maybe<Scalars['String']['output']>;
   eventsAdmin: Array<EventAdmin>;
   eventsChangeName: Array<EventChangeName>;
   eventsChangeRole: Array<EventChangeRole>;
@@ -24171,12 +24163,10 @@ export type ServerCountOrderByAggregateInput = {
   bombsDefused?: InputMaybe<SortOrder>;
   bombsPlanted?: InputMaybe<SortOrder>;
   city?: InputMaybe<SortOrder>;
-  connectionType?: InputMaybe<SortOrder>;
   country?: InputMaybe<SortOrder>;
   ctHits?: InputMaybe<SortOrder>;
   ctShots?: InputMaybe<SortOrder>;
   ctWins?: InputMaybe<SortOrder>;
-  dockerHost?: InputMaybe<SortOrder>;
   game?: InputMaybe<SortOrder>;
   headshots?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
@@ -24217,12 +24207,10 @@ export type ServerCreateInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -24278,12 +24266,10 @@ export type ServerCreateManyAuthTokenInput = {
   bombsDefused?: InputMaybe<Scalars['Int']['input']>;
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   game?: InputMaybe<Scalars['String']['input']>;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
@@ -24328,12 +24314,10 @@ export type ServerCreateManyInput = {
   bombsDefused?: InputMaybe<Scalars['Int']['input']>;
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   game?: InputMaybe<Scalars['String']['input']>;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
@@ -24594,12 +24578,10 @@ export type ServerCreateWithoutAuthTokenInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -24656,12 +24638,10 @@ export type ServerCreateWithoutConfigsInput = {
   bombsDefused?: InputMaybe<Scalars['Int']['input']>;
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -24719,12 +24699,10 @@ export type ServerCreateWithoutEventsAdminInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
   eventsChangeTeam?: InputMaybe<EventChangeTeamCreateNestedManyWithoutServerInput>;
@@ -24781,12 +24759,10 @@ export type ServerCreateWithoutEventsChangeNameInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
   eventsChangeTeam?: InputMaybe<EventChangeTeamCreateNestedManyWithoutServerInput>;
@@ -24843,12 +24819,10 @@ export type ServerCreateWithoutEventsChangeRoleInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeTeam?: InputMaybe<EventChangeTeamCreateNestedManyWithoutServerInput>;
@@ -24905,12 +24879,10 @@ export type ServerCreateWithoutEventsChangeTeamInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -24967,12 +24939,10 @@ export type ServerCreateWithoutEventsChatInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25029,12 +24999,10 @@ export type ServerCreateWithoutEventsConnectInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25091,12 +25059,10 @@ export type ServerCreateWithoutEventsDisconnectInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25153,12 +25119,10 @@ export type ServerCreateWithoutEventsEntryInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25215,12 +25179,10 @@ export type ServerCreateWithoutEventsFragInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25277,12 +25239,10 @@ export type ServerCreateWithoutEventsLatencyInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25339,12 +25299,10 @@ export type ServerCreateWithoutEventsPlayerActionInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25401,12 +25359,10 @@ export type ServerCreateWithoutEventsPlayerPlayerActionInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25463,12 +25419,10 @@ export type ServerCreateWithoutEventsRconInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25525,12 +25479,10 @@ export type ServerCreateWithoutEventsSuicideInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25587,12 +25539,10 @@ export type ServerCreateWithoutEventsTeamBonusInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25649,12 +25599,10 @@ export type ServerCreateWithoutEventsTeamkillInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25711,12 +25659,10 @@ export type ServerCreateWithoutLoadsInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -25773,12 +25719,10 @@ export type ServerCreateWithoutNotificationConfigInput = {
   bombsPlanted?: InputMaybe<Scalars['Int']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   configs?: InputMaybe<ServerConfigCreateNestedManyWithoutServerInput>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
   ctHits?: InputMaybe<Scalars['Int']['input']>;
   ctShots?: InputMaybe<Scalars['Int']['input']>;
   ctWins?: InputMaybe<Scalars['Int']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   eventsAdmin?: InputMaybe<EventAdminCreateNestedManyWithoutServerInput>;
   eventsChangeName?: InputMaybe<EventChangeNameCreateNestedManyWithoutServerInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleCreateNestedManyWithoutServerInput>;
@@ -26148,12 +26092,10 @@ export type ServerMaxOrderByAggregateInput = {
   bombsDefused?: InputMaybe<SortOrder>;
   bombsPlanted?: InputMaybe<SortOrder>;
   city?: InputMaybe<SortOrder>;
-  connectionType?: InputMaybe<SortOrder>;
   country?: InputMaybe<SortOrder>;
   ctHits?: InputMaybe<SortOrder>;
   ctShots?: InputMaybe<SortOrder>;
   ctWins?: InputMaybe<SortOrder>;
-  dockerHost?: InputMaybe<SortOrder>;
   game?: InputMaybe<SortOrder>;
   headshots?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
@@ -26193,12 +26135,10 @@ export type ServerMinOrderByAggregateInput = {
   bombsDefused?: InputMaybe<SortOrder>;
   bombsPlanted?: InputMaybe<SortOrder>;
   city?: InputMaybe<SortOrder>;
-  connectionType?: InputMaybe<SortOrder>;
   country?: InputMaybe<SortOrder>;
   ctHits?: InputMaybe<SortOrder>;
   ctShots?: InputMaybe<SortOrder>;
   ctWins?: InputMaybe<SortOrder>;
-  dockerHost?: InputMaybe<SortOrder>;
   game?: InputMaybe<SortOrder>;
   headshots?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
@@ -26246,9 +26186,7 @@ export enum ServerOrderByRelevanceFieldEnum {
   ActiveMap = 'activeMap',
   Address = 'address',
   City = 'city',
-  ConnectionType = 'connectionType',
   Country = 'country',
-  DockerHost = 'dockerHost',
   Game = 'game',
   Name = 'name',
   PublicAddress = 'publicAddress',
@@ -26275,12 +26213,10 @@ export type ServerOrderByWithAggregationInput = {
   bombsDefused?: InputMaybe<SortOrder>;
   bombsPlanted?: InputMaybe<SortOrder>;
   city?: InputMaybe<SortOrder>;
-  connectionType?: InputMaybe<SortOrder>;
   country?: InputMaybe<SortOrder>;
   ctHits?: InputMaybe<SortOrder>;
   ctShots?: InputMaybe<SortOrder>;
   ctWins?: InputMaybe<SortOrder>;
-  dockerHost?: InputMaybe<SortOrder>;
   game?: InputMaybe<SortOrder>;
   headshots?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
@@ -26323,12 +26259,10 @@ export type ServerOrderByWithRelationInput = {
   bombsPlanted?: InputMaybe<SortOrder>;
   city?: InputMaybe<SortOrder>;
   configs?: InputMaybe<ServerConfigOrderByRelationAggregateInput>;
-  connectionType?: InputMaybe<SortOrder>;
   country?: InputMaybe<SortOrder>;
   ctHits?: InputMaybe<SortOrder>;
   ctShots?: InputMaybe<SortOrder>;
   ctWins?: InputMaybe<SortOrder>;
-  dockerHost?: InputMaybe<SortOrder>;
   eventsAdmin?: InputMaybe<EventAdminOrderByRelationAggregateInput>;
   eventsChangeName?: InputMaybe<EventChangeNameOrderByRelationAggregateInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleOrderByRelationAggregateInput>;
@@ -26386,12 +26320,10 @@ export enum ServerScalarFieldEnum {
   BombsDefused = 'bombsDefused',
   BombsPlanted = 'bombsPlanted',
   City = 'city',
-  ConnectionType = 'connectionType',
   Country = 'country',
   CtHits = 'ctHits',
   CtShots = 'ctShots',
   CtWins = 'ctWins',
-  DockerHost = 'dockerHost',
   Game = 'game',
   Headshots = 'headshots',
   Kills = 'kills',
@@ -26439,12 +26371,10 @@ export type ServerScalarWhereInput = {
   bombsDefused?: InputMaybe<IntFilter>;
   bombsPlanted?: InputMaybe<IntFilter>;
   city?: InputMaybe<StringFilter>;
-  connectionType?: InputMaybe<StringFilter>;
   country?: InputMaybe<StringFilter>;
   ctHits?: InputMaybe<IntFilter>;
   ctShots?: InputMaybe<IntFilter>;
   ctWins?: InputMaybe<IntFilter>;
-  dockerHost?: InputMaybe<StringNullableFilter>;
   game?: InputMaybe<StringFilter>;
   headshots?: InputMaybe<IntFilter>;
   kills?: InputMaybe<IntFilter>;
@@ -26487,12 +26417,10 @@ export type ServerScalarWhereWithAggregatesInput = {
   bombsDefused?: InputMaybe<IntWithAggregatesFilter>;
   bombsPlanted?: InputMaybe<IntWithAggregatesFilter>;
   city?: InputMaybe<StringWithAggregatesFilter>;
-  connectionType?: InputMaybe<StringWithAggregatesFilter>;
   country?: InputMaybe<StringWithAggregatesFilter>;
   ctHits?: InputMaybe<IntWithAggregatesFilter>;
   ctShots?: InputMaybe<IntWithAggregatesFilter>;
   ctWins?: InputMaybe<IntWithAggregatesFilter>;
-  dockerHost?: InputMaybe<StringNullableWithAggregatesFilter>;
   game?: InputMaybe<StringWithAggregatesFilter>;
   headshots?: InputMaybe<IntWithAggregatesFilter>;
   kills?: InputMaybe<IntWithAggregatesFilter>;
@@ -26524,15 +26452,8 @@ export type ServerScalarWhereWithAggregatesInput = {
   tsWins?: InputMaybe<IntWithAggregatesFilter>;
 };
 
-export type ServerServers_Docker_UniqueCompoundUniqueInput = {
-  connectionType: Scalars['String']['input'];
-  dockerHost: Scalars['String']['input'];
-  port: Scalars['Int']['input'];
-};
-
-export type ServerServers_External_UniqueCompoundUniqueInput = {
-  address: Scalars['String']['input'];
-  connectionType: Scalars['String']['input'];
+export type ServerServers_Token_Port_UniqueCompoundUniqueInput = {
+  authTokenId: Scalars['Int']['input'];
   port: Scalars['Int']['input'];
 };
 
@@ -26881,12 +26802,10 @@ export type ServerUpdateInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -26942,12 +26861,10 @@ export type ServerUpdateManyMutationInput = {
   bombsDefused?: InputMaybe<IntFieldUpdateOperationsInput>;
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   game?: InputMaybe<StringFieldUpdateOperationsInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -27257,12 +27174,10 @@ export type ServerUpdateWithoutAuthTokenInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -27319,12 +27234,10 @@ export type ServerUpdateWithoutConfigsInput = {
   bombsDefused?: InputMaybe<IntFieldUpdateOperationsInput>;
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -27382,12 +27295,10 @@ export type ServerUpdateWithoutEventsAdminInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
   eventsChangeTeam?: InputMaybe<EventChangeTeamUpdateManyWithoutServerNestedInput>;
@@ -27444,12 +27355,10 @@ export type ServerUpdateWithoutEventsChangeNameInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
   eventsChangeTeam?: InputMaybe<EventChangeTeamUpdateManyWithoutServerNestedInput>;
@@ -27506,12 +27415,10 @@ export type ServerUpdateWithoutEventsChangeRoleInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeTeam?: InputMaybe<EventChangeTeamUpdateManyWithoutServerNestedInput>;
@@ -27568,12 +27475,10 @@ export type ServerUpdateWithoutEventsChangeTeamInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -27630,12 +27535,10 @@ export type ServerUpdateWithoutEventsChatInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -27692,12 +27595,10 @@ export type ServerUpdateWithoutEventsConnectInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -27754,12 +27655,10 @@ export type ServerUpdateWithoutEventsDisconnectInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -27816,12 +27715,10 @@ export type ServerUpdateWithoutEventsEntryInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -27878,12 +27775,10 @@ export type ServerUpdateWithoutEventsFragInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -27940,12 +27835,10 @@ export type ServerUpdateWithoutEventsLatencyInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -28002,12 +27895,10 @@ export type ServerUpdateWithoutEventsPlayerActionInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -28064,12 +27955,10 @@ export type ServerUpdateWithoutEventsPlayerPlayerActionInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -28126,12 +28015,10 @@ export type ServerUpdateWithoutEventsRconInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -28188,12 +28075,10 @@ export type ServerUpdateWithoutEventsSuicideInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -28250,12 +28135,10 @@ export type ServerUpdateWithoutEventsTeamBonusInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -28312,12 +28195,10 @@ export type ServerUpdateWithoutEventsTeamkillInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -28374,12 +28255,10 @@ export type ServerUpdateWithoutLoadsInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -28436,12 +28315,10 @@ export type ServerUpdateWithoutNotificationConfigInput = {
   bombsPlanted?: InputMaybe<IntFieldUpdateOperationsInput>;
   city?: InputMaybe<StringFieldUpdateOperationsInput>;
   configs?: InputMaybe<ServerConfigUpdateManyWithoutServerNestedInput>;
-  connectionType?: InputMaybe<StringFieldUpdateOperationsInput>;
   country?: InputMaybe<StringFieldUpdateOperationsInput>;
   ctHits?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctShots?: InputMaybe<IntFieldUpdateOperationsInput>;
   ctWins?: InputMaybe<IntFieldUpdateOperationsInput>;
-  dockerHost?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   eventsAdmin?: InputMaybe<EventAdminUpdateManyWithoutServerNestedInput>;
   eventsChangeName?: InputMaybe<EventChangeNameUpdateManyWithoutServerNestedInput>;
   eventsChangeRole?: InputMaybe<EventChangeRoleUpdateManyWithoutServerNestedInput>;
@@ -28622,12 +28499,10 @@ export type ServerWhereInput = {
   bombsPlanted?: InputMaybe<IntFilter>;
   city?: InputMaybe<StringFilter>;
   configs?: InputMaybe<ServerConfigListRelationFilter>;
-  connectionType?: InputMaybe<StringFilter>;
   country?: InputMaybe<StringFilter>;
   ctHits?: InputMaybe<IntFilter>;
   ctShots?: InputMaybe<IntFilter>;
   ctWins?: InputMaybe<IntFilter>;
-  dockerHost?: InputMaybe<StringNullableFilter>;
   eventsAdmin?: InputMaybe<EventAdminListRelationFilter>;
   eventsChangeName?: InputMaybe<EventChangeNameListRelationFilter>;
   eventsChangeRole?: InputMaybe<EventChangeRoleListRelationFilter>;
@@ -28690,12 +28565,10 @@ export type ServerWhereUniqueInput = {
   bombsPlanted?: InputMaybe<IntFilter>;
   city?: InputMaybe<StringFilter>;
   configs?: InputMaybe<ServerConfigListRelationFilter>;
-  connectionType?: InputMaybe<StringFilter>;
   country?: InputMaybe<StringFilter>;
   ctHits?: InputMaybe<IntFilter>;
   ctShots?: InputMaybe<IntFilter>;
   ctWins?: InputMaybe<IntFilter>;
-  dockerHost?: InputMaybe<StringNullableFilter>;
   eventsAdmin?: InputMaybe<EventAdminListRelationFilter>;
   eventsChangeName?: InputMaybe<EventChangeNameListRelationFilter>;
   eventsChangeRole?: InputMaybe<EventChangeRoleListRelationFilter>;
@@ -28737,8 +28610,7 @@ export type ServerWhereUniqueInput = {
   rconPassword?: InputMaybe<StringFilter>;
   rounds?: InputMaybe<IntFilter>;
   serverId?: InputMaybe<Scalars['Int']['input']>;
-  servers_docker_unique?: InputMaybe<ServerServers_Docker_UniqueCompoundUniqueInput>;
-  servers_external_unique?: InputMaybe<ServerServers_External_UniqueCompoundUniqueInput>;
+  servers_token_port_unique?: InputMaybe<ServerServers_Token_Port_UniqueCompoundUniqueInput>;
   sortOrder?: InputMaybe<IntFilter>;
   statusUrl?: InputMaybe<StringNullableFilter>;
   suicides?: InputMaybe<IntFilter>;
@@ -29334,8 +29206,6 @@ export enum TransactionIsolationLevel {
 
 export type UpdateServerInput = {
   address?: InputMaybe<Scalars['String']['input']>;
-  connectionType?: InputMaybe<Scalars['String']['input']>;
-  dockerHost?: InputMaybe<Scalars['String']['input']>;
   game?: InputMaybe<Scalars['String']['input']>;
   mod?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -30129,7 +29999,7 @@ export type CreateServerWithConfigMutationVariables = Exact<{
 }>;
 
 
-export type CreateServerWithConfigMutation = { __typename?: 'Mutation', createServerWithConfig?: { __typename?: 'ServerOperationResult', success?: boolean | null, message?: string | null, configsCount?: number | null, server?: { __typename?: 'SafeServer', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, statusUrl?: string | null, connectionType?: string | null, dockerHost?: string | null, sortOrder?: number | null } | null } | null };
+export type CreateServerWithConfigMutation = { __typename?: 'Mutation', createServerWithConfig?: { __typename?: 'ServerOperationResult', success?: boolean | null, message?: string | null, configsCount?: number | null, server?: { __typename?: 'SafeServer', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null } | null } | null };
 
 export type UpdateServerWithConfigMutationVariables = Exact<{
   serverId: Scalars['Int']['input'];
@@ -30137,7 +30007,7 @@ export type UpdateServerWithConfigMutationVariables = Exact<{
 }>;
 
 
-export type UpdateServerWithConfigMutation = { __typename?: 'Mutation', updateServerWithConfig?: { __typename?: 'ServerOperationResult', success?: boolean | null, message?: string | null, configsCount?: number | null, server?: { __typename?: 'SafeServer', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, statusUrl?: string | null, connectionType?: string | null, dockerHost?: string | null, sortOrder?: number | null } | null } | null };
+export type UpdateServerWithConfigMutation = { __typename?: 'Mutation', updateServerWithConfig?: { __typename?: 'ServerOperationResult', success?: boolean | null, message?: string | null, configsCount?: number | null, server?: { __typename?: 'SafeServer', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null } | null } | null };
 
 export type GetServersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -30166,7 +30036,7 @@ export type GetServerByIdWithConfigsQueryVariables = Exact<{
 }>;
 
 
-export type GetServerByIdWithConfigsQuery = { __typename?: 'Query', findUniqueServer?: { __typename?: 'Server', serverId: string, name: string, address: string, port: number, game: string, publicAddress: string, statusUrl?: string | null, rconPassword: string, connectionType: string, dockerHost?: string | null, sortOrder: number, configs: Array<{ __typename?: 'ServerConfig', parameter: string, value: string }> } | null };
+export type GetServerByIdWithConfigsQuery = { __typename?: 'Query', findUniqueServer?: { __typename?: 'Server', serverId: string, name: string, address: string, port: number, game: string, publicAddress: string, statusUrl?: string | null, rconPassword: string, sortOrder: number, configs: Array<{ __typename?: 'ServerConfig', parameter: string, value: string }> } | null };
 
 export type CreateServerTokenMutationVariables = Exact<{
   input: CreateServerTokenInput;
@@ -30242,7 +30112,7 @@ export type GetServerByIdQueryVariables = Exact<{
 }>;
 
 
-export type GetServerByIdQuery = { __typename?: 'Query', findUniqueServer?: { __typename?: 'Server', serverId: string, name: string, address: string, port: number, game: string, publicAddress: string, statusUrl?: string | null, rconPassword: string, connectionType: string, dockerHost?: string | null, sortOrder: number } | null };
+export type GetServerByIdQuery = { __typename?: 'Query', findUniqueServer?: { __typename?: 'Server', serverId: string, name: string, address: string, port: number, game: string, publicAddress: string, statusUrl?: string | null, rconPassword: string, sortOrder: number } | null };
 
 
 export const GetPublicGamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicGames"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hidden"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"equals"},"value":{"kind":"StringValue","value":"0","block":false}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"realgame"}}]}}]}}]} as unknown as DocumentNode<GetPublicGamesQuery, GetPublicGamesQueryVariables>;
@@ -30254,12 +30124,12 @@ export const GetPlayersWithPaginationDocument = {"kind":"Document","definitions"
 export const GetPlayerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPlayerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetPlayerCountQuery, GetPlayerCountQueryVariables>;
 export const GetGamesForSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesForSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetGamesForSelectQuery, GetGamesForSelectQueryVariables>;
 export const GetModsForSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetModsForSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyModSupported"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetModsForSelectQuery, GetModsForSelectQueryVariables>;
-export const CreateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"connectionType"}},{"kind":"Field","name":{"kind":"Name","value":"dockerHost"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerWithConfigMutation, CreateServerWithConfigMutationVariables>;
-export const UpdateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"connectionType"}},{"kind":"Field","name":{"kind":"Name","value":"dockerHost"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateServerWithConfigMutation, UpdateServerWithConfigMutationVariables>;
+export const CreateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerWithConfigMutation, CreateServerWithConfigMutationVariables>;
+export const UpdateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateServerWithConfigMutation, UpdateServerWithConfigMutationVariables>;
 export const GetServersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"activePlayers"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"activeMap"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}}]} as unknown as DocumentNode<GetServersQuery, GetServersQueryVariables>;
 export const GetServersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"activePlayers"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"activeMap"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}}]} as unknown as DocumentNode<GetServersWithPaginationQuery, GetServersWithPaginationQueryVariables>;
 export const GetServerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetServerCountQuery, GetServerCountQueryVariables>;
-export const GetServerByIdWithConfigsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerByIdWithConfigs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findUniqueServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"rconPassword"}},{"kind":"Field","name":{"kind":"Name","value":"connectionType"}},{"kind":"Field","name":{"kind":"Name","value":"dockerHost"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}},{"kind":"Field","name":{"kind":"Name","value":"configs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parameter"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]}}]} as unknown as DocumentNode<GetServerByIdWithConfigsQuery, GetServerByIdWithConfigsQueryVariables>;
+export const GetServerByIdWithConfigsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerByIdWithConfigs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findUniqueServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"rconPassword"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}},{"kind":"Field","name":{"kind":"Name","value":"configs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parameter"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]}}]} as unknown as DocumentNode<GetServerByIdWithConfigsQuery, GetServerByIdWithConfigsQueryVariables>;
 export const CreateServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"rawToken"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerTokenMutation, CreateServerTokenMutationVariables>;
 export const RevokeServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RevokeServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RevokeServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"revokeServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<RevokeServerTokenMutation, RevokeServerTokenMutationVariables>;
 export const GetServerTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeRevoked"},"value":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]} as unknown as DocumentNode<GetServerTokensQuery, GetServerTokensQueryVariables>;
@@ -30270,4 +30140,4 @@ export const GetUsersWithPaginationDocument = {"kind":"Document","definitions":[
 export const GetUserCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetUserCountQuery, GetUserCountQueryVariables>;
 export const GetGamesListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesList"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hidden"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"equals"},"value":{"kind":"StringValue","value":"0","block":false}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}}]}}]}}]} as unknown as DocumentNode<GetGamesListQuery, GetGamesListQueryVariables>;
 export const GetGeneralStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGeneralStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"}},{"kind":"Field","name":{"kind":"Name","value":"countClan"}},{"kind":"Field","name":{"kind":"Name","value":"countGame"}},{"kind":"Field","name":{"kind":"Name","value":"countServer"}},{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"kills"}}]}},{"kind":"Field","name":{"kind":"Name","value":"findFirstEventFrag"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eventTime"},"value":{"kind":"EnumValue","value":"desc"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"eventTime"}}]}},{"kind":"Field","name":{"kind":"Name","value":"findUniqueOption"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"keyname"},"value":{"kind":"StringValue","value":"DeleteDays","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]} as unknown as DocumentNode<GetGeneralStatsQuery, GetGeneralStatsQueryVariables>;
-export const GetServerByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findUniqueServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"rconPassword"}},{"kind":"Field","name":{"kind":"Name","value":"connectionType"}},{"kind":"Field","name":{"kind":"Name","value":"dockerHost"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]} as unknown as DocumentNode<GetServerByIdQuery, GetServerByIdQueryVariables>;
+export const GetServerByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findUniqueServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"rconPassword"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]} as unknown as DocumentNode<GetServerByIdQuery, GetServerByIdQueryVariables>;

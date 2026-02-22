@@ -80,8 +80,6 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
                     publicAddress: server.publicAddress || "",
                     statusUrl: server.statusUrl || "",
                     rconPassword: server.rconPassword || "",
-                    connectionType: server.connectionType || "external",
-                    dockerHost: server.dockerHost || "",
                     sortOrder: server.sortOrder || 0,
                     mod: currentMod,
                   }}

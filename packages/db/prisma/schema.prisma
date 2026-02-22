@@ -783,10 +783,6 @@ model Server {
   publicAddress String       @default("") @map("public_address") @db.VarChar(128)
   statusUrl     String?      @map("status_url") @db.VarChar(255)
   rconPassword   String       @default("") @map("rcon_password") @db.VarChar(512)
-  /// @deprecated - Scheduled for removal. Use token-based authentication instead.
-  connectionType String       @default("external") @map("connection_type") @db.VarChar(8)
-  /// @deprecated - Scheduled for removal. Use token-based authentication instead.
-  dockerHost     String?      @map("docker_host") @db.VarChar(255)
   authTokenId    Int?         @map("token_id") @db.UnsignedInt
   authToken      ServerToken? @relation(fields: [authTokenId], references: [id], onDelete: SetNull)
   kills          Int          @default(0)
@@ -840,11 +836,9 @@ model Server {
   loads                    ServerLoad[]
   notificationConfig       NotificationConfig?
 
-  // Legacy constraints (will be dropped when connectionType/dockerHost are removed)
-  @@unique([connectionType, address, port], name: "servers_external_unique")
-  @@unique([connectionType, dockerHost, port], name: "servers_docker_unique")
-  // New token-based index
-  @@index([authTokenId], name: "idx_server_token")
+  // Token + port is the stable server identity (survives IP changes from Docker restarts)
+  @@unique([authTokenId, port], name: "servers_token_port_unique")
+  @@index([address, port], name: "idx_server_address_port")
   @@index([game])
   @@index([lastEvent])
   @@index([name])

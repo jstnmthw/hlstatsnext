@@ -1,31 +1,12 @@
 /**
  * Global Test Setup
  *
- * Configures the testing environment for Vitest with proper database
- * connection, cleanup, and global mocks.
+ * Configures the testing environment for Vitest unit tests.
+ * No external services (database, RabbitMQ, etc.) should be required here.
  */
 
-import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest"
+import { afterEach, beforeEach, vi } from "vitest"
 import { resetAppContext } from "../context"
-import { cleanupDatabase, seedTestDatabase } from "../tests/fixtures/database"
-
-// Global setup - runs once before all tests
-beforeAll(async () => {
-  // Load test environment variables
-  process.env.NODE_ENV = "test"
-  process.env.LOG_LEVEL = "silent"
-
-  // Set test encryption key (32-byte base64 encoded key)
-  process.env.ENCRYPTION_KEY = "UeiKre+QpJAdqs8HECeQsuhJGOEatW+gu/t0pXPE5ns="
-
-  // Initialize test database
-  await seedTestDatabase()
-})
-
-// Global cleanup - runs once after all tests
-afterAll(async () => {
-  await cleanupDatabase()
-})
 
 // Test isolation - runs before each test
 beforeEach(() => {

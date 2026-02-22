@@ -15,16 +15,18 @@ import { createMockLogger } from "@/tests/mocks/logger"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { RabbitMQClient } from "./client"
 
-// Mock amqplib
-const mockAmqpConnect = vi.fn()
-vi.mock("amqplib", () => ({
-  connect: (...args: unknown[]) => mockAmqpConnect(...args),
+// Hoist mock variables so they're available when vi.mock() factories execute
+const { mockAmqpConnect, mockAmqpConnectionAdapter } = vi.hoisted(() => ({
+  mockAmqpConnect: vi.fn(),
+  mockAmqpConnectionAdapter: vi.fn(),
 }))
 
-// Mock the adapters module - we return the mock connection directly
-const mockAmqpConnectionAdapter = vi.fn()
+vi.mock("amqplib", () => ({
+  connect: mockAmqpConnect,
+}))
+
 vi.mock("./adapters", () => ({
-  AmqpConnectionAdapter: (...args: unknown[]) => mockAmqpConnectionAdapter(...args),
+  AmqpConnectionAdapter: mockAmqpConnectionAdapter,
 }))
 
 function createMockChannel(): QueueChannel {

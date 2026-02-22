@@ -150,8 +150,8 @@ describe("Event Pipeline (e2e)", () => {
       expect(event).not.toBeNull()
       expect(event!.eventType).toBe(EventType.PLAYER_CHANGE_TEAM)
       expect(event!.data).toMatchObject({
-        newTeam: "CT",
-        oldTeam: "Unassigned",
+        gameUserId: 2,
+        team: "CT",
       })
     })
   })
@@ -166,15 +166,15 @@ describe("Event Pipeline (e2e)", () => {
       expect(event).toBeNull()
     })
 
-    it("should track error count in stats", async () => {
+    it("should not count unrecognized lines as errors", async () => {
       const ingress = context.ingressService as unknown as TestIngressService
 
-      // Process several invalid lines
+      // Unrecognized lines are treated as success with no event (not errors)
       await context.ingressService.processRawEvent("invalid 1", serverId)
       await context.ingressService.processRawEvent("invalid 2", serverId)
 
       const stats = ingress.getStats()
-      expect(stats.totalErrors).toBeGreaterThan(0)
+      expect(stats.totalErrors).toBe(0)
     })
   })
 })

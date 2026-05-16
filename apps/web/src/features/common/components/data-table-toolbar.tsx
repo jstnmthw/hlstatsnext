@@ -31,12 +31,15 @@ export function DataTableToolbar<TData>({
   isPending,
 }: DataTableToolbarProps<TData>) {
   const [searchInput, setSearchInput] = useState(search)
+  const [prevSearch, setPrevSearch] = useState(search)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
-  // Sync external search state changes (e.g. reset)
-  useEffect(() => {
+  // Sync external search state changes (e.g. reset) by adjusting state during
+  // render — see https://react.dev/learn/you-might-not-need-an-effect
+  if (search !== prevSearch) {
+    setPrevSearch(search)
     setSearchInput(search)
-  }, [search])
+  }
 
   // Debounced search
   useEffect(() => {

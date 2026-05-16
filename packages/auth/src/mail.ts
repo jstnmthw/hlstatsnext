@@ -14,13 +14,14 @@
 interface SendOTPParams {
   email: string
   otp: string
-  type: "sign-in" | "email-verification" | "forget-password"
+  type: "sign-in" | "email-verification" | "forget-password" | "change-email"
 }
 
 const subjectMap = {
   "sign-in": "Your sign-in code",
   "email-verification": "Verify your email address",
   "forget-password": "Reset your password",
+  "change-email": "Confirm your new email address",
 } as const
 
 function getBody(otp: string, type: SendOTPParams["type"]): string {
@@ -31,6 +32,8 @@ function getBody(otp: string, type: SendOTPParams["type"]): string {
       return `Your password reset code is: ${otp}\n\nThis code expires in 5 minutes. If you did not request this, please ignore this email.`
     case "sign-in":
       return `Your sign-in code is: ${otp}\n\nThis code expires in 5 minutes.`
+    case "change-email":
+      return `Your email change confirmation code is: ${otp}\n\nThis code expires in 5 minutes. If you did not request this, please ignore this email.`
   }
 }
 

@@ -37,11 +37,11 @@
   "devDependencies": {
     "dotenv-cli": "^11.0.0",
     "husky": "^9.1.7",
-    "prettier": "^3.8.1",
+    "prettier": "^3.8.3",
     "prettier-plugin-organize-imports": "^4.3.0",
-    "prettier-plugin-tailwindcss": "^0.7.2",
-    "tailwindcss": "^4.2.0",
-    "turbo": "^2.8.10",
+    "prettier-plugin-tailwindcss": "^0.7.4",
+    "tailwindcss": "^4.3.0",
+    "turbo": "^2.9.14",
     "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@10.17.1",

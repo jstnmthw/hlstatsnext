@@ -3,14 +3,14 @@
  *
  * Seeds mod-specific configuration defaults within a transaction.
  */
+import type { TransactionalPrisma } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { Prisma } from "@repo/db/client"
 
 /**
  * Seeds mod-specific configuration defaults within a transaction
  */
 export async function seedModDefaults(
-  tx: Prisma.TransactionClient,
+  tx: TransactionalPrisma,
   serverId: number,
   gameCode: string,
   address: string,

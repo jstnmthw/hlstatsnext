@@ -12,7 +12,7 @@ interface ActionResult {
 }
 
 async function requirePermission(
-  permission: Record<string, string[]>,
+  permissions: Record<string, string[]>,
 ): Promise<
   | { session: NonNullable<Awaited<ReturnType<typeof getSession>>>; error?: never }
   | { error: ActionResult; session?: never }
@@ -23,7 +23,7 @@ async function requirePermission(
   }
 
   const hasPermission = await auth.api.userHasPermission({
-    body: { userId: session.user.id, permission },
+    body: { userId: session.user.id, permissions },
   })
   if (!hasPermission.success) {
     return { error: { success: false, message: "Insufficient permissions." } }

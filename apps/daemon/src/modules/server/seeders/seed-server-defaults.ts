@@ -3,14 +3,14 @@
  *
  * Seeds server configuration defaults within a transaction.
  */
+import type { TransactionalPrisma } from "@/database/client"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { Prisma } from "@repo/db/client"
 
 /**
  * Seeds server configuration defaults within a transaction
  */
 export async function seedServerDefaults(
-  tx: Prisma.TransactionClient,
+  tx: TransactionalPrisma,
   serverId: number,
   address: string,
   port: number,

@@ -12,28 +12,28 @@
   },
   "dependencies": {
     "@escape.tech/graphql-armor-max-depth": "^2.4.2",
-    "@graphql-tools/schema": "^10.0.31",
-    "@graphql-yoga/plugin-disable-introspection": "^2.19.0",
+    "@graphql-tools/schema": "^10.0.33",
+    "@graphql-yoga/plugin-disable-introspection": "^2.22.0",
     "@pothos/core": "^4.12.0",
-    "@pothos/plugin-prisma": "^4.14.2",
+    "@pothos/plugin-prisma": "^4.14.3",
     "@pothos/plugin-relay": "^4.7.0",
     "@pothos/plugin-with-input": "^4.1.4",
     "@repo/auth": "workspace:*",
     "@repo/crypto": "workspace:*",
     "@repo/db": "workspace:*",
     "cors": "^2.8.6",
-    "graphql": "^16.12.0",
-    "graphql-yoga": "^5.18.0",
-    "zod": "^4.3.6"
+    "graphql": "^16.14.0",
+    "graphql-yoga": "^5.21.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/cors": "^2.8.19",
-    "@types/node": "^25.3.0",
-    "dotenv": "^17.3.1",
-    "eslint": "^9.39.3",
-    "tsx": "^4.21.0",
+    "@types/node": "^25.8.0",
+    "dotenv": "^17.4.2",
+    "eslint": "^9.39.4",
+    "tsx": "^4.22.0",
     "typescript": "^5.9.3"
   }
 }

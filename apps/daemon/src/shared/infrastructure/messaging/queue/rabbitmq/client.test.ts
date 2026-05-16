@@ -8,12 +8,12 @@
 import type {
   QueueChannel,
   QueueConnection,
+  QueueConnectionError,
   RabbitMQConfig,
 } from "@/shared/infrastructure/messaging/queue/core/types"
-import { QueueConnectionError } from "@/shared/infrastructure/messaging/queue/core/types"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { RabbitMQClient } from "./client"
+import type { RabbitMQClient } from "./client"
 
 // Hoist mock variables so they're available when vi.mock() factories execute
 const { mockAmqpConnect, mockAmqpConnectionAdapter } = vi.hoisted(() => ({
@@ -88,14 +88,25 @@ function createDefaultConfig(): RabbitMQConfig {
 }
 
 describe("RabbitMQClient", () => {
+  // The shared test setup (src/tests/setup.ts) eagerly imports the app context,
+  // which transitively loads the real `amqplib` before this file's vi.mock()
+  // calls register. Re-importing ./client (and core/types) after
+  // vi.resetModules() rebuilds the subgraph against the mocked modules.
+  let RabbitMQClientCtor: typeof import("./client").RabbitMQClient
+  let QueueConnectionErrorCls: typeof QueueConnectionError
   let client: RabbitMQClient
   let config: RabbitMQConfig
   let logger: ReturnType<typeof createMockLogger>
   let mockChannel: QueueChannel
   let mockConnection: ReturnType<typeof createMockConnection>
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks()
+    vi.resetModules()
+    RabbitMQClientCtor = (await import("./client.js")).RabbitMQClient
+    QueueConnectionErrorCls = (
+      await import("@/shared/infrastructure/messaging/queue/core/types.js")
+    ).QueueConnectionError
 
     logger = createMockLogger()
     config = createDefaultConfig()
@@ -113,7 +124,7 @@ describe("RabbitMQClient", () => {
     // AmqpConnectionAdapter wraps raw connection -> returns our mockConnection
     mockAmqpConnectionAdapter.mockReturnValue(mockConnection)
 
-    client = new RabbitMQClient(config, logger)
+    client = new RabbitMQClientCtor(config, logger)
   })
 
   describe("connect", () => {
@@ -130,7 +141,7 @@ describe("RabbitMQClient", () => {
     it("should throw QueueConnectionError after exhausting retry attempts", async () => {
       mockAmqpConnect.mockRejectedValue(new Error("Connection refused"))
 
-      await expect(client.connect()).rejects.toThrow(QueueConnectionError)
+      await expect(client.connect()).rejects.toThrow(QueueConnectionErrorCls)
     })
 
     it("should wrap topology setup failure as QueueConnectionError", async () => {
@@ -138,7 +149,7 @@ describe("RabbitMQClient", () => {
         new Error("Channel create failed"),
       )
 
-      await expect(client.connect()).rejects.toThrow(QueueConnectionError)
+      await expect(client.connect()).rejects.toThrow(QueueConnectionErrorCls)
       expect(logger.error).toHaveBeenCalledWith(
         expect.stringContaining("Failed to establish RabbitMQ connection"),
       )
@@ -150,7 +161,7 @@ describe("RabbitMQClient", () => {
       await client.connect().catch(() => {})
 
       // Now a second attempt should not get "Connection already in progress"
-      await expect(client.connect()).rejects.toThrow(QueueConnectionError)
+      await expect(client.connect()).rejects.toThrow(QueueConnectionErrorCls)
     })
 
     it("should log retry delay messages", async () => {
@@ -199,7 +210,7 @@ describe("RabbitMQClient", () => {
       ;(cfg.connectionRetry as { initialDelay: number }).initialDelay = 2
       ;(cfg.connectionRetry as { maxDelay: number }).maxDelay = 5
 
-      const localClient = new RabbitMQClient(cfg, logger)
+      const localClient = new RabbitMQClientCtor(cfg, logger)
 
       mockAmqpConnect.mockRejectedValue(new Error("fail"))
 

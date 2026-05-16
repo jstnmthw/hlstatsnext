@@ -38,7 +38,7 @@ export async function createServer(
     }
 
     const hasPermission = await auth.api.userHasPermission({
-      body: { userId: session.user.id, permission: { server: ["create"] } },
+      body: { userId: session.user.id, permissions: { server: ["create"] } },
     })
     if (!hasPermission.success) {
       return { success: false, message: "Insufficient permissions." }

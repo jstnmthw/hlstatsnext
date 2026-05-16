@@ -36,7 +36,7 @@ export async function updateServer(
     }
 
     const hasPermission = await auth.api.userHasPermission({
-      body: { userId: session.user.id, permission: { server: ["update"] } },
+      body: { userId: session.user.id, permissions: { server: ["update"] } },
     })
     if (!hasPermission.success) {
       return { success: false, message: "Insufficient permissions." }

@@ -25,7 +25,7 @@ export async function ServerList({ className }: { className?: string }) {
 
   return (
     <div className={className}>
-      <h3 className="mb-1.5 text-lg font-semibold tracking-tight">Recently Active Servers</h3>
+      <h3 className="mb-1.5 text-lg leading-5 font-bold uppercase">Recently Active Servers</h3>
       <RecentServersTable data={servers} />
     </div>
   )

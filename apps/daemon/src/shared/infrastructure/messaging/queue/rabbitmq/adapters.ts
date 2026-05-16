@@ -11,6 +11,7 @@ import type {
   ConsumeOptions,
   PublishOptions,
   QueueChannel,
+  QueueCheckResult,
   QueueConnection,
 } from "@/shared/infrastructure/messaging/queue/core/types"
 import type * as amqp from "amqplib"
@@ -115,6 +116,15 @@ export class AmqpChannelAdapter implements QueueChannel {
 
   async assertQueue(queue: string, options?: AssertQueueOptions): Promise<void> {
     await this.channel.assertQueue(queue, options)
+  }
+
+  async checkQueue(queue: string): Promise<QueueCheckResult> {
+    const result = await this.channel.checkQueue(queue)
+    return {
+      queue: result.queue,
+      messageCount: result.messageCount,
+      consumerCount: result.consumerCount,
+    }
   }
 
   async bindQueue(queue: string, source: string, pattern: string): Promise<void> {

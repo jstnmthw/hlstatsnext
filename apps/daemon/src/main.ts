@@ -251,17 +251,19 @@ export class HLStatsDaemon {
   private startMetricsCollection(): void {
     const collectMetrics = async () => {
       try {
-        // Queue depth from consumer stats
+        // Queue depth: live count of ready messages across all consumed queues
         if (this.context.rabbitmqConsumer) {
-          const stats = this.context.rabbitmqConsumer.getConsumerStats()
-          this.context.metrics.setGauge("queue_depth", {}, stats.queueDepth)
+          const queueDepth = await this.context.rabbitmqConsumer.getQueueDepth()
+          this.context.metrics.setGauge("queue_depth", {}, queueDepth)
         }
 
-        // Active players from database (sum across all servers)
-        const result = await this.context.database.prisma.server.aggregate({
-          _sum: { activePlayers: true },
-        })
-        this.context.metrics.setGauge("active_players_count", {}, result._sum.activePlayers ?? 0)
+        // Active players/bots: live count of open player sessions (event-driven,
+        // RCON-synced). Avoids the drift of the Server.activePlayers column.
+        // Bots are tracked separately as they still incur processing load when
+        // a server's IgnoreBots config is disabled.
+        const sessionStats = await this.context.sessionService.getSessionStats()
+        this.context.metrics.setGauge("active_players_count", {}, sessionStats.realPlayerSessions)
+        this.context.metrics.setGauge("active_bots_count", {}, sessionStats.botSessions)
       } catch (error) {
         this.logger.debug("Metrics collection error", {
           error: error instanceof Error ? error.message : String(error),

@@ -194,6 +194,31 @@ export class EventConsumer implements IEventConsumer {
     }
   }
 
+  /**
+   * Query the current queue depth (ready message count) across all consumed
+   * queues via a passive check on each consumer channel.
+   *
+   * Updates the cached `queueDepth` stat and returns the aggregate total.
+   * Returns 0 when the consumer is not running (no open channels).
+   */
+  async getQueueDepth(): Promise<number> {
+    let total = 0
+
+    for (const [queueName, channel] of this.channels) {
+      try {
+        const { messageCount } = await channel.checkQueue(queueName)
+        total += messageCount
+      } catch (error) {
+        this.logger.debug(
+          `Failed to check depth for queue ${queueName}: ${error instanceof Error ? error.message : String(error)}`,
+        )
+      }
+    }
+
+    this.stats.queueDepth = total
+    return total
+  }
+
   private async consumeQueue(queueName: string): Promise<void> {
     const channel = await this.client.createChannel(`consumer-${queueName}`)
     this.channels.set(queueName, channel)

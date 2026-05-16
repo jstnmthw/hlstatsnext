@@ -38,6 +38,9 @@ describe("EventConsumer", () => {
       ack: vi.fn().mockResolvedValue(undefined),
       nack: vi.fn().mockResolvedValue(undefined),
       publish: vi.fn().mockReturnValue(true),
+      checkQueue: vi
+        .fn()
+        .mockResolvedValue({ queue: "test.queue", messageCount: 0, consumerCount: 1 }),
     } as unknown as QueueChannel
 
     mockClient = {
@@ -132,6 +135,42 @@ describe("EventConsumer", () => {
       await expect(consumer.stop()).resolves.toBeUndefined()
       expect(mockLogger.warn).toHaveBeenCalledWith(
         "Failed to cancel consumer test.queue-123-456: Error: Channel cancel failed",
+      )
+    })
+  })
+
+  describe("Queue Depth", () => {
+    it("should return 0 when the consumer is not running", async () => {
+      const depth = await consumer.getQueueDepth()
+
+      expect(depth).toBe(0)
+      expect(mockChannel.checkQueue).not.toHaveBeenCalled()
+    })
+
+    it("should sum ready message counts across all consumed queues", async () => {
+      config = { ...config, queues: ["queue1", "queue2"] }
+      consumer = new EventConsumer(mockClient, mockProcessor, mockLogger, config)
+
+      vi.mocked(mockChannel.checkQueue)
+        .mockResolvedValueOnce({ queue: "queue1", messageCount: 4, consumerCount: 1 })
+        .mockResolvedValueOnce({ queue: "queue2", messageCount: 6, consumerCount: 1 })
+
+      await consumer.start()
+      const depth = await consumer.getQueueDepth()
+
+      expect(depth).toBe(10)
+      expect(consumer.getConsumerStats().queueDepth).toBe(10)
+    })
+
+    it("should skip queues whose check fails without throwing", async () => {
+      vi.mocked(mockChannel.checkQueue).mockRejectedValueOnce(new Error("queue gone"))
+
+      await consumer.start()
+      const depth = await consumer.getQueueDepth()
+
+      expect(depth).toBe(0)
+      expect(mockLogger.debug).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to check depth for queue test.queue"),
       )
     })
   })

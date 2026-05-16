@@ -313,6 +313,27 @@ describe("PrometheusMetricsExporter", () => {
       expect(metrics).not.toContain("my_counter")
     })
 
+    it("should export memory, uptime and CPU process metrics", () => {
+      const metrics = exporter.exportMetrics()
+
+      expect(metrics).toContain("process_heap_total_bytes")
+      expect(metrics).toContain("process_external_memory_bytes")
+      expect(metrics).toContain("process_uptime_seconds")
+      expect(metrics).toContain("# TYPE process_cpu_seconds_total counter")
+    })
+
+    it("should accumulate process_cpu_seconds_total monotonically", () => {
+      const cpuLine = (output: string): number => {
+        const match = output.match(/^process_cpu_seconds_total (\d+\.?\d*)/m)
+        return match?.[1] ? Number(match[1]) : 0
+      }
+
+      const first = cpuLine(exporter.exportMetrics())
+      const second = cpuLine(exporter.exportMetrics())
+
+      expect(second).toBeGreaterThanOrEqual(first)
+    })
+
     it("should include HELP and TYPE comments", () => {
       exporter.incrementCounter("my_counter")
       exporter.setGauge("my_gauge", {}, 1)

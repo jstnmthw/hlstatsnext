@@ -14,6 +14,10 @@ export class PrometheusMetricsExporter {
   private databaseQueries: DatabaseQueryMetric[] = []
   private readonly maxQueryHistory = 10000 // Keep last 10k queries
 
+  // Cumulative CPU time (microseconds) observed at the last collection, used
+  // to derive the monotonic process_cpu_seconds_total counter.
+  private lastCpuMicros = 0
+
   constructor(logger: ILogger) {
     // Logger could be used for debugging metrics issues if needed
     if (logger) {
@@ -83,6 +87,18 @@ export class PrometheusMetricsExporter {
     const mem = process.memoryUsage()
     this.setGauge("process_resident_memory_bytes", {}, mem.rss)
     this.setGauge("process_heap_bytes", {}, mem.heapUsed)
+    this.setGauge("process_heap_total_bytes", {}, mem.heapTotal)
+    this.setGauge("process_external_memory_bytes", {}, mem.external)
+    this.setGauge("process_uptime_seconds", {}, process.uptime())
+
+    // CPU time is cumulative since process start. Export it as a counter
+    // (seconds) by accumulating the delta, so Grafana can rate() it into
+    // cores/percentage used.
+    const cpu = process.cpuUsage()
+    const totalMicros = cpu.user + cpu.system
+    const deltaMicros = Math.max(0, totalMicros - this.lastCpuMicros)
+    this.lastCpuMicros = totalMicros
+    this.incrementCounter("process_cpu_seconds_total", {}, deltaMicros / 1_000_000)
   }
 
   /**

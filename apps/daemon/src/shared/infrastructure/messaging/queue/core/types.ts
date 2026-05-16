@@ -197,6 +197,17 @@ export interface ConsumerStats {
 }
 
 /**
+ * Result of a passive queue check (queue depth and consumer count)
+ */
+export interface QueueCheckResult {
+  readonly queue: string
+  /** Number of messages ready to be delivered */
+  readonly messageCount: number
+  /** Number of active consumers on the queue */
+  readonly consumerCount: number
+}
+
+/**
  * Queue channel abstraction (wraps amqplib channel)
  */
 export interface QueueChannel {
@@ -212,6 +223,8 @@ export interface QueueChannel {
   prefetch(count: number): Promise<void>
   assertExchange(exchange: string, type: string, options?: AssertExchangeOptions): Promise<void>
   assertQueue(queue: string, options?: AssertQueueOptions): Promise<void>
+  /** Passively check a queue, returning its current message and consumer counts */
+  checkQueue(queue: string): Promise<QueueCheckResult>
   bindQueue(queue: string, source: string, pattern: string): Promise<void>
   close(): Promise<void>
 }

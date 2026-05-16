@@ -26,6 +26,9 @@ describe("AmqpChannelAdapter", () => {
       prefetch: vi.fn().mockResolvedValue(undefined),
       assertExchange: vi.fn().mockResolvedValue(undefined),
       assertQueue: vi.fn().mockResolvedValue(undefined),
+      checkQueue: vi
+        .fn()
+        .mockResolvedValue({ queue: "test.queue", messageCount: 7, consumerCount: 2 }),
       bindQueue: vi.fn().mockResolvedValue(undefined),
       close: vi.fn().mockResolvedValue(undefined),
     } as unknown as amqp.Channel
@@ -329,6 +332,17 @@ describe("AmqpChannelAdapter", () => {
       await adapter.assertQueue("test.queue")
 
       expect(mockAmqpChannel.assertQueue).toHaveBeenCalledWith("test.queue", undefined)
+    })
+
+    it("should check queue and return its message and consumer counts", async () => {
+      const result = await adapter.checkQueue("test.queue")
+
+      expect(mockAmqpChannel.checkQueue).toHaveBeenCalledWith("test.queue")
+      expect(result).toEqual({
+        queue: "test.queue",
+        messageCount: 7,
+        consumerCount: 2,
+      })
     })
 
     it("should bind queue", async () => {

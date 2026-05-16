@@ -114,4 +114,11 @@ export class RabbitMQConsumer {
   getConsumerStats() {
     return this.consumer.getConsumerStats()
   }
+
+  /**
+   * Query the current aggregate queue depth across all consumed queues.
+   */
+  async getQueueDepth(): Promise<number> {
+    return this.consumer.getQueueDepth()
+  }
 }

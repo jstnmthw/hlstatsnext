@@ -4,13 +4,12 @@
     "outDir": "dist",
     "rootDir": ".",
     "types": ["node"],
-    "baseUrl": "src",
     "paths": {
-      "@/*": ["*"],
-      "@/modules/*": ["modules/*"],
-      "@/shared/*": ["shared/*"],
-      "@/config/*": ["config/*"],
-      "@/database/*": ["database/*"]
+      "@/*": ["./src/*"],
+      "@/modules/*": ["./src/modules/*"],
+      "@/shared/*": ["./src/shared/*"],
+      "@/config/*": ["./src/config/*"],
+      "@/database/*": ["./src/database/*"]
     }
   },
   "include": ["src/**/*", "tests/**/*", "scripts/**/*"],

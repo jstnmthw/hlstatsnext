@@ -18,6 +18,7 @@ export function VersionAnnounce({ className, ...props }: ComponentProps<"div">) 
       <div className="relative">
         <div className="absolute inset-0 z-30" />
         <Image
+          loading="eager"
           width={768}
           height={432}
           src="https://images.unsplash.com/photo-1607853827120-6847830b38b0?w=768&auto=format&q=80"

@@ -118,7 +118,7 @@ export class AuthRateLimiter {
   /**
    * Drop entries that are no longer tracking anything: blocks that have expired
    * AND have no remaining attempts in the window. Bounded by unique source-IP
-   * count, but scanner traffic keeps it growing without this (WARN-1).
+   * count, but scanner traffic keeps it growing without this.
    */
   sweep(): number {
     const now = Date.now()

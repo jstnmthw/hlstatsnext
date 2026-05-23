@@ -99,9 +99,21 @@ export class TokenServerAuthenticator {
       return { kind: "unauthorized", reason: "invalid_format" }
     }
 
-    // Hash and validate token
+    // A DB outage during validateToken throws — wrap it so the rate limiter
+    // still counts the failed attempt. Otherwise an attacker can probe with
+    // the same source IP forever while the DB is unreachable without ever
+    // being blocked.
     const tokenHash = hashToken(token)
-    const validationResult = await this.validateToken(tokenHash)
+    let validationResult
+    try {
+      validationResult = await this.validateToken(tokenHash)
+    } catch (error) {
+      this.rateLimiter.recordFailure(sourceAddress)
+      this.logger.warn(
+        `Token validation error from ${sourceAddress}:${sourcePort}: ${error instanceof Error ? error.message : String(error)}`,
+      )
+      return { kind: "unauthorized", reason: "validation_error" }
+    }
 
     if (validationResult.kind !== "valid") {
       const blocked = this.rateLimiter.recordFailure(sourceAddress)
@@ -139,16 +151,18 @@ export class TokenServerAuthenticator {
     // Emit SERVER_AUTHENTICATED for ALL successful authentications (not just auto-registered).
     // This triggers immediate RCON connection — critical after daemon restart when
     // existing servers re-authenticate and need RCON before the monitoring cron fires.
-    try {
-      const event: ServerAuthenticatedEvent = {
-        eventType: EventType.SERVER_AUTHENTICATED,
-        timestamp: new Date(),
-        serverId: serverResult.serverId,
-      }
-      await this.eventBus.emit(event)
-    } catch (error) {
-      this.logger.warn(`Error emitting server authentication event: ${error}`)
+    //
+    // Fire-and-forget rather than awaiting. A slow SERVER_AUTHENTICATED
+    // subscriber (RCON connect can take seconds) must not block beacon
+    // handling for this source. Errors are still logged.
+    const event: ServerAuthenticatedEvent = {
+      eventType: EventType.SERVER_AUTHENTICATED,
+      timestamp: new Date(),
+      serverId: serverResult.serverId,
     }
+    void this.eventBus.emit(event).catch((error) => {
+      this.logger.warn(`Error emitting server authentication event: ${error}`)
+    })
 
     return serverResult
   }
@@ -219,8 +233,8 @@ export class TokenServerAuthenticator {
   /**
    * Periodic sweep. Drops expired token/source cache entries, prunes the
    * log-cooldown map for messages outside the cooldown window, and delegates
-   * to the rate limiter (WARN-1). Bounded by unique source IPs over the
-   * daemon's lifetime; unbounded in practice without this sweep.
+   * to the rate limiter. Bounded by unique source IPs over the daemon's
+   * lifetime; unbounded in practice without this sweep.
    */
   sweep(): {
     tokens: number
@@ -322,8 +336,9 @@ export class TokenServerAuthenticator {
     | { kind: "authenticated"; serverId: number }
     | { kind: "auto_registered"; serverId: number; tokenId: number }
   > {
-    // Atomic upsert using the @@unique([authTokenId, port]) constraint (RT-010).
-    // Prevents duplicate servers when concurrent beacons arrive before either commits.
+    // Atomic upsert using the @@unique([authTokenId, port]) constraint —
+    // prevents duplicate servers when concurrent beacons arrive before either
+    // commits.
     const server = await this.database.prisma.server.upsert({
       where: {
         servers_token_port_unique: {

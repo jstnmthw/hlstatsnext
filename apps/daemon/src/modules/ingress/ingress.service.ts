@@ -8,6 +8,7 @@
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { PrometheusMetricsExporter } from "@repo/observability"
 import type { IngressDependencies } from "./ingress.dependencies"
 import type { IIngressService, IngressOptions, IngressStats } from "./ingress.types"
 import type { BaseParser } from "./parsers/base.parser"
@@ -26,12 +27,16 @@ export class IngressService implements IIngressService {
   }
   private running: boolean = false
   private eventPublisher: IEventPublisher | null = null
+  /** Per-source IP cooldown for oversize-drop debug logs to avoid spam. */
+  private readonly oversizeLoggedAt = new Map<string, number>()
+  private static readonly OVERSIZE_LOG_COOLDOWN_MS = 60_000
 
   constructor(
     private readonly logger: ILogger,
     private readonly dependencies: IngressDependencies,
     options: IngressOptions = {},
     socketFactory?: ISocketFactory,
+    private readonly metrics?: PrometheusMetricsExporter,
   ) {
     this.options = {
       port: 27500,
@@ -69,6 +74,24 @@ export class IngressService implements IIngressService {
       this.logger.error(`UDP server error: ${error.message}`)
     })
 
+    // Surface UDP drops as a counter + rate-limited debug log so a
+    // misconfigured server fragmenting logs becomes visible.
+    this.udpServer.on(
+      "packetDropped",
+      (info: { reason: string; sourceAddress: string; sourcePort: number; size: number }) => {
+        this.metrics?.incrementCounter("udp_packets_dropped_total", { reason: info.reason })
+        const key = `${info.reason}:${info.sourceAddress}`
+        const now = Date.now()
+        const last = this.oversizeLoggedAt.get(key)
+        if (!last || now - last > IngressService.OVERSIZE_LOG_COOLDOWN_MS) {
+          this.oversizeLoggedAt.set(key, now)
+          this.logger.debug(
+            `UDP packet dropped (${info.reason}, ${info.size} bytes) from ${info.sourceAddress}:${info.sourcePort}`,
+          )
+        }
+      },
+    )
+
     // Start the UDP server
     await this.udpServer.start()
 
@@ -95,6 +118,17 @@ export class IngressService implements IIngressService {
     return {
       ...this.stats,
       uptime: this.stats.startTime ? Date.now() - this.stats.startTime.getTime() : 0,
+    }
+  }
+
+  /**
+   * Drop the per-server parser cache when a game server shuts down. Without
+   * this the entry survives until daemon restart, even for servers that have
+   * been removed entirely.
+   */
+  dropServer(serverId: number): void {
+    if (this.parserCache.delete(serverId)) {
+      this.logger.debug(`Dropped parser cache for server ${serverId}`)
     }
   }
 
@@ -175,7 +209,7 @@ export class IngressService implements IIngressService {
       }
 
       if (classified.kind === "rejected") {
-        return // Malformed beacon — discard to prevent data injection (RT-011)
+        return // Malformed beacon — discard to prevent data injection
       }
 
       // Regular engine log line — look up authenticated source

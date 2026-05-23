@@ -187,13 +187,11 @@ export class GoldSrcRconProtocol extends BaseRconProtocol {
         },
       )
 
-      // Single cleanup closure shared by every reject/resolve path. Earlier
-      // versions only ran cleanup on the success branch and on the
-      // socket.send-error branch — the timeout path leaked the message
-      // listener on the long-lived socket, accumulating one per failed
-      // challenge attempt (CRIT-14). Forward references to `cleanup` from
-      // inside `onMessage` and the setTimeout callback are safe: both
-      // closures only run after `cleanup` is defined below.
+      // Single cleanup closure shared by every reject/resolve path. The
+      // timeout path must clear the message listener too, or it leaks on the
+      // long-lived socket — one per failed challenge. Forward references to
+      // `cleanup` from inside `onMessage` and the setTimeout callback are
+      // safe: both closures only run after `cleanup` is defined below.
       const onMessage = (msg: Buffer, rinfo: dgram.RemoteInfo) => {
         cleanup()
 
@@ -282,9 +280,9 @@ export class GoldSrcRconProtocol extends BaseRconProtocol {
         },
       )
 
-      // Single cleanup closure shared by every reject/resolve path (CRIT-14).
-      // Forward references are safe — the timer/listener fire after `cleanup`
-      // is declared below.
+      // Single cleanup closure shared by every reject/resolve path. Forward
+      // references are safe — the timer/listener fire after `cleanup` is
+      // declared below.
       const onMessage = this.createMessageHandler(command, resolve, reject, () => cleanup())
 
       const timeout = setTimeout(() => {
@@ -323,7 +321,7 @@ export class GoldSrcRconProtocol extends BaseRconProtocol {
    * Creates message handler for command responses. `cleanup` clears the
    * outer timeout AND removes the message listener — the caller in
    * sendRconCommand wires up the same cleanup for every other reject path
-   * so the listener cannot leak (CRIT-14).
+   * so the listener cannot leak.
    */
   private createMessageHandler(
     command: string,

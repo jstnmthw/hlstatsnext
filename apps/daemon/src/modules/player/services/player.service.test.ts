@@ -55,6 +55,7 @@ describe("PlayerService", () => {
       getCurrentMap: vi.fn().mockResolvedValue("de_dust2"),
       getLastKnownMap: vi.fn().mockResolvedValue("de_dust2"),
       handleMapChange: vi.fn(),
+      clearServerCache: vi.fn(),
     }
 
     const mockServerRepository = {

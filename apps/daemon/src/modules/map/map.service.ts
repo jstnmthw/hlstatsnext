@@ -30,6 +30,8 @@ export interface IMapService {
   getCurrentMap(serverId: number): Promise<string>
   getLastKnownMap(serverId: number): Promise<string | null>
   handleMapChange(serverId: number, newMap: string, previousMap?: string): Promise<void>
+  /** Drop per-server cache when the game server shuts down. */
+  clearServerCache(serverId: number): void
 }
 
 export class MapService implements IMapService {
@@ -77,6 +79,17 @@ export class MapService implements IMapService {
    */
   async getLastKnownMap(serverId: number): Promise<string | null> {
     return await this.matchRepository.getLastKnownMap(serverId)
+  }
+
+  /**
+   * Drop the per-server cache entry on SERVER_SHUTDOWN. The cache is keyed
+   * by serverId so a removed/restarted server otherwise leaves a stale entry
+   * until the 30s TTL (or forever if the server never returns).
+   */
+  clearServerCache(serverId: number): void {
+    if (this.mapCache.delete(serverId)) {
+      this.logger.debug(`Cleared map cache for server ${serverId}`)
+    }
   }
 
   /**

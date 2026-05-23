@@ -32,6 +32,7 @@ function createMockMapService(): IMapService {
     getCurrentMap: vi.fn().mockResolvedValue("de_dust2"),
     getLastKnownMap: vi.fn(),
     handleMapChange: vi.fn(),
+    clearServerCache: vi.fn(),
   }
 }
 

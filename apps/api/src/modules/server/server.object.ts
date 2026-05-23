@@ -1,6 +1,6 @@
 /**
- * Custom Server prismaObject that omits the rconPassword field.
- * Replaces the auto-generated Server object to prevent credential exposure (RT-002).
+ * Custom Server prismaObject that omits the rconPassword field. Replaces the
+ * auto-generated Server object to prevent credential exposure.
  */
 import { builder } from "../../builder"
 
@@ -17,7 +17,7 @@ builder.prismaObject("Server", {
     publicAddress: t.exposeString("publicAddress"),
     statusUrl: t.string({ nullable: true, resolve: (server) => server.statusUrl }),
     authTokenId: t.int({ nullable: true, resolve: (server) => server.authTokenId }),
-    // rconPassword: OMITTED — sensitive credential (RT-002)
+    // rconPassword: OMITTED — sensitive credential
 
     // Aggregate stats
     kills: t.exposeInt("kills"),

@@ -10,11 +10,11 @@ import { schema } from "./pothos-schema"
 
 const isProduction = process.env.NODE_ENV === "production"
 
-// ─── Security plugins (RT-003, RT-004) ──────────────────────────────────────
+// ─── Security plugins ───────────────────────────────────────────────────────
 const plugins = [
-  // RT-003: Prevent DoS via deeply nested queries on bidirectional relations
+  // Prevent DoS via deeply nested queries on bidirectional relations
   maxDepthPlugin({ n: 7 }),
-  // RT-004: Hide schema structure from attackers in production
+  // Hide schema structure from attackers in production
   ...(isProduction ? [useDisableIntrospection()] : []),
 ]
 
@@ -26,7 +26,7 @@ const yoga = createYoga({
   graphiql: !isProduction,
   context: createContext,
   plugins,
-  // RT-004: Mask internal error details in production
+  // Mask internal error details in production
   maskedErrors: isProduction,
   cors: {
     origin: isProduction ? process.env.FRONTEND_URL : "http://localhost:3000",

@@ -1,6 +1,6 @@
 /**
- * Custom EventRcon prismaObject that omits the password field.
- * Replaces the auto-generated EventRcon object to prevent credential exposure (RT-002, RT-008).
+ * Custom EventRcon prismaObject that omits the password field. Replaces the
+ * auto-generated EventRcon object to prevent credential exposure.
  */
 import { builder } from "../../builder"
 
@@ -17,7 +17,7 @@ builder.prismaObject("EventRcon", {
     map: t.exposeString("map"),
     type: t.exposeString("type"),
     remoteIp: t.exposeString("remoteIp"),
-    // password: OMITTED — sensitive credential (RT-002, RT-008)
+    // password: OMITTED — sensitive credential
     command: t.exposeString("command"),
     server: t.relation("server"),
   }),

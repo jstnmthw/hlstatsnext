@@ -211,13 +211,15 @@ export class MatchService implements IMatchService {
     const { previousMap, newMap, playerCount } = event.data
 
     try {
-      // Finalize current match stats if exists
+      // Only delete `currentMatches` after finalize resolves. Wiping it
+      // regardless of finalize success would permanently lose round/scoring
+      // data on a transient DB error; preserving it lets the next event retry.
       const matchStats = this.currentMatches.get(serverId)
       if (matchStats && previousMap) {
         await this.finalizeMatch(serverId, previousMap, matchStats)
       }
 
-      // Reset match stats for new map
+      // Reset match stats for new map (only after finalize succeeded).
       this.currentMatches.delete(serverId)
 
       // Create new match stats with the current map
@@ -258,20 +260,22 @@ export class MatchService implements IMatchService {
   }
 
   private async finalizeMatch(serverId: number, mapName: string, stats: MatchStats): Promise<void> {
+    // Do NOT swallow errors here. The caller (handleMapChange) only deletes
+    // the in-memory match if finalize resolves — a thrown error preserves
+    // state so the next event can retry instead of silently losing the
+    // just-ended map's stats.
     try {
-      // Save match statistics to database
       await this.saveMatchToDatabase(serverId)
-
       this.logger.debug(
         `Match finalized on server ${serverId} for map ${mapName}: ${stats.totalRounds} rounds, ${stats.duration}s, scores: ${JSON.stringify(
           stats.teamScores,
         )}`,
       )
     } catch (error) {
-      this.logger.failed(
-        `Failed to finalize match on server ${serverId}`,
-        error instanceof Error ? error.message : String(error),
+      this.logger.error(
+        `Failed to finalize match on server ${serverId} for map ${mapName}: ${error instanceof Error ? error.message : String(error)}`,
       )
+      throw error
     }
   }
 

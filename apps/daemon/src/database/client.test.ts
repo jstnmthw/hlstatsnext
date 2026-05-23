@@ -85,9 +85,12 @@ describe("DatabaseClient", () => {
       const result = await client.transaction(mockCallback)
 
       expect(result).toBe("extended result")
+      // transaction() forwards an optional options arg to Prisma's
+      // $transaction, so the second positional arg is `undefined` when the
+      // caller doesn't override the default timeouts.
       expect(
         (mockExtendedClient as unknown as { $transaction: ReturnType<typeof vi.fn> }).$transaction,
-      ).toHaveBeenCalledWith(mockCallback)
+      ).toHaveBeenCalledWith(mockCallback, undefined)
     })
 
     it("should propagate transaction callback errors", async () => {

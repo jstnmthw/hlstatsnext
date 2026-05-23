@@ -104,52 +104,51 @@ describe("RetryBackoffCalculatorService", () => {
       vi.useRealTimers()
     })
 
-    it("should calculate exponential backoff for first failure (30 seconds)", () => {
+    it("should calculate exponential backoff for first failure (30 seconds, ±50% jitter)", () => {
       vi.useFakeTimers()
       vi.setSystemTime(new Date("2025-01-01T00:00:00Z"))
 
+      // Backoff jitters over [0.5x, 1.0x] to prevent dogpiling — assert a
+      // range rather than an exact value.
       const result = service.calculateNextRetry(1)
-
-      // baseDelay=30, multiplier=2, failureCount=1: 30 * 2^0 = 30 seconds
-      const expected = new Date(Date.now() + 30 * 1000)
-      expect(result.getTime()).toBe(expected.getTime())
+      const baseMs = 30 * 1000
+      const elapsed = result.getTime() - Date.now()
+      expect(elapsed).toBeGreaterThanOrEqual(baseMs * 0.5)
+      expect(elapsed).toBeLessThanOrEqual(baseMs)
 
       vi.useRealTimers()
     })
 
-    it("should calculate exponential backoff for second failure (60 seconds)", () => {
+    it("should calculate exponential backoff for second failure (60 seconds, ±50% jitter)", () => {
       vi.useFakeTimers()
       vi.setSystemTime(new Date("2025-01-01T00:00:00Z"))
 
       const result = service.calculateNextRetry(2)
-
-      // baseDelay=30, multiplier=2, failureCount=2: 30 * 2^1 = 60 seconds
-      const expected = new Date(Date.now() + 60 * 1000)
-      expect(result.getTime()).toBe(expected.getTime())
+      const baseMs = 60 * 1000
+      const elapsed = result.getTime() - Date.now()
+      expect(elapsed).toBeGreaterThanOrEqual(baseMs * 0.5)
+      expect(elapsed).toBeLessThanOrEqual(baseMs)
 
       vi.useRealTimers()
     })
 
-    it("should calculate exponential backoff for third failure (120 seconds)", () => {
+    it("should calculate exponential backoff for third failure (120 seconds, ±50% jitter)", () => {
       vi.useFakeTimers()
       vi.setSystemTime(new Date("2025-01-01T00:00:00Z"))
 
       const result = service.calculateNextRetry(3)
-
-      // baseDelay=30, multiplier=2, failureCount=3: 30 * 2^2 = 120 seconds
-      const expected = new Date(Date.now() + 120 * 1000)
-      expect(result.getTime()).toBe(expected.getTime())
+      const baseMs = 120 * 1000
+      const elapsed = result.getTime() - Date.now()
+      expect(elapsed).toBeGreaterThanOrEqual(baseMs * 0.5)
+      expect(elapsed).toBeLessThanOrEqual(baseMs)
 
       vi.useRealTimers()
     })
 
-    it("should cap backoff at maxBackoffMinutes", () => {
+    it("should cap backoff at maxBackoffMinutes (±50% jitter)", () => {
       vi.useFakeTimers()
       vi.setSystemTime(new Date("2025-01-01T00:00:00Z"))
 
-      // With maxConsecutiveFailures=5, failure 4 is the max before dormant
-      // 30 * 2^3 = 240 seconds = 4 minutes (under 30 min cap)
-      // Let's test with a lower maxBackoffMinutes
       const limitedConfig: RconConfig = {
         ...config,
         maxConsecutiveFailures: 20,
@@ -158,10 +157,10 @@ describe("RetryBackoffCalculatorService", () => {
       const limitedService = new RetryBackoffCalculatorService(mockLogger, limitedConfig)
 
       const result = limitedService.calculateNextRetry(10)
-
-      // 30 * 2^9 = 15360 seconds, but capped at 60 seconds (1 minute)
-      const expected = new Date(Date.now() + 60 * 1000)
-      expect(result.getTime()).toBe(expected.getTime())
+      const capMs = 60 * 1000
+      const elapsed = result.getTime() - Date.now()
+      expect(elapsed).toBeGreaterThanOrEqual(capMs * 0.5)
+      expect(elapsed).toBeLessThanOrEqual(capMs)
 
       vi.useRealTimers()
     })

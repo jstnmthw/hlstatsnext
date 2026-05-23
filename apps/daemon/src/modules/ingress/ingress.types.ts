@@ -40,6 +40,10 @@ export interface IIngressService {
    * Periodic sweep of ingress-side caches (auth/rate-limiter).
    */
   sweep(): void
+  /**
+   * Drop per-server caches (parser cache) on SERVER_SHUTDOWN.
+   */
+  dropServer(serverId: number): void
 }
 
 export interface IngressStats {

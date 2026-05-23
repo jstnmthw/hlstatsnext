@@ -137,7 +137,10 @@ export class CachedPlayerRepository extends PlayerRepository {
   }
 
   /**
-   * Invalidate all cache entries for a specific player
+   * Invalidate all cache entries for a specific player. Re-throws on failure
+   * so the handler fails its message and the broker can retry — better to
+   * redeliver than to feed incorrect skill/points calculations from a stale
+   * cached read.
    */
   private async invalidatePlayerCaches(playerId: number): Promise<void> {
     try {
@@ -148,24 +151,27 @@ export class CachedPlayerRepository extends PlayerRepository {
       ])
       this.logger.debug("Player caches invalidated", { playerId })
     } catch (error) {
-      this.logger.warn("Failed to invalidate player caches", {
+      this.logger.error("Failed to invalidate player caches", {
         playerId,
         error: error instanceof Error ? error.message : String(error),
       })
+      throw error
     }
   }
 
   /**
-   * Invalidate list-based caches
+   * Invalidate list-based caches. Re-throws on failure rather than leaving
+   * stale leaderboard pages cached (see invalidatePlayerCaches).
    */
   private async invalidateListCaches(): Promise<void> {
     try {
       await this.cache.invalidatePattern("players:list:*")
       this.logger.debug("Player list caches invalidated")
     } catch (error) {
-      this.logger.warn("Failed to invalidate player list caches", {
+      this.logger.error("Failed to invalidate player list caches", {
         error: error instanceof Error ? error.message : String(error),
       })
+      throw error
     }
   }
 

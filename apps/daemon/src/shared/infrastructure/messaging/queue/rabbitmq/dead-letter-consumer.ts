@@ -4,7 +4,7 @@
  * Lightweight consumer that drains `hlstats.events.dlq` and at minimum logs
  * each entry with its event type + retry count, increments a Prometheus
  * counter, and acks. Without this, the DLQ is a black hole — silent loss
- * with no observability (WARN-3).
+ * with no observability.
  *
  * Intentionally NOT a normal EventConsumer: DLQ messages have already failed
  * processing, so we don't want retry logic, nor do we want to feed them back

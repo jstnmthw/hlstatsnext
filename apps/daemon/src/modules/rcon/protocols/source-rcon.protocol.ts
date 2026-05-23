@@ -37,6 +37,22 @@ export class SourceRconProtocol extends BaseRconProtocol {
     }
 
     this.socket = new net.Socket()
+
+    // Enable TCP keepalive so a wedged connection doesn't sit around for the
+    // kernel's `tcp_keepalive_time` (default 2h on Linux) before we notice
+    // it's dead. 30s keepalive matches the typical RCON monitoring cadence —
+    // broken sockets surface within ~1-2 minutes.
+    this.socket.setKeepAlive(true, 30_000)
+    // Bound idle reads so a half-open connection (server crashed without FIN)
+    // raises `'timeout'` and we can destroy + reconnect instead of holding
+    // the slot forever. Twice the command timeout gives in-flight commands
+    // headroom while still being far below kernel defaults.
+    this.socket.setTimeout(this.commandTimeout * 2)
+    this.socket.on("timeout", () => {
+      this.logger.warn(`Source RCON socket timeout — destroying connection`)
+      this.socket?.destroy(new Error("Socket idle timeout"))
+    })
+
     this.setupSocketHandlers()
 
     try {
@@ -167,9 +183,43 @@ export class SourceRconProtocol extends BaseRconProtocol {
       command,
     )
 
+    // Wrap the per-command promise with our own timeout that always cleans
+    // up `pendingResponses`. Otherwise a `withTimeout` rejection in execute()
+    // orphans the entry — `delete()` only runs on a real response or socket
+    // close, neither of which happens for the timeout case. With monitoring
+    // every 30s against a slow server that's ~2880 leaked closures/day.
     return new Promise((resolve, reject) => {
-      this.pendingResponses.set(commandId, { resolve, reject })
-      this.sendPacket(commandPacket)
+      const cleanup = (): void => {
+        clearTimeout(timer)
+        this.pendingResponses.delete(commandId)
+      }
+      const timer = setTimeout(() => {
+        cleanup()
+        reject(
+          new RconError(
+            `Command response timeout after ${this.commandTimeout}ms`,
+            RconErrorCode.COMMAND_FAILED,
+          ),
+        )
+      }, this.commandTimeout)
+
+      this.pendingResponses.set(commandId, {
+        resolve: (value) => {
+          cleanup()
+          resolve(value)
+        },
+        reject: (error) => {
+          cleanup()
+          reject(error)
+        },
+      })
+
+      try {
+        this.sendPacket(commandPacket)
+      } catch (error) {
+        cleanup()
+        reject(error)
+      }
     })
   }
 

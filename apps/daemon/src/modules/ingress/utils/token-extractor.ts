@@ -60,7 +60,8 @@ export function classifyLine(rawLine: string): LineClassification {
   const gamePort = parseInt(portStr, 10)
 
   // Validate extracted values — reject ambiguous payloads instead of
-  // falling back to log_line processing (RT-011: prevents data injection)
+  // falling back to log_line processing, which would let an attacker
+  // forge engine log lines via the beacon path.
   if (token.length === 0 || isNaN(gamePort) || gamePort < 1 || gamePort > 65535) {
     return { kind: "rejected" }
   }

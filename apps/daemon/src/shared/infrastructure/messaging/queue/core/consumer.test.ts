@@ -184,14 +184,22 @@ describe("EventConsumer", () => {
       await consumer.start()
     })
 
-    it("should pause consumer", async () => {
+    it("should pause consumer by cancelling consumer tags", async () => {
       await consumer.pause()
-      expect(mockLogger.info).toHaveBeenCalledWith("Event consumer paused")
+      // Pause cancels the consumer tag so the broker stops delivering,
+      // rather than nack-spinning the prefetched messages.
+      expect(mockChannel.cancel).toHaveBeenCalled()
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        "Event consumer paused (broker delivery stopped)",
+      )
     })
 
-    it("should resume consumer", async () => {
+    it("should resume consumer by re-consuming", async () => {
       await consumer.pause()
+      // First consume() was during start(); pause() cancelled; resume() re-consumes.
+      vi.mocked(mockChannel.consume).mockClear()
       await consumer.resume()
+      expect(mockChannel.consume).toHaveBeenCalled()
       expect(mockLogger.info).toHaveBeenCalledWith("Event consumer resumed")
     })
   })
@@ -263,19 +271,13 @@ describe("EventConsumer", () => {
       expect(mockProcessor.processEvent).not.toHaveBeenCalled()
     })
 
-    it("should requeue messages when paused", async () => {
+    it("should stop receiving messages when paused (broker-side cancel)", async () => {
+      // Paused consumers do not nack-requeue (which would busy-spin); pause()
+      // cancels the consumer tag so the broker stops delivering. The handler
+      // captured during start() can still be called by this test, but in
+      // real operation the broker would never invoke it.
       await consumer.pause()
-
-      const mockMessage: ConsumeMessage = {
-        content: Buffer.from("{}"),
-        properties: {},
-        fields: {},
-      } as ConsumeMessage
-
-      await messageHandler(mockMessage)
-
-      expect(mockChannel.nack).toHaveBeenCalledWith(mockMessage, false, true)
-      expect(mockProcessor.processEvent).not.toHaveBeenCalled()
+      expect(mockChannel.cancel).toHaveBeenCalled()
     })
 
     it("should reject invalid JSON messages", async () => {
@@ -345,13 +347,18 @@ describe("EventConsumer", () => {
 
       await messageHandler(mockMessage)
 
+      // Retry defers via setTimeout (republish-then-ack). The error is logged
+      // immediately but nack is NOT called — a nack-then-republish design
+      // would dead-letter the original on every retry, producing N+1 DLQ
+      // entries per failing event. The current pattern republishes first and
+      // acks the original only on success.
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining("Error processing message msg-123 from test.queue"),
       )
-      expect(mockChannel.nack).toHaveBeenCalledWith(mockMessage, false, false)
-
-      const stats = consumer.getConsumerStats()
-      expect(stats.messagesNacked).toBe(1)
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringContaining("Retrying message msg-123"),
+      )
+      expect(mockChannel.nack).not.toHaveBeenCalled()
     })
 
     it("should send message to DLQ after max retries", async () => {

@@ -2,6 +2,7 @@ export interface EnvironmentConfig {
   nodeEnv: string
   ingressOptions: {
     port?: number
+    host?: string
   }
   rconConfig: {
     enabled: boolean
@@ -26,6 +27,7 @@ export function getEnvironmentConfig(): EnvironmentConfig {
     nodeEnv,
     ingressOptions: {
       port: process.env.INGRESS_PORT ? parseInt(process.env.INGRESS_PORT, 10) : undefined,
+      host: process.env.INGRESS_HOST,
     },
     rconConfig: {
       enabled: process.env.RCON_ENABLED === "true",

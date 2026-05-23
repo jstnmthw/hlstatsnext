@@ -191,7 +191,7 @@ export class GameDetectionService implements IGameDetectionService {
   /**
    * Drop cache entries past their TTL. Keys are `address:port`, which churns
    * on infrastructure with rotating container IPs — unbounded without a
-   * periodic sweep (WARN-13).
+   * periodic sweep.
    */
   sweep(): number {
     const cutoff = Date.now() - this.CACHE_TTL

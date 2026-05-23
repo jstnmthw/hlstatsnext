@@ -11,6 +11,12 @@ import { EventEmitter } from "events"
 export interface UdpServerOptions {
   port: number
   host?: string
+  /**
+   * Kernel receive buffer size (bytes). Without this, the default
+   * `net.core.rmem_default` (~212KB on stock Linux) silently drops bursts
+   * beyond ~1400 packets at the network stack.
+   */
+  recvBufferSize?: number
 }
 
 export interface LogPayload {
@@ -82,6 +88,7 @@ export class UdpServer extends EventEmitter {
     super()
     this.options = {
       host: "0.0.0.0",
+      recvBufferSize: 8 * 1024 * 1024,
       ...options,
     }
   }
@@ -92,8 +99,18 @@ export class UdpServer extends EventEmitter {
         this.socket = this.socketFactory.createSocket("udp4")
 
         this.socket.on("message", (buffer, rinfo) => {
-          // RT-009: Reject oversized packets to prevent memory exhaustion
-          if (buffer.length > 4096) return
+          // Reject oversized packets to prevent memory exhaustion. Emit a
+          // typed event so the caller can increment a metric and surface
+          // misconfigured (fragmented) sources that would otherwise be silent.
+          if (buffer.length > 4096) {
+            this.emit("packetDropped", {
+              reason: "oversize",
+              sourceAddress: rinfo.address,
+              sourcePort: rinfo.port,
+              size: buffer.length,
+            })
+            return
+          }
 
           const logLine = stripPacketHeader(buffer)
 
@@ -115,6 +132,21 @@ export class UdpServer extends EventEmitter {
         })
 
         this.socket.bind(this.options.port, this.options.host, () => {
+          // Apply receive buffer size AFTER bind — setRecvBufferSize requires
+          // an open socket. Failures here are non-fatal; the kernel default
+          // still works, just with smaller burst headroom.
+          try {
+            this.socket?.setRecvBufferSize(this.options.recvBufferSize)
+          } catch (error) {
+            this.logger.warn(
+              `Failed to set UDP recv buffer to ${this.options.recvBufferSize} bytes (need CAP_NET_ADMIN or higher net.core.rmem_max): ${error instanceof Error ? error.message : String(error)}`,
+            )
+          }
+          if (this.options.host === "0.0.0.0") {
+            this.logger.warn(
+              `UDP server bound to 0.0.0.0:${this.options.port} — any reachable host can send packets; gate at the network layer or set INGRESS_HOST=127.0.0.1`,
+            )
+          }
           this.logger.info(`UDP server listening on ${this.options.host}:${this.options.port}`)
           resolve()
         })

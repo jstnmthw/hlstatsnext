@@ -48,6 +48,9 @@ function createMockConnection(channel: QueueChannel) {
   const eventHandlers: Record<string, (...args: unknown[]) => void> = {}
   const conn: QueueConnection & { _handlers: typeof eventHandlers } = {
     createChannel: vi.fn().mockResolvedValue(channel),
+    // Confirm channel is required on the interface. Tests don't exercise it
+    // here, but it must exist for type compatibility.
+    createConfirmChannel: vi.fn().mockResolvedValue(channel),
     close: vi.fn().mockResolvedValue(undefined),
     on: vi.fn((event: string, listener: (...args: unknown[]) => void) => {
       eventHandlers[event] = listener

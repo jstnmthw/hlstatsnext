@@ -12,30 +12,42 @@ import {
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
+import type { PrometheusMetricsExporter } from "@repo/observability"
 import type {
   EventMessage,
   IEventPublisher,
   IQueueClient,
   MessageMetadata,
   PriorityMapper,
-  QueueChannel,
+  QueueConfirmChannel,
   RoutingKeyMapper,
 } from "./types"
 import { MessagePriority, QueuePublishError } from "./types"
 
 /**
- * Event publisher for RabbitMQ with comprehensive message handling
+ * Event publisher for RabbitMQ.
+ *
+ * Uses a publisher confirm channel: every publish awaits the broker's
+ * basic.ack — TCP-accepted is not the same as broker-persisted. On nack,
+ * throws QueuePublishError so the caller (ingress) can drop or buffer.
+ *
+ * If the broker has signalled connection.blocked, refuses to publish and
+ * drops with a metric increment. Better to fast-fail at the source than to
+ * silently fill the OS TCP buffer for the duration of the broker outage.
  */
 export class EventPublisher implements IEventPublisher {
-  private channel: QueueChannel | null = null
+  private channel: QueueConfirmChannel | null = null
   private publishedCount = 0
   private failedCount = 0
+  /** Counters for backpressure / blocked drops, surfaced via getStats. */
+  private blockedDropCount = 0
 
   constructor(
     private readonly client: IQueueClient,
     private readonly logger: ILogger,
     private readonly routingKeyMapper: RoutingKeyMapper = defaultRoutingKeyMapper,
     private readonly priorityMapper: PriorityMapper = defaultPriorityMapper,
+    private readonly metrics?: PrometheusMetricsExporter,
   ) {}
 
   async publish<T extends BaseEvent>(event: T): Promise<void> {
@@ -43,10 +55,27 @@ export class EventPublisher implements IEventPublisher {
     const routingKey = this.routingKeyMapper(event)
     const priority = this.priorityMapper(event)
 
+    // Refuse to publish while the broker says it can't accept. Without this
+    // gate the TCP socket buffers indefinitely → every publish in that
+    // window is silently lost when the broker eventually closes.
+    if (this.client.isBlocked()) {
+      this.blockedDropCount++
+      this.metrics?.incrementCounter("events_lost_on_publish_blocked", {
+        event_type: event.eventType,
+      })
+      this.failedCount++
+      throw new QueuePublishError(
+        `Broker connection blocked (flow control) — dropped ${event.eventType}`,
+      )
+    }
+
     try {
       await this.ensureChannel()
 
-      const published = this.channel!.publish(
+      // Confirm-channel publish: awaits basic.ack from the broker. Returns
+      // true on accepted-by-buffer; the promise resolves only when the broker
+      // has actually accepted (or fsync'd, if persistent).
+      const accepted = await this.channel!.publishWithConfirm(
         "hlstats.events",
         routingKey,
         Buffer.from(JSON.stringify(message)),
@@ -64,7 +93,13 @@ export class EventPublisher implements IEventPublisher {
         },
       )
 
-      if (!published) {
+      if (!accepted) {
+        // Local channel buffer full (rare with confirm channels but possible
+        // under burst). Treat as a publish failure so the caller can drop
+        // with a counter rather than acting as if the publish succeeded.
+        this.metrics?.incrementCounter("events_lost_on_publish_blocked", {
+          event_type: event.eventType,
+        })
         throw new QueuePublishError("Channel buffer full - message not published")
       }
 
@@ -119,17 +154,19 @@ export class EventPublisher implements IEventPublisher {
     })
   }
 
-  getStats(): { published: number; failed: number } {
+  getStats(): { published: number; failed: number; blockedDrops: number } {
     return {
       published: this.publishedCount,
       failed: this.failedCount,
+      blockedDrops: this.blockedDropCount,
     }
   }
 
   private async ensureChannel(): Promise<void> {
     if (this.channel) return
 
-    const channel = await this.client.createChannel("publisher")
+    // Confirm channel so each publish can await basic.ack.
+    const channel = await this.client.createConfirmChannel("publisher")
 
     // Invalidate the cached reference the moment amqplib closes the channel.
     // Without this, every subsequent publish() throws IllegalOperationError

@@ -14,6 +14,20 @@ export type TransactionalPrisma = Omit<
 >
 
 /**
+ * Options for interactive transactions. Defaults stay conservative (Prisma
+ * defaults are `maxWait: 2_000`, `timeout: 5_000` ms) but bursty writers
+ * under DB contention need more headroom; expose the knob.
+ */
+export interface TransactionOptions {
+  /** Max ms a tx may wait for a free connection before throwing. */
+  maxWait?: number
+  /** Max ms a tx may stay open before Prisma auto-rolls back. */
+  timeout?: number
+  /** Isolation level passed through to Prisma. */
+  isolationLevel?: "ReadUncommitted" | "ReadCommitted" | "RepeatableRead" | "Serializable"
+}
+
+/**
  * Daemon-specific database client wrapper
  *
  * Provides a wrapper around the shared db singleton with
@@ -21,6 +35,9 @@ export type TransactionalPrisma = Omit<
  */
 export class DatabaseClient {
   private _prismaWithMetrics?: PrismaWithMetrics
+  private lastConnectionCheck = 0
+  private lastConnectionResult = false
+  private static readonly CONNECTION_CHECK_CACHE_MS = 5_000
 
   /**
    * Set the extended Prisma client (with metrics or other extensions)
@@ -38,23 +55,37 @@ export class DatabaseClient {
   }
 
   /**
-   * Execute a transaction with proper typing
+   * Execute a transaction with proper typing. Callers can override Prisma's
+   * tight defaults (`maxWait: 2s`, `timeout: 5s`) when contention or batched
+   * writes warrant it.
    */
-  async transaction<T>(callback: (tx: TransactionalPrisma) => Promise<T>): Promise<T> {
+  async transaction<T>(
+    callback: (tx: TransactionalPrisma) => Promise<T>,
+    options?: TransactionOptions,
+  ): Promise<T> {
     const client = (this._prismaWithMetrics || db) as PrismaClient
-    return client.$transaction(callback)
+    return client.$transaction(callback, options)
   }
 
   /**
-   * Test database connectivity
+   * Test database connectivity. Cached for 5s so the per-scrape Prometheus
+   * call and k8s liveness probe don't each fire `SELECT 1` against the
+   * primary.
    */
   async testConnection(): Promise<boolean> {
+    const now = Date.now()
+    if (now - this.lastConnectionCheck < DatabaseClient.CONNECTION_CHECK_CACHE_MS) {
+      return this.lastConnectionResult
+    }
+    this.lastConnectionCheck = now
     try {
       const client = (this._prismaWithMetrics || db) as PrismaClient
       await client.$queryRaw`SELECT 1`
+      this.lastConnectionResult = true
       return true
     } catch (error) {
       console.error("Database connection test failed:", error)
+      this.lastConnectionResult = false
       return false
     }
   }

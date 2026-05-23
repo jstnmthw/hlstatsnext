@@ -34,7 +34,17 @@ export interface EventProcessingMetrics {
 }
 
 export class EventMetrics {
+  /**
+   * Bounded rolling sample for per-type min/max/avg derivation. A naive
+   * `Map<EventType, number[]>` would leak unboundedly AND throw `RangeError`
+   * past ~100k samples per type when fed to `Math.min(...arr)`. Cumulative
+   * count + totalTime are tracked separately so the average stays accurate
+   * even after the sample buffer rolls over.
+   */
+  private static readonly MAX_SAMPLES_PER_TYPE = 1000
   private readonly processingTimes: Map<EventType, number[]> = new Map()
+  /** Cumulative count + total time for accurate averages despite sample cap. */
+  private readonly aggregateTimes: Map<EventType, { count: number; totalTime: number }> = new Map()
   private readonly errorCounts: Map<EventType, number> = new Map()
   private readonly moduleMetrics: Map<
     string,
@@ -52,11 +62,20 @@ export class EventMetrics {
    * Record processing time for an event type
    */
   recordProcessingTime(eventType: EventType, duration: number, moduleName?: string): void {
-    // Global event type metrics
+    // Bounded sample buffer — shift on overflow, like EventConsumer does.
     if (!this.processingTimes.has(eventType)) {
       this.processingTimes.set(eventType, [])
     }
-    this.processingTimes.get(eventType)!.push(duration)
+    const samples = this.processingTimes.get(eventType)!
+    samples.push(duration)
+    if (samples.length > EventMetrics.MAX_SAMPLES_PER_TYPE) samples.shift()
+
+    // Cumulative aggregate (uncapped count, exact totalTime) so the average
+    // is correct over the full lifetime, not just the last 1k samples.
+    const agg = this.aggregateTimes.get(eventType) ?? { count: 0, totalTime: 0 }
+    agg.count++
+    agg.totalTime += duration
+    this.aggregateTimes.set(eventType, agg)
     this.totalEvents++
 
     // Module-specific metrics
@@ -125,18 +144,28 @@ export class EventMetrics {
     >
     const errorCounts: Record<EventType, number> = {} as Record<EventType, number>
 
-    // Calculate event type metrics
-    for (const [eventType, times] of this.processingTimes.entries()) {
-      eventsByType[eventType] = times.length
+    // Calculate event type metrics. min/max are derived from the bounded
+    // sample buffer (loop, not Math.min(...arr) spread — large arrays would
+    // RangeError); count/avg use the lifetime aggregate so they're accurate
+    // even after the sample buffer rolls over.
+    for (const [eventType, samples] of this.processingTimes.entries()) {
+      const agg = this.aggregateTimes.get(eventType)
+      const count = agg?.count ?? 0
+      eventsByType[eventType] = count
 
-      if (times.length > 0) {
-        const totalTime = times.reduce((sum, time) => sum + time, 0)
+      if (samples.length > 0 && agg) {
+        let minTime = Infinity
+        let maxTime = -Infinity
+        for (const t of samples) {
+          if (t < minTime) minTime = t
+          if (t > maxTime) maxTime = t
+        }
         processingTimes[eventType] = {
-          count: times.length,
-          totalTime,
-          averageTime: totalTime / times.length,
-          minTime: Math.min(...times),
-          maxTime: Math.max(...times),
+          count,
+          totalTime: agg.totalTime,
+          averageTime: agg.totalTime / count,
+          minTime,
+          maxTime,
         }
       }
     }
@@ -224,6 +253,7 @@ export class EventMetrics {
    */
   reset(): void {
     this.processingTimes.clear()
+    this.aggregateTimes.clear()
     this.errorCounts.clear()
     this.moduleMetrics.clear()
     this.totalEvents = 0

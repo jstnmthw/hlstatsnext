@@ -11,6 +11,7 @@ import type {
   QueueChannel,
   QueueClientEvent,
   QueueClientListener,
+  QueueConfirmChannel,
   QueueConnection,
   RabbitMQConfig,
 } from "@/shared/infrastructure/messaging/queue/core/types"
@@ -32,6 +33,13 @@ export class RabbitMQClient implements IQueueClient {
   private isConnecting = false
   private isShuttingDown = false
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null
+  /**
+   * Set by the broker's connection.blocked event. Publishers check
+   * isBlocked() before sending so the daemon applies backpressure (drop +
+   * metric) instead of silently filling the TCP buffer until a publish
+   * returns false.
+   */
+  private blocked = false
 
   /**
    * Polling interval used after `maxAttempts` exponential-backoff retries have
@@ -194,8 +202,31 @@ export class RabbitMQClient implements IQueueClient {
     }
   }
 
+  /**
+   * Open a publisher confirm channel for durable publishing. Not cached in
+   * `this.channels` because the publisher manages its channel's lifecycle
+   * (close/error → null + recreate on next publish).
+   */
+  async createConfirmChannel(name: string): Promise<QueueConfirmChannel> {
+    if (!this.connection) {
+      throw new QueueError("No active connection")
+    }
+    try {
+      const channel = await this.connection.createConfirmChannel()
+      this.logger.debug(`Created confirm channel: ${name}`)
+      return channel
+    } catch (error) {
+      this.logger.error(`Failed to create confirm channel ${name}: ${error}`)
+      throw new QueueError(`Failed to create confirm channel ${name}`, error as Error)
+    }
+  }
+
   isConnected(): boolean {
     return this.connection !== null && this.connectionStats.connected
+  }
+
+  isBlocked(): boolean {
+    return this.blocked
   }
 
   getConnectionStats(): ConnectionStats {
@@ -261,10 +292,15 @@ export class RabbitMQClient implements IQueueClient {
     })
 
     this.connection.on("blocked", (reason) => {
+      // While blocked, the broker is not accepting publishes. Flip the gate
+      // so publishers can drop with a metric instead of silently filling the
+      // TCP buffer.
+      this.blocked = true
       this.logger.warn(`RabbitMQ connection blocked: ${reason}`)
     })
 
     this.connection.on("unblocked", () => {
+      this.blocked = false
       this.logger.info("RabbitMQ connection unblocked")
     })
   }
@@ -376,7 +412,7 @@ export class RabbitMQClient implements IQueueClient {
 
       // Queue topology now reads from RabbitMQConfig.queues.*.options instead
       // of hardcoded values, so `messageTtl`/`maxLength`/`deadLetterExchange`
-      // declared in module.ts are no longer dead config (WARN-6). Priority
+      // declared in module.ts are no longer dead config. Priority
       // queue gets the extra `x-max-priority` argument; everything else is
       // derived from the same shape.
       await setupChannel.assertQueue(this.config.queues.priority.name, {
@@ -401,7 +437,7 @@ export class RabbitMQClient implements IQueueClient {
       })
 
       // Dead letter queue: bounded length so a long downstream outage cannot
-      // grow the DLQ into broker memory pressure (WARN-3). `drop-head` keeps
+      // grow the DLQ into broker memory pressure. `drop-head` keeps
       // the most-recent failures, which is more useful for diagnosis than
       // ancient ones.
       await setupChannel.assertQueue("hlstats.events.dlq", {

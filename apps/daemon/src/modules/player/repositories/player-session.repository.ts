@@ -174,7 +174,7 @@ export class PlayerSessionRepository implements IPlayerSessionRepository {
   /**
    * Drop sessions whose lastSeen is older than `maxAgeMs`. Defends against
    * ghost sessions when a server crashes mid-connection and never sends the
-   * DISCONNECT line (WARN-2). Returns the number of sessions evicted.
+   * DISCONNECT line. Returns the number of sessions evicted.
    */
   sweepStaleSessions(maxAgeMs: number): number {
     const cutoff = Date.now() - maxAgeMs

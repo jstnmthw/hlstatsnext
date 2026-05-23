@@ -145,16 +145,19 @@ describe("RabbitMQConsumer", () => {
 
   describe("Pause and Resume", () => {
     it("should pause consumer", async () => {
+      // Pause cancels consumer tags (broker stops delivering). Must be
+      // started first so there's a tag to cancel.
+      await consumer.start()
       await consumer.pause()
-
-      // EventConsumer.pause() sets isPaused flag
-      expect(mockLogger.info).toHaveBeenCalledWith("Event consumer paused")
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        "Event consumer paused (broker delivery stopped)",
+      )
     })
 
     it("should resume consumer", async () => {
+      await consumer.start()
+      await consumer.pause()
       await consumer.resume()
-
-      // EventConsumer.resume() clears isPaused flag
       expect(mockLogger.info).toHaveBeenCalledWith("Event consumer resumed")
     })
   })

@@ -20,6 +20,9 @@ vi.spyOn(Redis.prototype, "del").mockResolvedValue(0)
 vi.spyOn(Redis.prototype, "exists").mockResolvedValue(0)
 vi.spyOn(Redis.prototype, "mget").mockResolvedValue([])
 vi.spyOn(Redis.prototype, "keys").mockResolvedValue([])
+// invalidatePattern uses SCAN+UNLINK (non-blocking) instead of KEYS+DEL.
+vi.spyOn(Redis.prototype, "scan").mockResolvedValue(["0", []])
+vi.spyOn(Redis.prototype, "unlink").mockResolvedValue(0)
 vi.spyOn(Redis.prototype, "flushall").mockResolvedValue("OK")
 vi.spyOn(Redis.prototype, "ping").mockResolvedValue("PONG")
 vi.spyOn(Redis.prototype, "disconnect").mockResolvedValue()
@@ -394,10 +397,11 @@ describe("GarnetCacheService", () => {
 
   describe("invalidatePattern", () => {
     it("should delete keys matching pattern", async () => {
-      vi.mocked(Redis.prototype.keys).mockResolvedValue(["test:a", "test:b"])
-      vi.mocked(Redis.prototype.del).mockResolvedValue(2)
+      // SCAN returns cursor + batch; one iteration with cursor "0" terminates.
+      vi.mocked(Redis.prototype.scan).mockResolvedValueOnce(["0", ["test:a", "test:b"]])
+      vi.mocked(Redis.prototype.unlink).mockResolvedValue(2)
       await service.invalidatePattern("test:*")
-      expect(Redis.prototype.del).toHaveBeenCalledWith("test:a", "test:b")
+      expect(Redis.prototype.unlink).toHaveBeenCalledWith("test:a", "test:b")
       expect(logger.debug).toHaveBeenCalledWith("Invalidated cache keys", {
         pattern: "test:*",
         keyCount: 2,
@@ -405,22 +409,22 @@ describe("GarnetCacheService", () => {
     })
 
     it("should skip deletion when no keys match", async () => {
-      vi.mocked(Redis.prototype.keys).mockResolvedValue([])
+      vi.mocked(Redis.prototype.scan).mockResolvedValueOnce(["0", []])
       await service.invalidatePattern("nonexist:*")
-      expect(Redis.prototype.del).not.toHaveBeenCalled()
+      expect(Redis.prototype.unlink).not.toHaveBeenCalled()
     })
 
     it("should throw and log on failure with Error", async () => {
-      vi.mocked(Redis.prototype.keys).mockRejectedValue(new Error("Keys error"))
-      await expect(service.invalidatePattern("test:*")).rejects.toThrow("Keys error")
+      vi.mocked(Redis.prototype.scan).mockRejectedValueOnce(new Error("Scan error"))
+      await expect(service.invalidatePattern("test:*")).rejects.toThrow("Scan error")
       expect(logger.error).toHaveBeenCalledWith("Cache pattern invalidation failed", {
         pattern: "test:*",
-        error: "Keys error",
+        error: "Scan error",
       })
     })
 
     it("should throw and log on failure with non-Error", async () => {
-      vi.mocked(Redis.prototype.keys).mockRejectedValue(false)
+      vi.mocked(Redis.prototype.scan).mockRejectedValueOnce(false)
       await expect(service.invalidatePattern("test:*")).rejects.toBe(false)
       expect(logger.error).toHaveBeenCalledWith("Cache pattern invalidation failed", {
         pattern: "test:*",

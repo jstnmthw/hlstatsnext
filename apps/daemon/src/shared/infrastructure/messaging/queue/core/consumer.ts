@@ -57,8 +57,8 @@ export class EventConsumer implements IEventConsumer {
 
   /**
    * Bound listener kept as a field so we can subscribe in start() and
-   * unsubscribe in stop() without losing the reference (accumulated listeners
-   * on the long-lived client would be a leak — CRIT-9 in reverse).
+   * unsubscribe in stop() without losing the reference. Accumulated listeners
+   * on the long-lived client would leak one per start/stop cycle.
    */
   private readonly onClientConnected = (): void => {
     void this.resubscribeAfterReconnect()
@@ -88,6 +88,15 @@ export class EventConsumer implements IEventConsumer {
 
   /** Hard cap on shutdown drain wait, so a wedged handler can't block exit. */
   private static readonly DRAIN_TIMEOUT_MS = 5_000
+
+  /**
+   * Retry republish timers tracked so stop() can cancel them. Without this,
+   * a pending retry fires against either a closed channel (throws, swallowed)
+   * or — worse — races a still-open one during connection-close. An
+   * abandoned timer is equivalent to dropping the retry, which is acceptable:
+   * the broker's TTL + x-max-length still bound the impact.
+   */
+  private readonly pendingTimers = new Set<NodeJS.Timeout>()
 
   // Metrics reporting
   private metricsTimer: NodeJS.Timeout | null = null
@@ -195,9 +204,9 @@ export class EventConsumer implements IEventConsumer {
 
       // Phase 2: drain in-flight handlers with a bounded wait. Anything still
       // pending after the deadline gets abandoned — the broker will redeliver
-      // those unacked messages on reconnect (handlers are NOT idempotent today,
-      // CRIT-8 part 2 — but losing the ack here is the lesser evil vs. closing
-      // the channel mid-write).
+      // those unacked messages on reconnect. Handlers are not idempotent at
+      // the DB layer, so this can cause stat drift, but losing the ack here
+      // is the lesser evil vs. closing the channel mid-write.
       if (this.inflight.size > 0) {
         const pendingCount = this.inflight.size
         this.logger.info(`Draining ${pendingCount} in-flight handler(s) before shutdown`)
@@ -210,6 +219,16 @@ export class EventConsumer implements IEventConsumer {
             `Drain timed out after ${EventConsumer.DRAIN_TIMEOUT_MS}ms with ${this.inflight.size} handler(s) still running; abandoning them`,
           )
         }
+      }
+
+      // Cancel any pending retry republish timers before clearing channels.
+      // A timer that fires after this point would publish to a dead channel;
+      // better to drop the retry than to throw on a closed channel (or worse,
+      // push during a half-open shutdown race).
+      if (this.pendingTimers.size > 0) {
+        this.logger.debug(`Cancelling ${this.pendingTimers.size} pending retry timer(s)`)
+        for (const timer of this.pendingTimers) clearTimeout(timer)
+        this.pendingTimers.clear()
       }
 
       // Clear references but don't close channels
@@ -225,13 +244,56 @@ export class EventConsumer implements IEventConsumer {
     }
   }
 
+  /**
+   * Pause delivery from the broker via `channel.cancel(consumerTag)`. The
+   * broker stops delivering until we re-`consume()` on resume. A nack-with-
+   * requeue approach would spin at 100% CPU shuffling the prefetched messages
+   * back and forth — broker keeps delivering, we keep rejecting.
+   */
   async pause(): Promise<void> {
+    if (this.isPaused) return
     this.isPaused = true
-    this.logger.info("Event consumer paused")
+    for (const [queueName, channel] of this.channels) {
+      const consumerTag = this.consumerTags.find((tag) => tag.startsWith(queueName))
+      if (!consumerTag) continue
+      try {
+        await channel.cancel(consumerTag)
+      } catch (error) {
+        // Channel may already be closing — log but keep going so other queues
+        // still get paused.
+        this.logger.warn(
+          `Failed to cancel consumer for pause on ${queueName}: ${error instanceof Error ? error.message : String(error)}`,
+        )
+      }
+    }
+    this.consumerTags = []
+    this.logger.info("Event consumer paused (broker delivery stopped)")
   }
 
   async resume(): Promise<void> {
+    if (!this.isPaused) return
     this.isPaused = false
+
+    // Re-issue consume() for every channel that's still open. We do NOT
+    // clear `this.channels` — the channels themselves are fine, only their
+    // consumer subscription was cancelled.
+    for (const [queueName, channel] of this.channels) {
+      try {
+        const consumerTag = await channel.consume(
+          queueName,
+          (msg) => this.dispatch(msg, channel, queueName),
+          {
+            noAck: false,
+            consumerTag: `${queueName}-${process.pid}-${Date.now()}`,
+          },
+        )
+        this.consumerTags.push(consumerTag)
+      } catch (error) {
+        this.logger.error(
+          `Failed to resume consume for ${queueName}: ${error instanceof Error ? error.message : String(error)}`,
+        )
+      }
+    }
     this.logger.info("Event consumer resumed")
   }
 
@@ -272,7 +334,7 @@ export class EventConsumer implements IEventConsumer {
    * created a fresh connection — but our subscriptions live on the dead
    * channels. Drop the stale references and re-issue consume() for every
    * queue. Without this, the daemon keeps publishing but stops consuming
-   * forever after the first MQ blip (CRIT-3).
+   * forever after the first MQ blip.
    */
   private async resubscribeAfterReconnect(): Promise<void> {
     if (!this.isConsuming) return
@@ -295,6 +357,17 @@ export class EventConsumer implements IEventConsumer {
     const channel = await this.client.createChannel(`consumer-${queueName}`)
     this.channels.set(queueName, channel)
 
+    // Per-channel prefetch is the actual cap on in-flight messages this
+    // channel will hold from the broker — what an operator tuning the
+    // `concurrency` knob expects.
+    try {
+      await channel.prefetch(this.config.concurrency)
+    } catch (error) {
+      this.logger.warn(
+        `Failed to set prefetch=${this.config.concurrency} on ${queueName}: ${error instanceof Error ? error.message : String(error)}`,
+      )
+    }
+
     // Invalidate the cached channel when amqplib closes it. The client's
     // `"connected"` event will trigger a fresh consumeQueue() on reconnect.
     channel.on("close", () => {
@@ -309,34 +382,11 @@ export class EventConsumer implements IEventConsumer {
       )
     })
 
-    // Set up consumer with error handling
+    // Set up consumer with error handling. The async dispatch is shared with
+    // resume() — pause() cancels the consumer tag rather than nack-spinning.
     const consumerTag = await channel.consume(
       queueName,
-      async (msg) => {
-        if (!msg) {
-          this.logger.warn(`Received null message from queue ${queueName}`)
-          return
-        }
-
-        if (this.isPaused) {
-          // If paused, reject message and requeue
-          await channel.nack(msg, false, true)
-          return
-        }
-
-        // Increment received counters
-        this.eventsReceived++
-        this.queueStats[queueName]!.received++
-
-        // Track in-flight so stop() can drain before tearing down channels.
-        const work = this.handleMessage(msg, channel, queueName)
-        this.inflight.add(work)
-        try {
-          await work
-        } finally {
-          this.inflight.delete(work)
-        }
-      },
+      (msg) => this.dispatch(msg, channel, queueName),
       {
         noAck: false,
         consumerTag: `${queueName}-${process.pid}-${Date.now()}`,
@@ -345,6 +395,33 @@ export class EventConsumer implements IEventConsumer {
 
     this.consumerTags.push(consumerTag)
     this.logger.debug(`Started consuming from queue ${queueName} with consumerTag: ${consumerTag}`)
+  }
+
+  /**
+   * Per-message dispatch shared between initial consume and resume().
+   * Increments counters, tracks in-flight, and invokes handleMessage.
+   */
+  private async dispatch(
+    msg: ConsumeMessage | null,
+    channel: QueueChannel,
+    queueName: string,
+  ): Promise<void> {
+    if (!msg) {
+      this.logger.warn(`Received null message from queue ${queueName}`)
+      return
+    }
+
+    this.eventsReceived++
+    this.queueStats[queueName]!.received++
+
+    // Track in-flight so stop() can drain before tearing down channels.
+    const work = this.handleMessage(msg, channel, queueName)
+    this.inflight.add(work)
+    try {
+      await work
+    } finally {
+      this.inflight.delete(work)
+    }
   }
 
   private async handleMessage(
@@ -437,7 +514,11 @@ export class EventConsumer implements IEventConsumer {
       const retryCount = message.metadata.routing.retryCount
 
       if (retryCount < this.config.maxRetries) {
-        // Calculate retry delay with jitter
+        // Republish first, then ack the original. A nack-then-republish
+        // design would dead-letter the original AND queue a new copy on
+        // every retry — N+1 DLQ entries per persistently-failing event.
+        // The retry stays in the live queue (so message TTL applies); the
+        // DLQ is reserved for terminal failures only.
         const baseDelay = calculateRetryDelay(
           retryCount,
           this.config.retryDelay,
@@ -449,22 +530,37 @@ export class EventConsumer implements IEventConsumer {
           `Retrying message ${message.id} (attempt ${retryCount + 1}/${this.config.maxRetries}) in ${delay}ms`,
         )
 
-        // Nack with requeue after delay
-        await channel.nack(msg, false, false)
-        this.stats.messagesNacked++
-
-        // Republish with updated retry count after delay
-        setTimeout(async () => {
+        // Defer the republish so the failing condition (DB hiccup, etc.) has
+        // time to clear. Track the timer so stop() can cancel it.
+        const timer: NodeJS.Timeout = setTimeout(async () => {
+          this.pendingTimers.delete(timer)
           try {
             await this.republishWithRetry(message, channel)
+            // Republish accepted — safe to ack the original now. If we ack'd
+            // first we'd risk losing the message on a republish failure.
+            try {
+              await channel.ack(msg)
+              this.stats.messagesAcked++
+            } catch (ackError) {
+              // Channel likely closed in the gap between republish and ack;
+              // the broker will redeliver the original on the next consume.
+              // Worst case is one duplicate, which is the lesser evil vs.
+              // losing the message entirely.
+              this.logger.warn(
+                `Ack after republish failed for ${message.id}: ${ackError instanceof Error ? ackError.message : String(ackError)}`,
+              )
+            }
           } catch (republishError) {
+            // Republish failed — leave the original un-acked. Broker
+            // redelivers it; retryCount stays the same so we'll try again.
             this.logger.error(
-              `Failed to republish message ${message.id} for retry: ${republishError}`,
+              `Failed to republish message ${message.id} for retry; leaving un-acked for broker redelivery: ${republishError}`,
             )
           }
         }, delay)
+        this.pendingTimers.add(timer)
       } else {
-        // Exceeded retry limit, send to dead letter queue
+        // Terminal failure — send to DLQ for human review (or DLQ consumer).
         this.logger.error(
           `Message ${message.id} exceeded retry limit (${retryCount}/${this.config.maxRetries}), sending to DLQ`,
         )

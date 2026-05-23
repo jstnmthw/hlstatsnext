@@ -81,7 +81,12 @@ function createHandlerInstances(
     eventMetrics,
   )
 
-  const serverEventHandler = new ServerEventHandler(logger, eventMetrics)
+  // ServerEventHandler dispatches SERVER_SHUTDOWN to a coordinator that fans
+  // out cleanup across the per-server caches. The coordinator depends on the
+  // ingress service and serverStateManager, both of which are constructed in
+  // context.ts after this orchestrator — wired there via
+  // `setLifecycleCoordinator`.
+  const serverEventHandler = new ServerEventHandler(logger, undefined, eventMetrics)
 
   return {
     playerEventHandler,
@@ -186,6 +191,6 @@ function registerServerModule(registry: ModuleRegistry, handler: ServerEventHand
   registry.register({
     name: "server",
     handler,
-    handledEvents: [],
+    handledEvents: [EventType.SERVER_SHUTDOWN],
   })
 }

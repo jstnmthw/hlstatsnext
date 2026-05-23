@@ -16,7 +16,7 @@ import "./modules/server/server.resolver"
 builder.queryType({})
 builder.mutationType({})
 
-// ─── Security: Model Exclusion Lists (RT-001, RT-002) ───────────────────────
+// ─── Security: Model Exclusion Lists ────────────────────────────────────────
 // Auth models managed by Better Auth — never expose via GraphQL
 const AUTH_MODELS = ["Session", "Account", "Verification"] as const
 // Models with fully custom resolvers that replace all auto-generated CRUD
@@ -79,7 +79,7 @@ generateAllQueries({
     type === "Query" ? requireAdminResolver({ field, isPrismaField }) : field,
 })
 
-// Register mutations — require admin auth on all auto-generated mutations (RT-001)
+// Register mutations — require admin auth on all auto-generated mutations
 generateAllMutations({
   exclude: [...EXCLUDE_FROM_ALL, ...ADMIN_ONLY_MODELS],
   handleResolver: ({ field, type, isPrismaField }) =>

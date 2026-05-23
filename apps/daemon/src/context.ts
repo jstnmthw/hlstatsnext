@@ -32,6 +32,7 @@ import { IngressService } from "@/modules/ingress/ingress.service"
 import { MatchEventHandler } from "@/modules/match/match.events"
 import { PlayerEventHandler } from "@/modules/player/events/player.events"
 import { getScheduleConfig } from "@/modules/rcon/config/schedule.config"
+import { ServerLifecycleCoordinator } from "@/modules/server/server-lifecycle.coordinator"
 import { ServerEventHandler } from "@/modules/server/server.events"
 import { ServerStateManager } from "@/modules/server/state/server-state-manager"
 import { WeaponEventHandler } from "@/modules/weapon/weapon.events"
@@ -163,10 +164,36 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     infrastructure.logger,
     ingressDependencies,
     resolvedIngressOptions,
+    undefined,
+    infrastructure.metrics,
   )
 
   // Create event handlers and module registry
   const eventComponents = createEventHandlers(services, infrastructure.logger)
+
+  // Build the SERVER_SHUTDOWN fan-out coordinator now that ingressService +
+  // serverStateManager exist, and attach it to the ServerEventHandler before
+  // the consumer starts delivering events.
+  const lifecycleCoordinator = new ServerLifecycleCoordinator(
+    {
+      sessionService: services.sessionService,
+      serverStateManager,
+      matchService: services.matchService,
+      mapService: services.mapService,
+      notificationConfigRepository: services.notificationConfigRepository,
+      rconScheduleService: services.rconScheduleService,
+      rconService: services.rconService,
+      ingressService,
+      // RetryBackoffCalculator is currently private to ServerMonitoringCommand;
+      // its failure-state Map is bounded by # servers and TTL via
+      // `dormantRetryMinutes`, so cleanup on SERVER_SHUTDOWN is not load-bearing
+      // today. Pass a no-op so the coordinator stays decoupled from the
+      // monitoring command's internals.
+      retryBackoffCalculator: { resetFailureState: () => {} },
+    },
+    infrastructure.logger,
+  )
+  eventComponents.serverEventHandler.setLifecycleCoordinator(lifecycleCoordinator)
 
   return {
     // Infrastructure

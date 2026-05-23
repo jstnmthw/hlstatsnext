@@ -14,6 +14,7 @@ import type {
   QueueChannelEvent,
   QueueChannelListener,
   QueueCheckResult,
+  QueueConfirmChannel,
   QueueConnection,
 } from "@/shared/infrastructure/messaging/queue/core/types"
 import type * as amqp from "amqplib"
@@ -147,6 +148,44 @@ export class AmqpChannelAdapter implements QueueChannel {
 }
 
 /**
+ * Adapter wrapping an amqplib confirm channel. Delegates the ordinary
+ * QueueChannel surface to the base adapter and adds `publishWithConfirm`,
+ * which wraps amqplib's callback-style publish in a Promise so callers can
+ * await the broker's basic.ack/basic.nack.
+ */
+export class AmqpConfirmChannelAdapter extends AmqpChannelAdapter implements QueueConfirmChannel {
+  constructor(private readonly confirmChannel: amqp.ConfirmChannel) {
+    super(confirmChannel)
+  }
+
+  publishWithConfirm(
+    exchange: string,
+    routingKey: string,
+    content: Buffer,
+    options?: PublishOptions,
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      // The boolean return from `publish` is amqplib's local backpressure
+      // signal (false = local buffer full). The broker ack/nack comes via
+      // the callback. Both must be handled.
+      const accepted = this.confirmChannel.publish(
+        exchange,
+        routingKey,
+        content,
+        options ?? {},
+        (err) => {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve(accepted)
+        },
+      )
+    })
+  }
+}
+
+/**
  * Adapter class that wraps amqplib Connection to match our QueueConnection interface
  */
 export class AmqpConnectionAdapter implements QueueConnection {
@@ -157,6 +196,13 @@ export class AmqpConnectionAdapter implements QueueConnection {
       this.connection as unknown as { createChannel(): Promise<amqp.Channel> }
     ).createChannel()
     return new AmqpChannelAdapter(channel)
+  }
+
+  async createConfirmChannel(): Promise<QueueConfirmChannel> {
+    const channel = await (
+      this.connection as unknown as { createConfirmChannel(): Promise<amqp.ConfirmChannel> }
+    ).createConfirmChannel()
+    return new AmqpConfirmChannelAdapter(channel)
   }
 
   async close(): Promise<void> {

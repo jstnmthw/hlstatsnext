@@ -151,10 +151,16 @@ export class RconScheduleService implements IRconScheduleService {
       this.eventHandlerId = undefined
     }
 
-    // Stop all active jobs
+    // Stop all active jobs. `task.stop()` pauses node-cron's tick but leaves
+    // the task in its internal registry. For a normal process exit this is
+    // harmless, but it matters for tests and hot-reload — `destroy()` removes
+    // the task from the registry so it can't fire again and can be GC'd.
     for (const [scheduleId, job] of this.jobs) {
       try {
         job.task.stop()
+        // `destroy` exists on node-cron tasks but the type may not surface it
+        // across versions; guard with optional call.
+        ;(job.task as { destroy?: () => void }).destroy?.()
         this.logger.debug(`Stopped schedule: ${scheduleId}`)
       } catch (error) {
         this.logger.warn(`Error stopping schedule ${scheduleId}: ${error}`)
@@ -257,6 +263,7 @@ export class RconScheduleService implements IRconScheduleService {
 
     try {
       job.task.stop()
+      ;(job.task as { destroy?: () => void }).destroy?.()
       this.jobs.delete(scheduleId)
 
       this.logger.info(`Unregistered schedule: ${scheduleId}`)
@@ -574,6 +581,16 @@ export class RconScheduleService implements IRconScheduleService {
       this.serverExecutions.set(serverId, new Set())
     }
     this.serverExecutions.get(serverId)!.add(scheduleId)
+  }
+
+  /**
+   * Drop all per-server execution tracking for a server (SERVER_SHUTDOWN
+   * fan-out). Idempotent.
+   */
+  dropServer(serverId: number): void {
+    if (this.serverExecutions.delete(serverId)) {
+      this.logger.debug(`Dropped schedule execution tracking for server ${serverId}`)
+    }
   }
 
   /**

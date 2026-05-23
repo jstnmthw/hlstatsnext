@@ -14,7 +14,7 @@ import type {
   EventMessage,
   IQueueClient,
   PriorityMapper,
-  QueueChannel,
+  QueueConfirmChannel,
   RoutingKeyMapper,
 } from "./types"
 import { MessagePriority, QueuePublishError } from "./types"
@@ -22,15 +22,19 @@ import { MessagePriority, QueuePublishError } from "./types"
 describe("EventPublisher", () => {
   let publisher: EventPublisher
   let mockClient: IQueueClient
-  let mockChannel: QueueChannel
+  let mockChannel: QueueConfirmChannel
   let mockLogger: ILogger
 
   beforeEach(() => {
     // Initialize UUID service for all tests
     setUuidService(new SystemUuidService(systemClock))
 
+    // Publisher uses confirm channels — every publish awaits a basic.ack
+    // from the broker, so the mock returns a resolved promise (resolving
+    // `true` = local-buffer-accepted + broker-confirmed).
     mockChannel = {
       publish: vi.fn().mockReturnValue(true),
+      publishWithConfirm: vi.fn().mockResolvedValue(true),
       ack: vi.fn(),
       nack: vi.fn(),
       consume: vi.fn(),
@@ -38,13 +42,17 @@ describe("EventPublisher", () => {
       close: vi.fn(),
       on: vi.fn(),
       off: vi.fn(),
-    } as unknown as QueueChannel
+    } as unknown as QueueConfirmChannel
 
     mockClient = {
       createChannel: vi.fn().mockResolvedValue(mockChannel),
+      createConfirmChannel: vi.fn().mockResolvedValue(mockChannel),
       connect: vi.fn(),
       disconnect: vi.fn(),
       isConnected: vi.fn().mockReturnValue(true),
+      // Publisher checks isBlocked() before publishing; default to unblocked
+      // for tests.
+      isBlocked: vi.fn().mockReturnValue(false),
       on: vi.fn(),
       off: vi.fn(),
     } as unknown as IQueueClient
@@ -71,8 +79,8 @@ describe("EventPublisher", () => {
 
       await publisher.publish(event)
 
-      expect(mockClient.createChannel).toHaveBeenCalledWith("publisher")
-      expect(mockChannel.publish).toHaveBeenCalledWith(
+      expect(mockClient.createConfirmChannel).toHaveBeenCalledWith("publisher")
+      expect(mockChannel.publishWithConfirm).toHaveBeenCalledWith(
         "hlstats.events",
         "player.kill",
         expect.any(Buffer),
@@ -117,11 +125,11 @@ describe("EventPublisher", () => {
       await publisher.publish(event)
       await publisher.publish(event)
 
-      expect(mockClient.createChannel).toHaveBeenCalledTimes(1)
+      expect(mockClient.createConfirmChannel).toHaveBeenCalledTimes(1)
     })
 
     it("should handle channel buffer full", async () => {
-      vi.mocked(mockChannel.publish).mockReturnValue(false)
+      vi.mocked(mockChannel.publishWithConfirm).mockResolvedValue(false)
 
       const event: BaseEvent = {
         eventType: EventType.PLAYER_KILL,
@@ -141,7 +149,7 @@ describe("EventPublisher", () => {
 
     it("should handle publish errors", async () => {
       const error = new Error("Connection lost")
-      vi.mocked(mockChannel.publish).mockImplementation(() => {
+      vi.mocked(mockChannel.publishWithConfirm).mockImplementation(() => {
         throw error
       })
 
@@ -172,7 +180,7 @@ describe("EventPublisher", () => {
 
       await publisher.publish(event)
 
-      const publishCall = vi.mocked(mockChannel.publish).mock.calls[0]
+      const publishCall = vi.mocked(mockChannel.publishWithConfirm).mock.calls[0]
       const messageBuffer = publishCall?.[2] as Buffer
       const message = JSON.parse(messageBuffer.toString()) as EventMessage
 
@@ -191,7 +199,7 @@ describe("EventPublisher", () => {
 
       await publisher.publish(event)
 
-      const publishCall = vi.mocked(mockChannel.publish).mock.calls[0]
+      const publishCall = vi.mocked(mockChannel.publishWithConfirm).mock.calls[0]
       const messageBuffer = publishCall?.[2] as Buffer
       const message = JSON.parse(messageBuffer.toString()) as EventMessage
 
@@ -207,7 +215,7 @@ describe("EventPublisher", () => {
     it("should publish empty batch successfully", async () => {
       await publisher.publishBatch([])
 
-      expect(mockChannel.publish).not.toHaveBeenCalled()
+      expect(mockChannel.publishWithConfirm).not.toHaveBeenCalled()
       expect(mockLogger.queue).not.toHaveBeenCalled()
     })
 
@@ -229,7 +237,7 @@ describe("EventPublisher", () => {
 
       await publisher.publishBatch(events)
 
-      expect(mockChannel.publish).toHaveBeenCalledTimes(2)
+      expect(mockChannel.publishWithConfirm).toHaveBeenCalledTimes(2)
       expect(mockLogger.queue).toHaveBeenCalledWith(
         "Publishing batch of 2 events",
         expect.objectContaining({ batchId: expect.any(String) }),
@@ -253,7 +261,7 @@ describe("EventPublisher", () => {
 
       await publisher.publishBatch(events)
 
-      expect(mockChannel.publish).toHaveBeenCalledTimes(150)
+      expect(mockChannel.publishWithConfirm).toHaveBeenCalledTimes(150)
       expect(mockLogger.queue).toHaveBeenCalledWith(
         "Publishing batch of 150 events",
         expect.any(Object),
@@ -265,7 +273,7 @@ describe("EventPublisher", () => {
 
     it("should handle batch publish errors", async () => {
       const error = new Error("Batch publish failed")
-      vi.mocked(mockChannel.publish).mockImplementation(() => {
+      vi.mocked(mockChannel.publishWithConfirm).mockImplementation(() => {
         throw error
       })
 
@@ -300,7 +308,7 @@ describe("EventPublisher", () => {
 
       await customPublisher.publish(event)
 
-      expect(mockChannel.publish).toHaveBeenCalledWith(
+      expect(mockChannel.publishWithConfirm).toHaveBeenCalledWith(
         "hlstats.events",
         "custom.player_kill",
         expect.any(Buffer),
@@ -326,7 +334,7 @@ describe("EventPublisher", () => {
 
       await customPublisher.publish(event)
 
-      const publishCall = vi.mocked(mockChannel.publish).mock.calls[0]
+      const publishCall = vi.mocked(mockChannel.publishWithConfirm).mock.calls[0]
       const options = publishCall?.[3]
       expect(options?.priority).toBe(MessagePriority.LOW)
     })
@@ -341,17 +349,19 @@ describe("EventPublisher", () => {
         data: {},
       }
 
-      expect(publisher.getStats()).toEqual({ published: 0, failed: 0 })
+      // getStats tracks blockedDrops (the backpressure counter); assert all
+      // three fields.
+      expect(publisher.getStats()).toEqual({ published: 0, failed: 0, blockedDrops: 0 })
 
       await publisher.publish(event)
-      expect(publisher.getStats()).toEqual({ published: 1, failed: 0 })
+      expect(publisher.getStats()).toEqual({ published: 1, failed: 0, blockedDrops: 0 })
 
       await publisher.publish(event)
-      expect(publisher.getStats()).toEqual({ published: 2, failed: 0 })
+      expect(publisher.getStats()).toEqual({ published: 2, failed: 0, blockedDrops: 0 })
     })
 
     it("should track failure statistics", async () => {
-      vi.mocked(mockChannel.publish).mockReturnValue(false)
+      vi.mocked(mockChannel.publishWithConfirm).mockResolvedValue(false)
 
       const event: BaseEvent = {
         eventType: EventType.PLAYER_KILL,
@@ -366,7 +376,7 @@ describe("EventPublisher", () => {
         // Expected to fail
       }
 
-      expect(publisher.getStats()).toEqual({ published: 0, failed: 1 })
+      expect(publisher.getStats()).toEqual({ published: 0, failed: 1, blockedDrops: 0 })
     })
   })
 
@@ -383,7 +393,7 @@ describe("EventPublisher", () => {
 
       await publisher.publish(event)
 
-      const publishCall = vi.mocked(mockChannel.publish).mock.calls[0]
+      const publishCall = vi.mocked(mockChannel.publishWithConfirm).mock.calls[0]
       const messageBuffer = publishCall?.[2] as Buffer
       const message = JSON.parse(messageBuffer.toString()) as EventMessage
 
@@ -425,7 +435,7 @@ describe("EventPublisher", () => {
 
       await publisher.publish(event)
 
-      const publishCall = vi.mocked(mockChannel.publish).mock.calls[0]
+      const publishCall = vi.mocked(mockChannel.publishWithConfirm).mock.calls[0]
       const messageBuffer = publishCall?.[2] as Buffer
       const message = JSON.parse(messageBuffer.toString()) as EventMessage
 

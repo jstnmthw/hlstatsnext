@@ -21,10 +21,22 @@ export interface IQueueClient {
   connect(): Promise<void>
   disconnect(): Promise<void>
   createChannel(name: string): Promise<QueueChannel>
+  /**
+   * Open a publisher confirm channel. The returned channel acks every
+   * publish via `waitForConfirm` so the publisher can detect broker crashes
+   * or unroutable messages instead of assuming TCP-accepted means persisted.
+   */
+  createConfirmChannel(name: string): Promise<QueueConfirmChannel>
   isConnected(): boolean
   getConnectionStats(): ConnectionStats
   on(event: QueueClientEvent, listener: QueueClientListener): void
   off(event: QueueClientEvent, listener: QueueClientListener): void
+  /**
+   * True when the broker has sent connection.blocked. Publishers check this
+   * to apply backpressure instead of silently buffering into a dead TCP
+   * socket.
+   */
+  isBlocked(): boolean
 }
 
 /**
@@ -251,10 +263,31 @@ export interface QueueChannel {
 }
 
 /**
+ * Publisher confirm channel — extends QueueChannel with a promise-returning
+ * publish that resolves only after the broker acknowledges the message
+ * (basic.ack) or rejects it (basic.nack). Implementations wrap amqplib's
+ * confirm-channel callback API.
+ */
+export interface QueueConfirmChannel extends QueueChannel {
+  /**
+   * Publish and wait for the broker to ack/nack. Resolves on ack. Rejects on
+   * nack or channel error. Returns `false` if the channel's local buffer is
+   * full (caller must handle backpressure).
+   */
+  publishWithConfirm(
+    exchange: string,
+    routingKey: string,
+    content: Buffer,
+    options?: PublishOptions,
+  ): Promise<boolean>
+}
+
+/**
  * Queue connection abstraction
  */
 export interface QueueConnection {
   createChannel(): Promise<QueueChannel>
+  createConfirmChannel(): Promise<QueueConfirmChannel>
   close(): Promise<void>
   on(event: string, listener: (...args: unknown[]) => void): void
 }

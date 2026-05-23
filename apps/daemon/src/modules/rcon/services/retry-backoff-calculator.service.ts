@@ -53,7 +53,13 @@ export class RetryBackoffCalculatorService implements RetryBackoffCalculator {
 
     // Cap at maximum backoff time
     const maxDelaySeconds = this.config.maxBackoffMinutes * 60
-    const finalDelaySeconds = Math.min(exponentialDelay, maxDelaySeconds)
+    const cappedDelaySeconds = Math.min(exponentialDelay, maxDelaySeconds)
+
+    // Jitter the final delay over [0.5x, 1.0x] of the capped value. Without
+    // this every server computes the same `nextRetryAt` and on the recovery
+    // tick fires N concurrent connects — a dogpile against the broker or
+    // network that just came back.
+    const finalDelaySeconds = cappedDelaySeconds * (0.5 + Math.random() * 0.5)
 
     return new Date(Date.now() + finalDelaySeconds * 1000)
   }

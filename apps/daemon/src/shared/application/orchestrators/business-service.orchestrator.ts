@@ -30,7 +30,10 @@ import type { IPlayerSessionService } from "@/modules/player/types/player-sessio
 import type { IPlayerService } from "@/modules/player/types/player.types"
 import { RankingService } from "@/modules/ranking/ranking.service"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
-import { NotificationConfigRepository } from "@/modules/rcon/repositories/notification-config.repository"
+import {
+  NotificationConfigRepository,
+  type INotificationConfigRepository,
+} from "@/modules/rcon/repositories/notification-config.repository"
 import { RconScheduleService } from "@/modules/rcon/schedulers/rcon-schedule.service"
 import { CommandResolverService } from "@/modules/rcon/services/command-resolver.service"
 import { EventNotificationService } from "@/modules/rcon/services/event-notification.service"
@@ -62,6 +65,7 @@ export interface BusinessServiceCollection {
   playerStatusEnricher: IPlayerStatusEnricher
   sessionService: IPlayerSessionService
   commandResolverService: CommandResolverService
+  notificationConfigRepository: INotificationConfigRepository
 }
 
 /**
@@ -208,5 +212,6 @@ export function createBusinessServices(
     playerStatusEnricher,
     sessionService,
     commandResolverService,
+    notificationConfigRepository,
   }
 }

@@ -103,6 +103,7 @@ describe("KillEventHandler", () => {
       getCurrentMap: vi.fn().mockResolvedValue("de_dust2"),
       getLastKnownMap: vi.fn().mockResolvedValue("de_dust2"),
       handleMapChange: vi.fn(),
+      clearServerCache: vi.fn(),
     }
 
     handler = new KillEventHandler(

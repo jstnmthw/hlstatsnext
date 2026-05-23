@@ -156,6 +156,12 @@ export interface IRconScheduleService {
    * Execute a scheduled command immediately (for testing)
    */
   executeScheduleNow(scheduleId: string): Promise<ScheduleExecutionResult[]>
+
+  /**
+   * Drop per-server execution tracking on SERVER_SHUTDOWN. Idempotent —
+   * safe to call for unknown servers.
+   */
+  dropServer(serverId: number): void
 }
 
 export interface IScheduledCommandExecutor {

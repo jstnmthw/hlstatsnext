@@ -768,6 +768,7 @@ describe("ActionService", () => {
     const mockMapService = {
       getCurrentMap: vi.fn().mockResolvedValue("de_dust2"),
       handleMapChange: vi.fn(),
+      clearServerCache: vi.fn(),
       getLastKnownMap: vi.fn().mockResolvedValue(null),
     }
 
@@ -1380,6 +1381,7 @@ describe("ActionService", () => {
       const mapSvc = {
         getCurrentMap: vi.fn().mockResolvedValue("de_inferno"),
         handleMapChange: vi.fn(),
+        clearServerCache: vi.fn(),
         getLastKnownMap: vi.fn().mockResolvedValue(null),
       }
 

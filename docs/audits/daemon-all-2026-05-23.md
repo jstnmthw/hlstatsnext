@@ -72,7 +72,7 @@ private async ensureChannel(): Promise<void> {
 
 ### [CRITICAL] CRIT-4 — No publisher confirms; every published event can be lost on broker crash
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/publisher.ts:41-91`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/publisher.ts:41-91`
       **Pattern:** mq-ack (publisher-side durability)
       **Anti-pattern (Nygard):** False sense of durability.
       **Scenario:** RabbitMQ crash, OOM, host reboot. amqplib accepts the publish (TCP write succeeds) but the broker never persists to disk before crashing.
@@ -83,7 +83,7 @@ private async ensureChannel(): Promise<void> {
 
 ### [CRITICAL] CRIT-5 — Silent message loss when broker flow-controls (`connection.blocked`)
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/publisher.ts:67-69` and `apps/daemon/src/shared/infrastructure/messaging/queue/rabbitmq/client.ts:209-215`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/publisher.ts:67-69` and `apps/daemon/src/shared/infrastructure/messaging/queue/rabbitmq/client.ts:209-215`
       **Pattern:** mq-ack
       **Anti-pattern (Nygard):** Slow response / unbounded buffer / no backpressure.
       **Scenario:** Broker hits memory or disk high-water mark and sends `connection.blocked`. The daemon logs it but takes no defensive action. TCP buffer eventually fills; `channel.publish()` returns `false`.
@@ -99,7 +99,7 @@ if (!published) {
 
 ### [CRITICAL] CRIT-6 — Retry pattern double-writes the same message to DLQ; DLQ grows forever
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/consumer.ts:346-381` and topology at `apps/daemon/src/shared/infrastructure/messaging/queue/rabbitmq/client.ts:286-326, 374`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/consumer.ts:346-381` and topology at `apps/daemon/src/shared/infrastructure/messaging/queue/rabbitmq/client.ts:286-326, 374`
       **Pattern:** mq-dlq
       **Anti-pattern (Nygard):** Unbounded result set.
       **Scenario:** Any persistent handler failure (schema mismatch, downstream DB outage). The retry algorithm dead-letters the original _and_ republishes a copy. After N retries, you get N entries in DLQ for one logical event, plus one final DLQ entry on exhaustion.
@@ -214,7 +214,7 @@ recordHistogram(name, labels = {}, value) {
 
 ### [CRITICAL] CRIT-15 — `handleServerShutdown` is declared but never registered or implemented
 
-- [ ] **File:** `apps/daemon/src/modules/server/server.types.ts:15` (declaration only; verified via grep — no subscriber, no implementation)
+- [x] **File:** `apps/daemon/src/modules/server/server.types.ts:15` (declaration only; verified via grep — no subscriber, no implementation)
       **Pattern:** eviction-missing
       **Scenario:** Any game server shutdown (sends SERVER_SHUTDOWN log line) — restart, map-cycle out, manual stop, daemon witnessing a server going dark.
       **Description:** `EventType.SERVER_SHUTDOWN` exists (`shared/types/events.ts:39`) and is routed to topic `server.shutdown` (publisher.ts:203), but **no subscriber consumes it**. When a game server shuts down, nothing flushes the per-server in-memory state. Stranded state across at least 8 modules: - `PlayerSessionRepository` (5 Map entries per session) - `ServerStateManager.serverStates` + `lastActivity` - `MatchService.currentMatches` (with nested `playerTeams: Map<number, string>`) - `MapService.mapCache`, `GameDetectionService.gameCache` - `NotificationConfigRepository.configCache` - `RconScheduleService.serverExecutions` and `RetryBackoffCalculatorService.failureStates` - Open RCON sockets in `RconService.connections`
@@ -252,7 +252,7 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-4 — `pause()` requeues at head, causing busy-spin between consumer and broker
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/consumer.ts:235-239`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/consumer.ts:235-239`
       **Pattern:** nygard-antipattern (self-denial)
       **Scenario:** Operator calls `pause()` to throttle.
       **Description:** Broker keeps delivering up to `prefetchCount` messages; each is `nack`'d with `requeue=true` and immediately redelivered (nothing else is consuming). The consumer spins at 100% CPU shuffling the same 10 messages.
@@ -260,7 +260,7 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-5 — `concurrency` config is dead — only logged, never enforced
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/consumer.ts:118, 495`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/consumer.ts:118, 495`
       **Pattern:** nygard-antipattern (misleading config)
       **Description:** `RabbitMQConsumerConfig.concurrency = 10` is logged but never referenced. Actual parallelism = `prefetchCount × queueCount`. Operators tuning the value see no behavioral change.
       **Remediation:** Either delete the field or wire it to a semaphore around `handleMessage`. If the prefetch-per-channel pattern is intentional, rename to `prefetchPerChannel`.
@@ -282,14 +282,14 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-8 — `setTimeout` retry republish + reconnect timers not tracked on shutdown
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/consumer.ts:364-372` and `client.ts:239`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/consumer.ts:364-372` and `client.ts:239`
       **Pattern:** timer-leak, mq-ack
       **Description:** Timer handles for retry republish and reconnect attempts are not stored. On shutdown, they fire against either a closed channel (throws, swallowed) or — worse — a still-open one during connection-close race. Original message already in DLQ, retry never happens.
       **Remediation:** Store handles in a Set; clear all in `stop()`. For long-term: use a delayed-message exchange or RabbitMQ delayed-message plugin so retry timing lives in the broker.
 
 ### [WARNING] WARN-9 — Per-server RCON connections never reclaimed on server delete/disable
 
-- [ ] **File:** `apps/daemon/src/modules/rcon/services/rcon.service.ts:22, 27` and `services/retry-backoff-calculator.service.ts:13`
+- [x] **File:** `apps/daemon/src/modules/rcon/services/rcon.service.ts:22, 27` and `services/retry-backoff-calculator.service.ts:13`
       **Pattern:** unbounded-collection, zombie-socket
       **Scenario:** Admin removes Server #42, disables RCON, or rotates credentials with address change. There is no `SERVER_REMOVED` event (verified: zero matches).
       **Description:** Open UDP/TCP socket stays in `RconService.connections` until either a scheduled monitor run errors (delete on failure at rcon.service.ts:173) or daemon restart. Status polls may succeed against a different server now at the same address. `commandQueues` Promise chains and `failureStates` Map accumulate.
@@ -298,7 +298,7 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-10 — RCON reconnect dogpile; no jitter on backoff
 
-- [ ] **File:** `apps/daemon/src/modules/rcon/services/retry-backoff-calculator.service.ts:42-58` and `commands/scheduled/server-monitoring.command.ts:117-119`
+- [x] **File:** `apps/daemon/src/modules/rcon/services/retry-backoff-calculator.service.ts:42-58` and `commands/scheduled/server-monitoring.command.ts:117-119`
       **Pattern:** nygard-antipattern (dogpile, self-denial)
       **Scenario:** Network blip causes all monitored servers to fail simultaneously. `calculateNextRetry` is deterministic — all servers compute the same `nextRetryAt`. On the recovery tick, `Promise.allSettled(servers.map(...))` fires N concurrent connects.
       **Description:** `grep -r "jitter|Math.random" apps/daemon/src/modules/rcon` returns no matches. With N=50 servers this is 50 simultaneous connects on the recovery tick.
@@ -306,7 +306,7 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-11 — Source-RCON socket has no keepalive or connection timeout
 
-- [ ] **File:** `apps/daemon/src/modules/rcon/protocols/source-rcon.protocol.ts:39-40, 126-139`
+- [x] **File:** `apps/daemon/src/modules/rcon/protocols/source-rcon.protocol.ts:39-40, 126-139`
       **Pattern:** rcon-resilience
       **Anti-pattern (Nygard):** Integration point without timeout.
       **Description:** No `socket.setKeepAlive(true, ...)` call; default `tcp_keepalive_time` is 2 hours. A wedged TCP connection persists for hours. `withTimeout` wraps the Promise but does NOT cancel the underlying `connect()`. `commandTimeout` rejects the Promise but leaves stale entries in `pendingResponses` (separate WARN below).
@@ -314,7 +314,7 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-12 — Source-RCON `pendingResponses` Map leaks one entry per command timeout
 
-- [ ] **File:** `apps/daemon/src/modules/rcon/protocols/source-rcon.protocol.ts:21, 162-174`
+- [x] **File:** `apps/daemon/src/modules/rcon/protocols/source-rcon.protocol.ts:21, 162-174`
       **Pattern:** unbounded-collection
       **Description:** Command sent, server doesn't respond, `withTimeout` rejects, but the `pendingResponses.set(commandId, { resolve, reject })` entry is only deleted on real response or socket close — neither happens for the timeout case.
       **Growth/Impact:** ~2880 leaked entries/day per slow server at 30s monitor interval. Each retains closures over `this`.
@@ -337,21 +337,21 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-15 — Match state deleted before save completes (`finalizeMatch` swallow)
 
-- [ ] **File:** `apps/daemon/src/modules/match/match.service.ts:213-231, 270-291`
+- [x] **File:** `apps/daemon/src/modules/match/match.service.ts:213-231, 270-291`
       **Pattern:** silent-catch, data-loss
       **Description:** `finalizeMatch` catches DB failures and logs only. The next line (`currentMatches.delete(serverId)`) wipes the in-memory state regardless. Failed write cannot be retried — round/scoring data lost.
       **Remediation:** Move `delete` after finalize succeeds; or persist incrementally so finalize is recoverable. Promote logger.failed → logger.error + metric.
 
 ### [WARNING] WARN-16 — Cache invalidation failures masked → stale data returned
 
-- [ ] **File:** `apps/daemon/src/modules/player/repositories/cached-player.repository.ts:151-169`
+- [x] **File:** `apps/daemon/src/modules/player/repositories/cached-player.repository.ts:151-169`
       **Pattern:** silent-catch
       **Description:** On `update()`, the cache invalidation Promise is wrapped in try/catch that only `warn`s. The caller sees success but subsequent reads return stale player stats — skill calculations on outdated values.
       **Remediation:** Either re-throw on invalidation failure (force handler retry) or use cache-aside with very short TTL and pessimistic reads.
 
 ### [WARNING] WARN-17 — Per-event GeoIP DB lookups in connect hot path with no cache
 
-- [ ] **File:** `apps/daemon/src/modules/geoip/geoip.service.ts:32-44` (called from `connect-event.handler.ts:117-123`)
+- [x] **File:** `apps/daemon/src/modules/geoip/geoip.service.ts:32-44` (called from `connect-event.handler.ts:117-123`)
       **Pattern:** nygard-antipattern (slow response, no integration timeout)
       **Description:** Every connect blocks on two sequential Prisma queries with no caching. On a server reboot (everyone reconnects), 30+ simultaneous slow GeoIP lookups stampede the DB.
       **Remediation:** Cache GeoIP lookups by IP (LRU, bounded). Verify DB indexes on `startIpNum`/`endIpNum`. Consider async/deferred enrichment.
@@ -379,14 +379,14 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-21 — `node-cron` tasks `stop()`-ed but not `destroy()`-ed on shutdown
 
-- [ ] **File:** `apps/daemon/src/modules/rcon/schedulers/rcon-schedule.service.ts:155-166, 259`
+- [x] **File:** `apps/daemon/src/modules/rcon/schedulers/rcon-schedule.service.ts:155-166, 259`
       **Pattern:** timer-leak
       **Description:** Cron tasks paused but kept in node-cron internal registry. Harmless for normal process exit; matters in tests and any hot-reload scenario.
       **Remediation:** `task.destroy?.()` after `task.stop()`.
 
 ### [WARNING] WARN-22 — Excessive `recordHistogram`-style growth in `EventMetrics` (latent today)
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/observability/event-metrics.ts:37-46, 117-170`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/observability/event-metrics.ts:37-46, 117-170`
       **Pattern:** unbounded-collection (latent)
       **Description:** Class is constructed at `event-handler.orchestrator.ts:41` and threaded into every handler constructor, but `recordProcessingTime` / `recordError` are never called from production code today. Once wired up, the same defect as CRIT-13 applies (unbounded `Map<EventType, number[]>` + `Math.min(...times)` spread → `RangeError` past ~100k samples). The DB-pattern parallels CRIT-13 — fix together.
       **Remediation:** Either delete the class or rewrite as streaming aggregates before anyone wires it up. The bounded sampling pattern in `consumer.ts:68-69, 448-454` (cap at 1000 samples) is the model to copy.
@@ -395,78 +395,78 @@ recordHistogram(name, labels = {}, value) {
 
 ### [INFO] INFO-1 — QueryBus / CachedQueryBus / CommandBus subpackage is dead code with latent setInterval leak
 
-- [ ] **File:** `apps/daemon/src/shared/application/cqrs/{query-bus,cached-query-bus,command-bus}.ts`
+- [x] **File:** `apps/daemon/src/shared/application/cqrs/{query-bus,cached-query-bus,command-bus}.ts`
       **Pattern:** timer-leak (latent), dead-code
       **Description:** `CachedQueryBus` is only exported and `QueryBus` is only instantiated inside `CachedQueryBus`. Neither is referenced from any production wiring. `QueryBus.startCacheCleanup()` (line 226) discards the `setInterval` return value — even if activated, there's no way to cancel it. Currently has zero runtime impact but the API encourages future misuse.
       **Remediation:** Delete the subpackage, or implement `dispose()`/`shutdown()` on `QueryBus` and capture the timer handle.
 
 ### [INFO] INFO-2 — `PlayerHistoryService` is dead code (never instantiated)
 
-- [ ] **File:** `apps/daemon/src/modules/match/history.service.ts:11`
+- [x] **File:** `apps/daemon/src/modules/match/history.service.ts:11`
       **Description:** Class exists with `setInterval` lifecycle and `stop()`. No production caller.
       **Remediation:** Delete, or wire into the daemon.
 
 ### [INFO] INFO-3 — UDP server silently drops oversized packets; no metric
 
-- [ ] **File:** `apps/daemon/src/modules/ingress/udp-server.ts:94-96`
+- [x] **File:** `apps/daemon/src/modules/ingress/udp-server.ts:94-96`
       **Description:** RT-009 oversize-drop is correct defense, but silent. A misconfigured server (fragmented logs re-assembled wrong) is invisible.
       **Remediation:** Increment `udp_oversize_drops` counter; rate-limited debug log by source IP.
 
 ### [INFO] INFO-4 — UDP socket has no `setRecvBufferSize` — kernel default applies
 
-- [ ] **File:** `apps/daemon/src/modules/ingress/udp-server.ts:89-125`
+- [x] **File:** `apps/daemon/src/modules/ingress/udp-server.ts:89-125`
       **Description:** Default `net.core.rmem_default` ~212KB. Burst events beyond ~1400 packets silently drop at the network stack.
       **Remediation:** `socket.setRecvBufferSize(8 * 1024 * 1024)` and document in deployment requirements.
 
 ### [INFO] INFO-5 — UDP server binds to `0.0.0.0` by default
 
-- [ ] **File:** `apps/daemon/src/modules/ingress/udp-server.ts:83-87`
+- [x] **File:** `apps/daemon/src/modules/ingress/udp-server.ts:83-87`
       **Description:** Without a network-level firewall, any internet host can send UDP. Trust model is "anyone who knows a token". No second line of defense.
       **Remediation:** Make `127.0.0.1` the default; require explicit `0.0.0.0` binding. Optional source-IP allowlist.
 
 ### [INFO] INFO-6 — Beacon path awaits `eventBus.emit()` per packet (blocks per-source ingress)
 
-- [ ] **File:** `apps/daemon/src/modules/ingress/adapters/token-server-authenticator.ts:142-151`
+- [x] **File:** `apps/daemon/src/modules/ingress/adapters/token-server-authenticator.ts:142-151`
       **Description:** Slow `SERVER_AUTHENTICATED` subscriber (e.g., RCON connect) blocks beacon processing for that source.
       **Remediation:** If the emit is fire-and-forget by design: `void this.eventBus.emit(...).catch(...)`. Otherwise document why blocking is required.
 
 ### [INFO] INFO-7 — Beacon `validateToken` DB error bypasses rate-limiter
 
-- [ ] **File:** `apps/daemon/src/modules/ingress/adapters/token-server-authenticator.ts:83-115`
+- [x] **File:** `apps/daemon/src/modules/ingress/adapters/token-server-authenticator.ts:83-115`
       **Description:** `validateToken` throws (DB down). Outer `handleLogLine` catches but the rate limiter isn't bumped. Attacker can probe with the same source IP indefinitely without triggering the block as long as the DB is unreachable.
       **Remediation:** Wrap `validateToken` in try/catch within `handleBeacon`; record failure to rate limiter on error.
 
 ### [INFO] INFO-8 — `parserCache` keyed by serverId never evicts
 
-- [ ] **File:** `apps/daemon/src/modules/ingress/ingress.service.ts:20, 240`
+- [x] **File:** `apps/daemon/src/modules/ingress/ingress.service.ts:20, 240`
       **Description:** Bounded by total servers ever authenticated since daemon start. Small in practice (hundreds of bytes per entry). No eviction on server delete.
       **Remediation:** Hook into the CRIT-15 SERVER_SHUTDOWN cleanup chain.
 
 ### [INFO] INFO-9 — `DATABASE_URL` lacks documented pool tuning
 
-- [ ] **File:** `packages/db/env.example:4`
+- [x] **File:** `packages/db/env.example:4`
       **Description:** No `connection_limit` / `pool_timeout` documented. Pool defaults under burst load are easy to exhaust under contention.
       **Remediation:** Document recommended values sized to `EventConsumer.concurrency × avg_db_calls_per_event × 1.5`.
 
 ### [INFO] INFO-10 — `prisma.$transaction(callback)` lacks explicit timeout
 
-- [ ] **File:** `apps/daemon/src/database/client.ts:43-46`
+- [x] **File:** `apps/daemon/src/database/client.ts:43-46`
       **Description:** Default `{ maxWait: 2000, timeout: 5000 }`. Under bursty writes + contention this is tight. Accept options arg.
 
 ### [INFO] INFO-11 — No schema-version check on startup
 
-- [ ] **File:** `apps/daemon/src/main.ts:150-174`
+- [x] **File:** `apps/daemon/src/main.ts:150-174`
       **Description:** Migration drift surfaces as `Unknown column` at first event. Daemon happily runs against incompatible schema until first failure.
       **Remediation:** Query `_prisma_migrations` in preflight and compare against an embedded expected migration ID.
 
 ### [INFO] INFO-12 — Health-check `testConnection()` runs `SELECT 1` on every scrape
 
-- [ ] **File:** `apps/daemon/src/main.ts:101-105`
+- [x] **File:** `apps/daemon/src/main.ts:101-105`
       **Description:** Prometheus scrapes every 15s + k8s probes contribute additional load. Cache result with 5s TTL.
 
 ### [INFO] INFO-13 — `garnet-cache.service.ts:212-229` uses `KEYS` + spread `DEL` for pattern invalidation
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/caching/garnet-cache.service.ts:214`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/caching/garnet-cache.service.ts:214`
       **Description:** `client.keys(pattern)` is O(N) over the full keyspace and blocks the Redis/Garnet server. `del(...keys)` spreads a potentially large list.
       **Remediation:** Use `SCAN` + batched `DEL` (or `UNLINK`).
 
@@ -496,33 +496,33 @@ recordHistogram(name, labels = {}, value) {
 
 ### Quick wins (under a day each, high leverage)
 
-1. **CRIT-1**: Remove `bufferHex` from GoldSrc debug log. 1-line change.
-2. **CRIT-7**: Make `IngressService.stop()` async; await `udpServer.stop()`.
-3. **CRIT-10**: Add `unhandledRejection` / `uncaughtException` handlers in main.ts.
-4. **CRIT-11**: Wrap each shutdown phase in `Promise.race(phase, timeout)`.
-5. **CRIT-12**: After 5 failed reconnects, switch to forever-poll with jitter, don't give up.
-6. **WARN-18**: Replace `!!queueModule` with `queueModule.getStatus().connected`.
-7. **WARN-19**: Return shutdown success state and use it for exit code.
-8. **WARN-20**: Memoize shutdown promise.
-9. **WARN-7**: Lower heartbeat to 10-15s.
-10. **WARN-14**: Make handlers inspect `HandlerResult.success` and throw on failure.
+- [x] **CRIT-1**: Remove `bufferHex` from GoldSrc debug log. 1-line change.
+- [x] **CRIT-7**: Make `IngressService.stop()` async; await `udpServer.stop()`.
+- [x] **CRIT-10**: Add `unhandledRejection` / `uncaughtException` handlers in main.ts.
+- [x] **CRIT-11**: Wrap each shutdown phase in `Promise.race(phase, timeout)`.
+- [x] **CRIT-12**: After 5 failed reconnects, switch to forever-poll with jitter, don't give up.
+- [x] **WARN-18**: Replace `!!queueModule` with `queueModule.getStatus().connected`.
+- [x] **WARN-19**: Return shutdown success state and use it for exit code.
+- [x] **WARN-20**: Memoize shutdown promise.
+- [x] **WARN-7**: Lower heartbeat to 10-15s.
+- [x] **WARN-14**: Make handlers inspect `HandlerResult.success` and throw on failure.
 
 ### Medium (1-3 days each)
 
-11. **CRIT-2/CRIT-3/CRIT-9**: Add `on('close')` / `on('error')` to `QueueChannel` adapter and consumer/publisher reset their cached channels. Re-subscribe consumers on reconnect. **This is the single highest-leverage change in the audit.**
-12. **CRIT-8**: Track in-flight handler promises in `EventConsumer`; drain with timeout in shutdown.
-13. **CRIT-13**: Replace homegrown `PrometheusMetricsExporter` with `prom-client` library (or rewrite to bucket-counter aggregation).
-14. **CRIT-14**: Single `cleanup = () => { clearTimeout; off }` helper used by every reject path in GoldSrc RCON.
-15. **WARN-1, WARN-13, WARN-2**: Periodic sweepers for the unbounded caches.
-16. **WARN-3, WARN-6**: DLQ consumer + topology config wiring.
+- [x] **CRIT-2/CRIT-3/CRIT-9**: Add `on('close')` / `on('error')` to `QueueChannel` adapter and consumer/publisher reset their cached channels. Re-subscribe consumers on reconnect. **This is the single highest-leverage change in the audit.**
+- [x] **CRIT-8**: Track in-flight handler promises in `EventConsumer`; drain with timeout in shutdown.
+- [x] **CRIT-13**: Replace homegrown `PrometheusMetricsExporter` with `prom-client` library (or rewrite to bucket-counter aggregation).
+- [x] **CRIT-14**: Single `cleanup = () => { clearTimeout; off }` helper used by every reject path in GoldSrc RCON.
+- [x] **WARN-1, WARN-13, WARN-2**: Periodic sweepers for the unbounded caches.
+- [x] **WARN-3, WARN-6**: DLQ consumer + topology config wiring.
 
 ### Architectural (1+ week)
 
-17. **CRIT-4 + CRIT-5**: Convert publisher to confirm channel; design a bounded local buffer + DLQ for unconfirmed messages. Pair with CRIT-6 redesign so retries don't dead-letter.
-18. **CRIT-6**: Replace nack+setTimeout retry pattern with broker-side delayed-message plugin or in-flight scheduling that acks once republish is confirmed. Add `x-max-length` + DLQ consumer.
-19. **CRIT-15**: Wire `SERVER_SHUTDOWN` to a coordinator that fans out cleanup across the 8+ modules holding per-server state. Add `SERVER_REMOVED` for admin deletions. Fold WARN-9 (RCON connection cleanup) into the same chain.
-20. **CRIT-8 part 2**: Audit handlers for idempotency. Add idempotency keys (event message ID) to writes that are not naturally idempotent (`EventFrag`, `EventEntry`, etc.).
-21. **WARN-22**: Decide if the parallel `EventMetrics` system has a future; delete or rewrite as streaming aggregates.
+- [x] **CRIT-4 + CRIT-5**: Convert publisher to confirm channel; design a bounded local buffer + DLQ for unconfirmed messages. Pair with CRIT-6 redesign so retries don't dead-letter.
+- [x] **CRIT-6**: Replace nack+setTimeout retry pattern with broker-side delayed-message plugin or in-flight scheduling that acks once republish is confirmed. Add `x-max-length` + DLQ consumer.
+- [x] **CRIT-15**: Wire `SERVER_SHUTDOWN` to a coordinator that fans out cleanup across the 8+ modules holding per-server state. Add `SERVER_REMOVED` for admin deletions. Fold WARN-9 (RCON connection cleanup) into the same chain.
+- [ ] **CRIT-8 part 2**: Audit handlers for idempotency. Add idempotency keys (event message ID) to writes that are not naturally idempotent (`EventFrag`, `EventEntry`, etc.).
+- [x] **WARN-22**: Decide if the parallel `EventMetrics` system has a future; delete or rewrite as streaming aggregates.
 
 ---
 

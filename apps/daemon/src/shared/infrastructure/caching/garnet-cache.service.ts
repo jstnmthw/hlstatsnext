@@ -207,16 +207,38 @@ export class GarnetCacheService implements ICacheService {
   }
 
   /**
-   * Invalidate all keys matching a pattern
+   * Invalidate all keys matching a pattern via non-blocking `SCAN` +
+   * batched `UNLINK`. `KEYS` is O(N) over the whole keyspace and blocks the
+   * server; spread `DEL` of a large match list compounds the stall.
    */
   async invalidatePattern(pattern: string): Promise<void> {
+    const SCAN_BATCH = 500
+    const UNLINK_BATCH = 500
     try {
-      const keys = await this.client.keys(pattern)
-      if (keys.length > 0) {
-        await this.client.del(...keys)
+      let cursor = "0"
+      let totalDeleted = 0
+      do {
+        const [nextCursor, batch] = await this.client.scan(
+          cursor,
+          "MATCH",
+          pattern,
+          "COUNT",
+          SCAN_BATCH,
+        )
+        cursor = nextCursor
+        if (batch.length === 0) continue
+        for (let i = 0; i < batch.length; i += UNLINK_BATCH) {
+          const slice = batch.slice(i, i + UNLINK_BATCH)
+          // `unlink` is the non-blocking cousin of `del` — frees keys async.
+          await this.client.unlink(...slice)
+          totalDeleted += slice.length
+        }
+      } while (cursor !== "0")
+
+      if (totalDeleted > 0) {
         this.logger.debug("Invalidated cache keys", {
           pattern,
-          keyCount: keys.length,
+          keyCount: totalDeleted,
         })
       }
     } catch (error) {

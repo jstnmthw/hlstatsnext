@@ -232,14 +232,15 @@ export class CsParser extends BaseParser {
 
   private parseDamageEvent(logLine: string, serverId: number): ParseResult {
     // Example: "Player1<2><STEAM_ID><CT>" attacked "Player2<3><STEAM_ID><TERRORIST>" with "ak47" (damage "27") (damage_armor "0") (health "73") (armor "100") (hitgroup "chest")
+    // Health and armor can be negative on overkill (engine subtracts damage from remaining HP/AP regardless of zero floor).
     const damageRegex =
-      /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" attacked "([^"]+)<(\d+)><([^>]+)><([^>]*)>" with "([^"]+)" \(damage "(\d+)"\) \(damage_armor "(\d+)"\) \(health "(\d+)"\) \(armor "(\d+)"\)(?:\s+\(hitgroup "([^"]+)"\))?/
+      /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" attacked "([^"]+)<(\d+)><([^>]+)><([^>]*)>" with "([^"]+)" \(damage "(-?\d+)"\) \(damage_armor "(-?\d+)"\) \(health "(-?\d+)"\) \(armor "(-?\d+)"\)(?:\s+\(hitgroup "([^"]+)"\))?/
     let match = logLine.match(damageRegex)
 
     // Fallback tolerant regex for variant spacing/order
     if (!match) {
       const tolerant =
-        /"([^"]+)<(\d+)>[^"]*" attacked "([^"]+)<(\d+)>[^"]*" with "([^"]+)" .*?\(damage "(\d+)"\).*?\(damage_armor "(\d+)"\).*?\(health "(\d+)"\).*?\(armor "(\d+)"\)(?:.*?\(hitgroup "([^"]+)"\))?/
+        /"([^"]+)<(\d+)>[^"]*" attacked "([^"]+)<(\d+)>[^"]*" with "([^"]+)" .*?\(damage "(-?\d+)"\).*?\(damage_armor "(-?\d+)"\).*?\(health "(-?\d+)"\).*?\(armor "(-?\d+)"\)(?:.*?\(hitgroup "([^"]+)"\))?/
       match = logLine.match(tolerant)
     }
 

@@ -208,6 +208,20 @@ describe("CsParser", () => {
       expect(data.attackerTeam).toBe("CT")
       expect(data.victimTeam).toBe("CT")
     })
+
+    it("should parse overkill damage with negative remaining health/armor", () => {
+      // Engine emits negative health when damage > remaining HP (e.g. final shot of a kill).
+      const logLine = `"ddumplingz<8><BOT><TERRORIST>" attacked "discordbro<14><BOT><CT>" with "ak47" (damage "140") (damage_armor "0") (health "-110") (armor "0")`
+
+      const result = parser.parseLine(logLine, serverId)
+
+      expect(result.success).toBe(true)
+      const damageEvent = result.event as RawDamageEvent
+      const data = damageEvent.data
+      expect(data.damage).toBe(140)
+      expect(data.healthRemaining).toBe(-110)
+      expect(data.armorRemaining).toBe(0)
+    })
   })
 
   describe("parseConnectEvent", () => {

@@ -39,7 +39,7 @@
     "@pothos/plugin-relay": "^4.7.0",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^25.8.0",
+    "@types/node": "^25.9.1",
     "@types/unzipper": "^0.10.11",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.4",
@@ -47,7 +47,7 @@
     "prisma-generator-pothos-codegen": "^0.7.2",
     "ts-deepmerge": "^7.0.3",
     "tsc-alias": "^1.8.17",
-    "tsx": "^4.22.0",
+    "tsx": "^4.22.3",
     "typescript": "^5.9.3"
   },
   "exports": {

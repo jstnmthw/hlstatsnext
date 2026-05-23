@@ -47,7 +47,8 @@ export class ActionEventHandler extends BaseModuleEventHandler {
     const resolvedEvent = await this.resolveActionPlayerEvent(event)
     this.logPlayerInfo(resolvedEvent)
 
-    await this.actionService.handleActionEvent(resolvedEvent)
+    const result = await this.actionService.handleActionEvent(resolvedEvent)
+    throwIfFailed(result, "ACTION_PLAYER")
   }
 
   async handleActionPlayerPlayer(event: BaseEvent): Promise<void> {
@@ -61,7 +62,8 @@ export class ActionEventHandler extends BaseModuleEventHandler {
     const resolvedEvent = await this.resolveActionPlayerPlayerEvent(event)
     this.logPlayerInfo(resolvedEvent)
 
-    await this.actionService.handleActionEvent(resolvedEvent)
+    const result = await this.actionService.handleActionEvent(resolvedEvent)
+    throwIfFailed(result, "ACTION_PLAYER_PLAYER")
   }
 
   async handleActionTeam(event: BaseEvent): Promise<void> {
@@ -72,7 +74,8 @@ export class ActionEventHandler extends BaseModuleEventHandler {
       return
     }
 
-    await this.actionService.handleActionEvent(event)
+    const result = await this.actionService.handleActionEvent(event)
+    throwIfFailed(result, "ACTION_TEAM")
   }
 
   async handleActionWorld(event: BaseEvent): Promise<void> {
@@ -83,7 +86,8 @@ export class ActionEventHandler extends BaseModuleEventHandler {
       return
     }
 
-    await this.actionService.handleActionEvent(event)
+    const result = await this.actionService.handleActionEvent(event)
+    throwIfFailed(result, "ACTION_WORLD")
   }
 
   /**
@@ -258,5 +262,11 @@ export class ActionEventHandler extends BaseModuleEventHandler {
         },
       }
     }
+  }
+}
+
+function throwIfFailed(result: { success: boolean; error?: string }, eventType: string): void {
+  if (!result.success) {
+    throw new Error(`Action handler failed for ${eventType}: ${result.error ?? "unknown error"}`)
   }
 }

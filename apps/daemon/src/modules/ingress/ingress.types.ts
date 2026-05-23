@@ -20,7 +20,7 @@ export interface ServerAuthData {
 
 export interface IIngressService {
   start(): Promise<void>
-  stop(): void
+  stop(): Promise<void>
   isRunning(): boolean
   getStats(): IngressStats
   setPublisher(publisher: IEventPublisher): void

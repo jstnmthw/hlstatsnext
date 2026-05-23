@@ -245,7 +245,10 @@ describe("HLStatsDaemon", () => {
 
       await daemon.stop()
 
-      expect(mockContext.logger.failed).toHaveBeenCalledWith("Error during shutdown", "Stop error")
+      expect(mockContext.logger.failed).toHaveBeenCalledWith(
+        "Shutdown phase failed: ingressService.stop",
+        "Stop error",
+      )
     })
   })
 

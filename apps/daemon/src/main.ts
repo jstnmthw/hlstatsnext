@@ -74,6 +74,13 @@ export class HLStatsDaemon {
   private metricsCollectionInterval: ReturnType<typeof setInterval> | null = null
 
   /**
+   * Memoized shutdown promise. A SIGTERM followed by SIGINT (or any re-entrant
+   * stop()) must not double-close subsystems — Prisma, RabbitMQ, and Garnet all
+   * throw on second close.
+   */
+  private shutdownPromise: Promise<boolean> | null = null
+
+  /**
    * Creates a new HLStatsDaemon instance.
    *
    * Initializes all required services and dependencies based on environment
@@ -100,7 +107,7 @@ export class HLStatsDaemon {
       async () => ({
         status: await this.getHealthStatus(),
         database: await this.databaseConnection.testConnection(),
-        rabbitmq: !!this.context.queueModule,
+        rabbitmq: this.context.queueModule?.getStatus().connected ?? false,
         uptime: process.uptime(),
       }),
       { port: metricsPort },
@@ -300,35 +307,70 @@ export class HLStatsDaemon {
    * });
    * ```
    */
-  async stop(): Promise<void> {
+  async stop(): Promise<boolean> {
+    if (this.shutdownPromise) {
+      return this.shutdownPromise
+    }
+    this.shutdownPromise = this.runShutdown()
+    return this.shutdownPromise
+  }
+
+  private async runShutdown(): Promise<boolean> {
     this.logger.shutdown()
 
-    try {
-      // Stop metrics collection interval
-      if (this.metricsCollectionInterval) {
-        clearInterval(this.metricsCollectionInterval)
-        this.metricsCollectionInterval = null
+    // Per-phase timeout. A wedged Prisma transaction or AMQP close should not
+    // block the supervisor's grace window — better to abandon the phase, log,
+    // and let SIGKILL clean up than to look hung indefinitely.
+    const PHASE_TIMEOUT_MS = 5_000
+
+    let success = true
+
+    const runPhase = async <T>(name: string, work: Promise<T>): Promise<void> => {
+      try {
+        await withTimeout(work, PHASE_TIMEOUT_MS, name)
+      } catch (error) {
+        success = false
+        this.logger.failed(
+          `Shutdown phase failed: ${name}`,
+          error instanceof Error ? error.message : String(error),
+        )
       }
+    }
 
-      // Stop RCON services first
-      await this.rconScheduler.stop()
+    // Stop metrics collection interval (synchronous, no timeout needed)
+    if (this.metricsCollectionInterval) {
+      clearInterval(this.metricsCollectionInterval)
+      this.metricsCollectionInterval = null
+    }
 
-      await Promise.all([
-        this.context.ingressService.stop(),
-        this.context.rconService.disconnectAll(),
-        this.context.queueModule?.shutdown() || Promise.resolve(),
-        this.context.cache.disconnect(),
-        this.metricsServer.stop(),
-      ])
+    // Phase 1: stop accepting new work (UDP + scheduler) before tearing down
+    // dependencies they may still call into.
+    await runPhase("rconScheduler.stop", this.rconScheduler.stop())
+    await runPhase("ingressService.stop", this.context.ingressService.stop())
 
-      await this.databaseConnection.disconnect()
+    // Phase 2: close peripheral subsystems in parallel. None depend on each
+    // other for shutdown.
+    await Promise.all([
+      runPhase("rconService.disconnectAll", this.context.rconService.disconnectAll()),
+      runPhase("queueModule.shutdown", this.context.queueModule?.shutdown() ?? Promise.resolve()),
+      runPhase("cache.disconnect", this.context.cache.disconnect()),
+      runPhase("metricsServer.stop", this.metricsServer.stop()),
+    ])
+
+    // Phase 3: database last — every other subsystem may still issue queries
+    // during its own shutdown.
+    await runPhase("databaseConnection.disconnect", this.databaseConnection.disconnect())
+
+    if (success) {
       this.logger.shutdownComplete()
-    } catch (error) {
+    } else {
       this.logger.failed(
-        "Error during shutdown",
-        error instanceof Error ? error.message : String(error),
+        "Shutdown completed with errors",
+        "One or more subsystems failed to shut down cleanly",
       )
     }
+
+    return success
   }
 
   /**
@@ -395,12 +437,27 @@ export class HLStatsDaemon {
   private async getHealthStatus(): Promise<string> {
     try {
       const dbHealthy = await this.databaseConnection.testConnection()
-      const queueHealthy = !!this.context.queueModule
+      const queueHealthy = this.context.queueModule?.getStatus().connected ?? false
       return dbHealthy && queueHealthy ? "healthy" : "degraded"
     } catch {
       return "unhealthy"
     }
   }
+}
+
+/**
+ * Wrap a promise with a timeout. If `work` does not settle within `ms`, the
+ * returned promise rejects — the original task is left running (we cannot
+ * forcibly cancel an in-flight Prisma/AMQP call) but the caller is unblocked.
+ */
+function withTimeout<T>(work: Promise<T>, ms: number, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+  })
+  return Promise.race([work, timeout]).finally(() => {
+    if (timer) clearTimeout(timer)
+  })
 }
 
 /**
@@ -424,9 +481,33 @@ export class HLStatsDaemon {
 function createSignalHandler(daemon: HLStatsDaemon, signal: string) {
   return async () => {
     daemon.getContext().logger.received(signal)
-    await daemon.stop()
-    process.exit(0)
+    // Overall shutdown deadline: docker stop grace is typically 10s, k8s default
+    // terminationGracePeriodSeconds is 30s. 25s leaves headroom before SIGKILL.
+    const SHUTDOWN_DEADLINE_MS = 25_000
+    let success = false
+    try {
+      success = await withShutdownDeadline(daemon.stop(), SHUTDOWN_DEADLINE_MS)
+    } catch (error) {
+      daemon
+        .getContext()
+        .logger.failed(
+          "Shutdown deadline exceeded",
+          error instanceof Error ? error.message : String(error),
+        )
+      success = false
+    }
+    process.exit(success ? 0 : 1)
   }
+}
+
+function withShutdownDeadline(work: Promise<boolean>, ms: number): Promise<boolean> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`Shutdown exceeded overall deadline of ${ms}ms`)), ms)
+  })
+  return Promise.race([work, timeout]).finally(() => {
+    if (timer) clearTimeout(timer)
+  })
 }
 
 /**
@@ -453,6 +534,28 @@ async function main() {
 
     process.on("SIGINT", createSignalHandler(daemon, "SIGINT"))
     process.on("SIGTERM", createSignalHandler(daemon, "SIGTERM"))
+
+    // Catch detached promise rejections so a single unawaited error does not
+    // take the daemon down without observability or a clean shutdown.
+    process.on("unhandledRejection", (reason, promise) => {
+      const message = reason instanceof Error ? reason.stack || reason.message : String(reason)
+      daemon.getContext().logger.error(`Unhandled promise rejection: ${message}`, {
+        promise: String(promise),
+      })
+    })
+
+    // Uncaught exceptions are unrecoverable — log with context and run a best-
+    // effort shutdown before exiting.
+    process.on("uncaughtException", async (error) => {
+      const ctx = daemon.getContext()
+      ctx.logger.error(`Uncaught exception: ${error.stack ?? error.message}`)
+      try {
+        await daemon.stop()
+      } catch {
+        // shutdown already logged its own failures; nothing useful to add here
+      }
+      process.exit(1)
+    })
 
     await daemon.start()
   } catch (error) {

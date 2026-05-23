@@ -79,11 +79,11 @@ export class IngressService implements IIngressService {
     this.logger.started(`Ingress Server on ${this.options.host}:${this.options.port}`)
   }
 
-  stop(): void {
+  async stop(): Promise<void> {
     if (this.running) {
       this.logger.stopping("Ingress Server")
-      this.udpServer.stop()
       this.running = false
+      await this.udpServer.stop()
     }
   }
 

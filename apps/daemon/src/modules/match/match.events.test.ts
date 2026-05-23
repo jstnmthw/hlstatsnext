@@ -14,7 +14,7 @@ import { MatchEventHandler } from "./match.events"
 
 function createMockMatchService(): IMatchService {
   return {
-    handleMatchEvent: vi.fn().mockResolvedValue(undefined),
+    handleMatchEvent: vi.fn().mockResolvedValue({ success: true }),
     getMatchStats: vi.fn(),
     resetMatchStats: vi.fn(),
     setPlayerTeam: vi.fn(),
@@ -25,7 +25,7 @@ function createMockMatchService(): IMatchService {
 
 function createMockActionService(): IActionService {
   return {
-    handleActionEvent: vi.fn().mockResolvedValue(undefined),
+    handleActionEvent: vi.fn().mockResolvedValue({ success: true }),
   }
 }
 

@@ -14,7 +14,7 @@ import { ActionEventHandler } from "./action.events"
 
 function createMockActionService(): IActionService {
   return {
-    handleActionEvent: vi.fn().mockResolvedValue(undefined),
+    handleActionEvent: vi.fn().mockResolvedValue({ success: true }),
   }
 }
 

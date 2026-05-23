@@ -25,18 +25,29 @@ export class WeaponEventHandler extends BaseModuleEventHandler {
   async handleWeaponFire(event: BaseEvent): Promise<void> {
     this.logger.debug(`Weapon module handling WEAPON_FIRE for server ${event.serverId}`)
 
-    await this.weaponService.handleWeaponEvent(event as WeaponEvent)
+    const result = await this.weaponService.handleWeaponEvent(event as WeaponEvent)
+    throwIfFailed(result, "WEAPON_FIRE")
   }
 
   async handleWeaponHit(event: BaseEvent): Promise<void> {
     this.logger.debug(`Weapon module handling WEAPON_HIT for server ${event.serverId}`)
 
-    await this.weaponService.handleWeaponEvent(event as WeaponEvent)
+    const result = await this.weaponService.handleWeaponEvent(event as WeaponEvent)
+    throwIfFailed(result, "WEAPON_HIT")
   }
 
   async handlePlayerKill(event: BaseEvent): Promise<void> {
     this.logger.debug(`Weapon module handling PLAYER_KILL for server ${event.serverId}`)
 
-    await this.weaponService.handleWeaponEvent(event as WeaponEvent)
+    const result = await this.weaponService.handleWeaponEvent(event as WeaponEvent)
+    throwIfFailed(result, "PLAYER_KILL")
+  }
+}
+
+// Throw on a failed HandlerResult so the RabbitMQ consumer nacks the message
+// instead of silently acking and losing the failure.
+function throwIfFailed(result: { success: boolean; error?: string }, eventType: string): void {
+  if (!result.success) {
+    throw new Error(`Weapon handler failed for ${eventType}: ${result.error ?? "unknown error"}`)
   }
 }

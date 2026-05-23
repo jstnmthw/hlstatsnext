@@ -190,7 +190,7 @@ describe("Factory Functions", () => {
 
       expect(config.url).toBe("amqp://hlstats:hlstats-mq-dev@localhost:5672/hlstats")
       expect(config.prefetchCount).toBe(10)
-      expect(config.heartbeatInterval).toBe(60)
+      expect(config.heartbeatInterval).toBe(15)
       expect(config.connectionRetry).toEqual({
         maxAttempts: 5,
         initialDelay: 1000,

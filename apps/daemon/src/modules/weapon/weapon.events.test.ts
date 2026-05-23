@@ -12,7 +12,7 @@ import type { IWeaponService } from "./weapon.types"
 
 // Create mock weapon service
 const createMockWeaponService = (): IWeaponService => ({
-  handleWeaponEvent: vi.fn(),
+  handleWeaponEvent: vi.fn().mockResolvedValue({ success: true }),
   updateWeaponStats: vi.fn(),
 })
 

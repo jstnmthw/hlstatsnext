@@ -34,7 +34,8 @@ export class MatchEventHandler extends BaseModuleEventHandler {
    */
   async handleRoundStart(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling ROUND_START for server ${event.serverId}`)
-    await this.matchService.handleMatchEvent(event as MatchEvent)
+    const result = await this.matchService.handleMatchEvent(event as MatchEvent)
+    throwIfFailed(result, "ROUND_START")
   }
 
   /**
@@ -47,7 +48,8 @@ export class MatchEventHandler extends BaseModuleEventHandler {
    */
   async handleRoundEnd(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling ROUND_END for server ${event.serverId}`)
-    await this.matchService.handleMatchEvent(event as MatchEvent)
+    const result = await this.matchService.handleMatchEvent(event as MatchEvent)
+    throwIfFailed(result, "ROUND_END")
   }
 
   /**
@@ -60,9 +62,12 @@ export class MatchEventHandler extends BaseModuleEventHandler {
    */
   async handleTeamWin(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling TEAM_WIN for server ${event.serverId}`)
-    await this.matchService.handleMatchEvent(event as MatchEvent)
+    const result = await this.matchService.handleMatchEvent(event as MatchEvent)
+    throwIfFailed(result, "TEAM_WIN")
 
-    // Synthesize ACTION_TEAM for win triggers to award team-wide bonuses per legacy
+    // Synthesize ACTION_TEAM for win triggers to award team-wide bonuses per legacy.
+    // This is best-effort — a failure here should NOT cause the original TEAM_WIN
+    // to be redelivered (it already succeeded above).
     try {
       if (!this.actionService) return
       const data = (event as unknown as MatchEvent).data as {
@@ -98,6 +103,13 @@ export class MatchEventHandler extends BaseModuleEventHandler {
    */
   async handleMapChange(event: BaseEvent): Promise<void> {
     this.logger.debug(`Match module handling MAP_CHANGE for server ${event.serverId}`)
-    await this.matchService.handleMatchEvent(event as MatchEvent)
+    const result = await this.matchService.handleMatchEvent(event as MatchEvent)
+    throwIfFailed(result, "MAP_CHANGE")
+  }
+}
+
+function throwIfFailed(result: { success: boolean; error?: string }, eventType: string): void {
+  if (!result.success) {
+    throw new Error(`Match handler failed for ${eventType}: ${result.error ?? "unknown error"}`)
   }
 }

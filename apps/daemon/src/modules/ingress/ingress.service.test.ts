@@ -100,9 +100,9 @@ describe("IngressService", () => {
     ingressService.setPublisher(mockEventPublisher)
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     if (ingressService.isRunning()) {
-      ingressService.stop()
+      await ingressService.stop()
     }
   })
 
@@ -121,7 +121,7 @@ describe("IngressService", () => {
 
     it("should stop successfully", async () => {
       await ingressService.start()
-      ingressService.stop()
+      await ingressService.stop()
       expect(ingressService.isRunning()).toBe(false)
       expect(mockLogger.stopping).toHaveBeenCalledWith("Ingress Server")
     })

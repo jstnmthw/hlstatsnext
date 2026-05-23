@@ -29,6 +29,15 @@ export class RabbitMQClient implements IQueueClient {
   private reconnectAttempts = 0
   private isConnecting = false
   private isShuttingDown = false
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null
+
+  /**
+   * Polling interval used after `maxAttempts` exponential-backoff retries have
+   * been exhausted. Past this point we assume the broker is in a longer
+   * outage (rolling upgrade, host reboot) and keep polling forever rather
+   * than leaving the daemon silently disconnected.
+   */
+  private static readonly LONG_POLL_INTERVAL_MS = 30_000
   private connectionStats: ConnectionStats = {
     connected: false,
     heartbeatsSent: 0,
@@ -77,6 +86,12 @@ export class RabbitMQClient implements IQueueClient {
 
     // Mark as shutting down to prevent reconnection attempts
     this.isShuttingDown = true
+
+    // Cancel any pending reconnect attempt scheduled by handleConnectionError.
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer)
+      this.reconnectTimer = null
+    }
 
     try {
       // Close all channels first - check if they're already closed
@@ -226,32 +241,54 @@ export class RabbitMQClient implements IQueueClient {
       return
     }
 
-    // Attempt to reconnect
-    if (this.reconnectAttempts < this.config.connectionRetry.maxAttempts) {
-      this.reconnectAttempts++
-      const delay = Math.min(
+    // Don't pile up parallel reconnect timers if multiple errors fire close
+    // together (e.g., connection 'error' immediately followed by 'close').
+    if (this.reconnectTimer) {
+      return
+    }
+
+    this.reconnectAttempts++
+
+    // Phase 1: exponential backoff for the first `maxAttempts` tries.
+    // Phase 2: after exhaustion, keep polling forever at a longer interval —
+    // a long broker outage (rolling upgrade, host reboot) must not leave the
+    // daemon permanently disconnected with green health.
+    let delay: number
+    if (this.reconnectAttempts <= this.config.connectionRetry.maxAttempts) {
+      delay = Math.min(
         this.config.connectionRetry.initialDelay * Math.pow(2, this.reconnectAttempts - 1),
         this.config.connectionRetry.maxDelay,
       )
-
-      this.logger.info(`Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts})`)
-
-      setTimeout(async () => {
-        // Check again if we're shutting down before reconnecting
-        if (this.isShuttingDown) {
-          this.logger.debug("Skipping reconnection during shutdown")
-          return
-        }
-
-        try {
-          await this.connect()
-        } catch (reconnectError) {
-          this.logger.error(`Reconnection failed: ${reconnectError}`)
-        }
-      }, delay)
+      this.logger.info(
+        `Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts}/${this.config.connectionRetry.maxAttempts})`,
+      )
     } else {
-      this.logger.error("Maximum reconnection attempts reached")
+      // Jitter ±50% so simultaneous-outage redundancy doesn't dogpile on recovery.
+      const base = RabbitMQClient.LONG_POLL_INTERVAL_MS
+      delay = Math.floor(base * (0.5 + Math.random()))
+      this.logger.warn(
+        `RabbitMQ still unavailable after ${this.config.connectionRetry.maxAttempts} attempts; continuing to poll every ~${Math.round(base / 1000)}s`,
+      )
     }
+
+    this.reconnectTimer = setTimeout(async () => {
+      this.reconnectTimer = null
+      // Check again if we're shutting down before reconnecting
+      if (this.isShuttingDown) {
+        this.logger.debug("Skipping reconnection during shutdown")
+        return
+      }
+
+      try {
+        await this.connect()
+      } catch (reconnectError) {
+        this.logger.error(`Reconnection failed: ${reconnectError}`)
+        // Schedule the next attempt. Note: connect() itself failed before
+        // setting up the error handlers, so handleConnectionError won't be
+        // invoked by the connection — drive the next attempt directly.
+        await this.handleConnectionError(reconnectError as Error)
+      }
+    }, delay)
   }
 
   private async handleConnectionClose(): Promise<void> {

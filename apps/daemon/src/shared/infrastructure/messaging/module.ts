@@ -246,7 +246,11 @@ export function createDevelopmentRabbitMQConfig(url?: string): RabbitMQConfig {
   return {
     url: url || "amqp://hlstats:hlstats-mq-dev@localhost:5672/hlstats",
     prefetchCount: 10,
-    heartbeatInterval: 60,
+    // 15s heartbeat → dead-TCP detection in ~30s (2 missed beats), versus
+    // ~120s at the AMQP default of 60. Combined with publisher confirms,
+    // this bounds the window during which silent publishes can be lost when
+    // the broker is partitioned but the TCP socket has not yet errored.
+    heartbeatInterval: 15,
     connectionRetry: {
       maxAttempts: 5,
       initialDelay: 1000,

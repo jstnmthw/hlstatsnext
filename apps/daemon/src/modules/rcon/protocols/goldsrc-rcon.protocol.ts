@@ -260,13 +260,14 @@ export class GoldSrcRconProtocol extends BaseRconProtocol {
     return new Promise((resolve, reject) => {
       const commandBuffer = this.createCommandBuffer(command)
 
+      // Do NOT log buffer contents: the buffer contains the plaintext RCON
+      // password between the challenge and the command (see createCommandBuffer).
       this.logger.debug(
         `GoldSrc RCON: Sending command to ${this.serverAddress}:${this.serverPort}`,
         {
           command,
           challenge: this.challenge,
           bufferLength: commandBuffer.length,
-          bufferHex: commandBuffer.toString("hex").substring(0, 100),
         },
       )
 

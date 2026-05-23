@@ -155,7 +155,7 @@ export const DEFAULT_MESSAGE_TEMPLATES: MessageTemplates = {
     "[HLStatsNext]: {playerName} ({playerSkill}) lost {points} points for suicide with {weapon}",
   teamkill: "[HLStatsNext]: {killerName} lost {points} points for team killing {victimName}",
   playerAction: "[HLStatsNext]: {playerName} ({playerSkill}) got {points} points for {action}",
-  teamAction: "[HLStatsNext]: Team {team} ({playerCount} players) got {points} points for {action}",
+  teamAction: "[HLStatsNext]: {team} ({playerCount} players) got {points} points for {action}",
   playerPlayerAction:
     "[HLStatsNext]: {playerName} got {points} points for {action} against {victimName}",
   connect: "[HLStatsNext]: {playerName} from {playerCountry} connected",

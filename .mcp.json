@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "hlstats-db": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@bytebase/dbhub", "--dsn", "${HLSTATS_DB_DSN}"],
+      "env": {}
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    }
+  }
+}

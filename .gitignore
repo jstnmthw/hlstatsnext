@@ -40,7 +40,15 @@ yarn-error.log*
 # IDE/Editor
 .vscode
 .cursor
-.claude
+
+# Claude Code: ignore everything by default, then opt the team-shared bits
+# back in. settings.local.json stays personal; settings.json + skills + agents
+# + hooks are committed so a fresh clone gets the full team toolkit.
+.claude/*
+!.claude/agents/
+!.claude/hooks/
+!.claude/skills/
+!.claude/settings.json
 
 # Generated Prisma files
 generated/

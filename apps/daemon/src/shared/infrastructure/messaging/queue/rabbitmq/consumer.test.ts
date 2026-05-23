@@ -43,6 +43,8 @@ describe("RabbitMQConsumer", () => {
       assertExchange: vi.fn().mockResolvedValue(undefined),
       assertQueue: vi.fn().mockResolvedValue(undefined),
       bindQueue: vi.fn().mockResolvedValue(undefined),
+      on: vi.fn(),
+      off: vi.fn(),
     } as unknown as QueueChannel
 
     mockClient = {
@@ -50,6 +52,8 @@ describe("RabbitMQConsumer", () => {
       disconnect: vi.fn(),
       createChannel: vi.fn().mockResolvedValue(mockChannel),
       isConnected: vi.fn().mockReturnValue(true),
+      on: vi.fn(),
+      off: vi.fn(),
     } as unknown as IQueueClient
 
     mockLogger = {

@@ -99,6 +99,24 @@ export class IngressService implements IIngressService {
   }
 
   /**
+   * Periodic sweep of ingress-side caches (token auth, rate-limiter,
+   * log-cooldown map). Called by the daemon's housekeeping interval.
+   */
+  sweep(): void {
+    const result = this.dependencies.tokenAuthenticator.sweep()
+    if (
+      result.tokens > 0 ||
+      result.sources > 0 ||
+      result.logMessages > 0 ||
+      result.rateLimitEntries > 0
+    ) {
+      this.logger.debug(
+        `Ingress sweep evicted: tokens=${result.tokens} sources=${result.sources} logCooldown=${result.logMessages} rateLimit=${result.rateLimitEntries}`,
+      )
+    }
+  }
+
+  /**
    * Process a raw log line from an authenticated server.
    * This method is called after authentication has succeeded.
    */

@@ -44,7 +44,7 @@ this.logger.debug(
 
 ### [CRITICAL] CRIT-2 — Publisher caches a dead channel forever after the first reconnect
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/publisher.ts:30, 129-133`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/publisher.ts:30, 129-133`
       **Pattern:** mq-reconnect
       **Anti-pattern (Nygard):** Integration point without invalidation; stale handle as silent failure.
       **Scenario:** RabbitMQ restart at 3am, or any 1-second network blip. The `RabbitMQClient` reconnects (5 attempts, ~30s), but `EventPublisher.channel` still points at the dead channel from the old connection.
@@ -62,7 +62,7 @@ private async ensureChannel(): Promise<void> {
 
 ### [CRITICAL] CRIT-3 — Consumer caches dead channels; no re-subscribe on reconnect
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/consumer.ts:53` and `apps/daemon/src/shared/infrastructure/messaging/queue/rabbitmq/client.ts:218-269`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/core/consumer.ts:53` and `apps/daemon/src/shared/infrastructure/messaging/queue/rabbitmq/client.ts:218-269`
       **Pattern:** mq-reconnect
       **Scenario:** RabbitMQ restart. Client reconnects and creates new channels lazily. The consumer's `start()` is a one-shot at boot — its `consume(...)` registration is on the old (now-dead) channel.
       **Description:** `EventConsumer.channels` is a Map populated during `start()`. After client reconnects, there's no event wired to re-establish `consumeQueue()`. The daemon will eventually publish again (after CRIT-2 is fixed) but will stop consuming.
@@ -129,7 +129,7 @@ stop(): void {                  // returns void, signature swallows the promise
 
 ### [CRITICAL] CRIT-8 — Shutdown parallelism: dependencies torn down while in-flight handlers still run
 
-- [ ] **File:** `apps/daemon/src/main.ts:303-332` (`Promise.all([...])` at 316)
+- [x] **File:** `apps/daemon/src/main.ts:303-332` (`Promise.all([...])` at 316)
       **Pattern:** shutdown-order, mq-ack
       **Scenario:** SIGTERM during ~1k events/sec burst. Several event handlers are mid-flight.
       **Description:** Five subsystems shut down in parallel via `Promise.all`. There is no "stop accepting → drain → close dependencies" phasing. Cache (Garnet/Redis) and publisher channel can be torn down while a still-running handler is mid-write. RabbitMQ consumer cancels its consumer tag (consumer.ts:152) but the handler's `ack(msg)` will fire _after_ the channel closes → `IllegalOperationError` → message un-acked → RabbitMQ redelivers on reconnect → duplicate processing. With `prefetchCount=10 × 3 queues = 30`, up to 30 messages may be redelivered on each restart. Handlers in this codebase are **not idempotent** at the DB layer (`chat_message`, `Eventfrag`, `Action`, `EventEntry`, `EventChangeName`, etc. all insert new rows / cumulatively award points).
@@ -139,7 +139,7 @@ stop(): void {                  // returns void, signature swallows the promise
 
 ### [CRITICAL] CRIT-9 — Channel-level error/close events have no listeners; channel death undetected
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/rabbitmq/adapters.ts:22-137` and `client.ts:119-141`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/rabbitmq/adapters.ts:22-137` and `client.ts:119-141`
       **Pattern:** mq-reconnect (missing listeners)
       **Scenario:** Broker closes a single channel — e.g., precondition-failed on assertQueue mismatch, per-channel exception from amqplib, unroutable mandatory publish. Connection stays up but the channel is dead.
       **Description:** `AmqpChannelAdapter` does not expose `on(event, listener)` at all. `RabbitMQClient.createChannel` does not attach any handler. Only `connection.on(...)` listeners exist. When `channel.publish()` fires on a dead channel, amqplib throws `IllegalOperationError` — but the cached references in `EventConsumer.channels` and `EventPublisher.channel` are never invalidated. Daemon reports "connected" while every operation throws.
@@ -186,7 +186,7 @@ process.on("uncaughtException", async (err) => {
 
 ### [CRITICAL] CRIT-13 — Prometheus exporter accumulates every histogram sample forever
 
-- [ ] **File:** `packages/observability/src/prometheus/prometheus-metrics-exporter.ts:47-52, 138-173`
+- [x] **File:** `packages/observability/src/prometheus/prometheus-metrics-exporter.ts:47-52, 138-173`
       **Pattern:** unbounded-collection, metric-cardinality
       **Scenario:** Sustained daemon load. The daemon calls `recordHistogram` from `event-processor.ts:75, 99` (once per event) and from `prisma-metrics-extension.ts:154` (once per Prisma query) — both confirmed active production call sites.
       **Description:** `recordHistogram` pushes raw values onto a Map of arrays that is never trimmed. `exportMetrics()` runs `values.reduce(...)`, `values.filter(...)` per bucket on every scrape. No bucket-counter aggregation as in the standard `prom-client` library.
@@ -204,7 +204,7 @@ recordHistogram(name, labels = {}, value) {
 
 ### [CRITICAL] CRIT-14 — GoldSrc RCON `sendRconCommand` leaks message listeners on every timeout
 
-- [ ] **File:** `apps/daemon/src/modules/rcon/protocols/goldsrc-rcon.protocol.ts:273-289`
+- [x] **File:** `apps/daemon/src/modules/rcon/protocols/goldsrc-rcon.protocol.ts:273-289`
       **Pattern:** listener-leak
       **Scenario:** A command times out (frequent against an unstable/dead server). The `setTimeout(reject, commandTimeout)` callback at line 273 does not `clearTimeout` or `socket.off("message", onMessage)`. The listener is removed only on a `socket.send` error (line 283) or `messageHandler`'s success branch.
       **Description:** With monitoring every 30s and frequent timeouts during network instability, the long-lived UDP socket accumulates 30+ stale listeners per hour per server. Eventually `EventEmitter` warning at 10, then unbounded growth until `cleanup()` fires (only on disconnect — which doesn't happen for the timeout case). The `getChallengeFromServer` timeout path (line 190-195) has the same defect.
@@ -225,7 +225,7 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-1 — Unbounded `loggedMessages` and `AuthRateLimiter.entries` Maps grow per source IP
 
-- [ ] **File:** `apps/daemon/src/modules/ingress/adapters/token-server-authenticator.ts:59` (loggedMessages) and `apps/daemon/src/modules/ingress/utils/rate-limiter.ts:34` (entries)
+- [x] **File:** `apps/daemon/src/modules/ingress/adapters/token-server-authenticator.ts:59` (loggedMessages) and `apps/daemon/src/modules/ingress/utils/rate-limiter.ts:34` (entries)
       **Pattern:** unbounded-collection
       **Scenario:** Random internet UDP scans, spoofed-source UDP flood, or just IP churn over time.
       **Description:** `loggedMessages` is keyed by `"source-unknown-<ip>"` or `"beacon-ok-<ip>:<ephemeral-port>"` and never evicts (the `clearCaches()` and `clear()` methods are only called from tests). `AuthRateLimiter.entries` is keyed by source IP — even when `blockedUntil` expires, the entry is left behind with empty `attempts: []`.
@@ -234,7 +234,7 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-2 — `PlayerSessionRepository` has no eviction for ghost sessions
 
-- [ ] **File:** `apps/daemon/src/modules/player/repositories/player-session.repository.ts:24-36, 91-110`
+- [x] **File:** `apps/daemon/src/modules/player/repositories/player-session.repository.ts:24-36, 91-110`
       **Pattern:** unbounded-collection, ghost-session
       **Scenario:** Server crash (no QUIT log line sent), packet loss on the disconnect line, kick during connect handshake, mid-game map change with reissued userids.
       **Description:** Five parallel Maps shed entries only via `deleteSession()` (called from `DisconnectEventHandler`) or `deleteServerSessions()` (`synchronizeServerSessions`). No `lastSeen`-based TTL, no max-size, no RCON reconciliation.
@@ -243,7 +243,7 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-3 — Source queues silently drop messages older than 1 hour to DLQ; DLQ is a black hole
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/rabbitmq/client.ts:292-326`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/rabbitmq/client.ts:292-326`
       **Pattern:** mq-dlq
       **Scenario:** Daemon down >1h for maintenance, or consumer outage (CRIT-3) that nobody noticed.
       **Description:** Each source queue has `"x-message-ttl": 3600000`. Expired messages route to DLX → DLQ. DLQ has no `x-message-ttl`, no `x-max-length`, no consumer.
@@ -267,7 +267,7 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-6 — Hardcoded queue topology ignores `RabbitMQConfig.queues` — `maxLength` config is dead
 
-- [ ] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/rabbitmq/client.ts:272-336`; defaults at `messaging/module.ts:255-302`
+- [x] **File:** `apps/daemon/src/shared/infrastructure/messaging/queue/rabbitmq/client.ts:272-336`; defaults at `messaging/module.ts:255-302`
       **Pattern:** unbounded-collection (broker-side)
       **Description:** `setupTopology` hardcodes its own args and never reads `this.config.queues[*].options`. The `maxLength: 50000 / 75000 / 100000` declarations in config are inert.
       **Growth/Impact:** Queues protected only by `x-message-ttl: 3600000`. At 1k events/sec sustained downstream stall, 3.6M messages in one hour → broker OOM kill.
@@ -322,7 +322,7 @@ recordHistogram(name, labels = {}, value) {
 
 ### [WARNING] WARN-13 — `PlayerStatusEnricher.enrichmentCache` and `GameDetectionService.gameCache` unbounded
 
-- [ ] **File:** `apps/daemon/src/modules/player/enrichers/player-status-enricher.ts:27, 231` and `apps/daemon/src/modules/game/game-detection.service.ts:6, 184`
+- [x] **File:** `apps/daemon/src/modules/player/enrichers/player-status-enricher.ts:27, 231` and `apps/daemon/src/modules/game/game-detection.service.ts:6, 184`
       **Pattern:** cache-no-eviction
       **Description:** Both caches have working `cleanCache()` / TTL-on-read code but no production caller of the cleanup. `enrichmentCache` keys by `${steamId}:${ipAddress}` — grows with player + IP churn. `gameCache` keys by `${address}:${port}` — grows with infra churn (containerized servers with rotating IPs).
       **Growth/Impact:** Slow OOM over weeks. Tens to hundreds of thousands of entries per server.

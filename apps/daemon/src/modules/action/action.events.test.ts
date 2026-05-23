@@ -32,6 +32,7 @@ function createMockSessionService(): IPlayerSessionService {
     convertToGameUserIds: vi.fn(),
     canSendPrivateMessage: vi.fn(),
     getSessionStats: vi.fn(),
+    sweepStaleSessions: vi.fn(),
   }
 }
 

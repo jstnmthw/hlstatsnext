@@ -8,6 +8,7 @@ import type { IActionService } from "@/modules/action/action.types"
 import type { IGameDetectionService } from "@/modules/game/game-detection.types"
 import type { IIngressService, IngressOptions } from "@/modules/ingress/ingress.types"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IPlayerStatusEnricher } from "@/modules/player/enrichers/player-status-enricher"
 import type { IPlayerSessionService } from "@/modules/player/types/player-session.types"
 import type { IPlayerRepository, IPlayerService } from "@/modules/player/types/player.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
@@ -77,6 +78,7 @@ export interface AppContext {
   rconService: IRconService
   rconScheduleService: IRconScheduleService
   serverStatusEnricher: IServerStatusEnricher
+  playerStatusEnricher: IPlayerStatusEnricher
   sessionService: IPlayerSessionService
   commandResolverService: CommandResolverService
 
@@ -191,6 +193,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     rconService: services.rconService,
     rconScheduleService: services.rconScheduleService,
     serverStatusEnricher: services.serverStatusEnricher,
+    playerStatusEnricher: services.playerStatusEnricher,
     sessionService: services.sessionService,
     commandResolverService: services.commandResolverService,
 

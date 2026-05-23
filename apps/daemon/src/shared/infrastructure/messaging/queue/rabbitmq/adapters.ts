@@ -11,6 +11,8 @@ import type {
   ConsumeOptions,
   PublishOptions,
   QueueChannel,
+  QueueChannelEvent,
+  QueueChannelListener,
   QueueCheckResult,
   QueueConnection,
 } from "@/shared/infrastructure/messaging/queue/core/types"
@@ -133,6 +135,14 @@ export class AmqpChannelAdapter implements QueueChannel {
 
   async close(): Promise<void> {
     await this.channel.close()
+  }
+
+  on(event: QueueChannelEvent, listener: QueueChannelListener): void {
+    this.channel.on(event, listener)
+  }
+
+  off(event: QueueChannelEvent, listener: QueueChannelListener): void {
+    this.channel.off(event, listener)
   }
 }
 

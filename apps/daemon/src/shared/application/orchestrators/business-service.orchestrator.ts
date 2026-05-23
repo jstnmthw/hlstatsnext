@@ -20,6 +20,7 @@ import type { IMapService } from "@/modules/map/map.service"
 import { MapService } from "@/modules/map/map.service"
 import { MatchService } from "@/modules/match/match.service"
 import type { IMatchService } from "@/modules/match/match.types"
+import type { IPlayerStatusEnricher } from "@/modules/player/enrichers/player-status-enricher"
 import { PlayerStatusEnricher } from "@/modules/player/enrichers/player-status-enricher"
 import { PlayerSessionRepository } from "@/modules/player/repositories/player-session.repository"
 import { PlayerSessionService } from "@/modules/player/services/player-session.service"
@@ -58,6 +59,7 @@ export interface BusinessServiceCollection {
   rconService: IRconService
   rconScheduleService: IRconScheduleService
   serverStatusEnricher: IServerStatusEnricher
+  playerStatusEnricher: IPlayerStatusEnricher
   sessionService: IPlayerSessionService
   commandResolverService: CommandResolverService
 }
@@ -203,6 +205,7 @@ export function createBusinessServices(
     rconService,
     rconScheduleService,
     serverStatusEnricher,
+    playerStatusEnricher,
     sessionService,
     commandResolverService,
   }

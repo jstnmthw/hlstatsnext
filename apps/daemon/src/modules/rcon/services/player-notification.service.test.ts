@@ -58,6 +58,7 @@ describe("PlayerNotificationService", () => {
       convertToGameUserIds: vi.fn().mockResolvedValue([]),
       canSendPrivateMessage: vi.fn().mockResolvedValue(true),
       getSessionStats: vi.fn(),
+      sweepStaleSessions: vi.fn(),
     }
 
     service = new PlayerNotificationService(

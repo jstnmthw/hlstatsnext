@@ -36,6 +36,8 @@ describe("EventPublisher", () => {
       consume: vi.fn(),
       cancel: vi.fn(),
       close: vi.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
     } as unknown as QueueChannel
 
     mockClient = {
@@ -43,6 +45,8 @@ describe("EventPublisher", () => {
       connect: vi.fn(),
       disconnect: vi.fn(),
       isConnected: vi.fn().mockReturnValue(true),
+      on: vi.fn(),
+      off: vi.fn(),
     } as unknown as IQueueClient
 
     mockLogger = {

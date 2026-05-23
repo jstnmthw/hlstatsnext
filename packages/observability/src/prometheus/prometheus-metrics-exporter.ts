@@ -7,10 +7,32 @@
 
 import type { DatabaseQueryMetric, ILogger } from "../types"
 
+/**
+ * Fixed bucket upper bounds (seconds). Matches `prom-client` defaults closely
+ * enough for our dashboards and stays sorted ascending so a single linear pass
+ * in `recordHistogram` can update every applicable bucket.
+ */
+const DEFAULT_HISTOGRAM_BUCKETS: readonly number[] = [
+  0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10,
+] as const
+
+interface HistogramAggregate {
+  /** Cumulative count per bucket, parallel to DEFAULT_HISTOGRAM_BUCKETS */
+  bucketCounts: number[]
+  sum: number
+  count: number
+}
+
 export class PrometheusMetricsExporter {
   private counters = new Map<string, number>()
   private gauges = new Map<string, number>()
-  private histograms = new Map<string, number[]>()
+  /**
+   * Bucket-aggregated histograms. Earlier versions retained every raw sample
+   * (Map<string, number[]>), which grew without bound — at 1k events/sec ×
+   * ~60 label keys, ~5 GB heap in a week and O(N) scrape latency over the
+   * full history. Aggregating on write keeps memory O(buckets × keys).
+   */
+  private histograms = new Map<string, HistogramAggregate>()
   private databaseQueries: DatabaseQueryMetric[] = []
   private readonly maxQueryHistory = 10000 // Keep last 10k queries
 
@@ -43,12 +65,29 @@ export class PrometheusMetricsExporter {
 
   /**
    * Record a histogram observation (for durations, sizes, etc.)
+   *
+   * Aggregates on write — increments every bucket the value falls into, plus
+   * sum + count. No per-sample retention.
    */
   recordHistogram(name: string, labels: Record<string, string> = {}, value: number): void {
     const key = this.getMetricKey(name, labels)
-    const values = this.histograms.get(key) || []
-    values.push(value)
-    this.histograms.set(key, values)
+    let agg = this.histograms.get(key)
+    if (!agg) {
+      agg = {
+        bucketCounts: new Array(DEFAULT_HISTOGRAM_BUCKETS.length).fill(0),
+        sum: 0,
+        count: 0,
+      }
+      this.histograms.set(key, agg)
+    }
+
+    for (let i = 0; i < DEFAULT_HISTOGRAM_BUCKETS.length; i++) {
+      if (value <= DEFAULT_HISTOGRAM_BUCKETS[i]!) {
+        agg.bucketCounts[i]!++
+      }
+    }
+    agg.sum += value
+    agg.count++
   }
 
   /**
@@ -135,8 +174,8 @@ export class PrometheusMetricsExporter {
       lines.push(`${name}${labelStr} ${value}`)
     }
 
-    // Export histograms
-    for (const [key, values] of this.histograms.entries()) {
+    // Export histograms (already aggregated — no per-sample work here)
+    for (const [key, agg] of this.histograms.entries()) {
       const { name, labels } = this.parseMetricKey(key)
       const labelStr = this.formatLabels(labels)
 
@@ -145,31 +184,23 @@ export class PrometheusMetricsExporter {
         lines.push(`# TYPE ${name} histogram`)
       }
 
-      // Calculate histogram buckets
-      const buckets = [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10]
-      const counts = this.calculateBuckets(values, buckets)
-
-      for (let i = 0; i < buckets.length; i++) {
-        const bucket = buckets[i]
-        const count = counts[i]
-        if (bucket !== undefined && count !== undefined) {
-          const bucketLabels = {
-            ...labels,
-            le: Number.isInteger(bucket) ? bucket.toFixed(1) : bucket.toString(),
-          }
-          const bucketLabelStr = this.formatLabels(bucketLabels)
-          lines.push(`${name}_bucket${bucketLabelStr} ${count}`)
+      for (let i = 0; i < DEFAULT_HISTOGRAM_BUCKETS.length; i++) {
+        const bucket = DEFAULT_HISTOGRAM_BUCKETS[i]!
+        const bucketLabels = {
+          ...labels,
+          le: Number.isInteger(bucket) ? bucket.toFixed(1) : bucket.toString(),
         }
+        const bucketLabelStr = this.formatLabels(bucketLabels)
+        lines.push(`${name}_bucket${bucketLabelStr} ${agg.bucketCounts[i]}`)
       }
 
-      // Add +Inf bucket
+      // +Inf bucket (every observation falls into this one)
       const infLabels = { ...labels, le: "+Inf" }
       const infLabelStr = this.formatLabels(infLabels)
-      lines.push(`${name}_bucket${infLabelStr} ${values.length}`)
+      lines.push(`${name}_bucket${infLabelStr} ${agg.count}`)
 
-      // Add sum and count
-      lines.push(`${name}_sum${labelStr} ${values.reduce((a, b) => a + b, 0)}`)
-      lines.push(`${name}_count${labelStr} ${values.length}`)
+      lines.push(`${name}_sum${labelStr} ${agg.sum}`)
+      lines.push(`${name}_count${labelStr} ${agg.count}`)
     }
 
     return lines.join("\n") + "\n"
@@ -275,19 +306,6 @@ export class PrometheusMetricsExporter {
 
     const formatted = entries.map(([k, v]) => `${k}="${v}"`).join(",")
     return `{${formatted}}`
-  }
-
-  /**
-   * Calculate histogram bucket counts
-   */
-  private calculateBuckets(values: number[], buckets: number[]): number[] {
-    const counts: number[] = []
-
-    for (const bucket of buckets) {
-      counts.push(values.filter((v) => v <= bucket).length)
-    }
-
-    return counts
   }
 
   /**

@@ -358,6 +358,10 @@ export class PlayerSessionService implements IPlayerSessionService {
     }
   }
 
+  async sweepStaleSessions(maxAgeMs: number): Promise<number> {
+    return this.sessionRepository.sweepStaleSessions(maxAgeMs)
+  }
+
   // Private helper methods
 
   /**

@@ -25,6 +25,7 @@ const mockSessionRepository = {
   getSessionBySteamId: vi.fn(),
   getServerSessions: vi.fn().mockResolvedValue([]), // Return empty array by default
   getAllSessions: vi.fn().mockResolvedValue([]),
+  sweepStaleSessions: vi.fn().mockReturnValue(0),
 }
 
 let mockRconService: ReturnType<typeof createMockRconService>

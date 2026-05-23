@@ -9,6 +9,8 @@ import type {
   ConnectionStats,
   IQueueClient,
   QueueChannel,
+  QueueClientEvent,
+  QueueClientListener,
   QueueConnection,
   RabbitMQConfig,
 } from "@/shared/infrastructure/messaging/queue/core/types"
@@ -47,10 +49,44 @@ export class RabbitMQClient implements IQueueClient {
   }
   private connectionStartTime: number | null = null
 
+  /**
+   * Per-event listener sets for client lifecycle events. Consumers subscribe to
+   * `"connected"` to re-establish subscriptions after a transparent reconnect.
+   */
+  private readonly clientListeners = new Map<
+    "connected" | "disconnected",
+    Set<QueueClientListener>
+  >()
+
   constructor(
     private readonly config: RabbitMQConfig,
     private readonly logger: ILogger,
   ) {}
+
+  on(event: QueueClientEvent, listener: QueueClientListener): void {
+    if (!this.clientListeners.has(event)) {
+      this.clientListeners.set(event, new Set())
+    }
+    this.clientListeners.get(event)!.add(listener)
+  }
+
+  off(event: QueueClientEvent, listener: QueueClientListener): void {
+    this.clientListeners.get(event)?.delete(listener)
+  }
+
+  private emitClientEvent(event: QueueClientEvent): void {
+    const listeners = this.clientListeners.get(event)
+    if (!listeners) return
+    for (const listener of listeners) {
+      try {
+        listener()
+      } catch (error) {
+        this.logger.error(
+          `RabbitMQClient ${event} listener threw: ${error instanceof Error ? error.message : String(error)}`,
+        )
+      }
+    }
+  }
 
   async connect(): Promise<void> {
     if (this.isConnecting) {
@@ -72,6 +108,9 @@ export class RabbitMQClient implements IQueueClient {
       this.isConnecting = false
 
       this.logger.info("RabbitMQ connection established successfully")
+
+      // Notify subscribers (consumer re-subscribes its queues here).
+      this.emitClientEvent("connected")
     } catch (error) {
       this.isConnecting = false
       this.logger.error(`Failed to establish RabbitMQ connection: ${error}`)
@@ -232,8 +271,13 @@ export class RabbitMQClient implements IQueueClient {
 
   private async handleConnectionError(error: Error): Promise<void> {
     this.logger.error(`Handling connection error: ${error}`)
+    const wasConnected = this.connection !== null
     this.connection = null
     this.channels.clear()
+
+    if (wasConnected) {
+      this.emitClientEvent("disconnected")
+    }
 
     // Don't attempt to reconnect if we're shutting down
     if (this.isShuttingDown) {
@@ -292,9 +336,14 @@ export class RabbitMQClient implements IQueueClient {
   }
 
   private async handleConnectionClose(): Promise<void> {
+    const wasConnected = this.connection !== null
     this.connection = null
     this.channels.clear()
     this.connectionStats.channelsCount = 0
+
+    if (wasConnected) {
+      this.emitClientEvent("disconnected")
+    }
 
     // Don't attempt reconnection if we're shutting down
     if (this.isShuttingDown) {
@@ -325,41 +374,43 @@ export class RabbitMQClient implements IQueueClient {
         autoDelete: false,
       })
 
-      // Create priority queue
-      await setupChannel.assertQueue("hlstats.events.priority", {
-        durable: true,
-        autoDelete: false,
+      // Queue topology now reads from RabbitMQConfig.queues.*.options instead
+      // of hardcoded values, so `messageTtl`/`maxLength`/`deadLetterExchange`
+      // declared in module.ts are no longer dead config (WARN-6). Priority
+      // queue gets the extra `x-max-priority` argument; everything else is
+      // derived from the same shape.
+      await setupChannel.assertQueue(this.config.queues.priority.name, {
+        durable: this.config.queues.priority.options.durable,
+        autoDelete: this.config.queues.priority.options.autoDelete,
         arguments: {
-          "x-dead-letter-exchange": "hlstats.events.dlx",
-          "x-message-ttl": 3600000, // 1 hour
+          ...buildQueueArguments(this.config.queues.priority.options),
           "x-max-priority": 10,
         },
       })
 
-      // Create standard queue
-      await setupChannel.assertQueue("hlstats.events.standard", {
-        durable: true,
-        autoDelete: false,
-        arguments: {
-          "x-dead-letter-exchange": "hlstats.events.dlx",
-          "x-message-ttl": 3600000, // 1 hour
-        },
+      await setupChannel.assertQueue(this.config.queues.standard.name, {
+        durable: this.config.queues.standard.options.durable,
+        autoDelete: this.config.queues.standard.options.autoDelete,
+        arguments: buildQueueArguments(this.config.queues.standard.options),
       })
 
-      // Create bulk queue
-      await setupChannel.assertQueue("hlstats.events.bulk", {
-        durable: true,
-        autoDelete: false,
-        arguments: {
-          "x-dead-letter-exchange": "hlstats.events.dlx",
-          "x-message-ttl": 3600000, // 1 hour
-        },
+      await setupChannel.assertQueue(this.config.queues.bulk.name, {
+        durable: this.config.queues.bulk.options.durable,
+        autoDelete: this.config.queues.bulk.options.autoDelete,
+        arguments: buildQueueArguments(this.config.queues.bulk.options),
       })
 
-      // Create dead letter queue
+      // Dead letter queue: bounded length so a long downstream outage cannot
+      // grow the DLQ into broker memory pressure (WARN-3). `drop-head` keeps
+      // the most-recent failures, which is more useful for diagnosis than
+      // ancient ones.
       await setupChannel.assertQueue("hlstats.events.dlq", {
         durable: true,
         autoDelete: false,
+        arguments: {
+          "x-max-length": 10000,
+          "x-overflow": "drop-head",
+        },
       })
 
       // Create bindings
@@ -416,4 +467,25 @@ export class RabbitMQClient implements IQueueClient {
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms))
   }
+}
+
+/**
+ * Build amqplib arguments object from QueueConfig.options. Skips undefined
+ * fields so we don't pass `"x-max-length": undefined` (which amqplib treats
+ * differently than absence).
+ */
+function buildQueueArguments(
+  options: RabbitMQConfig["queues"]["priority"]["options"],
+): Record<string, unknown> {
+  const args: Record<string, unknown> = {}
+  if (options.deadLetterExchange !== undefined) {
+    args["x-dead-letter-exchange"] = options.deadLetterExchange
+  }
+  if (options.messageTtl !== undefined) {
+    args["x-message-ttl"] = options.messageTtl
+  }
+  if (options.maxLength !== undefined) {
+    args["x-max-length"] = options.maxLength
+  }
+  return args
 }

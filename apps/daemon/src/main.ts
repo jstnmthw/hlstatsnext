@@ -74,6 +74,15 @@ export class HLStatsDaemon {
   private metricsCollectionInterval: ReturnType<typeof setInterval> | null = null
 
   /**
+   * Periodic sweep of in-process caches that would otherwise grow without
+   * bound over a long-running daemon (player sessions, geo enrichment,
+   * game-detection, rate-limiter, log-cooldown). Paired clear in runShutdown().
+   */
+  private housekeepingInterval: ReturnType<typeof setInterval> | null = null
+  private static readonly HOUSEKEEPING_INTERVAL_MS = 5 * 60 * 1000
+  private static readonly STALE_SESSION_MAX_AGE_MS = 30 * 60 * 1000
+
+  /**
    * Memoized shutdown promise. A SIGTERM followed by SIGINT (or any re-entrant
    * stop()) must not double-close subsystems — Prisma, RabbitMQ, and Garnet all
    * throw on second close.
@@ -246,10 +255,59 @@ export class HLStatsDaemon {
     // Start periodic metrics gauge collection (every 15s to match Prometheus scrape interval)
     this.startMetricsCollection()
 
+    // Start periodic cache housekeeping
+    this.startHousekeeping()
+
     await Promise.all([this.context.ingressService.start()])
 
     // Start RCON scheduler for scheduled commands and monitoring
     await this.rconScheduler.start()
+  }
+
+  /**
+   * Fan out periodic cache sweeps to every component that holds an unbounded
+   * in-memory cache. Each sweep is best-effort — one failing call must not
+   * stop the others, and a slow call must not block the tick (so we
+   * fire-and-forget).
+   */
+  private startHousekeeping(): void {
+    const run = (): void => {
+      try {
+        const evicted = this.context.gameDetectionService.sweep()
+        if (evicted > 0) this.logger.debug(`Housekeeping: gameCache evicted ${evicted}`)
+      } catch (error) {
+        this.logger.debug(
+          `Housekeeping: gameDetectionService.sweep failed: ${error instanceof Error ? error.message : String(error)}`,
+        )
+      }
+      try {
+        const evicted = this.context.playerStatusEnricher.sweep()
+        if (evicted > 0) this.logger.debug(`Housekeeping: enrichmentCache evicted ${evicted}`)
+      } catch (error) {
+        this.logger.debug(
+          `Housekeeping: playerStatusEnricher.sweep failed: ${error instanceof Error ? error.message : String(error)}`,
+        )
+      }
+      try {
+        this.context.ingressService.sweep()
+      } catch (error) {
+        this.logger.debug(
+          `Housekeeping: ingressService.sweep failed: ${error instanceof Error ? error.message : String(error)}`,
+        )
+      }
+      void this.context.sessionService
+        .sweepStaleSessions(HLStatsDaemon.STALE_SESSION_MAX_AGE_MS)
+        .then((evicted) => {
+          if (evicted > 0) this.logger.debug(`Housekeeping: stale sessions evicted ${evicted}`)
+        })
+        .catch((error) => {
+          this.logger.debug(
+            `Housekeeping: sweepStaleSessions failed: ${error instanceof Error ? error.message : String(error)}`,
+          )
+        })
+    }
+
+    this.housekeepingInterval = setInterval(run, HLStatsDaemon.HOUSEKEEPING_INTERVAL_MS)
   }
 
   /**
@@ -341,6 +399,12 @@ export class HLStatsDaemon {
     if (this.metricsCollectionInterval) {
       clearInterval(this.metricsCollectionInterval)
       this.metricsCollectionInterval = null
+    }
+
+    // Stop housekeeping interval (synchronous, no timeout needed)
+    if (this.housekeepingInterval) {
+      clearInterval(this.housekeepingInterval)
+      this.housekeepingInterval = null
     }
 
     // Phase 1: stop accepting new work (UDP + scheduler) before tearing down

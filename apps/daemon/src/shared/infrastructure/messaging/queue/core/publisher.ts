@@ -127,9 +127,28 @@ export class EventPublisher implements IEventPublisher {
   }
 
   private async ensureChannel(): Promise<void> {
-    if (!this.channel) {
-      this.channel = await this.client.createChannel("publisher")
+    if (this.channel) return
+
+    const channel = await this.client.createChannel("publisher")
+
+    // Invalidate the cached reference the moment amqplib closes the channel.
+    // Without this, every subsequent publish() throws IllegalOperationError
+    // against the dead channel — silent message loss until daemon restart.
+    const onClose = () => {
+      this.channel = null
+      this.logger.warn("Publisher channel closed — will reopen on next publish")
     }
+    const onError = (...args: unknown[]) => {
+      const error = args[0]
+      this.logger.error(
+        `Publisher channel error: ${error instanceof Error ? error.message : String(error)}`,
+      )
+      this.channel = null
+    }
+    channel.on("close", onClose)
+    channel.on("error", onError)
+
+    this.channel = channel
   }
 
   private createMessage<T extends BaseEvent>(event: T): EventMessage<T> {

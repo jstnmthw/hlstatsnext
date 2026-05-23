@@ -55,6 +55,15 @@ export class EventConsumer implements IEventConsumer {
   private isConsuming = false
   private isPaused = false
 
+  /**
+   * Bound listener kept as a field so we can subscribe in start() and
+   * unsubscribe in stop() without losing the reference (accumulated listeners
+   * on the long-lived client would be a leak — CRIT-9 in reverse).
+   */
+  private readonly onClientConnected = (): void => {
+    void this.resubscribeAfterReconnect()
+  }
+
   private stats: ConsumerStats = {
     isConsuming: false,
     messagesProcessed: 0,
@@ -67,6 +76,18 @@ export class EventConsumer implements IEventConsumer {
 
   private processingTimes: number[] = []
   private readonly maxProcessingTimesSamples = 1000
+
+  /**
+   * Promises for currently-running handleMessage invocations. On shutdown we
+   * cancel the consumer tags (so the broker stops delivering) and then await
+   * this set with a deadline. Without this, channels close mid-handler and
+   * the unacked messages are redelivered + double-processed on next start —
+   * none of the writers (chat_message, EventFrag, Action, …) are idempotent.
+   */
+  private readonly inflight = new Set<Promise<void>>()
+
+  /** Hard cap on shutdown drain wait, so a wedged handler can't block exit. */
+  private static readonly DRAIN_TIMEOUT_MS = 5_000
 
   // Metrics reporting
   private metricsTimer: NodeJS.Timeout | null = null
@@ -107,6 +128,10 @@ export class EventConsumer implements IEventConsumer {
         this.queueStats[queueName] = { received: 0, processed: 0, errors: 0 }
       }
 
+      // Subscribe BEFORE starting consumeQueue so a reconnect during initial
+      // subscribe (rare but possible) won't be missed.
+      this.client.on("connected", this.onClientConnected)
+
       // Start consuming from all configured queues
       await Promise.all(this.config.queues.map((queueName) => this.consumeQueue(queueName)))
 
@@ -143,8 +168,12 @@ export class EventConsumer implements IEventConsumer {
         this.metricsTimer = null
       }
 
-      // Cancel all consumers but don't close channels
-      // The channels will be closed by RabbitMQClient.disconnect()
+      // Unsubscribe from reconnect events so the listener doesn't leak across
+      // start/stop cycles.
+      this.client.off("connected", this.onClientConnected)
+
+      // Phase 1: tell broker to stop delivering NEW messages. In-flight
+      // handlers continue to run.
       for (const [queueName, channel] of this.channels) {
         const consumerTag = this.consumerTags.find((tag) => tag.startsWith(queueName))
         if (consumerTag) {
@@ -161,6 +190,25 @@ export class EventConsumer implements IEventConsumer {
               this.logger.warn(`Failed to cancel consumer ${consumerTag}: ${error}`)
             }
           }
+        }
+      }
+
+      // Phase 2: drain in-flight handlers with a bounded wait. Anything still
+      // pending after the deadline gets abandoned — the broker will redeliver
+      // those unacked messages on reconnect (handlers are NOT idempotent today,
+      // CRIT-8 part 2 — but losing the ack here is the lesser evil vs. closing
+      // the channel mid-write).
+      if (this.inflight.size > 0) {
+        const pendingCount = this.inflight.size
+        this.logger.info(`Draining ${pendingCount} in-flight handler(s) before shutdown`)
+        const drained = await drainWithTimeout(
+          Array.from(this.inflight),
+          EventConsumer.DRAIN_TIMEOUT_MS,
+        )
+        if (!drained) {
+          this.logger.warn(
+            `Drain timed out after ${EventConsumer.DRAIN_TIMEOUT_MS}ms with ${this.inflight.size} handler(s) still running; abandoning them`,
+          )
         }
       }
 
@@ -219,9 +267,47 @@ export class EventConsumer implements IEventConsumer {
     return total
   }
 
+  /**
+   * After a transparent reconnect, the client has cleared its channel cache and
+   * created a fresh connection — but our subscriptions live on the dead
+   * channels. Drop the stale references and re-issue consume() for every
+   * queue. Without this, the daemon keeps publishing but stops consuming
+   * forever after the first MQ blip (CRIT-3).
+   */
+  private async resubscribeAfterReconnect(): Promise<void> {
+    if (!this.isConsuming) return
+
+    this.logger.warn("RabbitMQ reconnected — re-subscribing consumers")
+    this.channels.clear()
+    this.consumerTags = []
+
+    try {
+      await Promise.all(this.config.queues.map((queueName) => this.consumeQueue(queueName)))
+      this.logger.info("Consumer re-subscribed to all queues after reconnect")
+    } catch (error) {
+      this.logger.error(
+        `Failed to re-subscribe consumers after reconnect: ${error instanceof Error ? error.message : String(error)}`,
+      )
+    }
+  }
+
   private async consumeQueue(queueName: string): Promise<void> {
     const channel = await this.client.createChannel(`consumer-${queueName}`)
     this.channels.set(queueName, channel)
+
+    // Invalidate the cached channel when amqplib closes it. The client's
+    // `"connected"` event will trigger a fresh consumeQueue() on reconnect.
+    channel.on("close", () => {
+      if (this.channels.get(queueName) === channel) {
+        this.channels.delete(queueName)
+      }
+    })
+    channel.on("error", (...args: unknown[]) => {
+      const err = args[0]
+      this.logger.error(
+        `Consumer channel error for ${queueName}: ${err instanceof Error ? err.message : String(err)}`,
+      )
+    })
 
     // Set up consumer with error handling
     const consumerTag = await channel.consume(
@@ -242,7 +328,14 @@ export class EventConsumer implements IEventConsumer {
         this.eventsReceived++
         this.queueStats[queueName]!.received++
 
-        await this.handleMessage(msg, channel, queueName)
+        // Track in-flight so stop() can drain before tearing down channels.
+        const work = this.handleMessage(msg, channel, queueName)
+        this.inflight.add(work)
+        try {
+          await work
+        } finally {
+          this.inflight.delete(work)
+        }
       },
       {
         noAck: false,
@@ -482,6 +575,27 @@ export class EventConsumer implements IEventConsumer {
         `  Queue ${queueName}: ${q.received} received, ${q.processed} processed, ${q.errors} errors`,
       )
     }
+  }
+}
+
+/**
+ * Wait for all in-flight handlers to settle, or `timeoutMs` to elapse.
+ * Returns true if everything drained, false on timeout.
+ */
+async function drainWithTimeout(work: Promise<unknown>[], timeoutMs: number): Promise<boolean> {
+  if (work.length === 0) return true
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<"timeout">((resolve) => {
+    timer = setTimeout(() => resolve("timeout"), timeoutMs)
+  })
+  try {
+    const result = await Promise.race([
+      Promise.allSettled(work).then(() => "drained" as const),
+      timeout,
+    ])
+    return result === "drained"
+  } finally {
+    if (timer) clearTimeout(timer)
   }
 }
 

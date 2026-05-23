@@ -116,6 +116,28 @@ export class AuthRateLimiter {
   }
 
   /**
+   * Drop entries that are no longer tracking anything: blocks that have expired
+   * AND have no remaining attempts in the window. Bounded by unique source-IP
+   * count, but scanner traffic keeps it growing without this (WARN-1).
+   */
+  sweep(): number {
+    const now = Date.now()
+    const windowStart = now - this.config.windowMs
+    let evicted = 0
+
+    for (const [ip, entry] of this.entries) {
+      const stillBlocked = entry.blockedUntil !== null && entry.blockedUntil > now
+      const recentAttempts = entry.attempts.some((ts) => ts > windowStart)
+      if (!stillBlocked && !recentAttempts) {
+        this.entries.delete(ip)
+        evicted++
+      }
+    }
+
+    return evicted
+  }
+
+  /**
    * Get the remaining attempts before an IP is blocked.
    *
    * @param sourceIp - The source IP address

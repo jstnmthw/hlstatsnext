@@ -118,6 +118,13 @@ export interface IPlayerSessionRepository {
    * Get all active sessions across all servers
    */
   getAllSessions(): Promise<PlayerSession[]>
+
+  /**
+   * Drop sessions whose lastSeen is older than `maxAgeMs`. Used to evict ghost
+   * sessions left behind when a game server crashes without emitting a
+   * DISCONNECT line. Returns the number of sessions evicted.
+   */
+  sweepStaleSessions(maxAgeMs: number): number
 }
 
 /**
@@ -180,6 +187,12 @@ export interface IPlayerSessionService {
    * Get session statistics for monitoring
    */
   getSessionStats(): Promise<SessionStats>
+
+  /**
+   * Drop sessions whose lastSeen is older than `maxAgeMs`. Called periodically
+   * to evict ghost sessions. Returns the number of sessions evicted.
+   */
+  sweepStaleSessions(maxAgeMs: number): Promise<number>
 }
 
 /**

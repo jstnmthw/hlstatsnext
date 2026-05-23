@@ -41,10 +41,14 @@ describe("EventConsumer", () => {
       checkQueue: vi
         .fn()
         .mockResolvedValue({ queue: "test.queue", messageCount: 0, consumerCount: 1 }),
+      on: vi.fn(),
+      off: vi.fn(),
     } as unknown as QueueChannel
 
     mockClient = {
       createChannel: vi.fn().mockResolvedValue(mockChannel),
+      on: vi.fn(),
+      off: vi.fn(),
     } as unknown as IQueueClient
 
     mockProcessor = {

@@ -35,5 +35,6 @@ export function createMockSessionService(): IPlayerSessionService {
       botSessions: 0,
       realPlayerSessions: 0,
     }),
+    sweepStaleSessions: vi.fn().mockResolvedValue(0),
   }
 }

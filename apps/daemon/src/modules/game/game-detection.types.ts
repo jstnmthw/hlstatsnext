@@ -9,4 +9,6 @@ export interface IGameDetectionService {
   detectGameFromServerQuery(address: string, port: number): Promise<GameDetectionResult>
   detectGame(address: string, port: number, logLines: string[]): Promise<GameDetectionResult>
   normalizeGameCode(detectedCode: string): string
+  /** Drop cache entries past their TTL. Returns number evicted. */
+  sweep(): number
 }

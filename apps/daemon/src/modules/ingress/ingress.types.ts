@@ -36,6 +36,10 @@ export interface IIngressService {
    * Get all currently authenticated server IDs.
    */
   getAuthenticatedServerIds(): number[]
+  /**
+   * Periodic sweep of ingress-side caches (auth/rate-limiter).
+   */
+  sweep(): void
 }
 
 export interface IngressStats {

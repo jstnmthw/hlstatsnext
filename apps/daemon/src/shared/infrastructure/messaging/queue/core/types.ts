@@ -7,6 +7,14 @@
 import type { BaseEvent } from "@/shared/types/events"
 
 /**
+ * Lifecycle events emitted by IQueueClient. Consumers subscribe to
+ * `"connected"` to know when to re-establish subscriptions after a transparent
+ * reconnect.
+ */
+export type QueueClientEvent = "connected" | "disconnected"
+export type QueueClientListener = () => void
+
+/**
  * Queue client interface for dependency injection
  */
 export interface IQueueClient {
@@ -15,6 +23,8 @@ export interface IQueueClient {
   createChannel(name: string): Promise<QueueChannel>
   isConnected(): boolean
   getConnectionStats(): ConnectionStats
+  on(event: QueueClientEvent, listener: QueueClientListener): void
+  off(event: QueueClientEvent, listener: QueueClientListener): void
 }
 
 /**
@@ -208,6 +218,15 @@ export interface QueueCheckResult {
 }
 
 /**
+ * Channel-level events. `close` fires when the broker or amqplib closes the
+ * channel (e.g. precondition-failed, connection drop). `error` fires for
+ * per-channel exceptions. Both must invalidate any cached reference to this
+ * channel — once closed, every operation throws IllegalOperationError.
+ */
+export type QueueChannelEvent = "close" | "error"
+export type QueueChannelListener = (...args: unknown[]) => void
+
+/**
  * Queue channel abstraction (wraps amqplib channel)
  */
 export interface QueueChannel {
@@ -227,6 +246,8 @@ export interface QueueChannel {
   checkQueue(queue: string): Promise<QueueCheckResult>
   bindQueue(queue: string, source: string, pattern: string): Promise<void>
   close(): Promise<void>
+  on(event: QueueChannelEvent, listener: QueueChannelListener): void
+  off(event: QueueChannelEvent, listener: QueueChannelListener): void
 }
 
 /**

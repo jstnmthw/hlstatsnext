@@ -172,6 +172,35 @@ export class PlayerSessionRepository implements IPlayerSessionRepository {
   }
 
   /**
+   * Drop sessions whose lastSeen is older than `maxAgeMs`. Defends against
+   * ghost sessions when a server crashes mid-connection and never sends the
+   * DISCONNECT line (WARN-2). Returns the number of sessions evicted.
+   */
+  sweepStaleSessions(maxAgeMs: number): number {
+    const cutoff = Date.now() - maxAgeMs
+    let evicted = 0
+
+    // Snapshot the keys first — we mutate the underlying map during iteration.
+    const candidates: Array<{ key: string; session: PlayerSession }> = []
+    for (const [key, session] of this.sessions) {
+      if (session.lastSeen.getTime() < cutoff) {
+        candidates.push({ key, session })
+      }
+    }
+
+    for (const { key, session } of candidates) {
+      this.removeFromIndexes(session, key)
+      this.sessions.delete(key)
+      evicted++
+    }
+
+    if (evicted > 0) {
+      this.logger.debug(`Swept ${evicted} stale player session(s) (>${maxAgeMs}ms idle)`)
+    }
+    return evicted
+  }
+
+  /**
    * Get session statistics for monitoring
    */
   getStats(): {

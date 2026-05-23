@@ -408,11 +408,11 @@ describe("PlayerStatusEnricher", () => {
     })
   })
 
-  describe("cleanCache", () => {
+  describe("sweep", () => {
     it("should clean expired cache entries", () => {
       // This is a simple test since we can't easily test private cache behavior
       // Just ensure the method doesn't throw
-      expect(() => enricher.cleanCache()).not.toThrow()
+      expect(() => enricher.sweep()).not.toThrow()
     })
   })
 })

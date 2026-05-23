@@ -22,6 +22,7 @@ import type {
 } from "./queue/core/types"
 import { RabbitMQClient } from "./queue/rabbitmq/client"
 import { RabbitMQConsumer } from "./queue/rabbitmq/consumer"
+import { DeadLetterConsumer } from "./queue/rabbitmq/dead-letter-consumer"
 
 /**
  * Configuration for the queue module
@@ -43,6 +44,7 @@ export class QueueModule {
   private publisher: IEventPublisher | null = null
   private consumer: IEventConsumer | null = null
   private rabbitmqConsumer: RabbitMQConsumer | null = null
+  private deadLetterConsumer: DeadLetterConsumer | null = null
 
   constructor(
     private readonly config: QueueModuleConfig,
@@ -136,6 +138,20 @@ export class QueueModule {
     )
     await consumer.start()
     this.rabbitmqConsumer = consumer
+
+    // Spin up the DLQ drain alongside the main consumer. Failing to start
+    // it must NOT take down the daemon — the main pipeline still works,
+    // we just lose DLQ observability until restart.
+    try {
+      this.deadLetterConsumer = new DeadLetterConsumer(this.client, this.logger, metrics)
+      await this.deadLetterConsumer.start()
+    } catch (error) {
+      this.logger.warn(
+        `Dead letter consumer failed to start (continuing without it): ${error instanceof Error ? error.message : String(error)}`,
+      )
+      this.deadLetterConsumer = null
+    }
+
     return consumer
   }
 
@@ -175,6 +191,12 @@ export class QueueModule {
     this.logger.info("Shutting down queue module...")
 
     try {
+      // Stop DLQ drain first — same channel pool as the main consumer.
+      if (this.deadLetterConsumer) {
+        await this.deadLetterConsumer.stop()
+        this.deadLetterConsumer = null
+      }
+
       // Stop rabbitmq consumer wrapper if running
       if (this.rabbitmqConsumer) {
         await this.rabbitmqConsumer.stop()

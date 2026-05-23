@@ -217,6 +217,51 @@ export class TokenServerAuthenticator {
   }
 
   /**
+   * Periodic sweep. Drops expired token/source cache entries, prunes the
+   * log-cooldown map for messages outside the cooldown window, and delegates
+   * to the rate limiter (WARN-1). Bounded by unique source IPs over the
+   * daemon's lifetime; unbounded in practice without this sweep.
+   */
+  sweep(): {
+    tokens: number
+    sources: number
+    logMessages: number
+    rateLimitEntries: number
+  } {
+    const now = Date.now()
+    let tokens = 0
+    let sources = 0
+    let logMessages = 0
+
+    for (const [hash, entry] of this.tokenCache) {
+      if (now - entry.cachedAt > this.config.tokenCacheTtlMs) {
+        this.tokenCache.delete(hash)
+        tokens++
+      }
+    }
+
+    for (const [key, entry] of this.sourceCache) {
+      if (now - entry.cachedAt > this.config.sourceCacheTtlMs) {
+        this.sourceCache.delete(key)
+        sources++
+      }
+    }
+
+    // Anything older than 2× the cooldown can't suppress a future log line.
+    const logCutoff = now - this.LOG_COOLDOWN_MS * 2
+    for (const [key, lastLogTime] of this.loggedMessages) {
+      if (lastLogTime < logCutoff) {
+        this.loggedMessages.delete(key)
+        logMessages++
+      }
+    }
+
+    const rateLimitEntries = this.rateLimiter.sweep()
+
+    return { tokens, sources, logMessages, rateLimitEntries }
+  }
+
+  /**
    * Validate token via cache or database.
    */
   private async validateToken(

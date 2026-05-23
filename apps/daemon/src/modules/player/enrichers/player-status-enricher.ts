@@ -18,6 +18,11 @@ export interface IPlayerStatusEnricher {
    * Enrich player geo data from RCON status player list
    */
   enrichPlayerGeoData(serverId: number, playerList: PlayerInfo[]): Promise<void>
+
+  /**
+   * Drop cache entries past their TTL. Returns the number of entries evicted.
+   */
+  sweep(): number
 }
 
 /**
@@ -226,14 +231,17 @@ export class PlayerStatusEnricher implements IPlayerStatusEnricher {
   }
 
   /**
-   * Clean expired cache entries
+   * Clean expired cache entries. Returns the number of entries evicted.
    */
-  cleanCache(): void {
+  sweep(): number {
     const now = Date.now()
+    let evicted = 0
     for (const [key, entry] of this.enrichmentCache.entries()) {
       if (now - entry.timestamp > this.CACHE_TTL_MS) {
         this.enrichmentCache.delete(key)
+        evicted++
       }
     }
+    return evicted
   }
 }

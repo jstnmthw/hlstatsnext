@@ -187,16 +187,15 @@ export class GoldSrcRconProtocol extends BaseRconProtocol {
         },
       )
 
-      const timeout = setTimeout(() => {
-        this.logger.error(
-          `GoldSrc RCON: Challenge request timeout after ${this.connectionTimeout}ms for ${this.serverAddress}:${this.serverPort}`,
-        )
-        reject(new RconError("Challenge request timeout", RconErrorCode.TIMEOUT))
-      }, this.connectionTimeout)
-
+      // Single cleanup closure shared by every reject/resolve path. Earlier
+      // versions only ran cleanup on the success branch and on the
+      // socket.send-error branch — the timeout path leaked the message
+      // listener on the long-lived socket, accumulating one per failed
+      // challenge attempt (CRIT-14). Forward references to `cleanup` from
+      // inside `onMessage` and the setTimeout callback are safe: both
+      // closures only run after `cleanup` is defined below.
       const onMessage = (msg: Buffer, rinfo: dgram.RemoteInfo) => {
-        clearTimeout(timeout)
-        this.socket?.off("message", onMessage)
+        cleanup()
 
         const response = msg.toString()
         this.logger.debug(
@@ -223,12 +222,24 @@ export class GoldSrcRconProtocol extends BaseRconProtocol {
         }
       }
 
+      const timeout = setTimeout(() => {
+        cleanup()
+        this.logger.error(
+          `GoldSrc RCON: Challenge request timeout after ${this.connectionTimeout}ms for ${this.serverAddress}:${this.serverPort}`,
+        )
+        reject(new RconError("Challenge request timeout", RconErrorCode.TIMEOUT))
+      }, this.connectionTimeout)
+
+      const cleanup = (): void => {
+        clearTimeout(timeout)
+        this.socket?.off("message", onMessage)
+      }
+
       this.socket?.on("message", onMessage)
 
       this.socket?.send(challengeRequest, this.serverPort, this.serverAddress, (error) => {
         if (error) {
-          clearTimeout(timeout)
-          this.socket?.off("message", onMessage)
+          cleanup()
           this.logger.debug(
             `GoldSrc RCON: Failed to send challenge request to ${this.serverAddress}:${this.serverPort}`,
             {
@@ -271,17 +282,25 @@ export class GoldSrcRconProtocol extends BaseRconProtocol {
         },
       )
 
+      // Single cleanup closure shared by every reject/resolve path (CRIT-14).
+      // Forward references are safe — the timer/listener fire after `cleanup`
+      // is declared below.
+      const onMessage = this.createMessageHandler(command, resolve, reject, () => cleanup())
+
       const timeout = setTimeout(() => {
+        cleanup()
         reject(new RconError("Command timeout", RconErrorCode.TIMEOUT))
       }, this.commandTimeout)
 
-      const onMessage = this.createMessageHandler(command, resolve, reject, timeout)
+      const cleanup = (): void => {
+        clearTimeout(timeout)
+        this.socket?.off("message", onMessage)
+      }
 
       this.socket?.on("message", onMessage)
       this.socket?.send(commandBuffer, this.serverPort, this.serverAddress, (error) => {
         if (error) {
-          clearTimeout(timeout)
-          this.socket?.removeListener("message", onMessage)
+          cleanup()
           reject(
             new RconError(`Failed to send command: ${error.message}`, RconErrorCode.COMMAND_FAILED),
           )
@@ -301,13 +320,16 @@ export class GoldSrcRconProtocol extends BaseRconProtocol {
   }
 
   /**
-   * Creates message handler for command responses
+   * Creates message handler for command responses. `cleanup` clears the
+   * outer timeout AND removes the message listener — the caller in
+   * sendRconCommand wires up the same cleanup for every other reject path
+   * so the listener cannot leak (CRIT-14).
    */
   private createMessageHandler(
     command: string,
     resolve: (value: string) => void,
     reject: (reason: Error) => void,
-    timeout: NodeJS.Timeout,
+    cleanup: () => void,
   ) {
     const messageHandler = (msg: Buffer, rinfo: dgram.RemoteInfo) => {
       this.logger.debug(`GoldSrc RCON: Received response from ${rinfo.address}:${rinfo.port}`, {
@@ -319,8 +341,7 @@ export class GoldSrcRconProtocol extends BaseRconProtocol {
       const result = this.processResponse(msg)
 
       if (result.type === "complete") {
-        clearTimeout(timeout)
-        this.socket?.removeListener("message", messageHandler)
+        cleanup()
 
         const responseResult = this.responseHandler.parseCommandResponse(result.data, command)
 

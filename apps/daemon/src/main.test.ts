@@ -17,8 +17,13 @@ const mockDatabaseConnection = {
 
 vi.mock("@/context")
 vi.mock("@/config/environment.config")
+
+const metricsServerCtor = vi.fn()
 vi.mock("@repo/observability", () => ({
   MetricsServer: class {
+    constructor(...args: unknown[]) {
+      metricsServerCtor(...args)
+    }
     start = vi.fn().mockResolvedValue(undefined)
     stop = vi.fn().mockResolvedValue(undefined)
   },
@@ -112,6 +117,29 @@ describe("HLStatsDaemon", () => {
 
       expect(mockedGetAppContext).toHaveBeenCalledWith({})
       expect(mockContext.logger.info).toHaveBeenCalledWith("Initializing HLStatsNext Daemon...")
+    })
+
+    it("should not instantiate MetricsServer when METRICS_ENABLED is unset (default off)", async () => {
+      delete process.env.METRICS_ENABLED
+      metricsServerCtor.mockClear()
+
+      await HLStatsDaemon.create()
+
+      expect(metricsServerCtor).not.toHaveBeenCalled()
+      expect(mockContext.logger.info).toHaveBeenCalledWith(
+        "Metrics disabled (set METRICS_ENABLED=true to enable Prometheus scraping)",
+      )
+    })
+
+    it("should instantiate MetricsServer when METRICS_ENABLED=true", async () => {
+      process.env.METRICS_ENABLED = "true"
+      metricsServerCtor.mockClear()
+      try {
+        await HLStatsDaemon.create()
+        expect(metricsServerCtor).toHaveBeenCalledTimes(1)
+      } finally {
+        delete process.env.METRICS_ENABLED
+      }
     })
   })
 

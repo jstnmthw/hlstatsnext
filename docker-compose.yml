@@ -55,9 +55,11 @@ services:
       - rabbitmq-data:/var/lib/rabbitmq
       - ./docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
       - ./docker/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+      - ./docker/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
     ports:
       - "5672:5672" # AMQP
       - "127.0.0.1:15672:15672" # Management UI (localhost only)
+      - "15692:15692" # Prometheus scrape endpoint (rabbitmq_prometheus plugin)
     networks:
       - default
     healthcheck:
@@ -90,58 +92,6 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: hlstatsnext-dev-prometheus
-    hostname: hlstatsnext-dev-prometheus
-    extra_hosts:
-      - "host.docker.internal:host-gateway" # Enable host.docker.internal on Linux
-    volumes:
-      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
-    ports:
-      - "9090:9090" # Prometheus UI
-    networks:
-      - default
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.time=15d"
-      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
-      - "--web.console.templates=/usr/share/prometheus/consoles"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: hlstatsnext-dev-grafana
-    hostname: hlstatsnext-dev-grafana
-    environment:
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
-      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-piechart-panel
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
-    ports:
-      - "3001:3000" # Grafana UI (using 3001 to avoid conflict with web app on 3000)
-    networks:
-      - default
-    depends_on:
-      - prometheus
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
   # daemon:
   #   build:
   #     context: .
@@ -170,42 +120,6 @@ services:
   #     - default
   #   restart: unless-stopped
 
-  # cstrike:
-  #   image: gameservermanagers/gameserver:cs
-  #   container_name: hlstatsnext-dev-cstrike
-  #   hostname: hlstatsnext-dev-cstrike
-  #   networks:
-  #     - default
-  #   environment:
-  #     - UID=${USER_ID:-1000}
-  #     - GID=${GROUP_ID:-1000}
-  #     - GAME=cs
-  #     - LGSM_GAMESERVER=csserver
-  #   volumes:
-  #     - ./servers/cs1:/data
-  #   ports:
-  #     - "27015:27015/udp" # UDP port for game server logs
-  #     - "27015:27015/tcp" # TCP port for game server
-  #   restart: unless-stopped
-
-  # tfc:
-  #   image: gameservermanagers/gameserver:tfc
-  #   container_name: hlstatsnext-dev-tfc
-  #   hostname: hlstatsnext-dev-tfc
-  #   networks:
-  #     - default
-  #   environment:
-  #     - UID=${USER_ID:-1000}
-  #     - GID=${GROUP_ID:-1000}
-  #     - GAME=tfc
-  #     - LGSM_GAMESERVER=tfcserver
-  #   volumes:
-  #     - ./servers/tfc:/data
-  #   ports:
-  #     - "27016:27015/udp" # UDP port for game server logs
-  #     - "27016:27015/tcp" # TCP port for game server
-  #   restart: unless-stopped
-
 networks:
   default:
     name: hlstatsnext-network
@@ -215,5 +129,3 @@ volumes:
   db-volume:
   rabbitmq-data:
   garnet-data:
-  prometheus-data:
-  grafana-data:

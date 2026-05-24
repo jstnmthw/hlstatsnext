@@ -67,11 +67,14 @@ export class HLStatsDaemon {
   /** Database connection management service */
   private databaseConnection: DatabaseConnectionService
 
-  /** Metrics HTTP server for Prometheus scraping */
-  private metricsServer: MetricsServer
+  /** Metrics HTTP server for Prometheus scraping. Null when METRICS_ENABLED is off. */
+  private metricsServer: MetricsServer | null
 
   /** Interval handle for periodic metrics gauge collection */
   private metricsCollectionInterval: ReturnType<typeof setInterval> | null = null
+
+  /** Whether the Prometheus HTTP server and gauge interval are active. */
+  private metricsEnabled: boolean
 
   /**
    * Periodic sweep of in-process caches that would otherwise grow without
@@ -108,19 +111,24 @@ export class HLStatsDaemon {
     this.rconScheduler = this.context.rconScheduleService
     this.databaseConnection = new DatabaseConnectionService(this.context)
 
-    // Create metrics server for Prometheus scraping
-    const metricsPort = Number(process.env.METRICS_PORT) || 9091
-    this.metricsServer = new MetricsServer(
-      this.context.metrics,
-      this.logger,
-      async () => ({
-        status: await this.getHealthStatus(),
-        database: await this.databaseConnection.testConnection(),
-        rabbitmq: this.context.queueModule?.getStatus().connected ?? false,
-        uptime: process.uptime(),
-      }),
-      { port: metricsPort },
-    )
+    this.metricsEnabled = parseBooleanEnv(process.env.METRICS_ENABLED)
+    if (this.metricsEnabled) {
+      const metricsPort = Number(process.env.METRICS_PORT) || 9091
+      this.metricsServer = new MetricsServer(
+        this.context.metrics,
+        this.logger,
+        async () => ({
+          status: await this.getHealthStatus(),
+          database: await this.databaseConnection.testConnection(),
+          rabbitmq: this.context.queueModule?.getStatus().connected ?? false,
+          uptime: process.uptime(),
+        }),
+        { port: metricsPort },
+      )
+    } else {
+      this.metricsServer = null
+      this.logger.info("Metrics disabled (set METRICS_ENABLED=true to enable Prometheus scraping)")
+    }
 
     this.logger.info("Initializing HLStatsNext Daemon...")
   }
@@ -249,11 +257,13 @@ export class HLStatsDaemon {
    * @returns Promise that resolves when all services are started
    */
   private async startServices(): Promise<void> {
-    // Start metrics server first
-    await this.metricsServer.start()
-
-    // Start periodic metrics gauge collection (every 15s to match Prometheus scrape interval)
-    this.startMetricsCollection()
+    // Metrics surface is opt-in: skip binding the HTTP server and the 15s
+    // gauge collection interval when METRICS_ENABLED is off. In-process
+    // counters remain wired and effectively no-op.
+    if (this.metricsServer) {
+      await this.metricsServer.start()
+      this.startMetricsCollection()
+    }
 
     // Start periodic cache housekeeping
     this.startHousekeeping()
@@ -311,17 +321,13 @@ export class HLStatsDaemon {
   }
 
   /**
-   * Starts periodic collection of gauge metrics (queue depth, active players).
+   * Starts periodic collection of gauge metrics (active players, active bots).
+   * Queue depth is now sourced from the broker's rabbitmq_prometheus plugin
+   * (series `rabbitmq_queue_messages_ready`) rather than re-derived in-process.
    */
   private startMetricsCollection(): void {
     const collectMetrics = async () => {
       try {
-        // Queue depth: live count of ready messages across all consumed queues
-        if (this.context.rabbitmqConsumer) {
-          const queueDepth = await this.context.rabbitmqConsumer.getQueueDepth()
-          this.context.metrics.setGauge("queue_depth", {}, queueDepth)
-        }
-
         // Active players/bots: live count of open player sessions (event-driven,
         // RCON-synced). Avoids the drift of the Server.activePlayers column.
         // Bots are tracked separately as they still incur processing load when
@@ -418,7 +424,7 @@ export class HLStatsDaemon {
       runPhase("rconService.disconnectAll", this.context.rconService.disconnectAll()),
       runPhase("queueModule.shutdown", this.context.queueModule?.shutdown() ?? Promise.resolve()),
       runPhase("cache.disconnect", this.context.cache.disconnect()),
-      runPhase("metricsServer.stop", this.metricsServer.stop()),
+      runPhase("metricsServer.stop", this.metricsServer?.stop() ?? Promise.resolve()),
     ])
 
     // Phase 3: database last — every other subsystem may still issue queries
@@ -507,6 +513,16 @@ export class HLStatsDaemon {
       return "unhealthy"
     }
   }
+}
+
+/**
+ * Parse a boolean env var. Treat `true`/`1`/`yes`/`on` (case-insensitive) as true;
+ * anything else (including unset) is false. Keeps the opt-in default explicit.
+ */
+function parseBooleanEnv(value: string | undefined): boolean {
+  if (!value) return false
+  const normalized = value.trim().toLowerCase()
+  return normalized === "true" || normalized === "1" || normalized === "yes" || normalized === "on"
 }
 
 /**

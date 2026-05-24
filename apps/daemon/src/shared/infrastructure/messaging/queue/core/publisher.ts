@@ -60,7 +60,7 @@ export class EventPublisher implements IEventPublisher {
     // window is silently lost when the broker eventually closes.
     if (this.client.isBlocked()) {
       this.blockedDropCount++
-      this.metrics?.incrementCounter("events_lost_on_publish_blocked", {
+      this.metrics?.incrementCounter("daemon_rabbitmq_events_lost_on_publish_blocked", {
         event_type: event.eventType,
       })
       this.failedCount++
@@ -97,7 +97,7 @@ export class EventPublisher implements IEventPublisher {
         // Local channel buffer full (rare with confirm channels but possible
         // under burst). Treat as a publish failure so the caller can drop
         // with a counter rather than acting as if the publish succeeded.
-        this.metrics?.incrementCounter("events_lost_on_publish_blocked", {
+        this.metrics?.incrementCounter("daemon_rabbitmq_events_lost_on_publish_blocked", {
           event_type: event.eventType,
         })
         throw new QueuePublishError("Channel buffer full - message not published")

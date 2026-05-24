@@ -8,8 +8,8 @@ global:
 
   # Attach these labels to all metrics
   external_labels:
-    monitor: 'hlstatsnext'
-    environment: 'production'
+    monitor: "hlstatsnext"
+    environment: "production"
 
 # Alertmanager configuration (optional, for future use)
 # alerting:
@@ -25,19 +25,27 @@ global:
 # Scrape configurations
 scrape_configs:
   # Prometheus itself
-  - job_name: 'prometheus'
+  - job_name: "prometheus"
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
         labels:
-          service: 'prometheus'
+          service: "prometheus"
 
   # HLStatsNext Daemon
-  - job_name: 'hlstats-daemon'
+  - job_name: "hlstats-daemon"
     static_configs:
-      - targets: ['host.docker.internal:9091'] # When daemon runs on host
+      - targets: ["host.docker.internal:9091"] # When daemon runs on host
         labels:
-          service: 'daemon'
-          app: 'hlstatsnext'
+          service: "daemon"
+          app: "hlstatsnext"
+
+  # HLStatsNext GraphQL API (gated by METRICS_ENABLED)
+  - job_name: "hlstats-api"
+    static_configs:
+      - targets: ["host.docker.internal:9092"] # When api runs on host
+        labels:
+          service: "api"
+          app: "hlstatsnext"
 
   # MySQL Database (via mysqld_exporter - optional, requires setup)
   # - job_name: 'mysql'
@@ -45,13 +53,12 @@ scrape_configs:
   #     - targets: ['mysqld-exporter:9104']
   #       labels:
   #         service: 'mysql'
-
   # RabbitMQ (built-in metrics endpoint)
-  - job_name: 'rabbitmq'
+  - job_name: "rabbitmq"
     static_configs:
-      - targets: ['rabbitmq:15692'] # RabbitMQ Prometheus plugin port
+      - targets: ["rabbitmq:15692"] # RabbitMQ Prometheus plugin port
         labels:
-          service: 'rabbitmq'
+          service: "rabbitmq"
     # Note: Requires rabbitmq_prometheus plugin enabled
 
   # Node Exporter (system metrics - optional, requires setup)

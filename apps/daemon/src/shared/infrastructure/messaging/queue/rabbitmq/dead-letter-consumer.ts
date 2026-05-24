@@ -142,7 +142,7 @@ export class DeadLetterConsumer {
       `Dead-lettered message: id=${messageId} eventType=${eventType} retries=${retryCount} origin=${origin} reason=${reason}`,
     )
 
-    this.metrics?.incrementCounter("dead_letter_messages_total", {
+    this.metrics?.incrementCounter("daemon_rabbitmq_dead_letter_messages_total", {
       event_type: eventType,
       reason,
     })

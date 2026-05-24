@@ -3,6 +3,8 @@
 
 # Default variables
 COMPOSE_FILE := docker-compose.yml
+OBS_COMPOSE_FILE := docker-compose.observability.yml
+OBS_PROJECT := hlstatsnext-observability
 DAEMON_CONTAINER := hlstatsnext-daemon
 DB_CONTAINER := hlstatsnext-db
 CS1_CONTAINER := hlstatsnext-cstrike
@@ -19,6 +21,7 @@ NC := \033[0m # No Color
 
 # Declare all targets as phony
 .PHONY: help restart up down build logs status clean \
+        obs-up obs-down obs-logs \
         daemon-restart daemon-logs daemon-shell \
         db-reset db-logs db-shell db-backup \
         cs1-restart cs1-details cs1-logs cs1-shell cs1-stop cs1-start \
@@ -104,6 +107,23 @@ logs:
 status:
 	@echo "$(GREEN)Container Status:$(NC)"
 	@docker-compose -f $(COMPOSE_FILE) ps
+
+# ===========================================
+# OBSERVABILITY (opt-in: Prometheus + Grafana)
+# ===========================================
+
+obs-up:
+	@echo "$(GREEN)Starting observability stack (Prometheus + Grafana)...$(NC)"
+	@docker compose -f $(OBS_COMPOSE_FILE) -p $(OBS_PROJECT) up -d
+	@echo "$(GREEN)✓ Observability stack started (Prometheus :9090, Grafana :3001)$(NC)"
+
+obs-down:
+	@echo "$(YELLOW)Stopping observability stack...$(NC)"
+	@docker compose -f $(OBS_COMPOSE_FILE) -p $(OBS_PROJECT) down
+	@echo "$(GREEN)✓ Observability stack stopped$(NC)"
+
+obs-logs:
+	@docker compose -f $(OBS_COMPOSE_FILE) -p $(OBS_PROJECT) logs -f
 
 # ===========================================
 # CS1 SERVER COMMANDS

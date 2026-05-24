@@ -24,7 +24,7 @@
       "type": "row",
       "title": "Overview",
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
       "panels": []
     },
     {
@@ -32,14 +32,14 @@
       "title": "Active Players",
       "description": "Live count of connected human players (open sessions, excludes bots).",
       "type": "stat",
-      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 1},
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "thresholds"},
+          "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
-            "steps": [{"color": "blue", "value": null}]
+            "steps": [{ "color": "blue", "value": null }]
           }
         },
         "overrides": []
@@ -50,25 +50,23 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "textMode": "auto",
-        "reduceOptions": {"calc": "lastNotNull", "fields": "", "values": false}
+        "reduceOptions": { "calc": "lastNotNull", "fields": "", "values": false }
       },
-      "targets": [
-        {"expr": "sum(active_players_count) or vector(0)", "refId": "A"}
-      ]
+      "targets": [{ "expr": "sum(active_players_count) or vector(0)", "refId": "A" }]
     },
     {
       "id": 3,
       "title": "Active Bots",
       "description": "Live count of connected bots. These still incur processing load when a server's IgnoreBots config is disabled.",
       "type": "stat",
-      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 1},
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 1 },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "thresholds"},
+          "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
-            "steps": [{"color": "purple", "value": null}]
+            "steps": [{ "color": "purple", "value": null }]
           }
         },
         "overrides": []
@@ -79,26 +77,24 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "textMode": "auto",
-        "reduceOptions": {"calc": "lastNotNull", "fields": "", "values": false}
+        "reduceOptions": { "calc": "lastNotNull", "fields": "", "values": false }
       },
-      "targets": [
-        {"expr": "sum(active_bots_count) or vector(0)", "refId": "A"}
-      ]
+      "targets": [{ "expr": "sum(active_bots_count) or vector(0)", "refId": "A" }]
     },
     {
       "id": 4,
       "title": "Events / sec",
       "description": "Rate of events processed across all event types.",
       "type": "stat",
-      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 1},
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 },
       "fieldConfig": {
         "defaults": {
           "unit": "ops",
           "decimals": 2,
-          "color": {"mode": "thresholds"},
+          "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
-            "steps": [{"color": "green", "value": null}]
+            "steps": [{ "color": "green", "value": null }]
           }
         },
         "overrides": []
@@ -109,28 +105,26 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "textMode": "auto",
-        "reduceOptions": {"calc": "lastNotNull", "fields": "", "values": false}
+        "reduceOptions": { "calc": "lastNotNull", "fields": "", "values": false }
       },
-      "targets": [
-        {"expr": "sum(rate(events_processed_total[1m])) or vector(0)", "refId": "A"}
-      ]
+      "targets": [{ "expr": "sum(rate(events_processed_total[1m])) or vector(0)", "refId": "A" }]
     },
     {
       "id": 5,
       "title": "Queue Depth",
       "description": "Messages waiting (ready) across all RabbitMQ consumer queues. 0 means the consumer is keeping up with the inbound rate.",
       "type": "stat",
-      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 1},
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "thresholds"},
+          "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 50},
-              {"color": "red", "value": 200}
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 200 }
             ]
           }
         },
@@ -142,29 +136,27 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "textMode": "auto",
-        "reduceOptions": {"calc": "lastNotNull", "fields": "", "values": false}
+        "reduceOptions": { "calc": "lastNotNull", "fields": "", "values": false }
       },
-      "targets": [
-        {"expr": "sum(queue_depth) or vector(0)", "refId": "A"}
-      ]
+      "targets": [{ "expr": "sum(rabbitmq_queue_messages_ready) or vector(0)", "refId": "A" }]
     },
     {
       "id": 6,
       "title": "Slow Queries",
       "description": "Rate of database queries taking longer than 1s.",
       "type": "stat",
-      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 5},
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 5 },
       "fieldConfig": {
         "defaults": {
           "unit": "ops",
           "decimals": 2,
-          "color": {"mode": "thresholds"},
+          "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 0.1},
-              {"color": "red", "value": 1}
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.1 },
+              { "color": "red", "value": 1 }
             ]
           }
         },
@@ -176,10 +168,13 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "textMode": "auto",
-        "reduceOptions": {"calc": "lastNotNull", "fields": "", "values": false}
+        "reduceOptions": { "calc": "lastNotNull", "fields": "", "values": false }
       },
       "targets": [
-        {"expr": "(sum(rate(database_query_duration_seconds_count[5m])) - sum(rate(database_query_duration_seconds_bucket{le=\"1.0\"}[5m]))) or vector(0)", "refId": "A"}
+        {
+          "expr": "(sum(rate(database_query_duration_seconds_count[5m])) - sum(rate(database_query_duration_seconds_bucket{le=\"1.0\"}[5m]))) or vector(0)",
+          "refId": "A"
+        }
       ]
     },
     {
@@ -187,17 +182,17 @@
       "title": "Failed Queries",
       "description": "Rate of database queries that returned an error.",
       "type": "stat",
-      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 5},
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 5 },
       "fieldConfig": {
         "defaults": {
           "unit": "ops",
           "decimals": 2,
-          "color": {"mode": "thresholds"},
+          "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "red", "value": 0.001}
+              { "color": "green", "value": null },
+              { "color": "red", "value": 0.001 }
             ]
           }
         },
@@ -209,10 +204,13 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "textMode": "auto",
-        "reduceOptions": {"calc": "lastNotNull", "fields": "", "values": false}
+        "reduceOptions": { "calc": "lastNotNull", "fields": "", "values": false }
       },
       "targets": [
-        {"expr": "sum(rate(database_queries_total{success=\"false\"}[5m])) or vector(0)", "refId": "A"}
+        {
+          "expr": "sum(rate(database_queries_total{success=\"false\"}[5m])) or vector(0)",
+          "refId": "A"
+        }
       ]
     },
     {
@@ -220,18 +218,18 @@
       "title": "CPU Usage",
       "description": "Daemon process CPU usage. 100% = one full core.",
       "type": "stat",
-      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 5},
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 5 },
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
           "decimals": 1,
-          "color": {"mode": "thresholds"},
+          "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 0.7},
-              {"color": "red", "value": 0.9}
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.7 },
+              { "color": "red", "value": 0.9 }
             ]
           }
         },
@@ -243,10 +241,13 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "textMode": "auto",
-        "reduceOptions": {"calc": "lastNotNull", "fields": "", "values": false}
+        "reduceOptions": { "calc": "lastNotNull", "fields": "", "values": false }
       },
       "targets": [
-        {"expr": "sum(rate(process_cpu_seconds_total{job=\"hlstats-daemon\"}[5m])) or vector(0)", "refId": "A"}
+        {
+          "expr": "sum(rate(process_cpu_seconds_total{job=\"hlstats-daemon\"}[5m])) or vector(0)",
+          "refId": "A"
+        }
       ]
     },
     {
@@ -254,14 +255,14 @@
       "title": "Memory (RSS)",
       "description": "Daemon process resident set size.",
       "type": "stat",
-      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 5},
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 5 },
       "fieldConfig": {
         "defaults": {
           "unit": "bytes",
-          "color": {"mode": "thresholds"},
+          "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
-            "steps": [{"color": "green", "value": null}]
+            "steps": [{ "color": "green", "value": null }]
           }
         },
         "overrides": []
@@ -272,10 +273,10 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "textMode": "auto",
-        "reduceOptions": {"calc": "lastNotNull", "fields": "", "values": false}
+        "reduceOptions": { "calc": "lastNotNull", "fields": "", "values": false }
       },
       "targets": [
-        {"expr": "sum(process_resident_memory_bytes{job=\"hlstats-daemon\"})", "refId": "A"}
+        { "expr": "sum(process_resident_memory_bytes{job=\"hlstats-daemon\"})", "refId": "A" }
       ]
     },
     {
@@ -283,18 +284,18 @@
       "type": "row",
       "title": "Event Processing",
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 9},
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
       "panels": []
     },
     {
       "id": 11,
       "title": "Events Processed per Second",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 10},
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
       "fieldConfig": {
         "defaults": {
           "unit": "ops",
-          "color": {"mode": "palette-classic"},
+          "color": { "mode": "palette-classic" },
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "smooth",
@@ -303,30 +304,34 @@
             "gradientMode": "opacity",
             "spanNulls": false,
             "showPoints": "never",
-            "stacking": {"mode": "none", "group": "A"},
+            "stacking": { "mode": "none", "group": "A" },
             "axisPlacement": "auto",
-            "scaleDistribution": {"type": "linear"}
+            "scaleDistribution": { "type": "linear" }
           }
         },
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "list", "placement": "right", "showLegend": true, "calcs": []},
-        "tooltip": {"mode": "multi", "sort": "desc"}
+        "legend": { "displayMode": "list", "placement": "right", "showLegend": true, "calcs": [] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       },
       "targets": [
-        {"expr": "sum by (event_type) (rate(events_processed_total[1m]))", "legendFormat": "{{event_type}}", "refId": "A"}
+        {
+          "expr": "sum by (event_type) (rate(events_processed_total[1m]))",
+          "legendFormat": "{{event_type}}",
+          "refId": "A"
+        }
       ]
     },
     {
       "id": 12,
       "title": "Event Processing Duration (p95)",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 10},
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
       "fieldConfig": {
         "defaults": {
           "unit": "s",
-          "color": {"mode": "palette-classic"},
+          "color": { "mode": "palette-classic" },
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "smooth",
@@ -335,19 +340,23 @@
             "gradientMode": "opacity",
             "spanNulls": false,
             "showPoints": "never",
-            "stacking": {"mode": "none", "group": "A"},
+            "stacking": { "mode": "none", "group": "A" },
             "axisPlacement": "auto",
-            "scaleDistribution": {"type": "linear"}
+            "scaleDistribution": { "type": "linear" }
           }
         },
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "list", "placement": "right", "showLegend": true, "calcs": []},
-        "tooltip": {"mode": "multi", "sort": "desc"}
+        "legend": { "displayMode": "list", "placement": "right", "showLegend": true, "calcs": [] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       },
       "targets": [
-        {"expr": "histogram_quantile(0.95, sum by (event_type, le) (rate(event_processing_duration_seconds_bucket[5m])))", "legendFormat": "{{event_type}}", "refId": "A"}
+        {
+          "expr": "histogram_quantile(0.95, sum by (event_type, le) (rate(event_processing_duration_seconds_bucket[5m])))",
+          "legendFormat": "{{event_type}}",
+          "refId": "A"
+        }
       ]
     },
     {
@@ -355,18 +364,18 @@
       "type": "row",
       "title": "Database",
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 18},
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
       "panels": []
     },
     {
       "id": 14,
       "title": "Query Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 19},
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 19 },
       "fieldConfig": {
         "defaults": {
           "unit": "ops",
-          "color": {"mode": "palette-classic"},
+          "color": { "mode": "palette-classic" },
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "smooth",
@@ -375,30 +384,39 @@
             "gradientMode": "opacity",
             "spanNulls": false,
             "showPoints": "never",
-            "stacking": {"mode": "none", "group": "A"},
+            "stacking": { "mode": "none", "group": "A" },
             "axisPlacement": "auto",
-            "scaleDistribution": {"type": "linear"}
+            "scaleDistribution": { "type": "linear" }
           }
         },
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["lastNotNull", "max"]},
-        "tooltip": {"mode": "multi", "sort": "desc"}
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": ["lastNotNull", "max"]
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       },
       "targets": [
-        {"expr": "sum by (operation, table) (rate(database_queries_total[1m]))", "legendFormat": "{{operation}} - {{table}}", "refId": "A"}
+        {
+          "expr": "sum by (operation, table) (rate(database_queries_total[1m]))",
+          "legendFormat": "{{operation}} - {{table}}",
+          "refId": "A"
+        }
       ]
     },
     {
       "id": 15,
       "title": "Query Duration (p95)",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 19},
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 19 },
       "fieldConfig": {
         "defaults": {
           "unit": "s",
-          "color": {"mode": "palette-classic"},
+          "color": { "mode": "palette-classic" },
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "smooth",
@@ -407,30 +425,39 @@
             "gradientMode": "opacity",
             "spanNulls": false,
             "showPoints": "never",
-            "stacking": {"mode": "none", "group": "A"},
+            "stacking": { "mode": "none", "group": "A" },
             "axisPlacement": "auto",
-            "scaleDistribution": {"type": "linear"}
+            "scaleDistribution": { "type": "linear" }
           }
         },
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["lastNotNull", "max"]},
-        "tooltip": {"mode": "multi", "sort": "desc"}
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": ["lastNotNull", "max"]
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       },
       "targets": [
-        {"expr": "histogram_quantile(0.95, sum by (operation, table, le) (rate(database_query_duration_seconds_bucket[5m])))", "legendFormat": "{{operation}} - {{table}}", "refId": "A"}
+        {
+          "expr": "histogram_quantile(0.95, sum by (operation, table, le) (rate(database_query_duration_seconds_bucket[5m])))",
+          "legendFormat": "{{operation}} - {{table}}",
+          "refId": "A"
+        }
       ]
     },
     {
       "id": 16,
       "title": "Query Duration (p99)",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 19},
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 19 },
       "fieldConfig": {
         "defaults": {
           "unit": "s",
-          "color": {"mode": "palette-classic"},
+          "color": { "mode": "palette-classic" },
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "smooth",
@@ -439,65 +466,92 @@
             "gradientMode": "opacity",
             "spanNulls": false,
             "showPoints": "never",
-            "stacking": {"mode": "none", "group": "A"},
+            "stacking": { "mode": "none", "group": "A" },
             "axisPlacement": "auto",
-            "scaleDistribution": {"type": "linear"}
+            "scaleDistribution": { "type": "linear" }
           }
         },
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["lastNotNull", "max"]},
-        "tooltip": {"mode": "multi", "sort": "desc"}
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": ["lastNotNull", "max"]
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       },
       "targets": [
-        {"expr": "histogram_quantile(0.99, sum by (operation, table, le) (rate(database_query_duration_seconds_bucket[5m])))", "legendFormat": "{{operation}} - {{table}}", "refId": "A"}
+        {
+          "expr": "histogram_quantile(0.99, sum by (operation, table, le) (rate(database_query_duration_seconds_bucket[5m])))",
+          "legendFormat": "{{operation}} - {{table}}",
+          "refId": "A"
+        }
       ]
     },
     {
       "id": 17,
       "title": "Queries by Table",
       "type": "piechart",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 27},
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 27 },
       "fieldConfig": {
         "defaults": {
           "unit": "ops",
-          "color": {"mode": "palette-classic"},
-          "custom": {"hideFrom": {"tooltip": false, "viz": false, "legend": false}}
+          "color": { "mode": "palette-classic" },
+          "custom": { "hideFrom": { "tooltip": false, "viz": false, "legend": false } }
         },
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "table", "placement": "right", "showLegend": true, "values": ["value", "percent"]},
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": ["value", "percent"]
+        },
         "pieType": "donut",
-        "tooltip": {"mode": "single", "sort": "desc"},
-        "reduceOptions": {"calc": "lastNotNull", "fields": "", "values": false}
+        "tooltip": { "mode": "single", "sort": "desc" },
+        "reduceOptions": { "calc": "lastNotNull", "fields": "", "values": false }
       },
       "targets": [
-        {"expr": "sum by (table) (rate(database_queries_total[5m]))", "legendFormat": "{{table}}", "refId": "A"}
+        {
+          "expr": "sum by (table) (rate(database_queries_total[5m]))",
+          "legendFormat": "{{table}}",
+          "refId": "A"
+        }
       ]
     },
     {
       "id": 18,
       "title": "Queries by Operation",
       "type": "piechart",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 27},
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 27 },
       "fieldConfig": {
         "defaults": {
           "unit": "ops",
-          "color": {"mode": "palette-classic"},
-          "custom": {"hideFrom": {"tooltip": false, "viz": false, "legend": false}}
+          "color": { "mode": "palette-classic" },
+          "custom": { "hideFrom": { "tooltip": false, "viz": false, "legend": false } }
         },
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "table", "placement": "right", "showLegend": true, "values": ["value", "percent"]},
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": ["value", "percent"]
+        },
         "pieType": "donut",
-        "tooltip": {"mode": "single", "sort": "desc"},
-        "reduceOptions": {"calc": "lastNotNull", "fields": "", "values": false}
+        "tooltip": { "mode": "single", "sort": "desc" },
+        "reduceOptions": { "calc": "lastNotNull", "fields": "", "values": false }
       },
       "targets": [
-        {"expr": "sum by (operation) (rate(database_queries_total[5m]))", "legendFormat": "{{operation}}", "refId": "A"}
+        {
+          "expr": "sum by (operation) (rate(database_queries_total[5m]))",
+          "legendFormat": "{{operation}}",
+          "refId": "A"
+        }
       ]
     },
     {
@@ -505,7 +559,7 @@
       "type": "row",
       "title": "System Resources",
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 35},
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 35 },
       "panels": []
     },
     {
@@ -513,12 +567,12 @@
       "title": "CPU Usage",
       "description": "Daemon process CPU usage derived from process_cpu_seconds_total. 100% = one full core.",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 36},
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 36 },
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
           "min": 0,
-          "color": {"mode": "palette-classic"},
+          "color": { "mode": "palette-classic" },
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "smooth",
@@ -527,19 +581,28 @@
             "gradientMode": "opacity",
             "spanNulls": false,
             "showPoints": "never",
-            "stacking": {"mode": "none", "group": "A"},
+            "stacking": { "mode": "none", "group": "A" },
             "axisPlacement": "auto",
-            "scaleDistribution": {"type": "linear"}
+            "scaleDistribution": { "type": "linear" }
           }
         },
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "list", "placement": "bottom", "showLegend": true, "calcs": ["lastNotNull", "max"]},
-        "tooltip": {"mode": "single", "sort": "desc"}
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": ["lastNotNull", "max"]
+        },
+        "tooltip": { "mode": "single", "sort": "desc" }
       },
       "targets": [
-        {"expr": "sum(rate(process_cpu_seconds_total{job=\"hlstats-daemon\"}[5m]))", "legendFormat": "CPU", "refId": "A"}
+        {
+          "expr": "sum(rate(process_cpu_seconds_total{job=\"hlstats-daemon\"}[5m]))",
+          "legendFormat": "CPU",
+          "refId": "A"
+        }
       ]
     },
     {
@@ -547,12 +610,12 @@
       "title": "Memory Usage",
       "description": "Daemon process memory. RSS is total resident memory; heap used/total are the V8 JS heap; external covers Buffers and C++ objects.",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 36},
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 36 },
       "fieldConfig": {
         "defaults": {
           "unit": "bytes",
           "min": 0,
-          "color": {"mode": "palette-classic"},
+          "color": { "mode": "palette-classic" },
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "smooth",
@@ -561,22 +624,43 @@
             "gradientMode": "opacity",
             "spanNulls": false,
             "showPoints": "never",
-            "stacking": {"mode": "none", "group": "A"},
+            "stacking": { "mode": "none", "group": "A" },
             "axisPlacement": "auto",
-            "scaleDistribution": {"type": "linear"}
+            "scaleDistribution": { "type": "linear" }
           }
         },
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["lastNotNull", "max"]},
-        "tooltip": {"mode": "multi", "sort": "desc"}
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": ["lastNotNull", "max"]
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       },
       "targets": [
-        {"expr": "sum(process_resident_memory_bytes{job=\"hlstats-daemon\"})", "legendFormat": "RSS (resident)", "refId": "A"},
-        {"expr": "sum(process_heap_bytes{job=\"hlstats-daemon\"})", "legendFormat": "Heap used", "refId": "B"},
-        {"expr": "sum(process_heap_total_bytes{job=\"hlstats-daemon\"})", "legendFormat": "Heap total", "refId": "C"},
-        {"expr": "sum(process_external_memory_bytes{job=\"hlstats-daemon\"})", "legendFormat": "External (buffers)", "refId": "D"}
+        {
+          "expr": "sum(process_resident_memory_bytes{job=\"hlstats-daemon\"})",
+          "legendFormat": "RSS (resident)",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(process_heap_bytes{job=\"hlstats-daemon\"})",
+          "legendFormat": "Heap used",
+          "refId": "B"
+        },
+        {
+          "expr": "sum(process_heap_total_bytes{job=\"hlstats-daemon\"})",
+          "legendFormat": "Heap total",
+          "refId": "C"
+        },
+        {
+          "expr": "sum(process_external_memory_bytes{job=\"hlstats-daemon\"})",
+          "legendFormat": "External (buffers)",
+          "refId": "D"
+        }
       ]
     }
   ]

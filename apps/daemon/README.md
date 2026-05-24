@@ -364,8 +364,10 @@ The daemon exposes Prometheus metrics:
 
 - `hlstats_events_processed_total` - Events by type and status
 - `hlstats_processing_duration_seconds` - Processing time histograms
-- `hlstats_queue_depth` - Current queue backlog
 - `hlstats_active_players` - Currently connected players (RCON-enriched, respects IgnoreBots config)
+
+Queue depth is sourced from the broker via the `rabbitmq_prometheus` plugin
+(series `rabbitmq_queue_messages_ready`) rather than re-derived in the daemon.
 
 ### Logging
 

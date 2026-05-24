@@ -1,7 +1,3 @@
-import {
-  GET_PLAYER_COUNT,
-  GET_PLAYERS_WITH_PAGINATION,
-} from "@/features/admin/players/graphql/player-queries"
 import { Footer } from "@/features/common/components/footer"
 import { Header } from "@/features/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
@@ -14,6 +10,10 @@ import {
 } from "@/features/common/graphql/pagination"
 import { playerPageTableConfig } from "@/features/players/components/player-config"
 import { PlayersTable } from "@/features/players/components/players-table"
+import {
+  GET_PUBLIC_PLAYER_COUNT,
+  GET_PUBLIC_PLAYERS_WITH_PAGINATION,
+} from "@/features/players/graphql/player-queries"
 import { query } from "@/lib/apollo-client"
 
 export const metadata = {
@@ -44,12 +44,12 @@ export default async function PlayersPage(props: PlayersPageProps) {
   const countVariables = buildCountVariables(params, playerPageTableConfig.searchFields)
 
   const { data } = await query({
-    query: GET_PLAYERS_WITH_PAGINATION,
+    query: GET_PUBLIC_PLAYERS_WITH_PAGINATION,
     variables: queryVariables,
   })
 
   const { data: countData } = await query({
-    query: GET_PLAYER_COUNT,
+    query: GET_PUBLIC_PLAYER_COUNT,
     variables: countVariables,
   })
 

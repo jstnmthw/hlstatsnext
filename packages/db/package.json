@@ -6,7 +6,7 @@
     "build": "tsc",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf node_modules dist .turbo",
-    "db:generate": "rm -rf generated/prisma && prisma generate --no-hints",
+    "db:generate": "rm -rf generated/prisma && prisma generate --no-hints && tsx src/scripts/sanitize-pothos-inputs.ts",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",

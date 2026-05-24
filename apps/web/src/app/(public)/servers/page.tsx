@@ -1,7 +1,3 @@
-import {
-  GET_SERVERS_WITH_PAGINATION,
-  GET_SERVER_COUNT,
-} from "@/features/admin/servers/graphql/server-queries"
 import { Footer } from "@/features/common/components/footer"
 import { Header } from "@/features/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
@@ -14,6 +10,10 @@ import {
 } from "@/features/common/graphql/pagination"
 import { serverPageTableConfig } from "@/features/servers/components/server-config"
 import { ServersTable } from "@/features/servers/components/servers-table"
+import {
+  GET_PUBLIC_SERVER_COUNT,
+  GET_PUBLIC_SERVERS_WITH_PAGINATION,
+} from "@/features/servers/graphql/server-queries"
 import { query } from "@/lib/apollo-client"
 
 export const metadata = {
@@ -49,12 +49,12 @@ export default async function ServersPage(props: ServersPageProps) {
   const countVariables = buildCountVariables(params, serverPageTableConfig.searchFields)
 
   const { data } = await query({
-    query: GET_SERVERS_WITH_PAGINATION,
+    query: GET_PUBLIC_SERVERS_WITH_PAGINATION,
     variables: queryVariables,
   })
 
   const { data: countData } = await query({
-    query: GET_SERVER_COUNT,
+    query: GET_PUBLIC_SERVER_COUNT,
     variables: countVariables,
   })
 

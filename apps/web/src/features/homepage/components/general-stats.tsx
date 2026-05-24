@@ -10,7 +10,7 @@ export async function GeneralStats({ className, ...props }: ComponentProps<"div"
   const clans = data?.countClan ?? 0
   const games = data?.countGame ?? 0
   const servers = data?.countServer ?? 0
-  const totalKills = data?.findManyServer?.reduce((sum, s) => sum + s.kills, 0) ?? 0
+  const totalKills = data?.getTotalKills ?? 0
   const lastKillTime = data?.findFirstEventFrag?.eventTime as string | null
   const deleteDays = data?.findUniqueOption?.value ?? "N/A"
 

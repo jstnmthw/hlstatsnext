@@ -18,12 +18,12 @@ import {
 import { ColumnDef } from "@tanstack/react-table"
 
 export type PlayerListItem = {
-  playerId: string
-  lastName: string
+  playerId?: number | null
+  lastName?: string | null
   email?: string | null
-  skill: number
-  kills: number
-  deaths: number
+  skill?: number | null
+  kills?: number | null
+  deaths?: number | null
   lastEvent?: string | Date | null
   lastSkillChange?: string | Date | null
   __typename?: string
@@ -143,7 +143,9 @@ export const playerColumns = (): ColumnDef<PlayerListItem>[] => [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(player.playerId)}>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(String(player.playerId ?? ""))}
+            >
               Copy player ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />

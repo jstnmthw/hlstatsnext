@@ -79,7 +79,6 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
                     game: server.game || "cstrike",
                     publicAddress: server.publicAddress || "",
                     statusUrl: server.statusUrl || "",
-                    rconPassword: server.rconPassword || "",
                     sortOrder: server.sortOrder || 0,
                     mod: currentMod,
                     authToken: server.authToken?.tokenPrefix

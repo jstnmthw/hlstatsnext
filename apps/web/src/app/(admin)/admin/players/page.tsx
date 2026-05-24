@@ -3,8 +3,8 @@ import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 import { AdminPlayersTable } from "@/features/admin/players/components/admin-players-table"
 import { playerTableConfig } from "@/features/admin/players/components/player-columns"
 import {
-  GET_PLAYERS_WITH_PAGINATION,
-  GET_PLAYER_COUNT,
+  GET_ADMIN_PLAYER_COUNT,
+  GET_ADMIN_PLAYERS_WITH_PAGINATION,
 } from "@/features/admin/players/graphql/player-queries"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
@@ -33,12 +33,12 @@ export default async function PlayersPage(props: AdminPageProps) {
   const countVariables = buildCountVariables(params, playerTableConfig.searchFields)
 
   const { data } = await query({
-    query: GET_PLAYERS_WITH_PAGINATION,
+    query: GET_ADMIN_PLAYERS_WITH_PAGINATION,
     variables: queryVariables,
   })
 
   const { data: countData } = await query({
-    query: GET_PLAYER_COUNT,
+    query: GET_ADMIN_PLAYER_COUNT,
     variables: countVariables,
   })
 

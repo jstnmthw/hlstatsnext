@@ -46,6 +46,41 @@ export function requireAdmin(ctx: Context): NonNullable<Session> {
   return session
 }
 
+/**
+ * Wrap a custom Pothos field config so its `resolve` runs only for admins.
+ *
+ * NOTE: Pothos derives the `resolve` arg/return types from the literal config
+ * passed to `t.field`/`t.prismaField`. Routing the config through this generic
+ * helper severs that inference, so `args` collapses to `{}` and TypeScript
+ * rejects the field. Until we wrap admin gating in a real Pothos plugin /
+ * field-builder method, prefer calling `requireAdmin(context)` inline inside
+ * the resolver. The helper is kept for resolvers that take no args
+ * (or where you're willing to annotate types manually).
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- wraps untyped Pothos field configs
+export function requireAdminField<TFieldConfig extends { resolve: (...args: any[]) => any }>(
+  field: TFieldConfig,
+): TFieldConfig {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- internal wrapping; outer type stays TFieldConfig
+  const originalResolve = field.resolve as (...args: any[]) => any
+  // Detect prismaField (5 args: query, root, args, context, info) vs plain field (4 args)
+  const isPrismaField = originalResolve.length === 5
+  const wrappedResolve = isPrismaField
+    ? (query: unknown, root: unknown, args: unknown, context: Context, info: unknown) => {
+        requireAdmin(context as Context)
+        return originalResolve(query, root, args, context, info)
+      }
+    : (root: unknown, args: unknown, context: Context, info: unknown) => {
+        requireAdmin(context as Context)
+        return originalResolve(root, args, context, info)
+      }
+  // Cast back to TFieldConfig — the wrapped resolver has a deliberately broader
+  // signature than the original, but at the GraphQL boundary it is invoked
+  // with the same args. Preserving TFieldConfig keeps Pothos's inferred arg
+  // and return types intact at all call sites.
+  return { ...field, resolve: wrappedResolve } as unknown as TFieldConfig
+}
+
 // Singleton services (created once, reused across requests)
 let services: Services | null = null
 

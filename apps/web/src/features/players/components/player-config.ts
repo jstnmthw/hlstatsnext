@@ -1,12 +1,12 @@
 import { DataTableConfig } from "@/features/common/types/data-table"
 
 export interface PublicPlayerItem {
-  playerId: string
-  lastName: string
-  skill: number
-  kills: number
-  deaths: number
-  country: string
+  playerId?: number | null
+  lastName?: string | null
+  skill?: number | null
+  kills?: number | null
+  deaths?: number | null
+  country?: string | null
   flag?: string | null
   lastEvent?: string | Date | null
 }

@@ -20,24 +20,6 @@ export type Scalars = {
   Json: { input: any; output: any; }
 };
 
-export type Account = {
-  __typename?: 'Account';
-  accessToken?: Maybe<Scalars['String']['output']>;
-  accessTokenExpiresAt?: Maybe<Scalars['DateTime']['output']>;
-  accountId: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['ID']['output'];
-  idToken?: Maybe<Scalars['String']['output']>;
-  password?: Maybe<Scalars['String']['output']>;
-  providerId: Scalars['String']['output'];
-  refreshToken?: Maybe<Scalars['String']['output']>;
-  refreshTokenExpiresAt?: Maybe<Scalars['DateTime']['output']>;
-  scope?: Maybe<Scalars['String']['output']>;
-  updatedAt: Scalars['DateTime']['output'];
-  user: User;
-  userId: Scalars['String']['output'];
-};
-
 export type AccountCountOrderByAggregateInput = {
   accessToken?: InputMaybe<SortOrder>;
   accessTokenExpiresAt?: InputMaybe<SortOrder>;
@@ -3961,15 +3943,12 @@ export type EventConnect = {
   __typename?: 'EventConnect';
   eventTime?: Maybe<Scalars['DateTime']['output']>;
   eventTimeDisconnect?: Maybe<Scalars['DateTime']['output']>;
-  hostgroup: Scalars['String']['output'];
-  hostname: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  ipAddress: Scalars['String']['output'];
-  map: Scalars['String']['output'];
-  player: Player;
-  playerId: Scalars['Int']['output'];
-  server: Server;
-  serverId: Scalars['Int']['output'];
+  id?: Maybe<Scalars['Int']['output']>;
+  map?: Maybe<Scalars['String']['output']>;
+  player?: Maybe<Player>;
+  playerId?: Maybe<Scalars['Int']['output']>;
+  server?: Maybe<Server>;
+  serverId?: Maybe<Scalars['Int']['output']>;
 };
 
 export type EventConnectAvgOrderByAggregateInput = {
@@ -3981,10 +3960,7 @@ export type EventConnectAvgOrderByAggregateInput = {
 export type EventConnectCountOrderByAggregateInput = {
   eventTime?: InputMaybe<SortOrder>;
   eventTimeDisconnect?: InputMaybe<SortOrder>;
-  hostgroup?: InputMaybe<SortOrder>;
-  hostname?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
-  ipAddress?: InputMaybe<SortOrder>;
   map?: InputMaybe<SortOrder>;
   playerId?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
@@ -3993,9 +3969,6 @@ export type EventConnectCountOrderByAggregateInput = {
 export type EventConnectCreateInput = {
   eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   eventTimeDisconnect?: InputMaybe<Scalars['DateTime']['input']>;
-  hostgroup?: InputMaybe<Scalars['String']['input']>;
-  hostname?: InputMaybe<Scalars['String']['input']>;
-  ipAddress?: InputMaybe<Scalars['String']['input']>;
   map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutConnectsInput>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsConnectInput>;
@@ -4004,10 +3977,7 @@ export type EventConnectCreateInput = {
 export type EventConnectCreateManyInput = {
   eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   eventTimeDisconnect?: InputMaybe<Scalars['DateTime']['input']>;
-  hostgroup?: InputMaybe<Scalars['String']['input']>;
-  hostname?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
-  ipAddress?: InputMaybe<Scalars['String']['input']>;
   map?: InputMaybe<Scalars['String']['input']>;
   playerId?: InputMaybe<Scalars['Int']['input']>;
   serverId?: InputMaybe<Scalars['Int']['input']>;
@@ -4016,10 +3986,7 @@ export type EventConnectCreateManyInput = {
 export type EventConnectCreateManyPlayerInput = {
   eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   eventTimeDisconnect?: InputMaybe<Scalars['DateTime']['input']>;
-  hostgroup?: InputMaybe<Scalars['String']['input']>;
-  hostname?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
-  ipAddress?: InputMaybe<Scalars['String']['input']>;
   map?: InputMaybe<Scalars['String']['input']>;
   serverId?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -4032,10 +3999,7 @@ export type EventConnectCreateManyPlayerInputEnvelope = {
 export type EventConnectCreateManyServerInput = {
   eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   eventTimeDisconnect?: InputMaybe<Scalars['DateTime']['input']>;
-  hostgroup?: InputMaybe<Scalars['String']['input']>;
-  hostname?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
-  ipAddress?: InputMaybe<Scalars['String']['input']>;
   map?: InputMaybe<Scalars['String']['input']>;
   playerId?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -4072,9 +4036,6 @@ export type EventConnectCreateOrConnectWithoutServerInput = {
 export type EventConnectCreateWithoutPlayerInput = {
   eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   eventTimeDisconnect?: InputMaybe<Scalars['DateTime']['input']>;
-  hostgroup?: InputMaybe<Scalars['String']['input']>;
-  hostname?: InputMaybe<Scalars['String']['input']>;
-  ipAddress?: InputMaybe<Scalars['String']['input']>;
   map?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsConnectInput>;
 };
@@ -4082,9 +4043,6 @@ export type EventConnectCreateWithoutPlayerInput = {
 export type EventConnectCreateWithoutServerInput = {
   eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   eventTimeDisconnect?: InputMaybe<Scalars['DateTime']['input']>;
-  hostgroup?: InputMaybe<Scalars['String']['input']>;
-  hostname?: InputMaybe<Scalars['String']['input']>;
-  ipAddress?: InputMaybe<Scalars['String']['input']>;
   map?: InputMaybe<Scalars['String']['input']>;
   player?: InputMaybe<PlayerCreateNestedOneWithoutConnectsInput>;
 };
@@ -4098,10 +4056,7 @@ export type EventConnectListRelationFilter = {
 export type EventConnectMaxOrderByAggregateInput = {
   eventTime?: InputMaybe<SortOrder>;
   eventTimeDisconnect?: InputMaybe<SortOrder>;
-  hostgroup?: InputMaybe<SortOrder>;
-  hostname?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
-  ipAddress?: InputMaybe<SortOrder>;
   map?: InputMaybe<SortOrder>;
   playerId?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
@@ -4110,10 +4065,7 @@ export type EventConnectMaxOrderByAggregateInput = {
 export type EventConnectMinOrderByAggregateInput = {
   eventTime?: InputMaybe<SortOrder>;
   eventTimeDisconnect?: InputMaybe<SortOrder>;
-  hostgroup?: InputMaybe<SortOrder>;
-  hostname?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
-  ipAddress?: InputMaybe<SortOrder>;
   map?: InputMaybe<SortOrder>;
   playerId?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
@@ -4144,10 +4096,7 @@ export type EventConnectOrderByWithAggregationInput = {
   _sum?: InputMaybe<EventConnectSumOrderByAggregateInput>;
   eventTime?: InputMaybe<SortOrder>;
   eventTimeDisconnect?: InputMaybe<SortOrder>;
-  hostgroup?: InputMaybe<SortOrder>;
-  hostname?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
-  ipAddress?: InputMaybe<SortOrder>;
   map?: InputMaybe<SortOrder>;
   playerId?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
@@ -4157,10 +4106,7 @@ export type EventConnectOrderByWithRelationInput = {
   _relevance?: InputMaybe<EventConnectOrderByRelevanceInput>;
   eventTime?: InputMaybe<SortOrder>;
   eventTimeDisconnect?: InputMaybe<SortOrder>;
-  hostgroup?: InputMaybe<SortOrder>;
-  hostname?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
-  ipAddress?: InputMaybe<SortOrder>;
   map?: InputMaybe<SortOrder>;
   player?: InputMaybe<PlayerOrderByWithRelationInput>;
   playerId?: InputMaybe<SortOrder>;
@@ -4186,10 +4132,7 @@ export type EventConnectScalarWhereInput = {
   OR?: InputMaybe<Array<EventConnectScalarWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
   eventTimeDisconnect?: InputMaybe<DateTimeNullableFilter>;
-  hostgroup?: InputMaybe<StringFilter>;
-  hostname?: InputMaybe<StringFilter>;
   id?: InputMaybe<IntFilter>;
-  ipAddress?: InputMaybe<StringFilter>;
   map?: InputMaybe<StringFilter>;
   playerId?: InputMaybe<IntFilter>;
   serverId?: InputMaybe<IntFilter>;
@@ -4201,10 +4144,7 @@ export type EventConnectScalarWhereWithAggregatesInput = {
   OR?: InputMaybe<Array<EventConnectScalarWhereWithAggregatesInput>>;
   eventTime?: InputMaybe<DateTimeNullableWithAggregatesFilter>;
   eventTimeDisconnect?: InputMaybe<DateTimeNullableWithAggregatesFilter>;
-  hostgroup?: InputMaybe<StringWithAggregatesFilter>;
-  hostname?: InputMaybe<StringWithAggregatesFilter>;
   id?: InputMaybe<IntWithAggregatesFilter>;
-  ipAddress?: InputMaybe<StringWithAggregatesFilter>;
   map?: InputMaybe<StringWithAggregatesFilter>;
   playerId?: InputMaybe<IntWithAggregatesFilter>;
   serverId?: InputMaybe<IntWithAggregatesFilter>;
@@ -4219,9 +4159,6 @@ export type EventConnectSumOrderByAggregateInput = {
 export type EventConnectUpdateInput = {
   eventTime?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   eventTimeDisconnect?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  hostgroup?: InputMaybe<StringFieldUpdateOperationsInput>;
-  hostname?: InputMaybe<StringFieldUpdateOperationsInput>;
-  ipAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   map?: InputMaybe<StringFieldUpdateOperationsInput>;
   player?: InputMaybe<PlayerUpdateOneRequiredWithoutConnectsNestedInput>;
   server?: InputMaybe<ServerUpdateOneRequiredWithoutEventsConnectNestedInput>;
@@ -4230,9 +4167,6 @@ export type EventConnectUpdateInput = {
 export type EventConnectUpdateManyMutationInput = {
   eventTime?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   eventTimeDisconnect?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  hostgroup?: InputMaybe<StringFieldUpdateOperationsInput>;
-  hostname?: InputMaybe<StringFieldUpdateOperationsInput>;
-  ipAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   map?: InputMaybe<StringFieldUpdateOperationsInput>;
 };
 
@@ -4287,9 +4221,6 @@ export type EventConnectUpdateWithWhereUniqueWithoutServerInput = {
 export type EventConnectUpdateWithoutPlayerInput = {
   eventTime?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   eventTimeDisconnect?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  hostgroup?: InputMaybe<StringFieldUpdateOperationsInput>;
-  hostname?: InputMaybe<StringFieldUpdateOperationsInput>;
-  ipAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   map?: InputMaybe<StringFieldUpdateOperationsInput>;
   server?: InputMaybe<ServerUpdateOneRequiredWithoutEventsConnectNestedInput>;
 };
@@ -4297,9 +4228,6 @@ export type EventConnectUpdateWithoutPlayerInput = {
 export type EventConnectUpdateWithoutServerInput = {
   eventTime?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   eventTimeDisconnect?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  hostgroup?: InputMaybe<StringFieldUpdateOperationsInput>;
-  hostname?: InputMaybe<StringFieldUpdateOperationsInput>;
-  ipAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   map?: InputMaybe<StringFieldUpdateOperationsInput>;
   player?: InputMaybe<PlayerUpdateOneRequiredWithoutConnectsNestedInput>;
 };
@@ -4322,10 +4250,7 @@ export type EventConnectWhereInput = {
   OR?: InputMaybe<Array<EventConnectWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
   eventTimeDisconnect?: InputMaybe<DateTimeNullableFilter>;
-  hostgroup?: InputMaybe<StringFilter>;
-  hostname?: InputMaybe<StringFilter>;
   id?: InputMaybe<IntFilter>;
-  ipAddress?: InputMaybe<StringFilter>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
   playerId?: InputMaybe<IntFilter>;
@@ -4339,10 +4264,7 @@ export type EventConnectWhereUniqueInput = {
   OR?: InputMaybe<Array<EventConnectWhereInput>>;
   eventTime?: InputMaybe<DateTimeNullableFilter>;
   eventTimeDisconnect?: InputMaybe<DateTimeNullableFilter>;
-  hostgroup?: InputMaybe<StringFilter>;
-  hostname?: InputMaybe<StringFilter>;
   id?: InputMaybe<Scalars['Int']['input']>;
-  ipAddress?: InputMaybe<StringFilter>;
   map?: InputMaybe<StringFilter>;
   player?: InputMaybe<PlayerWhereInput>;
   playerId?: InputMaybe<IntFilter>;
@@ -7161,15 +7083,14 @@ export type EventPlayerPlayerActionWhereUniqueInput = {
 
 export type EventRcon = {
   __typename?: 'EventRcon';
-  command: Scalars['String']['output'];
+  command?: Maybe<Scalars['String']['output']>;
   eventTime?: Maybe<Scalars['DateTime']['output']>;
-  id: Scalars['ID']['output'];
-  map: Scalars['String']['output'];
-  password: Scalars['String']['output'];
-  remoteIp: Scalars['String']['output'];
-  server: Server;
-  serverId: Scalars['Int']['output'];
-  type: Scalars['String']['output'];
+  id?: Maybe<Scalars['Int']['output']>;
+  map?: Maybe<Scalars['String']['output']>;
+  remoteIp?: Maybe<Scalars['String']['output']>;
+  server?: Maybe<Server>;
+  serverId?: Maybe<Scalars['Int']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
 };
 
 export type EventRconAvgOrderByAggregateInput = {
@@ -7182,7 +7103,6 @@ export type EventRconCountOrderByAggregateInput = {
   eventTime?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
   map?: InputMaybe<SortOrder>;
-  password?: InputMaybe<SortOrder>;
   remoteIp?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   type?: InputMaybe<SortOrder>;
@@ -7192,7 +7112,6 @@ export type EventRconCreateInput = {
   command?: InputMaybe<Scalars['String']['input']>;
   eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   map?: InputMaybe<Scalars['String']['input']>;
-  password?: InputMaybe<Scalars['String']['input']>;
   remoteIp?: InputMaybe<Scalars['String']['input']>;
   server?: InputMaybe<ServerCreateNestedOneWithoutEventsRconInput>;
   type?: InputMaybe<Scalars['String']['input']>;
@@ -7203,7 +7122,6 @@ export type EventRconCreateManyInput = {
   eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<Scalars['String']['input']>;
-  password?: InputMaybe<Scalars['String']['input']>;
   remoteIp?: InputMaybe<Scalars['String']['input']>;
   serverId?: InputMaybe<Scalars['Int']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
@@ -7214,7 +7132,6 @@ export type EventRconCreateManyServerInput = {
   eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<Scalars['String']['input']>;
-  password?: InputMaybe<Scalars['String']['input']>;
   remoteIp?: InputMaybe<Scalars['String']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
 };
@@ -7240,7 +7157,6 @@ export type EventRconCreateWithoutServerInput = {
   command?: InputMaybe<Scalars['String']['input']>;
   eventTime?: InputMaybe<Scalars['DateTime']['input']>;
   map?: InputMaybe<Scalars['String']['input']>;
-  password?: InputMaybe<Scalars['String']['input']>;
   remoteIp?: InputMaybe<Scalars['String']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
 };
@@ -7256,7 +7172,6 @@ export type EventRconMaxOrderByAggregateInput = {
   eventTime?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
   map?: InputMaybe<SortOrder>;
-  password?: InputMaybe<SortOrder>;
   remoteIp?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   type?: InputMaybe<SortOrder>;
@@ -7267,7 +7182,6 @@ export type EventRconMinOrderByAggregateInput = {
   eventTime?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
   map?: InputMaybe<SortOrder>;
-  password?: InputMaybe<SortOrder>;
   remoteIp?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   type?: InputMaybe<SortOrder>;
@@ -7301,7 +7215,6 @@ export type EventRconOrderByWithAggregationInput = {
   eventTime?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
   map?: InputMaybe<SortOrder>;
-  password?: InputMaybe<SortOrder>;
   remoteIp?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   type?: InputMaybe<SortOrder>;
@@ -7313,7 +7226,6 @@ export type EventRconOrderByWithRelationInput = {
   eventTime?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
   map?: InputMaybe<SortOrder>;
-  password?: InputMaybe<SortOrder>;
   remoteIp?: InputMaybe<SortOrder>;
   server?: InputMaybe<ServerOrderByWithRelationInput>;
   serverId?: InputMaybe<SortOrder>;
@@ -7339,7 +7251,6 @@ export type EventRconScalarWhereInput = {
   eventTime?: InputMaybe<DateTimeNullableFilter>;
   id?: InputMaybe<IntFilter>;
   map?: InputMaybe<StringFilter>;
-  password?: InputMaybe<StringFilter>;
   remoteIp?: InputMaybe<StringFilter>;
   serverId?: InputMaybe<IntFilter>;
   type?: InputMaybe<StringFilter>;
@@ -7353,7 +7264,6 @@ export type EventRconScalarWhereWithAggregatesInput = {
   eventTime?: InputMaybe<DateTimeNullableWithAggregatesFilter>;
   id?: InputMaybe<IntWithAggregatesFilter>;
   map?: InputMaybe<StringWithAggregatesFilter>;
-  password?: InputMaybe<StringWithAggregatesFilter>;
   remoteIp?: InputMaybe<StringWithAggregatesFilter>;
   serverId?: InputMaybe<IntWithAggregatesFilter>;
   type?: InputMaybe<StringWithAggregatesFilter>;
@@ -7368,7 +7278,6 @@ export type EventRconUpdateInput = {
   command?: InputMaybe<StringFieldUpdateOperationsInput>;
   eventTime?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   map?: InputMaybe<StringFieldUpdateOperationsInput>;
-  password?: InputMaybe<StringFieldUpdateOperationsInput>;
   remoteIp?: InputMaybe<StringFieldUpdateOperationsInput>;
   server?: InputMaybe<ServerUpdateOneRequiredWithoutEventsRconNestedInput>;
   type?: InputMaybe<StringFieldUpdateOperationsInput>;
@@ -7378,7 +7287,6 @@ export type EventRconUpdateManyMutationInput = {
   command?: InputMaybe<StringFieldUpdateOperationsInput>;
   eventTime?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   map?: InputMaybe<StringFieldUpdateOperationsInput>;
-  password?: InputMaybe<StringFieldUpdateOperationsInput>;
   remoteIp?: InputMaybe<StringFieldUpdateOperationsInput>;
   type?: InputMaybe<StringFieldUpdateOperationsInput>;
 };
@@ -7411,7 +7319,6 @@ export type EventRconUpdateWithoutServerInput = {
   command?: InputMaybe<StringFieldUpdateOperationsInput>;
   eventTime?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   map?: InputMaybe<StringFieldUpdateOperationsInput>;
-  password?: InputMaybe<StringFieldUpdateOperationsInput>;
   remoteIp?: InputMaybe<StringFieldUpdateOperationsInput>;
   type?: InputMaybe<StringFieldUpdateOperationsInput>;
 };
@@ -7430,7 +7337,6 @@ export type EventRconWhereInput = {
   eventTime?: InputMaybe<DateTimeNullableFilter>;
   id?: InputMaybe<IntFilter>;
   map?: InputMaybe<StringFilter>;
-  password?: InputMaybe<StringFilter>;
   remoteIp?: InputMaybe<StringFilter>;
   server?: InputMaybe<ServerWhereInput>;
   serverId?: InputMaybe<IntFilter>;
@@ -7445,7 +7351,6 @@ export type EventRconWhereUniqueInput = {
   eventTime?: InputMaybe<DateTimeNullableFilter>;
   id?: InputMaybe<Scalars['Int']['input']>;
   map?: InputMaybe<StringFilter>;
-  password?: InputMaybe<StringFilter>;
   remoteIp?: InputMaybe<StringFilter>;
   server?: InputMaybe<ServerWhereInput>;
   serverId?: InputMaybe<IntFilter>;
@@ -10607,7 +10512,6 @@ export type ModSupportedWhereUniqueInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createManyAccount: Array<Account>;
   createManyAction: Array<Action>;
   createManyAward: Array<Award>;
   createManyClan: Array<Clan>;
@@ -10654,12 +10558,8 @@ export type Mutation = {
   createManyServerConfig: Array<ServerConfig>;
   createManyServerConfigDefault: Array<ServerConfigDefault>;
   createManyServerLoad: Array<ServerLoad>;
-  createManySession: Array<Session>;
   createManyTeam: Array<Team>;
-  createManyUser: Array<User>;
-  createManyVerification: Array<Verification>;
   createManyWeapon: Array<Weapon>;
-  createOneAccount: Account;
   createOneAction: Action;
   createOneAward: Award;
   createOneClan: Clan;
@@ -10706,14 +10606,10 @@ export type Mutation = {
   createOneServerConfig: ServerConfig;
   createOneServerConfigDefault: ServerConfigDefault;
   createOneServerLoad: ServerLoad;
-  createOneSession: Session;
   createOneTeam: Team;
-  createOneUser: User;
-  createOneVerification: Verification;
   createOneWeapon: Weapon;
   createServerToken?: Maybe<CreateServerTokenResult>;
   createServerWithConfig?: Maybe<ServerOperationResult>;
-  deleteManyAccount?: Maybe<BatchPayload>;
   deleteManyAction?: Maybe<BatchPayload>;
   deleteManyAward?: Maybe<BatchPayload>;
   deleteManyClan?: Maybe<BatchPayload>;
@@ -10760,12 +10656,8 @@ export type Mutation = {
   deleteManyServerConfig?: Maybe<BatchPayload>;
   deleteManyServerConfigDefault?: Maybe<BatchPayload>;
   deleteManyServerLoad?: Maybe<BatchPayload>;
-  deleteManySession?: Maybe<BatchPayload>;
   deleteManyTeam?: Maybe<BatchPayload>;
-  deleteManyUser?: Maybe<BatchPayload>;
-  deleteManyVerification?: Maybe<BatchPayload>;
   deleteManyWeapon?: Maybe<BatchPayload>;
-  deleteOneAccount?: Maybe<Account>;
   deleteOneAction?: Maybe<Action>;
   deleteOneAward?: Maybe<Award>;
   deleteOneClan?: Maybe<Clan>;
@@ -10812,13 +10704,9 @@ export type Mutation = {
   deleteOneServerConfig?: Maybe<ServerConfig>;
   deleteOneServerConfigDefault?: Maybe<ServerConfigDefault>;
   deleteOneServerLoad?: Maybe<ServerLoad>;
-  deleteOneSession?: Maybe<Session>;
   deleteOneTeam?: Maybe<Team>;
-  deleteOneUser?: Maybe<User>;
-  deleteOneVerification?: Maybe<Verification>;
   deleteOneWeapon?: Maybe<Weapon>;
   revokeServerToken?: Maybe<RevokeServerTokenResult>;
-  updateManyAccount: BatchPayload;
   updateManyAction: BatchPayload;
   updateManyAward: BatchPayload;
   updateManyClan: BatchPayload;
@@ -10865,12 +10753,8 @@ export type Mutation = {
   updateManyServerConfig: BatchPayload;
   updateManyServerConfigDefault: BatchPayload;
   updateManyServerLoad: BatchPayload;
-  updateManySession: BatchPayload;
   updateManyTeam: BatchPayload;
-  updateManyUser: BatchPayload;
-  updateManyVerification: BatchPayload;
   updateManyWeapon: BatchPayload;
-  updateOneAccount?: Maybe<Account>;
   updateOneAction?: Maybe<Action>;
   updateOneAward?: Maybe<Award>;
   updateOneClan?: Maybe<Clan>;
@@ -10917,13 +10801,9 @@ export type Mutation = {
   updateOneServerConfig?: Maybe<ServerConfig>;
   updateOneServerConfigDefault?: Maybe<ServerConfigDefault>;
   updateOneServerLoad?: Maybe<ServerLoad>;
-  updateOneSession?: Maybe<Session>;
   updateOneTeam?: Maybe<Team>;
-  updateOneUser?: Maybe<User>;
-  updateOneVerification?: Maybe<Verification>;
   updateOneWeapon?: Maybe<Weapon>;
   updateServerWithConfig?: Maybe<ServerOperationResult>;
-  upsertOneAccount: Account;
   upsertOneAction: Action;
   upsertOneAward: Award;
   upsertOneClan: Clan;
@@ -10970,16 +10850,8 @@ export type Mutation = {
   upsertOneServerConfig: ServerConfig;
   upsertOneServerConfigDefault: ServerConfigDefault;
   upsertOneServerLoad: ServerLoad;
-  upsertOneSession: Session;
   upsertOneTeam: Team;
-  upsertOneUser: User;
-  upsertOneVerification: Verification;
   upsertOneWeapon: Weapon;
-};
-
-
-export type MutationCreateManyAccountArgs = {
-  data: Array<AccountCreateInput>;
 };
 
 
@@ -11213,33 +11085,13 @@ export type MutationCreateManyServerLoadArgs = {
 };
 
 
-export type MutationCreateManySessionArgs = {
-  data: Array<SessionCreateInput>;
-};
-
-
 export type MutationCreateManyTeamArgs = {
   data: Array<TeamCreateInput>;
 };
 
 
-export type MutationCreateManyUserArgs = {
-  data: Array<UserCreateInput>;
-};
-
-
-export type MutationCreateManyVerificationArgs = {
-  data: Array<VerificationCreateInput>;
-};
-
-
 export type MutationCreateManyWeaponArgs = {
   data: Array<WeaponCreateInput>;
-};
-
-
-export type MutationCreateOneAccountArgs = {
-  data: AccountCreateInput;
 };
 
 
@@ -11473,23 +11325,8 @@ export type MutationCreateOneServerLoadArgs = {
 };
 
 
-export type MutationCreateOneSessionArgs = {
-  data: SessionCreateInput;
-};
-
-
 export type MutationCreateOneTeamArgs = {
   data: TeamCreateInput;
-};
-
-
-export type MutationCreateOneUserArgs = {
-  data: UserCreateInput;
-};
-
-
-export type MutationCreateOneVerificationArgs = {
-  data: VerificationCreateInput;
 };
 
 
@@ -11505,11 +11342,6 @@ export type MutationCreateServerTokenArgs = {
 
 export type MutationCreateServerWithConfigArgs = {
   data: CreateServerInput;
-};
-
-
-export type MutationDeleteManyAccountArgs = {
-  where: AccountWhereInput;
 };
 
 
@@ -11743,33 +11575,13 @@ export type MutationDeleteManyServerLoadArgs = {
 };
 
 
-export type MutationDeleteManySessionArgs = {
-  where: SessionWhereInput;
-};
-
-
 export type MutationDeleteManyTeamArgs = {
   where: TeamWhereInput;
 };
 
 
-export type MutationDeleteManyUserArgs = {
-  where: UserWhereInput;
-};
-
-
-export type MutationDeleteManyVerificationArgs = {
-  where: VerificationWhereInput;
-};
-
-
 export type MutationDeleteManyWeaponArgs = {
   where: WeaponWhereInput;
-};
-
-
-export type MutationDeleteOneAccountArgs = {
-  where: AccountWhereUniqueInput;
 };
 
 
@@ -12003,23 +11815,8 @@ export type MutationDeleteOneServerLoadArgs = {
 };
 
 
-export type MutationDeleteOneSessionArgs = {
-  where: SessionWhereUniqueInput;
-};
-
-
 export type MutationDeleteOneTeamArgs = {
   where: TeamWhereUniqueInput;
-};
-
-
-export type MutationDeleteOneUserArgs = {
-  where: UserWhereUniqueInput;
-};
-
-
-export type MutationDeleteOneVerificationArgs = {
-  where: VerificationWhereUniqueInput;
 };
 
 
@@ -12030,12 +11827,6 @@ export type MutationDeleteOneWeaponArgs = {
 
 export type MutationRevokeServerTokenArgs = {
   input: RevokeServerTokenInput;
-};
-
-
-export type MutationUpdateManyAccountArgs = {
-  data: AccountUpdateManyMutationInput;
-  where?: InputMaybe<AccountWhereInput>;
 };
 
 
@@ -12315,39 +12106,15 @@ export type MutationUpdateManyServerLoadArgs = {
 };
 
 
-export type MutationUpdateManySessionArgs = {
-  data: SessionUpdateManyMutationInput;
-  where?: InputMaybe<SessionWhereInput>;
-};
-
-
 export type MutationUpdateManyTeamArgs = {
   data: TeamUpdateManyMutationInput;
   where?: InputMaybe<TeamWhereInput>;
 };
 
 
-export type MutationUpdateManyUserArgs = {
-  data: UserUpdateManyMutationInput;
-  where?: InputMaybe<UserWhereInput>;
-};
-
-
-export type MutationUpdateManyVerificationArgs = {
-  data: VerificationUpdateManyMutationInput;
-  where?: InputMaybe<VerificationWhereInput>;
-};
-
-
 export type MutationUpdateManyWeaponArgs = {
   data: WeaponUpdateManyMutationInput;
   where?: InputMaybe<WeaponWhereInput>;
-};
-
-
-export type MutationUpdateOneAccountArgs = {
-  data: AccountUpdateInput;
-  where: AccountWhereUniqueInput;
 };
 
 
@@ -12627,27 +12394,9 @@ export type MutationUpdateOneServerLoadArgs = {
 };
 
 
-export type MutationUpdateOneSessionArgs = {
-  data: SessionUpdateInput;
-  where: SessionWhereUniqueInput;
-};
-
-
 export type MutationUpdateOneTeamArgs = {
   data: TeamUpdateInput;
   where: TeamWhereUniqueInput;
-};
-
-
-export type MutationUpdateOneUserArgs = {
-  data: UserUpdateInput;
-  where: UserWhereUniqueInput;
-};
-
-
-export type MutationUpdateOneVerificationArgs = {
-  data: VerificationUpdateInput;
-  where: VerificationWhereUniqueInput;
 };
 
 
@@ -12660,13 +12409,6 @@ export type MutationUpdateOneWeaponArgs = {
 export type MutationUpdateServerWithConfigArgs = {
   data: UpdateServerInput;
   serverId: Scalars['Int']['input'];
-};
-
-
-export type MutationUpsertOneAccountArgs = {
-  create: AccountCreateInput;
-  update: AccountUpdateInput;
-  where: AccountWhereUniqueInput;
 };
 
 
@@ -12992,31 +12734,10 @@ export type MutationUpsertOneServerLoadArgs = {
 };
 
 
-export type MutationUpsertOneSessionArgs = {
-  create: SessionCreateInput;
-  update: SessionUpdateInput;
-  where: SessionWhereUniqueInput;
-};
-
-
 export type MutationUpsertOneTeamArgs = {
   create: TeamCreateInput;
   update: TeamUpdateInput;
   where: TeamWhereUniqueInput;
-};
-
-
-export type MutationUpsertOneUserArgs = {
-  create: UserCreateInput;
-  update: UserUpdateInput;
-  where: UserWhereUniqueInput;
-};
-
-
-export type MutationUpsertOneVerificationArgs = {
-  create: VerificationCreateInput;
-  update: VerificationUpdateInput;
-  where: VerificationWhereUniqueInput;
 };
 
 
@@ -14066,305 +13787,65 @@ export type OptionWhereUniqueInput = {
 
 export type Player = {
   __typename?: 'Player';
-  activity: Scalars['Int']['output'];
-  awards: Array<PlayerAward>;
-  awardsWonAsDWinner: Array<Award>;
-  awardsWonAsGWinner: Array<Award>;
-  blockAvatar: Scalars['Int']['output'];
-  chats: Array<EventChat>;
-  city: Scalars['String']['output'];
+  activity?: Maybe<Scalars['Int']['output']>;
+  awards?: Maybe<Array<PlayerAward>>;
+  awardsWonAsDWinner?: Maybe<Array<Award>>;
+  awardsWonAsGWinner?: Maybe<Array<Award>>;
+  blockAvatar?: Maybe<Scalars['Int']['output']>;
+  chats?: Maybe<Array<EventChat>>;
+  city?: Maybe<Scalars['String']['output']>;
   clan?: Maybe<Clan>;
   clanId?: Maybe<Scalars['Int']['output']>;
-  connectionTime: Scalars['Int']['output'];
-  connects: Array<EventConnect>;
-  country: Scalars['String']['output'];
+  connectionTime?: Maybe<Scalars['Int']['output']>;
+  connects?: Maybe<Array<EventConnect>>;
+  country?: Maybe<Scalars['String']['output']>;
   countryData?: Maybe<Country>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
-  deathStreak: Scalars['Int']['output'];
-  deaths: Scalars['Int']['output'];
-  disconnects: Array<EventDisconnect>;
-  displayEvents: Scalars['Int']['output'];
+  deathStreak?: Maybe<Scalars['Int']['output']>;
+  deaths?: Maybe<Scalars['Int']['output']>;
+  disconnects?: Maybe<Array<EventDisconnect>>;
+  displayEvents?: Maybe<Scalars['Int']['output']>;
   email?: Maybe<Scalars['String']['output']>;
-  entries: Array<EventEntry>;
+  entries?: Maybe<Array<EventEntry>>;
   flag?: Maybe<Scalars['String']['output']>;
-  fragsAsKiller: Array<EventFrag>;
-  fragsAsVictim: Array<EventFrag>;
+  fragsAsKiller?: Maybe<Array<EventFrag>>;
+  fragsAsVictim?: Maybe<Array<EventFrag>>;
   fullName?: Maybe<Scalars['String']['output']>;
-  game: Scalars['String']['output'];
-  gameData: Game;
-  headshots: Scalars['Int']['output'];
-  hideRanking: Scalars['Int']['output'];
-  history: Array<PlayerHistory>;
-  hits: Scalars['Int']['output'];
-  killStreak: Scalars['Int']['output'];
-  kills: Scalars['Int']['output'];
-  lastAddress: Scalars['String']['output'];
+  game?: Maybe<Scalars['String']['output']>;
+  gameData?: Maybe<Game>;
+  headshots?: Maybe<Scalars['Int']['output']>;
+  hideRanking?: Maybe<Scalars['Int']['output']>;
+  history?: Maybe<Array<PlayerHistory>>;
+  hits?: Maybe<Scalars['Int']['output']>;
+  killStreak?: Maybe<Scalars['Int']['output']>;
+  kills?: Maybe<Scalars['Int']['output']>;
+  lastAddress?: Maybe<Scalars['String']['output']>;
   lastEvent?: Maybe<Scalars['DateTime']['output']>;
-  lastName: Scalars['String']['output'];
+  lastName?: Maybe<Scalars['String']['output']>;
   lastSkillChange?: Maybe<Scalars['DateTime']['output']>;
   lat?: Maybe<Scalars['Float']['output']>;
-  latencyEvents: Array<EventLatency>;
+  latencyEvents?: Maybe<Array<EventLatency>>;
   lng?: Maybe<Scalars['Float']['output']>;
   mmrank?: Maybe<Scalars['Int']['output']>;
-  nameChanges: Array<EventChangeName>;
-  names: Array<PlayerName>;
-  playerActions: Array<EventPlayerAction>;
-  playerId: Scalars['ID']['output'];
-  playerPlayerActionsAsActor: Array<EventPlayerPlayerAction>;
-  playerPlayerActionsAsVictim: Array<EventPlayerPlayerAction>;
-  ribbons: Array<PlayerRibbon>;
-  roleChanges: Array<EventChangeRole>;
-  shots: Scalars['Int']['output'];
-  skill: Scalars['Int']['output'];
-  state: Scalars['String']['output'];
-  suicideEvents: Array<EventSuicide>;
-  suicides: Scalars['Int']['output'];
-  teamBonuses: Array<EventTeamBonus>;
-  teamChanges: Array<EventChangeTeam>;
-  teamkills: Scalars['Int']['output'];
-  teamkillsAsKiller: Array<EventTeamkill>;
-  teamkillsAsVictim: Array<EventTeamkill>;
-  uniqueIds: Array<PlayerUniqueId>;
-};
-
-
-export type PlayerAwardsArgs = {
-  cursor?: InputMaybe<PlayerAwardWhereUniqueInput>;
-  distinct?: InputMaybe<Array<PlayerAwardScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<PlayerAwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<PlayerAwardWhereInput>;
-};
-
-
-export type PlayerAwardsWonAsDWinnerArgs = {
-  cursor?: InputMaybe<AwardWhereUniqueInput>;
-  distinct?: InputMaybe<Array<AwardScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<AwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<AwardWhereInput>;
-};
-
-
-export type PlayerAwardsWonAsGWinnerArgs = {
-  cursor?: InputMaybe<AwardWhereUniqueInput>;
-  distinct?: InputMaybe<Array<AwardScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<AwardOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<AwardWhereInput>;
-};
-
-
-export type PlayerChatsArgs = {
-  cursor?: InputMaybe<EventChatWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventChatScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventChatOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventChatWhereInput>;
-};
-
-
-export type PlayerConnectsArgs = {
-  cursor?: InputMaybe<EventConnectWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventConnectScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventConnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventConnectWhereInput>;
-};
-
-
-export type PlayerDisconnectsArgs = {
-  cursor?: InputMaybe<EventDisconnectWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventDisconnectScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventDisconnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventDisconnectWhereInput>;
-};
-
-
-export type PlayerEntriesArgs = {
-  cursor?: InputMaybe<EventEntryWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventEntryScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventEntryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventEntryWhereInput>;
-};
-
-
-export type PlayerFragsAsKillerArgs = {
-  cursor?: InputMaybe<EventFragWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventFragScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventFragOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventFragWhereInput>;
-};
-
-
-export type PlayerFragsAsVictimArgs = {
-  cursor?: InputMaybe<EventFragWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventFragScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventFragOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventFragWhereInput>;
-};
-
-
-export type PlayerHistoryArgs = {
-  cursor?: InputMaybe<PlayerHistoryWhereUniqueInput>;
-  distinct?: InputMaybe<Array<PlayerHistoryScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<PlayerHistoryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<PlayerHistoryWhereInput>;
-};
-
-
-export type PlayerLatencyEventsArgs = {
-  cursor?: InputMaybe<EventLatencyWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventLatencyScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventLatencyOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventLatencyWhereInput>;
-};
-
-
-export type PlayerNameChangesArgs = {
-  cursor?: InputMaybe<EventChangeNameWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventChangeNameScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventChangeNameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventChangeNameWhereInput>;
-};
-
-
-export type PlayerNamesArgs = {
-  cursor?: InputMaybe<PlayerNameWhereUniqueInput>;
-  distinct?: InputMaybe<Array<PlayerNameScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<PlayerNameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<PlayerNameWhereInput>;
-};
-
-
-export type PlayerPlayerActionsArgs = {
-  cursor?: InputMaybe<EventPlayerActionWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventPlayerActionScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventPlayerActionWhereInput>;
-};
-
-
-export type PlayerPlayerPlayerActionsAsActorArgs = {
-  cursor?: InputMaybe<EventPlayerPlayerActionWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventPlayerPlayerActionScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventPlayerPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventPlayerPlayerActionWhereInput>;
-};
-
-
-export type PlayerPlayerPlayerActionsAsVictimArgs = {
-  cursor?: InputMaybe<EventPlayerPlayerActionWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventPlayerPlayerActionScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventPlayerPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventPlayerPlayerActionWhereInput>;
-};
-
-
-export type PlayerRibbonsArgs = {
-  cursor?: InputMaybe<PlayerRibbonWhereUniqueInput>;
-  distinct?: InputMaybe<Array<PlayerRibbonScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<PlayerRibbonOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<PlayerRibbonWhereInput>;
-};
-
-
-export type PlayerRoleChangesArgs = {
-  cursor?: InputMaybe<EventChangeRoleWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventChangeRoleScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventChangeRoleOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventChangeRoleWhereInput>;
-};
-
-
-export type PlayerSuicideEventsArgs = {
-  cursor?: InputMaybe<EventSuicideWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventSuicideScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventSuicideOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventSuicideWhereInput>;
-};
-
-
-export type PlayerTeamBonusesArgs = {
-  cursor?: InputMaybe<EventTeamBonusWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventTeamBonusScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventTeamBonusOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventTeamBonusWhereInput>;
-};
-
-
-export type PlayerTeamChangesArgs = {
-  cursor?: InputMaybe<EventChangeTeamWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventChangeTeamScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventChangeTeamOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventChangeTeamWhereInput>;
-};
-
-
-export type PlayerTeamkillsAsKillerArgs = {
-  cursor?: InputMaybe<EventTeamkillWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventTeamkillScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventTeamkillOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventTeamkillWhereInput>;
-};
-
-
-export type PlayerTeamkillsAsVictimArgs = {
-  cursor?: InputMaybe<EventTeamkillWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventTeamkillScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventTeamkillOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventTeamkillWhereInput>;
-};
-
-
-export type PlayerUniqueIdsArgs = {
-  cursor?: InputMaybe<PlayerUniqueIdWhereUniqueInput>;
-  distinct?: InputMaybe<Array<PlayerUniqueIdScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<PlayerUniqueIdOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<PlayerUniqueIdWhereInput>;
+  nameChanges?: Maybe<Array<EventChangeName>>;
+  names?: Maybe<Array<PlayerName>>;
+  playerActions?: Maybe<Array<EventPlayerAction>>;
+  playerId?: Maybe<Scalars['Int']['output']>;
+  playerPlayerActionsAsActor?: Maybe<Array<EventPlayerPlayerAction>>;
+  playerPlayerActionsAsVictim?: Maybe<Array<EventPlayerPlayerAction>>;
+  ribbons?: Maybe<Array<PlayerRibbon>>;
+  roleChanges?: Maybe<Array<EventChangeRole>>;
+  shots?: Maybe<Scalars['Int']['output']>;
+  skill?: Maybe<Scalars['Int']['output']>;
+  state?: Maybe<Scalars['String']['output']>;
+  suicideEvents?: Maybe<Array<EventSuicide>>;
+  suicides?: Maybe<Scalars['Int']['output']>;
+  teamBonuses?: Maybe<Array<EventTeamBonus>>;
+  teamChanges?: Maybe<Array<EventChangeTeam>>;
+  teamkills?: Maybe<Scalars['Int']['output']>;
+  teamkillsAsKiller?: Maybe<Array<EventTeamkill>>;
+  teamkillsAsVictim?: Maybe<Array<EventTeamkill>>;
+  uniqueIds?: Maybe<Array<PlayerUniqueId>>;
 };
 
 export type PlayerAvgOrderByAggregateInput = {
@@ -14380,8 +13861,6 @@ export type PlayerAvgOrderByAggregateInput = {
   hits?: InputMaybe<SortOrder>;
   killStreak?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
-  lat?: InputMaybe<SortOrder>;
-  lng?: InputMaybe<SortOrder>;
   mmrank?: InputMaybe<SortOrder>;
   playerId?: InputMaybe<SortOrder>;
   shots?: InputMaybe<SortOrder>;
@@ -14722,21 +14201,16 @@ export type PlayerCountOrderByAggregateInput = {
   deathStreak?: InputMaybe<SortOrder>;
   deaths?: InputMaybe<SortOrder>;
   displayEvents?: InputMaybe<SortOrder>;
-  email?: InputMaybe<SortOrder>;
   flag?: InputMaybe<SortOrder>;
-  fullName?: InputMaybe<SortOrder>;
   game?: InputMaybe<SortOrder>;
   headshots?: InputMaybe<SortOrder>;
   hideRanking?: InputMaybe<SortOrder>;
   hits?: InputMaybe<SortOrder>;
   killStreak?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
-  lastAddress?: InputMaybe<SortOrder>;
   lastEvent?: InputMaybe<SortOrder>;
   lastName?: InputMaybe<SortOrder>;
   lastSkillChange?: InputMaybe<SortOrder>;
-  lat?: InputMaybe<SortOrder>;
-  lng?: InputMaybe<SortOrder>;
   mmrank?: InputMaybe<SortOrder>;
   playerId?: InputMaybe<SortOrder>;
   shots?: InputMaybe<SortOrder>;
@@ -14764,11 +14238,9 @@ export type PlayerCreateInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -14776,13 +14248,10 @@ export type PlayerCreateInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -14814,21 +14283,16 @@ export type PlayerCreateManyClanInput = {
   deathStreak?: InputMaybe<Scalars['Int']['input']>;
   deaths?: InputMaybe<Scalars['Int']['input']>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   flag?: InputMaybe<Scalars['String']['input']>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   game: Scalars['String']['input'];
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   playerId?: InputMaybe<Scalars['Int']['input']>;
   shots?: InputMaybe<Scalars['Int']['input']>;
@@ -14854,20 +14318,15 @@ export type PlayerCreateManyCountryDataInput = {
   deathStreak?: InputMaybe<Scalars['Int']['input']>;
   deaths?: InputMaybe<Scalars['Int']['input']>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   game: Scalars['String']['input'];
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   playerId?: InputMaybe<Scalars['Int']['input']>;
   shots?: InputMaybe<Scalars['Int']['input']>;
@@ -14893,20 +14352,15 @@ export type PlayerCreateManyGameDataInput = {
   deathStreak?: InputMaybe<Scalars['Int']['input']>;
   deaths?: InputMaybe<Scalars['Int']['input']>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   flag?: InputMaybe<Scalars['String']['input']>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   playerId?: InputMaybe<Scalars['Int']['input']>;
   shots?: InputMaybe<Scalars['Int']['input']>;
@@ -14932,21 +14386,16 @@ export type PlayerCreateManyInput = {
   deathStreak?: InputMaybe<Scalars['Int']['input']>;
   deaths?: InputMaybe<Scalars['Int']['input']>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   flag?: InputMaybe<Scalars['String']['input']>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   game: Scalars['String']['input'];
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   playerId?: InputMaybe<Scalars['Int']['input']>;
   shots?: InputMaybe<Scalars['Int']['input']>;
@@ -15273,11 +14722,9 @@ export type PlayerCreateWithoutAwardsInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -15285,13 +14732,10 @@ export type PlayerCreateWithoutAwardsInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -15330,11 +14774,9 @@ export type PlayerCreateWithoutAwardsWonAsDWinnerInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -15342,13 +14784,10 @@ export type PlayerCreateWithoutAwardsWonAsDWinnerInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -15387,11 +14826,9 @@ export type PlayerCreateWithoutAwardsWonAsGWinnerInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -15399,13 +14836,10 @@ export type PlayerCreateWithoutAwardsWonAsGWinnerInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -15444,11 +14878,9 @@ export type PlayerCreateWithoutChatsInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -15456,13 +14888,10 @@ export type PlayerCreateWithoutChatsInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -15501,11 +14930,9 @@ export type PlayerCreateWithoutClanInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -15513,13 +14940,10 @@ export type PlayerCreateWithoutClanInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -15558,11 +14982,9 @@ export type PlayerCreateWithoutConnectsInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -15570,13 +14992,10 @@ export type PlayerCreateWithoutConnectsInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -15615,11 +15034,9 @@ export type PlayerCreateWithoutCountryDataInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -15627,13 +15044,10 @@ export type PlayerCreateWithoutCountryDataInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -15672,11 +15086,9 @@ export type PlayerCreateWithoutDisconnectsInput = {
   deathStreak?: InputMaybe<Scalars['Int']['input']>;
   deaths?: InputMaybe<Scalars['Int']['input']>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -15684,13 +15096,10 @@ export type PlayerCreateWithoutDisconnectsInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -15730,10 +15139,8 @@ export type PlayerCreateWithoutEntriesInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -15741,13 +15148,10 @@ export type PlayerCreateWithoutEntriesInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -15787,10 +15191,8 @@ export type PlayerCreateWithoutFragsAsKillerInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -15798,13 +15200,10 @@ export type PlayerCreateWithoutFragsAsKillerInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -15844,10 +15243,8 @@ export type PlayerCreateWithoutFragsAsVictimInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -15855,13 +15252,10 @@ export type PlayerCreateWithoutFragsAsVictimInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -15901,24 +15295,19 @@ export type PlayerCreateWithoutGameDataInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -15958,24 +15347,19 @@ export type PlayerCreateWithoutHistoryInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -16015,11 +15399,9 @@ export type PlayerCreateWithoutLatencyEventsInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16027,12 +15409,9 @@ export type PlayerCreateWithoutLatencyEventsInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -16072,11 +15451,9 @@ export type PlayerCreateWithoutNameChangesInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16084,13 +15461,10 @@ export type PlayerCreateWithoutNameChangesInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -16129,11 +15503,9 @@ export type PlayerCreateWithoutNamesInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16141,13 +15513,10 @@ export type PlayerCreateWithoutNamesInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   playerActions?: InputMaybe<EventPlayerActionCreateNestedManyWithoutPlayerInput>;
@@ -16186,11 +15555,9 @@ export type PlayerCreateWithoutPlayerActionsInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16198,13 +15565,10 @@ export type PlayerCreateWithoutPlayerActionsInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -16243,11 +15607,9 @@ export type PlayerCreateWithoutPlayerPlayerActionsAsActorInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16255,13 +15617,10 @@ export type PlayerCreateWithoutPlayerPlayerActionsAsActorInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -16300,11 +15659,9 @@ export type PlayerCreateWithoutPlayerPlayerActionsAsVictimInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16312,13 +15669,10 @@ export type PlayerCreateWithoutPlayerPlayerActionsAsVictimInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -16357,11 +15711,9 @@ export type PlayerCreateWithoutRibbonsInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16369,13 +15721,10 @@ export type PlayerCreateWithoutRibbonsInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -16414,11 +15763,9 @@ export type PlayerCreateWithoutRoleChangesInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16426,13 +15773,10 @@ export type PlayerCreateWithoutRoleChangesInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -16471,11 +15815,9 @@ export type PlayerCreateWithoutSuicideEventsInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16483,13 +15825,10 @@ export type PlayerCreateWithoutSuicideEventsInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -16528,11 +15867,9 @@ export type PlayerCreateWithoutTeamBonusesInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16540,13 +15877,10 @@ export type PlayerCreateWithoutTeamBonusesInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -16585,11 +15919,9 @@ export type PlayerCreateWithoutTeamChangesInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16597,13 +15929,10 @@ export type PlayerCreateWithoutTeamChangesInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -16642,11 +15971,9 @@ export type PlayerCreateWithoutTeamkillsAsKillerInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16654,13 +15981,10 @@ export type PlayerCreateWithoutTeamkillsAsKillerInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -16699,11 +16023,9 @@ export type PlayerCreateWithoutTeamkillsAsVictimInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16711,13 +16033,10 @@ export type PlayerCreateWithoutTeamkillsAsVictimInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -16756,11 +16075,9 @@ export type PlayerCreateWithoutUniqueIdsInput = {
   deaths?: InputMaybe<Scalars['Int']['input']>;
   disconnects?: InputMaybe<EventDisconnectCreateNestedManyWithoutPlayerInput>;
   displayEvents?: InputMaybe<Scalars['Int']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
   entries?: InputMaybe<EventEntryCreateNestedManyWithoutPlayerInput>;
   fragsAsKiller?: InputMaybe<EventFragCreateNestedManyWithoutKillerInput>;
   fragsAsVictim?: InputMaybe<EventFragCreateNestedManyWithoutVictimInput>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
   gameData: GameCreateNestedOneWithoutPlayersInput;
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
@@ -16768,13 +16085,10 @@ export type PlayerCreateWithoutUniqueIdsInput = {
   hits?: InputMaybe<Scalars['Int']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
-  lastAddress?: InputMaybe<Scalars['String']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   lastSkillChange?: InputMaybe<Scalars['DateTime']['input']>;
-  lat?: InputMaybe<Scalars['Float']['input']>;
   latencyEvents?: InputMaybe<EventLatencyCreateNestedManyWithoutPlayerInput>;
-  lng?: InputMaybe<Scalars['Float']['input']>;
   mmrank?: InputMaybe<Scalars['Int']['input']>;
   nameChanges?: InputMaybe<EventChangeNameCreateNestedManyWithoutPlayerInput>;
   names?: InputMaybe<PlayerNameCreateNestedManyWithoutPlayerInput>;
@@ -17261,21 +16575,16 @@ export type PlayerMaxOrderByAggregateInput = {
   deathStreak?: InputMaybe<SortOrder>;
   deaths?: InputMaybe<SortOrder>;
   displayEvents?: InputMaybe<SortOrder>;
-  email?: InputMaybe<SortOrder>;
   flag?: InputMaybe<SortOrder>;
-  fullName?: InputMaybe<SortOrder>;
   game?: InputMaybe<SortOrder>;
   headshots?: InputMaybe<SortOrder>;
   hideRanking?: InputMaybe<SortOrder>;
   hits?: InputMaybe<SortOrder>;
   killStreak?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
-  lastAddress?: InputMaybe<SortOrder>;
   lastEvent?: InputMaybe<SortOrder>;
   lastName?: InputMaybe<SortOrder>;
   lastSkillChange?: InputMaybe<SortOrder>;
-  lat?: InputMaybe<SortOrder>;
-  lng?: InputMaybe<SortOrder>;
   mmrank?: InputMaybe<SortOrder>;
   playerId?: InputMaybe<SortOrder>;
   shots?: InputMaybe<SortOrder>;
@@ -17296,21 +16605,16 @@ export type PlayerMinOrderByAggregateInput = {
   deathStreak?: InputMaybe<SortOrder>;
   deaths?: InputMaybe<SortOrder>;
   displayEvents?: InputMaybe<SortOrder>;
-  email?: InputMaybe<SortOrder>;
   flag?: InputMaybe<SortOrder>;
-  fullName?: InputMaybe<SortOrder>;
   game?: InputMaybe<SortOrder>;
   headshots?: InputMaybe<SortOrder>;
   hideRanking?: InputMaybe<SortOrder>;
   hits?: InputMaybe<SortOrder>;
   killStreak?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
-  lastAddress?: InputMaybe<SortOrder>;
   lastEvent?: InputMaybe<SortOrder>;
   lastName?: InputMaybe<SortOrder>;
   lastSkillChange?: InputMaybe<SortOrder>;
-  lat?: InputMaybe<SortOrder>;
-  lng?: InputMaybe<SortOrder>;
   mmrank?: InputMaybe<SortOrder>;
   playerId?: InputMaybe<SortOrder>;
   shots?: InputMaybe<SortOrder>;
@@ -17731,21 +17035,16 @@ export type PlayerOrderByWithAggregationInput = {
   deathStreak?: InputMaybe<SortOrder>;
   deaths?: InputMaybe<SortOrder>;
   displayEvents?: InputMaybe<SortOrder>;
-  email?: InputMaybe<SortOrder>;
   flag?: InputMaybe<SortOrder>;
-  fullName?: InputMaybe<SortOrder>;
   game?: InputMaybe<SortOrder>;
   headshots?: InputMaybe<SortOrder>;
   hideRanking?: InputMaybe<SortOrder>;
   hits?: InputMaybe<SortOrder>;
   killStreak?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
-  lastAddress?: InputMaybe<SortOrder>;
   lastEvent?: InputMaybe<SortOrder>;
   lastName?: InputMaybe<SortOrder>;
   lastSkillChange?: InputMaybe<SortOrder>;
-  lat?: InputMaybe<SortOrder>;
-  lng?: InputMaybe<SortOrder>;
   mmrank?: InputMaybe<SortOrder>;
   playerId?: InputMaybe<SortOrder>;
   shots?: InputMaybe<SortOrder>;
@@ -17775,12 +17074,10 @@ export type PlayerOrderByWithRelationInput = {
   deaths?: InputMaybe<SortOrder>;
   disconnects?: InputMaybe<EventDisconnectOrderByRelationAggregateInput>;
   displayEvents?: InputMaybe<SortOrder>;
-  email?: InputMaybe<SortOrder>;
   entries?: InputMaybe<EventEntryOrderByRelationAggregateInput>;
   flag?: InputMaybe<SortOrder>;
   fragsAsKiller?: InputMaybe<EventFragOrderByRelationAggregateInput>;
   fragsAsVictim?: InputMaybe<EventFragOrderByRelationAggregateInput>;
-  fullName?: InputMaybe<SortOrder>;
   game?: InputMaybe<SortOrder>;
   gameData?: InputMaybe<GameOrderByWithRelationInput>;
   headshots?: InputMaybe<SortOrder>;
@@ -17789,13 +17086,10 @@ export type PlayerOrderByWithRelationInput = {
   hits?: InputMaybe<SortOrder>;
   killStreak?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
-  lastAddress?: InputMaybe<SortOrder>;
   lastEvent?: InputMaybe<SortOrder>;
   lastName?: InputMaybe<SortOrder>;
   lastSkillChange?: InputMaybe<SortOrder>;
-  lat?: InputMaybe<SortOrder>;
   latencyEvents?: InputMaybe<EventLatencyOrderByRelationAggregateInput>;
-  lng?: InputMaybe<SortOrder>;
   mmrank?: InputMaybe<SortOrder>;
   nameChanges?: InputMaybe<EventChangeNameOrderByRelationAggregateInput>;
   names?: InputMaybe<PlayerNameOrderByRelationAggregateInput>;
@@ -18148,21 +17442,16 @@ export type PlayerScalarWhereInput = {
   deathStreak?: InputMaybe<IntFilter>;
   deaths?: InputMaybe<IntFilter>;
   displayEvents?: InputMaybe<IntFilter>;
-  email?: InputMaybe<StringNullableFilter>;
   flag?: InputMaybe<StringNullableFilter>;
-  fullName?: InputMaybe<StringNullableFilter>;
   game?: InputMaybe<StringFilter>;
   headshots?: InputMaybe<IntFilter>;
   hideRanking?: InputMaybe<IntFilter>;
   hits?: InputMaybe<IntFilter>;
   killStreak?: InputMaybe<IntFilter>;
   kills?: InputMaybe<IntFilter>;
-  lastAddress?: InputMaybe<StringFilter>;
   lastEvent?: InputMaybe<DateTimeNullableFilter>;
   lastName?: InputMaybe<StringFilter>;
   lastSkillChange?: InputMaybe<DateTimeNullableFilter>;
-  lat?: InputMaybe<FloatNullableFilter>;
-  lng?: InputMaybe<FloatNullableFilter>;
   mmrank?: InputMaybe<IntNullableFilter>;
   playerId?: InputMaybe<IntFilter>;
   shots?: InputMaybe<IntFilter>;
@@ -18186,21 +17475,16 @@ export type PlayerScalarWhereWithAggregatesInput = {
   deathStreak?: InputMaybe<IntWithAggregatesFilter>;
   deaths?: InputMaybe<IntWithAggregatesFilter>;
   displayEvents?: InputMaybe<IntWithAggregatesFilter>;
-  email?: InputMaybe<StringNullableWithAggregatesFilter>;
   flag?: InputMaybe<StringNullableWithAggregatesFilter>;
-  fullName?: InputMaybe<StringNullableWithAggregatesFilter>;
   game?: InputMaybe<StringWithAggregatesFilter>;
   headshots?: InputMaybe<IntWithAggregatesFilter>;
   hideRanking?: InputMaybe<IntWithAggregatesFilter>;
   hits?: InputMaybe<IntWithAggregatesFilter>;
   killStreak?: InputMaybe<IntWithAggregatesFilter>;
   kills?: InputMaybe<IntWithAggregatesFilter>;
-  lastAddress?: InputMaybe<StringWithAggregatesFilter>;
   lastEvent?: InputMaybe<DateTimeNullableWithAggregatesFilter>;
   lastName?: InputMaybe<StringWithAggregatesFilter>;
   lastSkillChange?: InputMaybe<DateTimeNullableWithAggregatesFilter>;
-  lat?: InputMaybe<FloatNullableWithAggregatesFilter>;
-  lng?: InputMaybe<FloatNullableWithAggregatesFilter>;
   mmrank?: InputMaybe<IntNullableWithAggregatesFilter>;
   playerId?: InputMaybe<IntWithAggregatesFilter>;
   shots?: InputMaybe<IntWithAggregatesFilter>;
@@ -18248,8 +17532,6 @@ export type PlayerSumOrderByAggregateInput = {
   hits?: InputMaybe<SortOrder>;
   killStreak?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
-  lat?: InputMaybe<SortOrder>;
-  lng?: InputMaybe<SortOrder>;
   mmrank?: InputMaybe<SortOrder>;
   playerId?: InputMaybe<SortOrder>;
   shots?: InputMaybe<SortOrder>;
@@ -18505,11 +17787,9 @@ export type PlayerUpdateInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -18517,13 +17797,10 @@ export type PlayerUpdateInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -18555,19 +17832,14 @@ export type PlayerUpdateManyMutationInput = {
   deathStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   shots?: InputMaybe<IntFieldUpdateOperationsInput>;
   skill?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -18981,11 +18253,9 @@ export type PlayerUpdateWithoutAwardsInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -18993,13 +18263,10 @@ export type PlayerUpdateWithoutAwardsInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19038,11 +18305,9 @@ export type PlayerUpdateWithoutAwardsWonAsDWinnerInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19050,13 +18315,10 @@ export type PlayerUpdateWithoutAwardsWonAsDWinnerInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19095,11 +18357,9 @@ export type PlayerUpdateWithoutAwardsWonAsGWinnerInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19107,13 +18367,10 @@ export type PlayerUpdateWithoutAwardsWonAsGWinnerInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19152,11 +18409,9 @@ export type PlayerUpdateWithoutChatsInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19164,13 +18419,10 @@ export type PlayerUpdateWithoutChatsInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19209,11 +18461,9 @@ export type PlayerUpdateWithoutClanInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19221,13 +18471,10 @@ export type PlayerUpdateWithoutClanInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19266,11 +18513,9 @@ export type PlayerUpdateWithoutConnectsInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19278,13 +18523,10 @@ export type PlayerUpdateWithoutConnectsInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19323,11 +18565,9 @@ export type PlayerUpdateWithoutCountryDataInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19335,13 +18575,10 @@ export type PlayerUpdateWithoutCountryDataInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19380,11 +18617,9 @@ export type PlayerUpdateWithoutDisconnectsInput = {
   deathStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19392,13 +18627,10 @@ export type PlayerUpdateWithoutDisconnectsInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19438,10 +18670,8 @@ export type PlayerUpdateWithoutEntriesInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19449,13 +18679,10 @@ export type PlayerUpdateWithoutEntriesInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19495,10 +18722,8 @@ export type PlayerUpdateWithoutFragsAsKillerInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19506,13 +18731,10 @@ export type PlayerUpdateWithoutFragsAsKillerInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19552,10 +18774,8 @@ export type PlayerUpdateWithoutFragsAsVictimInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19563,13 +18783,10 @@ export type PlayerUpdateWithoutFragsAsVictimInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19609,24 +18826,19 @@ export type PlayerUpdateWithoutGameDataInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19666,24 +18878,19 @@ export type PlayerUpdateWithoutHistoryInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19723,11 +18930,9 @@ export type PlayerUpdateWithoutLatencyEventsInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19735,12 +18940,9 @@ export type PlayerUpdateWithoutLatencyEventsInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19780,11 +18982,9 @@ export type PlayerUpdateWithoutNameChangesInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19792,13 +18992,10 @@ export type PlayerUpdateWithoutNameChangesInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
   playerActions?: InputMaybe<EventPlayerActionUpdateManyWithoutPlayerNestedInput>;
@@ -19837,11 +19034,9 @@ export type PlayerUpdateWithoutNamesInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19849,13 +19044,10 @@ export type PlayerUpdateWithoutNamesInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   playerActions?: InputMaybe<EventPlayerActionUpdateManyWithoutPlayerNestedInput>;
@@ -19894,11 +19086,9 @@ export type PlayerUpdateWithoutPlayerActionsInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19906,13 +19096,10 @@ export type PlayerUpdateWithoutPlayerActionsInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -19951,11 +19138,9 @@ export type PlayerUpdateWithoutPlayerPlayerActionsAsActorInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -19963,13 +19148,10 @@ export type PlayerUpdateWithoutPlayerPlayerActionsAsActorInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -20008,11 +19190,9 @@ export type PlayerUpdateWithoutPlayerPlayerActionsAsVictimInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -20020,13 +19200,10 @@ export type PlayerUpdateWithoutPlayerPlayerActionsAsVictimInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -20065,11 +19242,9 @@ export type PlayerUpdateWithoutRibbonsInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -20077,13 +19252,10 @@ export type PlayerUpdateWithoutRibbonsInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -20122,11 +19294,9 @@ export type PlayerUpdateWithoutRoleChangesInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -20134,13 +19304,10 @@ export type PlayerUpdateWithoutRoleChangesInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -20179,11 +19346,9 @@ export type PlayerUpdateWithoutSuicideEventsInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -20191,13 +19356,10 @@ export type PlayerUpdateWithoutSuicideEventsInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -20236,11 +19398,9 @@ export type PlayerUpdateWithoutTeamBonusesInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -20248,13 +19408,10 @@ export type PlayerUpdateWithoutTeamBonusesInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -20293,11 +19450,9 @@ export type PlayerUpdateWithoutTeamChangesInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -20305,13 +19460,10 @@ export type PlayerUpdateWithoutTeamChangesInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -20350,11 +19502,9 @@ export type PlayerUpdateWithoutTeamkillsAsKillerInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -20362,13 +19512,10 @@ export type PlayerUpdateWithoutTeamkillsAsKillerInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -20407,11 +19554,9 @@ export type PlayerUpdateWithoutTeamkillsAsVictimInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -20419,13 +19564,10 @@ export type PlayerUpdateWithoutTeamkillsAsVictimInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -20464,11 +19606,9 @@ export type PlayerUpdateWithoutUniqueIdsInput = {
   deaths?: InputMaybe<IntFieldUpdateOperationsInput>;
   disconnects?: InputMaybe<EventDisconnectUpdateManyWithoutPlayerNestedInput>;
   displayEvents?: InputMaybe<IntFieldUpdateOperationsInput>;
-  email?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   entries?: InputMaybe<EventEntryUpdateManyWithoutPlayerNestedInput>;
   fragsAsKiller?: InputMaybe<EventFragUpdateManyWithoutKillerNestedInput>;
   fragsAsVictim?: InputMaybe<EventFragUpdateManyWithoutVictimNestedInput>;
-  fullName?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   gameData?: InputMaybe<GameUpdateOneRequiredWithoutPlayersNestedInput>;
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
@@ -20476,13 +19616,10 @@ export type PlayerUpdateWithoutUniqueIdsInput = {
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
-  lastAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   lastName?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastSkillChange?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  lat?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   latencyEvents?: InputMaybe<EventLatencyUpdateManyWithoutPlayerNestedInput>;
-  lng?: InputMaybe<NullableFloatFieldUpdateOperationsInput>;
   mmrank?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   nameChanges?: InputMaybe<EventChangeNameUpdateManyWithoutPlayerNestedInput>;
   names?: InputMaybe<PlayerNameUpdateManyWithoutPlayerNestedInput>;
@@ -20687,12 +19824,10 @@ export type PlayerWhereInput = {
   deaths?: InputMaybe<IntFilter>;
   disconnects?: InputMaybe<EventDisconnectListRelationFilter>;
   displayEvents?: InputMaybe<IntFilter>;
-  email?: InputMaybe<StringNullableFilter>;
   entries?: InputMaybe<EventEntryListRelationFilter>;
   flag?: InputMaybe<StringNullableFilter>;
   fragsAsKiller?: InputMaybe<EventFragListRelationFilter>;
   fragsAsVictim?: InputMaybe<EventFragListRelationFilter>;
-  fullName?: InputMaybe<StringNullableFilter>;
   game?: InputMaybe<StringFilter>;
   gameData?: InputMaybe<GameWhereInput>;
   headshots?: InputMaybe<IntFilter>;
@@ -20701,13 +19836,10 @@ export type PlayerWhereInput = {
   hits?: InputMaybe<IntFilter>;
   killStreak?: InputMaybe<IntFilter>;
   kills?: InputMaybe<IntFilter>;
-  lastAddress?: InputMaybe<StringFilter>;
   lastEvent?: InputMaybe<DateTimeNullableFilter>;
   lastName?: InputMaybe<StringFilter>;
   lastSkillChange?: InputMaybe<DateTimeNullableFilter>;
-  lat?: InputMaybe<FloatNullableFilter>;
   latencyEvents?: InputMaybe<EventLatencyListRelationFilter>;
-  lng?: InputMaybe<FloatNullableFilter>;
   mmrank?: InputMaybe<IntNullableFilter>;
   nameChanges?: InputMaybe<EventChangeNameListRelationFilter>;
   names?: InputMaybe<PlayerNameListRelationFilter>;
@@ -20752,12 +19884,10 @@ export type PlayerWhereUniqueInput = {
   deaths?: InputMaybe<IntFilter>;
   disconnects?: InputMaybe<EventDisconnectListRelationFilter>;
   displayEvents?: InputMaybe<IntFilter>;
-  email?: InputMaybe<StringNullableFilter>;
   entries?: InputMaybe<EventEntryListRelationFilter>;
   flag?: InputMaybe<StringNullableFilter>;
   fragsAsKiller?: InputMaybe<EventFragListRelationFilter>;
   fragsAsVictim?: InputMaybe<EventFragListRelationFilter>;
-  fullName?: InputMaybe<StringNullableFilter>;
   game?: InputMaybe<StringFilter>;
   gameData?: InputMaybe<GameWhereInput>;
   headshots?: InputMaybe<IntFilter>;
@@ -20766,13 +19896,10 @@ export type PlayerWhereUniqueInput = {
   hits?: InputMaybe<IntFilter>;
   killStreak?: InputMaybe<IntFilter>;
   kills?: InputMaybe<IntFilter>;
-  lastAddress?: InputMaybe<StringFilter>;
   lastEvent?: InputMaybe<DateTimeNullableFilter>;
   lastName?: InputMaybe<StringFilter>;
   lastSkillChange?: InputMaybe<DateTimeNullableFilter>;
-  lat?: InputMaybe<FloatNullableFilter>;
   latencyEvents?: InputMaybe<EventLatencyListRelationFilter>;
-  lng?: InputMaybe<FloatNullableFilter>;
   mmrank?: InputMaybe<IntNullableFilter>;
   nameChanges?: InputMaybe<EventChangeNameListRelationFilter>;
   names?: InputMaybe<PlayerNameListRelationFilter>;
@@ -20797,7 +19924,6 @@ export type PlayerWhereUniqueInput = {
 
 export type Query = {
   __typename?: 'Query';
-  countAccount: Scalars['Int']['output'];
   countAction: Scalars['Int']['output'];
   countAward: Scalars['Int']['output'];
   countClan: Scalars['Int']['output'];
@@ -20845,12 +19971,9 @@ export type Query = {
   countServerConfigDefault: Scalars['Int']['output'];
   countServerLoad: Scalars['Int']['output'];
   countServerToken?: Maybe<Scalars['Int']['output']>;
-  countSession: Scalars['Int']['output'];
   countTeam: Scalars['Int']['output'];
   countUser: Scalars['Int']['output'];
-  countVerification: Scalars['Int']['output'];
   countWeapon: Scalars['Int']['output'];
-  findFirstAccount?: Maybe<Account>;
   findFirstAction?: Maybe<Action>;
   findFirstAward?: Maybe<Award>;
   findFirstClan?: Maybe<Clan>;
@@ -20897,12 +20020,9 @@ export type Query = {
   findFirstServerConfig?: Maybe<ServerConfig>;
   findFirstServerConfigDefault?: Maybe<ServerConfigDefault>;
   findFirstServerLoad?: Maybe<ServerLoad>;
-  findFirstSession?: Maybe<Session>;
   findFirstTeam?: Maybe<Team>;
   findFirstUser?: Maybe<User>;
-  findFirstVerification?: Maybe<Verification>;
   findFirstWeapon?: Maybe<Weapon>;
-  findManyAccount: Array<Account>;
   findManyAction: Array<Action>;
   findManyAward: Array<Award>;
   findManyClan: Array<Clan>;
@@ -20949,14 +20069,11 @@ export type Query = {
   findManyServerConfig: Array<ServerConfig>;
   findManyServerConfigDefault: Array<ServerConfigDefault>;
   findManyServerLoad: Array<ServerLoad>;
-  findManyServerToken?: Maybe<Array<ServerToken>>;
-  findManySession: Array<Session>;
+  findManyServerToken: Array<ServerToken>;
   findManyTeam: Array<Team>;
   findManyUser: Array<User>;
-  findManyVerification: Array<Verification>;
   findManyWeapon: Array<Weapon>;
   findServerToken?: Maybe<ServerToken>;
-  findUniqueAccount?: Maybe<Account>;
   findUniqueAction?: Maybe<Action>;
   findUniqueAward?: Maybe<Award>;
   findUniqueClan?: Maybe<Clan>;
@@ -21003,25 +20120,14 @@ export type Query = {
   findUniqueServerConfig?: Maybe<ServerConfig>;
   findUniqueServerConfigDefault?: Maybe<ServerConfigDefault>;
   findUniqueServerLoad?: Maybe<ServerLoad>;
-  findUniqueSession?: Maybe<Session>;
   findUniqueTeam?: Maybe<Team>;
   findUniqueUser?: Maybe<User>;
-  findUniqueVerification?: Maybe<Verification>;
   findUniqueWeapon?: Maybe<Weapon>;
   getPlayerById?: Maybe<Player>;
   getPlayers?: Maybe<GetPlayersResult>;
   getServerPlayers?: Maybe<GetServerPlayersResult>;
+  getTotalKills?: Maybe<Scalars['Int']['output']>;
   health?: Maybe<HealthStatus>;
-};
-
-
-export type QueryCountAccountArgs = {
-  cursor?: InputMaybe<AccountWhereUniqueInput>;
-  distinct?: InputMaybe<Array<AccountScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<AccountOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<AccountWhereInput>;
 };
 
 
@@ -21490,16 +20596,6 @@ export type QueryCountServerTokenArgs = {
 };
 
 
-export type QueryCountSessionArgs = {
-  cursor?: InputMaybe<SessionWhereUniqueInput>;
-  distinct?: InputMaybe<Array<SessionScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<SessionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<SessionWhereInput>;
-};
-
-
 export type QueryCountTeamArgs = {
   cursor?: InputMaybe<TeamWhereUniqueInput>;
   distinct?: InputMaybe<Array<TeamScalarFieldEnum>>;
@@ -21520,16 +20616,6 @@ export type QueryCountUserArgs = {
 };
 
 
-export type QueryCountVerificationArgs = {
-  cursor?: InputMaybe<VerificationWhereUniqueInput>;
-  distinct?: InputMaybe<Array<VerificationScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<VerificationOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<VerificationWhereInput>;
-};
-
-
 export type QueryCountWeaponArgs = {
   cursor?: InputMaybe<WeaponWhereUniqueInput>;
   distinct?: InputMaybe<Array<WeaponScalarFieldEnum>>;
@@ -21537,16 +20623,6 @@ export type QueryCountWeaponArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
   take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<WeaponWhereInput>;
-};
-
-
-export type QueryFindFirstAccountArgs = {
-  cursor?: InputMaybe<AccountWhereUniqueInput>;
-  distinct?: InputMaybe<Array<AccountScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<AccountOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<AccountWhereInput>;
 };
 
 
@@ -22010,16 +21086,6 @@ export type QueryFindFirstServerLoadArgs = {
 };
 
 
-export type QueryFindFirstSessionArgs = {
-  cursor?: InputMaybe<SessionWhereUniqueInput>;
-  distinct?: InputMaybe<Array<SessionScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<SessionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<SessionWhereInput>;
-};
-
-
 export type QueryFindFirstTeamArgs = {
   cursor?: InputMaybe<TeamWhereUniqueInput>;
   distinct?: InputMaybe<Array<TeamScalarFieldEnum>>;
@@ -22040,16 +21106,6 @@ export type QueryFindFirstUserArgs = {
 };
 
 
-export type QueryFindFirstVerificationArgs = {
-  cursor?: InputMaybe<VerificationWhereUniqueInput>;
-  distinct?: InputMaybe<Array<VerificationScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<VerificationOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<VerificationWhereInput>;
-};
-
-
 export type QueryFindFirstWeaponArgs = {
   cursor?: InputMaybe<WeaponWhereUniqueInput>;
   distinct?: InputMaybe<Array<WeaponScalarFieldEnum>>;
@@ -22057,16 +21113,6 @@ export type QueryFindFirstWeaponArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
   take?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<WeaponWhereInput>;
-};
-
-
-export type QueryFindManyAccountArgs = {
-  cursor?: InputMaybe<AccountWhereUniqueInput>;
-  distinct?: InputMaybe<Array<AccountScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<AccountOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<AccountWhereInput>;
 };
 
 
@@ -22537,16 +21583,6 @@ export type QueryFindManyServerTokenArgs = {
 };
 
 
-export type QueryFindManySessionArgs = {
-  cursor?: InputMaybe<SessionWhereUniqueInput>;
-  distinct?: InputMaybe<Array<SessionScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<SessionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<SessionWhereInput>;
-};
-
-
 export type QueryFindManyTeamArgs = {
   cursor?: InputMaybe<TeamWhereUniqueInput>;
   distinct?: InputMaybe<Array<TeamScalarFieldEnum>>;
@@ -22567,16 +21603,6 @@ export type QueryFindManyUserArgs = {
 };
 
 
-export type QueryFindManyVerificationArgs = {
-  cursor?: InputMaybe<VerificationWhereUniqueInput>;
-  distinct?: InputMaybe<Array<VerificationScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<VerificationOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<VerificationWhereInput>;
-};
-
-
 export type QueryFindManyWeaponArgs = {
   cursor?: InputMaybe<WeaponWhereUniqueInput>;
   distinct?: InputMaybe<Array<WeaponScalarFieldEnum>>;
@@ -22589,11 +21615,6 @@ export type QueryFindManyWeaponArgs = {
 
 export type QueryFindServerTokenArgs = {
   id: Scalars['Int']['input'];
-};
-
-
-export type QueryFindUniqueAccountArgs = {
-  where: AccountWhereUniqueInput;
 };
 
 
@@ -22827,11 +21848,6 @@ export type QueryFindUniqueServerLoadArgs = {
 };
 
 
-export type QueryFindUniqueSessionArgs = {
-  where: SessionWhereUniqueInput;
-};
-
-
 export type QueryFindUniqueTeamArgs = {
   where: TeamWhereUniqueInput;
 };
@@ -22839,11 +21855,6 @@ export type QueryFindUniqueTeamArgs = {
 
 export type QueryFindUniqueUserArgs = {
   where: UserWhereUniqueInput;
-};
-
-
-export type QueryFindUniqueVerificationArgs = {
-  where: VerificationWhereUniqueInput;
 };
 
 
@@ -22869,7 +21880,7 @@ export type QueryGetServerPlayersArgs = {
   serverId: Scalars['Int']['input'];
   skip?: InputMaybe<Scalars['Int']['input']>;
   sortField?: InputMaybe<Scalars['String']['input']>;
-  sortOrder?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<SortOrderArg>;
   take?: InputMaybe<Scalars['Int']['input']>;
 };
 
@@ -23544,246 +22555,65 @@ export type SafeServerToken = {
 
 export type Server = {
   __typename?: 'Server';
-  activeMap: Scalars['String']['output'];
-  activePlayers: Scalars['Int']['output'];
-  address: Scalars['String']['output'];
+  activeMap?: Maybe<Scalars['String']['output']>;
+  activePlayers?: Maybe<Scalars['Int']['output']>;
+  address?: Maybe<Scalars['String']['output']>;
   authToken?: Maybe<ServerToken>;
   authTokenId?: Maybe<Scalars['Int']['output']>;
-  bombsDefused: Scalars['Int']['output'];
-  bombsPlanted: Scalars['Int']['output'];
-  city: Scalars['String']['output'];
-  configs: Array<ServerConfig>;
-  country: Scalars['String']['output'];
-  ctHits: Scalars['Int']['output'];
-  ctShots: Scalars['Int']['output'];
-  ctWins: Scalars['Int']['output'];
-  eventsAdmin: Array<EventAdmin>;
-  eventsChangeName: Array<EventChangeName>;
-  eventsChangeRole: Array<EventChangeRole>;
-  eventsChangeTeam: Array<EventChangeTeam>;
-  eventsChat: Array<EventChat>;
-  eventsConnect: Array<EventConnect>;
-  eventsDisconnect: Array<EventDisconnect>;
-  eventsEntry: Array<EventEntry>;
-  eventsFrag: Array<EventFrag>;
-  eventsLatency: Array<EventLatency>;
-  eventsPlayerAction: Array<EventPlayerAction>;
-  eventsPlayerPlayerAction: Array<EventPlayerPlayerAction>;
-  eventsRcon: Array<EventRcon>;
-  eventsSuicide: Array<EventSuicide>;
-  eventsTeamBonus: Array<EventTeamBonus>;
-  eventsTeamkill: Array<EventTeamkill>;
-  game: Scalars['String']['output'];
-  headshots: Scalars['Int']['output'];
-  kills: Scalars['Int']['output'];
+  bombsDefused?: Maybe<Scalars['Int']['output']>;
+  bombsPlanted?: Maybe<Scalars['Int']['output']>;
+  city?: Maybe<Scalars['String']['output']>;
+  configs?: Maybe<Array<ServerConfig>>;
+  country?: Maybe<Scalars['String']['output']>;
+  ctHits?: Maybe<Scalars['Int']['output']>;
+  ctShots?: Maybe<Scalars['Int']['output']>;
+  ctWins?: Maybe<Scalars['Int']['output']>;
+  eventsAdmin?: Maybe<Array<EventAdmin>>;
+  eventsChangeName?: Maybe<Array<EventChangeName>>;
+  eventsChangeRole?: Maybe<Array<EventChangeRole>>;
+  eventsChangeTeam?: Maybe<Array<EventChangeTeam>>;
+  eventsChat?: Maybe<Array<EventChat>>;
+  eventsConnect?: Maybe<Array<EventConnect>>;
+  eventsDisconnect?: Maybe<Array<EventDisconnect>>;
+  eventsEntry?: Maybe<Array<EventEntry>>;
+  eventsFrag?: Maybe<Array<EventFrag>>;
+  eventsLatency?: Maybe<Array<EventLatency>>;
+  eventsPlayerAction?: Maybe<Array<EventPlayerAction>>;
+  eventsPlayerPlayerAction?: Maybe<Array<EventPlayerPlayerAction>>;
+  eventsRcon?: Maybe<Array<EventRcon>>;
+  eventsSuicide?: Maybe<Array<EventSuicide>>;
+  eventsTeamBonus?: Maybe<Array<EventTeamBonus>>;
+  eventsTeamkill?: Maybe<Array<EventTeamkill>>;
+  game?: Maybe<Scalars['String']['output']>;
+  headshots?: Maybe<Scalars['Int']['output']>;
+  kills?: Maybe<Scalars['Int']['output']>;
   lastEvent?: Maybe<Scalars['DateTime']['output']>;
   lat?: Maybe<Scalars['Float']['output']>;
   lng?: Maybe<Scalars['Float']['output']>;
-  loads: Array<ServerLoad>;
-  mapChanges: Scalars['Int']['output'];
-  mapCtHits: Scalars['Int']['output'];
-  mapCtShots: Scalars['Int']['output'];
-  mapCtWins: Scalars['Int']['output'];
-  mapRounds: Scalars['Int']['output'];
-  mapStarted: Scalars['Int']['output'];
-  mapTsHits: Scalars['Int']['output'];
-  mapTsShots: Scalars['Int']['output'];
-  mapTsWins: Scalars['Int']['output'];
-  maxPlayers: Scalars['Int']['output'];
-  name: Scalars['String']['output'];
+  loads?: Maybe<Array<ServerLoad>>;
+  mapChanges?: Maybe<Scalars['Int']['output']>;
+  mapCtHits?: Maybe<Scalars['Int']['output']>;
+  mapCtShots?: Maybe<Scalars['Int']['output']>;
+  mapCtWins?: Maybe<Scalars['Int']['output']>;
+  mapRounds?: Maybe<Scalars['Int']['output']>;
+  mapStarted?: Maybe<Scalars['Int']['output']>;
+  mapTsHits?: Maybe<Scalars['Int']['output']>;
+  mapTsShots?: Maybe<Scalars['Int']['output']>;
+  mapTsWins?: Maybe<Scalars['Int']['output']>;
+  maxPlayers?: Maybe<Scalars['Int']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
   notificationConfig?: Maybe<NotificationConfig>;
-  players: Scalars['Int']['output'];
-  port: Scalars['Int']['output'];
-  publicAddress: Scalars['String']['output'];
-  rconPassword: Scalars['String']['output'];
-  rounds: Scalars['Int']['output'];
-  serverId: Scalars['ID']['output'];
-  sortOrder: Scalars['Int']['output'];
+  players?: Maybe<Scalars['Int']['output']>;
+  port?: Maybe<Scalars['Int']['output']>;
+  publicAddress?: Maybe<Scalars['String']['output']>;
+  rounds?: Maybe<Scalars['Int']['output']>;
+  serverId?: Maybe<Scalars['Int']['output']>;
+  sortOrder?: Maybe<Scalars['Int']['output']>;
   statusUrl?: Maybe<Scalars['String']['output']>;
-  suicides: Scalars['Int']['output'];
-  tsHits: Scalars['Int']['output'];
-  tsShots: Scalars['Int']['output'];
-  tsWins: Scalars['Int']['output'];
-};
-
-
-export type ServerConfigsArgs = {
-  cursor?: InputMaybe<ServerConfigWhereUniqueInput>;
-  distinct?: InputMaybe<Array<ServerConfigScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<ServerConfigOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<ServerConfigWhereInput>;
-};
-
-
-export type ServerEventsAdminArgs = {
-  cursor?: InputMaybe<EventAdminWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventAdminScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventAdminOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventAdminWhereInput>;
-};
-
-
-export type ServerEventsChangeNameArgs = {
-  cursor?: InputMaybe<EventChangeNameWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventChangeNameScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventChangeNameOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventChangeNameWhereInput>;
-};
-
-
-export type ServerEventsChangeRoleArgs = {
-  cursor?: InputMaybe<EventChangeRoleWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventChangeRoleScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventChangeRoleOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventChangeRoleWhereInput>;
-};
-
-
-export type ServerEventsChangeTeamArgs = {
-  cursor?: InputMaybe<EventChangeTeamWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventChangeTeamScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventChangeTeamOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventChangeTeamWhereInput>;
-};
-
-
-export type ServerEventsChatArgs = {
-  cursor?: InputMaybe<EventChatWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventChatScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventChatOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventChatWhereInput>;
-};
-
-
-export type ServerEventsConnectArgs = {
-  cursor?: InputMaybe<EventConnectWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventConnectScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventConnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventConnectWhereInput>;
-};
-
-
-export type ServerEventsDisconnectArgs = {
-  cursor?: InputMaybe<EventDisconnectWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventDisconnectScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventDisconnectOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventDisconnectWhereInput>;
-};
-
-
-export type ServerEventsEntryArgs = {
-  cursor?: InputMaybe<EventEntryWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventEntryScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventEntryOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventEntryWhereInput>;
-};
-
-
-export type ServerEventsFragArgs = {
-  cursor?: InputMaybe<EventFragWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventFragScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventFragOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventFragWhereInput>;
-};
-
-
-export type ServerEventsLatencyArgs = {
-  cursor?: InputMaybe<EventLatencyWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventLatencyScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventLatencyOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventLatencyWhereInput>;
-};
-
-
-export type ServerEventsPlayerActionArgs = {
-  cursor?: InputMaybe<EventPlayerActionWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventPlayerActionScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventPlayerActionWhereInput>;
-};
-
-
-export type ServerEventsPlayerPlayerActionArgs = {
-  cursor?: InputMaybe<EventPlayerPlayerActionWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventPlayerPlayerActionScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventPlayerPlayerActionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventPlayerPlayerActionWhereInput>;
-};
-
-
-export type ServerEventsRconArgs = {
-  cursor?: InputMaybe<EventRconWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventRconScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventRconOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventRconWhereInput>;
-};
-
-
-export type ServerEventsSuicideArgs = {
-  cursor?: InputMaybe<EventSuicideWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventSuicideScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventSuicideOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventSuicideWhereInput>;
-};
-
-
-export type ServerEventsTeamBonusArgs = {
-  cursor?: InputMaybe<EventTeamBonusWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventTeamBonusScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventTeamBonusOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventTeamBonusWhereInput>;
-};
-
-
-export type ServerEventsTeamkillArgs = {
-  cursor?: InputMaybe<EventTeamkillWhereUniqueInput>;
-  distinct?: InputMaybe<Array<EventTeamkillScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<EventTeamkillOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<EventTeamkillWhereInput>;
-};
-
-
-export type ServerLoadsArgs = {
-  cursor?: InputMaybe<ServerLoadWhereUniqueInput>;
-  distinct?: InputMaybe<Array<ServerLoadScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<ServerLoadOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<ServerLoadWhereInput>;
+  suicides?: Maybe<Scalars['Int']['output']>;
+  tsHits?: Maybe<Scalars['Int']['output']>;
+  tsShots?: Maybe<Scalars['Int']['output']>;
+  tsWins?: Maybe<Scalars['Int']['output']>;
 };
 
 export type ServerAvgOrderByAggregateInput = {
@@ -24187,7 +23017,6 @@ export type ServerCountOrderByAggregateInput = {
   players?: InputMaybe<SortOrder>;
   port?: InputMaybe<SortOrder>;
   publicAddress?: InputMaybe<SortOrder>;
-  rconPassword?: InputMaybe<SortOrder>;
   rounds?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   sortOrder?: InputMaybe<SortOrder>;
@@ -24249,7 +23078,6 @@ export type ServerCreateInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24290,7 +23118,6 @@ export type ServerCreateManyAuthTokenInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   serverId?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
@@ -24338,7 +23165,6 @@ export type ServerCreateManyInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   serverId?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
@@ -24620,7 +23446,6 @@ export type ServerCreateWithoutAuthTokenInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24680,7 +23505,6 @@ export type ServerCreateWithoutConfigsInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24740,7 +23564,6 @@ export type ServerCreateWithoutEventsAdminInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24800,7 +23623,6 @@ export type ServerCreateWithoutEventsChangeNameInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24860,7 +23682,6 @@ export type ServerCreateWithoutEventsChangeRoleInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24920,7 +23741,6 @@ export type ServerCreateWithoutEventsChangeTeamInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24980,7 +23800,6 @@ export type ServerCreateWithoutEventsChatInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25040,7 +23859,6 @@ export type ServerCreateWithoutEventsConnectInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25100,7 +23918,6 @@ export type ServerCreateWithoutEventsDisconnectInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25160,7 +23977,6 @@ export type ServerCreateWithoutEventsEntryInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25220,7 +24036,6 @@ export type ServerCreateWithoutEventsFragInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25280,7 +24095,6 @@ export type ServerCreateWithoutEventsLatencyInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25340,7 +24154,6 @@ export type ServerCreateWithoutEventsPlayerActionInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25400,7 +24213,6 @@ export type ServerCreateWithoutEventsPlayerPlayerActionInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25460,7 +24272,6 @@ export type ServerCreateWithoutEventsRconInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25520,7 +24331,6 @@ export type ServerCreateWithoutEventsSuicideInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25580,7 +24390,6 @@ export type ServerCreateWithoutEventsTeamBonusInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25640,7 +24449,6 @@ export type ServerCreateWithoutEventsTeamkillInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25700,7 +24508,6 @@ export type ServerCreateWithoutLoadsInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -25760,7 +24567,6 @@ export type ServerCreateWithoutNotificationConfigInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -26116,7 +24922,6 @@ export type ServerMaxOrderByAggregateInput = {
   players?: InputMaybe<SortOrder>;
   port?: InputMaybe<SortOrder>;
   publicAddress?: InputMaybe<SortOrder>;
-  rconPassword?: InputMaybe<SortOrder>;
   rounds?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   sortOrder?: InputMaybe<SortOrder>;
@@ -26159,7 +24964,6 @@ export type ServerMinOrderByAggregateInput = {
   players?: InputMaybe<SortOrder>;
   port?: InputMaybe<SortOrder>;
   publicAddress?: InputMaybe<SortOrder>;
-  rconPassword?: InputMaybe<SortOrder>;
   rounds?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   sortOrder?: InputMaybe<SortOrder>;
@@ -26237,7 +25041,6 @@ export type ServerOrderByWithAggregationInput = {
   players?: InputMaybe<SortOrder>;
   port?: InputMaybe<SortOrder>;
   publicAddress?: InputMaybe<SortOrder>;
-  rconPassword?: InputMaybe<SortOrder>;
   rounds?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   sortOrder?: InputMaybe<SortOrder>;
@@ -26301,7 +25104,6 @@ export type ServerOrderByWithRelationInput = {
   players?: InputMaybe<SortOrder>;
   port?: InputMaybe<SortOrder>;
   publicAddress?: InputMaybe<SortOrder>;
-  rconPassword?: InputMaybe<SortOrder>;
   rounds?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   sortOrder?: InputMaybe<SortOrder>;
@@ -26395,7 +25197,6 @@ export type ServerScalarWhereInput = {
   players?: InputMaybe<IntFilter>;
   port?: InputMaybe<IntFilter>;
   publicAddress?: InputMaybe<StringFilter>;
-  rconPassword?: InputMaybe<StringFilter>;
   rounds?: InputMaybe<IntFilter>;
   serverId?: InputMaybe<IntFilter>;
   sortOrder?: InputMaybe<IntFilter>;
@@ -26441,7 +25242,6 @@ export type ServerScalarWhereWithAggregatesInput = {
   players?: InputMaybe<IntWithAggregatesFilter>;
   port?: InputMaybe<IntWithAggregatesFilter>;
   publicAddress?: InputMaybe<StringWithAggregatesFilter>;
-  rconPassword?: InputMaybe<StringWithAggregatesFilter>;
   rounds?: InputMaybe<IntWithAggregatesFilter>;
   serverId?: InputMaybe<IntWithAggregatesFilter>;
   sortOrder?: InputMaybe<IntWithAggregatesFilter>;
@@ -26520,9 +25320,7 @@ export type ServerTokenCountOrderByAggregateInput = {
   id?: InputMaybe<SortOrder>;
   lastUsedAt?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
-  rconPassword?: InputMaybe<SortOrder>;
   revokedAt?: InputMaybe<SortOrder>;
-  tokenHash?: InputMaybe<SortOrder>;
   tokenPrefix?: InputMaybe<SortOrder>;
 };
 
@@ -26533,10 +25331,8 @@ export type ServerTokenCreateInput = {
   game?: InputMaybe<Scalars['String']['input']>;
   lastUsedAt?: InputMaybe<Scalars['DateTime']['input']>;
   name: Scalars['String']['input'];
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   revokedAt?: InputMaybe<Scalars['DateTime']['input']>;
   servers?: InputMaybe<ServerCreateNestedManyWithoutAuthTokenInput>;
-  tokenHash: Scalars['String']['input'];
   tokenPrefix: Scalars['String']['input'];
 };
 
@@ -26548,9 +25344,7 @@ export type ServerTokenCreateManyInput = {
   id?: InputMaybe<Scalars['Int']['input']>;
   lastUsedAt?: InputMaybe<Scalars['DateTime']['input']>;
   name: Scalars['String']['input'];
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   revokedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  tokenHash: Scalars['String']['input'];
   tokenPrefix: Scalars['String']['input'];
 };
 
@@ -26572,9 +25366,7 @@ export type ServerTokenCreateWithoutServersInput = {
   game?: InputMaybe<Scalars['String']['input']>;
   lastUsedAt?: InputMaybe<Scalars['DateTime']['input']>;
   name: Scalars['String']['input'];
-  rconPassword?: InputMaybe<Scalars['String']['input']>;
   revokedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  tokenHash: Scalars['String']['input'];
   tokenPrefix: Scalars['String']['input'];
 };
 
@@ -26586,9 +25378,7 @@ export type ServerTokenMaxOrderByAggregateInput = {
   id?: InputMaybe<SortOrder>;
   lastUsedAt?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
-  rconPassword?: InputMaybe<SortOrder>;
   revokedAt?: InputMaybe<SortOrder>;
-  tokenHash?: InputMaybe<SortOrder>;
   tokenPrefix?: InputMaybe<SortOrder>;
 };
 
@@ -26600,9 +25390,7 @@ export type ServerTokenMinOrderByAggregateInput = {
   id?: InputMaybe<SortOrder>;
   lastUsedAt?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
-  rconPassword?: InputMaybe<SortOrder>;
   revokedAt?: InputMaybe<SortOrder>;
-  tokenHash?: InputMaybe<SortOrder>;
   tokenPrefix?: InputMaybe<SortOrder>;
 };
 
@@ -26639,9 +25427,7 @@ export type ServerTokenOrderByWithAggregationInput = {
   id?: InputMaybe<SortOrder>;
   lastUsedAt?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
-  rconPassword?: InputMaybe<SortOrder>;
   revokedAt?: InputMaybe<SortOrder>;
-  tokenHash?: InputMaybe<SortOrder>;
   tokenPrefix?: InputMaybe<SortOrder>;
 };
 
@@ -26654,10 +25440,8 @@ export type ServerTokenOrderByWithRelationInput = {
   id?: InputMaybe<SortOrder>;
   lastUsedAt?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
-  rconPassword?: InputMaybe<SortOrder>;
   revokedAt?: InputMaybe<SortOrder>;
   servers?: InputMaybe<ServerOrderByRelationAggregateInput>;
-  tokenHash?: InputMaybe<SortOrder>;
   tokenPrefix?: InputMaybe<SortOrder>;
 };
 
@@ -26686,9 +25470,7 @@ export type ServerTokenScalarWhereWithAggregatesInput = {
   id?: InputMaybe<IntWithAggregatesFilter>;
   lastUsedAt?: InputMaybe<DateTimeNullableWithAggregatesFilter>;
   name?: InputMaybe<StringWithAggregatesFilter>;
-  rconPassword?: InputMaybe<StringWithAggregatesFilter>;
   revokedAt?: InputMaybe<DateTimeNullableWithAggregatesFilter>;
-  tokenHash?: InputMaybe<StringWithAggregatesFilter>;
   tokenPrefix?: InputMaybe<StringWithAggregatesFilter>;
 };
 
@@ -26703,10 +25485,8 @@ export type ServerTokenUpdateInput = {
   game?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastUsedAt?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   name?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   revokedAt?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   servers?: InputMaybe<ServerUpdateManyWithoutAuthTokenNestedInput>;
-  tokenHash?: InputMaybe<StringFieldUpdateOperationsInput>;
   tokenPrefix?: InputMaybe<StringFieldUpdateOperationsInput>;
 };
 
@@ -26717,9 +25497,7 @@ export type ServerTokenUpdateManyMutationInput = {
   game?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastUsedAt?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   name?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   revokedAt?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  tokenHash?: InputMaybe<StringFieldUpdateOperationsInput>;
   tokenPrefix?: InputMaybe<StringFieldUpdateOperationsInput>;
 };
 
@@ -26745,9 +25523,7 @@ export type ServerTokenUpdateWithoutServersInput = {
   game?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastUsedAt?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   name?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   revokedAt?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
-  tokenHash?: InputMaybe<StringFieldUpdateOperationsInput>;
   tokenPrefix?: InputMaybe<StringFieldUpdateOperationsInput>;
 };
 
@@ -26768,10 +25544,8 @@ export type ServerTokenWhereInput = {
   id?: InputMaybe<IntFilter>;
   lastUsedAt?: InputMaybe<DateTimeNullableFilter>;
   name?: InputMaybe<StringFilter>;
-  rconPassword?: InputMaybe<StringFilter>;
   revokedAt?: InputMaybe<DateTimeNullableFilter>;
   servers?: InputMaybe<ServerListRelationFilter>;
-  tokenHash?: InputMaybe<StringFilter>;
   tokenPrefix?: InputMaybe<StringFilter>;
 };
 
@@ -26786,10 +25560,8 @@ export type ServerTokenWhereUniqueInput = {
   id?: InputMaybe<Scalars['Int']['input']>;
   lastUsedAt?: InputMaybe<DateTimeNullableFilter>;
   name?: InputMaybe<StringFilter>;
-  rconPassword?: InputMaybe<StringFilter>;
   revokedAt?: InputMaybe<DateTimeNullableFilter>;
   servers?: InputMaybe<ServerListRelationFilter>;
-  tokenHash?: InputMaybe<Scalars['String']['input']>;
   tokenPrefix?: InputMaybe<StringFilter>;
 };
 
@@ -26844,7 +25616,6 @@ export type ServerUpdateInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26885,7 +25656,6 @@ export type ServerUpdateManyMutationInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27216,7 +25986,6 @@ export type ServerUpdateWithoutAuthTokenInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27276,7 +26045,6 @@ export type ServerUpdateWithoutConfigsInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27336,7 +26104,6 @@ export type ServerUpdateWithoutEventsAdminInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27396,7 +26163,6 @@ export type ServerUpdateWithoutEventsChangeNameInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27456,7 +26222,6 @@ export type ServerUpdateWithoutEventsChangeRoleInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27516,7 +26281,6 @@ export type ServerUpdateWithoutEventsChangeTeamInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27576,7 +26340,6 @@ export type ServerUpdateWithoutEventsChatInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27636,7 +26399,6 @@ export type ServerUpdateWithoutEventsConnectInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27696,7 +26458,6 @@ export type ServerUpdateWithoutEventsDisconnectInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27756,7 +26517,6 @@ export type ServerUpdateWithoutEventsEntryInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27816,7 +26576,6 @@ export type ServerUpdateWithoutEventsFragInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27876,7 +26635,6 @@ export type ServerUpdateWithoutEventsLatencyInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27936,7 +26694,6 @@ export type ServerUpdateWithoutEventsPlayerActionInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27996,7 +26753,6 @@ export type ServerUpdateWithoutEventsPlayerPlayerActionInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -28056,7 +26812,6 @@ export type ServerUpdateWithoutEventsRconInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -28116,7 +26871,6 @@ export type ServerUpdateWithoutEventsSuicideInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -28176,7 +26930,6 @@ export type ServerUpdateWithoutEventsTeamBonusInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -28236,7 +26989,6 @@ export type ServerUpdateWithoutEventsTeamkillInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -28296,7 +27048,6 @@ export type ServerUpdateWithoutLoadsInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -28356,7 +27107,6 @@ export type ServerUpdateWithoutNotificationConfigInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
-  rconPassword?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -28541,7 +27291,6 @@ export type ServerWhereInput = {
   players?: InputMaybe<IntFilter>;
   port?: InputMaybe<IntFilter>;
   publicAddress?: InputMaybe<StringFilter>;
-  rconPassword?: InputMaybe<StringFilter>;
   rounds?: InputMaybe<IntFilter>;
   serverId?: InputMaybe<IntFilter>;
   sortOrder?: InputMaybe<IntFilter>;
@@ -28607,7 +27356,6 @@ export type ServerWhereUniqueInput = {
   players?: InputMaybe<IntFilter>;
   port?: InputMaybe<IntFilter>;
   publicAddress?: InputMaybe<StringFilter>;
-  rconPassword?: InputMaybe<StringFilter>;
   rounds?: InputMaybe<IntFilter>;
   serverId?: InputMaybe<Scalars['Int']['input']>;
   servers_token_port_unique?: InputMaybe<ServerServers_Token_Port_UniqueCompoundUniqueInput>;
@@ -28617,20 +27365,6 @@ export type ServerWhereUniqueInput = {
   tsHits?: InputMaybe<IntFilter>;
   tsShots?: InputMaybe<IntFilter>;
   tsWins?: InputMaybe<IntFilter>;
-};
-
-export type Session = {
-  __typename?: 'Session';
-  createdAt: Scalars['DateTime']['output'];
-  expiresAt: Scalars['DateTime']['output'];
-  id: Scalars['ID']['output'];
-  impersonatedBy?: Maybe<Scalars['String']['output']>;
-  ipAddress?: Maybe<Scalars['String']['output']>;
-  token: Scalars['String']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-  user: User;
-  userAgent?: Maybe<Scalars['String']['output']>;
-  userId: Scalars['String']['output'];
 };
 
 export type SessionCountOrderByAggregateInput = {
@@ -28929,6 +27663,11 @@ export enum SortOrder {
   Desc = 'desc'
 }
 
+export enum SortOrderArg {
+  Asc = 'asc',
+  Desc = 'desc'
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: InputMaybe<Scalars['String']['input']>;
 };
@@ -29218,39 +27957,17 @@ export type UpdateServerInput = {
 
 export type User = {
   __typename?: 'User';
-  accounts: Array<Account>;
   banExpires?: Maybe<Scalars['DateTime']['output']>;
   banReason?: Maybe<Scalars['String']['output']>;
   banned?: Maybe<Scalars['Boolean']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  email: Scalars['String']['output'];
-  emailVerified: Scalars['Boolean']['output'];
-  id: Scalars['ID']['output'];
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  email?: Maybe<Scalars['String']['output']>;
+  emailVerified?: Maybe<Scalars['Boolean']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
   image?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
+  name?: Maybe<Scalars['String']['output']>;
   role?: Maybe<Scalars['String']['output']>;
-  sessions: Array<Session>;
-  updatedAt: Scalars['DateTime']['output'];
-};
-
-
-export type UserAccountsArgs = {
-  cursor?: InputMaybe<AccountWhereUniqueInput>;
-  distinct?: InputMaybe<Array<AccountScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<AccountOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<AccountWhereInput>;
-};
-
-
-export type UserSessionsArgs = {
-  cursor?: InputMaybe<SessionWhereUniqueInput>;
-  distinct?: InputMaybe<Array<SessionScalarFieldEnum>>;
-  orderBy?: InputMaybe<Array<SessionOrderByWithRelationInput>>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<SessionWhereInput>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type UserCountOrderByAggregateInput = {
@@ -29596,16 +28313,6 @@ export type UserWhereUniqueInput = {
   role?: InputMaybe<StringNullableFilter>;
   sessions?: InputMaybe<SessionListRelationFilter>;
   updatedAt?: InputMaybe<DateTimeFilter>;
-};
-
-export type Verification = {
-  __typename?: 'Verification';
-  createdAt?: Maybe<Scalars['DateTime']['output']>;
-  expiresAt: Scalars['DateTime']['output'];
-  id: Scalars['ID']['output'];
-  identifier: Scalars['String']['output'];
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
-  value: Scalars['String']['output'];
 };
 
 export type VerificationCountOrderByAggregateInput = {
@@ -29962,12 +28669,7 @@ export type GetGameCountQueryVariables = Exact<{
 
 export type GetGameCountQuery = { __typename?: 'Query', countGame: number };
 
-export type GetPlayersQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetPlayersQuery = { __typename?: 'Query', findManyPlayer: Array<{ __typename?: 'Player', playerId: string, lastName: string, email?: string | null, skill: number, kills: number, deaths: number, lastEvent?: any | null, lastSkillChange?: any | null }> };
-
-export type GetPlayersWithPaginationQueryVariables = Exact<{
+export type GetAdminPlayersWithPaginationQueryVariables = Exact<{
   take?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<PlayerOrderByWithRelationInput> | PlayerOrderByWithRelationInput>;
@@ -29975,14 +28677,14 @@ export type GetPlayersWithPaginationQueryVariables = Exact<{
 }>;
 
 
-export type GetPlayersWithPaginationQuery = { __typename?: 'Query', findManyPlayer: Array<{ __typename?: 'Player', playerId: string, lastName: string, email?: string | null, skill: number, kills: number, deaths: number, country: string, flag?: string | null, lastEvent?: any | null, lastSkillChange?: any | null }> };
+export type GetAdminPlayersWithPaginationQuery = { __typename?: 'Query', findManyPlayer: Array<{ __typename?: 'Player', playerId?: number | null, lastName?: string | null, email?: string | null, skill?: number | null, kills?: number | null, deaths?: number | null, country?: string | null, flag?: string | null, lastEvent?: any | null, lastSkillChange?: any | null }> };
 
-export type GetPlayerCountQueryVariables = Exact<{
+export type GetAdminPlayerCountQueryVariables = Exact<{
   where?: InputMaybe<PlayerWhereInput>;
 }>;
 
 
-export type GetPlayerCountQuery = { __typename?: 'Query', countPlayer: number };
+export type GetAdminPlayerCountQuery = { __typename?: 'Query', countPlayer: number };
 
 export type GetGamesForSelectQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -30012,7 +28714,7 @@ export type UpdateServerWithConfigMutation = { __typename?: 'Mutation', updateSe
 export type GetServersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetServersQuery = { __typename?: 'Query', findManyServer: Array<{ __typename?: 'Server', serverId: string, name: string, address: string, port: number, game: string, activePlayers: number, maxPlayers: number, activeMap: string, lastEvent?: any | null, city: string, country: string }> };
+export type GetServersQuery = { __typename?: 'Query', findManyServer: Array<{ __typename?: 'Server', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, activePlayers?: number | null, maxPlayers?: number | null, activeMap?: string | null, lastEvent?: any | null, city?: string | null, country?: string | null }> };
 
 export type GetServersWithPaginationQueryVariables = Exact<{
   take?: InputMaybe<Scalars['Int']['input']>;
@@ -30022,7 +28724,7 @@ export type GetServersWithPaginationQueryVariables = Exact<{
 }>;
 
 
-export type GetServersWithPaginationQuery = { __typename?: 'Query', findManyServer: Array<{ __typename?: 'Server', serverId: string, name: string, address: string, port: number, game: string, activePlayers: number, maxPlayers: number, activeMap: string, lastEvent?: any | null, city: string, country: string }> };
+export type GetServersWithPaginationQuery = { __typename?: 'Query', findManyServer: Array<{ __typename?: 'Server', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, activePlayers?: number | null, maxPlayers?: number | null, activeMap?: string | null, lastEvent?: any | null, city?: string | null, country?: string | null }> };
 
 export type GetServerCountQueryVariables = Exact<{
   where?: InputMaybe<ServerWhereInput>;
@@ -30036,7 +28738,7 @@ export type GetServerByIdWithConfigsQueryVariables = Exact<{
 }>;
 
 
-export type GetServerByIdWithConfigsQuery = { __typename?: 'Query', findUniqueServer?: { __typename?: 'Server', serverId: string, name: string, address: string, port: number, game: string, publicAddress: string, statusUrl?: string | null, rconPassword: string, sortOrder: number, configs: Array<{ __typename?: 'ServerConfig', parameter: string, value: string }>, authToken?: { __typename?: 'ServerToken', tokenPrefix?: string | null, name?: string | null } | null } | null };
+export type GetServerByIdWithConfigsQuery = { __typename?: 'Query', findUniqueServer?: { __typename?: 'Server', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null, configs?: Array<{ __typename?: 'ServerConfig', parameter: string, value: string }> | null, authToken?: { __typename?: 'ServerToken', tokenPrefix?: string | null, name?: string | null } | null } | null };
 
 export type CreateServerTokenMutationVariables = Exact<{
   input: CreateServerTokenInput;
@@ -30059,7 +28761,7 @@ export type GetServerTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetServerTokensQuery = { __typename?: 'Query', findManyServerToken?: Array<{ __typename?: 'ServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount: number, status?: string | null, hasRconPassword?: boolean | null }> | null };
+export type GetServerTokensQuery = { __typename?: 'Query', findManyServerToken: Array<{ __typename?: 'ServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount: number, status?: string | null, hasRconPassword?: boolean | null }> };
 
 export type GetServerTokenCountQueryVariables = Exact<{
   includeRevoked?: InputMaybe<Scalars['Boolean']['input']>;
@@ -30078,7 +28780,7 @@ export type GetServerTokenByIdQuery = { __typename?: 'Query', findServerToken?: 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUsersQuery = { __typename?: 'Query', findManyUser: Array<{ __typename?: 'User', id: string, name: string, email: string, emailVerified: boolean, role?: string | null, banned?: boolean | null, banReason?: string | null, banExpires?: any | null, image?: string | null, createdAt: any, updatedAt: any }> };
+export type GetUsersQuery = { __typename?: 'Query', findManyUser: Array<{ __typename?: 'User', id?: string | null, name?: string | null, email?: string | null, emailVerified?: boolean | null, role?: string | null, banned?: boolean | null, banReason?: string | null, banExpires?: any | null, image?: string | null, createdAt?: any | null, updatedAt?: any | null }> };
 
 export type GetUsersWithPaginationQueryVariables = Exact<{
   take?: InputMaybe<Scalars['Int']['input']>;
@@ -30088,7 +28790,7 @@ export type GetUsersWithPaginationQueryVariables = Exact<{
 }>;
 
 
-export type GetUsersWithPaginationQuery = { __typename?: 'Query', findManyUser: Array<{ __typename?: 'User', id: string, name: string, email: string, emailVerified: boolean, role?: string | null, banned?: boolean | null, banReason?: string | null, banExpires?: any | null, image?: string | null, createdAt: any, updatedAt: any }> };
+export type GetUsersWithPaginationQuery = { __typename?: 'Query', findManyUser: Array<{ __typename?: 'User', id?: string | null, name?: string | null, email?: string | null, emailVerified?: boolean | null, role?: string | null, banned?: boolean | null, banReason?: string | null, banExpires?: any | null, image?: string | null, createdAt?: any | null, updatedAt?: any | null }> };
 
 export type GetUserCountQueryVariables = Exact<{
   where?: InputMaybe<UserWhereInput>;
@@ -30105,23 +28807,49 @@ export type GetGamesListQuery = { __typename?: 'Query', findManyGame: Array<{ __
 export type GetGeneralStatsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGeneralStatsQuery = { __typename?: 'Query', countPlayer: number, countClan: number, countGame: number, countServer: number, findManyServer: Array<{ __typename?: 'Server', kills: number }>, findFirstEventFrag?: { __typename?: 'EventFrag', eventTime?: any | null } | null, findUniqueOption?: { __typename?: 'Option', value: string } | null };
+export type GetGeneralStatsQuery = { __typename?: 'Query', countPlayer: number, countClan: number, countGame: number, countServer: number, getTotalKills?: number | null, findFirstEventFrag?: { __typename?: 'EventFrag', eventTime?: any | null } | null, findUniqueOption?: { __typename?: 'Option', value: string } | null };
 
-export type GetServerByIdQueryVariables = Exact<{
-  serverId: Scalars['Int']['input'];
+export type GetPublicPlayersWithPaginationQueryVariables = Exact<{
+  take?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<PlayerOrderByWithRelationInput> | PlayerOrderByWithRelationInput>;
+  where?: InputMaybe<PlayerWhereInput>;
 }>;
 
 
-export type GetServerByIdQuery = { __typename?: 'Query', findUniqueServer?: { __typename?: 'Server', serverId: string, name: string, address: string, port: number, game: string, publicAddress: string, statusUrl?: string | null, rconPassword: string, sortOrder: number } | null };
+export type GetPublicPlayersWithPaginationQuery = { __typename?: 'Query', findManyPlayer: Array<{ __typename?: 'Player', playerId?: number | null, lastName?: string | null, skill?: number | null, kills?: number | null, deaths?: number | null, country?: string | null, flag?: string | null, lastEvent?: any | null, lastSkillChange?: any | null }> };
+
+export type GetPublicPlayerCountQueryVariables = Exact<{
+  where?: InputMaybe<PlayerWhereInput>;
+}>;
+
+
+export type GetPublicPlayerCountQuery = { __typename?: 'Query', countPlayer: number };
+
+export type GetPublicServersWithPaginationQueryVariables = Exact<{
+  take?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<ServerOrderByWithRelationInput> | ServerOrderByWithRelationInput>;
+  where?: InputMaybe<ServerWhereInput>;
+}>;
+
+
+export type GetPublicServersWithPaginationQuery = { __typename?: 'Query', findManyServer: Array<{ __typename?: 'Server', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, activePlayers?: number | null, maxPlayers?: number | null, activeMap?: string | null, lastEvent?: any | null, city?: string | null, country?: string | null }> };
+
+export type GetPublicServerCountQueryVariables = Exact<{
+  where?: InputMaybe<ServerWhereInput>;
+}>;
+
+
+export type GetPublicServerCountQuery = { __typename?: 'Query', countServer: number };
 
 
 export const GetPublicGamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicGames"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hidden"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"equals"},"value":{"kind":"StringValue","value":"0","block":false}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"realgame"}}]}}]}}]} as unknown as DocumentNode<GetPublicGamesQuery, GetPublicGamesQueryVariables>;
 export const GetGamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGames"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"realgame"}}]}}]}}]} as unknown as DocumentNode<GetGamesQuery, GetGamesQueryVariables>;
 export const GetGamesWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GameOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"GameWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"realgame"}}]}}]}}]} as unknown as DocumentNode<GetGamesWithPaginationQuery, GetGamesWithPaginationQueryVariables>;
 export const GetGameCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGameCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"GameWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetGameCountQuery, GetGameCountQueryVariables>;
-export const GetPlayersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPlayers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyPlayer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playerId"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"skill"}},{"kind":"Field","name":{"kind":"Name","value":"kills"}},{"kind":"Field","name":{"kind":"Name","value":"deaths"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"lastSkillChange"}}]}}]}}]} as unknown as DocumentNode<GetPlayersQuery, GetPlayersQueryVariables>;
-export const GetPlayersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPlayersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playerId"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"skill"}},{"kind":"Field","name":{"kind":"Name","value":"kills"}},{"kind":"Field","name":{"kind":"Name","value":"deaths"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"flag"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"lastSkillChange"}}]}}]}}]} as unknown as DocumentNode<GetPlayersWithPaginationQuery, GetPlayersWithPaginationQueryVariables>;
-export const GetPlayerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPlayerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetPlayerCountQuery, GetPlayerCountQueryVariables>;
+export const GetAdminPlayersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminPlayersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playerId"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"skill"}},{"kind":"Field","name":{"kind":"Name","value":"kills"}},{"kind":"Field","name":{"kind":"Name","value":"deaths"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"flag"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"lastSkillChange"}}]}}]}}]} as unknown as DocumentNode<GetAdminPlayersWithPaginationQuery, GetAdminPlayersWithPaginationQueryVariables>;
+export const GetAdminPlayerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminPlayerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetAdminPlayerCountQuery, GetAdminPlayerCountQueryVariables>;
 export const GetGamesForSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesForSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetGamesForSelectQuery, GetGamesForSelectQueryVariables>;
 export const GetModsForSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetModsForSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyModSupported"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetModsForSelectQuery, GetModsForSelectQueryVariables>;
 export const CreateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerWithConfigMutation, CreateServerWithConfigMutationVariables>;
@@ -30129,7 +28857,7 @@ export const UpdateServerWithConfigDocument = {"kind":"Document","definitions":[
 export const GetServersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"activePlayers"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"activeMap"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}}]} as unknown as DocumentNode<GetServersQuery, GetServersQueryVariables>;
 export const GetServersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"activePlayers"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"activeMap"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}}]} as unknown as DocumentNode<GetServersWithPaginationQuery, GetServersWithPaginationQueryVariables>;
 export const GetServerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetServerCountQuery, GetServerCountQueryVariables>;
-export const GetServerByIdWithConfigsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerByIdWithConfigs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findUniqueServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"rconPassword"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}},{"kind":"Field","name":{"kind":"Name","value":"configs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parameter"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}},{"kind":"Field","name":{"kind":"Name","value":"authToken"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetServerByIdWithConfigsQuery, GetServerByIdWithConfigsQueryVariables>;
+export const GetServerByIdWithConfigsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerByIdWithConfigs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findUniqueServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}},{"kind":"Field","name":{"kind":"Name","value":"configs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parameter"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}},{"kind":"Field","name":{"kind":"Name","value":"authToken"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetServerByIdWithConfigsQuery, GetServerByIdWithConfigsQueryVariables>;
 export const CreateServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"rawToken"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerTokenMutation, CreateServerTokenMutationVariables>;
 export const RevokeServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RevokeServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RevokeServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"revokeServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<RevokeServerTokenMutation, RevokeServerTokenMutationVariables>;
 export const GetServerTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeRevoked"},"value":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]} as unknown as DocumentNode<GetServerTokensQuery, GetServerTokensQueryVariables>;
@@ -30139,5 +28867,8 @@ export const GetUsersDocument = {"kind":"Document","definitions":[{"kind":"Opera
 export const GetUsersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUsersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UserOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"emailVerified"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"banned"}},{"kind":"Field","name":{"kind":"Name","value":"banReason"}},{"kind":"Field","name":{"kind":"Name","value":"banExpires"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetUsersWithPaginationQuery, GetUsersWithPaginationQueryVariables>;
 export const GetUserCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetUserCountQuery, GetUserCountQueryVariables>;
 export const GetGamesListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesList"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hidden"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"equals"},"value":{"kind":"StringValue","value":"0","block":false}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}}]}}]}}]} as unknown as DocumentNode<GetGamesListQuery, GetGamesListQueryVariables>;
-export const GetGeneralStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGeneralStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"}},{"kind":"Field","name":{"kind":"Name","value":"countClan"}},{"kind":"Field","name":{"kind":"Name","value":"countGame"}},{"kind":"Field","name":{"kind":"Name","value":"countServer"}},{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"kills"}}]}},{"kind":"Field","name":{"kind":"Name","value":"findFirstEventFrag"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eventTime"},"value":{"kind":"EnumValue","value":"desc"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"eventTime"}}]}},{"kind":"Field","name":{"kind":"Name","value":"findUniqueOption"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"keyname"},"value":{"kind":"StringValue","value":"DeleteDays","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]} as unknown as DocumentNode<GetGeneralStatsQuery, GetGeneralStatsQueryVariables>;
-export const GetServerByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findUniqueServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"rconPassword"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]} as unknown as DocumentNode<GetServerByIdQuery, GetServerByIdQueryVariables>;
+export const GetGeneralStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGeneralStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"}},{"kind":"Field","name":{"kind":"Name","value":"countClan"}},{"kind":"Field","name":{"kind":"Name","value":"countGame"}},{"kind":"Field","name":{"kind":"Name","value":"countServer"}},{"kind":"Field","name":{"kind":"Name","value":"getTotalKills"}},{"kind":"Field","name":{"kind":"Name","value":"findFirstEventFrag"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eventTime"},"value":{"kind":"EnumValue","value":"desc"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"eventTime"}}]}},{"kind":"Field","name":{"kind":"Name","value":"findUniqueOption"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"keyname"},"value":{"kind":"StringValue","value":"DeleteDays","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]} as unknown as DocumentNode<GetGeneralStatsQuery, GetGeneralStatsQueryVariables>;
+export const GetPublicPlayersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicPlayersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playerId"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"skill"}},{"kind":"Field","name":{"kind":"Name","value":"kills"}},{"kind":"Field","name":{"kind":"Name","value":"deaths"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"flag"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"lastSkillChange"}}]}}]}}]} as unknown as DocumentNode<GetPublicPlayersWithPaginationQuery, GetPublicPlayersWithPaginationQueryVariables>;
+export const GetPublicPlayerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicPlayerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetPublicPlayerCountQuery, GetPublicPlayerCountQueryVariables>;
+export const GetPublicServersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicServersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"activePlayers"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"activeMap"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}}]} as unknown as DocumentNode<GetPublicServersWithPaginationQuery, GetPublicServersWithPaginationQueryVariables>;
+export const GetPublicServerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicServerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetPublicServerCountQuery, GetPublicServerCountQueryVariables>;

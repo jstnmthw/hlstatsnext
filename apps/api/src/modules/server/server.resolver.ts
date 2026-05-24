@@ -1,4 +1,4 @@
-import type { Server } from "@repo/db/client"
+import { db, type Server } from "@repo/db/client"
 import { builder } from "../../builder"
 import { requireAdmin } from "../../context"
 
@@ -113,9 +113,15 @@ builder.mutationField("updateServerWithConfig", (t) =>
           configsCount: 0,
         }
       } catch (error) {
+        // Don't leak Prisma column/constraint names to the client. Log inner
+        // error for diagnostics; return a generic user-facing message.
+        console.error(
+          "[server.resolver] updateServerWithConfig failed:",
+          error instanceof Error ? error.message : String(error),
+        )
         return {
           success: false,
-          message: `Failed to update server: ${error instanceof Error ? error.message : "Unknown error"}`,
+          message: "Failed to update server",
           server: null,
           configsCount: 0,
         }
@@ -163,13 +169,29 @@ builder.mutationField("createServerWithConfig", (t) =>
           configsCount: result.configsCount,
         }
       } catch (error) {
+        console.error(
+          "[server.resolver] createServerWithConfig failed:",
+          error instanceof Error ? error.message : String(error),
+        )
         return {
           success: false,
-          message: `Failed to create server: ${error instanceof Error ? error.message : "Unknown error"}`,
+          message: "Failed to create server",
           server: null,
           configsCount: 0,
         }
       }
+    },
+  }),
+)
+
+// Total kills across all servers — single aggregate query rather than the
+// previous client-side sum over `findManyServer { kills }` which loaded
+// every server row just to add up one column.
+builder.queryField("getTotalKills", (t) =>
+  t.int({
+    resolve: async () => {
+      const result = await db.server.aggregate({ _sum: { kills: true } })
+      return result._sum.kills ?? 0
     },
   }),
 )

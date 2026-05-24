@@ -1,8 +1,8 @@
 import { graphql } from "@/lib/gql"
 
-/** Admin player listing — includes PII (email) for the admin column. Must NOT be imported from public routes. */
-export const GET_ADMIN_PLAYERS_WITH_PAGINATION = graphql(`
-  query GetAdminPlayersWithPagination(
+/** Public player listing — must not select PII (no email, lastAddress, etc). */
+export const GET_PUBLIC_PLAYERS_WITH_PAGINATION = graphql(`
+  query GetPublicPlayersWithPagination(
     $take: Int
     $skip: Int
     $orderBy: [PlayerOrderByWithRelationInput!]
@@ -11,7 +11,6 @@ export const GET_ADMIN_PLAYERS_WITH_PAGINATION = graphql(`
     findManyPlayer(take: $take, skip: $skip, orderBy: $orderBy, where: $where) {
       playerId
       lastName
-      email
       skill
       kills
       deaths
@@ -23,8 +22,8 @@ export const GET_ADMIN_PLAYERS_WITH_PAGINATION = graphql(`
   }
 `)
 
-export const GET_ADMIN_PLAYER_COUNT = graphql(`
-  query GetAdminPlayerCount($where: PlayerWhereInput) {
+export const GET_PUBLIC_PLAYER_COUNT = graphql(`
+  query GetPublicPlayerCount($where: PlayerWhereInput) {
     countPlayer(where: $where)
   }
 `)

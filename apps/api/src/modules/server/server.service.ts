@@ -94,7 +94,13 @@ export class ServerService {
       // Decrypt the RCON password
       return await this.crypto.decrypt(server.rconPassword)
     } catch (error) {
-      console.error("Failed to decrypt RCON password for server", serverId, error)
+      // Log only the message — error objects may carry the encrypted blob
+      // in their stack/cause and we don't want that landing in logs.
+      console.error(
+        "[server.service] Failed to decrypt RCON password",
+        { serverId },
+        error instanceof Error ? error.message : String(error),
+      )
       return null
     }
   }
@@ -159,7 +165,10 @@ export class ServerService {
         return { success: false, message: "Failed to decrypt RCON password" }
       }
     } catch (error) {
-      console.error("RCON connection test failed:", error)
+      console.error(
+        "[server.service] RCON connection test failed:",
+        error instanceof Error ? error.message : String(error),
+      )
       return { success: false, message: "RCON connection test failed" }
     }
   }

@@ -1,12 +1,16 @@
 import { DataTableConfig } from "@/features/common/types/data-table"
 
 export interface PublicServerItem {
-  serverId: string
-  name: string
-  address: string
-  port: number
-  activePlayers: number
-  maxPlayers: number
+  serverId?: number | null
+  name?: string | null
+  address?: string | null
+  port?: number | null
+  activePlayers?: number | null
+  maxPlayers?: number | null
+  activeMap?: string | null
+  game?: string | null
+  city?: string | null
+  country?: string | null
   lastEvent?: string | Date | null
 }
 

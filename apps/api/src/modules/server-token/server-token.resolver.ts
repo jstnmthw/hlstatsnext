@@ -151,6 +151,7 @@ RevokeServerTokenResult.implement({
 builder.queryField("findManyServerToken", (t) =>
   t.prismaField({
     type: ["ServerToken"],
+    nullable: false,
     args: {
       includeRevoked: t.arg.boolean({ required: false, defaultValue: false }),
       skip: t.arg.int({ required: false }),

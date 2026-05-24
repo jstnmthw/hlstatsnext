@@ -57,7 +57,6 @@ export const GET_SERVER_BY_ID = graphql(`
       game
       publicAddress
       statusUrl
-      rconPassword
       sortOrder
       configs {
         parameter

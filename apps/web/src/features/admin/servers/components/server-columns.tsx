@@ -2,7 +2,6 @@ import { DataTableColumnHeader } from "@/features/common/components/data-table-c
 import { useDataTableContext } from "@/features/common/components/data-table-context"
 import { DataTableConfig } from "@/features/common/types/data-table"
 import { formatDate } from "@/lib/datetime-util"
-import { Server } from "@repo/db/client"
 import {
   Badge,
   Button,
@@ -20,20 +19,18 @@ import {
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
 
-export type ServerListItem = Pick<
-  Server,
-  | "name"
-  | "address"
-  | "port"
-  | "activePlayers"
-  | "maxPlayers"
-  | "activeMap"
-  | "game"
-  | "city"
-  | "country"
-> & {
-  serverId: string
-  lastEvent?: string | Date
+export type ServerListItem = {
+  serverId?: number | null
+  name?: string | null
+  address?: string | null
+  port?: number | null
+  activePlayers?: number | null
+  maxPlayers?: number | null
+  activeMap?: string | null
+  game?: string | null
+  city?: string | null
+  country?: string | null
+  lastEvent?: string | Date | null
   __typename?: string
 }
 
@@ -180,7 +177,9 @@ export const serverColumns = (): ColumnDef<ServerListItem>[] => [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(server.serverId)}>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(String(server.serverId ?? ""))}
+            >
               Copy server ID
             </DropdownMenuItem>
             <DropdownMenuItem

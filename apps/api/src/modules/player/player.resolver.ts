@@ -4,6 +4,12 @@ import type { GetPlayersFilters, GetServerPlayersFilters, PlayerServerStats } fr
 
 const playerService = new PlayerService()
 
+// Sort order enum — validated at GraphQL parse time, eliminating the
+// `string → "asc" | "desc"` cast that previously delegated validation to Prisma.
+const SortOrderEnum = builder.enumType("SortOrderArg", {
+  values: ["asc", "desc"] as const,
+})
+
 // GraphQL Input Types
 const GetPlayersFiltersInput = builder.inputType("GetPlayersFiltersInput", {
   fields: (t) => ({
@@ -171,7 +177,7 @@ builder.queryField("getServerPlayers", (t) =>
       take: t.arg.int({ required: false }),
       skip: t.arg.int({ required: false }),
       sortField: t.arg.string({ required: false }),
-      sortOrder: t.arg.string({ required: false }),
+      sortOrder: t.arg({ type: SortOrderEnum, required: false }),
     },
     resolve: async (_, { serverId, filters, take, skip, sortField, sortOrder }) => {
       const playerFilters: GetServerPlayersFilters = {
@@ -183,10 +189,7 @@ builder.queryField("getServerPlayers", (t) =>
         minSkill: filters?.minSkill || undefined,
       }
 
-      const orderBy = playerService.buildPlayerOrderBy(
-        sortField || "skill",
-        (sortOrder as "asc" | "desc") || "desc",
-      )
+      const orderBy = playerService.buildPlayerOrderBy(sortField || "skill", sortOrder ?? "desc")
 
       return await playerService.getServerPlayers(
         serverId,

@@ -25,17 +25,17 @@ import { ColumnDef } from "@tanstack/react-table"
 import { UserRowActions } from "./user-row-actions"
 
 export type UserListItem = {
-  id: string
-  name: string
-  email: string
-  emailVerified: boolean
+  id?: string | null
+  name?: string | null
+  email?: string | null
+  emailVerified?: boolean | null
   role?: string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: string | Date | null
   image?: string | null
-  createdAt: string | Date | null
-  updatedAt: string | Date | null
+  createdAt?: string | Date | null
+  updatedAt?: string | Date | null
   __typename?: string
 }
 
@@ -181,8 +181,8 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
       return (
         <div className="flex items-center gap-3 pl-2">
           <Avatar className="size-8">
-            {user.image && <AvatarImage src={user.image} alt={user.name} />}
-            <AvatarFallback className="text-xs">{getInitials(user.name)}</AvatarFallback>
+            {user.image && <AvatarImage src={user.image} alt={user.name ?? ""} />}
+            <AvatarFallback className="text-xs">{getInitials(user.name ?? "")}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
             <span className="font-medium">{user.name}</span>

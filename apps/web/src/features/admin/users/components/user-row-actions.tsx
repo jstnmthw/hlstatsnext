@@ -47,7 +47,7 @@ export function UserRowActions({ user }: UserRowActionsProps) {
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem
             onClick={() => {
-              navigator.clipboard.writeText(user.email)
+              navigator.clipboard.writeText(user.email ?? "")
               toast.info("Email copied to clipboard")
             }}
           >
@@ -80,24 +80,24 @@ export function UserRowActions({ user }: UserRowActionsProps) {
       <EditUserSheet
         open={editOpen}
         onOpenChange={setEditOpen}
-        userId={user.id}
-        userName={user.name}
-        userEmail={user.email}
+        userId={user.id ?? ""}
+        userName={user.name ?? ""}
+        userEmail={user.email ?? ""}
       />
 
       <ChangeRoleDialog
         open={roleOpen}
         onOpenChange={setRoleOpen}
-        userId={user.id}
-        userName={user.name}
+        userId={user.id ?? ""}
+        userName={user.name ?? ""}
         currentRole={user.role || "user"}
       />
 
       <BanUserDialog
         open={banOpen}
         onOpenChange={setBanOpen}
-        userId={user.id}
-        userName={user.name}
+        userId={user.id ?? ""}
+        userName={user.name ?? ""}
         isBanned={!!user.banned}
         banReason={user.banReason}
         banExpires={user.banExpires}
@@ -106,8 +106,8 @@ export function UserRowActions({ user }: UserRowActionsProps) {
       <DeleteUserDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        userId={user.id}
-        userName={user.name}
+        userId={user.id ?? ""}
+        userName={user.name ?? ""}
       />
     </>
   )

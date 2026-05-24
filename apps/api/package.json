@@ -11,6 +11,7 @@
     "clean": "rm -rf node_modules dist .turbo"
   },
   "dependencies": {
+    "@escape.tech/graphql-armor-cost-limit": "^2.4.3",
     "@escape.tech/graphql-armor-max-depth": "^2.4.2",
     "@graphql-tools/schema": "^10.0.33",
     "@graphql-yoga/plugin-disable-introspection": "^2.22.0",

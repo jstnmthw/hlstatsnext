@@ -37,23 +37,29 @@ export const playerPageColumns: ColumnDef<PublicPlayerItem>[] = [
   {
     accessorKey: "skill",
     header: () => <DataTableColumnHeader title="Skill" field="skill" />,
-    cell: ({ row }) => <span className="tabular-nums">{row.original.skill.toLocaleString()}</span>,
+    cell: ({ row }) => (
+      <span className="tabular-nums">{(row.original.skill ?? 0).toLocaleString()}</span>
+    ),
   },
   {
     accessorKey: "kills",
     header: () => <DataTableColumnHeader title="Kills" field="kills" />,
-    cell: ({ row }) => <span className="tabular-nums">{row.original.kills.toLocaleString()}</span>,
+    cell: ({ row }) => (
+      <span className="tabular-nums">{(row.original.kills ?? 0).toLocaleString()}</span>
+    ),
   },
   {
     accessorKey: "deaths",
     header: () => <DataTableColumnHeader title="Deaths" field="deaths" />,
-    cell: ({ row }) => <span className="tabular-nums">{row.original.deaths.toLocaleString()}</span>,
+    cell: ({ row }) => (
+      <span className="tabular-nums">{(row.original.deaths ?? 0).toLocaleString()}</span>
+    ),
   },
   {
     id: "kd",
     header: "K/D",
     cell: ({ row }) => {
-      const kd = (row.original.kills / (row.original.deaths || 1)).toFixed(2)
+      const kd = ((row.original.kills ?? 0) / (row.original.deaths || 1)).toFixed(2)
       return <span className="text-muted-foreground tabular-nums">{kd}</span>
     },
     enableSorting: false,

@@ -1,4 +1,4 @@
-import { GET_PLAYERS_WITH_PAGINATION } from "@/features/admin/players/graphql/player-queries"
+import { GET_PUBLIC_PLAYERS_WITH_PAGINATION } from "@/features/players/graphql/player-queries"
 import { query } from "@/lib/apollo-client"
 import { SortOrder } from "@/lib/gql/graphql"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle, cn, IconTrophy } from "@repo/ui"
@@ -9,7 +9,7 @@ const trophyColors = ["text-amber-400", "text-zinc-400", "text-amber-700"] as co
 
 export async function TopPlayers({ className, ...props }: ComponentProps<"div">) {
   const { data } = await query({
-    query: GET_PLAYERS_WITH_PAGINATION,
+    query: GET_PUBLIC_PLAYERS_WITH_PAGINATION,
     variables: {
       take: 5,
       orderBy: [{ skill: SortOrder.Desc }],
@@ -36,8 +36,10 @@ export async function TopPlayers({ className, ...props }: ComponentProps<"div">)
           </thead>
           <tbody>
             {players.map((player, i) => {
+              const kills = player.kills ?? 0
+              const skill = player.skill ?? 0
               const deaths = player.deaths || 1
-              const kd = (player.kills / deaths).toFixed(2)
+              const kd = (kills / deaths).toFixed(2)
               return (
                 <tr
                   key={player.playerId}
@@ -53,7 +55,7 @@ export async function TopPlayers({ className, ...props }: ComponentProps<"div">)
                       {player.lastName}
                     </Link>
                   </td>
-                  <td className="py-2 text-right tabular-nums">{player.skill.toLocaleString()}</td>
+                  <td className="py-2 text-right tabular-nums">{skill.toLocaleString()}</td>
                   <td className="py-2 text-right text-muted-foreground tabular-nums">{kd}</td>
                 </tr>
               )

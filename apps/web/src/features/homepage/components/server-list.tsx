@@ -1,11 +1,11 @@
-import { GET_SERVERS_WITH_PAGINATION } from "@/features/admin/servers/graphql/server-queries"
 import { RecentServersTable } from "@/features/servers/components/servers-table"
+import { GET_PUBLIC_SERVERS_WITH_PAGINATION } from "@/features/servers/graphql/server-queries"
 import { query } from "@/lib/apollo-client"
 import { SortOrder } from "@/lib/gql/graphql"
 
 export async function ServerList({ className }: { className?: string }) {
   const { data } = await query({
-    query: GET_SERVERS_WITH_PAGINATION,
+    query: GET_PUBLIC_SERVERS_WITH_PAGINATION,
     variables: {
       take: 5,
       orderBy: [{ activePlayers: SortOrder.Desc }],

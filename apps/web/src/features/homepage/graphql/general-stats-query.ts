@@ -6,9 +6,7 @@ export const GET_GENERAL_STATS = graphql(`
     countClan
     countGame
     countServer
-    findManyServer {
-      kills
-    }
+    getTotalKills
     findFirstEventFrag(orderBy: [{ eventTime: desc }]) {
       eventTime
     }

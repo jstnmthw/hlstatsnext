@@ -18,7 +18,6 @@ interface ServerEditFormProps {
     game: string
     publicAddress?: string
     statusUrl?: string
-    rconPassword?: string
     sortOrder: number
     mod: string
     authToken?: { tokenPrefix: string; name: string } | null
@@ -175,12 +174,13 @@ export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
             id="rconPassword"
             name="rconPassword"
             type="password"
-            placeholder="Optional remote console password"
-            defaultValue={server.rconPassword || ""}
+            placeholder="Leave blank to keep current password"
             maxLength={255}
+            autoComplete="new-password"
           />
           <p className="text-xs text-muted-foreground">
-            Used for remote server administration and real-time monitoring.
+            Used for remote server administration and real-time monitoring. Blank leaves the
+            existing password unchanged; entering a value re-encrypts and replaces it.
             {server.authToken && " Overrides the default RCON password from the token."}
           </p>
           {state.errors?.rconPassword && (

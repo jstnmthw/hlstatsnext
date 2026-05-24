@@ -85,7 +85,6 @@ hlstatsnext/
 │   └── grafana/          # Grafana dashboards and provisioning
 ├── servers/              # Game server data (optional)
 ├── docker-compose.yml    # Docker services definition
-├── Makefile              # Docker management shortcuts
 └── turbo.json            # Turborepo build configuration
 ```
 
@@ -289,47 +288,37 @@ ENCRYPTION_KEY='73QPGNk0Wx8Ruy5YeDe8dKaZm+YG0mOv/HvVxWpBj5s='
 
 ```bash
 # Start all services
-docker compose up -d
-
-# Or use Make shortcuts
-make up
+pnpm docker:up
 
 # Check status
-make status
-docker compose ps
+pnpm docker:ps
 ```
 
 ### Available Services
 
-| Service        | Container              | Port(s)     | Description                               |
-| -------------- | ---------------------- | ----------- | ----------------------------------------- |
-| **db**         | hlstatsnext-db         | 3306        | MySQL 8.4 database                        |
-| **rabbitmq**   | hlstatsnext-rabbitmq   | 5672, 15672 | Message queue + management UI             |
-| **garnet**     | hlstatsnext-garnet     | 6379        | Redis-compatible cache (Microsoft Garnet) |
-| **prometheus** | hlstatsnext-prometheus | 9090        | Metrics collection                        |
-| **grafana**    | hlstatsnext-grafana    | 3001        | Metrics visualization                     |
+| Service      | Container                | Port(s)     | Description                               |
+| ------------ | ------------------------ | ----------- | ----------------------------------------- |
+| **db**       | hlstatsnext-dev-db       | 3306        | MySQL 8.4 database                        |
+| **rabbitmq** | hlstatsnext-dev-rabbitmq | 5672, 15672 | Message queue + management UI             |
+| **garnet**   | hlstatsnext-dev-garnet   | 6379        | Redis-compatible cache (Microsoft Garnet) |
 
-### Make Commands
+Observability (opt-in, separate compose file): Prometheus on `:9090`, Grafana on `:3001`. Start with `pnpm docker:obs:up`.
+
+### Container Commands
 
 ```bash
-make              # Restart all containers (down + up)
-make up           # Start containers
-make down         # Stop containers
-make logs         # View all logs
-make status       # Container status
-make build        # Build with no cache
-make clean        # Remove stopped containers
-make prune        # Remove all unused resources (caution!)
+pnpm docker:up        # Start containers
+pnpm docker:down      # Stop containers
+pnpm docker:logs      # Tail logs for all services
+pnpm docker:ps        # Container status
+```
 
-# Database
-make db-logs      # View database logs
-make db-shell     # Access database shell
-make db-backup    # Create backup to ./backups/
+Anything beyond that is a one-off `docker` invocation — for example:
 
-# Daemon (when containerized)
-make daemon-logs
-make daemon-shell
-make daemon-restart
+```bash
+docker logs -f hlstatsnext-dev-db                            # DB logs
+docker exec -it hlstatsnext-dev-db mysql -u root -proot      # DB shell
+docker compose build --no-cache                              # Force rebuild
 ```
 
 ### Network Configuration
@@ -536,13 +525,13 @@ Monitor message queues:
 
 ```bash
 # Check if MySQL is running
-docker ps | grep hlstatsnext-db
+docker ps | grep hlstatsnext-dev-db
 
 # View MySQL logs
-make db-logs
+docker logs -f hlstatsnext-dev-db
 
 # Test connection
-docker exec -it hlstatsnext-db mysql -u hlstatsnext -pchangeme -e "SELECT 1"
+docker exec -it hlstatsnext-dev-db mysql -u hlstatsnext -pchangeme -e "SELECT 1"
 ```
 
 ### Prisma Issues

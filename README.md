@@ -69,35 +69,32 @@ pnpm ui add button
 
 ## Docker
 
-Comprehensive Makefile for container management. Run `make help` for all commands.
+Container management is driven by `pnpm` scripts that wrap `docker compose`.
 
 ```bash
-make              # Restart all containers (down + up)
-make up           # Start containers
-make down         # Stop containers
-make logs         # View logs
-make status       # Container status
+pnpm docker:up        # Start containers
+pnpm docker:down      # Stop containers
+pnpm docker:logs      # Tail logs for all services
+pnpm docker:ps        # Container status
+```
+
+The optional observability stack lives in its own compose file:
+
+```bash
+pnpm docker:obs:up    # Prometheus + Grafana
+pnpm docker:obs:down
+pnpm docker:obs:logs
 ```
 
 ### Services
 
-| Service    | Port(s)     | Description                         |
-| ---------- | ----------- | ----------------------------------- |
-| db         | 3306        | MySQL 8.4 database                  |
-| rabbitmq   | 5672, 15672 | Message queue + management UI       |
-| garnet     | 6379        | Redis-compatible cache              |
-| prometheus | 9090        | Metrics collection                  |
-| grafana    | 3001        | Metrics visualization (admin/admin) |
+| Service  | Port(s)     | Description                   |
+| -------- | ----------- | ----------------------------- |
+| db       | 3306        | MySQL 8.4 database            |
+| rabbitmq | 5672, 15672 | Message queue + management UI |
+| garnet   | 6379        | Redis-compatible cache        |
 
-### Service Commands
-
-```bash
-# Database
-make db-logs      make db-shell     make db-backup
-
-# Daemon (when containerized)
-make daemon-logs  make daemon-shell make daemon-restart
-```
+Observability (opt-in via `pnpm docker:obs:up`): Prometheus on `:9090`, Grafana on `:3001`.
 
 ### Environment Variables
 

@@ -92,11 +92,8 @@ mp_logmessages 1
 ### 4. Start Services
 
 ```bash
-# Start all services with docker-compose
-docker-compose up -d
-
-# Or use the Makefile
-make up
+# Start all services
+pnpm docker:up
 ```
 
 ## How It Works

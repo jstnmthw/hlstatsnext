@@ -45,7 +45,7 @@ Turbo task graph essentials: `build` depends on `^build`; codegen is `turbo run 
 | Observability metrics                     | `packages/observability/`                                                                             |
 | Auth                                      | `packages/auth/` (Better Auth)                                                                        |
 | Pre-commit hook                           | `.husky/pre-commit`                                                                                   |
-| Docker stack                              | `docker-compose.yml` + `Makefile`                                                                     |
+| Docker stack                              | `docker-compose.yml` (scripts in root `package.json` under `docker:*`)                                |
 
 ## Critical conventions
 

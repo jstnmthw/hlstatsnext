@@ -8,8 +8,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./globals.css": "./src/globals.css",
-    "./lib/utils": "./src/lib/utils.ts",
-    "./preview": "./src/components/preview.tsx"
+    "./lib/utils": "./src/lib/utils.ts"
   },
   "scripts": {
     "build:components": "tsc",

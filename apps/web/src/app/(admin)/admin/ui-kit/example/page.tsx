@@ -1,4 +1,4 @@
-import { CoverExample } from "@repo/ui/preview"
+import { CoverExample } from "@/features/ui-kit/components/preview"
 
 export default function Page() {
   return <CoverExample />

@@ -1,5 +1,6 @@
+import { DataTableActionsHeader } from "@/features/common/components/data-table-actions-header"
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
-import { useDataTableContext } from "@/features/common/components/data-table-context"
+import { createSelectColumn } from "@/features/common/components/data-table-select-column"
 import { DataTableConfig } from "@/features/common/types/data-table"
 import { formatDate } from "@/lib/datetime-util"
 import {
@@ -7,15 +8,11 @@ import {
   AvatarFallback,
   AvatarImage,
   Badge,
-  Button,
-  Checkbox,
-  cn,
   IconBan,
   IconCheck,
   IconCircle,
   IconCircleCheck,
   IconMailOff,
-  IconRefresh,
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -66,23 +63,6 @@ export const userTableConfig: DataTableConfig = {
   ],
   frozenColumnsLeft: ["select"],
   frozenColumnsRight: ["actions"],
-}
-
-function ActionsHeader() {
-  const { onRefresh, isPending } = useDataTableContext()
-  return (
-    <div className="flex items-center justify-end pr-3 pl-1">
-      <Button variant="ghost" className="group size-8 p-0" onClick={onRefresh} disabled={isPending}>
-        <IconRefresh
-          className={cn(
-            "size-4",
-            isPending ? "animate-spin" : "",
-            "text-zinc-500 transition-colors duration-200 group-hover:text-zinc-100",
-          )}
-        />
-      </Button>
-    </div>
-  )
 }
 
 function getInitials(name: string): string {
@@ -147,32 +127,7 @@ function StatusBadge({ user }: { user: UserListItem }) {
 }
 
 export const userColumns = (): ColumnDef<UserListItem>[] => [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <div className="flex max-w-10 items-center justify-center pr-3 pl-1">
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex max-w-10 items-center justify-center pr-3 pl-1">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+  createSelectColumn<UserListItem>(),
   {
     accessorKey: "name",
     header: () => <DataTableColumnHeader title="Name" field="name" />,
@@ -220,7 +175,7 @@ export const userColumns = (): ColumnDef<UserListItem>[] => [
   },
   {
     id: "actions",
-    header: () => <ActionsHeader />,
+    header: () => <DataTableActionsHeader />,
     cell: ({ row }) => <UserRowActions user={row.original} />,
   },
 ]

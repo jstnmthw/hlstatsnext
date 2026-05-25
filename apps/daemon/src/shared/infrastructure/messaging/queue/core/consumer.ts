@@ -1,28 +1,29 @@
 /**
  * Event Consumer Implementation
  *
- * Implements event consumption from RabbitMQ with multi-queue support,
- * retry logic with exponential backoff, and dead letter queue handling.
+ * Lifecycle state machine for RabbitMQ consumption with multi-queue support.
+ * Delegates retry/DLQ decisions to MessageRetryOrchestrator, metrics
+ * bookkeeping to ConsumerMetricsCollector, and message parsing/validation to
+ * message-validator helpers.
  */
 
-import {
-  addJitter,
-  calculateRetryDelay,
-  formatDuration,
-  safeJsonParse,
-} from "@/shared/infrastructure/messaging/queue/utils/message-utils"
+import { formatDuration } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
+import { ConsumerMetricsCollector } from "./consumer-metrics-collector"
+import { MessageRetryOrchestrator } from "./message-retry-orchestrator"
+import { defaultMessageValidator, parseMessage } from "./message-validator"
 import type {
   ConsumeMessage,
   ConsumerStats,
-  EventMessage,
   IEventConsumer,
   IQueueClient,
   MessageValidator,
   QueueChannel,
 } from "./types"
 import { QueueConsumeError } from "./types"
+
+export { defaultMessageValidator } from "./message-validator"
 
 /**
  * Event processor interface for handling consumed events
@@ -64,18 +65,8 @@ export class EventConsumer implements IEventConsumer {
     void this.resubscribeAfterReconnect()
   }
 
-  private stats: ConsumerStats = {
-    isConsuming: false,
-    messagesProcessed: 0,
-    messagesAcked: 0,
-    messagesNacked: 0,
-    messagesRejected: 0,
-    averageProcessingTime: 0,
-    queueDepth: 0,
-  }
-
-  private processingTimes: number[] = []
-  private readonly maxProcessingTimesSamples = 1000
+  private readonly metrics: ConsumerMetricsCollector
+  private readonly retryOrchestrator: MessageRetryOrchestrator
 
   /**
    * Promises for currently-running handleMessage invocations. On shutdown we
@@ -89,37 +80,24 @@ export class EventConsumer implements IEventConsumer {
   /** Hard cap on shutdown drain wait, so a wedged handler can't block exit. */
   private static readonly DRAIN_TIMEOUT_MS = 5_000
 
-  /**
-   * Retry republish timers tracked so stop() can cancel them. Without this,
-   * a pending retry fires against either a closed channel (throws, swallowed)
-   * or — worse — races a still-open one during connection-close. An
-   * abandoned timer is equivalent to dropping the retry, which is acceptable:
-   * the broker's TTL + x-max-length still bound the impact.
-   */
-  private readonly pendingTimers = new Set<NodeJS.Timeout>()
-
-  // Metrics reporting
-  private metricsTimer: NodeJS.Timeout | null = null
-  private startTime: Date = new Date()
-  private eventsReceived = 0
-  private validationErrors = 0
-  private queueStats: Record<
-    string,
-    {
-      received: number
-      processed: number
-      errors: number
-      lastProcessedAt?: Date
-    }
-  > = {}
-
   constructor(
     private readonly client: IQueueClient,
     private readonly processor: IEventProcessor,
     private readonly logger: ILogger,
     private readonly config: ConsumerConfig = defaultConsumerConfig,
     private readonly messageValidator: MessageValidator = defaultMessageValidator,
-  ) {}
+  ) {
+    this.metrics = new ConsumerMetricsCollector(this.logger)
+    this.retryOrchestrator = new MessageRetryOrchestrator(
+      {
+        maxRetries: this.config.maxRetries,
+        retryDelay: this.config.retryDelay,
+        maxRetryDelay: this.config.maxRetryDelay,
+      },
+      this.logger,
+      this.metrics,
+    )
+  }
 
   async start(): Promise<void> {
     if (this.isConsuming) {
@@ -127,37 +105,25 @@ export class EventConsumer implements IEventConsumer {
     }
 
     try {
-      // Initialize metrics state
-      this.startTime = new Date()
-      this.eventsReceived = 0
-      this.validationErrors = 0
-      this.queueStats = {}
-
-      for (const queueName of this.config.queues) {
-        this.queueStats[queueName] = { received: 0, processed: 0, errors: 0 }
-      }
+      this.metrics.resetForStart(this.config.queues)
 
       // Subscribe BEFORE starting consumeQueue so a reconnect during initial
       // subscribe (rare but possible) won't be missed.
       this.client.on("connected", this.onClientConnected)
 
-      // Start consuming from all configured queues
       await Promise.all(this.config.queues.map((queueName) => this.consumeQueue(queueName)))
 
       this.isConsuming = true
-      this.stats.isConsuming = true
+      this.metrics.setConsuming(true)
       this.isPaused = false
 
       this.logger.info(
         `Event consumer started successfully for queues: ${this.config.queues.join(", ")} with concurrency: ${this.config.concurrency}`,
       )
 
-      // Start periodic metrics logging if enabled
       if (this.config.logMetrics !== false) {
         const interval = this.config.metricsInterval ?? 30000
-        this.metricsTimer = setInterval(() => {
-          this.logMetrics()
-        }, interval)
+        this.metrics.startPeriodicLogging(interval)
       }
     } catch (error) {
       this.logger.error(`Failed to start event consumer: ${error}`)
@@ -171,11 +137,7 @@ export class EventConsumer implements IEventConsumer {
     }
 
     try {
-      // Stop metrics timer
-      if (this.metricsTimer) {
-        clearInterval(this.metricsTimer)
-        this.metricsTimer = null
-      }
+      this.metrics.stopPeriodicLogging()
 
       // Unsubscribe from reconnect events so the listener doesn't leak across
       // start/stop cycles.
@@ -190,7 +152,6 @@ export class EventConsumer implements IEventConsumer {
             await channel.cancel(consumerTag)
             this.logger.debug(`Cancelled consumer tag: ${consumerTag}`)
           } catch (error) {
-            // Channel might already be closed
             const errorMessage = error instanceof Error ? error.message : String(error)
             if (
               !errorMessage.includes("Channel closed") &&
@@ -222,20 +183,16 @@ export class EventConsumer implements IEventConsumer {
       }
 
       // Cancel any pending retry republish timers before clearing channels.
-      // A timer that fires after this point would publish to a dead channel;
-      // better to drop the retry than to throw on a closed channel (or worse,
-      // push during a half-open shutdown race).
-      if (this.pendingTimers.size > 0) {
-        this.logger.debug(`Cancelling ${this.pendingTimers.size} pending retry timer(s)`)
-        for (const timer of this.pendingTimers) clearTimeout(timer)
-        this.pendingTimers.clear()
+      // A timer that fires after this point would publish to a dead channel.
+      const cancelled = this.retryOrchestrator.cancelPending()
+      if (cancelled > 0) {
+        this.logger.debug(`Cancelling ${cancelled} pending retry timer(s)`)
       }
 
-      // Clear references but don't close channels
       this.channels.clear()
       this.consumerTags = []
       this.isConsuming = false
-      this.stats.isConsuming = false
+      this.metrics.setConsuming(false)
 
       this.logger.info("Event consumer stopped")
     } catch (error) {
@@ -259,8 +216,6 @@ export class EventConsumer implements IEventConsumer {
       try {
         await channel.cancel(consumerTag)
       } catch (error) {
-        // Channel may already be closing — log but keep going so other queues
-        // still get paused.
         this.logger.warn(
           `Failed to cancel consumer for pause on ${queueName}: ${error instanceof Error ? error.message : String(error)}`,
         )
@@ -298,10 +253,7 @@ export class EventConsumer implements IEventConsumer {
   }
 
   getConsumerStats(): ConsumerStats {
-    return {
-      ...this.stats,
-      averageProcessingTime: this.calculateAverageProcessingTime(),
-    }
+    return this.metrics.getStats()
   }
 
   /**
@@ -325,7 +277,7 @@ export class EventConsumer implements IEventConsumer {
       }
     }
 
-    this.stats.queueDepth = total
+    this.metrics.setQueueDepth(total)
     return total
   }
 
@@ -382,8 +334,6 @@ export class EventConsumer implements IEventConsumer {
       )
     })
 
-    // Set up consumer with error handling. The async dispatch is shared with
-    // resume() — pause() cancels the consumer tag rather than nack-spinning.
     const consumerTag = await channel.consume(
       queueName,
       (msg) => this.dispatch(msg, channel, queueName),
@@ -411,8 +361,7 @@ export class EventConsumer implements IEventConsumer {
       return
     }
 
-    this.eventsReceived++
-    this.queueStats[queueName]!.received++
+    this.metrics.recordReceived(queueName)
 
     // Track in-flight so stop() can drain before tearing down channels.
     const work = this.handleMessage(msg, channel, queueName)
@@ -433,28 +382,24 @@ export class EventConsumer implements IEventConsumer {
     let messageId = "unknown"
 
     try {
-      // Parse message
-      const parseResult = this.parseMessage(msg)
+      const parseResult = parseMessage(msg)
       if (!parseResult.success) {
         this.logger.error(
           `Failed to parse message from ${queueName}: ${parseResult.error} (contentLength: ${msg.content.length})`,
         )
 
-        await this.rejectMessage(msg, channel, "Invalid message format")
-        // Count parse/validation error against metrics
-        this.validationErrors++
-        this.queueStats[queueName]!.errors++
+        await this.retryOrchestrator.reject(msg, channel, "Invalid message format")
+        this.metrics.recordValidationError(queueName)
         return
       }
 
       const message = parseResult.data
       messageId = message.id
 
-      // Validate message
       try {
         await this.messageValidator(message)
       } catch (validationError) {
-        this.validationErrors++
+        this.metrics.recordValidationError(queueName)
         throw validationError
       }
 
@@ -468,18 +413,11 @@ export class EventConsumer implements IEventConsumer {
         },
       )
 
-      // Process the event
       await this.processor.processEvent(message.payload)
 
-      // Acknowledge successful processing
       await channel.ack(msg)
-      this.stats.messagesAcked++
-      this.stats.messagesProcessed++
-      this.queueStats[queueName]!.processed++
-      this.queueStats[queueName]!.lastProcessedAt = new Date()
-
       const processingTime = Date.now() - startTime
-      this.recordProcessingTime(processingTime)
+      this.metrics.recordProcessed(queueName, processingTime)
 
       this.logger.debug(
         `Message ${messageId} (${message.payload.eventType}) processed successfully in ${formatDuration(processingTime)}`,
@@ -491,185 +429,9 @@ export class EventConsumer implements IEventConsumer {
         `Error processing message ${messageId} from ${queueName} in ${formatDuration(processingTime)}: ${error instanceof Error ? error.message : String(error)}`,
       )
 
-      // Track per-queue errors
-      this.queueStats[queueName]!.errors++
+      this.metrics.recordQueueError(queueName)
 
-      await this.handleProcessingError(msg, channel, error as Error)
-    }
-  }
-
-  private async handleProcessingError(
-    msg: ConsumeMessage,
-    channel: QueueChannel,
-    error: Error,
-  ): Promise<void> {
-    try {
-      const parseResult = this.parseMessage(msg)
-      if (!parseResult.success) {
-        await this.rejectMessage(msg, channel, "Unparseable message with processing error")
-        return
-      }
-
-      const message = parseResult.data
-      const retryCount = message.metadata.routing.retryCount
-
-      if (retryCount < this.config.maxRetries) {
-        // Republish first, then ack the original. A nack-then-republish
-        // design would dead-letter the original AND queue a new copy on
-        // every retry — N+1 DLQ entries per persistently-failing event.
-        // The retry stays in the live queue (so message TTL applies); the
-        // DLQ is reserved for terminal failures only.
-        const baseDelay = calculateRetryDelay(
-          retryCount,
-          this.config.retryDelay,
-          this.config.maxRetryDelay,
-        )
-        const delay = addJitter(baseDelay)
-
-        this.logger.info(
-          `Retrying message ${message.id} (attempt ${retryCount + 1}/${this.config.maxRetries}) in ${delay}ms`,
-        )
-
-        // Defer the republish so the failing condition (DB hiccup, etc.) has
-        // time to clear. Track the timer so stop() can cancel it.
-        const timer: NodeJS.Timeout = setTimeout(async () => {
-          this.pendingTimers.delete(timer)
-          try {
-            await this.republishWithRetry(message, channel)
-            // Republish accepted — safe to ack the original now. If we ack'd
-            // first we'd risk losing the message on a republish failure.
-            try {
-              await channel.ack(msg)
-              this.stats.messagesAcked++
-            } catch (ackError) {
-              // Channel likely closed in the gap between republish and ack;
-              // the broker will redeliver the original on the next consume.
-              // Worst case is one duplicate, which is the lesser evil vs.
-              // losing the message entirely.
-              this.logger.warn(
-                `Ack after republish failed for ${message.id}: ${ackError instanceof Error ? ackError.message : String(ackError)}`,
-              )
-            }
-          } catch (republishError) {
-            // Republish failed — leave the original un-acked. Broker
-            // redelivers it; retryCount stays the same so we'll try again.
-            this.logger.error(
-              `Failed to republish message ${message.id} for retry; leaving un-acked for broker redelivery: ${republishError}`,
-            )
-          }
-        }, delay)
-        this.pendingTimers.add(timer)
-      } else {
-        // Terminal failure — send to DLQ for human review (or DLQ consumer).
-        this.logger.error(
-          `Message ${message.id} exceeded retry limit (${retryCount}/${this.config.maxRetries}), sending to DLQ`,
-        )
-
-        await channel.nack(msg, false, false)
-        this.stats.messagesRejected++
-      }
-    } catch (handlingError) {
-      this.logger.error(
-        `Error in error handling - original: ${error.message}, handling error: ${handlingError instanceof Error ? handlingError.message : String(handlingError)}`,
-      )
-
-      // Last resort: reject the message
-      await this.rejectMessage(msg, channel, "Error in error handling")
-    }
-  }
-
-  private async republishWithRetry(message: EventMessage, channel: QueueChannel): Promise<void> {
-    const updatedMessage: EventMessage = {
-      ...message,
-      metadata: {
-        ...message.metadata,
-        routing: {
-          ...message.metadata.routing,
-          retryCount: message.metadata.routing.retryCount + 1,
-        },
-      },
-    }
-
-    const published = channel.publish(
-      "hlstats.events",
-      message.metadata.routing.key,
-      Buffer.from(JSON.stringify(updatedMessage)),
-      {
-        persistent: true,
-        priority: message.metadata.routing.priority,
-        messageId: message.id,
-        headers: {
-          "x-correlation-id": message.correlationId,
-          "x-retry-count": updatedMessage.metadata.routing.retryCount,
-        },
-      },
-    )
-
-    if (!published) {
-      throw new Error("Failed to republish message: channel buffer full")
-    }
-  }
-
-  private async rejectMessage(
-    msg: ConsumeMessage,
-    channel: QueueChannel,
-    reason: string,
-  ): Promise<void> {
-    this.logger.warn(`Rejecting message: ${reason}`)
-    channel.nack(msg, false, false)
-    this.stats.messagesRejected++
-  }
-
-  private parseMessage(
-    msg: ConsumeMessage,
-  ): { success: true; data: EventMessage } | { success: false; error: string } {
-    try {
-      const content = msg.content.toString("utf8")
-      return safeJsonParse<EventMessage>(content)
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
-
-  private recordProcessingTime(time: number): void {
-    this.processingTimes.push(time)
-
-    // Keep only the last N samples for rolling average
-    if (this.processingTimes.length > this.maxProcessingTimesSamples) {
-      this.processingTimes.shift()
-    }
-  }
-
-  private calculateAverageProcessingTime(): number {
-    if (this.processingTimes.length === 0) {
-      return 0
-    }
-
-    const sum = this.processingTimes.reduce((acc, time) => acc + time, 0)
-    return sum / this.processingTimes.length
-  }
-
-  /**
-   * Periodic metrics logger to mirror Shadow Consumer metrics for real processing
-   */
-  private logMetrics(): void {
-    const uptimeMs = Date.now() - this.startTime.getTime()
-    const eventsPerSecond = uptimeMs > 0 ? this.eventsReceived / (uptimeMs / 1000) : 0
-
-    this.logger.info(`Queue Consumer Metrics:`)
-    this.logger.info(`  Events Received: ${this.eventsReceived}`)
-    this.logger.info(`  Events Processed: ${this.stats.messagesProcessed}`)
-    this.logger.info(`  Validation Errors: ${this.validationErrors}`)
-    this.logger.info(`  Events/sec: ${eventsPerSecond.toFixed(2)}`)
-
-    // Per-queue stats
-    for (const [queueName, q] of Object.entries(this.queueStats)) {
-      this.logger.info(
-        `  Queue ${queueName}: ${q.received} received, ${q.processed} processed, ${q.errors} errors`,
-      )
+      await this.retryOrchestrator.handleFailure(msg, channel, error as Error)
     }
   }
 }
@@ -706,29 +468,4 @@ export const defaultConsumerConfig: ConsumerConfig = {
   queues: ["hlstats.events.priority", "hlstats.events.standard", "hlstats.events.bulk"],
   logMetrics: true,
   metricsInterval: 30000,
-}
-
-/**
- * Default message validator
- */
-export async function defaultMessageValidator(message: EventMessage): Promise<void> {
-  if (!message.id) {
-    throw new Error("Message missing ID")
-  }
-
-  if (!message.payload) {
-    throw new Error("Message missing payload")
-  }
-
-  if (!message.payload.eventType) {
-    throw new Error("Message payload missing eventType")
-  }
-
-  if (!message.metadata) {
-    throw new Error("Message missing metadata")
-  }
-
-  if (typeof message.metadata.source.serverId !== "number") {
-    throw new Error("Message metadata missing or invalid serverId")
-  }
 }

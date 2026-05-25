@@ -23,9 +23,17 @@ export {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "./components/dropdown-menu"
 
@@ -137,7 +145,9 @@ export {
   Popover,
   PopoverAnchor,
   PopoverContent,
+  PopoverDescription,
   PopoverHeader,
+  PopoverTitle,
   PopoverTrigger,
 } from "./components/popover"
 

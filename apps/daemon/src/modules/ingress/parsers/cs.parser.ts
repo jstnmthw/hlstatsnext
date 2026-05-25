@@ -1,119 +1,122 @@
 /**
  * Counter-Strike Parser
  *
- * Parses Counter-Strike game server logs into structured events.
+ * Thin orchestrator that wires together:
+ *   - ParserStrategyTable: substring -> handler dispatch
+ *   - EventAssemblyHelper: BaseEvent envelope construction
+ *   - StateCoordinator:    the only place ServerStateManager is mutated
+ *
+ * Individual parseXxxEvent handlers are pure with respect to state: they only
+ * read from the log line and write through the coordinator/helper.
  */
 
 import { GameConfig } from "@/config/game.config"
 import type { ServerStateManager } from "@/modules/server/state/server-state-manager"
-import {
-  generateCorrelationId,
-  generateMessageId,
-} from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 import type { IClock } from "@/shared/infrastructure/time/clock.interface"
-import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import type { ParseResult } from "./base.parser"
 import { BaseParser } from "./base.parser"
+import { EventAssemblyHelper } from "./event-assembly-helper"
+import { ParserStrategyTable } from "./parser-strategy-table"
+import { StateCoordinator } from "./state-coordinator"
+
+const TIMESTAMP_PREFIX_RE = /^L \d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}: /
 
 export class CsParser extends BaseParser {
-  // Parser strategy map for different log line patterns
-  private readonly parserStrategies: Array<{
-    patterns: string[]
-    handler: (line: string, serverId: number) => ParseResult
-  }> = [
-    {
-      patterns: ["Rcon:"],
-      handler: (line, serverId) => this.parseRconCommandEvent(line, serverId),
-    },
-    {
-      patterns: ['triggered "amx_'],
-      handler: (line, serverId) => this.parseAdminCommandEvent(line, serverId),
-    },
-    {
-      patterns: [" killed "],
-      handler: (line, serverId) => this.parseKillEvent(line, serverId),
-    },
-    {
-      patterns: [" attacked "],
-      handler: (line, serverId) => this.parseDamageEvent(line, serverId),
-    },
-    {
-      patterns: [" committed suicide with ", " killed self "],
-      handler: (line, serverId) => this.parseSuicideEvent(line, serverId),
-    },
-    {
-      patterns: [" connected, address "],
-      handler: (line, serverId) => this.parseConnectEvent(line, serverId),
-    },
-    {
-      patterns: [" entered the game"],
-      handler: (line, serverId) => this.parseEnterEvent(line, serverId),
-    },
-    {
-      patterns: [" disconnected (reason ", " disconnected"],
-      handler: (line, serverId) => this.parseDisconnectEvent(line, serverId),
-    },
-    {
-      patterns: [" joined team ", " changed team to "],
-      handler: (line, serverId) => this.parseChangeTeamEvent(line, serverId),
-    },
-    {
-      patterns: [" changed role to ", " changed role "],
-      handler: (line, serverId) => this.parseChangeRoleEvent(line, serverId),
-    },
-    {
-      patterns: [" changed name to "],
-      handler: (line, serverId) => this.parseChangeNameEvent(line, serverId),
-    },
-    {
-      patterns: [" say ", " say_team "],
-      handler: (line, serverId) => this.parseChatEvent(line, serverId),
-    },
-    {
-      patterns: ["Mapchange to ", "Started map ", "changelevel:"],
-      handler: (line, serverId) => this.parseMapChangeEvent(line, serverId),
-    },
-    {
-      patterns: ['World triggered "Round_Start"'],
-      handler: (line, serverId) => this.parseRoundStartEvent(line, serverId),
-    },
-    {
-      patterns: ['triggered "Terrorists_Win"', 'triggered "CTs_Win"'],
-      handler: (line, serverId) => this.parseTeamWinEvent(line, serverId),
-    },
-    {
-      patterns: ['World triggered "Round_End"'],
-      handler: (line, serverId) => this.parseRoundEndEvent(line, serverId),
-    },
-  ]
+  private readonly assembler: EventAssemblyHelper
+  private readonly state: StateCoordinator
+  private readonly strategies: ParserStrategyTable
 
   constructor(
     game: string = GameConfig.getDefaultGame(),
     clock: IClock,
-    private readonly stateManager: ServerStateManager,
+    stateManager: ServerStateManager,
   ) {
     super(game, clock)
+    this.assembler = new EventAssemblyHelper(clock)
+    this.state = new StateCoordinator(stateManager)
+    this.strategies = new ParserStrategyTable([
+      {
+        patterns: ["Rcon:"],
+        handler: (line, serverId) => this.parseRconCommandEvent(line, serverId),
+      },
+      {
+        patterns: ['triggered "amx_'],
+        handler: (line, serverId) => this.parseAdminCommandEvent(line, serverId),
+      },
+      {
+        patterns: [" killed "],
+        handler: (line, serverId) => this.parseKillEvent(line, serverId),
+      },
+      {
+        patterns: [" attacked "],
+        handler: (line, serverId) => this.parseDamageEvent(line, serverId),
+      },
+      {
+        patterns: [" committed suicide with ", " killed self "],
+        handler: (line, serverId) => this.parseSuicideEvent(line, serverId),
+      },
+      {
+        patterns: [" connected, address "],
+        handler: (line, serverId) => this.parseConnectEvent(line, serverId),
+      },
+      {
+        patterns: [" entered the game"],
+        handler: (line, serverId) => this.parseEnterEvent(line, serverId),
+      },
+      {
+        patterns: [" disconnected (reason ", " disconnected"],
+        handler: (line, serverId) => this.parseDisconnectEvent(line, serverId),
+      },
+      {
+        patterns: [" joined team ", " changed team to "],
+        handler: (line, serverId) => this.parseChangeTeamEvent(line, serverId),
+      },
+      {
+        patterns: [" changed role to ", " changed role "],
+        handler: (line, serverId) => this.parseChangeRoleEvent(line, serverId),
+      },
+      {
+        patterns: [" changed name to "],
+        handler: (line, serverId) => this.parseChangeNameEvent(line, serverId),
+      },
+      {
+        patterns: [" say ", " say_team "],
+        handler: (line, serverId) => this.parseChatEvent(line, serverId),
+      },
+      {
+        patterns: ["Mapchange to ", "Started map ", "changelevel:"],
+        handler: (line, serverId) => this.parseMapChangeEvent(line, serverId),
+      },
+      {
+        patterns: ['World triggered "Round_Start"'],
+        handler: (line, serverId) => this.parseRoundStartEvent(line, serverId),
+      },
+      {
+        patterns: ['triggered "Terrorists_Win"', 'triggered "CTs_Win"'],
+        handler: (line, serverId) => this.parseTeamWinEvent(line, serverId),
+      },
+      {
+        patterns: ['World triggered "Round_End"'],
+        handler: (line, serverId) => this.parseRoundEndEvent(line, serverId),
+      },
+    ])
   }
 
   parseLine(logLine: string, serverId: number): ParseResult {
     try {
-      // Remove timestamp prefix if present
-      const cleanLine = logLine.replace(/^L \d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}: /, "")
+      const cleanLine = logLine.replace(TIMESTAMP_PREFIX_RE, "")
 
-      // Try pattern-based parsing first
-      const strategyResult = this.tryParseWithStrategies(cleanLine, serverId)
+      const strategyResult = this.strategies.dispatch(cleanLine, serverId)
       if (strategyResult) {
         return strategyResult
       }
 
-      // Handle special cases that need custom logic
       const specialResult = this.tryParseSpecialCases(cleanLine, serverId)
       if (specialResult) {
         return specialResult
       }
 
-      // Default: unhandled event type
       return { event: null, success: true }
     } catch (error) {
       return {
@@ -124,30 +127,20 @@ export class CsParser extends BaseParser {
     }
   }
 
-  private tryParseWithStrategies(cleanLine: string, serverId: number): ParseResult | null {
-    for (const strategy of this.parserStrategies) {
-      if (strategy.patterns.some((pattern) => cleanLine.includes(pattern))) {
-        return strategy.handler(cleanLine, serverId)
-      }
-    }
-    return null
-  }
-
   private tryParseSpecialCases(cleanLine: string, serverId: number): ParseResult | null {
-    // Player action triggers (exclude world events) - needs custom logic
+    // Player- and team-triggered actions need custom dispatch because the
+    // strategy table can't disambiguate "World triggered" from "<player> triggered"
+    // by substring alone.
     if (cleanLine.includes('triggered "') && !cleanLine.includes("World triggered")) {
-      // Player-triggered ACTION_PLAYER
       const actionResult = this.parseActionEvent(cleanLine, serverId)
       if (actionResult.success && actionResult.event) {
         return actionResult
       }
 
-      // Team-triggered non-win ACTION_TEAM
       const teamActionResult = this.parseTeamActionEvent(cleanLine, serverId)
       if (teamActionResult.success && teamActionResult.event) {
         return teamActionResult
       }
-      // Fall through to other event parsing if not an action
     }
 
     return null
@@ -198,13 +191,10 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Invalid game user ID in kill event" }
     }
 
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.PLAYER_KILL,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
         killerGameUserId,
         victimGameUserId,
@@ -225,7 +215,7 @@ export class CsParser extends BaseParser {
           isBot: victimSteamId === "BOT",
         },
       },
-    }
+    })
 
     return { event, success: true }
   }
@@ -237,7 +227,6 @@ export class CsParser extends BaseParser {
       /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" attacked "([^"]+)<(\d+)><([^>]+)><([^>]*)>" with "([^"]+)" \(damage "(-?\d+)"\) \(damage_armor "(-?\d+)"\) \(health "(-?\d+)"\) \(armor "(-?\d+)"\)(?:\s+\(hitgroup "([^"]+)"\))?/
     let match = logLine.match(damageRegex)
 
-    // Fallback tolerant regex for variant spacing/order
     if (!match) {
       const tolerant =
         /"([^"]+)<(\d+)>[^"]*" attacked "([^"]+)<(\d+)>[^"]*" with "([^"]+)" .*?\(damage "(-?\d+)"\).*?\(damage_armor "(-?\d+)"\).*?\(health "(-?\d+)"\).*?\(armor "(-?\d+)"\)(?:.*?\(hitgroup "([^"]+)"\))?/
@@ -284,13 +273,10 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Invalid game user ID in damage event" }
     }
 
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.PLAYER_DAMAGE,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
         attackerGameUserId,
         victimGameUserId,
@@ -315,7 +301,7 @@ export class CsParser extends BaseParser {
           isBot: victimSteamId === "BOT",
         },
       },
-    }
+    })
 
     return { event, success: true }
   }
@@ -336,13 +322,10 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Missing required fields in suicide event" }
     }
 
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.PLAYER_SUICIDE,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
         gameUserId,
         team: team || "UNKNOWN",
@@ -353,7 +336,7 @@ export class CsParser extends BaseParser {
         playerName,
         isBot: (steamId || "") === "BOT",
       },
-    }
+    })
 
     return { event, success: true }
   }
@@ -378,13 +361,10 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Invalid game user ID in connect event" }
     }
 
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.PLAYER_CONNECT,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
         gameUserId,
         steamId,
@@ -396,7 +376,7 @@ export class CsParser extends BaseParser {
         playerName,
         isBot: steamId === "BOT",
       },
-    }
+    })
 
     return { event, success: true }
   }
@@ -425,13 +405,10 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Invalid game user ID in enter/connect event" }
     }
 
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.PLAYER_ENTRY,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
         gameUserId,
       },
@@ -440,7 +417,7 @@ export class CsParser extends BaseParser {
         playerName,
         isBot: steamId === "BOT",
       },
-    }
+    })
 
     return { event, success: true }
   }
@@ -471,13 +448,10 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Invalid game user ID in team change" }
     }
 
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.PLAYER_CHANGE_TEAM,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
         gameUserId,
         team: newTeam,
@@ -487,13 +461,12 @@ export class CsParser extends BaseParser {
         playerName,
         isBot: steamId === "BOT",
       },
-    }
+    })
 
     return { event, success: true }
   }
 
   private parseChangeRoleEvent(logLine: string, serverId: number): ParseResult {
-    // Example variants are mod dependent; attempt a tolerant parse if present
     const regex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" changed role to "([^"]+)"/i
 
     const match = logLine.match(regex)
@@ -510,13 +483,10 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Missing required fields in role change" }
     }
 
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.PLAYER_CHANGE_ROLE,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
         gameUserId,
         role,
@@ -526,7 +496,7 @@ export class CsParser extends BaseParser {
         playerName,
         isBot: (steamId || "") === "BOT",
       },
-    }
+    })
 
     return { event, success: true }
   }
@@ -549,13 +519,10 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Missing required fields in name change" }
     }
 
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.PLAYER_CHANGE_NAME,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
         gameUserId,
         oldName,
@@ -566,7 +533,7 @@ export class CsParser extends BaseParser {
         playerName: newName,
         isBot: (steamId || "") === "BOT",
       },
-    }
+    })
 
     return { event, success: true }
   }
@@ -590,13 +557,10 @@ export class CsParser extends BaseParser {
 
       const parsedId = parseInt(playerIdStr)
       const gameUserId = Number.isNaN(parsedId) ? -1 : parsedId
-      const event: BaseEvent = {
+      const event = this.assembler.assemble({
         eventType: EventType.PLAYER_DISCONNECT,
-        timestamp: this.createTimestamp(),
         serverId,
         raw: logLine,
-        eventId: generateMessageId(),
-        correlationId: generateCorrelationId(),
         data: {
           gameUserId,
           reason: reason ?? "",
@@ -606,7 +570,7 @@ export class CsParser extends BaseParser {
           playerName,
           isBot: steamId === "BOT",
         },
-      }
+      })
 
       return { event, success: true }
     }
@@ -621,13 +585,10 @@ export class CsParser extends BaseParser {
 
       const parsedId = parseInt(playerIdStr)
       const gameUserId = Number.isNaN(parsedId) ? -1 : parsedId
-      const event: BaseEvent = {
+      const event = this.assembler.assemble({
         eventType: EventType.PLAYER_DISCONNECT,
-        timestamp: this.createTimestamp(),
         serverId,
         raw: logLine,
-        eventId: generateMessageId(),
-        correlationId: generateCorrelationId(),
         data: {
           gameUserId,
           reason: "",
@@ -637,7 +598,7 @@ export class CsParser extends BaseParser {
           playerName,
           isBot: (steamId || "") === "BOT",
         },
-      }
+      })
 
       return { event, success: true }
     }
@@ -666,32 +627,28 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Invalid game user ID in chat event" }
     }
 
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.CHAT_MESSAGE,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
         gameUserId,
         message,
         team,
-        isDead: false, // Would need additional parsing to determine
+        isDead: false,
       },
       meta: {
         steamId,
         playerName,
         isBot: steamId === "BOT",
       },
-    }
+    })
 
     return { event, success: true }
   }
 
   private parseActionEvent(logLine: string, serverId: number): ParseResult {
-    // Parse player action events like:
-    // "Player<2><STEAM_ID><TERRORIST>" triggered "Spawned_With_The_Bomb"
+    // Example: "Player<2><STEAM_ID><TERRORIST>" triggered "Spawned_With_The_Bomb"
     const playerActionRegex = /"([^"]+)<(\d+)><([^>]+)><([^>]*)>" triggered "([^"]+)"/
     const playerMatch = logLine.match(playerActionRegex)
 
@@ -711,13 +668,10 @@ export class CsParser extends BaseParser {
         return { event: null, success: false, error: "Invalid game user ID in action event" }
       }
 
-      const event: BaseEvent = {
+      const event = this.assembler.assemble({
         eventType: EventType.ACTION_PLAYER,
-        timestamp: this.createTimestamp(),
         serverId,
         raw: logLine,
-        eventId: generateMessageId(),
-        correlationId: generateCorrelationId(),
         data: {
           gameUserId,
           actionCode,
@@ -729,21 +683,16 @@ export class CsParser extends BaseParser {
           playerName,
           isBot: steamId === "BOT",
         },
-      }
+      })
 
       return { event, success: true }
     }
 
-    // Parse team action events like:
-    // Team "TERRORIST" triggered "Terrorists_Win"
-    // (Already handled by parseTeamWinEvent, but could add other team actions here)
-
-    // Not an action event we handle
     return { event: null, success: false }
   }
 
   private parseTeamActionEvent(logLine: string, serverId: number): ParseResult {
-    // Team "TERRORIST" triggered "Target_Bombed" (CT "4") (T "5")
+    // Example: Team "TERRORIST" triggered "Target_Bombed" (CT "4") (T "5")
     const teamTriggerMatch = logLine.match(/Team "([^"]+)" triggered "([^"]+)"/i)
     if (!teamTriggerMatch) {
       return { event: null, success: false }
@@ -751,117 +700,97 @@ export class CsParser extends BaseParser {
 
     const [, team, triggerName] = teamTriggerMatch
 
-    // If it's a team win, this is handled elsewhere
+    // Win triggers are routed through parseTeamWinEvent via the strategy table;
+    // skip them here so they don't double-emit as ACTION_TEAM.
     if (triggerName === "Terrorists_Win" || triggerName === "CTs_Win") {
       return { event: null, success: false }
     }
 
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.ACTION_TEAM,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
         team,
         actionCode: triggerName,
         game: this.game,
       },
-    }
+    })
 
     return { event, success: true }
   }
 
   private parseRoundStartEvent(logLine: string, serverId: number): ParseResult {
-    // Example: World triggered "Round_Start"
+    const ctx = this.state.beginRound(serverId)
 
-    const roundInfo = this.stateManager.startRound(serverId) || { roundNumber: 1 }
-    const serverState = this.stateManager.getServerState(serverId)
-
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.ROUND_START,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
-        map: serverState?.currentMap || "",
-        roundNumber: roundInfo.roundNumber,
-        maxPlayers: serverState?.maxPlayers || 0,
+        map: ctx.currentMap,
+        roundNumber: ctx.roundNumber,
+        maxPlayers: ctx.maxPlayers,
       },
-    }
+    })
 
     return { event, success: true }
   }
 
   private parseRoundEndEvent(logLine: string, serverId: number): ParseResult {
-    // Example: World triggered "Round_End"
+    const roundInfo = this.state.finishRound(serverId)
 
-    const roundInfo = this.stateManager.endRound(serverId) || {
-      roundNumber: 1,
-      winningTeam: undefined,
-    }
-
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.ROUND_END,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
         winningTeam: roundInfo.winningTeam,
         roundNumber: roundInfo.roundNumber,
       },
-    }
+    })
 
     return { event, success: true }
   }
 
   private parseTeamWinEvent(logLine: string, serverId: number): ParseResult {
-    // Parse: Team "TERRORIST" triggered "Terrorists_Win" (CT "4") (T "4")
+    // Example: Team "TERRORIST" triggered "Terrorists_Win" (CT "4") (T "4")
     const teamWinMatch = logLine.match(/Team "([^"]+)" triggered "([^"]+)"/i)
-    if (teamWinMatch) {
-      const [, team, triggerName] = teamWinMatch
-
-      // Store winning team for subsequent Round_End event
-      if (team) {
-        this.stateManager.setWinningTeam(serverId, team)
-      }
-
-      // Extract scores
-      const scoreMatch = logLine.match(/\(CT "(\d+)"\) \(T "(\d+)"\)/)
-      let ctScore = 0
-      let tScore = 0
-
-      if (scoreMatch) {
-        ctScore = parseInt(scoreMatch[1] || "0") || 0
-        tScore = parseInt(scoreMatch[2] || "0") || 0
-      }
-
-      const event: BaseEvent = {
-        eventType: EventType.TEAM_WIN,
-        timestamp: this.createTimestamp(),
-        serverId,
-        raw: logLine,
-        eventId: generateMessageId(),
-        correlationId: generateCorrelationId(),
-        data: {
-          winningTeam: team,
-          triggerName,
-          score: {
-            ct: ctScore,
-            t: tScore,
-          },
-        },
-      }
-
-      return { event, success: true }
+    if (!teamWinMatch) {
+      return { event: null, success: false, error: "Could not parse team win event" }
     }
 
-    return { event: null, success: false, error: "Could not parse team win event" }
+    const [, team, triggerName] = teamWinMatch
+
+    // Stash winner so the subsequent Round_End event can attach it.
+    if (team) {
+      this.state.rememberWinningTeam(serverId, team)
+    }
+
+    const scoreMatch = logLine.match(/\(CT "(\d+)"\) \(T "(\d+)"\)/)
+    let ctScore = 0
+    let tScore = 0
+
+    if (scoreMatch) {
+      ctScore = parseInt(scoreMatch[1] || "0") || 0
+      tScore = parseInt(scoreMatch[2] || "0") || 0
+    }
+
+    const event = this.assembler.assemble({
+      eventType: EventType.TEAM_WIN,
+      serverId,
+      raw: logLine,
+      data: {
+        winningTeam: team,
+        triggerName,
+        score: {
+          ct: ctScore,
+          t: tScore,
+        },
+      },
+    })
+
+    return { event, success: true }
   }
 
   private parseMapChangeEvent(logLine: string, serverId: number): ParseResult {
@@ -870,10 +799,8 @@ export class CsParser extends BaseParser {
     // "Started map "cs_havana" (CRC "-1352213912")"
     // "changelevel: de_mirage"
     // "Cmd: "<host>" changelevel "de_aztec""
-
     let mapName = ""
 
-    // Try different map change patterns
     const mapchangeToMatch = logLine.match(/Mapchange to (\w+)/)
     const startedMapMatch = logLine.match(/Started map "(\w+)"/)
     const changelevelMatch = logLine.match(/changelevel:?\s+(\w+)/)
@@ -891,24 +818,17 @@ export class CsParser extends BaseParser {
       return { event: null, success: false, error: "Could not extract map name from change event" }
     }
 
-    // Update map in state manager
-    const mapChange = this.stateManager.updateMap(serverId, mapName) || {
-      changed: true,
-      previousMap: undefined,
-    }
+    const mapChange = this.state.recordMapChange(serverId, mapName)
 
-    const event: BaseEvent = {
+    const event = this.assembler.assemble({
       eventType: EventType.MAP_CHANGE,
-      timestamp: this.createTimestamp(),
       serverId,
       raw: logLine,
-      eventId: generateMessageId(),
-      correlationId: generateCorrelationId(),
       data: {
         newMap: mapName,
         previousMap: mapChange.previousMap,
       },
-    }
+    })
 
     return { event, success: true }
   }

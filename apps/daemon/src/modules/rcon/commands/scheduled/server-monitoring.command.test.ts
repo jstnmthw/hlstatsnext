@@ -98,7 +98,10 @@ describe("ServerMonitoringCommand", () => {
     port: 27016,
   }
 
-  const createContext = (schedule?: ScheduledCommand): ScheduleExecutionContext => {
+  const createContext = (
+    server: ServerInfo = mockServer,
+    schedule?: ScheduledCommand,
+  ): ScheduleExecutionContext => {
     const sched = schedule ?? {
       id: "monitoring-test",
       name: "Monitoring Test",
@@ -110,6 +113,7 @@ describe("ServerMonitoringCommand", () => {
       scheduleId: sched.id,
       executionId: `${sched.id}-exec-${Date.now()}`,
       schedule: sched,
+      server,
       startTime: new Date(),
     }
   }
@@ -212,18 +216,7 @@ describe("ServerMonitoringCommand", () => {
   })
 
   describe("execute", () => {
-    it("should return zero counts when no active servers found", async () => {
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([])
-
-      const result = await command.execute(createContext())
-
-      expect(result.serversProcessed).toBe(0)
-      expect(result.commandsSent).toBe(0)
-      expect(mockLogger.info).toHaveBeenCalledWith("No active servers found for monitoring")
-    })
-
-    it("should successfully monitor a single server", async () => {
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer])
+    it("should successfully monitor the server from the context", async () => {
       mockRconService.isConnected.mockReturnValue(true)
       mockServerStatusEnricher.enrichServerStatus.mockResolvedValue()
 
@@ -234,19 +227,22 @@ describe("ServerMonitoringCommand", () => {
       expect(mockServerStatusEnricher.enrichServerStatus).toHaveBeenCalledWith(1)
     })
 
-    it("should successfully monitor multiple servers", async () => {
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer, mockServer2])
+    it("should only ever touch the single server in the context", async () => {
       mockRconService.isConnected.mockReturnValue(true)
       mockServerStatusEnricher.enrichServerStatus.mockResolvedValue()
 
-      const result = await command.execute(createContext())
+      const result = await command.execute(createContext(mockServer2))
 
-      expect(result.serversProcessed).toBe(2)
-      expect(result.commandsSent).toBe(2)
+      expect(result.serversProcessed).toBe(1)
+      expect(result.commandsSent).toBe(1)
+      // Regression guard: the command must NOT re-discover and enrich the whole
+      // fleet. One execution => exactly one enrichment, for the context server.
+      expect(mockServerStatusEnricher.enrichServerStatus).toHaveBeenCalledTimes(1)
+      expect(mockServerStatusEnricher.enrichServerStatus).toHaveBeenCalledWith(2)
+      expect(mockServerService.findActiveServersWithRcon).not.toHaveBeenCalled()
     })
 
-    it("should establish RCON connection for disconnected servers", async () => {
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer])
+    it("should establish an RCON connection for a disconnected server", async () => {
       mockRconService.isConnected.mockReturnValue(false)
       mockRconService.connect.mockResolvedValue()
       mockServerStatusEnricher.enrichServerStatus.mockResolvedValue()
@@ -261,8 +257,7 @@ describe("ServerMonitoringCommand", () => {
       )
     })
 
-    it("should log debug for already connected servers", async () => {
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer])
+    it("should log debug for an already connected server", async () => {
       mockRconService.isConnected.mockReturnValue(true)
       mockServerStatusEnricher.enrichServerStatus.mockResolvedValue()
 
@@ -273,8 +268,7 @@ describe("ServerMonitoringCommand", () => {
       )
     })
 
-    it("should handle server monitoring failure with error object", async () => {
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer])
+    it("should handle monitoring failure with an Error object", async () => {
       mockRconService.isConnected.mockReturnValue(true)
       mockServerStatusEnricher.enrichServerStatus.mockRejectedValue(new Error("Connection timeout"))
       mockRconService.getEngineDisplayNameForServer.mockResolvedValue("Source")
@@ -287,8 +281,7 @@ describe("ServerMonitoringCommand", () => {
       expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining("Connection timeout"))
     })
 
-    it("should handle server monitoring failure with non-Error object", async () => {
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer])
+    it("should handle monitoring failure with a non-Error object", async () => {
       mockRconService.isConnected.mockReturnValue(true)
       mockServerStatusEnricher.enrichServerStatus.mockRejectedValue("string error")
       mockRconService.getEngineDisplayNameForServer.mockResolvedValue("GoldSrc")
@@ -302,7 +295,6 @@ describe("ServerMonitoringCommand", () => {
     })
 
     it("should handle disconnect error gracefully during error handling", async () => {
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer])
       mockRconService.isConnected.mockReturnValue(true)
       mockServerStatusEnricher.enrichServerStatus.mockRejectedValue(new Error("timeout"))
       mockRconService.getEngineDisplayNameForServer.mockResolvedValue("Source")
@@ -317,110 +309,23 @@ describe("ServerMonitoringCommand", () => {
       )
     })
 
-    it("should handle mixed success and failure across servers", async () => {
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer, mockServer2])
+    it("should skip a server that is in its backoff period", async () => {
       mockRconService.isConnected.mockReturnValue(true)
-
-      // Server 1 succeeds, server 2 fails
-      mockServerStatusEnricher.enrichServerStatus.mockImplementation(async (serverId: number) => {
-        if (serverId === 2) {
-          throw new Error("Server 2 failure")
-        }
-      })
       mockRconService.getEngineDisplayNameForServer.mockResolvedValue("Source")
       mockRconService.disconnect.mockResolvedValue()
 
-      const result = await command.execute(createContext())
+      // First tick fails, recording a failure that moves the server to BACKING_OFF.
+      mockServerStatusEnricher.enrichServerStatus.mockRejectedValueOnce(new Error("failure"))
+      await command.execute(createContext())
 
-      expect(result.serversProcessed).toBe(2)
-      expect(result.commandsSent).toBe(1) // Only server 1 succeeded
-    })
-
-    it("should catch top-level errors and return zero counts", async () => {
-      mockServerService.findActiveServersWithRcon.mockRejectedValue(
-        new Error("Database unavailable"),
-      )
-
+      // Second tick: server is in backoff, so it must be skipped without enriching.
+      mockServerStatusEnricher.enrichServerStatus.mockResolvedValue()
       const result = await command.execute(createContext())
 
       expect(result.serversProcessed).toBe(0)
       expect(result.commandsSent).toBe(0)
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("Server monitoring execution failed"),
-        expect.any(Object),
-      )
-    })
-
-    it("should catch top-level non-Error errors and return zero counts", async () => {
-      mockServerService.findActiveServersWithRcon.mockRejectedValue("string rejection")
-
-      const result = await command.execute(createContext())
-
-      expect(result.serversProcessed).toBe(0)
-      expect(result.commandsSent).toBe(0)
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("string rejection"),
-        expect.any(Object),
-      )
-    })
-
-    it("should log skipped servers in backoff period", async () => {
-      // Create a command and manually trigger a failure to put server in backoff
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer, mockServer2])
-      mockRconService.isConnected.mockReturnValue(true)
-
-      // First execution: server 2 fails, putting it in backoff
-      mockServerStatusEnricher.enrichServerStatus.mockImplementation(async (serverId: number) => {
-        if (serverId === 2) {
-          throw new Error("failure")
-        }
-      })
-      mockRconService.getEngineDisplayNameForServer.mockResolvedValue("Source")
-      mockRconService.disconnect.mockResolvedValue()
-
-      await command.execute(createContext())
-
-      // Second execution: server 2 should be skipped (in backoff)
-      mockServerStatusEnricher.enrichServerStatus.mockResolvedValue()
-
-      await command.execute(createContext())
-
-      // Server 2 was recorded as failing, and the mock shouldRetry returns false for BACKING_OFF
-      // So skippedCount > 0 and debug log should fire
-      expect(mockLogger.debug).toHaveBeenCalledWith(expect.stringContaining("Skipped"))
-    })
-
-    it("should handle null monitorResult or server in results loop", async () => {
-      // This tests the guard: if (!monitorResult || !server) { continue }
-      // In practice this is hard to trigger, but we can verify the code handles
-      // empty results gracefully
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer])
-      mockRconService.isConnected.mockReturnValue(true)
-      mockServerStatusEnricher.enrichServerStatus.mockResolvedValue()
-
-      const result = await command.execute(createContext())
-      expect(result.serversProcessed).toBe(1)
-    })
-
-    it("should log completion with scheduleId, totals, and skipped info", async () => {
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer])
-      mockRconService.isConnected.mockReturnValue(true)
-      mockServerStatusEnricher.enrichServerStatus.mockResolvedValue()
-
-      const ctx = createContext()
-      await command.execute(ctx)
-
-      expect(mockLogger.debug).toHaveBeenCalledWith(
-        "Server monitoring completed",
-        expect.objectContaining({
-          scheduleId: ctx.schedule.id,
-          totalServers: 1,
-          monitored: 1,
-          successful: 1,
-          errors: 0,
-          skipped: 0,
-        }),
-      )
+      expect(mockServerStatusEnricher.enrichServerStatus).toHaveBeenCalledTimes(1)
+      expect(mockLogger.debug).toHaveBeenCalledWith(expect.stringContaining("backoff period"))
     })
   })
 

@@ -8,7 +8,7 @@
  *   "hlx_typehud" → hlx_typehud <color> <message>
  */
 
-import type { IServerService } from "@/modules/server/server.types"
+import type { ServerInfo } from "@/modules/server/server.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { mockDeep, type MockProxy } from "vitest-mock-extended"
@@ -20,9 +20,8 @@ describe("ServerMessageCommand", () => {
   let command: ServerMessageCommand
   let mockLogger: MockProxy<ILogger>
   let mockRconService: MockProxy<IRconService>
-  let mockServerService: MockProxy<IServerService>
 
-  const mockServer = {
+  const mockServer: ServerInfo = {
     serverId: 1,
     game: "cstrike",
     name: "Test Server",
@@ -33,8 +32,7 @@ describe("ServerMessageCommand", () => {
   beforeEach(() => {
     mockLogger = mockDeep<ILogger>()
     mockRconService = mockDeep<IRconService>()
-    mockServerService = mockDeep<IServerService>()
-    command = new ServerMessageCommand(mockLogger, mockRconService, mockServerService)
+    command = new ServerMessageCommand(mockLogger, mockRconService)
   })
 
   afterEach(() => {
@@ -294,7 +292,6 @@ describe("ServerMessageCommand", () => {
     beforeEach(() => {
       mockRconService.isConnected.mockReturnValue(true)
       mockRconService.executeCommand.mockResolvedValue("OK")
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer])
     })
 
     it("should execute hlx_csay with color and message", async () => {
@@ -384,20 +381,6 @@ describe("ServerMessageCommand", () => {
       expect(mockRconService.executeCommand).toHaveBeenCalledWith(1, "hlx_tsay FFFFFF Server #1")
     })
 
-    it("should handle no active servers", async () => {
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([])
-
-      const context = makeContext({
-        id: "test-no-servers",
-        command: { type: "hlx_csay", color: "FF0000", message: "Hello" },
-      })
-
-      const result = await command.execute(context)
-
-      expect(result.serversProcessed).toBe(0)
-      expect(result.commandsSent).toBe(0)
-    })
-
     it("should skip servers with no RCON connection", async () => {
       mockRconService.isConnected.mockReturnValue(false)
 
@@ -458,51 +441,31 @@ describe("ServerMessageCommand", () => {
       expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining("string error"))
     })
 
-    it("should execute on multiple servers", async () => {
-      const server2 = {
+    it("should only message the single server in the context", async () => {
+      const server2: ServerInfo = {
         serverId: 2,
         game: "cstrike",
         name: "Server 2",
         address: "127.0.0.2",
         port: 27016,
       }
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer, server2])
 
-      const context = makeContext({
-        id: "test-multi",
-        command: { type: "hlx_csay", color: "FF0000", message: "Hello all" },
-      })
-
-      const result = await command.execute(context)
-
-      expect(result.serversProcessed).toBe(2)
-      expect(result.commandsSent).toBe(2)
-    })
-
-    it("should handle mixed success/failure across servers", async () => {
-      const server2 = {
-        serverId: 2,
-        game: "cstrike",
-        name: "Server 2",
-        address: "127.0.0.2",
-        port: 27016,
-      }
-      mockServerService.findActiveServersWithRcon.mockResolvedValue([mockServer, server2])
-
-      mockRconService.executeCommand.mockImplementation(async (serverId: number) => {
-        if (serverId === 2) throw new Error("timeout")
-        return "OK"
-      })
-
-      const context = makeContext({
-        id: "test-mixed",
-        command: { type: "hlx_csay", color: "FF0000", message: "Hello" },
-      })
+      const context = makeContext(
+        { id: "test-single", command: { type: "hlx_csay", color: "FF0000", message: "Hello all" } },
+        server2,
+      )
 
       const result = await command.execute(context)
 
-      expect(result.serversProcessed).toBe(2)
+      // Regression guard: the executor fans out per server, so the command must
+      // send to exactly the context server — never re-broadcast to the fleet.
+      expect(result.serversProcessed).toBe(1)
       expect(result.commandsSent).toBe(1)
+      // The command's constructor no longer receives the server service, so it
+      // is structurally incapable of re-discovering the fleet — sending to
+      // exactly the context server is enforced at compile time.
+      expect(mockRconService.executeCommand).toHaveBeenCalledTimes(1)
+      expect(mockRconService.executeCommand).toHaveBeenCalledWith(2, "hlx_csay FF0000 Hello all")
     })
 
     it("should return 0 counts when command cannot be built", async () => {
@@ -534,11 +497,13 @@ describe("ServerMessageCommand", () => {
   })
 
   describe("execute (error in base class)", () => {
-    it("should catch errors from executeCommand and return zero counts", async () => {
-      mockServerService.findActiveServersWithRcon.mockRejectedValue(new Error("DB error"))
+    it("should catch unexpected errors from executeCommand and return zero counts", async () => {
+      mockRconService.isConnected.mockImplementation(() => {
+        throw new Error("connection check blew up")
+      })
 
       const context = makeContext({
-        id: "test-db-error",
+        id: "test-unexpected-error",
         command: { type: "hlx_csay", color: "FF0000", message: "Hello" },
       })
 
@@ -570,6 +535,7 @@ describe("ServerMessageCommand", () => {
   /** Helper to build a ScheduleExecutionContext from partial schedule data */
   function makeContext(
     partial: Partial<ScheduledCommand> & { id: string; command: ScheduledCommand["command"] },
+    server: ServerInfo = mockServer,
   ): ScheduleExecutionContext {
     const schedule: ScheduledCommand = {
       name: partial.name || "Test",
@@ -581,6 +547,7 @@ describe("ServerMessageCommand", () => {
       schedule,
       scheduleId: schedule.id,
       executionId: "test-execution",
+      server,
       startTime: new Date(),
     }
   }

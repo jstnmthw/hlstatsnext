@@ -77,113 +77,42 @@ export class ServerMonitoringCommand implements IScheduledCommandExecutor {
   }
 
   /**
-   * Execute server monitoring
+   * Monitor the single server targeted by this scheduled execution.
+   *
+   * The executor fans out across every active server and invokes this once
+   * per server, so we only ever touch `context.server`. Re-discovering the
+   * full server list here would re-monitor every server on every invocation —
+   * an N² fan-out that floods the logs and hammers RCON.
    */
   async execute(context: ScheduleExecutionContext): Promise<{
     serversProcessed: number
     commandsSent: number
   }> {
-    try {
-      this.logger.debug("Starting server monitoring execution", {
-        scheduleId: context.schedule.id,
-        executionId: context.executionId,
-      })
+    const { server } = context
 
-      // Discover active servers
-      const servers = await this.discoverActiveServers()
+    this.logger.debug("Starting server monitoring execution", {
+      scheduleId: context.schedule.id,
+      executionId: context.executionId,
+      serverId: server.serverId,
+    })
 
-      if (servers.length === 0) {
-        this.logger.info("No active servers found for monitoring")
-        return {
-          serversProcessed: 0,
-          commandsSent: 0,
-        }
-      }
-
-      this.logger.debug(`Discovered ${servers.length} servers for monitoring`)
-
-      // Filter servers based on retry logic
-      const serversToMonitor = servers.filter((server) => {
-        const failureState = this.retryCalculator.getFailureState(server.serverId)
-        return this.retryCalculator.shouldRetry(failureState)
-      })
-
-      const skippedCount = servers.length - serversToMonitor.length
-      if (skippedCount > 0) {
-        this.logger.debug(`Skipped ${skippedCount} servers in backoff period`)
-      }
-
-      // Monitor each server
-      const monitoringResults = await Promise.allSettled(
-        serversToMonitor.map((server) => this.monitorSingleServer(server)),
-      )
-
-      // Process results
-      let successCount = 0
-      let errorCount = 0
-
-      for (let i = 0; i < monitoringResults.length; i++) {
-        const monitorResult = monitoringResults[i]
-        const server = serversToMonitor[i]
-
-        if (!monitorResult || !server) {
-          continue
-        }
-
-        if (monitorResult.status === "fulfilled") {
-          successCount++
-          // Reset failure state on success
-          this.retryCalculator.resetFailureState(server.serverId)
-        } else {
-          errorCount++
-          // Record failure
-          const failureState = this.retryCalculator.recordFailure(server.serverId)
-          const errorMessage =
-            monitorResult.reason instanceof Error
-              ? monitorResult.reason.message
-              : String(monitorResult.reason)
-
-          // Log server error
-          this.logger.error(`Server ${server.serverId}: ${errorMessage}`)
-
-          await this.handleServerError(server, monitorResult.reason, failureState)
-        }
-      }
-
-      this.logger.debug(`Server monitoring completed`, {
-        scheduleId: context.schedule.id,
-        totalServers: servers.length,
-        monitored: serversToMonitor.length,
-        successful: successCount,
-        errors: errorCount,
-        skipped: skippedCount,
-      })
-
-      return {
-        serversProcessed: serversToMonitor.length,
-        commandsSent: successCount,
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      this.logger.error(`Server monitoring execution failed: ${errorMessage}`, {
-        scheduleId: context.schedule.id,
-        error: errorMessage,
-      })
-
-      return {
-        serversProcessed: 0,
-        commandsSent: 0,
-      }
+    const failureState = this.retryCalculator.getFailureState(server.serverId)
+    if (!this.retryCalculator.shouldRetry(failureState)) {
+      this.logger.debug(`Skipped server ${server.serverId} in backoff period`)
+      return { serversProcessed: 0, commandsSent: 0 }
     }
-  }
 
-  /**
-   * Discover active servers that need monitoring
-   */
-  private async discoverActiveServers(): Promise<ServerInfo[]> {
-    // Get servers with recent events and RCON credentials
-    const recentlyActiveServers = await this.serverService.findActiveServersWithRcon()
-    return recentlyActiveServers
+    try {
+      await this.monitorSingleServer(server)
+      this.retryCalculator.resetFailureState(server.serverId)
+      return { serversProcessed: 1, commandsSent: 1 }
+    } catch (error) {
+      const newFailureState = this.retryCalculator.recordFailure(server.serverId)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      this.logger.error(`Server ${server.serverId}: ${errorMessage}`)
+      await this.handleServerError(server, error, newFailureState)
+      return { serversProcessed: 1, commandsSent: 0 }
+    }
   }
 
   /**

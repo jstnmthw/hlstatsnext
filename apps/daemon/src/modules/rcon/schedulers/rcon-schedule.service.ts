@@ -361,11 +361,7 @@ export class RconScheduleService implements IRconScheduleService {
   }
 
   private initializeExecutors(): void {
-    const messageCommand = new ServerMessageCommand(
-      this.logger,
-      this.rconService,
-      this.serverService,
-    )
+    const messageCommand = new ServerMessageCommand(this.logger, this.rconService)
 
     for (const type of ["hlx_csay", "hlx_tsay", "hlx_typehud"]) {
       this.executors.set(type, messageCommand)

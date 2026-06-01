@@ -8,7 +8,6 @@
  *   - "hlx_typehud" → hlx_typehud <color> <message> (typewriter HUD)
  */
 
-import type { IServerService } from "@/modules/server/server.types"
 import type { ILogger } from "@/shared/utils/logger.types"
 import type { IRconService } from "../../types/rcon.types"
 import type { ScheduledCommand, ScheduleExecutionContext } from "../../types/schedule.types"
@@ -21,11 +20,7 @@ const VALID_TYPES = new Set(["hlx_csay", "hlx_tsay", "hlx_typehud"])
  * Server message command executor for scheduled announcements
  */
 export class ServerMessageCommand extends BaseScheduledCommand {
-  constructor(
-    logger: ILogger,
-    rconService: IRconService,
-    private readonly serverService: IServerService,
-  ) {
+  constructor(logger: ILogger, rconService: IRconService) {
     super(logger, rconService)
   }
 
@@ -37,7 +32,7 @@ export class ServerMessageCommand extends BaseScheduledCommand {
     serversProcessed: number
     commandsSent: number
   }> {
-    const { schedule } = context
+    const { schedule, server } = context
 
     const rconCommand = this.buildRconCommand(schedule)
     if (!rconCommand) {
@@ -45,42 +40,29 @@ export class ServerMessageCommand extends BaseScheduledCommand {
       return { serversProcessed: 0, commandsSent: 0 }
     }
 
-    const servers = await this.serverService.findActiveServersWithRcon()
-    if (servers.length === 0) {
-      this.logger.info("No active servers found for message command execution")
+    if (!this.rconService.isConnected(server.serverId)) {
+      this.logger.debug(`RCON not connected for server ${server.serverId}, skipping`)
       return { serversProcessed: 0, commandsSent: 0 }
     }
 
-    let serversProcessed = 0
-    let commandsSent = 0
+    try {
+      const processedCommand = this.replacePlaceholders(rconCommand, server)
+      await this.rconService.executeCommand(server.serverId, processedCommand)
 
-    for (const server of servers) {
-      try {
-        if (!this.rconService.isConnected(server.serverId)) {
-          this.logger.debug(`RCON not connected for server ${server.serverId}, skipping`)
-          continue
-        }
+      this.logger.info("Server message delivered successfully", {
+        scheduleId: schedule.id,
+        serverId: server.serverId,
+        command: processedCommand,
+      })
 
-        const processedCommand = this.replacePlaceholders(rconCommand, server)
-        await this.rconService.executeCommand(server.serverId, processedCommand)
-        commandsSent++
-        serversProcessed++
-
-        this.logger.info("Server message delivered successfully", {
-          scheduleId: schedule.id,
-          serverId: server.serverId,
-          command: processedCommand,
-        })
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error)
-        this.logger.warn(
-          `Failed to execute message command on server ${server.serverId}: ${errorMessage}`,
-        )
-        serversProcessed++
-      }
+      return { serversProcessed: 1, commandsSent: 1 }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      this.logger.warn(
+        `Failed to execute message command on server ${server.serverId}: ${errorMessage}`,
+      )
+      return { serversProcessed: 1, commandsSent: 0 }
     }
-
-    return { serversProcessed, commandsSent }
   }
 
   protected async validateCommand(schedule: ScheduledCommand): Promise<boolean> {

@@ -4,6 +4,7 @@
  * Provides interfaces and types for scheduled RCON command execution.
  */
 
+import type { ServerInfo } from "@/modules/server/server.types"
 import type { ScheduledTask } from "node-cron"
 
 // Core Schedule Types
@@ -100,6 +101,11 @@ export interface ScheduleExecutionContext {
 
   /** The scheduled command being executed */
   schedule: ScheduledCommand
+
+  /** The single server this execution targets. The executor fans out across
+   * servers and invokes the command once per server — commands must act only
+   * on this server, never re-discover the full server list. */
+  server: ServerInfo
 
   /** When execution started */
   startTime: Date

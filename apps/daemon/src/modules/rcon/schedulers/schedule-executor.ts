@@ -120,6 +120,7 @@ export class ScheduleExecutor {
         scheduleId: schedule.id,
         executionId,
         schedule,
+        server,
         startTime: new Date(),
       }
 

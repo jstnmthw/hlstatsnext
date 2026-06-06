@@ -44,8 +44,8 @@ No. The single `IgnoreBots` switch collapsed persistence + scoring + display tog
 - [ ] **No `MinPlayers` anti-boosting gate in the pipeline** — HLstatsX discarded frags below a trackable-player threshold; we have no equivalent, so even human-vs-human kills on a near-empty (or bot-stuffed) server inflate ranks.
       **Fix:** Consider a `MinPlayers` server config checked at the top of the frag/action handlers, counting trackable (non-bot, when `IgnoreBots=on`) players. Complementary to the Phase 1 fix, not a replacement.
 
-- [ ] **Bots are created as first-class `Player` rows with synthetic IDs** (`simple-player-resolver.service.ts` → `BOT_<serverId>_<name>`) regardless of `IgnoreBots`. Once Phase 1 lands these rows stop being created while `IgnoreBots=on`, but any rows already written persist and leak onto leaderboards.
-      **Fix:** Plan a one-off cleanup/migration for existing `BOT_*` `Player` rows, and (see Phase 3) add a durable marker so they can be excluded by query rather than by string-matching the unique id.
+- [x] **Bots are created as first-class `Player` rows with synthetic IDs** (`simple-player-resolver.service.ts` → `BOT_<serverId>_<name>`) regardless of `IgnoreBots`. Once Phase 1 lands these rows stop being created while `IgnoreBots=on`. **FIXED 2026-06-06** (durable `isBot` marker).
+      **Fix applied:** Added the `isBot` column (Phase 3) so bots are a queryable fact rather than a `BOT_`-prefix string match. New rows are flagged at creation. No backfill of pre-existing rows — this is a dev DB that gets reset, so a `db:push --force-reset` + reseed clears stale bot rows.
 
 ---
 
@@ -53,11 +53,14 @@ No. The single `IgnoreBots` switch collapsed persistence + scoring + display tog
 
 These are the choices behind questions **A** and **B**. The key framing: **persistence, scoring, and display are three separate concerns** that HLstatsX fused into one switch. Hiding bots on the frontend does **not** fix skill-farming — if a bot kill changes a human's `skill`, the human's rank is already wrong whether or not the bot is visible. So decide scoring first, display second.
 
-- [ ] **Add `isBot Boolean @default(false)` to `Player`** (and set it on creation in `simple-player-resolver.service.ts`).
-      **Why:** Makes "is this a bot" a queryable fact instead of a fragile `BOT_`-prefix string match, so every consumer (leaderboards, admin, aggregates) can exclude bots consistently and server-side.
+- [x] **Add `isBot Boolean @default(false)` to `Player`** (and set it on creation). **FIXED 2026-06-06.**
+      **Fix applied:** Added `isBot Boolean @default(false) @map("is_bot")` to `Player` plus a `@@index([isBot, skill])` for the humans-only leaderboard. Both creation paths (`PlayerService` and `SimplePlayerResolverService`) already derive `isBot`; it's now threaded through `PlayerCreateData` into `upsertPlayer`'s `create` and `update` (self-healing) blocks. Exposed as `isBot` on the GraphQL `Player` object so admin UIs can label bots.
 
-- [ ] **Filter bots at the API/query layer, not the frontend.** `findManyPlayer` (`apps/web/.../player-queries.ts`, and any public leaderboard query) currently has no bot exclusion.
-      **Why:** Frontend-only filtering leaks via direct API access, breaks pagination counts, and must be re-implemented per view. A default `where: { isBot: false }` (or a resolver-level default) enforces it once.
+- [x] **Hide bots on the public leaderboard, default-on and toggleable.** **FIXED 2026-06-06** (frontend default filter, not API gating).
+      **Decision:** Bot visibility isn't sensitive enough to warrant server-side session gating (the earlier `handleResolver` approach was reverted as over-engineering). Bots are hidden _by default_ via a query-layer `where: { isBot: { equals: false } }` passed from the web, with maximum flexibility to opt back in. This is purely cosmetic — Phase 1 already handles the integrity concern (when `IgnoreBots=on` nothing is tracked; when off, bots are tracked and _do_ move skill, which is intended).
+      **Fix applied:** Exposed `isBot` on the GraphQL `Player` object. Added `withHumanFilter(where, showBots)` in `apps/web/.../players/graphql/player-queries.ts`. The public players page (`app/(public)/players/page.tsx`) applies it to the list + count queries, hiding bots unless `?showBots=true`. The homepage `TopPlayers` widget always hides bots. The filter rides the existing loose `WhereFilter` type, so the web typechecks without regen.
+      **Tradeoff (accepted):** a direct API caller that omits the filter still sees bots — fine, since showing bots publicly "is not a big deal."
+      **Manual step (live stack):** `pnpm -F @repo/db db:push` to add the `is_bot` column (required before the `where: { isBot }` filter resolves at runtime). Optional: `pnpm codegen` (API up) to surface `isBot` in `apps/web`'s strict generated types.
 
 - [ ] **If you want bots tracked when `IgnoreBots=off` (option B's "track but don't show"):** keep scoring **human-only** by excluding bot-involved frags from the _skill exchange_ while still recording the bot's raw kill/death counts, OR score bots fully but hide them by `isBot`. Recommend the latter only for game modes where bot stats are meaningful (the L4D precedent). For competitive CS-style servers, prefer the strict HLstatsX behavior (Phase 1) and treat "track bots" as an explicit opt-in per server.
 
@@ -68,10 +71,10 @@ These are the choices behind questions **A** and **B**. The key framing: **persi
 ## Recommendation (what I'd ship)
 
 1. **Now (correctness):** Phase 1 — make `IgnoreBots` gate scoring exactly like HLstatsX (discard the whole frag when either side is a bot). This stops rank farming and stops bot `Player` rows from being created. Fastest path to "behaves like people expect."
-2. **Next (hygiene):** Phase 3's `isBot` flag + server-side leaderboard filter + cleanup of existing `BOT_*` rows. This is what lets you safely answer "keep all and filter" — but enforced in the API, not the browser.
+2. **Next (hygiene):** Phase 3's `isBot` flag + a default-on bot filter on the public leaderboard. Shipped as a frontend default (`where: { isBot: false }`, toggleable via `?showBots=true`) rather than server-side gating — bot visibility isn't sensitive, so the simpler approach won.
 3. **Later (optional product features):** `MinPlayers` anti-boost gate, weighted `BotSkillWeight`, and a per-server "track bots" opt-in for casual/co-op modes. Only build these if a use case appears; HLstatsX shipped fine without weighting.
 
-**On "keep all and filter on frontend?"** — No. Keep all only if you also stop bot kills from moving human skill (otherwise the data is already corrupt), and filter at the **query layer** keyed on a real `isBot` column. Frontend filtering alone solves the cosmetic problem and none of the integrity problem.
+**On "keep all and filter on frontend?"** — Yes, _now that Phase 1 exists_. The integrity problem (bot kills moving human skill) is settled separately: when `IgnoreBots=on` nothing is tracked, and when off, bots affecting skill is intended. That leaves display as a pure cosmetic choice, so a default-on frontend filter keyed on the real `isBot` column is the right tool — exactly what shipped. Filtering on the frontend would have been wrong _only_ if it were the sole defense against farming; it isn't.
 
 ---
 

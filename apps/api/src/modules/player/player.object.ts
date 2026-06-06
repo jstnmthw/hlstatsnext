@@ -89,6 +89,7 @@ builder.prismaObject("Player", {
     // Misc
     mmrank: t.exposeInt("mmrank", { nullable: true }),
     createdAt: t.expose("createdAt", { type: "DateTime", nullable: true }),
+    isBot: t.exposeBoolean("isBot"),
 
     // Relations
     countryData: t.relation("countryData", { nullable: true }),

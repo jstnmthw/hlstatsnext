@@ -51,6 +51,7 @@ function createMockPlayer(overrides: Partial<Player> = {}): Player {
     blockAvatar: 0,
     mmrank: null,
     createdAt: new Date(),
+    isBot: false,
     ...overrides,
   }
 }
@@ -299,6 +300,7 @@ describe("PlayerRepository", () => {
           player: {
             update: {
               lastName: playerData.lastName,
+              isBot: false,
             },
           },
         },
@@ -310,6 +312,7 @@ describe("PlayerRepository", () => {
               lastName: playerData.lastName,
               game: playerData.game,
               skill: playerData.skill,
+              isBot: false,
               createdAt: expect.any(Date),
             },
           },
@@ -318,6 +321,37 @@ describe("PlayerRepository", () => {
           player: true,
         },
       })
+    })
+
+    it("should persist isBot=true when creating a bot player", async () => {
+      const playerData = {
+        lastName: "Bot Bob",
+        game: "csgo",
+        steamId: "BOT_3_BotBob",
+        skill: 1000,
+        isBot: true,
+      }
+
+      const mockCreatedPlayer = createMockPlayer({ playerId: 7, ...playerData })
+      const mockUpsertResult = {
+        player: mockCreatedPlayer,
+        uniqueId: playerData.steamId,
+        game: playerData.game,
+        playerId: mockCreatedPlayer.playerId,
+        merge: null,
+      }
+      mockDatabase.mockPrisma.playerUniqueId.upsert.mockResolvedValue(mockUpsertResult)
+
+      await playerRepository.upsertPlayer(playerData)
+
+      expect(mockDatabase.mockPrisma.playerUniqueId.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          update: { player: { update: expect.objectContaining({ isBot: true }) } },
+          create: expect.objectContaining({
+            player: { create: expect.objectContaining({ isBot: true }) },
+          }),
+        }),
+      )
     })
 
     it("should return existing player when one exists", async () => {

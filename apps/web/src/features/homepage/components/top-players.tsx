@@ -1,3 +1,4 @@
+import type { WhereFilter } from "@/features/common/graphql/pagination"
 import { GET_PUBLIC_PLAYERS_WITH_PAGINATION } from "@/features/players/graphql/player-queries"
 import { query } from "@/lib/apollo-client"
 import { SortOrder } from "@/lib/gql/graphql"
@@ -8,11 +9,14 @@ import { ComponentProps } from "react"
 const trophyColors = ["text-amber-400", "text-zinc-400", "text-amber-700"] as const
 
 export async function TopPlayers({ className, ...props }: ComponentProps<"div">) {
+  // Top-players is a fixed widget, so bots are always hidden (no toggle).
+  const where: WhereFilter = { isBot: { equals: false } }
   const { data } = await query({
     query: GET_PUBLIC_PLAYERS_WITH_PAGINATION,
     variables: {
       take: 5,
       orderBy: [{ skill: SortOrder.Desc }],
+      where,
     },
   })
 

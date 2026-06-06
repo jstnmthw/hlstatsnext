@@ -13,6 +13,7 @@ import { PlayersTable } from "@/features/players/components/players-table"
 import {
   GET_PUBLIC_PLAYER_COUNT,
   GET_PUBLIC_PLAYERS_WITH_PAGINATION,
+  withHumanFilter,
 } from "@/features/players/graphql/player-queries"
 import { query } from "@/lib/apollo-client"
 
@@ -40,8 +41,19 @@ export default async function PlayersPage(props: PlayersPageProps) {
     playerPageTableConfig.filters,
   )
 
-  const queryVariables = buildPaginationVariables(params, playerPageTableConfig.searchFields)
-  const countVariables = buildCountVariables(params, playerPageTableConfig.searchFields)
+  const baseQueryVariables = buildPaginationVariables(params, playerPageTableConfig.searchFields)
+  const baseCountVariables = buildCountVariables(params, playerPageTableConfig.searchFields)
+
+  // Hide bots by default; ?showBots=true opts back in.
+  const showBots = searchParams.showBots === "true"
+  const queryVariables = {
+    ...baseQueryVariables,
+    where: withHumanFilter(baseQueryVariables.where, showBots),
+  }
+  const countVariables = {
+    ...baseCountVariables,
+    where: withHumanFilter(baseCountVariables.where, showBots),
+  }
 
   const { data } = await query({
     query: GET_PUBLIC_PLAYERS_WITH_PAGINATION,

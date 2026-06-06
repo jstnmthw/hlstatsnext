@@ -204,6 +204,7 @@ export interface PlayerCreateData {
   game: string
   skill?: number
   steamId: string
+  isBot?: boolean
 }
 
 export interface SkillRating {

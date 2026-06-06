@@ -43,6 +43,7 @@ export class SimplePlayerResolverService implements IPlayerResolver {
         lastName: normalizedName,
         game,
         steamId: effectiveId,
+        isBot,
       })
 
       this.logger.debug(

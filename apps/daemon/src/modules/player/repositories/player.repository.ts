@@ -138,6 +138,9 @@ export class PlayerRepository extends BatchedRepository<Player> implements IPlay
             player: {
               update: {
                 lastName: data.lastName,
+                // Self-heal the flag in case a row predates isBot or was created
+                // before the bot was recognized; the identity never changes type.
+                isBot: data.isBot ?? false,
               },
             },
           },
@@ -149,6 +152,7 @@ export class PlayerRepository extends BatchedRepository<Player> implements IPlay
                 lastName: data.lastName,
                 game: data.game,
                 skill: data.skill || 1000,
+                isBot: data.isBot ?? false,
                 createdAt: new Date(),
               },
             },

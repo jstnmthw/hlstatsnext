@@ -852,6 +852,7 @@ describe("PlayerService", () => {
         game,
         skill: 1000, // DEFAULT_RATING
         steamId,
+        isBot: false,
       })
     })
 
@@ -902,6 +903,7 @@ describe("PlayerService", () => {
         game,
         skill: 1000,
         steamId: "BOT_5_TestBot", // Should use server-specific format with original name
+        isBot: true,
       })
     })
 
@@ -923,6 +925,7 @@ describe("PlayerService", () => {
         game,
         skill: 1000,
         steamId: "BOT_0_TestBot", // Should use default server 0
+        isBot: true,
       })
     })
 
@@ -945,6 +948,7 @@ describe("PlayerService", () => {
         game,
         skill: 1000,
         steamId: "76561198000123456", // Should remain unchanged for real players
+        isBot: false,
       })
     })
   })

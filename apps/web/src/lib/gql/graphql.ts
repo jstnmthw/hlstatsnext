@@ -13817,6 +13817,7 @@ export type Player = {
   hideRanking?: Maybe<Scalars['Int']['output']>;
   history?: Maybe<Array<PlayerHistory>>;
   hits?: Maybe<Scalars['Int']['output']>;
+  isBot?: Maybe<Scalars['Boolean']['output']>;
   killStreak?: Maybe<Scalars['Int']['output']>;
   kills?: Maybe<Scalars['Int']['output']>;
   lastAddress?: Maybe<Scalars['String']['output']>;
@@ -14206,6 +14207,7 @@ export type PlayerCountOrderByAggregateInput = {
   headshots?: InputMaybe<SortOrder>;
   hideRanking?: InputMaybe<SortOrder>;
   hits?: InputMaybe<SortOrder>;
+  isBot?: InputMaybe<SortOrder>;
   killStreak?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
   lastEvent?: InputMaybe<SortOrder>;
@@ -14246,6 +14248,7 @@ export type PlayerCreateInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14288,6 +14291,7 @@ export type PlayerCreateManyClanInput = {
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14322,6 +14326,7 @@ export type PlayerCreateManyCountryDataInput = {
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14356,6 +14361,7 @@ export type PlayerCreateManyGameDataInput = {
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14391,6 +14397,7 @@ export type PlayerCreateManyInput = {
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14730,6 +14737,7 @@ export type PlayerCreateWithoutAwardsInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14782,6 +14790,7 @@ export type PlayerCreateWithoutAwardsWonAsDWinnerInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14834,6 +14843,7 @@ export type PlayerCreateWithoutAwardsWonAsGWinnerInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14886,6 +14896,7 @@ export type PlayerCreateWithoutChatsInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14938,6 +14949,7 @@ export type PlayerCreateWithoutClanInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14990,6 +15002,7 @@ export type PlayerCreateWithoutConnectsInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15042,6 +15055,7 @@ export type PlayerCreateWithoutCountryDataInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15094,6 +15108,7 @@ export type PlayerCreateWithoutDisconnectsInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15146,6 +15161,7 @@ export type PlayerCreateWithoutEntriesInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15198,6 +15214,7 @@ export type PlayerCreateWithoutFragsAsKillerInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15250,6 +15267,7 @@ export type PlayerCreateWithoutFragsAsVictimInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15302,6 +15320,7 @@ export type PlayerCreateWithoutGameDataInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15354,6 +15373,7 @@ export type PlayerCreateWithoutHistoryInput = {
   headshots?: InputMaybe<Scalars['Int']['input']>;
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15407,6 +15427,7 @@ export type PlayerCreateWithoutLatencyEventsInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15459,6 +15480,7 @@ export type PlayerCreateWithoutNameChangesInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15511,6 +15533,7 @@ export type PlayerCreateWithoutNamesInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15563,6 +15586,7 @@ export type PlayerCreateWithoutPlayerActionsInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15615,6 +15639,7 @@ export type PlayerCreateWithoutPlayerPlayerActionsAsActorInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15667,6 +15692,7 @@ export type PlayerCreateWithoutPlayerPlayerActionsAsVictimInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15719,6 +15745,7 @@ export type PlayerCreateWithoutRibbonsInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15771,6 +15798,7 @@ export type PlayerCreateWithoutRoleChangesInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15823,6 +15851,7 @@ export type PlayerCreateWithoutSuicideEventsInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15875,6 +15904,7 @@ export type PlayerCreateWithoutTeamBonusesInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15927,6 +15957,7 @@ export type PlayerCreateWithoutTeamChangesInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15979,6 +16010,7 @@ export type PlayerCreateWithoutTeamkillsAsKillerInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -16031,6 +16063,7 @@ export type PlayerCreateWithoutTeamkillsAsVictimInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -16083,6 +16116,7 @@ export type PlayerCreateWithoutUniqueIdsInput = {
   hideRanking?: InputMaybe<Scalars['Int']['input']>;
   history?: InputMaybe<PlayerHistoryCreateNestedManyWithoutPlayerInput>;
   hits?: InputMaybe<Scalars['Int']['input']>;
+  isBot?: InputMaybe<Scalars['Boolean']['input']>;
   killStreak?: InputMaybe<Scalars['Int']['input']>;
   kills?: InputMaybe<Scalars['Int']['input']>;
   lastEvent?: InputMaybe<Scalars['DateTime']['input']>;
@@ -16580,6 +16614,7 @@ export type PlayerMaxOrderByAggregateInput = {
   headshots?: InputMaybe<SortOrder>;
   hideRanking?: InputMaybe<SortOrder>;
   hits?: InputMaybe<SortOrder>;
+  isBot?: InputMaybe<SortOrder>;
   killStreak?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
   lastEvent?: InputMaybe<SortOrder>;
@@ -16610,6 +16645,7 @@ export type PlayerMinOrderByAggregateInput = {
   headshots?: InputMaybe<SortOrder>;
   hideRanking?: InputMaybe<SortOrder>;
   hits?: InputMaybe<SortOrder>;
+  isBot?: InputMaybe<SortOrder>;
   killStreak?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
   lastEvent?: InputMaybe<SortOrder>;
@@ -17040,6 +17076,7 @@ export type PlayerOrderByWithAggregationInput = {
   headshots?: InputMaybe<SortOrder>;
   hideRanking?: InputMaybe<SortOrder>;
   hits?: InputMaybe<SortOrder>;
+  isBot?: InputMaybe<SortOrder>;
   killStreak?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
   lastEvent?: InputMaybe<SortOrder>;
@@ -17084,6 +17121,7 @@ export type PlayerOrderByWithRelationInput = {
   hideRanking?: InputMaybe<SortOrder>;
   history?: InputMaybe<PlayerHistoryOrderByRelationAggregateInput>;
   hits?: InputMaybe<SortOrder>;
+  isBot?: InputMaybe<SortOrder>;
   killStreak?: InputMaybe<SortOrder>;
   kills?: InputMaybe<SortOrder>;
   lastEvent?: InputMaybe<SortOrder>;
@@ -17406,6 +17444,7 @@ export enum PlayerScalarFieldEnum {
   Headshots = 'headshots',
   HideRanking = 'hideRanking',
   Hits = 'hits',
+  IsBot = 'isBot',
   KillStreak = 'killStreak',
   Kills = 'kills',
   LastAddress = 'lastAddress',
@@ -17447,6 +17486,7 @@ export type PlayerScalarWhereInput = {
   headshots?: InputMaybe<IntFilter>;
   hideRanking?: InputMaybe<IntFilter>;
   hits?: InputMaybe<IntFilter>;
+  isBot?: InputMaybe<BoolFilter>;
   killStreak?: InputMaybe<IntFilter>;
   kills?: InputMaybe<IntFilter>;
   lastEvent?: InputMaybe<DateTimeNullableFilter>;
@@ -17480,6 +17520,7 @@ export type PlayerScalarWhereWithAggregatesInput = {
   headshots?: InputMaybe<IntWithAggregatesFilter>;
   hideRanking?: InputMaybe<IntWithAggregatesFilter>;
   hits?: InputMaybe<IntWithAggregatesFilter>;
+  isBot?: InputMaybe<BoolWithAggregatesFilter>;
   killStreak?: InputMaybe<IntWithAggregatesFilter>;
   kills?: InputMaybe<IntWithAggregatesFilter>;
   lastEvent?: InputMaybe<DateTimeNullableWithAggregatesFilter>;
@@ -17795,6 +17836,7 @@ export type PlayerUpdateInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -17835,6 +17877,7 @@ export type PlayerUpdateManyMutationInput = {
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18261,6 +18304,7 @@ export type PlayerUpdateWithoutAwardsInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18313,6 +18357,7 @@ export type PlayerUpdateWithoutAwardsWonAsDWinnerInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18365,6 +18410,7 @@ export type PlayerUpdateWithoutAwardsWonAsGWinnerInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18417,6 +18463,7 @@ export type PlayerUpdateWithoutChatsInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18469,6 +18516,7 @@ export type PlayerUpdateWithoutClanInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18521,6 +18569,7 @@ export type PlayerUpdateWithoutConnectsInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18573,6 +18622,7 @@ export type PlayerUpdateWithoutCountryDataInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18625,6 +18675,7 @@ export type PlayerUpdateWithoutDisconnectsInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18677,6 +18728,7 @@ export type PlayerUpdateWithoutEntriesInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18729,6 +18781,7 @@ export type PlayerUpdateWithoutFragsAsKillerInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18781,6 +18834,7 @@ export type PlayerUpdateWithoutFragsAsVictimInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18833,6 +18887,7 @@ export type PlayerUpdateWithoutGameDataInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18885,6 +18940,7 @@ export type PlayerUpdateWithoutHistoryInput = {
   headshots?: InputMaybe<IntFieldUpdateOperationsInput>;
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18938,6 +18994,7 @@ export type PlayerUpdateWithoutLatencyEventsInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -18990,6 +19047,7 @@ export type PlayerUpdateWithoutNameChangesInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19042,6 +19100,7 @@ export type PlayerUpdateWithoutNamesInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19094,6 +19153,7 @@ export type PlayerUpdateWithoutPlayerActionsInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19146,6 +19206,7 @@ export type PlayerUpdateWithoutPlayerPlayerActionsAsActorInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19198,6 +19259,7 @@ export type PlayerUpdateWithoutPlayerPlayerActionsAsVictimInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19250,6 +19312,7 @@ export type PlayerUpdateWithoutRibbonsInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19302,6 +19365,7 @@ export type PlayerUpdateWithoutRoleChangesInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19354,6 +19418,7 @@ export type PlayerUpdateWithoutSuicideEventsInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19406,6 +19471,7 @@ export type PlayerUpdateWithoutTeamBonusesInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19458,6 +19524,7 @@ export type PlayerUpdateWithoutTeamChangesInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19510,6 +19577,7 @@ export type PlayerUpdateWithoutTeamkillsAsKillerInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19562,6 +19630,7 @@ export type PlayerUpdateWithoutTeamkillsAsVictimInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19614,6 +19683,7 @@ export type PlayerUpdateWithoutUniqueIdsInput = {
   hideRanking?: InputMaybe<IntFieldUpdateOperationsInput>;
   history?: InputMaybe<PlayerHistoryUpdateManyWithoutPlayerNestedInput>;
   hits?: InputMaybe<IntFieldUpdateOperationsInput>;
+  isBot?: InputMaybe<BoolFieldUpdateOperationsInput>;
   killStreak?: InputMaybe<IntFieldUpdateOperationsInput>;
   kills?: InputMaybe<IntFieldUpdateOperationsInput>;
   lastEvent?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
@@ -19834,6 +19904,7 @@ export type PlayerWhereInput = {
   hideRanking?: InputMaybe<IntFilter>;
   history?: InputMaybe<PlayerHistoryListRelationFilter>;
   hits?: InputMaybe<IntFilter>;
+  isBot?: InputMaybe<BoolFilter>;
   killStreak?: InputMaybe<IntFilter>;
   kills?: InputMaybe<IntFilter>;
   lastEvent?: InputMaybe<DateTimeNullableFilter>;
@@ -19894,6 +19965,7 @@ export type PlayerWhereUniqueInput = {
   hideRanking?: InputMaybe<IntFilter>;
   history?: InputMaybe<PlayerHistoryListRelationFilter>;
   hits?: InputMaybe<IntFilter>;
+  isBot?: InputMaybe<BoolFilter>;
   killStreak?: InputMaybe<IntFilter>;
   kills?: InputMaybe<IntFilter>;
   lastEvent?: InputMaybe<DateTimeNullableFilter>;

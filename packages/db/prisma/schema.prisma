@@ -148,6 +148,12 @@ model Player {
   mmrank    Int?      @map("mm_rank") @db.TinyInt // Matchmaking rank
   createdAt DateTime? @map("created_at") @db.DateTime(0)
 
+  // True for game bots (synthetic BOT_<server>_<name> identities). Bots are
+  // tracked and affect skill only when a server's IgnoreBots is off; this flag
+  // lets public leaderboard queries exclude them server-side instead of relying
+  // on the fragile BOT_ uniqueId prefix.
+  isBot Boolean @default(false) @map("is_bot")
+
   // Relationships
   uniqueIds                   PlayerUniqueId[]
   awardsWonAsDWinner          Award[]                   @relation("AwardDWinner")
@@ -185,6 +191,8 @@ model Player {
   @@index([connectionTime], name: "connection_time")
   @@index([skill, kills], name: "skill_kills")
   @@index([game, skill], name: "game_skill")
+  // Serves the public leaderboard: humans only (isBot = 0), ordered by skill.
+  @@index([isBot, skill], name: "isbot_skill")
   @@map("players")
 }
 

@@ -56,6 +56,7 @@ describe("MatchRepository", () => {
       blockAvatar: 0,
       mmrank: null,
       createdAt: new Date(),
+      isBot: false,
       ...overrides,
     }
   }

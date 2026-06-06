@@ -104,7 +104,7 @@ export class PlayerService implements IPlayerService {
     }
 
     // Create new resolution promise and cache it
-    const resolutionPromise = this._performPlayerResolution(effectiveId, playerName, game)
+    const resolutionPromise = this._performPlayerResolution(effectiveId, playerName, game, isBot)
     this.playerResolutionCache.set(cacheKey, resolutionPromise)
 
     try {
@@ -123,6 +123,7 @@ export class PlayerService implements IPlayerService {
     effectiveId: string,
     playerName: string,
     game: string,
+    isBot: boolean,
   ): Promise<number> {
     try {
       // Use database-level upsert to eliminate race conditions
@@ -131,6 +132,7 @@ export class PlayerService implements IPlayerService {
         game,
         skill: this.DEFAULT_RATING,
         steamId: effectiveId,
+        isBot,
       })
 
       this.logger.debug(

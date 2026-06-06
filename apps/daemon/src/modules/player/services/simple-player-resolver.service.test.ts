@@ -58,6 +58,7 @@ describe("SimplePlayerResolverService", () => {
         lastName: "NewPlayer",
         game: "cstrike",
         steamId: "76561197961574371",
+        isBot: false,
       })
     })
 
@@ -90,6 +91,7 @@ describe("SimplePlayerResolverService", () => {
       expect(mockRepository.upsertPlayer).toHaveBeenCalledWith(
         expect.objectContaining({
           steamId: "BOT_5_Expert",
+          isBot: true,
         }),
       )
     })

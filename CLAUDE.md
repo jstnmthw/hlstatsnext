@@ -92,27 +92,28 @@ Run all three after editing `packages/db/prisma/schema.prisma`, custom Pothos ob
 
 ## Output conventions
 
-| Output                                                      | Location                                                                                                                                          |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Implementation plans                                        | `docs/plans/<feature>.md`                                                                                                                         |
-| Audit findings (security, quality, review, daemon, graphql) | `docs/audits/<category>-<target>-<YYYY-MM-DD>.md`                                                                                                 |
-| Architecture / deployment / best-practices docs             | `docs/<TOPIC>.md` (top-level, ALL_CAPS — match the existing convention: `ARCHITECTURE.md`, `BEST_PRACTICES.md`, `PRODUCTION_DEPLOYMENT.md`, etc.) |
+| Output                                                                 | Location                                                                                                                                          |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Implementation plans                                                   | `docs/plans/<feature>.md`                                                                                                                         |
+| Audit findings (security, quality, review, daemon, graphql, dead-code) | `docs/audits/<category>-<target>-<YYYY-MM-DD>.md`                                                                                                 |
+| Architecture / deployment / best-practices docs                        | `docs/<TOPIC>.md` (top-level, ALL_CAPS — match the existing convention: `ARCHITECTURE.md`, `BEST_PRACTICES.md`, `PRODUCTION_DEPLOYMENT.md`, etc.) |
 
 Never silently overwrite a dated file — append a numeric suffix (`-2`, `-3`).
 
 ## Skills available in this project
 
-| Slash                | Purpose                                                          |
-| -------------------- | ---------------------------------------------------------------- |
-| `/plan <feature>`    | Feasibility + phased plan → `docs/plans/`                        |
-| `/execute <plan>`    | Execute a plan phase-by-phase, tick checkboxes                   |
-| `/security <target>` | Web/API/auth/RCON security audit → `docs/audits/security-*`      |
-| `/quality <target>`  | God files, mixed concerns, duplication → `docs/audits/quality-*` |
-| `/review <target>`   | Code review against project conventions → `docs/audits/review-*` |
-| `/doc <target>`      | Generate/update READMEs, ARCHITECTURE, JSDoc                     |
-| `/codegen`           | Run Prisma + GraphQL codegen; detect schema drift                |
-| `/daemon <scope>`    | Memleak + stability audit tuned for the daemon                   |
-| `/graphql <scope>`   | Pothos + Yoga + Apollo security/correctness audit                |
+| Slash                | Purpose                                                             |
+| -------------------- | ------------------------------------------------------------------- |
+| `/plan <feature>`    | Feasibility + phased plan → `docs/plans/`                           |
+| `/execute <plan>`    | Execute a plan phase-by-phase, tick checkboxes                      |
+| `/security <target>` | Web/API/auth/RCON security audit → `docs/audits/security-*`         |
+| `/quality <target>`  | God files, mixed concerns, duplication → `docs/audits/quality-*`    |
+| `/review <target>`   | Code review against project conventions → `docs/audits/review-*`    |
+| `/doc <target>`      | Generate/update READMEs, ARCHITECTURE, JSDoc                        |
+| `/codegen`           | Run Prisma + GraphQL codegen; detect schema drift                   |
+| `/daemon <scope>`    | Memleak + stability audit tuned for the daemon                      |
+| `/graphql <scope>`   | Pothos + Yoga + Apollo security/correctness audit                   |
+| `/dead-code <path>`  | Unused exports, orphan files, dead deps → `docs/audits/dead-code-*` |
 
 ## What NOT to do
 

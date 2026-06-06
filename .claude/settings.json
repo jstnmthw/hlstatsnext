@@ -1,40 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "permissions": {
-    "allow": [
-      "Bash(ls:*)",
-      "Bash(find:*)",
-      "Bash(pnpm:*)",
-      "Bash(pnpm exec prettier:*)",
-      "Bash(npx vitest:*)",
-      "Bash(npx tsc:*)",
-      "Bash(jq:*)",
-      "Bash(git status:*)",
-      "Bash(git branch:*)",
-      "Bash(git diff:*)",
-      "Bash(git log:*)",
-      "Bash(git rev-list:*)",
-      "Bash(git rev-parse:*)",
-      "Bash(git show:*)",
-      "Bash(turbo:*)",
-      "Bash(docker exec:*)",
-      "Bash(docker ps:*)",
-      "Bash(docker logs:*)",
-      "Bash(docker compose:*)",
-      "Bash(make:*)",
-      "Skill(plan)",
-      "Skill(execute)",
-      "Skill(security)",
-      "Skill(quality)",
-      "Skill(review)",
-      "Skill(doc)",
-      "Skill(codegen)",
-      "Skill(daemon)",
-      "Skill(graphql)",
-      "mcp__ide__getDiagnostics"
-    ],
-    "deny": []
-  },
   "hooks": {
     "SessionStart": [
       {

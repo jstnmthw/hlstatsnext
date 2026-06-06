@@ -55,18 +55,18 @@ All four are declared in `turbo.json#globalEnv` so Turbo's cache invalidates cor
 
 A small table of "if I see series X, where did it come from?" — useful when a panel is empty.
 
-| Series prefix / name                                                                                            | Origin                                                      | Scrape target               |
-| --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | --------------------------- |
-| `process_*`, `nodejs_*`                                                                                         | `prom-client` default metrics (API only)                    | `host.docker.internal:9092` |
-| `process_resident_memory_bytes`, `process_heap_bytes`, `process_uptime_seconds`                                 | Homegrown `PrometheusMetricsExporter` (daemon)              | `host.docker.internal:9091` |
-| `graphql_envelop_*`                                                                                             | `@envelop/prometheus` (API)                                 | `host.docker.internal:9092` |
-| `events_processed_total`, `event_processing_duration_seconds`                                                   | Daemon event handler completion (application-level)         | `host.docker.internal:9091` |
-| `udp_packets_dropped_total`                                                                                     | Daemon ingress                                              | `host.docker.internal:9091` |
-| `active_players_count`, `active_bots_count`                                                                     | Daemon gauge interval (15 s)                                | `host.docker.internal:9091` |
-| `daemon_rabbitmq_events_lost_on_publish_blocked`                                                                | Daemon publisher when broker is in flow control             | `host.docker.internal:9091` |
-| `daemon_rabbitmq_dead_letter_messages_total`                                                                    | Daemon DLX consumer                                         | `host.docker.internal:9091` |
-| `prisma_queries_total`, `prisma_query_duration_ms`, `database_queries_total`, `database_query_duration_seconds` | Daemon Prisma metrics extension (`createPrismaWithMetrics`) | `host.docker.internal:9091` |
-| `rabbitmq_*` (incl. `rabbitmq_queue_messages_ready`, `rabbitmq_channel_*`)                                      | `rabbitmq_prometheus` broker plugin                         | `rabbitmq:15692`            |
+| Series prefix / name                                                                            | Origin                                                      | Scrape target               |
+| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | --------------------------- |
+| `process_*`, `nodejs_*`                                                                         | `prom-client` default metrics (API only)                    | `host.docker.internal:9092` |
+| `process_resident_memory_bytes`, `process_heap_bytes`, `process_uptime_seconds`                 | Homegrown `PrometheusMetricsExporter` (daemon)              | `host.docker.internal:9091` |
+| `graphql_envelop_*`                                                                             | `@envelop/prometheus` (API)                                 | `host.docker.internal:9092` |
+| `events_processed_total`, `event_processing_duration_seconds`                                   | Daemon event handler completion (application-level)         | `host.docker.internal:9091` |
+| `udp_packets_dropped_total`                                                                     | Daemon ingress                                              | `host.docker.internal:9091` |
+| `active_players_count`, `active_bots_count`                                                     | Daemon gauge interval (15 s)                                | `host.docker.internal:9091` |
+| `daemon_rabbitmq_events_lost_on_publish_blocked`                                                | Daemon publisher when broker is in flow control             | `host.docker.internal:9091` |
+| `daemon_rabbitmq_dead_letter_messages_total`                                                    | Daemon DLX consumer                                         | `host.docker.internal:9091` |
+| `database_queries_total`, `database_query_duration_seconds` (labelled by `operation` + `table`) | Daemon Prisma metrics extension (`createPrismaWithMetrics`) | `host.docker.internal:9091` |
+| `rabbitmq_*` (incl. `rabbitmq_queue_messages_ready`, `rabbitmq_channel_*`)                      | `rabbitmq_prometheus` broker plugin                         | `rabbitmq:15692`            |
 
 ### Why two RabbitMQ sources?
 
@@ -87,7 +87,9 @@ rate(rabbitmq_channel_messages_published_total[5m])
 
 ## Why the custom Prisma extension is still in use
 
-Prisma 5+ briefly exposed `client.$metrics.prometheus()` natively. **Prisma 7 removed that API.** Until upstream restores it (or a community `@prisma/extension-metrics` lands), we keep the homegrown `createPrismaWithMetrics` extension in `packages/observability/`. It records `prisma_queries_total`, `prisma_query_duration_ms`, and feeds `database_queries_total` / `database_query_duration_seconds` into the same exporter. Pool stats are not currently available from Prisma 7 at all.
+Prisma 5+ briefly exposed `client.$metrics.prometheus()` natively. **Prisma 7 removed that API.** Until upstream restores it (or a community `@prisma/extension-metrics` lands), we keep the homegrown `createPrismaWithMetrics` extension in `packages/observability/`. It emits `database_queries_total` / `database_query_duration_seconds`, labelled by `operation` (SELECT/INSERT/UPDATE/DELETE) + `table`, and feeds the same data into the `/query-stats` endpoint (p50/p95/p99, slow + failed queries). Pool stats are not available from Prisma 7 at all — use a `mysqld_exporter` (`Threads_connected`/`Threads_running`) if you need connection-pool visibility.
+
+> The extension previously also emitted a parallel `prisma_queries_total` / `prisma_query_duration_ms` family labelled by `model` + `action`. That was dropped — it duplicated `database_*` (model ≈ table) at higher cardinality, and no dashboard or alert consumed it. The `action`-level granularity (e.g. `findUnique` vs `count`) is no longer exported; reconstruct it from query logs if ever needed.
 
 ## Dashboards
 

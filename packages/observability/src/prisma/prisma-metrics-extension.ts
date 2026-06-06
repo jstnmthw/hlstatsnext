@@ -143,22 +143,6 @@ function recordQueryMetrics(info: PrismaQueryInfo, metrics: PrometheusMetricsExp
     success: info.success,
     error: info.error,
   })
-
-  // Also record standard metrics
-  metrics.incrementCounter("prisma_queries_total", {
-    model: info.model,
-    action: info.action,
-    success: info.success.toString(),
-  })
-
-  metrics.recordHistogram(
-    "prisma_query_duration_ms",
-    {
-      model: info.model,
-      action: info.action,
-    },
-    info.duration,
-  )
 }
 
 /**

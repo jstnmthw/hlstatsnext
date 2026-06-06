@@ -103,9 +103,9 @@ describe("createPrismaWithMetrics", () => {
       // Check that metrics were recorded
       const metricsOutput = mockMetrics.exportMetrics()
 
-      expect(metricsOutput).toContain("prisma_queries_total")
-      expect(metricsOutput).toContain('model="User"')
-      expect(metricsOutput).toContain('action="findMany"')
+      expect(metricsOutput).toContain("database_queries_total")
+      expect(metricsOutput).toContain('table="User"')
+      expect(metricsOutput).toContain('operation="SELECT"')
       expect(metricsOutput).toContain('success="true"')
     })
 
@@ -220,7 +220,7 @@ describe("createPrismaWithMetrics", () => {
 
       const metricsOutput = mockMetrics.exportMetrics()
 
-      expect(metricsOutput).toContain('model="unknown"')
+      expect(metricsOutput).toContain('table="unknown"')
     })
   })
 })

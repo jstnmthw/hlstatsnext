@@ -22,9 +22,9 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "eslint": "^9.39.4",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.8"
   }
 }

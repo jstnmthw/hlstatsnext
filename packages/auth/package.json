@@ -16,8 +16,8 @@
   },
   "dependencies": {
     "@repo/db": "workspace:*",
-    "better-auth": "^1.6.11",
-    "resend": "^6.12.3",
+    "better-auth": "^1.6.14",
+    "resend": "^6.12.4",
     "zod": "^4.4.3"
   },
   "peerDependencies": {
@@ -27,11 +27,11 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "@types/react": "19.2.14",
     "eslint": "^9.39.4",
-    "next": "^16.2.6",
-    "react": "^19.2.6",
+    "next": "^16.2.7",
+    "react": "^19.2.7",
     "typescript": "^5.9.3"
   }
 }

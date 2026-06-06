@@ -16,15 +16,15 @@
     "clean": "rm -rf node_modules .next .turbo"
   },
   "dependencies": {
-    "@apollo/client": "^4.2.0",
+    "@apollo/client": "^4.2.2",
     "@apollo/client-integration-nextjs": "^0.14.5",
     "@repo/auth": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tanstack/react-table": "^8.21.3",
-    "graphql": "^16.14.0",
-    "next": "^16.2.6",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "graphql": "^16.14.1",
+    "next": "^16.2.7",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "sonner": "^2.0.7",
     "zod": "^4.4.3"
   },
@@ -38,17 +38,17 @@
     "@repo/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4.3.0",
     "@types/jsdom": "^27.0.0",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "@vitest/coverage-v8": "^4.1.7",
-    "date-fns": "^4.3.0",
+    "@vitest/coverage-v8": "^4.1.8",
+    "date-fns": "^4.4.0",
     "eslint": "^9.39.4",
     "jsdom": "^28.1.0",
     "postcss": "^8.5.15",
     "tailwindcss": "^4.3.0",
-    "tsx": "^4.22.3",
+    "tsx": "^4.22.4",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.8"
   }
 }

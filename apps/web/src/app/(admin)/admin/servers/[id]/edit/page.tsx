@@ -78,6 +78,7 @@ export default async function EditServerPage({ params }: EditServerPageProps) {
                     port: server.port || 27015,
                     game: server.game || "cstrike",
                     publicAddress: server.publicAddress || "",
+                    rconAddress: server.rconAddress || "",
                     statusUrl: server.statusUrl || "",
                     sortOrder: server.sortOrder || 0,
                     mod: currentMod,

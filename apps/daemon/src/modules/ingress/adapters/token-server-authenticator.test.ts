@@ -132,7 +132,7 @@ describe("TokenServerAuthenticator", () => {
             port: 27015,
           },
         },
-        update: { address: "192.168.1.100" },
+        update: {},
         create: {
           address: "192.168.1.100",
           port: 27015,
@@ -217,7 +217,7 @@ describe("TokenServerAuthenticator", () => {
       expect(result).toEqual({ kind: "unauthorized", reason: "rate_limited" })
     })
 
-    it("should update address atomically via upsert when server IP changes", async () => {
+    it("should not overwrite address on re-beacon (learned source IP may be NAT'd)", async () => {
       vi.mocked(mockTokenRepository.findByHash).mockResolvedValue({
         kind: "valid",
         token: mockTokenEntity,
@@ -228,14 +228,15 @@ describe("TokenServerAuthenticator", () => {
       )
       vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(5)
 
-      // Beacon arrives from new Docker IP after container restart
+      // Beacon arrives from a (possibly NAT'd) Docker IP after container restart
       const result = await authenticator.handleBeacon(validToken.raw, 27015, "172.18.0.5", 54321)
 
       expect(result).toEqual({ kind: "authenticated", serverId: 42 })
-      // Upsert's update clause always sets address — atomic and idempotent
+      // Address is best-effort set once at create and not clobbered on re-beacon;
+      // RCON dialing uses the operator-set rconAddress instead.
       expect(mockDatabase.prisma.server.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          update: { address: "172.18.0.5" },
+          update: {},
         }),
       )
     })

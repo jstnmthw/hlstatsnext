@@ -11,6 +11,7 @@ export class ServerRepository {
         name: data.name || "",
         rconPassword: data.rconPassword || "",
         publicAddress: data.publicAddress || "",
+        rconAddress: data.rconAddress || "",
         statusUrl: data.statusUrl,
         sortOrder: data.sortOrder || 0,
       },
@@ -28,6 +29,7 @@ export class ServerRepository {
           name: data.name || "",
           rconPassword: data.rconPassword || "",
           publicAddress: data.publicAddress || "",
+          rconAddress: data.rconAddress || "",
           statusUrl: data.statusUrl,
           sortOrder: data.sortOrder || 0,
         },
@@ -189,6 +191,7 @@ export class ServerRepository {
         port: number
         game: string
         publicAddress: string
+        rconAddress: string
         statusUrl: string | null
         rconPassword: string
         sortOrder: number
@@ -199,6 +202,7 @@ export class ServerRepository {
       if (data.port !== undefined) updateData.port = data.port
       if (data.game !== undefined) updateData.game = data.game
       if (data.publicAddress !== undefined) updateData.publicAddress = data.publicAddress
+      if (data.rconAddress !== undefined) updateData.rconAddress = data.rconAddress
       if (data.statusUrl !== undefined) updateData.statusUrl = data.statusUrl
       if (data.rconPassword !== undefined) updateData.rconPassword = data.rconPassword
       if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder

@@ -17,6 +17,7 @@ interface ServerEditFormProps {
     port: number
     game: string
     publicAddress?: string
+    rconAddress?: string
     statusUrl?: string
     sortOrder: number
     mod: string
@@ -133,6 +134,25 @@ export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
           {state.errors?.publicAddress && (
             <ErrorMessage>{state.errors.publicAddress[0]}</ErrorMessage>
           )}
+        </FormField>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-1">
+        <FormField>
+          <Label htmlFor="rconAddress">RCON Address</Label>
+          <Input
+            id="rconAddress"
+            name="rconAddress"
+            placeholder="Optional RCON host (IP or hostname)"
+            defaultValue={server.rconAddress || ""}
+            maxLength={255}
+          />
+          <p className="text-xs text-muted-foreground">
+            Optional. Where the daemon dials RCON (IP or hostname). Leave blank to use the server
+            address. Set this to the server&apos;s Docker network alias when the daemon and server
+            are on different networks.
+          </p>
+          {state.errors?.rconAddress && <ErrorMessage>{state.errors.rconAddress[0]}</ErrorMessage>}
         </FormField>
       </div>
 

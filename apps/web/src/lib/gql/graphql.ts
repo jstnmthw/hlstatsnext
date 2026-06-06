@@ -2185,6 +2185,7 @@ export type CreateServerInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   port: Scalars['Int']['input'];
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rconPassword: Scalars['String']['input'];
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -22603,6 +22604,7 @@ export type SafeServer = {
   name?: Maybe<Scalars['String']['output']>;
   port?: Maybe<Scalars['Int']['output']>;
   publicAddress?: Maybe<Scalars['String']['output']>;
+  rconAddress?: Maybe<Scalars['String']['output']>;
   serverId?: Maybe<Scalars['Int']['output']>;
   sortOrder?: Maybe<Scalars['Int']['output']>;
   statusUrl?: Maybe<Scalars['String']['output']>;
@@ -22678,6 +22680,7 @@ export type Server = {
   players?: Maybe<Scalars['Int']['output']>;
   port?: Maybe<Scalars['Int']['output']>;
   publicAddress?: Maybe<Scalars['String']['output']>;
+  rconAddress?: Maybe<Scalars['String']['output']>;
   rounds?: Maybe<Scalars['Int']['output']>;
   serverId?: Maybe<Scalars['Int']['output']>;
   sortOrder?: Maybe<Scalars['Int']['output']>;
@@ -23089,6 +23092,7 @@ export type ServerCountOrderByAggregateInput = {
   players?: InputMaybe<SortOrder>;
   port?: InputMaybe<SortOrder>;
   publicAddress?: InputMaybe<SortOrder>;
+  rconAddress?: InputMaybe<SortOrder>;
   rounds?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   sortOrder?: InputMaybe<SortOrder>;
@@ -23150,6 +23154,7 @@ export type ServerCreateInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -23190,6 +23195,7 @@ export type ServerCreateManyAuthTokenInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   serverId?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
@@ -23237,6 +23243,7 @@ export type ServerCreateManyInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   serverId?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
@@ -23518,6 +23525,7 @@ export type ServerCreateWithoutAuthTokenInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -23577,6 +23585,7 @@ export type ServerCreateWithoutConfigsInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -23636,6 +23645,7 @@ export type ServerCreateWithoutEventsAdminInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -23695,6 +23705,7 @@ export type ServerCreateWithoutEventsChangeNameInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -23754,6 +23765,7 @@ export type ServerCreateWithoutEventsChangeRoleInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -23813,6 +23825,7 @@ export type ServerCreateWithoutEventsChangeTeamInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -23872,6 +23885,7 @@ export type ServerCreateWithoutEventsChatInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -23931,6 +23945,7 @@ export type ServerCreateWithoutEventsConnectInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -23990,6 +24005,7 @@ export type ServerCreateWithoutEventsDisconnectInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24049,6 +24065,7 @@ export type ServerCreateWithoutEventsEntryInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24108,6 +24125,7 @@ export type ServerCreateWithoutEventsFragInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24167,6 +24185,7 @@ export type ServerCreateWithoutEventsLatencyInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24226,6 +24245,7 @@ export type ServerCreateWithoutEventsPlayerActionInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24285,6 +24305,7 @@ export type ServerCreateWithoutEventsPlayerPlayerActionInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24344,6 +24365,7 @@ export type ServerCreateWithoutEventsRconInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24403,6 +24425,7 @@ export type ServerCreateWithoutEventsSuicideInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24462,6 +24485,7 @@ export type ServerCreateWithoutEventsTeamBonusInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24521,6 +24545,7 @@ export type ServerCreateWithoutEventsTeamkillInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24580,6 +24605,7 @@ export type ServerCreateWithoutLoadsInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24639,6 +24665,7 @@ export type ServerCreateWithoutNotificationConfigInput = {
   players?: InputMaybe<Scalars['Int']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rounds?: InputMaybe<Scalars['Int']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -24994,6 +25021,7 @@ export type ServerMaxOrderByAggregateInput = {
   players?: InputMaybe<SortOrder>;
   port?: InputMaybe<SortOrder>;
   publicAddress?: InputMaybe<SortOrder>;
+  rconAddress?: InputMaybe<SortOrder>;
   rounds?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   sortOrder?: InputMaybe<SortOrder>;
@@ -25036,6 +25064,7 @@ export type ServerMinOrderByAggregateInput = {
   players?: InputMaybe<SortOrder>;
   port?: InputMaybe<SortOrder>;
   publicAddress?: InputMaybe<SortOrder>;
+  rconAddress?: InputMaybe<SortOrder>;
   rounds?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   sortOrder?: InputMaybe<SortOrder>;
@@ -25066,6 +25095,7 @@ export enum ServerOrderByRelevanceFieldEnum {
   Game = 'game',
   Name = 'name',
   PublicAddress = 'publicAddress',
+  RconAddress = 'rconAddress',
   RconPassword = 'rconPassword',
   StatusUrl = 'statusUrl'
 }
@@ -25113,6 +25143,7 @@ export type ServerOrderByWithAggregationInput = {
   players?: InputMaybe<SortOrder>;
   port?: InputMaybe<SortOrder>;
   publicAddress?: InputMaybe<SortOrder>;
+  rconAddress?: InputMaybe<SortOrder>;
   rounds?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   sortOrder?: InputMaybe<SortOrder>;
@@ -25176,6 +25207,7 @@ export type ServerOrderByWithRelationInput = {
   players?: InputMaybe<SortOrder>;
   port?: InputMaybe<SortOrder>;
   publicAddress?: InputMaybe<SortOrder>;
+  rconAddress?: InputMaybe<SortOrder>;
   rounds?: InputMaybe<SortOrder>;
   serverId?: InputMaybe<SortOrder>;
   sortOrder?: InputMaybe<SortOrder>;
@@ -25218,6 +25250,7 @@ export enum ServerScalarFieldEnum {
   Players = 'players',
   Port = 'port',
   PublicAddress = 'publicAddress',
+  RconAddress = 'rconAddress',
   RconPassword = 'rconPassword',
   Rounds = 'rounds',
   ServerId = 'serverId',
@@ -25269,6 +25302,7 @@ export type ServerScalarWhereInput = {
   players?: InputMaybe<IntFilter>;
   port?: InputMaybe<IntFilter>;
   publicAddress?: InputMaybe<StringFilter>;
+  rconAddress?: InputMaybe<StringFilter>;
   rounds?: InputMaybe<IntFilter>;
   serverId?: InputMaybe<IntFilter>;
   sortOrder?: InputMaybe<IntFilter>;
@@ -25314,6 +25348,7 @@ export type ServerScalarWhereWithAggregatesInput = {
   players?: InputMaybe<IntWithAggregatesFilter>;
   port?: InputMaybe<IntWithAggregatesFilter>;
   publicAddress?: InputMaybe<StringWithAggregatesFilter>;
+  rconAddress?: InputMaybe<StringWithAggregatesFilter>;
   rounds?: InputMaybe<IntWithAggregatesFilter>;
   serverId?: InputMaybe<IntWithAggregatesFilter>;
   sortOrder?: InputMaybe<IntWithAggregatesFilter>;
@@ -25688,6 +25723,7 @@ export type ServerUpdateInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -25728,6 +25764,7 @@ export type ServerUpdateManyMutationInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26058,6 +26095,7 @@ export type ServerUpdateWithoutAuthTokenInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26117,6 +26155,7 @@ export type ServerUpdateWithoutConfigsInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26176,6 +26215,7 @@ export type ServerUpdateWithoutEventsAdminInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26235,6 +26275,7 @@ export type ServerUpdateWithoutEventsChangeNameInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26294,6 +26335,7 @@ export type ServerUpdateWithoutEventsChangeRoleInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26353,6 +26395,7 @@ export type ServerUpdateWithoutEventsChangeTeamInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26412,6 +26455,7 @@ export type ServerUpdateWithoutEventsChatInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26471,6 +26515,7 @@ export type ServerUpdateWithoutEventsConnectInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26530,6 +26575,7 @@ export type ServerUpdateWithoutEventsDisconnectInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26589,6 +26635,7 @@ export type ServerUpdateWithoutEventsEntryInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26648,6 +26695,7 @@ export type ServerUpdateWithoutEventsFragInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26707,6 +26755,7 @@ export type ServerUpdateWithoutEventsLatencyInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26766,6 +26815,7 @@ export type ServerUpdateWithoutEventsPlayerActionInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26825,6 +26875,7 @@ export type ServerUpdateWithoutEventsPlayerPlayerActionInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26884,6 +26935,7 @@ export type ServerUpdateWithoutEventsRconInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -26943,6 +26995,7 @@ export type ServerUpdateWithoutEventsSuicideInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27002,6 +27055,7 @@ export type ServerUpdateWithoutEventsTeamBonusInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27061,6 +27115,7 @@ export type ServerUpdateWithoutEventsTeamkillInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27120,6 +27175,7 @@ export type ServerUpdateWithoutLoadsInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27179,6 +27235,7 @@ export type ServerUpdateWithoutNotificationConfigInput = {
   players?: InputMaybe<IntFieldUpdateOperationsInput>;
   port?: InputMaybe<IntFieldUpdateOperationsInput>;
   publicAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   rounds?: InputMaybe<IntFieldUpdateOperationsInput>;
   sortOrder?: InputMaybe<IntFieldUpdateOperationsInput>;
   statusUrl?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -27363,6 +27420,7 @@ export type ServerWhereInput = {
   players?: InputMaybe<IntFilter>;
   port?: InputMaybe<IntFilter>;
   publicAddress?: InputMaybe<StringFilter>;
+  rconAddress?: InputMaybe<StringFilter>;
   rounds?: InputMaybe<IntFilter>;
   serverId?: InputMaybe<IntFilter>;
   sortOrder?: InputMaybe<IntFilter>;
@@ -27428,6 +27486,7 @@ export type ServerWhereUniqueInput = {
   players?: InputMaybe<IntFilter>;
   port?: InputMaybe<IntFilter>;
   publicAddress?: InputMaybe<StringFilter>;
+  rconAddress?: InputMaybe<StringFilter>;
   rounds?: InputMaybe<IntFilter>;
   serverId?: InputMaybe<Scalars['Int']['input']>;
   servers_token_port_unique?: InputMaybe<ServerServers_Token_Port_UniqueCompoundUniqueInput>;
@@ -28022,6 +28081,7 @@ export type UpdateServerInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   port?: InputMaybe<Scalars['Int']['input']>;
   publicAddress?: InputMaybe<Scalars['String']['input']>;
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rconPassword?: InputMaybe<Scalars['String']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
   statusUrl?: InputMaybe<Scalars['String']['input']>;
@@ -28773,7 +28833,7 @@ export type CreateServerWithConfigMutationVariables = Exact<{
 }>;
 
 
-export type CreateServerWithConfigMutation = { __typename?: 'Mutation', createServerWithConfig?: { __typename?: 'ServerOperationResult', success?: boolean | null, message?: string | null, configsCount?: number | null, server?: { __typename?: 'SafeServer', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null } | null } | null };
+export type CreateServerWithConfigMutation = { __typename?: 'Mutation', createServerWithConfig?: { __typename?: 'ServerOperationResult', success?: boolean | null, message?: string | null, configsCount?: number | null, server?: { __typename?: 'SafeServer', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, rconAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null } | null } | null };
 
 export type UpdateServerWithConfigMutationVariables = Exact<{
   serverId: Scalars['Int']['input'];
@@ -28781,7 +28841,7 @@ export type UpdateServerWithConfigMutationVariables = Exact<{
 }>;
 
 
-export type UpdateServerWithConfigMutation = { __typename?: 'Mutation', updateServerWithConfig?: { __typename?: 'ServerOperationResult', success?: boolean | null, message?: string | null, configsCount?: number | null, server?: { __typename?: 'SafeServer', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null } | null } | null };
+export type UpdateServerWithConfigMutation = { __typename?: 'Mutation', updateServerWithConfig?: { __typename?: 'ServerOperationResult', success?: boolean | null, message?: string | null, configsCount?: number | null, server?: { __typename?: 'SafeServer', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, rconAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null } | null } | null };
 
 export type GetServersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -28810,7 +28870,7 @@ export type GetServerByIdWithConfigsQueryVariables = Exact<{
 }>;
 
 
-export type GetServerByIdWithConfigsQuery = { __typename?: 'Query', findUniqueServer?: { __typename?: 'Server', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null, configs?: Array<{ __typename?: 'ServerConfig', parameter: string, value: string }> | null, authToken?: { __typename?: 'ServerToken', tokenPrefix?: string | null, name?: string | null } | null } | null };
+export type GetServerByIdWithConfigsQuery = { __typename?: 'Query', findUniqueServer?: { __typename?: 'Server', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, rconAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null, configs?: Array<{ __typename?: 'ServerConfig', parameter: string, value: string }> | null, authToken?: { __typename?: 'ServerToken', tokenPrefix?: string | null, name?: string | null } | null } | null };
 
 export type CreateServerTokenMutationVariables = Exact<{
   input: CreateServerTokenInput;
@@ -28924,12 +28984,12 @@ export const GetAdminPlayersWithPaginationDocument = {"kind":"Document","definit
 export const GetAdminPlayerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminPlayerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetAdminPlayerCountQuery, GetAdminPlayerCountQueryVariables>;
 export const GetGamesForSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesForSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetGamesForSelectQuery, GetGamesForSelectQueryVariables>;
 export const GetModsForSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetModsForSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyModSupported"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetModsForSelectQuery, GetModsForSelectQueryVariables>;
-export const CreateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerWithConfigMutation, CreateServerWithConfigMutationVariables>;
-export const UpdateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateServerWithConfigMutation, UpdateServerWithConfigMutationVariables>;
+export const CreateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerWithConfigMutation, CreateServerWithConfigMutationVariables>;
+export const UpdateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateServerWithConfigMutation, UpdateServerWithConfigMutationVariables>;
 export const GetServersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"activePlayers"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"activeMap"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}}]} as unknown as DocumentNode<GetServersQuery, GetServersQueryVariables>;
 export const GetServersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"activePlayers"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"activeMap"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}}]} as unknown as DocumentNode<GetServersWithPaginationQuery, GetServersWithPaginationQueryVariables>;
 export const GetServerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetServerCountQuery, GetServerCountQueryVariables>;
-export const GetServerByIdWithConfigsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerByIdWithConfigs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findUniqueServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}},{"kind":"Field","name":{"kind":"Name","value":"configs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parameter"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}},{"kind":"Field","name":{"kind":"Name","value":"authToken"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetServerByIdWithConfigsQuery, GetServerByIdWithConfigsQueryVariables>;
+export const GetServerByIdWithConfigsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerByIdWithConfigs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findUniqueServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}},{"kind":"Field","name":{"kind":"Name","value":"configs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parameter"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}},{"kind":"Field","name":{"kind":"Name","value":"authToken"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetServerByIdWithConfigsQuery, GetServerByIdWithConfigsQueryVariables>;
 export const CreateServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"rawToken"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerTokenMutation, CreateServerTokenMutationVariables>;
 export const RevokeServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RevokeServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RevokeServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"revokeServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<RevokeServerTokenMutation, RevokeServerTokenMutationVariables>;
 export const GetServerTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeRevoked"},"value":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]} as unknown as DocumentNode<GetServerTokensQuery, GetServerTokensQueryVariables>;

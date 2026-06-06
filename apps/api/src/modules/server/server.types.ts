@@ -8,6 +8,7 @@ export interface CreateServerInput {
   mod?: string
   rconPassword?: string
   publicAddress?: string
+  rconAddress?: string
   statusUrl?: string
   sortOrder?: number
 }
@@ -19,6 +20,7 @@ export interface UpdateServerInput {
   game?: string
   mod?: string
   publicAddress?: string
+  rconAddress?: string
   statusUrl?: string | null
   rconPassword?: string
   sortOrder?: number

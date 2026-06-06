@@ -26,6 +26,7 @@ export class ServerService {
     rconPassword: string
     game?: string
     publicAddress?: string
+    rconAddress?: string
     statusUrl?: string
   }): Promise<Server> {
     // Encrypt the RCON password
@@ -38,6 +39,7 @@ export class ServerService {
       rconPassword: encryptedRconPassword,
       game: serverData.game || "valve",
       publicAddress: serverData.publicAddress,
+      rconAddress: serverData.rconAddress,
       statusUrl: serverData.statusUrl,
     })
 

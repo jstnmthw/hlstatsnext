@@ -15,6 +15,7 @@ builder.prismaObject("Server", {
     sortOrder: t.exposeInt("sortOrder"),
     game: t.exposeString("game"),
     publicAddress: t.exposeString("publicAddress"),
+    rconAddress: t.exposeString("rconAddress"),
     statusUrl: t.string({ nullable: true, resolve: (server) => server.statusUrl }),
     authTokenId: t.int({ nullable: true, resolve: (server) => server.authTokenId }),
     // rconPassword: OMITTED — sensitive credential

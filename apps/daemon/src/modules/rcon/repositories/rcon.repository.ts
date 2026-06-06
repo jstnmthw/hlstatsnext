@@ -25,6 +25,7 @@ export class RconRepository implements IRconRepository {
         select: {
           serverId: true,
           address: true,
+          rconAddress: true,
           port: true,
           rconPassword: true,
           game: true,
@@ -53,13 +54,16 @@ export class RconRepository implements IRconRepository {
         return null
       }
 
-      // With token-based auth, server.address and server.port are always the correct
-      // game server address and port (set during beacon auto-registration)
-      this.logger.debug(`RCON connection for server ${serverId}: ${server.address}:${server.port}`)
+      // An explicit rconAddress takes precedence over the beacon-learned address.
+      // The learned address is the UDP source IP, which is unusable when it has
+      // been NAT'd (e.g. a Docker bridge gateway); rconAddress lets an operator
+      // pin the real RCON host (IP or resolvable hostname / container alias).
+      const rconAddress = server.rconAddress || server.address
+      this.logger.debug(`RCON connection for server ${serverId}: ${rconAddress}:${server.port}`)
 
       return {
         serverId: server.serverId,
-        address: server.address,
+        address: rconAddress,
         port: server.port,
         rconPassword: decryptedPassword,
         gameEngine,

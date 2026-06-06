@@ -59,6 +59,7 @@ describe("RconRepository", () => {
         select: {
           serverId: true,
           address: true,
+          rconAddress: true,
           port: true,
           rconPassword: true,
           game: true,
@@ -66,6 +67,41 @@ describe("RconRepository", () => {
       })
 
       expect(mockCrypto.decrypt).toHaveBeenCalledWith("encrypted_pass")
+    })
+
+    it("should prefer rconAddress over the learned address when set", async () => {
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
+        serverId: 7,
+        address: "172.18.0.1",
+        rconAddress: "cs-server-1",
+        port: 27015,
+        rconPassword: "enc",
+        game: "csgo",
+      } as never)
+
+      const result = await repository.getRconCredentials(7)
+
+      expect(result!.address).toBe("cs-server-1")
+      expect(result!.port).toBe(27015)
+      expect(mockLogger.debug).toHaveBeenCalledWith(
+        "RCON connection for server 7: cs-server-1:27015",
+      )
+    })
+
+    it("should fall back to the learned address when rconAddress is empty", async () => {
+      mockDb.mockPrisma.server.findUnique.mockResolvedValue({
+        serverId: 8,
+        address: "192.168.0.178",
+        rconAddress: "",
+        port: 27018,
+        rconPassword: "enc",
+        game: "csgo",
+      } as never)
+
+      const result = await repository.getRconCredentials(8)
+
+      expect(result!.address).toBe("192.168.0.178")
+      expect(result!.port).toBe(27018)
     })
 
     it("should return null when server is not found", async () => {

@@ -789,6 +789,7 @@ model Server {
   sortOrder     Int          @default(0) @map("sort_order") @db.TinyInt
   game          String       @default("valve") @db.VarChar(32)
   publicAddress String       @default("") @map("public_address") @db.VarChar(128)
+  rconAddress   String       @default("") @map("rcon_address") @db.VarChar(255)
   statusUrl     String?      @map("status_url") @db.VarChar(255)
   rconPassword   String       @default("") @map("rcon_password") @db.VarChar(512)
   authTokenId    Int?         @map("token_id") @db.UnsignedInt

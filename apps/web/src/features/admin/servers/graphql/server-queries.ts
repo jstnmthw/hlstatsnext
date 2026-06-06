@@ -56,6 +56,7 @@ export const GET_SERVER_BY_ID = graphql(`
       port
       game
       publicAddress
+      rconAddress
       statusUrl
       sortOrder
       configs {

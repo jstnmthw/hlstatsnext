@@ -9,6 +9,7 @@ const UpdateServerInput = builder.inputType("UpdateServerInput", {
     address: t.string({ required: false }),
     port: t.int({ required: false }),
     publicAddress: t.string({ required: false }),
+    rconAddress: t.string({ required: false }),
     statusUrl: t.string({ required: false }),
     game: t.string({ required: false }),
     mod: t.string({ required: false }),
@@ -27,6 +28,7 @@ const CreateServerInput = builder.inputType("CreateServerInput", {
     game: t.string({ required: false }),
     mod: t.string({ required: false }),
     publicAddress: t.string({ required: false }),
+    rconAddress: t.string({ required: false }),
     statusUrl: t.string({ required: false }),
     sortOrder: t.int({ required: false }),
   }),
@@ -43,6 +45,7 @@ SafeServer.implement({
     port: t.exposeInt("port"),
     game: t.exposeString("game"),
     publicAddress: t.exposeString("publicAddress"),
+    rconAddress: t.exposeString("rconAddress"),
     statusUrl: t.exposeString("statusUrl", { nullable: true }),
     sortOrder: t.exposeInt("sortOrder"),
   }),
@@ -91,6 +94,8 @@ builder.mutationField("updateServerWithConfig", (t) =>
         if (data.port !== null && data.port !== undefined) updateData.port = data.port
         if (data.publicAddress !== null && data.publicAddress !== undefined)
           updateData.publicAddress = data.publicAddress
+        if (data.rconAddress !== null && data.rconAddress !== undefined)
+          updateData.rconAddress = data.rconAddress
         if (data.statusUrl !== null && data.statusUrl !== undefined)
           updateData.statusUrl = data.statusUrl
         if (data.game !== null && data.game !== undefined) updateData.game = data.game
@@ -152,6 +157,7 @@ builder.mutationField("createServerWithConfig", (t) =>
           mod: data.mod || undefined,
           rconPassword: data.rconPassword || undefined,
           publicAddress: data.publicAddress || undefined,
+          rconAddress: data.rconAddress || undefined,
           statusUrl: data.statusUrl || undefined,
           sortOrder: data.sortOrder || undefined,
         }

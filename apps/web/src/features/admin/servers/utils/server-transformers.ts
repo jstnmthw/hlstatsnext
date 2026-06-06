@@ -38,6 +38,7 @@ export function extractFormDataForUpdate(formData: FormData) {
     game: formData.get("game"),
     mod: formData.get("mod"),
     publicAddress: formData.get("publicAddress"),
+    rconAddress: formData.get("rconAddress"),
     statusUrl: formData.get("statusUrl"),
     rconPassword: formData.get("rconPassword"),
     sortOrder: formData.get("sortOrder"),

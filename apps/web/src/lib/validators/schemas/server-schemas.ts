@@ -38,6 +38,8 @@ export const ServerFieldSchemas = {
 
   publicAddress: z.string().max(128, "Public address is too long").optional().or(z.null()),
 
+  rconAddress: z.string().max(255, "RCON address is too long").optional().or(z.null()),
+
   statusUrl: z
     .string()
     .url("Please enter a valid URL")
@@ -73,6 +75,7 @@ export const UpdateServerSchema = z.object({
   game: ServerFieldSchemas.game,
   mod: ServerFieldSchemas.mod,
   publicAddress: ServerFieldSchemas.publicAddress,
+  rconAddress: ServerFieldSchemas.rconAddress,
   statusUrl: ServerFieldSchemas.statusUrl,
   rconPassword: ServerFieldSchemas.rconPassword,
   sortOrder: ServerFieldSchemas.sortOrder,

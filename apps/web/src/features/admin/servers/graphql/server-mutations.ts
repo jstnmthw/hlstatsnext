@@ -13,6 +13,7 @@ export const CREATE_SERVER_MUTATION = graphql(`
         port
         game
         publicAddress
+        rconAddress
         statusUrl
         sortOrder
       }
@@ -33,6 +34,7 @@ export const UPDATE_SERVER_WITH_CONFIG_MUTATION = graphql(`
         port
         game
         publicAddress
+        rconAddress
         statusUrl
         sortOrder
       }

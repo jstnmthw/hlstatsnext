@@ -10,6 +10,7 @@ export function createMockServerRecord(overrides: Partial<Server> = {}): Server 
     sortOrder: 0,
     game: "csgo",
     publicAddress: "",
+    rconAddress: "",
     statusUrl: null,
     rconPassword: "",
     authTokenId: null,

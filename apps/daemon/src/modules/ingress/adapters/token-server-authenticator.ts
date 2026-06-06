@@ -346,7 +346,11 @@ export class TokenServerAuthenticator {
           port: gamePort,
         },
       },
-      update: { address },
+      // Do not overwrite address on re-beacon: the learned UDP source IP can be a
+      // NAT artifact (e.g. a Docker bridge gateway) and would clobber an
+      // operator-meaningful value. address is best-effort set once at create;
+      // RCON dialing uses rconAddress when set (see RconRepository).
+      update: {},
       create: {
         address,
         port: gamePort,

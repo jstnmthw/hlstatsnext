@@ -58,6 +58,7 @@ export async function updateServer(
       game: validation.data.game,
       mod: validation.data.mod || undefined,
       publicAddress: validation.data.publicAddress || undefined,
+      rconAddress: validation.data.rconAddress || undefined,
       statusUrl: validation.data.statusUrl || undefined,
       rconPassword: validation.data.rconPassword || undefined,
       sortOrder: validation.data.sortOrder,

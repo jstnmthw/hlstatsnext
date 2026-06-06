@@ -57,11 +57,7 @@ export class PlayerStatusEnricher implements IPlayerStatusEnricher {
       }
 
       // Check if bots should be ignored
-      const ignoreBots = await this.serverService.getServerConfigBoolean(
-        serverId,
-        "IgnoreBots",
-        true,
-      )
+      const ignoreBots = await this.serverService.isIgnoreBotsEnabled(serverId)
 
       // Filter players that need enrichment
       const playersToEnrich = this.filterPlayersForEnrichment(playerList, ignoreBots)

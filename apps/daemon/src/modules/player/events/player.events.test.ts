@@ -28,6 +28,7 @@ const createMockServerService = (): IServerService => ({
   getServerByAddress: vi.fn(),
   getServerGame: vi.fn().mockResolvedValue("csgo"),
   getServerConfigBoolean: vi.fn().mockResolvedValue(false),
+  isIgnoreBotsEnabled: vi.fn().mockResolvedValue(false),
   hasRconCredentials: vi.fn().mockResolvedValue(false),
   findActiveServersWithRcon: vi.fn().mockResolvedValue([]),
   findServersByIds: vi.fn().mockResolvedValue([]),
@@ -290,7 +291,7 @@ describe("PlayerEventHandler", () => {
     })
 
     it("should ignore bot PLAYER_CONNECT when IgnoreBots is enabled", async () => {
-      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+      vi.mocked(serverService.isIgnoreBotsEnabled).mockResolvedValue(true)
 
       const event: BaseEvent = {
         eventType: EventType.PLAYER_CONNECT,
@@ -307,13 +308,13 @@ describe("PlayerEventHandler", () => {
 
       await handler.handleEvent(event)
 
-      expect(serverService.getServerConfigBoolean).toHaveBeenCalledWith(1, "IgnoreBots", true)
+      expect(serverService.isIgnoreBotsEnabled).toHaveBeenCalledWith(1)
       expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
       expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("Ignoring bot"))
     })
 
     it("should process bot PLAYER_CONNECT when IgnoreBots is disabled", async () => {
-      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(false)
+      vi.mocked(serverService.isIgnoreBotsEnabled).mockResolvedValue(false)
 
       const event: BaseEvent = {
         eventType: EventType.PLAYER_CONNECT,
@@ -334,7 +335,7 @@ describe("PlayerEventHandler", () => {
     })
 
     it("should ignore bot PLAYER_DISCONNECT when IgnoreBots is enabled", async () => {
-      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+      vi.mocked(serverService.isIgnoreBotsEnabled).mockResolvedValue(true)
 
       const event: BaseEvent = {
         eventType: EventType.PLAYER_DISCONNECT,
@@ -350,7 +351,7 @@ describe("PlayerEventHandler", () => {
     })
 
     it("should ignore bot PLAYER_ENTRY when IgnoreBots is enabled", async () => {
-      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+      vi.mocked(serverService.isIgnoreBotsEnabled).mockResolvedValue(true)
 
       const event: BaseEvent = {
         eventType: EventType.PLAYER_ENTRY,
@@ -377,7 +378,7 @@ describe("PlayerEventHandler", () => {
 
       await handler.handleEvent(event)
 
-      expect(serverService.getServerConfigBoolean).not.toHaveBeenCalled()
+      expect(serverService.isIgnoreBotsEnabled).not.toHaveBeenCalled()
       expect(playerService.handlePlayerEvent).toHaveBeenCalled()
     })
 
@@ -393,7 +394,7 @@ describe("PlayerEventHandler", () => {
 
       await handler.handleEvent(event)
 
-      expect(serverService.getServerConfigBoolean).not.toHaveBeenCalled()
+      expect(serverService.isIgnoreBotsEnabled).not.toHaveBeenCalled()
       expect(playerService.handlePlayerEvent).toHaveBeenCalled()
     })
 
@@ -456,7 +457,7 @@ describe("PlayerEventHandler", () => {
     })
 
     it("should discard a human-kills-bot PLAYER_KILL when IgnoreBots is enabled", async () => {
-      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+      vi.mocked(serverService.isIgnoreBotsEnabled).mockResolvedValue(true)
 
       const event: BaseEvent = {
         eventType: EventType.PLAYER_KILL,
@@ -472,13 +473,13 @@ describe("PlayerEventHandler", () => {
 
       await handler.handleEvent(event)
 
-      expect(serverService.getServerConfigBoolean).toHaveBeenCalledWith(1, "IgnoreBots", true)
+      expect(serverService.isIgnoreBotsEnabled).toHaveBeenCalledWith(1)
       expect(playerService.getOrCreatePlayer).not.toHaveBeenCalled()
       expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
     })
 
     it("should process a human-kills-bot PLAYER_KILL when IgnoreBots is disabled", async () => {
-      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(false)
+      vi.mocked(serverService.isIgnoreBotsEnabled).mockResolvedValue(false)
 
       const event: BaseEvent = {
         eventType: EventType.PLAYER_KILL,
@@ -499,7 +500,7 @@ describe("PlayerEventHandler", () => {
     })
 
     it("should discard a bot-involved PLAYER_DAMAGE when IgnoreBots is enabled", async () => {
-      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+      vi.mocked(serverService.isIgnoreBotsEnabled).mockResolvedValue(true)
 
       const event: BaseEvent = {
         eventType: EventType.PLAYER_DAMAGE,
@@ -520,7 +521,7 @@ describe("PlayerEventHandler", () => {
     })
 
     it("should discard a bot-involved PLAYER_TEAMKILL when IgnoreBots is enabled", async () => {
-      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+      vi.mocked(serverService.isIgnoreBotsEnabled).mockResolvedValue(true)
 
       const event: BaseEvent = {
         eventType: EventType.PLAYER_TEAMKILL,
@@ -554,7 +555,7 @@ describe("PlayerEventHandler", () => {
 
       await handler.handleEvent(event)
 
-      expect(serverService.getServerConfigBoolean).not.toHaveBeenCalled()
+      expect(serverService.isIgnoreBotsEnabled).not.toHaveBeenCalled()
       expect(playerService.handlePlayerEvent).toHaveBeenCalled()
     })
 

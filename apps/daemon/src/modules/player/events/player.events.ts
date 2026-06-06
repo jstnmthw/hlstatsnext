@@ -49,11 +49,7 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
     // frag rather than only the bot's half stops humans from farming skill against
     // bots and keeps bots out of the Player table.
     if (eventInvolvesBot(event)) {
-      const ignoreBots = await this.serverService.getServerConfigBoolean(
-        event.serverId,
-        "IgnoreBots",
-        true,
-      )
+      const ignoreBots = await this.serverService.isIgnoreBotsEnabled(event.serverId)
       if (ignoreBots) {
         this.logger.debug(`Ignoring bot ${event.eventType} due to server IgnoreBots=on`)
         return

@@ -86,12 +86,7 @@ export class ServerStatusEnricher implements IServerStatusEnricher {
     serverId: number,
     status: ServerStatus,
   ): Promise<ServerStatusUpdate> {
-    // Get IgnoreBots configuration (default to false - include bots)
-    const ignoreBots = await this.serverService.getServerConfigBoolean(
-      serverId,
-      "IgnoreBots",
-      false,
-    )
+    const ignoreBots = await this.serverService.isIgnoreBotsEnabled(serverId)
 
     // Calculate active players based on IgnoreBots setting
     let activePlayers: number
@@ -119,12 +114,7 @@ export class ServerStatusEnricher implements IServerStatusEnricher {
     update: ServerStatusUpdate,
     newMap: string,
   ): Promise<void> {
-    // Get IgnoreBots configuration (default to false - include bots)
-    const ignoreBots = await this.serverService.getServerConfigBoolean(
-      serverId,
-      "IgnoreBots",
-      false,
-    )
+    const ignoreBots = await this.serverService.isIgnoreBotsEnabled(serverId)
     const ignoreBotStatus = ignoreBots ? "(IgnoreBots=ON)" : "(IgnoreBots=OFF)"
 
     // Check if map changed to potentially reset map stats

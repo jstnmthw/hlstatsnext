@@ -43,11 +43,7 @@ export class WeaponEventHandler extends BaseModuleEventHandler {
     // Mirror the player module: when IgnoreBots is on, a bot-involved kill is
     // discarded entirely, so its weapon stats must not be recorded either.
     if (eventInvolvesBot(event)) {
-      const ignoreBots = await this.serverService.getServerConfigBoolean(
-        event.serverId,
-        "IgnoreBots",
-        true,
-      )
+      const ignoreBots = await this.serverService.isIgnoreBotsEnabled(event.serverId)
       if (ignoreBots) {
         this.logger.debug(
           `Weapon module ignoring bot PLAYER_KILL for server ${event.serverId} (IgnoreBots=on)`,

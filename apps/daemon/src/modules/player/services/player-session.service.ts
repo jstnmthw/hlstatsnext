@@ -96,7 +96,7 @@ export class PlayerSessionService implements IPlayerSessionService {
       // Get server configuration
       const ignoreBots =
         options.respectIgnoreBots !== false
-          ? await this.serverService.getServerConfigBoolean(serverId, "IgnoreBots", true)
+          ? await this.serverService.isIgnoreBotsEnabled(serverId)
           : false
 
       // Get current server status via RCON

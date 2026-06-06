@@ -4,6 +4,7 @@ export interface IServerService {
   getServerByAddress(address: string, port: number): Promise<ServerInfo | null>
   getServerGame(serverId: number): Promise<string>
   getServerConfigBoolean(serverId: number, parameter: string, fallback: boolean): Promise<boolean>
+  isIgnoreBotsEnabled(serverId: number): Promise<boolean>
   getServerConfig(serverId: number, parameter: string): Promise<string | null>
   getServerModType(serverId: number): Promise<string>
   hasRconCredentials(serverId: number): Promise<boolean>

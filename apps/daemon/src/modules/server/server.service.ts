@@ -8,6 +8,7 @@ export class ServerService implements IServerService {
   // acceptable for rarely-changed admin settings. Keyed by serverId:parameter,
   // so the map is bounded by (servers × parameters) and entries refresh in place.
   private static readonly CONFIG_CACHE_TTL_MS = 30_000
+  private static readonly IGNORE_BOTS_DEFAULT = false
   private readonly configCache = new Map<string, { value: string | null; expiresAt: number }>()
 
   constructor(
@@ -49,6 +50,15 @@ export class ServerService implements IServerService {
     if (["1", "true", "yes", "on"].includes(normalized)) return true
     if (["0", "false", "no", "off"].includes(normalized)) return false
     return fallback
+  }
+
+  // Single source of truth for the per-server IgnoreBots flag. Scoring, presence,
+  // session sync, and player-count enrichment all read it through here so they can
+  // never disagree about whether bots count. The last-resort fallback matches the
+  // seeded servers_config_default row (IgnoreBots='0'), so an unseeded DB behaves
+  // identically to a seeded one rather than silently flipping the default.
+  async isIgnoreBotsEnabled(serverId: number): Promise<boolean> {
+    return this.getServerConfigBoolean(serverId, "IgnoreBots", ServerService.IGNORE_BOTS_DEFAULT)
   }
 
   private async readServerConfigCached(

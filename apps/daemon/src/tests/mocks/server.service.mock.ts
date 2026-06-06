@@ -14,6 +14,7 @@ export function createMockServerService(): IServerService {
     getServerByAddress: vi.fn().mockResolvedValue(null),
     getServerGame: vi.fn().mockResolvedValue("cstrike"),
     getServerConfigBoolean: vi.fn().mockResolvedValue(false),
+    isIgnoreBotsEnabled: vi.fn().mockResolvedValue(false),
     getServerModType: vi.fn().mockResolvedValue(null),
     getServerConfig: vi.fn().mockResolvedValue(null),
     hasRconCredentials: vi.fn().mockResolvedValue(false),

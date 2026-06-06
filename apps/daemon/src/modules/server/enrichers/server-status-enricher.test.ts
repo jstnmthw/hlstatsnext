@@ -40,6 +40,7 @@ const mockServerService: IServerService = {
   getServerByAddress: vi.fn(),
   getServerGame: vi.fn(),
   getServerConfigBoolean: vi.fn(),
+  isIgnoreBotsEnabled: vi.fn(),
   getServerConfig: vi.fn(),
   getServerModType: vi.fn(),
   hasRconCredentials: vi.fn(),
@@ -85,7 +86,7 @@ describe("ServerStatusEnricher", () => {
 
       vi.mocked(mockRconService.isConnected).mockReturnValue(true)
       vi.mocked(mockRconService.getStatus).mockResolvedValue(mockStatus)
-      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(false) // IgnoreBots = false
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(false) // IgnoreBots = false
       vi.mocked(mockServerRepository.findById).mockResolvedValue({
         serverId: 1,
         game: "cstrike",
@@ -100,11 +101,7 @@ describe("ServerStatusEnricher", () => {
 
       // Assert
       expect(mockRconService.getStatus).toHaveBeenCalledWith(serverId)
-      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
-        serverId,
-        "IgnoreBots",
-        false,
-      )
+      expect(mockServerService.isIgnoreBotsEnabled).toHaveBeenCalledWith(serverId)
       expect(mockServerRepository.resetMapStats).toHaveBeenCalledWith(
         serverId,
         "cs_backalley",
@@ -128,7 +125,7 @@ describe("ServerStatusEnricher", () => {
 
       vi.mocked(mockRconService.isConnected).mockReturnValue(true)
       vi.mocked(mockRconService.getStatus).mockResolvedValue(mockStatus)
-      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(false) // IgnoreBots = false
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(false) // IgnoreBots = false
       vi.mocked(mockServerRepository.findById).mockResolvedValue({
         serverId: 1,
         game: "cstrike",
@@ -142,11 +139,7 @@ describe("ServerStatusEnricher", () => {
       await enricher.enrichServerStatus(serverId)
 
       // Assert
-      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
-        serverId,
-        "IgnoreBots",
-        false,
-      )
+      expect(mockServerService.isIgnoreBotsEnabled).toHaveBeenCalledWith(serverId)
       expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(serverId, {
         activePlayers: 3, // Total players since IgnoreBots = false
         maxPlayers: 32,
@@ -170,7 +163,7 @@ describe("ServerStatusEnricher", () => {
 
       vi.mocked(mockRconService.isConnected).mockReturnValue(false)
       vi.mocked(mockRconService.getStatus).mockResolvedValue(mockStatus)
-      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(false) // IgnoreBots = false
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(false) // IgnoreBots = false
       vi.mocked(mockServerRepository.findById).mockResolvedValue({
         serverId: 1,
         game: "cstrike",
@@ -186,11 +179,7 @@ describe("ServerStatusEnricher", () => {
       // Assert
       expect(mockRconService.connect).toHaveBeenCalledWith(serverId)
       expect(mockRconService.getStatus).toHaveBeenCalledWith(serverId)
-      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
-        serverId,
-        "IgnoreBots",
-        false,
-      )
+      expect(mockServerService.isIgnoreBotsEnabled).toHaveBeenCalledWith(serverId)
     })
 
     it("should handle RCON failures gracefully", async () => {
@@ -222,7 +211,7 @@ describe("ServerStatusEnricher", () => {
 
       vi.mocked(mockRconService.isConnected).mockReturnValue(true)
       vi.mocked(mockRconService.getStatus).mockResolvedValue(mockStatus)
-      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(false) // IgnoreBots = false
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(false) // IgnoreBots = false
       vi.mocked(mockServerRepository.findById).mockResolvedValue({
         serverId: 1,
         game: "cstrike",
@@ -236,11 +225,7 @@ describe("ServerStatusEnricher", () => {
       await enricher.enrichServerStatus(serverId)
 
       // Assert
-      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
-        serverId,
-        "IgnoreBots",
-        false,
-      )
+      expect(mockServerService.isIgnoreBotsEnabled).toHaveBeenCalledWith(serverId)
       expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(
         serverId,
         expect.objectContaining({
@@ -263,7 +248,7 @@ describe("ServerStatusEnricher", () => {
 
       vi.mocked(mockRconService.isConnected).mockReturnValue(true)
       vi.mocked(mockRconService.getStatus).mockResolvedValue(mockStatus)
-      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(false) // IgnoreBots = false
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(false) // IgnoreBots = false
       vi.mocked(mockServerRepository.findById).mockResolvedValue({
         serverId: 1,
         game: "cstrike",
@@ -277,11 +262,7 @@ describe("ServerStatusEnricher", () => {
       await enricher.enrichServerStatus(serverId)
 
       // Assert
-      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
-        serverId,
-        "IgnoreBots",
-        false,
-      )
+      expect(mockServerService.isIgnoreBotsEnabled).toHaveBeenCalledWith(serverId)
       expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(
         serverId,
         expect.objectContaining({
@@ -309,7 +290,7 @@ describe("ServerStatusEnricher", () => {
 
         vi.mocked(mockRconService.isConnected).mockReturnValue(true)
         vi.mocked(mockRconService.getStatus).mockResolvedValue(mockStatus)
-        vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(false) // IgnoreBots = false
+        vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(false) // IgnoreBots = false
         vi.mocked(mockServerRepository.findById).mockResolvedValue({
           serverId: 1,
           game: "cstrike",
@@ -323,11 +304,7 @@ describe("ServerStatusEnricher", () => {
         await enricher.enrichServerStatus(serverId)
 
         // Assert
-        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
-          serverId,
-          "IgnoreBots",
-          false,
-        )
+        expect(mockServerService.isIgnoreBotsEnabled).toHaveBeenCalledWith(serverId)
         expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(serverId, {
           activePlayers: 5, // Total players (real + bots)
           maxPlayers: 32,
@@ -352,7 +329,7 @@ describe("ServerStatusEnricher", () => {
 
         vi.mocked(mockRconService.isConnected).mockReturnValue(true)
         vi.mocked(mockRconService.getStatus).mockResolvedValue(mockStatus)
-        vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // IgnoreBots = true
+        vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true) // IgnoreBots = true
         vi.mocked(mockServerRepository.findById).mockResolvedValue({
           serverId: 1,
           game: "cstrike",
@@ -366,11 +343,7 @@ describe("ServerStatusEnricher", () => {
         await enricher.enrichServerStatus(serverId)
 
         // Assert
-        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
-          serverId,
-          "IgnoreBots",
-          false,
-        )
+        expect(mockServerService.isIgnoreBotsEnabled).toHaveBeenCalledWith(serverId)
         expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(serverId, {
           activePlayers: 2, // Only real players
           maxPlayers: 32,
@@ -395,7 +368,7 @@ describe("ServerStatusEnricher", () => {
 
         vi.mocked(mockRconService.isConnected).mockReturnValue(true)
         vi.mocked(mockRconService.getStatus).mockResolvedValue(mockStatus)
-        vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // IgnoreBots = true
+        vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true) // IgnoreBots = true
         vi.mocked(mockServerRepository.findById).mockResolvedValue({
           serverId: 1,
           game: "cstrike",
@@ -409,11 +382,7 @@ describe("ServerStatusEnricher", () => {
         await enricher.enrichServerStatus(serverId)
 
         // Assert
-        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
-          serverId,
-          "IgnoreBots",
-          false,
-        )
+        expect(mockServerService.isIgnoreBotsEnabled).toHaveBeenCalledWith(serverId)
         expect(mockServerRepository.resetMapStats).toHaveBeenCalledWith(
           serverId,
           "cs_office",
@@ -436,7 +405,7 @@ describe("ServerStatusEnricher", () => {
 
         vi.mocked(mockRconService.isConnected).mockReturnValue(true)
         vi.mocked(mockRconService.getStatus).mockResolvedValue(mockStatus)
-        vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // IgnoreBots = true
+        vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true) // IgnoreBots = true
         vi.mocked(mockServerRepository.findById).mockResolvedValue({
           serverId: 1,
           game: "cstrike",
@@ -450,11 +419,7 @@ describe("ServerStatusEnricher", () => {
         await enricher.enrichServerStatus(serverId)
 
         // Assert
-        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
-          serverId,
-          "IgnoreBots",
-          false,
-        )
+        expect(mockServerService.isIgnoreBotsEnabled).toHaveBeenCalledWith(serverId)
         expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(serverId, {
           activePlayers: 6, // Falls back to total players when realPlayerCount unavailable
           maxPlayers: 32,
@@ -479,7 +444,7 @@ describe("ServerStatusEnricher", () => {
 
         vi.mocked(mockRconService.isConnected).mockReturnValue(true)
         vi.mocked(mockRconService.getStatus).mockResolvedValue(mockStatus)
-        vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // IgnoreBots = true
+        vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true) // IgnoreBots = true
         vi.mocked(mockServerRepository.findById).mockResolvedValue({
           serverId: 1,
           game: "cstrike",
@@ -493,11 +458,7 @@ describe("ServerStatusEnricher", () => {
         await enricher.enrichServerStatus(serverId)
 
         // Assert
-        expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(
-          serverId,
-          "IgnoreBots",
-          false,
-        )
+        expect(mockServerService.isIgnoreBotsEnabled).toHaveBeenCalledWith(serverId)
         expect(mockServerRepository.updateServerStatusFromRcon).toHaveBeenCalledWith(serverId, {
           activePlayers: 0, // Only real players (0)
           maxPlayers: 32,

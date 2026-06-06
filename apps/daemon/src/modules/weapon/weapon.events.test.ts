@@ -20,6 +20,7 @@ const createMockWeaponService = (): IWeaponService => ({
 const createMockServerService = (): IServerService =>
   ({
     getServerConfigBoolean: vi.fn().mockResolvedValue(false),
+    isIgnoreBotsEnabled: vi.fn().mockResolvedValue(false),
   }) as unknown as IServerService
 
 describe("WeaponEventHandler", () => {
@@ -203,7 +204,7 @@ describe("WeaponEventHandler", () => {
     })
 
     it("should discard bot-involved PLAYER_KILL when IgnoreBots is enabled", async () => {
-      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+      vi.mocked(serverService.isIgnoreBotsEnabled).mockResolvedValue(true)
 
       const event: BaseEvent = {
         eventType: EventType.PLAYER_KILL,
@@ -219,12 +220,12 @@ describe("WeaponEventHandler", () => {
 
       await handler.handlePlayerKill(event)
 
-      expect(serverService.getServerConfigBoolean).toHaveBeenCalledWith(3, "IgnoreBots", true)
+      expect(serverService.isIgnoreBotsEnabled).toHaveBeenCalledWith(3)
       expect(weaponService.handleWeaponEvent).not.toHaveBeenCalled()
     })
 
     it("should record bot-involved PLAYER_KILL when IgnoreBots is disabled", async () => {
-      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(false)
+      vi.mocked(serverService.isIgnoreBotsEnabled).mockResolvedValue(false)
 
       const event: BaseEvent = {
         eventType: EventType.PLAYER_KILL,

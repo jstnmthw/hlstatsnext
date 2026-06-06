@@ -55,9 +55,8 @@ describe("PlayerStatusEnricher", () => {
 
     it("should enrich player geo data when enrichment is enabled", async () => {
       // Mock server configurations
-      vi.mocked(mockServerService.getServerConfigBoolean)
-        .mockResolvedValueOnce(true) // EnableGeoIPEnrichment = true
-        .mockResolvedValueOnce(true) // IgnoreBots = true
+      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // EnableGeoIPEnrichment = true
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true) // IgnoreBots = true
 
       // Mock server service
       vi.mocked(mockServerService.findById).mockResolvedValue({
@@ -89,7 +88,7 @@ describe("PlayerStatusEnricher", () => {
         "EnableGeoIPEnrichment",
         true,
       )
-      expect(mockServerService.getServerConfigBoolean).toHaveBeenCalledWith(1, "IgnoreBots", true)
+      expect(mockServerService.isIgnoreBotsEnabled).toHaveBeenCalledWith(1)
       expect(mockPlayerRepository.findByUniqueId).toHaveBeenCalledWith(
         "STEAM_0:1:123456",
         "cstrike",
@@ -124,9 +123,8 @@ describe("PlayerStatusEnricher", () => {
         isBot: true,
       }
 
-      vi.mocked(mockServerService.getServerConfigBoolean)
-        .mockResolvedValueOnce(true) // EnableGeoIPEnrichment = true
-        .mockResolvedValueOnce(true) // IgnoreBots = true
+      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // EnableGeoIPEnrichment = true
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true) // IgnoreBots = true
 
       vi.mocked(mockServerService.findById).mockResolvedValue({
         serverId: 1,
@@ -162,9 +160,8 @@ describe("PlayerStatusEnricher", () => {
         lastAddress: "127.0.0.1",
       }
 
-      vi.mocked(mockServerService.getServerConfigBoolean)
-        .mockResolvedValueOnce(true) // EnableGeoIPEnrichment = true
-        .mockResolvedValueOnce(false) // IgnoreBots = false
+      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // EnableGeoIPEnrichment = true
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(false) // IgnoreBots = false
 
       vi.mocked(mockServerService.findById).mockResolvedValue({
         serverId: 1,
@@ -209,9 +206,8 @@ describe("PlayerStatusEnricher", () => {
         { ...mockPlayerInfo, address: "" },
       ]
 
-      vi.mocked(mockServerService.getServerConfigBoolean)
-        .mockResolvedValueOnce(true) // EnableGeoIPEnrichment = true
-        .mockResolvedValueOnce(true) // IgnoreBots = true
+      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // EnableGeoIPEnrichment = true
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true) // IgnoreBots = true
 
       vi.mocked(mockServerService.findById).mockResolvedValue({
         serverId: 1,
@@ -237,9 +233,8 @@ describe("PlayerStatusEnricher", () => {
         { ...mockPlayerInfo, uniqueid: "BOT", isBot: false }, // Non-bot with BOT ID
       ]
 
-      vi.mocked(mockServerService.getServerConfigBoolean)
-        .mockResolvedValueOnce(true) // EnableGeoIPEnrichment = true
-        .mockResolvedValueOnce(true) // IgnoreBots = true
+      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // EnableGeoIPEnrichment = true
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true) // IgnoreBots = true
 
       vi.mocked(mockServerService.findById).mockResolvedValue({
         serverId: 1,
@@ -261,9 +256,8 @@ describe("PlayerStatusEnricher", () => {
 
     it("should skip players already enriched recently", async () => {
       // First enrichment
-      vi.mocked(mockServerService.getServerConfigBoolean)
-        .mockResolvedValueOnce(true) // EnableGeoIPEnrichment = true
-        .mockResolvedValueOnce(true) // IgnoreBots = true
+      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // EnableGeoIPEnrichment = true
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true) // IgnoreBots = true
 
       vi.mocked(mockServerService.findById).mockResolvedValue({
         serverId: 1,
@@ -291,9 +285,8 @@ describe("PlayerStatusEnricher", () => {
       vi.clearAllMocks()
 
       // Second call immediately after should be cached
-      vi.mocked(mockServerService.getServerConfigBoolean)
-        .mockResolvedValueOnce(true) // EnableGeoIPEnrichment = true
-        .mockResolvedValueOnce(true) // IgnoreBots = true
+      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // EnableGeoIPEnrichment = true
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true) // IgnoreBots = true
 
       vi.mocked(mockServerService.findById).mockResolvedValue({
         serverId: 1,
@@ -313,9 +306,8 @@ describe("PlayerStatusEnricher", () => {
     })
 
     it("should handle GeoIP lookup failures gracefully", async () => {
-      vi.mocked(mockServerService.getServerConfigBoolean)
-        .mockResolvedValueOnce(true) // EnableGeoIPEnrichment = true
-        .mockResolvedValueOnce(true) // IgnoreBots = true
+      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // EnableGeoIPEnrichment = true
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true) // IgnoreBots = true
 
       vi.mocked(mockServerService.findById).mockResolvedValue({
         serverId: 1,
@@ -339,9 +331,8 @@ describe("PlayerStatusEnricher", () => {
     })
 
     it("should handle player not found in database", async () => {
-      vi.mocked(mockServerService.getServerConfigBoolean)
-        .mockResolvedValueOnce(true) // EnableGeoIPEnrichment = true
-        .mockResolvedValueOnce(true) // IgnoreBots = true
+      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true) // EnableGeoIPEnrichment = true
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true) // IgnoreBots = true
 
       vi.mocked(mockServerService.findById).mockResolvedValue({
         serverId: 1,

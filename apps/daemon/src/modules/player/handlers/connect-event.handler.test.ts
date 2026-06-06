@@ -165,7 +165,7 @@ describe("ConnectEventHandler", () => {
     })
 
     it("should skip session creation for bots when IgnoreBots is true", async () => {
-      vi.mocked(mockServerService.getServerConfigBoolean).mockResolvedValue(true)
+      vi.mocked(mockServerService.isIgnoreBotsEnabled).mockResolvedValue(true)
 
       const event: PlayerConnectEvent = {
         eventType: EventType.PLAYER_CONNECT,

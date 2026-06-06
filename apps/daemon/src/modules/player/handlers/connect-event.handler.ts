@@ -58,11 +58,7 @@ export class ConnectEventHandler extends BasePlayerEventHandler {
       })
 
       // Check IgnoreBots configuration
-      const ignoreBots = await this.serverService.getServerConfigBoolean(
-        event.serverId,
-        "IgnoreBots",
-        true,
-      )
+      const ignoreBots = await this.serverService.isIgnoreBotsEnabled(event.serverId)
 
       // Skip bot session creation if IgnoreBots=true
       if (ignoreBots && meta.isBot) {

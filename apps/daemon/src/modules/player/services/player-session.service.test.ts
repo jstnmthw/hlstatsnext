@@ -121,8 +121,8 @@ describe("PlayerSessionService", () => {
 
       // Configure IgnoreBots=true
       ;(
-        mockServerService.getServerConfigBoolean as MockedFunction<
-          typeof mockServerService.getServerConfigBoolean
+        mockServerService.isIgnoreBotsEnabled as MockedFunction<
+          typeof mockServerService.isIgnoreBotsEnabled
         >
       ).mockResolvedValue(true)
       ;(
@@ -195,8 +195,8 @@ describe("PlayerSessionService", () => {
 
       // Configure IgnoreBots=false
       ;(
-        mockServerService.getServerConfigBoolean as MockedFunction<
-          typeof mockServerService.getServerConfigBoolean
+        mockServerService.isIgnoreBotsEnabled as MockedFunction<
+          typeof mockServerService.isIgnoreBotsEnabled
         >
       ).mockResolvedValue(false)
       ;(
@@ -499,8 +499,8 @@ describe("PlayerSessionService", () => {
       const serverId = 1
 
       ;(
-        mockServerService.getServerConfigBoolean as MockedFunction<
-          typeof mockServerService.getServerConfigBoolean
+        mockServerService.isIgnoreBotsEnabled as MockedFunction<
+          typeof mockServerService.isIgnoreBotsEnabled
         >
       ).mockResolvedValue(false)
       ;(
@@ -560,11 +560,11 @@ describe("PlayerSessionService", () => {
       mockSessionRepository.createSession.mockResolvedValue({})
       mockSessionRepository.deleteServerSessions.mockResolvedValue(0)
 
-      // respectIgnoreBots=false means getServerConfigBoolean should NOT be called
+      // respectIgnoreBots=false means isIgnoreBotsEnabled should NOT be called
       const result = await service.synchronizeServerSessions(serverId, { respectIgnoreBots: false })
 
       // Bot must be included because ignoreBots is forced to false
-      expect(mockServerService.getServerConfigBoolean).not.toHaveBeenCalled()
+      expect(mockServerService.isIgnoreBotsEnabled).not.toHaveBeenCalled()
       expect(mockSessionRepository.createSession).toHaveBeenCalledTimes(1)
       expect(result).toBe(1)
     })
@@ -573,8 +573,8 @@ describe("PlayerSessionService", () => {
       const serverId = 1
 
       ;(
-        mockServerService.getServerConfigBoolean as MockedFunction<
-          typeof mockServerService.getServerConfigBoolean
+        mockServerService.isIgnoreBotsEnabled as MockedFunction<
+          typeof mockServerService.isIgnoreBotsEnabled
         >
       ).mockResolvedValue(false)
       ;(
@@ -624,8 +624,8 @@ describe("PlayerSessionService", () => {
       ]
 
       ;(
-        mockServerService.getServerConfigBoolean as MockedFunction<
-          typeof mockServerService.getServerConfigBoolean
+        mockServerService.isIgnoreBotsEnabled as MockedFunction<
+          typeof mockServerService.isIgnoreBotsEnabled
         >
       ).mockResolvedValue(false)
       ;(
@@ -677,8 +677,8 @@ describe("PlayerSessionService", () => {
       ]
 
       ;(
-        mockServerService.getServerConfigBoolean as MockedFunction<
-          typeof mockServerService.getServerConfigBoolean
+        mockServerService.isIgnoreBotsEnabled as MockedFunction<
+          typeof mockServerService.isIgnoreBotsEnabled
         >
       ).mockResolvedValue(false)
       ;(

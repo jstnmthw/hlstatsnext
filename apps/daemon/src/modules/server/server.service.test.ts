@@ -385,6 +385,34 @@ describe("ServerService", () => {
     })
   })
 
+  describe("isIgnoreBotsEnabled", () => {
+    it("reads the IgnoreBots parameter", async () => {
+      mockRepository.getServerConfig.mockResolvedValue("1")
+
+      await serverService.isIgnoreBotsEnabled(7)
+
+      expect(mockRepository.getServerConfig).toHaveBeenCalledWith(7, "IgnoreBots")
+    })
+
+    it("defaults to false (matching the seeded config default) when no value resolves", async () => {
+      mockRepository.getServerConfig.mockResolvedValue(null)
+
+      expect(await serverService.isIgnoreBotsEnabled(7)).toBe(false)
+    })
+
+    it("honors an explicit on value", async () => {
+      mockRepository.getServerConfig.mockResolvedValue("1")
+
+      expect(await serverService.isIgnoreBotsEnabled(7)).toBe(true)
+    })
+
+    it("honors an explicit off value", async () => {
+      mockRepository.getServerConfig.mockResolvedValue("0")
+
+      expect(await serverService.isIgnoreBotsEnabled(7)).toBe(false)
+    })
+  })
+
   describe("hasRconCredentials", () => {
     it("should return true when server has RCON credentials", async () => {
       mockRepository.hasRconCredentials.mockResolvedValue(true)

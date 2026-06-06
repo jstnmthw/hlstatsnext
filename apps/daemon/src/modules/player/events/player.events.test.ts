@@ -38,6 +38,7 @@ const createMockServerService = (): IServerService => ({
   handleAdminAction: vi.fn(),
   getServerConfig: vi.fn().mockResolvedValue(""),
   getServerModType: vi.fn().mockResolvedValue(""),
+  clearServerCache: vi.fn(),
 })
 
 describe("PlayerEventHandler", () => {

@@ -6,11 +6,6 @@
  */
 
 import { DatabaseClient } from "@/database/client"
-import {
-  createCacheService,
-  getCacheConfigFromEnv,
-  type ICacheService,
-} from "@/shared/infrastructure/caching"
 import Logger from "@/shared/utils/logger"
 import type { ILogger } from "@/shared/utils/logger.types"
 import { createCryptoService, type ICryptoService } from "@repo/crypto"
@@ -20,14 +15,13 @@ export interface InfrastructureComponents {
   database: DatabaseClient
   logger: ILogger
   crypto: ICryptoService
-  cache: ICacheService
   metrics: PrometheusMetricsExporter
 }
 
 /**
  * Creates core infrastructure components with standardized configuration
  *
- * @returns Configured database client, logger instance, crypto service, cache, and metrics
+ * @returns Configured database client, logger instance, crypto service, and metrics
  */
 export function createInfrastructureComponents(): InfrastructureComponents {
   const database = new DatabaseClient()
@@ -48,10 +42,6 @@ export function createInfrastructureComponents(): InfrastructureComponents {
   }
   const crypto = createCryptoService()
 
-  // Create cache service
-  const cacheConfig = getCacheConfigFromEnv()
-  const cache = createCacheService(cacheConfig, logger)
-
   // Create Prisma client with metrics extension using factory pattern
   // This returns a properly-typed extended client without unsafe casts
   // Guard: database.prisma is undefined when DATABASE_URL is not set (e.g. CI unit tests)
@@ -71,7 +61,6 @@ export function createInfrastructureComponents(): InfrastructureComponents {
     database,
     logger,
     crypto,
-    cache,
     metrics,
   }
 }

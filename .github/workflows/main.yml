@@ -160,11 +160,6 @@ jobs:
           --health-timeout=5s
           --health-retries=10
 
-      garnet:
-        image: ghcr.io/microsoft/garnet:latest
-        ports:
-          - 6380:6379
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -196,9 +191,6 @@ jobs:
         env:
           DATABASE_URL: mysql://hlstatsnext:changeme@localhost:3307/hlstatsnext_test
           RABBITMQ_URL: amqp://hlstats:hlstats@localhost:5673/hlstats
-          CACHE_ENABLED: "true"
-          CACHE_HOST: localhost
-          CACHE_PORT: "6380"
 
   # Update Coverage Badge: Publish badge to gist on main branch
   update-badge:

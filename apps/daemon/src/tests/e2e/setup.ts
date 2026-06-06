@@ -21,11 +21,6 @@ beforeAll(async () => {
   process.env.RABBITMQ_URL =
     process.env.RABBITMQ_URL || "amqp://hlstats:hlstats@localhost:5673/hlstats"
 
-  // Garnet / Redis cache
-  process.env.CACHE_ENABLED = "true"
-  process.env.CACHE_HOST = process.env.CACHE_HOST || "localhost"
-  process.env.CACHE_PORT = process.env.CACHE_PORT || "6380"
-
   // Verify DB connectivity
   const db = getTestDb()
   try {

@@ -62,7 +62,8 @@
       "msgpackr-extract"
     ],
     "overrides": {
-      "node-domexception": "file:./packages/node-domexception-stub"
+      "node-domexception": "file:./packages/node-domexception-stub",
+      "kysely": "0.28.17"
     },
     "ignoredBuiltDependencies": [
       "@parcel/watcher",

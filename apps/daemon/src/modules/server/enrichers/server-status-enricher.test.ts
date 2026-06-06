@@ -43,6 +43,7 @@ const mockServerService: IServerService = {
   isIgnoreBotsEnabled: vi.fn(),
   getServerConfig: vi.fn(),
   getServerModType: vi.fn(),
+  clearServerCache: vi.fn(),
   hasRconCredentials: vi.fn(),
   findActiveServersWithRcon: vi.fn(),
   findServersByIds: vi.fn(),

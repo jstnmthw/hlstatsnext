@@ -17,6 +17,7 @@ export function createMockServerService(): IServerService {
     isIgnoreBotsEnabled: vi.fn().mockResolvedValue(false),
     getServerModType: vi.fn().mockResolvedValue(null),
     getServerConfig: vi.fn().mockResolvedValue(null),
+    clearServerCache: vi.fn(),
     hasRconCredentials: vi.fn().mockResolvedValue(false),
     findActiveServersWithRcon: vi.fn().mockResolvedValue([]),
     findServersByIds: vi.fn().mockResolvedValue([]),

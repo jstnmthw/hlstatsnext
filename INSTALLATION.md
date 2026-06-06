@@ -121,20 +121,6 @@ DB_IDLE_TIMEOUT=300000
 DB_HEALTH_CHECK_INTERVAL=60000
 DB_MAX_RETRIES=3
 
-# Cache Configuration (Garnet)
-CACHE_ENABLED=true
-CACHE_HOST=hlstatsnext-garnet
-CACHE_PORT=6379
-CACHE_PASSWORD=
-CACHE_KEY_PREFIX=hlstats:
-CACHE_DEFAULT_TTL=3600
-CACHE_RETRY_DELAY=100
-CACHE_MAX_RETRIES=3
-
-# Garnet Configuration
-GARNET_MEMORY=1g
-GARNET_PORT=6379
-
 # RabbitMQ Configuration
 RABBITMQ_USER=hlstats
 RABBITMQ_PASSWORD=hlstats
@@ -215,16 +201,6 @@ DB_CONNECTION_TIMEOUT=30000
 DB_IDLE_TIMEOUT=300000
 DB_HEALTH_CHECK_INTERVAL=60000
 DB_MAX_RETRIES=3
-
-# Cache (Garnet/Redis)
-CACHE_ENABLED=true
-CACHE_HOST=localhost
-CACHE_PORT=6379
-CACHE_PASSWORD=
-CACHE_KEY_PREFIX=hlstats:
-CACHE_DEFAULT_TTL=3600
-CACHE_RETRY_DELAY=100
-CACHE_MAX_RETRIES=3
 ```
 
 ### API App (`apps/api/.env`)
@@ -296,11 +272,10 @@ pnpm docker:ps
 
 ### Available Services
 
-| Service      | Container                | Port(s)     | Description                               |
-| ------------ | ------------------------ | ----------- | ----------------------------------------- |
-| **db**       | hlstatsnext-dev-db       | 3306        | MySQL 8.4 database                        |
-| **rabbitmq** | hlstatsnext-dev-rabbitmq | 5672, 15672 | Message queue + management UI             |
-| **garnet**   | hlstatsnext-dev-garnet   | 6379        | Redis-compatible cache (Microsoft Garnet) |
+| Service      | Container                | Port(s)     | Description                   |
+| ------------ | ------------------------ | ----------- | ----------------------------- |
+| **db**       | hlstatsnext-dev-db       | 3306        | MySQL 8.4 database            |
+| **rabbitmq** | hlstatsnext-dev-rabbitmq | 5672, 15672 | Message queue + management UI |
 
 Observability (opt-in, separate compose file): Prometheus on `:9090`, Grafana on `:3001`. Start with `pnpm docker:obs:up`.
 
@@ -556,16 +531,6 @@ lsof -i :27500
 
 # Kill process
 kill -9 <PID>
-```
-
-### Cache Issues (Garnet)
-
-```bash
-# Check Garnet status
-docker logs hlstatsnext-garnet
-
-# Disable cache temporarily
-# Set CACHE_ENABLED=false in .env
 ```
 
 ### GeoIP Seeding Fails

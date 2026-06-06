@@ -7,6 +7,7 @@ export interface IServerService {
   isIgnoreBotsEnabled(serverId: number): Promise<boolean>
   getServerConfig(serverId: number, parameter: string): Promise<string | null>
   getServerModType(serverId: number): Promise<string>
+  clearServerCache(serverId: number): void
   hasRconCredentials(serverId: number): Promise<boolean>
   findActiveServersWithRcon(maxAgeMinutes?: number): Promise<ServerInfo[]>
   findServersByIds(serverIds: number[]): Promise<ServerInfo[]>

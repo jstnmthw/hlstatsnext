@@ -39,6 +39,11 @@ export interface ServerLifecycleDeps {
   retryBackoffCalculator: { resetFailureState(serverId: number): void }
   rconService: IRconService
   ingressService: IIngressService
+  /**
+   * Only the per-server cache reset is needed here; a narrow type keeps the
+   * coordinator decoupled from the full server service surface.
+   */
+  serverService: { clearServerCache(serverId: number): void }
 }
 
 export class ServerLifecycleCoordinator {
@@ -101,6 +106,9 @@ export class ServerLifecycleCoordinator {
       this.deps.retryBackoffCalculator.resetFailureState(serverId),
     )
     this.safe("ingressService.dropServer", () => this.deps.ingressService.dropServer(serverId))
+    this.safe("serverService.clearServerCache", () =>
+      this.deps.serverService.clearServerCache(serverId),
+    )
 
     this.logger.debug(`Server ${serverId} shutdown fan-out complete`)
   }

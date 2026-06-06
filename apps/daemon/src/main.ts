@@ -423,7 +423,6 @@ export class HLStatsDaemon {
     await Promise.all([
       runPhase("rconService.disconnectAll", this.context.rconService.disconnectAll()),
       runPhase("queueModule.shutdown", this.context.queueModule?.shutdown() ?? Promise.resolve()),
-      runPhase("cache.disconnect", this.context.cache.disconnect()),
       runPhase("metricsServer.stop", this.metricsServer?.stop() ?? Promise.resolve()),
     ])
 

@@ -177,13 +177,45 @@ describe("ServerService", () => {
     it("should handle different game types", async () => {
       const gameTypes = ["cstrike", "css", "csgo", "tf2", "dod"]
 
-      for (const game of gameTypes) {
-        const serverInfo = { ...mockServerInfo, game }
-        mockRepository.findById.mockResolvedValue(serverInfo)
+      // A server's game is immutable, so distinct games mean distinct servers
+      // (the per-server cache returns the first game for a given serverId).
+      for (const [index, game] of gameTypes.entries()) {
+        const serverId = index + 1
+        mockRepository.findById.mockResolvedValue({ ...mockServerInfo, serverId, game })
 
-        const result = await serverService.getServerGame(1)
+        const result = await serverService.getServerGame(serverId)
         expect(result).toBe(game)
       }
+    })
+
+    it("caches the game so repeated reads hit the DB once", async () => {
+      mockRepository.findById.mockResolvedValue(mockServerInfo)
+
+      await serverService.getServerGame(1)
+      await serverService.getServerGame(1)
+      const result = await serverService.getServerGame(1)
+
+      expect(result).toBe("cstrike")
+      expect(mockRepository.findById).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not cache a not-found lookup", async () => {
+      mockRepository.findById.mockResolvedValueOnce(null)
+      expect(await serverService.getServerGame(1)).toBe("unknown")
+
+      mockRepository.findById.mockResolvedValueOnce(mockServerInfo)
+      expect(await serverService.getServerGame(1)).toBe("cstrike")
+      expect(mockRepository.findById).toHaveBeenCalledTimes(2)
+    })
+
+    it("clearServerCache forces the next read to hit the DB again", async () => {
+      mockRepository.findById.mockResolvedValue(mockServerInfo)
+
+      await serverService.getServerGame(1)
+      serverService.clearServerCache(1)
+      await serverService.getServerGame(1)
+
+      expect(mockRepository.findById).toHaveBeenCalledTimes(2)
     })
   })
 

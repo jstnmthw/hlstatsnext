@@ -4,7 +4,6 @@
 # Services run on non-default ports to avoid conflicts with dev:
 #   MySQL    → 3307  (dev: 3306)
 #   RabbitMQ → 5673  (dev: 5672)
-#   Garnet   → 6380  (dev: 6379)
 name: hlstatsnext-test
 
 services:
@@ -47,22 +46,6 @@ services:
       timeout: 5s
       retries: 10
       start_period: 10s
-    networks:
-      - hlstatsnext-test-network
-
-  garnet-test:
-    image: ghcr.io/microsoft/garnet:latest
-    container_name: hlstatsnext-test-garnet
-    hostname: hlstatsnext-test-garnet
-    ports:
-      - "6380:6379"
-    command: --port 6379
-    healthcheck:
-      test: ["CMD-SHELL", "bash -c 'echo PING > /dev/tcp/localhost/6379'"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 5s
     networks:
       - hlstatsnext-test-network
 

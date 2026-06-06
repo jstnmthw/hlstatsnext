@@ -5,7 +5,7 @@ Prometheus + Grafana for hlstatsnext.com. **Everything in this stack is opt-in**
 ## TL;DR
 
 ```bash
-pnpm docker:up                  # core stack: db, rabbitmq, garnet
+pnpm docker:up                  # core stack: db, rabbitmq
 pnpm docker:obs:up              # start Prometheus + Grafana (separate compose)
 METRICS_ENABLED=true pnpm dev   # turn on app-side metrics scrape targets
 # Grafana: http://localhost:3001 (admin / admin)
@@ -29,7 +29,7 @@ This means you can run the observability containers continuously without forcing
 | API `/metrics`      | `apps/api` (inline `node:http` listener; `@envelop/prometheus` + `prom-client` Registry) |  9092 | **Yes**                                      |
 | RabbitMQ `/metrics` | `rabbitmq_prometheus` broker plugin                                                      | 15692 | No (broker plugin is always on once enabled) |
 
-The compose layering is deliberate: the main `docker-compose.yml` boots only the data-plane services (db, rabbitmq, garnet) that the daemon and API need to function. The observability stack lives in `docker-compose.observability.yml` and attaches to the same `hlstatsnext-network` bridge so it can scrape `rabbitmq:15692` and reach host processes via `host.docker.internal`.
+The compose layering is deliberate: the main `docker-compose.yml` boots only the data-plane services (db, rabbitmq) that the daemon and API need to function. The observability stack lives in `docker-compose.observability.yml` and attaches to the same `hlstatsnext-network` bridge so it can scrape `rabbitmq:15692` and reach host processes via `host.docker.internal`.
 
 ### Host-vs-container networking
 

@@ -348,28 +348,6 @@ services:
         limits:
           memory: 512M
 
-  # ─── Cache (Garnet — Redis-compatible) ────────────────────
-  garnet:
-    image: ghcr.io/microsoft/garnet:latest
-    container_name: hlstatsnext-garnet
-    hostname: hlstatsnext-garnet
-    command: --port 6379 --memory ${GARNET_MEMORY:-1g} --checkpointdir /data
-    volumes:
-      - garnet-data:/data
-    networks:
-      - internal
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "bash -c 'echo PING > /dev/tcp/localhost/6379'"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-
   # ─── Web App (Next.js) ───────────────────────────────────
   web:
     build:
@@ -475,12 +453,6 @@ services:
       RCON_BACKOFF_MULTIPLIER: ${RCON_BACKOFF_MULTIPLIER:-2}
       RCON_MAX_BACKOFF_MINUTES: ${RCON_MAX_BACKOFF_MINUTES:-30}
       RCON_DORMANT_RETRY_MINUTES: ${RCON_DORMANT_RETRY_MINUTES:-60}
-      CACHE_ENABLED: ${CACHE_ENABLED:-true}
-      CACHE_HOST: hlstatsnext-garnet
-      CACHE_PORT: "6379"
-      CACHE_PASSWORD: ${CACHE_PASSWORD:-}
-      CACHE_KEY_PREFIX: "hlstats:"
-      CACHE_DEFAULT_TTL: ${CACHE_DEFAULT_TTL:-3600}
     ports:
       - "27500:27500/udp"
     networks:
@@ -571,7 +543,6 @@ networks:
 volumes:
   db-data:
   rabbitmq-data:
-  garnet-data:
   prometheus-data:
   grafana-data:
 ```
@@ -631,11 +602,6 @@ RABBITMQ_PASSWORD=         # generate: openssl rand -base64 32
 RABBITMQ_VHOST=hlstats
 RABBITMQ_ERLANG_COOKIE=    # generate: openssl rand -hex 32
 
-# ─── Cache (Garnet) ────────────────────────────────────────
-GARNET_MEMORY=2g
-CACHE_ENABLED=true
-CACHE_PASSWORD=
-
 # ─── Application Secrets ───────────────────────────────────
 ENCRYPTION_KEY=            # generate: openssl rand -base64 32
 BETTER_AUTH_SECRET=        # generate: openssl rand -base64 32
@@ -664,7 +630,6 @@ RCON_MAX_CONSECUTIVE_FAILURES=10
 RCON_BACKOFF_MULTIPLIER=2
 RCON_MAX_BACKOFF_MINUTES=30
 RCON_DORMANT_RETRY_MINUTES=60
-CACHE_DEFAULT_TTL=3600
 ```
 
 Generate all secrets at once:
@@ -844,7 +809,7 @@ docker exec hlstatsnext-db mysqldump \
 
 ### Non-Root Containers
 
-All application Dockerfiles (web, api, daemon) create and switch to a non-root user. The infrastructure containers (MySQL, RabbitMQ, Garnet, Prometheus, Grafana) run as their own non-root users by default.
+All application Dockerfiles (web, api, daemon) create and switch to a non-root user. The infrastructure containers (MySQL, RabbitMQ, Prometheus, Grafana) run as their own non-root users by default.
 
 ### Read-Only Filesystems
 
@@ -874,11 +839,11 @@ The compose file uses two networks:
 - **`internal`** — all services communicate here. Not exposed to Traefik.
 - **`web`** (external) — only `web`, `api`, and `grafana` are on this network, making them discoverable by Traefik.
 
-The database, RabbitMQ, Garnet, and Prometheus are only on the `internal` network and are not reachable from outside.
+The database, RabbitMQ, and Prometheus are only on the `internal` network and are not reachable from outside.
 
 ### No Exposed Ports on Infrastructure
 
-Note that `db`, `rabbitmq`, `garnet`, and `prometheus` have **no `ports:` mapping** in the production compose file. They are only accessible via the internal Docker network. This is a deliberate difference from the dev compose file.
+Note that `db`, `rabbitmq`, and `prometheus` have **no `ports:` mapping** in the production compose file. They are only accessible via the internal Docker network. This is a deliberate difference from the dev compose file.
 
 ### Firewall (UFW)
 

@@ -75,9 +75,6 @@ const mockContext = {
   queueModule: {
     shutdown: vi.fn(),
   },
-  cache: {
-    disconnect: vi.fn(),
-  },
   metrics: {
     getMetrics: vi.fn().mockReturnValue(""),
   },
@@ -250,7 +247,6 @@ describe("HLStatsDaemon", () => {
       vi.mocked(mockContext.ingressService.stop).mockResolvedValue(undefined)
       vi.mocked(mockContext.rconService.disconnectAll).mockResolvedValue(undefined)
       vi.mocked(mockContext.rconScheduleService.stop).mockResolvedValue(undefined)
-      vi.mocked(mockContext.cache.disconnect).mockResolvedValue(undefined)
       vi.mocked(mockDatabaseConnection.disconnect).mockResolvedValue(undefined)
 
       await daemon.stop()
@@ -267,7 +263,6 @@ describe("HLStatsDaemon", () => {
       vi.mocked(mockContext.rconScheduleService.stop).mockResolvedValue(undefined)
       vi.mocked(mockContext.ingressService.stop).mockRejectedValue(new Error("Stop error"))
       vi.mocked(mockContext.rconService.disconnectAll).mockResolvedValue(undefined)
-      vi.mocked(mockContext.cache.disconnect).mockResolvedValue(undefined)
       vi.spyOn(mockContext.database, "disconnect").mockResolvedValue(undefined)
       vi.mocked(mockDatabaseConnection.disconnect).mockResolvedValue(undefined)
 

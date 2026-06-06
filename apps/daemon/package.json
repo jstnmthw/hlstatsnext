@@ -19,7 +19,6 @@
   "dependencies": {
     "@repo/observability": "workspace:*",
     "amqplib": "^0.10.9",
-    "ioredis": "^5.11.1",
     "node-cron": "^4.2.1",
     "winston": "^3.19.0",
     "zod": "^4.4.3"

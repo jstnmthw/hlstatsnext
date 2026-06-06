@@ -105,6 +105,41 @@ describe("ActionRepository", () => {
       expect(result).toBeNull()
     })
 
+    it("serves a repeated positive lookup from cache", async () => {
+      const mockAction = {
+        id: 1,
+        game: "cstrike",
+        code: "defused_the_bomb",
+        count: 0,
+        rewardPlayer: 10,
+        rewardTeam: 2,
+        team: "CT",
+        description: "Defused the bomb",
+        forPlayerActions: "1",
+        forPlayerPlayerActions: "0",
+        forTeamActions: "0",
+        forWorldActions: "0",
+      }
+      vi.mocked(mockDatabase.prisma.action.findFirst).mockResolvedValue(mockAction)
+
+      const first = await repository.findActionByCode("cstrike", "defused_the_bomb", "CT")
+      const second = await repository.findActionByCode("cstrike", "defused_the_bomb", "CT")
+
+      expect(second).toEqual(first)
+      expect(mockDatabase.prisma.action.findFirst).toHaveBeenCalledTimes(1)
+    })
+
+    it("caches negative results so unknown codes are not re-queried", async () => {
+      vi.mocked(mockDatabase.prisma.action.findFirst).mockResolvedValue(null)
+
+      expect(await repository.findActionByCode("cstrike", "unknown_code", "CT")).toBeNull()
+      expect(await repository.findActionByCode("cstrike", "unknown_code", "CT")).toBeNull()
+
+      // First resolution is two queries (team + fallback); the cached miss
+      // serves the second call without touching the DB.
+      expect(mockDatabase.prisma.action.findFirst).toHaveBeenCalledTimes(2)
+    })
+
     it("should throw error on database failure", async () => {
       vi.mocked(mockDatabase.prisma.action.findFirst).mockRejectedValue(new Error("Database error"))
 

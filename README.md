@@ -13,7 +13,7 @@ HLStatsNext is a complete modernization of HLstatsX:CE, replacing the legacy PHP
 - **Real-time Statistics** — Node.js daemon processes game events instantly
 - **Modern Stack** — TypeScript, Next.js 16, GraphQL Yoga, Prisma, MySQL 8.4
 - **Turborepo Monorepo** — Shared packages, optimized builds, hot-reload dev
-- **Docker Ready** — MySQL, RabbitMQ, Garnet (Redis), Prometheus, Grafana
+- **Docker Ready** — MySQL, RabbitMQ, Prometheus, Grafana
 - **Type-Safe API** — End-to-end type safety with GraphQL code generation
 - **GeoIP Support** — Player geolocation via MaxMind GeoLite2
 
@@ -92,7 +92,6 @@ pnpm docker:obs:logs
 | -------- | ----------- | ----------------------------- |
 | db       | 3306        | MySQL 8.4 database            |
 | rabbitmq | 5672, 15672 | Message queue + management UI |
-| garnet   | 6379        | Redis-compatible cache        |
 
 Observability (opt-in via `pnpm docker:obs:up`): Prometheus on `:9090`, Grafana on `:3001`.
 

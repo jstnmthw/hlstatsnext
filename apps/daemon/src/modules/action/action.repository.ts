@@ -9,6 +9,15 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { ActionDefinition, IActionRepository } from "./action.types"
 
 export class ActionRepository implements IActionRepository {
+  // Action definitions are static reference data (admin-edited only) read up to
+  // twice per action event. Cache the resolved lookup — including negative
+  // results, since unknown codes recur — keyed by game:code:team. Full-clear on
+  // a 5-minute window mirrors RankingService.weaponModifierCache so an admin
+  // edit propagates within the window. Bounded by distinct codes per game.
+  private readonly actionCache = new Map<string, ActionDefinition | null>()
+  private actionCacheLastUpdated = 0
+  private readonly ACTION_CACHE_TTL_MS = 5 * 60 * 1000
+
   constructor(
     private readonly database: DatabaseClient,
     private readonly logger: ILogger,
@@ -19,6 +28,18 @@ export class ActionRepository implements IActionRepository {
     actionCode: string,
     team?: string,
   ): Promise<ActionDefinition | null> {
+    const cacheKey = `${game}:${actionCode}:${team ?? ""}`
+    const now = Date.now()
+
+    if (now - this.actionCacheLastUpdated > this.ACTION_CACHE_TTL_MS) {
+      this.actionCache.clear()
+      this.actionCacheLastUpdated = now
+    }
+
+    if (this.actionCache.has(cacheKey)) {
+      return this.actionCache.get(cacheKey)!
+    }
+
     try {
       this.logger.debug(
         `Looking up action: game=${game}, code=${actionCode}, team=${team || "undefined"}`,
@@ -47,23 +68,24 @@ export class ActionRepository implements IActionRepository {
 
       this.logger.debug(`Action lookup result: ${action ? `Found ID ${action.id}` : "Not found"}`)
 
-      if (!action) {
-        return null
-      }
+      const definition: ActionDefinition | null = action
+        ? {
+            id: action.id,
+            game: action.game,
+            code: action.code,
+            rewardPlayer: action.rewardPlayer,
+            rewardTeam: action.rewardTeam,
+            team: action.team,
+            description: action.description,
+            forPlayerActions: action.forPlayerActions === "1",
+            forPlayerPlayerActions: action.forPlayerPlayerActions === "1",
+            forTeamActions: action.forTeamActions === "1",
+            forWorldActions: action.forWorldActions === "1",
+          }
+        : null
 
-      return {
-        id: action.id,
-        game: action.game,
-        code: action.code,
-        rewardPlayer: action.rewardPlayer,
-        rewardTeam: action.rewardTeam,
-        team: action.team,
-        description: action.description,
-        forPlayerActions: action.forPlayerActions === "1",
-        forPlayerPlayerActions: action.forPlayerPlayerActions === "1",
-        forTeamActions: action.forTeamActions === "1",
-        forWorldActions: action.forWorldActions === "1",
-      }
+      this.actionCache.set(cacheKey, definition)
+      return definition
     } catch (error) {
       throw new Error(`Failed to find action by code: ${error}`)
     }

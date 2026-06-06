@@ -19,7 +19,6 @@ import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-st
 import type { IServerService } from "@/modules/server/server.types"
 import type { IWeaponService } from "@/modules/weapon/weapon.types"
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
-import type { ICacheService } from "@/shared/infrastructure/caching"
 import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { ILogger } from "@/shared/utils/logger.types"
@@ -59,7 +58,6 @@ export interface AppContext {
   database: DatabaseClient
   logger: ILogger
   eventBus: IEventBus
-  cache: ICacheService
   metrics: PrometheusMetricsExporter
 
   // Queue Infrastructure (migration to queue-first)
@@ -184,6 +182,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
       rconScheduleService: services.rconScheduleService,
       rconService: services.rconService,
       ingressService,
+      serverService: services.serverService,
       // RetryBackoffCalculator is currently private to ServerMonitoringCommand;
       // its failure-state Map is bounded by # servers and TTL via
       // `dormantRetryMinutes`, so cleanup on SERVER_SHUTDOWN is not load-bearing
@@ -200,7 +199,6 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     database: infrastructure.database,
     logger: infrastructure.logger,
     eventBus,
-    cache: infrastructure.cache,
     metrics: infrastructure.metrics,
 
     // Queue Infrastructure

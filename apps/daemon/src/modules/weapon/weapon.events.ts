@@ -5,16 +5,19 @@
  * This handler allows the weapon module to manage its own events and statistics independently.
  */
 
+import type { IServerService } from "@/modules/server/server.types"
 import type { IWeaponService, WeaponEvent } from "@/modules/weapon/weapon.types"
 import { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-handler.base"
 import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import type { BaseEvent } from "@/shared/types/events"
+import { eventInvolvesBot } from "@/shared/utils/bot-event.util"
 import type { ILogger } from "@/shared/utils/logger.types"
 
 export class WeaponEventHandler extends BaseModuleEventHandler {
   constructor(
     logger: ILogger,
     private readonly weaponService: IWeaponService,
+    private readonly serverService: IServerService,
     metrics?: EventMetrics,
   ) {
     super(logger, metrics)
@@ -37,6 +40,22 @@ export class WeaponEventHandler extends BaseModuleEventHandler {
   }
 
   async handlePlayerKill(event: BaseEvent): Promise<void> {
+    // Mirror the player module: when IgnoreBots is on, a bot-involved kill is
+    // discarded entirely, so its weapon stats must not be recorded either.
+    if (eventInvolvesBot(event)) {
+      const ignoreBots = await this.serverService.getServerConfigBoolean(
+        event.serverId,
+        "IgnoreBots",
+        true,
+      )
+      if (ignoreBots) {
+        this.logger.debug(
+          `Weapon module ignoring bot PLAYER_KILL for server ${event.serverId} (IgnoreBots=on)`,
+        )
+        return
+      }
+    }
+
     this.logger.debug(`Weapon module handling PLAYER_KILL for server ${event.serverId}`)
 
     const result = await this.weaponService.handleWeaponEvent(event as WeaponEvent)

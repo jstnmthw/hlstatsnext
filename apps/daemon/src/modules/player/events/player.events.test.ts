@@ -455,6 +455,109 @@ describe("PlayerEventHandler", () => {
       )
     })
 
+    it("should discard a human-kills-bot PLAYER_KILL when IgnoreBots is enabled", async () => {
+      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "human-kills-bot",
+        data: { weapon: "ak47", headshot: false },
+        meta: {
+          killer: { steamId: "STEAM_1:0:111", playerName: "Human", isBot: false },
+          victim: { steamId: "BOT", playerName: "Bot Bob", isBot: true },
+        },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(serverService.getServerConfigBoolean).toHaveBeenCalledWith(1, "IgnoreBots", true)
+      expect(playerService.getOrCreatePlayer).not.toHaveBeenCalled()
+      expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
+    })
+
+    it("should process a human-kills-bot PLAYER_KILL when IgnoreBots is disabled", async () => {
+      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(false)
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "human-kills-bot-allowed",
+        data: { weapon: "ak47", headshot: false },
+        meta: {
+          killer: { steamId: "STEAM_1:0:111", playerName: "Human", isBot: false },
+          victim: { steamId: "BOT", playerName: "Bot Bob", isBot: true },
+        },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(playerService.getOrCreatePlayer).toHaveBeenCalledTimes(2)
+      expect(playerService.handlePlayerEvent).toHaveBeenCalled()
+    })
+
+    it("should discard a bot-involved PLAYER_DAMAGE when IgnoreBots is enabled", async () => {
+      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_DAMAGE,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "bot-damage",
+        data: { damage: 50, weapon: "ak47" },
+        meta: {
+          killer: { steamId: "BOT", playerName: "Bot Bob", isBot: true },
+          victim: { steamId: "STEAM_1:0:222", playerName: "Human", isBot: false },
+        },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(playerService.getOrCreatePlayer).not.toHaveBeenCalled()
+      expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
+    })
+
+    it("should discard a bot-involved PLAYER_TEAMKILL when IgnoreBots is enabled", async () => {
+      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_TEAMKILL,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "bot-teamkill",
+        data: { weapon: "awp" },
+        meta: {
+          killer: { steamId: "BOT", playerName: "Bot Bob", isBot: true },
+          victim: { steamId: "BOT", playerName: "Bot Alice", isBot: true },
+        },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(playerService.handlePlayerEvent).not.toHaveBeenCalled()
+    })
+
+    it("should not check IgnoreBots for an all-human PLAYER_KILL", async () => {
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 1,
+        eventId: "human-kill",
+        data: { weapon: "ak47", headshot: false },
+        meta: {
+          killer: { steamId: "STEAM_1:0:111", playerName: "K", isBot: false },
+          victim: { steamId: "STEAM_1:0:222", playerName: "V", isBot: false },
+        },
+      }
+
+      await handler.handleEvent(event)
+
+      expect(serverService.getServerConfigBoolean).not.toHaveBeenCalled()
+      expect(playerService.handlePlayerEvent).toHaveBeenCalled()
+    })
+
     it("should handle PLAYER_DAMAGE with missing meta gracefully", async () => {
       const event: BaseEvent = {
         eventType: EventType.PLAYER_DAMAGE,

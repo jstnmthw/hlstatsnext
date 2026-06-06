@@ -2,6 +2,14 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import type { IServerRepository, IServerService, ServerInfo } from "./server.types"
 
 export class ServerService implements IServerService {
+  // IgnoreBots and similar per-server flags are read on hot event paths (every
+  // bot-involved kill/damage). Cache config reads briefly so a busy bot server
+  // doesn't query the DB per event; staleness is bounded by the TTL, which is
+  // acceptable for rarely-changed admin settings. Keyed by serverId:parameter,
+  // so the map is bounded by (servers × parameters) and entries refresh in place.
+  private static readonly CONFIG_CACHE_TTL_MS = 30_000
+  private readonly configCache = new Map<string, { value: string | null; expiresAt: number }>()
+
   constructor(
     private readonly repository: IServerRepository,
     private readonly logger: ILogger,
@@ -35,12 +43,31 @@ export class ServerService implements IServerService {
     parameter: string,
     fallback: boolean,
   ): Promise<boolean> {
-    const raw = await this.repository.getServerConfig(serverId, parameter)
+    const raw = await this.readServerConfigCached(serverId, parameter)
     if (raw == null) return fallback
     const normalized = raw.trim().toLowerCase()
     if (["1", "true", "yes", "on"].includes(normalized)) return true
     if (["0", "false", "no", "off"].includes(normalized)) return false
     return fallback
+  }
+
+  private async readServerConfigCached(
+    serverId: number,
+    parameter: string,
+  ): Promise<string | null> {
+    const key = `${serverId}:${parameter}`
+    const now = Date.now()
+    const cached = this.configCache.get(key)
+    if (cached && cached.expiresAt > now) {
+      return cached.value
+    }
+
+    const value = await this.repository.getServerConfig(serverId, parameter)
+    this.configCache.set(key, {
+      value,
+      expiresAt: now + ServerService.CONFIG_CACHE_TTL_MS,
+    })
+    return value
   }
 
   async hasRconCredentials(serverId: number): Promise<boolean> {

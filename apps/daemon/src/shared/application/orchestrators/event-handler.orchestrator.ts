@@ -65,7 +65,12 @@ function createHandlerInstances(
     eventMetrics,
   )
 
-  const weaponEventHandler = new WeaponEventHandler(logger, services.weaponService, eventMetrics)
+  const weaponEventHandler = new WeaponEventHandler(
+    logger,
+    services.weaponService,
+    services.serverService,
+    eventMetrics,
+  )
 
   const matchEventHandler = new MatchEventHandler(
     logger,

@@ -12,6 +12,7 @@ import { BaseModuleEventHandler } from "@/shared/infrastructure/modules/event-ha
 import type { EventMetrics } from "@/shared/infrastructure/observability/event-metrics"
 import type { BaseEvent, PlayerMeta } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
+import { eventInvolvesBot } from "@/shared/utils/bot-event.util"
 import type { ILogger } from "@/shared/utils/logger.types"
 
 interface KillEventMeta {
@@ -42,15 +43,12 @@ export class PlayerEventHandler extends BaseModuleEventHandler {
    * This is much cleaner than having multiple methods that do the same thing
    */
   async handleEvent(event: BaseEvent): Promise<void> {
-    // Apply per-server IgnoreBots for lifecycle events
-    if (
-      (event.eventType === EventType.PLAYER_CONNECT ||
-        event.eventType === EventType.PLAYER_DISCONNECT ||
-        event.eventType === EventType.PLAYER_ENTRY) &&
-      event.meta &&
-      typeof event.meta === "object" &&
-      (event.meta as PlayerMeta).isBot
-    ) {
+    // When IgnoreBots is on for the server, discard the whole event if a bot is
+    // involved — presence events (CONNECT/DISCONNECT/ENTRY) and scoring events
+    // (KILL/DAMAGE/TEAMKILL) where either participant is a bot. Dropping the entire
+    // frag rather than only the bot's half stops humans from farming skill against
+    // bots and keeps bots out of the Player table.
+    if (eventInvolvesBot(event)) {
       const ignoreBots = await this.serverService.getServerConfigBoolean(
         event.serverId,
         "IgnoreBots",

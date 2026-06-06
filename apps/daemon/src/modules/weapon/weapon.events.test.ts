@@ -2,6 +2,7 @@
  * WeaponEventHandler Unit Tests
  */
 
+import type { IServerService } from "@/modules/server/server.types"
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import { createMockEventBus } from "@/tests/mocks/event-bus"
@@ -16,18 +17,25 @@ const createMockWeaponService = (): IWeaponService => ({
   updateWeaponStats: vi.fn(),
 })
 
+const createMockServerService = (): IServerService =>
+  ({
+    getServerConfigBoolean: vi.fn().mockResolvedValue(false),
+  }) as unknown as IServerService
+
 describe("WeaponEventHandler", () => {
   let handler: WeaponEventHandler
   let logger: ReturnType<typeof createMockLogger>
   let eventBus: ReturnType<typeof createMockEventBus>
   let weaponService: IWeaponService
+  let serverService: IServerService
 
   beforeEach(() => {
     logger = createMockLogger()
     eventBus = createMockEventBus()
     weaponService = createMockWeaponService()
+    serverService = createMockServerService()
 
-    handler = new WeaponEventHandler(logger, weaponService)
+    handler = new WeaponEventHandler(logger, weaponService, serverService)
   })
 
   afterEach(() => {
@@ -191,6 +199,47 @@ describe("WeaponEventHandler", () => {
       expect(logger.debug).toHaveBeenCalledWith(
         expect.stringContaining("Weapon module handling PLAYER_KILL for server 3"),
       )
+      expect(weaponService.handleWeaponEvent).toHaveBeenCalledWith(event)
+    })
+
+    it("should discard bot-involved PLAYER_KILL when IgnoreBots is enabled", async () => {
+      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(true)
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 3,
+        eventId: "bot-kill",
+        data: { weapon: "awp", headshot: false },
+        meta: {
+          killer: { steamId: "STEAM_1:0:111", playerName: "Human", isBot: false },
+          victim: { steamId: "BOT", playerName: "Bot Bob", isBot: true },
+        },
+      }
+
+      await handler.handlePlayerKill(event)
+
+      expect(serverService.getServerConfigBoolean).toHaveBeenCalledWith(3, "IgnoreBots", true)
+      expect(weaponService.handleWeaponEvent).not.toHaveBeenCalled()
+    })
+
+    it("should record bot-involved PLAYER_KILL when IgnoreBots is disabled", async () => {
+      vi.mocked(serverService.getServerConfigBoolean).mockResolvedValue(false)
+
+      const event: BaseEvent = {
+        eventType: EventType.PLAYER_KILL,
+        timestamp: new Date(),
+        serverId: 3,
+        eventId: "bot-kill-allowed",
+        data: { weapon: "awp", headshot: false },
+        meta: {
+          killer: { steamId: "STEAM_1:0:111", playerName: "Human", isBot: false },
+          victim: { steamId: "BOT", playerName: "Bot Bob", isBot: true },
+        },
+      }
+
+      await handler.handlePlayerKill(event)
+
       expect(weaponService.handleWeaponEvent).toHaveBeenCalledWith(event)
     })
   })

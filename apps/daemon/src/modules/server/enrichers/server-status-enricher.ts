@@ -6,7 +6,7 @@
  */
 
 import type { IPlayerStatusEnricher } from "@/modules/player/enrichers/player-status-enricher"
-import type { IRconService, ServerStatus } from "@/modules/rcon/types/rcon.types"
+import type { IRconRepository, IRconService, ServerStatus } from "@/modules/rcon/types/rcon.types"
 import type {
   IServerRepository,
   IServerService,
@@ -29,6 +29,7 @@ export class ServerStatusEnricher implements IServerStatusEnricher {
     private readonly rconService: IRconService,
     private readonly serverRepository: IServerRepository,
     private readonly serverService: IServerService,
+    private readonly rconRepository: IRconRepository,
     private readonly logger: ILogger,
     private readonly playerStatusEnricher?: IPlayerStatusEnricher,
   ) {}
@@ -51,6 +52,9 @@ export class ServerStatusEnricher implements IServerStatusEnricher {
 
       const update = await this.buildStatusUpdate(serverId, status)
       await this.updateServerDatabase(serverId, update, status.map)
+
+      // Append a historical load snapshot (servers_load) for population charts
+      await this.rconRepository.recordServerLoad(serverId, status)
 
       // Enrich player geo data if enricher is available and there are players with IPs
       if (this.playerStatusEnricher && status.playerList && status.playerList.length > 0) {

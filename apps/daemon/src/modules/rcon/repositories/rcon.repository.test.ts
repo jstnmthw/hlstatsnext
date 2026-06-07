@@ -179,7 +179,7 @@ describe("RconRepository", () => {
     })
   })
 
-  describe("updateServerStatus", () => {
+  describe("recordServerLoad", () => {
     it("should insert server load record", async () => {
       mockDb.mockPrisma.serverLoad.create.mockResolvedValue({} as never)
 
@@ -194,7 +194,7 @@ describe("RconRepository", () => {
         botCount: 2,
       }
 
-      await repository.updateServerStatus(1, status)
+      await repository.recordServerLoad(1, status)
 
       expect(mockDb.mockPrisma.serverLoad.create).toHaveBeenCalledWith({
         data: {
@@ -233,7 +233,7 @@ describe("RconRepository", () => {
         // No realPlayerCount
       }
 
-      await repository.updateServerStatus(2, status)
+      await repository.recordServerLoad(2, status)
 
       expect(mockDb.mockPrisma.serverLoad.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
@@ -256,10 +256,33 @@ describe("RconRepository", () => {
       }
 
       // Should not throw
-      await expect(repository.updateServerStatus(1, status)).resolves.not.toThrow()
+      await expect(repository.recordServerLoad(1, status)).resolves.not.toThrow()
 
       expect(mockLogger.debug).toHaveBeenCalledWith(
         expect.stringContaining("Could not insert server status history"),
+      )
+    })
+  })
+
+  describe("pruneServerLoad", () => {
+    it("should delete rows older than the cutoff and return the count", async () => {
+      mockDb.mockPrisma.serverLoad.deleteMany.mockResolvedValue({ count: 42 } as never)
+
+      const cutoff = 1_700_000_000
+      const deleted = await repository.pruneServerLoad(cutoff)
+
+      expect(deleted).toBe(42)
+      expect(mockDb.mockPrisma.serverLoad.deleteMany).toHaveBeenCalledWith({
+        where: { timestamp: { lt: cutoff } },
+      })
+    })
+
+    it("should return 0 and not throw when the delete fails", async () => {
+      mockDb.mockPrisma.serverLoad.deleteMany.mockRejectedValue(new Error("db down"))
+
+      await expect(repository.pruneServerLoad(1_700_000_000)).resolves.toBe(0)
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to prune servers_load"),
       )
     })
   })

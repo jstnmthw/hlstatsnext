@@ -74,7 +74,7 @@ export class RconRepository implements IRconRepository {
     }
   }
 
-  async updateServerStatus(serverId: number, status: ServerStatus): Promise<void> {
+  async recordServerLoad(serverId: number, status: ServerStatus): Promise<void> {
     try {
       // Insert status history record using ServerLoad table
       await this.database.prisma.serverLoad.create({
@@ -99,6 +99,18 @@ export class RconRepository implements IRconRepository {
     } catch (error) {
       // ServerLoad insert might fail due to primary key constraints - this is optional
       this.logger.debug(`Could not insert server status history: ${error}`)
+    }
+  }
+
+  async pruneServerLoad(olderThanUnixSeconds: number): Promise<number> {
+    try {
+      const result = await this.database.prisma.serverLoad.deleteMany({
+        where: { timestamp: { lt: olderThanUnixSeconds } },
+      })
+      return result.count
+    } catch (error) {
+      this.logger.warn(`Failed to prune servers_load history: ${error}`)
+      return 0
     }
   }
 

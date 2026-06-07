@@ -322,45 +322,6 @@ describe("ServerStateManager", () => {
     })
   })
 
-  describe("cleanupInactiveStates", () => {
-    it("should remove states older than max age", () => {
-      const oldTime = new Date("2024-01-01T12:00:00Z")
-      const currentTime = new Date("2024-01-01T14:00:00Z")
-
-      vi.setSystemTime(oldTime)
-      stateManager.getServerState(1)
-
-      vi.setSystemTime(currentTime)
-      stateManager.cleanupInactiveStates(60) // 60 minute max age
-
-      expect(stateManager.getActiveServers()).not.toContain(1)
-    })
-
-    it("should keep active states", () => {
-      const now = new Date()
-      vi.setSystemTime(now)
-
-      stateManager.getServerState(1)
-      stateManager.cleanupInactiveStates(60)
-
-      expect(stateManager.getActiveServers()).toContain(1)
-    })
-
-    it("should log cleanup count", () => {
-      const oldTime = new Date("2024-01-01T12:00:00Z")
-      const currentTime = new Date("2024-01-01T14:00:00Z")
-
-      vi.setSystemTime(oldTime)
-      stateManager.getServerState(1)
-      stateManager.getServerState(2)
-
-      vi.setSystemTime(currentTime)
-      stateManager.cleanupInactiveStates(60)
-
-      expect(mockLogger.debug).toHaveBeenCalledWith("Cleaned up 2 inactive server states")
-    })
-  })
-
   describe("getStats", () => {
     it("should return state manager statistics", () => {
       stateManager.getServerState(1)

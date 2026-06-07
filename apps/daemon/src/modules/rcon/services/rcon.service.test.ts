@@ -56,7 +56,8 @@ const mockLogger = createMockLogger()
 function createMockRepository(): IRconRepository {
   return {
     getRconCredentials: vi.fn(),
-    updateServerStatus: vi.fn(),
+    recordServerLoad: vi.fn(),
+    pruneServerLoad: vi.fn(),
   }
 }
 

@@ -2,7 +2,7 @@
  * Server Status Enricher Tests
  */
 
-import type { IRconService, ServerStatus } from "@/modules/rcon/types/rcon.types"
+import type { IRconRepository, IRconService, ServerStatus } from "@/modules/rcon/types/rcon.types"
 import type { IServerRepository, IServerService } from "@/modules/server/server.types"
 import { createMockLogger } from "@/tests/mocks/logger"
 import { beforeEach, describe, expect, it, vi } from "vitest"
@@ -53,6 +53,12 @@ const mockServerService: IServerService = {
   handleAdminAction: vi.fn(),
 }
 
+const mockRconRepository: IRconRepository = {
+  getRconCredentials: vi.fn(),
+  recordServerLoad: vi.fn(),
+  pruneServerLoad: vi.fn(),
+}
+
 const mockLogger = createMockLogger()
 
 describe("ServerStatusEnricher", () => {
@@ -65,6 +71,7 @@ describe("ServerStatusEnricher", () => {
       mockRconService,
       mockServerRepository,
       mockServerService,
+      mockRconRepository,
       mockLogger,
     )
     serverId = 1

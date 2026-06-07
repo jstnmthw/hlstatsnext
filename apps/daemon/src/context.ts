@@ -13,7 +13,7 @@ import type { IPlayerSessionService } from "@/modules/player/types/player-sessio
 import type { IPlayerRepository, IPlayerService } from "@/modules/player/types/player.types"
 import type { IRankingService } from "@/modules/ranking/ranking.types"
 import type { CommandResolverService } from "@/modules/rcon/services/command-resolver.service"
-import type { IRconService } from "@/modules/rcon/types/rcon.types"
+import type { IRconRepository, IRconService } from "@/modules/rcon/types/rcon.types"
 import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
 import type { IServerStatusEnricher } from "@/modules/server/enrichers/server-status-enricher"
 import type { IServerService } from "@/modules/server/server.types"
@@ -97,6 +97,7 @@ export interface AppContext {
   // Repositories (for coordinators)
   repositories: {
     playerRepository: IPlayerRepository
+    rconRepository: IRconRepository
   }
 }
 
@@ -236,6 +237,7 @@ export function createAppContext(ingressOptions?: IngressOptions): AppContext {
     // Repositories (for coordinators)
     repositories: {
       playerRepository: repositories.playerRepository,
+      rconRepository: repositories.rconRepository,
     },
   }
 }

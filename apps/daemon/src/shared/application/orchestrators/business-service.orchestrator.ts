@@ -182,6 +182,7 @@ export function createBusinessServices(
     rconService,
     repositories.serverRepository,
     serverService,
+    repositories.rconRepository,
     logger,
     playerStatusEnricher,
   )

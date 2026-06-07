@@ -319,39 +319,6 @@ export class ServerStateManager {
   }
 
   /**
-   * Clean up inactive server states
-   */
-  cleanupInactiveStates(maxAgeMinutes: number = 60): void {
-    const cutoffTime = new Date(Date.now() - maxAgeMinutes * 60 * 1000)
-    let cleanedCount = 0
-
-    for (const [serverId, state] of this.serverStates.entries()) {
-      if (state.lastActivity < cutoffTime) {
-        this.serverStates.delete(serverId)
-        cleanedCount++
-      }
-    }
-
-    if (cleanedCount > 0) {
-      this.logger.debug(`Cleaned up ${cleanedCount} inactive server states`)
-    }
-  }
-
-  /**
-   * Start periodic cleanup of inactive states
-   */
-  startPeriodicCleanup(intervalMinutes: number = 30): void {
-    setInterval(
-      () => {
-        this.cleanupInactiveStates()
-      },
-      intervalMinutes * 60 * 1000,
-    )
-
-    this.logger.debug(`Started periodic server state cleanup (every ${intervalMinutes} minutes)`)
-  }
-
-  /**
    * Get state manager statistics
    */
   getStats(): {

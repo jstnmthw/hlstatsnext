@@ -60,9 +60,15 @@ export interface IRconRepository {
   getRconCredentials(serverId: number): Promise<RconCredentials | null>
 
   /**
-   * Update server status in database
+   * Record a server load/population snapshot in servers_load (historical time-series)
    */
-  updateServerStatus(serverId: number, status: ServerStatus): Promise<void>
+  recordServerLoad(serverId: number, status: ServerStatus): Promise<void>
+
+  /**
+   * Delete servers_load rows older than the given Unix timestamp (seconds).
+   * Returns the number of rows removed.
+   */
+  pruneServerLoad(olderThanUnixSeconds: number): Promise<number>
 }
 
 // Data Types

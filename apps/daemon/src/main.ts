@@ -82,8 +82,12 @@ export class HLStatsDaemon {
    * game-detection, rate-limiter, log-cooldown). Paired clear in runShutdown().
    */
   private housekeepingInterval: ReturnType<typeof setInterval> | null = null
+  /** Wall-clock of the last servers_load prune; gates retention to once per day. */
+  private lastServerLoadPruneAt = 0
   private static readonly HOUSEKEEPING_INTERVAL_MS = 5 * 60 * 1000
   private static readonly STALE_SESSION_MAX_AGE_MS = 30 * 60 * 1000
+  private static readonly SERVER_LOAD_RETENTION_DAYS = 30
+  private static readonly SERVER_LOAD_PRUNE_INTERVAL_MS = 24 * 60 * 60 * 1000
 
   /**
    * Memoized shutdown promise. A SIGTERM followed by SIGINT (or any re-entrant
@@ -315,6 +319,26 @@ export class HLStatsDaemon {
             `Housekeeping: sweepStaleSessions failed: ${error instanceof Error ? error.message : String(error)}`,
           )
         })
+
+      // servers_load retention runs at most once per day, riding the 5-minute
+      // housekeeping tick so it needs no separate (shutdown-managed) timer.
+      const now = Date.now()
+      if (now - this.lastServerLoadPruneAt >= HLStatsDaemon.SERVER_LOAD_PRUNE_INTERVAL_MS) {
+        this.lastServerLoadPruneAt = now
+        const serverLoadCutoff = Math.floor(
+          (now - HLStatsDaemon.SERVER_LOAD_RETENTION_DAYS * 24 * 60 * 60 * 1000) / 1000,
+        )
+        void this.context.repositories.rconRepository
+          .pruneServerLoad(serverLoadCutoff)
+          .then((deleted) => {
+            if (deleted > 0) this.logger.debug(`Housekeeping: servers_load pruned ${deleted}`)
+          })
+          .catch((error) => {
+            this.logger.debug(
+              `Housekeeping: pruneServerLoad failed: ${error instanceof Error ? error.message : String(error)}`,
+            )
+          })
+      }
     }
 
     this.housekeepingInterval = setInterval(run, HLStatsDaemon.HOUSEKEEPING_INTERVAL_MS)

@@ -1,6 +1,7 @@
 "use client"
 
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
+import { FlagIcon } from "@repo/ui"
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
 import { PublicPlayerItem } from "./player-config"
@@ -26,12 +27,15 @@ export const playerPageColumns: ColumnDef<PublicPlayerItem>[] = [
     accessorKey: "lastName",
     header: () => <DataTableColumnHeader title="Player" field="lastName" />,
     cell: ({ row }) => (
-      <Link
-        href={`/players/${row.original.playerId}`}
-        className="font-medium hover:text-primary-bright hover:underline"
-      >
-        {row.original.lastName}
-      </Link>
+      <span className="inline-flex items-center gap-2">
+        <FlagIcon code={row.original.flag} name={row.original.country} />
+        <Link
+          href={`/players/${row.original.playerId}`}
+          className="font-medium hover:text-primary-bright hover:underline"
+        >
+          {row.original.lastName}
+        </Link>
+      </span>
     ),
   },
   {

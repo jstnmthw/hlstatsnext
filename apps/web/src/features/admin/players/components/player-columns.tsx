@@ -11,6 +11,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  FlagIcon,
   IconDots,
 } from "@repo/ui"
 import { ColumnDef } from "@tanstack/react-table"
@@ -19,6 +20,8 @@ export type PlayerListItem = {
   playerId?: number | null
   lastName?: string | null
   email?: string | null
+  country?: string | null
+  flag?: string | null
   skill?: number | null
   kills?: number | null
   deaths?: number | null
@@ -47,6 +50,12 @@ export const playerColumns = (): ColumnDef<PlayerListItem>[] => [
   {
     accessorKey: "lastName",
     header: () => <DataTableColumnHeader title="Name" field="lastName" />,
+    cell: ({ row }) => (
+      <span className="inline-flex items-center gap-2">
+        <FlagIcon code={row.original.flag} name={row.original.country} />
+        {row.original.lastName}
+      </span>
+    ),
   },
   {
     accessorKey: "email",

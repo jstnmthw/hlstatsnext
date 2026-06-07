@@ -119,6 +119,9 @@ export {
   FieldTitle,
 } from "./components/field"
 
+export { FlagIcon } from "./components/flag-icon"
+export type { FlagIconProps } from "./components/flag-icon"
+
 export {
   InputGroup,
   InputGroupAddon,

@@ -1,5 +1,6 @@
 /* Component-specific styles only - web app handles base Tailwind compilation */
 @import "tw-animate-css";
+@import "./famfamfam-flags.css";
 
 :root {
   /* UI package specific CSS variables */

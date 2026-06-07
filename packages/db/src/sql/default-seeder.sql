@@ -3277,7 +3277,7 @@ INSERT INTO `mods_defaults` (`code`, `parameter`, `value`) VALUES
 ('MINISTATS', 'BroadCastEventsCommand', 'ms_psay'),
 ('SOURCEMOD', 'BroadCastEventsCommand', 'hlx_sm_psay'),
 ('', 'BroadCastEventsCommandAnnounce', 'say'),
-('AMXX', 'BroadCastEventsCommandAnnounce', 'hlx_amx_csay'),
+('AMXX', 'BroadCastEventsCommandAnnounce', 'hlx_event'),
 ('BEETLE', 'BroadCastEventsCommandAnnounce', 'hlx_csay'),
 ('MANI', 'BroadCastEventsCommandAnnounce', 'ma_hlx_csay'),
 ('MINISTATS', 'BroadCastEventsCommandAnnounce', 'ms_csay'),

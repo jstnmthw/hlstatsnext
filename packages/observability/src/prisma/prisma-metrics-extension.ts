@@ -70,41 +70,50 @@ export function createPrismaWithMetrics(
           error = err instanceof Error ? err.message : String(err)
           throw err
         } finally {
-          const duration = Date.now() - startTime
-          const modelName = model || "unknown"
+          // This runs in a finally: a throw here would override the pending
+          // `return result` and surface as a query failure to the caller.
+          // Observability must never break the data path, so swallow anything.
+          try {
+            const duration = Date.now() - startTime
+            const modelName = model || "unknown"
 
-          // Record metrics
-          recordQueryMetrics(
-            {
-              model: modelName,
-              action: operation,
-              duration,
-              query: formatQuery({ model: modelName, action: operation, args }),
-              success,
-              error,
-            },
-            metrics,
-          )
+            // Record metrics
+            recordQueryMetrics(
+              {
+                model: modelName,
+                action: operation,
+                duration,
+                query: formatQuery({ model: modelName, action: operation, args }),
+                success,
+                error,
+              },
+              metrics,
+            )
 
-          // Log slow queries
-          if (logSlowQueries && duration > slowQueryThresholdMs) {
-            logger.warn("Slow database query detected", {
-              model: modelName,
-              action: operation,
-              duration,
-              query: formatQuery({ model: modelName, action: operation, args }),
-              threshold: slowQueryThresholdMs,
-            })
-          }
+            // Log slow queries
+            if (logSlowQueries && duration > slowQueryThresholdMs) {
+              logger.warn("Slow database query detected", {
+                model: modelName,
+                action: operation,
+                duration,
+                query: formatQuery({ model: modelName, action: operation, args }),
+                threshold: slowQueryThresholdMs,
+              })
+            }
 
-          // Log all queries if enabled (debug mode)
-          if (logAllQueries) {
-            logger.debug("Database query executed", {
-              model: modelName,
-              action: operation,
-              duration,
-              success,
-            })
+            // Log all queries if enabled (debug mode)
+            if (logAllQueries) {
+              logger.debug("Database query executed", {
+                model: modelName,
+                action: operation,
+                duration,
+                success,
+              })
+            }
+          } catch (metricsErr) {
+            logger.warn(
+              `Prisma metrics recording failed: ${metricsErr instanceof Error ? metricsErr.message : String(metricsErr)}`,
+            )
           }
         }
       },
@@ -181,8 +190,7 @@ function formatQuery(params: { model: string; action: string; args: unknown }): 
 
     // Add where clause if present
     if (argsObj.where) {
-      const whereStr = JSON.stringify(argsObj.where)
-      parts.push(`WHERE ${whereStr}`)
+      parts.push(`WHERE ${safeStringify(argsObj.where)}`)
     }
 
     // Add select/include if present
@@ -200,4 +208,18 @@ function formatQuery(params: { model: string; action: string; args: unknown }): 
   }
 
   return parts.join(" ")
+}
+
+/**
+ * JSON.stringify that tolerates values the default serializer rejects.
+ * Prisma surfaces BigInt-backed columns (e.g. GeoLiteCity IP ranges) as
+ * bigint in `where` args, and a raw JSON.stringify throws on those — which,
+ * from inside the query wrapper's finally, would corrupt the query result.
+ */
+function safeStringify(value: unknown): string {
+  try {
+    return JSON.stringify(value, (_key, val) => (typeof val === "bigint" ? val.toString() : val))
+  } catch {
+    return "[unserializable]"
+  }
 }

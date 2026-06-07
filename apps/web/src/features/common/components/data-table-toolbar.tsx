@@ -3,7 +3,7 @@
 import { DataTableFacetedFilter } from "@/features/common/components/data-table-faceted-filter"
 import { DataTableViewOptions } from "@/features/common/components/data-table-view-options"
 import { DataTableConfig } from "@/features/common/types/data-table"
-import { Button, IconX, Input } from "@repo/ui"
+import { Button, IconX, Input, Label, Switch } from "@repo/ui"
 import { Table } from "@tanstack/react-table"
 import { useEffect, useRef, useState } from "react"
 
@@ -12,9 +12,11 @@ interface DataTableToolbarProps<TData> {
   config: DataTableConfig
   search: string
   filters: Record<string, string[]>
+  toggles: Record<string, boolean>
   isFiltered: boolean
   onSearch: (value: string) => void
   onFilterChange: (filterId: string, values: string[]) => void
+  onToggleChange: (toggleId: string, value: boolean) => void
   onReset: () => void
   isPending: boolean
 }
@@ -24,9 +26,11 @@ export function DataTableToolbar<TData>({
   config,
   search,
   filters,
+  toggles,
   isFiltered,
   onSearch,
   onFilterChange,
+  onToggleChange,
   onReset,
   isPending,
 }: DataTableToolbarProps<TData>) {
@@ -79,6 +83,19 @@ export function DataTableToolbar<TData>({
             selectedValues={filters[filter.id] || []}
             onSelectionChange={(values) => onFilterChange(filter.id, values)}
           />
+        ))}
+        {config.toggles?.map((toggle) => (
+          <div key={toggle.id} className="flex items-center space-x-2">
+            <Switch
+              id={`toggle-${toggle.id}`}
+              checked={toggles[toggle.id] ?? false}
+              onCheckedChange={(value) => onToggleChange(toggle.id, value)}
+              disabled={isPending}
+            />
+            <Label htmlFor={`toggle-${toggle.id}`} className="text-sm whitespace-nowrap">
+              {toggle.label}
+            </Label>
+          </div>
         ))}
         {isFiltered && (
           <Button variant="ghost" onClick={onReset} className="h-8 px-2 lg:px-3">

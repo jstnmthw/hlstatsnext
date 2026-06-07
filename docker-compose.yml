@@ -1,7 +1,14 @@
 # Local development containers for hlstatsnext.
 # Usage:
-#   pnpm docker:up         - Start local development database
-#   pnpm docker:down       - Stop development database
+#   pnpm docker:up         - Start the core stack (db, rabbitmq, daemon)
+#   pnpm docker:down       - Stop the core stack
+#   pnpm docker:obs:up     - Add the observability stack (Prometheus + Grafana)
+#   pnpm docker:obs:down   - Remove just the observability stack
+#
+# Prometheus and Grafana live behind the `observability` Compose profile, so a
+# bare `docker compose up -d` starts only the core stack and never warns about
+# them as orphans. Enable them with `docker compose --profile observability up`
+# or by naming the services explicitly (e.g. `docker compose up -d prometheus`).
 #
 # For test database, see docker-compose.test.yml
 # For production, see docker-compose.prod.yml
@@ -98,6 +105,62 @@ services:
       - default
     restart: unless-stopped
 
+  # Opt-in observability stack. Only started when the `observability` profile is
+  # active (or the services are named explicitly); excluded from a bare `up`.
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: hlstatsnext-dev-prometheus
+    hostname: hlstatsnext-dev-prometheus
+    profiles: [observability]
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Enable host.docker.internal on Linux
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090" # Prometheus UI
+    networks:
+      - default
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: hlstatsnext-dev-grafana
+    hostname: hlstatsnext-dev-grafana
+    profiles: [observability]
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-piechart-panel
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3001:3000" # Grafana UI (using 3001 to avoid conflict with web app on 3000)
+    networks:
+      - default
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 networks:
   default:
     name: hlstatsnext-network
@@ -106,3 +169,5 @@ networks:
 volumes:
   db-volume:
   rabbitmq-data:
+  prometheus-data:
+  grafana-data:

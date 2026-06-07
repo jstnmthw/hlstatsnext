@@ -11,6 +11,7 @@ export interface DataTableUrlState {
   search: string
   pageSize: number
   filters: Record<string, string[]>
+  toggles: Record<string, boolean>
 }
 
 export function useDataTableUrl(config: DataTableConfig) {
@@ -32,6 +33,14 @@ export function useDataTableUrl(config: DataTableConfig) {
       }
     }
 
+    const toggles: Record<string, boolean> = {}
+    if (config.toggles) {
+      for (const toggle of config.toggles) {
+        const paramName = toggle.paramName || toggle.id
+        toggles[toggle.id] = searchParams.get(paramName) === "true"
+      }
+    }
+
     return {
       page: Number(searchParams.get("page")) || 1,
       pageSize: Number(searchParams.get("pageSize")) || config.defaultPageSize,
@@ -39,6 +48,7 @@ export function useDataTableUrl(config: DataTableConfig) {
       sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || config.defaultSortOrder,
       search: searchParams.get("search") || "",
       filters,
+      toggles,
     }
   }, [searchParams, config])
 
@@ -69,6 +79,15 @@ export function useDataTableUrl(config: DataTableConfig) {
           if (values && values.length > 0) {
             const paramName = filter.paramName || filter.id
             params.set(paramName, values.join(","))
+          }
+        }
+      }
+
+      // Re-emit active toggles so they survive sort/paginate/search.
+      if (config.toggles) {
+        for (const toggle of config.toggles) {
+          if (state.toggles[toggle.id]) {
+            params.set(toggle.paramName || toggle.id, "true")
           }
         }
       }
@@ -134,6 +153,17 @@ export function useDataTableUrl(config: DataTableConfig) {
     [pushState, currentState],
   )
 
+  const handleToggleChange = useCallback(
+    (toggleId: string, value: boolean) => {
+      pushState({
+        ...currentState,
+        toggles: { ...currentState.toggles, [toggleId]: value },
+        page: 1,
+      })
+    },
+    [pushState, currentState],
+  )
+
   const resetFilters = useCallback(() => {
     pushState({
       page: 1,
@@ -142,6 +172,7 @@ export function useDataTableUrl(config: DataTableConfig) {
       search: "",
       pageSize: config.defaultPageSize,
       filters: {},
+      toggles: {},
     })
   }, [pushState, config])
 
@@ -156,6 +187,9 @@ export function useDataTableUrl(config: DataTableConfig) {
     for (const values of Object.values(currentState.filters)) {
       if (values.length > 0) return true
     }
+    for (const on of Object.values(currentState.toggles)) {
+      if (on) return true
+    }
     return false
   }, [currentState])
 
@@ -166,6 +200,7 @@ export function useDataTableUrl(config: DataTableConfig) {
     handleSearch,
     handlePageSizeChange,
     handleFilterChange,
+    handleToggleChange,
     resetFilters,
     handleRefresh,
     isPending,

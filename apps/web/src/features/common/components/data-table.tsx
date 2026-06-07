@@ -76,6 +76,7 @@ export function DataTable<T>({
     handleSearch,
     handlePageSizeChange,
     handleFilterChange,
+    handleToggleChange,
     resetFilters,
     handleRefresh,
     isPending,
@@ -153,9 +154,11 @@ export function DataTable<T>({
             config={config}
             search={currentState.search}
             filters={currentState.filters}
+            toggles={currentState.toggles}
             isFiltered={isFiltered}
             onSearch={handleSearch}
             onFilterChange={handleFilterChange}
+            onToggleChange={handleToggleChange}
             onReset={resetFilters}
             isPending={isPending}
           />

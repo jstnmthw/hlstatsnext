@@ -13,6 +13,13 @@ export interface FacetedFilterDefinition {
   paramName?: string // URL param name, defaults to id
 }
 
+/** A simple on/off URL toggle (param present and "true" = on, absent = off). */
+export interface ToggleFilterDefinition {
+  id: string
+  label: string
+  paramName?: string // URL param name, defaults to id
+}
+
 export interface DataTableConfig {
   defaultSortField: string
   defaultSortOrder: "asc" | "desc"
@@ -20,6 +27,7 @@ export interface DataTableConfig {
   searchFields?: string[]
   filterPlaceholder?: string
   filters?: FacetedFilterDefinition[]
+  toggles?: ToggleFilterDefinition[]
   frozenColumnsLeft?: string[]
   frozenColumnsRight?: string[]
 }

@@ -5,8 +5,8 @@ Prometheus + Grafana for hlstatsnext.com. **Everything in this stack is opt-in**
 ## TL;DR
 
 ```bash
-pnpm docker:up                  # core stack: db, rabbitmq
-pnpm docker:obs:up              # start Prometheus + Grafana (separate compose)
+pnpm docker:up                  # core stack: db, rabbitmq, daemon
+pnpm docker:obs:up              # add Prometheus + Grafana (observability profile)
 METRICS_ENABLED=true pnpm dev   # turn on app-side metrics scrape targets
 # Grafana: http://localhost:3001 (admin / admin)
 # Prometheus: http://localhost:9090
@@ -23,17 +23,17 @@ This means you can run the observability containers continuously without forcing
 
 | Surface             | Source                                                                                   |  Port | Gated by `METRICS_ENABLED`                   |
 | ------------------- | ---------------------------------------------------------------------------------------- | ----: | -------------------------------------------- |
-| Prometheus          | `docker-compose.observability.yml` → `prom/prometheus`                                   |  9090 | No (compose is itself opt-in)                |
-| Grafana             | `docker-compose.observability.yml` → `grafana/grafana`                                   |  3001 | No                                           |
+| Prometheus          | `docker-compose.yml` (`observability` profile) → `prom/prometheus`                       |  9090 | No (profile is itself opt-in)                |
+| Grafana             | `docker-compose.yml` (`observability` profile) → `grafana/grafana`                       |  3001 | No                                           |
 | Daemon `/metrics`   | `apps/daemon` (via `@repo/observability` `MetricsServer`)                                |  9091 | **Yes**                                      |
 | API `/metrics`      | `apps/api` (inline `node:http` listener; `@envelop/prometheus` + `prom-client` Registry) |  9092 | **Yes**                                      |
 | RabbitMQ `/metrics` | `rabbitmq_prometheus` broker plugin                                                      | 15692 | No (broker plugin is always on once enabled) |
 
-The compose layering is deliberate: the main `docker-compose.yml` boots only the data-plane services (db, rabbitmq) that the daemon and API need to function. The observability stack lives in `docker-compose.observability.yml` and attaches to the same `hlstatsnext-network` bridge so it can scrape `rabbitmq:15692` and reach host processes via `host.docker.internal`.
+The split is by Compose profile, not by file. The core services (db, rabbitmq, daemon) carry no profile and start on a bare `docker compose up`; Prometheus and Grafana sit behind the `observability` profile in the same `docker-compose.yml`. Because they share one project and the `hlstatsnext-network` bridge, Prometheus can scrape `rabbitmq:15692` and reach host processes via `host.docker.internal` — and a profile-less `up` neither starts them nor flags them as orphans. Enable them with `docker compose --profile observability up -d` (or `pnpm docker:obs:up`).
 
 ### Host-vs-container networking
 
-Prometheus is in a container; the daemon and API typically run on the host during development. The `prometheus` service in `docker-compose.observability.yml` declares `extra_hosts: ["host.docker.internal:host-gateway"]` so Linux containers can resolve the host the same way macOS/Windows do out of the box. The scrape jobs in `docker/prometheus/prometheus.yml` use `host.docker.internal:9091` (daemon) and `host.docker.internal:9092` (api) for this reason. If you containerize the daemon or API later, swap those targets for the service hostnames.
+Prometheus is in a container; the daemon and API typically run on the host during development. The `prometheus` service in `docker-compose.yml` declares `extra_hosts: ["host.docker.internal:host-gateway"]` so Linux containers can resolve the host the same way macOS/Windows do out of the box. The scrape jobs in `docker/prometheus/prometheus.yml` use `host.docker.internal:9091` (daemon) and `host.docker.internal:9092` (api) for this reason. If you containerize the daemon or API later, swap those targets for the service hostnames.
 
 ## Env vars
 

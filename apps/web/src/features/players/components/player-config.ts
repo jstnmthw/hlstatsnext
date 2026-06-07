@@ -18,4 +18,6 @@ export const playerPageTableConfig: DataTableConfig = {
   defaultPageSize: 25,
   searchFields: ["lastName"],
   filterPlaceholder: "Search by player name...",
+  // Bots are hidden by default; this surfaces ?showBots=true as a toolbar switch.
+  toggles: [{ id: "showBots", label: "Show bots" }],
 }

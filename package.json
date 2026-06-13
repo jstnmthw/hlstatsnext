@@ -39,10 +39,10 @@
   "devDependencies": {
     "dotenv-cli": "^11.0.0",
     "husky": "^9.1.7",
-    "prettier": "^3.8.3",
+    "prettier": "^3.8.4",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.7.4",
-    "tailwindcss": "^4.3.0",
+    "tailwindcss": "^4.3.1",
     "turbo": "^2.9.18",
     "typescript": "^5.9.3"
   },

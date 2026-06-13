@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@repo/db": "workspace:*",
-    "better-auth": "^1.6.14",
+    "better-auth": "^1.6.18",
     "resend": "^6.12.4",
     "zod": "^4.4.3"
   },
@@ -27,10 +27,10 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^25.9.2",
+    "@types/node": "^25.9.3",
     "@types/react": "19.2.14",
     "eslint": "^9.39.4",
-    "next": "^16.2.7",
+    "next": "^16.2.9",
     "react": "^19.2.7",
     "typescript": "^5.9.3"
   }

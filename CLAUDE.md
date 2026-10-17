@@ -21,7 +21,7 @@ apps/
 packages/
 ├── auth/                       Better Auth 1.6.x wrapper. Session/Account/Verification models live here.
 ├── config/{eslint,tailwind,typescript}  Shared configs. Extend, do not fork.
-├── crypto/                     Argon2 wrapper. RCON passwords + Better Auth password hashing.
+├── crypto/                     Argon2 + encryption helpers. RCON passwords at rest and server-token hashing. User passwords are hashed by Better Auth itself (scrypt), not here.
 ├── db/                         Prisma 7 + MySQL/MariaDB. Schema: prisma/schema.prisma. Exports: client, graphql/types, codegen.
 ├── observability/              Prometheus client + Prisma metrics extension. Add new metrics here.
 ├── plugins/amx/                AMX plugin management for game servers.
@@ -92,11 +92,12 @@ Run all three after editing `packages/db/prisma/schema.prisma`, custom Pothos ob
 
 ## Output conventions
 
-| Output                                                                 | Location                                                                                                                                          |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Implementation plans                                                   | `docs/plans/<feature>.md`                                                                                                                         |
-| Audit findings (security, quality, review, daemon, graphql, dead-code) | `docs/audits/<category>-<target>-<YYYY-MM-DD>.md`                                                                                                 |
-| Architecture / deployment / best-practices docs                        | `docs/<TOPIC>.md` (top-level, ALL_CAPS — match the existing convention: `ARCHITECTURE.md`, `BEST_PRACTICES.md`, `PRODUCTION_DEPLOYMENT.md`, etc.) |
+| Output                                                                 | Location                                                                                                                                                   |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Implementation plans                                                   | `docs/plans/<feature>.md`                                                                                                                                  |
+| Audit findings (security, quality, review, daemon, graphql, dead-code) | `docs/audits/<category>-<target>-<YYYY-MM-DD>.md`                                                                                                          |
+| Architecture / deployment / best-practices docs                        | `docs/<TOPIC>.md` (top-level, ALL_CAPS — match the existing convention: `ARCHITECTURE.md`, `BEST_PRACTICES.md`, `PRODUCTION_DEPLOYMENT.md`, etc.)          |
+| Architecture decision records                                          | `docs/adr/NNNN-slug.md` — copy `docs/adr/template.md`, add a row to `docs/adr/README.md`. Accepted records are never edited; a new record supersedes them. |
 
 Never silently overwrite a dated file — append a numeric suffix (`-2`, `-3`).
 

@@ -1,3 +1,4 @@
+import { isAdmin } from "@repo/auth/permissions"
 import { getAuth } from "@repo/auth/server"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
@@ -15,7 +16,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  if (session.user.role !== "admin") {
+  if (!isAdmin(session.user)) {
     return NextResponse.redirect(new URL("/", request.url))
   }
 

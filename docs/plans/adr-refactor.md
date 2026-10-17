@@ -27,13 +27,13 @@ Why this order and not the numbering: 0003 needs the environment schema from 000
 
 ## Phase 3: ADR 0003. One access statement
 
-- [ ] `permissions.ts` gains `hasPermission(role, permissions)` built on the roles' own `authorize`, plus `roleOf(user)` and `isAdmin(user)`. The file stays free of server-only imports.
-- [ ] Admin plugin options: `defaultRole: "user"`, `adminRoles: ["admin"]`.
-- [ ] Replace every role string compare: `proxy.ts`, the `(auth)` and `(admin)` layouts, both headers, `apps/api/src/context.ts`.
-- [ ] Server actions check the statement in process through the helpers instead of the `auth.api.userHasPermission` round trip.
-- [ ] `updateUserName` and `anonymizeUser` write through `auth.api.adminUpdateUser`; `@repo/db` leaves `user-actions.ts`.
-- [ ] `ADMIN_EMAILS` joins the env schema; a `databaseHooks.user.create.before` hook promotes a matching sign-up to `admin`.
-- [ ] Checks pass.
+- [x] `permissions.ts` gains `hasPermission(role, permissions)` built on the roles' own `authorize`, plus `roleOf(user)` and `isAdmin(user)`, with unit tests. The file stays free of server-only imports. `user` gains `update` and `set-email`, which `adminUpdateUser` checks; a shared `roles` map feeds both the server and client plugins.
+- [x] Admin plugin options: `defaultRole: "user"`, `adminRoles: ["admin"]`.
+- [x] Replace every role string compare: `proxy.ts`, the `(auth)` and `(admin)` layouts, both headers, `apps/api/src/context.ts`.
+- [x] Server actions check the statement in process through the helpers instead of the `auth.api.userHasPermission` round trip.
+- [x] `updateUserName` and `anonymizeUser` write through `auth.api.adminUpdateUser`; `@repo/db` leaves `user-actions.ts`.
+- [x] `ADMIN_EMAILS` joins the env schema; a `databaseHooks.user.create.before` hook promotes a matching sign-up to `admin`.
+- [x] Checks pass.
 
 ## Phase 4: ADR 0004. Authorization in the data layer
 

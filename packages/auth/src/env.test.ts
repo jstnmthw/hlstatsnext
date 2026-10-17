@@ -51,6 +51,18 @@ describe("parseAuthEnv", () => {
     expect(env.MAIL_PROVIDER).toBe("resend")
   })
 
+  it("parses ADMIN_EMAILS into a lowercase list and defaults to none", () => {
+    expect(parseAuthEnv(minimal).ADMIN_EMAILS).toEqual([])
+    const env = parseAuthEnv({ ...minimal, ADMIN_EMAILS: " Admin@Example.com, ops@example.com ,," })
+    expect(env.ADMIN_EMAILS).toEqual(["admin@example.com", "ops@example.com"])
+  })
+
+  it("rejects a non-address in ADMIN_EMAILS", () => {
+    expect(() => parseAuthEnv({ ...minimal, ADMIN_EMAILS: "admin@example.com,nope" })).toThrow(
+      /ADMIN_EMAILS/,
+    )
+  })
+
   it("rejects an unknown MAIL_PROVIDER", () => {
     expect(() => parseAuthEnv({ ...minimal, MAIL_PROVIDER: "smtp" })).toThrow(/MAIL_PROVIDER/)
   })

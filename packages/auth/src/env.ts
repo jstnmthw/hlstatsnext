@@ -13,6 +13,18 @@ const schema = z
     MAIL_PROVIDER: z.enum(["console", "resend"]).default("console"),
     MAIL_FROM: z.string().default("noreply@hlstatsnext.com"),
     RESEND_API_KEY: z.string().optional(),
+    ADMIN_EMAILS: z
+      .string()
+      .optional()
+      .transform((value) =>
+        value
+          ? value
+              .split(",")
+              .map((email) => email.trim().toLowerCase())
+              .filter(Boolean)
+          : [],
+      )
+      .pipe(z.array(z.email("ADMIN_EMAILS must be a comma-separated list of email addresses"))),
   })
   .superRefine((env, ctx) => {
     if (Boolean(env.GOOGLE_CLIENT_ID) !== Boolean(env.GOOGLE_CLIENT_SECRET)) {

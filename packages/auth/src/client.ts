@@ -2,16 +2,13 @@
 
 import { adminClient, emailOTPClient } from "better-auth/client/plugins"
 import { createAuthClient } from "better-auth/react"
-import { ac, adminRole, userRole } from "./permissions"
+import { ac, roles } from "./permissions"
 
 export const authClient = createAuthClient({
   plugins: [
     adminClient({
       ac,
-      roles: {
-        admin: adminRole,
-        user: userRole,
-      },
+      roles,
     }),
     emailOTPClient(),
   ],

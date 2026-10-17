@@ -1,3 +1,4 @@
+import { isAdmin } from "@repo/auth/permissions"
 import { getAuth, type Session } from "@repo/auth/server"
 import { createCryptoService, type ICryptoService } from "@repo/crypto"
 import { db } from "@repo/db/client"
@@ -36,7 +37,7 @@ export function requireAuth(ctx: Context): NonNullable<Session> {
 /** Throw if the request is not from an admin. */
 export function requireAdmin(ctx: Context): NonNullable<Session> {
   const session = requireAuth(ctx)
-  if (session.user.role !== "admin") {
+  if (!isAdmin(session.user)) {
     throw new GraphQLError("Admin access required", {
       extensions: { code: "FORBIDDEN" },
     })

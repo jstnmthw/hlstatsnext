@@ -4,7 +4,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma"
 import { admin, emailOTP } from "better-auth/plugins"
 import { getEnv } from "./env"
 import { sendOTP } from "./mail"
-import { ac, adminRole, userRole } from "./permissions"
+import { ac, roles } from "./permissions"
 
 function buildAuth() {
   const env = getEnv()
@@ -57,6 +57,19 @@ function buildAuth() {
       sendOnSignUp: true,
       autoSignInAfterVerification: true,
     },
+    databaseHooks: {
+      user: {
+        create: {
+          // ADMIN_EMAILS bootstraps the first admin on a fresh database; later
+          // admins are promoted from the users page.
+          before: async (user) => {
+            if (env.ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+              return { data: { ...user, role: "admin" } }
+            }
+          },
+        },
+      },
+    },
     ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
       ? {
           socialProviders: {
@@ -89,10 +102,9 @@ function buildAuth() {
     plugins: [
       admin({
         ac,
-        roles: {
-          admin: adminRole,
-          user: userRole,
-        },
+        roles,
+        defaultRole: "user",
+        adminRoles: ["admin"],
       }),
       emailOTP({
         otpLength: 6,

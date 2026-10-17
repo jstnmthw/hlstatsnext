@@ -1,5 +1,6 @@
 import { AccountMenu } from "@/features/common/components/account-menu"
 import { AppLogo } from "@/features/common/components/app-logo"
+import { isAdmin } from "@repo/auth/permissions"
 import { getSession } from "@repo/auth/session"
 import { Button, cn } from "@repo/ui"
 import Link from "next/link"
@@ -59,7 +60,7 @@ export async function Header({
                 email: session.user.email,
                 image: session.user.image,
               }}
-              isAdmin={session.user.role === "admin"}
+              isAdmin={isAdmin(session.user)}
             />
           ) : (
             <Button variant="primary" size="sm" asChild className="uppercase">

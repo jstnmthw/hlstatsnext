@@ -1,8 +1,8 @@
 "use server"
 
+import { hasPermission, type Permissions } from "@repo/auth/permissions"
 import { getAuth } from "@repo/auth/server"
-import { getSession } from "@repo/auth/session"
-import { db } from "@repo/db/client"
+import { getSession, type Session } from "@repo/auth/session"
 import { revalidatePath } from "next/cache"
 import { headers } from "next/headers"
 
@@ -12,20 +12,14 @@ interface ActionResult {
 }
 
 async function requirePermission(
-  permissions: Record<string, string[]>,
-): Promise<
-  | { session: NonNullable<Awaited<ReturnType<typeof getSession>>>; error?: never }
-  | { error: ActionResult; session?: never }
-> {
+  permissions: Permissions,
+): Promise<{ session: Session; error?: never } | { error: ActionResult; session?: never }> {
   const session = await getSession()
   if (!session) {
     return { error: { success: false, message: "Authentication required." } }
   }
 
-  const hasPermission = await getAuth().api.userHasPermission({
-    body: { userId: session.user.id, permissions },
-  })
-  if (!hasPermission.success) {
+  if (!hasPermission(session.user.role, permissions)) {
     return { error: { success: false, message: "Insufficient permissions." } }
   }
 
@@ -91,7 +85,7 @@ export async function unbanUser(userId: string): Promise<ActionResult> {
 
 export async function updateUserName(userId: string, name: string): Promise<ActionResult> {
   try {
-    const { session, error } = await requirePermission({ user: ["set-role"] })
+    const { session, error } = await requirePermission({ user: ["update"] })
     if (error) return error
 
     const selfError = preventSelfAction(session.user.id, userId)
@@ -102,9 +96,9 @@ export async function updateUserName(userId: string, name: string): Promise<Acti
       return { success: false, message: "Name cannot be empty." }
     }
 
-    await db.user.update({
-      where: { id: userId },
-      data: { name: trimmed },
+    await getAuth().api.adminUpdateUser({
+      body: { userId, data: { name: trimmed } },
+      headers: await headers(),
     })
 
     revalidatePath("/admin/users")
@@ -144,19 +138,18 @@ export async function anonymizeUser(userId: string): Promise<ActionResult> {
     const selfError = preventSelfAction(session.user.id, userId)
     if (selfError) return selfError
 
-    await db.user.update({
-      where: { id: userId },
-      data: {
-        name: "[Deleted User]",
-        email: `deleted-${userId}@removed.local`,
-        image: null,
-        banned: true,
-        banReason: "Account anonymized by administrator",
+    // Setting `banned` through the endpoint also deletes the user's sessions.
+    await getAuth().api.adminUpdateUser({
+      body: {
+        userId,
+        data: {
+          name: "[Deleted User]",
+          email: `deleted-${userId}@removed.local`,
+          image: null,
+          banned: true,
+          banReason: "Account anonymized by administrator",
+        },
       },
-    })
-
-    await getAuth().api.revokeUserSessions({
-      body: { userId },
       headers: await headers(),
     })
 

@@ -1,4 +1,5 @@
 import { AppLogo } from "@/features/common/components/app-logo"
+import { isAdmin } from "@repo/auth/permissions"
 import { getSession } from "@repo/auth/session"
 import { redirect } from "next/navigation"
 
@@ -7,7 +8,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
 
   // Only redirect verified users — unverified users need access to /verify-email
   if (session?.user.emailVerified) {
-    if (session.user.role === "admin") {
+    if (isAdmin(session.user)) {
       redirect("/admin")
     }
     redirect("/")

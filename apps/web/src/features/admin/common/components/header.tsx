@@ -1,6 +1,7 @@
 import { AccountMenu } from "@/features/common/components/account-menu"
 import { AppLogo } from "@/features/common/components/app-logo"
 import { getSession } from "@repo/auth"
+import { isAdmin } from "@repo/auth/permissions"
 import { Badge, Button, cn, IconBrush } from "@repo/ui"
 import Link from "next/link"
 import { Navbar } from "./navbar"
@@ -54,7 +55,7 @@ export async function AdminHeader({ className, currentPath }: AdminHeaderProps) 
                   email: session.user.email,
                   image: session.user.image,
                 }}
-                isAdmin={session.user.role === "admin"}
+                isAdmin={isAdmin(session.user)}
               />
             )}
           </div>

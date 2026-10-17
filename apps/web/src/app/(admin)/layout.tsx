@@ -1,3 +1,4 @@
+import { isAdmin } from "@repo/auth/permissions"
 import { getSession } from "@repo/auth/session"
 import { redirect } from "next/navigation"
 
@@ -8,7 +9,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/login")
   }
 
-  if (session.user.role !== "admin") {
+  if (!isAdmin(session.user)) {
     redirect("/")
   }
 

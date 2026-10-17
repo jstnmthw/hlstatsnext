@@ -10,6 +10,7 @@ A shared UI component library for HLStatsNext, built with [shadcn/ui](https://ui
 - [Project Structure](#project-structure)
 - [Component Management](#component-management)
 - [Development Workflow](#development-workflow)
+- [Storybook](#storybook)
 - [Usage in Apps](#usage-in-apps)
 - [Styling & Theming](#styling--theming)
 - [Creating Custom Components](#creating-custom-components)
@@ -51,6 +52,9 @@ pnpm install
 ```bash
 # Utilities
 pnpm ui add [component]  # Add shadcn/ui components
+pnpm dev               # Storybook on http://localhost:6006 (also started by the root `pnpm dev`)
+pnpm storybook         # Same, standalone, and opens the browser
+pnpm build-storybook   # Static Storybook build → storybook-static/
 pnpm lint              # Lint the codebase
 pnpm check-types       # Type checking
 pnpm clean             # Clean node_modules
@@ -69,9 +73,12 @@ packages/ui/
 │   │   └── ...              # Other components
 │   ├── lib/
 │   │   └── utils.ts         # Utility functions (cn, etc.)
+│   ├── styles/
+│   │   └── themes/          # Colour themes; theme-config.css selects the active one
 │   ├── index.ts             # Main barrel export
 │   ├── icons.ts             # Re-exported lucide-react icons
-│   └── globals.css          # Global styles and CSS variables
+│   └── globals.css          # Design tokens (@theme inline), base styles, theme import
+├── .storybook/              # Storybook config (React + Vite + Tailwind)
 ├── components.json          # shadcn/ui configuration
 ├── package.json
 ├── tsconfig.json
@@ -235,6 +242,39 @@ pnpm check-types
 pnpm lint
 ```
 
+## Storybook
+
+Components are documented and developed in [Storybook](https://storybook.js.org/) 10 (React + Vite) with the docs and accessibility addons. Stories live next to their components as `src/components/<name>.stories.tsx`.
+
+```bash
+# From the repo root
+pnpm dev                                 # starts Storybook on http://localhost:6006 alongside web, api and daemon
+pnpm storybook                           # Storybook alone, opens the browser
+pnpm build-storybook                     # static build to packages/ui/storybook-static/
+```
+
+`.storybook/preview.css` compiles Tailwind once over this package's own `src/globals.css`, exactly as the web app does, so stories use the same theme tokens, font scale and active colour theme as production. Stories are type-checked and linted with the rest of the package but are excluded from the `tsc` build (`tsconfig.build.json`).
+
+A minimal story:
+
+```tsx
+// src/components/spinner.stories.tsx
+import type { Meta, StoryObj } from "@storybook/react-vite"
+import { Spinner } from "./spinner"
+
+const meta = {
+  title: "Components/Spinner",
+  component: Spinner,
+  tags: ["autodocs"],
+} satisfies Meta<typeof Spinner>
+
+export default meta
+
+type Story = StoryObj<typeof meta>
+
+export const Default: Story = {}
+```
+
 ## Usage in Apps
 
 ### Importing Components
@@ -277,41 +317,41 @@ Make sure your app's `package.json` includes the UI package:
 
 ### Tailwind Configuration
 
-Your apps should extend the shared Tailwind config:
+Tailwind is compiled once, by the app. The app imports Tailwind, then this package's tokens, and registers this package's source so only the utilities actually used are generated:
 
-```javascript
-// tailwind.config.js
-import { createConfig } from "@repo/tailwind-config"
+```css
+/* apps/web/src/app/globals.css */
+@import "tailwindcss";
+@import "@repo/ui/globals.css";
 
-export default createConfig({
-  content: [
-    "./src/**/*.{js,ts,jsx,tsx}",
-    "../../packages/ui/src/**/*.{js,ts,jsx,tsx}", // Include UI package
-  ],
-})
+@source "../../../../packages/ui/src";
+@source not "../../../../packages/ui/src/**/*.stories.tsx";
 ```
+
+Do not import Tailwind inside this package, build its CSS separately, or prefix its classes. A second Tailwind build would duplicate the preflight and theme variables in the app bundle.
 
 ## Styling & Theming
 
 ### CSS Variables
 
-The package uses CSS variables for theming, defined in `globals.css`:
+This package owns the design tokens. `src/globals.css` imports the active colour theme from `src/styles/themes/theme-config.css`, maps the theme's CSS variables to Tailwind utilities through `@theme inline`, overrides the font scale, and sets the base `body` and border colours. Switch themes by editing `theme-config.css`; see `src/styles/themes/README.md`.
 
 ```css
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    /* ... more variables */
-  }
+/* src/styles/themes/terminal.css (excerpt) */
+:root {
+  --background: oklch(17.764% 0.00002 271.152);
+  --foreground: oklch(0.985 0 0);
+  --primary: oklch(67.443% 0.21861 143.604);
+  /* ... */
+}
+```
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    /* ... dark theme variables */
-  }
+```css
+/* src/globals.css (excerpt) */
+@theme inline {
+  --color-background: var(--background);
+  --color-primary: var(--primary);
+  /* ... */
 }
 ```
 

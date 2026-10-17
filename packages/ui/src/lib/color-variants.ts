@@ -542,3 +542,5 @@ export function getComponentStyles(
 
   return styles
 }
+
+export const colorSchemes = Object.keys(baseColorVariants) as ColorScheme[]

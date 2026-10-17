@@ -37,7 +37,6 @@
     "@playwright/test": "^1.64.1",
     "@repo/db": "workspace:*",
     "@repo/eslint-config": "workspace:*",
-    "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4.3.1",
     "@types/jsdom": "^27.0.0",

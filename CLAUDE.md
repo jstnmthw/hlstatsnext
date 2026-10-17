@@ -8,6 +8,8 @@ This file tells Claude Code how to work on the **hlstatsnext.com** project. Trea
 
 This is a **production system** with three tightly-coupled processes: the daemon must never lose events; the API must enforce strict authz on sensitive models; the web app is the public face of the leaderboards and admin console.
 
+@AGENTS.md
+
 ## Monorepo layout
 
 Turborepo + pnpm workspaces. Three apps and several packages under `@repo/*`:
@@ -20,7 +22,7 @@ apps/
 
 packages/
 ├── auth/                       Better Auth 1.6.x wrapper. Session/Account/Verification models live here.
-├── config/{eslint,tailwind,typescript}  Shared configs. Extend, do not fork.
+├── config/{eslint,typescript}           Shared configs. Extend, do not fork.
 ├── crypto/                     Argon2 + encryption helpers. RCON passwords at rest and server-token hashing. User passwords are hashed by Better Auth itself (scrypt), not here.
 ├── db/                         Prisma 7 + MySQL/MariaDB. Schema: prisma/schema.prisma. Exports: client, graphql/types, codegen.
 ├── observability/              Prometheus client + Prisma metrics extension. Add new metrics here.

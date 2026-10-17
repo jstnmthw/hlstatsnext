@@ -1,4 +1,5 @@
-import { config } from "@repo/eslint-config/react-internal";
+import { config } from "@repo/eslint-config/react-internal"
+import storybook from "eslint-plugin-storybook"
 
-/** @type {import("eslint").Linter.Config} */
-export default config;
+/** @type {import("eslint").Linter.Config[]} */
+export default [...config, ...storybook.configs["flat/recommended"]]

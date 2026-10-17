@@ -1,0 +1,13 @@
+/*
+ * Stories compile Tailwind once, exactly like an app does: Tailwind first,
+ * then this package's own tokens, then this package's sources.
+ */
+@import "tailwindcss";
+@import "../src/globals.css";
+
+@source "../src";
+
+/* The web app sets this through next/font; mirror it so stories use the same face. */
+:root {
+  --font-sans: "JetBrains Mono", ui-monospace, monospace;
+}

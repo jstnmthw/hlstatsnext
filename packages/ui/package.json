@@ -11,12 +11,15 @@
     "./lib/utils": "./src/lib/utils.ts"
   },
   "scripts": {
-    "build:components": "tsc",
+    "build:components": "tsc -p tsconfig.build.json",
     "build": "pnpm build:components",
     "check-types": "tsc --noEmit",
-    "lint": "eslint src --max-warnings 0",
-    "clean": "rm -rf node_modules dist .turbo",
-    "ui": "pnpm dlx shadcn@latest"
+    "dev": "storybook dev -p 6006 --ci",
+    "lint": "eslint src .storybook --max-warnings 0",
+    "clean": "rm -rf node_modules dist storybook-static .turbo",
+    "ui": "pnpm dlx shadcn@latest",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "peerDependencies": {
     "react": "^19"
@@ -24,9 +27,20 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@storybook/addon-a11y": "^10.6.2",
+    "@storybook/addon-docs": "^10.6.2",
+    "@storybook/react-vite": "^10.6.2",
+    "@tailwindcss/vite": "^4.3.1",
     "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
     "eslint": "^9.39.4",
-    "typescript": "^5.9.3"
+    "eslint-plugin-storybook": "^10.6.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "storybook": "^10.6.2",
+    "tailwindcss": "^4.3.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.4"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

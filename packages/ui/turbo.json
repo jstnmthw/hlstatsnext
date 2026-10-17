@@ -6,13 +6,6 @@
     },
     "build:components": {
       "outputs": ["dist/**"]
-    },
-    "dev": {
-      "with": ["dev:components"]
-    },
-    "dev:components": {
-      "cache": false,
-      "persistent": true
     }
   }
 }

@@ -1,15 +1,97 @@
-/* Component-specific styles only - web app handles base Tailwind compilation */
+/*
+ * Design tokens and base styles for @repo/ui.
+ *
+ * Consumers compile Tailwind once and layer this file on top:
+ *   @import "tailwindcss";
+ *   @import "@repo/ui/globals.css";
+ *   @source "<path to packages/ui/src>";
+ */
 @import "tw-animate-css";
 @import "./famfamfam-flags.css";
+@import "./styles/themes/theme-config.css";
 
 :root {
-  /* UI package specific CSS variables */
+  --radius: 0;
   --ui-component-radius: 0.5rem;
-  /* Component-specific variables can be added here as needed */
 }
 
-/* Component-specific base styles if needed */
-@layer components {
-  /* Custom component styles that aren't covered by Tailwind utilities */
-  /* These will be included in the final compiled CSS */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-bright: var(--primary-bright);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Font scale - overrides Tailwind v4 defaults */
+  --text-xs: 10px;
+  --text-xs--line-height: 16px;
+  --text-sm: 11px;
+  --text-sm--line-height: 18px;
+  --text-base: 12px;
+  --text-base--line-height: 20px;
+  --text-lg: 14px;
+  --text-lg--line-height: 24px;
+  --text-xl: 16px;
+  --text-xl--line-height: 26px;
+  --text-2xl: 18px;
+  --text-2xl--line-height: 28px;
+  --text-3xl: 22px;
+  --text-3xl--line-height: 30px;
+  --text-4xl: 24px;
+  --text-4xl--line-height: 32px;
+  --text-5xl: 26px;
+  --text-5xl--line-height: 34px;
+  --text-6xl: 28px;
+  --text-6xl--line-height: 36px;
+  --text-7xl: 30px;
+  --text-7xl--line-height: 38px;
+  --text-8xl: 32px;
+  --text-8xl--line-height: 40px;
+  --text-9xl: 34px;
+  --text-9xl--line-height: 42px;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    color: var(--foreground);
+    background: var(--background);
+    font-size: 12px;
+    line-height: 20px;
+  }
 }

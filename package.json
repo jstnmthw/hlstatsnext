@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "build-storybook": "turbo run build-storybook",
     "check-types": "turbo run check-types",
     "check-all": "turbo run check-types && turbo run lint && pnpm format:fix",
     "clean": "turbo run clean && rm -rf node_modules .turbo",
@@ -31,6 +32,7 @@
     "lint": "turbo run lint",
     "prepare": "husky",
     "ui": "pnpm --filter @repo/ui ui",
+    "storybook": "pnpm --filter @repo/ui storybook",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
     "test:integration": "turbo run test:integration",

@@ -38,3 +38,5 @@ coverage/
 # IDE
 .vscode/
 .idea/ 
+# Storybook
+storybook-static/

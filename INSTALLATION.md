@@ -76,8 +76,7 @@ hlstatsnext/
 │   ├── crypto/           # Encryption utilities
 │   ├── observability/    # Prometheus metrics
 │   ├── eslint-config/    # Shared ESLint configuration
-│   ├── typescript-config/# Shared TypeScript configuration
-│   └── tailwind-config/  # Shared Tailwind CSS configuration
+│   └── typescript-config/# Shared TypeScript configuration
 ├── docker/               # Docker configuration files
 │   ├── mysql/            # MySQL config and init scripts
 │   ├── rabbitmq/         # RabbitMQ config and definitions

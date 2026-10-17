@@ -62,3 +62,7 @@ packages/db/data/
 
 # Legacy
 # legacy/
+
+# Storybook
+*storybook.log
+storybook-static

@@ -76,7 +76,7 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
       return
     }
 
-    router.push("/login")
+    router.push("/accounts")
     router.refresh()
   }
 

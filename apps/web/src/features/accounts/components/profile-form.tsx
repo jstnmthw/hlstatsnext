@@ -54,18 +54,6 @@ export function ProfileForm() {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          value={session?.user.email ?? ""}
-          disabled
-          className="opacity-60"
-        />
-        <p className="text-xs text-muted-foreground">Email changes are not currently supported.</p>
-      </div>
-
       <Button type="submit" variant="primary" disabled={loading}>
         {loading ? "Saving..." : "Save changes"}
       </Button>

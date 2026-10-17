@@ -9,7 +9,7 @@ export function GoogleButton() {
 
   async function handleGoogleSignIn() {
     setLoading(true)
-    await signIn.social({ provider: "google", callbackURL: "/admin" })
+    await signIn.social({ provider: "google", callbackURL: "/accounts" })
   }
 
   return (

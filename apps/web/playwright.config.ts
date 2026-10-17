@@ -23,6 +23,8 @@ export default defineConfig({
   // Ports of their own, so a run never shares a server with `pnpm dev`. Better
   // Auth must be told the origin the browser will use, hence BETTER_AUTH_URL.
   // Readiness is probed on pages that need no API, and on the API's health query.
+  // Next allows one `next dev` per project, so while `pnpm dev` is running point
+  // the suite at it instead: PLAYWRIGHT_BASE_URL=http://localhost:3000.
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : [
@@ -32,7 +34,8 @@ export default defineConfig({
           url: `${graphqlURL}?query=%7Bhealth%7Bstatus%7D%7D`,
           reuseExistingServer: true,
           timeout: 120_000,
-          env: { PORT: String(apiPort) },
+          // No metrics listener: a `pnpm dev` API on the same machine already binds that port.
+          env: { PORT: String(apiPort), METRICS_ENABLED: "false" },
         },
         {
           command: `pnpm exec next dev --port ${webPort}`,

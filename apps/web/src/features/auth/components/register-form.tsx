@@ -1,20 +1,30 @@
 "use client"
 
+import { authErrorMessage } from "@/features/auth/lib/auth-error-messages"
 import { signUp } from "@repo/auth/client"
 import { Button, Card, Input, Label } from "@repo/ui"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { GoogleButton } from "./google-button"
+import { OrDivider } from "./or-divider"
 import { PasswordInput } from "./password-input"
+import { SteamButton } from "./steam-button"
 
-export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
+interface RegisterFormProps {
+  googleEnabled: boolean
+  errorCode?: string
+}
+
+export function RegisterForm({ googleEnabled, errorCode }: RegisterFormProps) {
   const router = useRouter()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [error, setError] = useState("")
+  const [error, setError] = useState(() =>
+    errorCode ? authErrorMessage(errorCode, "Registration failed. Please try again.") : "",
+  )
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -48,14 +58,25 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
     <>
       <div className="mb-6">
         <h2 className="text-lg font-bold tracking-tight uppercase">Create an account</h2>
-        <p className="text-muted-foreground">Enter your details to create a new account.</p>
+        <p className="text-muted-foreground">
+          Continue with Steam to claim your players, or register with your email.
+        </p>
       </div>
       <Card className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="rounded-md bg-destructive/10 px-3 py-2 text-destructive">{error}</div>
-          )}
+        {error && (
+          <div className="mb-4 rounded-md bg-destructive/10 px-3 py-2 text-destructive">
+            {error}
+          </div>
+        )}
 
+        <div className="space-y-3">
+          <SteamButton errorCallbackURL="/register">Continue with Steam</SteamButton>
+          {googleEnabled && <GoogleButton />}
+        </div>
+
+        <OrDivider label="or with email" />
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -108,27 +129,18 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
             />
           </div>
 
-          <Button type="submit" variant="primary" className="w-full" disabled={loading}>
-            {loading ? "Creating account..." : "Create account"}
+          <Button
+            type="submit"
+            variant="outline"
+            colorScheme="zinc"
+            className="w-full"
+            disabled={loading}
+          >
+            {loading ? "Creating account..." : "Create account with email"}
           </Button>
         </form>
 
-        {googleEnabled && (
-          <>
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">or continue with</span>
-              </div>
-            </div>
-
-            <GoogleButton />
-          </>
-        )}
-
-        <p className="text-center text-muted-foreground">
+        <p className="mt-6 text-center text-muted-foreground">
           Already have an account?{" "}
           <Link href="/login" className="text-primary-bright hover:underline">
             Sign in

@@ -52,6 +52,9 @@ function buildAuth() {
       accountLinking: {
         enabled: true,
         trustedProviders: ["google"],
+        // Steam accounts carry a synthetic address, so linking one to an
+        // email account is always a different-email link.
+        allowDifferentEmails: true,
       },
     },
     emailVerification: {
@@ -112,6 +115,9 @@ function buildAuth() {
         otpLength: 6,
         expiresIn: 300,
         sendVerificationOnSignUp: true,
+        // Lets a Steam-only user add a real address; the code goes to the new
+        // address, and the synthetic current one cannot be verified.
+        changeEmail: { enabled: true, verifyCurrentEmail: false },
         async sendVerificationOTP({ email, otp, type }) {
           // Fire-and-forget to avoid timing attacks
           void sendOTP({ email, otp, type })

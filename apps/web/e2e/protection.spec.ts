@@ -43,3 +43,26 @@ test.describe("as an admin", () => {
     await expect(page.getByRole("heading", { name: /admin dashboard/i })).toBeVisible()
   })
 })
+
+test.describe("sign-in methods", () => {
+  for (const path of ["/login", "/register"]) {
+    test(`${path} offers Steam first`, async ({ page }) => {
+      await page.goto(path)
+      await expect(page.getByRole("button").first()).toHaveText(/steam/i)
+    })
+  }
+})
+
+test.describe("as a user, in settings", () => {
+  test.use({ storageState: storageStatePath.user })
+
+  test("sees the connected accounts and, having a password, the password form", async ({
+    page,
+  }) => {
+    await page.goto("/accounts/settings")
+    // Card titles render as plain elements, not headings.
+    await expect(page.getByText("Connected accounts", { exact: true })).toBeVisible()
+    await expect(page.getByText("Steam", { exact: true })).toBeVisible()
+    await expect(page.getByText("Change Password", { exact: true })).toBeVisible()
+  })
+})

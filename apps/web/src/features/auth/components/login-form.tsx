@@ -1,18 +1,28 @@
 "use client"
 
+import { authErrorMessage } from "@/features/auth/lib/auth-error-messages"
 import { signIn } from "@repo/auth/client"
 import { Button, Card, Input, Label } from "@repo/ui"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { GoogleButton } from "./google-button"
+import { OrDivider } from "./or-divider"
 import { PasswordInput } from "./password-input"
+import { SteamButton } from "./steam-button"
 
-export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
+interface LoginFormProps {
+  googleEnabled: boolean
+  errorCode?: string
+}
+
+export function LoginForm({ googleEnabled, errorCode }: LoginFormProps) {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
+  const [error, setError] = useState(() =>
+    errorCode ? authErrorMessage(errorCode, "Sign in failed. Please try again.") : "",
+  )
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -36,7 +46,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
       return
     }
 
-    router.push("/admin")
+    router.push("/accounts")
     router.refresh()
   }
 
@@ -44,20 +54,31 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     <>
       <div className="mb-6">
         <h2 className="text-lg font-bold tracking-tight uppercase">Sign in</h2>
-        <p className="text-muted-foreground">Enter your credentials to access the admin panel.</p>
+        <p className="text-muted-foreground">
+          Sign in with Steam to claim your players, or use your email.
+        </p>
       </div>
       <Card className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="rounded-md bg-destructive/10 px-3 py-2 text-destructive">{error}</div>
-          )}
+        {error && (
+          <div className="mb-4 rounded-md bg-destructive/10 px-3 py-2 text-destructive">
+            {error}
+          </div>
+        )}
 
+        <div className="space-y-3">
+          <SteamButton errorCallbackURL="/login">Sign in with Steam</SteamButton>
+          {googleEnabled && <GoogleButton />}
+        </div>
+
+        <OrDivider label="or with email" />
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
-              placeholder="admin@example.com"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -85,27 +106,18 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
             />
           </div>
 
-          <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign in"}
+          <Button
+            type="submit"
+            variant="outline"
+            colorScheme="zinc"
+            className="mt-2 w-full"
+            disabled={loading}
+          >
+            {loading ? "Signing in..." : "Sign in with email"}
           </Button>
         </form>
 
-        {googleEnabled && (
-          <>
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">or continue with</span>
-              </div>
-            </div>
-
-            <GoogleButton />
-          </>
-        )}
-
-        <p className="text-center text-muted-foreground">
+        <p className="mt-6 text-center text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link href="/register" className="text-primary-bright hover:underline">
             Register

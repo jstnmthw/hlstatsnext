@@ -4,6 +4,8 @@ const webPort = 3100
 const apiPort = 4100
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${webPort}`
 const graphqlURL = `http://localhost:${apiPort}/graphql`
+// CI runners compile cold, so the servers get longer to come up there.
+const serverTimeout = process.env.CI ? 240_000 : 120_000
 
 export default defineConfig({
   testDir: "./e2e",
@@ -33,7 +35,7 @@ export default defineConfig({
           cwd: "../api",
           url: `${graphqlURL}?query=%7Bhealth%7Bstatus%7D%7D`,
           reuseExistingServer: true,
-          timeout: 120_000,
+          timeout: serverTimeout,
           // No metrics listener: a `pnpm dev` API on the same machine already binds that port.
           env: { PORT: String(apiPort), METRICS_ENABLED: "false" },
         },
@@ -41,7 +43,7 @@ export default defineConfig({
           command: `pnpm exec next dev --port ${webPort}`,
           url: `${baseURL}/login`,
           reuseExistingServer: true,
-          timeout: 120_000,
+          timeout: serverTimeout,
           env: { BETTER_AUTH_URL: baseURL, NEXT_PUBLIC_GRAPHQL_URL: graphqlURL },
         },
       ],

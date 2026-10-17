@@ -55,7 +55,7 @@ Why this order and not the numbering: 0003 needs the environment schema from 000
 
 ## Phase 6: ADR 0008. Better Auth 1.7.10, then Steam
 
-- [ ] Commit A: upgrade `better-auth` to 1.7.10. Re-check the `kysely` 0.28.17 override, the Prisma adapter and the e2e sign-in paths; the web build must pass.
+- [x] Commit A: upgrade `better-auth` to 1.7.10 in `@repo/auth` and `@repo/db`. Findings: the 1.7.0 `account.issuer` requirement was reverted in 1.7.3 and is absent from 1.7.10, so the Prisma schema is unchanged; the cookie cache still defaults to the compact strategy the proxy verifies; 1.7.10 declares `kysely ^0.28.17 || ^0.29.0`, so the 0.28.17 override stays valid and is kept. `zod` moved to 4.6.7 across the workspace so one copy serves both the apps and Better Auth (two copies produced TS2742 in `@repo/auth`). Type checks, lint, unit tests, the web build and the Playwright sign-in paths all pass.
 - [ ] Commit B: add `better-auth-steam` at an exact version. Before merging, read its callback: it must round-trip the assertion to Steam's `check_authentication`, match `return_to` exactly, and take the Steam ID from the verified `claimed_id`.
 - [ ] `steamId String? @unique` on `User`; run `pnpm db:generate`, `pnpm codegen`, `pnpm check-types`; expose `steamId` on the custom `User` object.
 - [ ] `/steam/login` joins the rate-limit rules; `STEAM_API_KEY` joins the env schema.

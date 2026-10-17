@@ -18,10 +18,10 @@
   },
   "dependencies": {
     "@repo/db": "workspace:*",
-    "better-auth": "^1.6.18",
+    "better-auth": "^1.7.10",
     "resend": "^6.12.4",
     "server-only": "^0.0.1",
-    "zod": "^4.4.3"
+    "zod": "^4.6.7"
   },
   "peerDependencies": {
     "next": ">=16",

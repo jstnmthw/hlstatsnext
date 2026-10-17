@@ -362,6 +362,7 @@ services:
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
       BETTER_AUTH_URL: "https://${WEB_DOMAIN}"
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+      STEAM_API_KEY: ${STEAM_API_KEY:-}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       MAIL_PROVIDER: ${MAIL_PROVIDER:-resend}
@@ -607,6 +608,7 @@ RABBITMQ_ERLANG_COOKIE=    # generate: openssl rand -hex 32
 ENCRYPTION_KEY=            # generate: openssl rand -base64 32
 BETTER_AUTH_SECRET=        # generate: openssl rand -base64 32
 ADMIN_EMAILS=              # comma-separated; a sign-up with one of these addresses becomes admin
+STEAM_API_KEY=             # optional; fills in Steam users' display name and avatar
 
 # ─── OAuth (optional) ──────────────────────────────────────
 GOOGLE_CLIENT_ID=

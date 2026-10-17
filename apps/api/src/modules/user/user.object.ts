@@ -25,6 +25,7 @@ builder.prismaObject("User", {
       nullable: true,
       resolve: (user) => user.banExpires,
     }),
+    steamId: t.exposeString("steamId", { nullable: true }),
     // sessions, accounts: OMITTED — auth internals managed by Better Auth
   }),
 })

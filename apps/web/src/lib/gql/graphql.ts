@@ -28099,6 +28099,7 @@ export type User = {
   image?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   role?: Maybe<Scalars['String']['output']>;
+  steamId?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -28113,6 +28114,7 @@ export type UserCountOrderByAggregateInput = {
   image?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
   role?: InputMaybe<SortOrder>;
+  steamId?: InputMaybe<SortOrder>;
   updatedAt?: InputMaybe<SortOrder>;
 };
 
@@ -28129,6 +28131,7 @@ export type UserCreateInput = {
   name: Scalars['String']['input'];
   role?: InputMaybe<Scalars['String']['input']>;
   sessions?: InputMaybe<SessionCreateNestedManyWithoutUserInput>;
+  steamId?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
@@ -28143,6 +28146,7 @@ export type UserCreateManyInput = {
   image?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   role?: InputMaybe<Scalars['String']['input']>;
+  steamId?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
@@ -28180,6 +28184,7 @@ export type UserCreateWithoutAccountsInput = {
   name: Scalars['String']['input'];
   role?: InputMaybe<Scalars['String']['input']>;
   sessions?: InputMaybe<SessionCreateNestedManyWithoutUserInput>;
+  steamId?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
@@ -28195,6 +28200,7 @@ export type UserCreateWithoutSessionsInput = {
   image?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   role?: InputMaybe<Scalars['String']['input']>;
+  steamId?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
@@ -28209,6 +28215,7 @@ export type UserMaxOrderByAggregateInput = {
   image?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
   role?: InputMaybe<SortOrder>;
+  steamId?: InputMaybe<SortOrder>;
   updatedAt?: InputMaybe<SortOrder>;
 };
 
@@ -28223,6 +28230,7 @@ export type UserMinOrderByAggregateInput = {
   image?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
   role?: InputMaybe<SortOrder>;
+  steamId?: InputMaybe<SortOrder>;
   updatedAt?: InputMaybe<SortOrder>;
 };
 
@@ -28232,7 +28240,8 @@ export enum UserOrderByRelevanceFieldEnum {
   Id = 'id',
   Image = 'image',
   Name = 'name',
-  Role = 'role'
+  Role = 'role',
+  SteamId = 'steamId'
 }
 
 export type UserOrderByRelevanceInput = {
@@ -28255,6 +28264,7 @@ export type UserOrderByWithAggregationInput = {
   image?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
   role?: InputMaybe<SortOrder>;
+  steamId?: InputMaybe<SortOrder>;
   updatedAt?: InputMaybe<SortOrder>;
 };
 
@@ -28272,6 +28282,7 @@ export type UserOrderByWithRelationInput = {
   name?: InputMaybe<SortOrder>;
   role?: InputMaybe<SortOrder>;
   sessions?: InputMaybe<SessionOrderByRelationAggregateInput>;
+  steamId?: InputMaybe<SortOrder>;
   updatedAt?: InputMaybe<SortOrder>;
 };
 
@@ -28286,6 +28297,7 @@ export enum UserScalarFieldEnum {
   Image = 'image',
   Name = 'name',
   Role = 'role',
+  SteamId = 'steamId',
   UpdatedAt = 'updatedAt'
 }
 
@@ -28308,6 +28320,7 @@ export type UserScalarWhereWithAggregatesInput = {
   image?: InputMaybe<StringNullableWithAggregatesFilter>;
   name?: InputMaybe<StringWithAggregatesFilter>;
   role?: InputMaybe<StringNullableWithAggregatesFilter>;
+  steamId?: InputMaybe<StringNullableWithAggregatesFilter>;
   updatedAt?: InputMaybe<DateTimeWithAggregatesFilter>;
 };
 
@@ -28324,6 +28337,7 @@ export type UserUpdateInput = {
   name?: InputMaybe<StringFieldUpdateOperationsInput>;
   role?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   sessions?: InputMaybe<SessionUpdateManyWithoutUserNestedInput>;
+  steamId?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   updatedAt?: InputMaybe<DateTimeFieldUpdateOperationsInput>;
 };
 
@@ -28338,6 +28352,7 @@ export type UserUpdateManyMutationInput = {
   image?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   name?: InputMaybe<StringFieldUpdateOperationsInput>;
   role?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
+  steamId?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   updatedAt?: InputMaybe<DateTimeFieldUpdateOperationsInput>;
 };
 
@@ -28379,6 +28394,7 @@ export type UserUpdateWithoutAccountsInput = {
   name?: InputMaybe<StringFieldUpdateOperationsInput>;
   role?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   sessions?: InputMaybe<SessionUpdateManyWithoutUserNestedInput>;
+  steamId?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   updatedAt?: InputMaybe<DateTimeFieldUpdateOperationsInput>;
 };
 
@@ -28394,6 +28410,7 @@ export type UserUpdateWithoutSessionsInput = {
   image?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   name?: InputMaybe<StringFieldUpdateOperationsInput>;
   role?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
+  steamId?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   updatedAt?: InputMaybe<DateTimeFieldUpdateOperationsInput>;
 };
 
@@ -28425,6 +28442,7 @@ export type UserWhereInput = {
   name?: InputMaybe<StringFilter>;
   role?: InputMaybe<StringNullableFilter>;
   sessions?: InputMaybe<SessionListRelationFilter>;
+  steamId?: InputMaybe<StringNullableFilter>;
   updatedAt?: InputMaybe<DateTimeFilter>;
 };
 
@@ -28444,6 +28462,7 @@ export type UserWhereUniqueInput = {
   name?: InputMaybe<StringFilter>;
   role?: InputMaybe<StringNullableFilter>;
   sessions?: InputMaybe<SessionListRelationFilter>;
+  steamId?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<DateTimeFilter>;
 };
 
@@ -28774,16 +28793,6 @@ export type WeaponWhereUniqueInput = {
   weaponId?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type GetPublicGamesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetPublicGamesQuery = { __typename?: 'Query', findManyGame: Array<{ __typename?: 'Game', code: string, name: string, realgame: string }> };
-
-export type GetGamesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetGamesQuery = { __typename?: 'Query', findManyGame: Array<{ __typename?: 'Game', code: string, name: string, hidden: string, realgame: string }> };
-
 export type GetGamesWithPaginationQueryVariables = Exact<{
   take?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
@@ -28800,6 +28809,11 @@ export type GetGameCountQueryVariables = Exact<{
 
 
 export type GetGameCountQuery = { __typename?: 'Query', countGame: number };
+
+export type GetGamesForSelectQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetGamesForSelectQuery = { __typename?: 'Query', findManyGame: Array<{ __typename?: 'Game', code: string, name: string }> };
 
 export type GetAdminPlayersWithPaginationQueryVariables = Exact<{
   take?: InputMaybe<Scalars['Int']['input']>;
@@ -28818,128 +28832,10 @@ export type GetAdminPlayerCountQueryVariables = Exact<{
 
 export type GetAdminPlayerCountQuery = { __typename?: 'Query', countPlayer: number };
 
-export type GetGamesForSelectQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetPublicGamesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGamesForSelectQuery = { __typename?: 'Query', findManyGame: Array<{ __typename?: 'Game', code: string, name: string }> };
-
-export type GetModsForSelectQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetModsForSelectQuery = { __typename?: 'Query', findManyModSupported: Array<{ __typename?: 'ModSupported', code: string, name: string }> };
-
-export type CreateServerWithConfigMutationVariables = Exact<{
-  data: CreateServerInput;
-}>;
-
-
-export type CreateServerWithConfigMutation = { __typename?: 'Mutation', createServerWithConfig?: { __typename?: 'ServerOperationResult', success?: boolean | null, message?: string | null, configsCount?: number | null, server?: { __typename?: 'SafeServer', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, rconAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null } | null } | null };
-
-export type UpdateServerWithConfigMutationVariables = Exact<{
-  serverId: Scalars['Int']['input'];
-  data: UpdateServerInput;
-}>;
-
-
-export type UpdateServerWithConfigMutation = { __typename?: 'Mutation', updateServerWithConfig?: { __typename?: 'ServerOperationResult', success?: boolean | null, message?: string | null, configsCount?: number | null, server?: { __typename?: 'SafeServer', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, rconAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null } | null } | null };
-
-export type GetServersQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetServersQuery = { __typename?: 'Query', findManyServer: Array<{ __typename?: 'Server', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, activePlayers?: number | null, maxPlayers?: number | null, activeMap?: string | null, lastEvent?: any | null, city?: string | null, country?: string | null }> };
-
-export type GetServersWithPaginationQueryVariables = Exact<{
-  take?: InputMaybe<Scalars['Int']['input']>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Array<ServerOrderByWithRelationInput> | ServerOrderByWithRelationInput>;
-  where?: InputMaybe<ServerWhereInput>;
-}>;
-
-
-export type GetServersWithPaginationQuery = { __typename?: 'Query', findManyServer: Array<{ __typename?: 'Server', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, activePlayers?: number | null, maxPlayers?: number | null, activeMap?: string | null, lastEvent?: any | null, city?: string | null, country?: string | null }> };
-
-export type GetServerCountQueryVariables = Exact<{
-  where?: InputMaybe<ServerWhereInput>;
-}>;
-
-
-export type GetServerCountQuery = { __typename?: 'Query', countServer: number };
-
-export type GetServerByIdWithConfigsQueryVariables = Exact<{
-  serverId: Scalars['Int']['input'];
-}>;
-
-
-export type GetServerByIdWithConfigsQuery = { __typename?: 'Query', findUniqueServer?: { __typename?: 'Server', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, rconAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null, configs?: Array<{ __typename?: 'ServerConfig', parameter: string, value: string }> | null, authToken?: { __typename?: 'ServerToken', tokenPrefix?: string | null, name?: string | null } | null } | null };
-
-export type CreateServerTokenMutationVariables = Exact<{
-  input: CreateServerTokenInput;
-}>;
-
-
-export type CreateServerTokenMutation = { __typename?: 'Mutation', createServerToken?: { __typename?: 'CreateServerTokenResult', success?: boolean | null, message?: string | null, rawToken?: string | null, token?: { __typename?: 'SafeServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount?: number | null, status?: string | null, hasRconPassword?: boolean | null } | null } | null };
-
-export type RevokeServerTokenMutationVariables = Exact<{
-  input: RevokeServerTokenInput;
-}>;
-
-
-export type RevokeServerTokenMutation = { __typename?: 'Mutation', revokeServerToken?: { __typename?: 'RevokeServerTokenResult', success?: boolean | null, message?: string | null, token?: { __typename?: 'SafeServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount?: number | null, status?: string | null, hasRconPassword?: boolean | null } | null } | null };
-
-export type GetServerTokensQueryVariables = Exact<{
-  includeRevoked?: InputMaybe<Scalars['Boolean']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-
-export type GetServerTokensQuery = { __typename?: 'Query', findManyServerToken: Array<{ __typename?: 'ServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount: number, status?: string | null, hasRconPassword?: boolean | null }> };
-
-export type GetServerTokenCountQueryVariables = Exact<{
-  includeRevoked?: InputMaybe<Scalars['Boolean']['input']>;
-}>;
-
-
-export type GetServerTokenCountQuery = { __typename?: 'Query', countServerToken?: number | null };
-
-export type GetServerTokenByIdQueryVariables = Exact<{
-  id: Scalars['Int']['input'];
-}>;
-
-
-export type GetServerTokenByIdQuery = { __typename?: 'Query', findServerToken?: { __typename?: 'ServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount: number, status?: string | null, hasRconPassword?: boolean | null } | null };
-
-export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetUsersQuery = { __typename?: 'Query', findManyUser: Array<{ __typename?: 'User', id?: string | null, name?: string | null, email?: string | null, emailVerified?: boolean | null, role?: string | null, banned?: boolean | null, banReason?: string | null, banExpires?: any | null, image?: string | null, createdAt?: any | null, updatedAt?: any | null }> };
-
-export type GetUsersWithPaginationQueryVariables = Exact<{
-  take?: InputMaybe<Scalars['Int']['input']>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Array<UserOrderByWithRelationInput> | UserOrderByWithRelationInput>;
-  where?: InputMaybe<UserWhereInput>;
-}>;
-
-
-export type GetUsersWithPaginationQuery = { __typename?: 'Query', findManyUser: Array<{ __typename?: 'User', id?: string | null, name?: string | null, email?: string | null, emailVerified?: boolean | null, role?: string | null, banned?: boolean | null, banReason?: string | null, banExpires?: any | null, image?: string | null, createdAt?: any | null, updatedAt?: any | null }> };
-
-export type GetUserCountQueryVariables = Exact<{
-  where?: InputMaybe<UserWhereInput>;
-}>;
-
-
-export type GetUserCountQuery = { __typename?: 'Query', countUser: number };
-
-export type GetGamesListQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetGamesListQuery = { __typename?: 'Query', findManyGame: Array<{ __typename?: 'Game', code: string, name: string, hidden: string }> };
-
-export type GetGeneralStatsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetGeneralStatsQuery = { __typename?: 'Query', countPlayer: number, countClan: number, countGame: number, countServer: number, getTotalKills?: number | null, findFirstEventFrag?: { __typename?: 'EventFrag', eventTime?: any | null } | null, findUniqueOption?: { __typename?: 'Option', value: string } | null };
+export type GetPublicGamesQuery = { __typename?: 'Query', findManyGame: Array<{ __typename?: 'Game', code: string, name: string, realgame: string }> };
 
 export type GetPublicPlayersWithPaginationQueryVariables = Exact<{
   take?: InputMaybe<Scalars['Int']['input']>;
@@ -28975,32 +28871,123 @@ export type GetPublicServerCountQueryVariables = Exact<{
 
 export type GetPublicServerCountQuery = { __typename?: 'Query', countServer: number };
 
+export type GetGeneralStatsQueryVariables = Exact<{ [key: string]: never; }>;
 
-export const GetPublicGamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicGames"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hidden"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"equals"},"value":{"kind":"StringValue","value":"0","block":false}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"realgame"}}]}}]}}]} as unknown as DocumentNode<GetPublicGamesQuery, GetPublicGamesQueryVariables>;
-export const GetGamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGames"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"realgame"}}]}}]}}]} as unknown as DocumentNode<GetGamesQuery, GetGamesQueryVariables>;
+
+export type GetGeneralStatsQuery = { __typename?: 'Query', countPlayer: number, countClan: number, countGame: number, countServer: number, getTotalKills?: number | null, findFirstEventFrag?: { __typename?: 'EventFrag', eventTime?: any | null } | null, findUniqueOption?: { __typename?: 'Option', value: string } | null };
+
+export type GetServersWithPaginationQueryVariables = Exact<{
+  take?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<ServerOrderByWithRelationInput> | ServerOrderByWithRelationInput>;
+  where?: InputMaybe<ServerWhereInput>;
+}>;
+
+
+export type GetServersWithPaginationQuery = { __typename?: 'Query', findManyServer: Array<{ __typename?: 'Server', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, activePlayers?: number | null, maxPlayers?: number | null, activeMap?: string | null, lastEvent?: any | null, city?: string | null, country?: string | null }> };
+
+export type GetServerCountQueryVariables = Exact<{
+  where?: InputMaybe<ServerWhereInput>;
+}>;
+
+
+export type GetServerCountQuery = { __typename?: 'Query', countServer: number };
+
+export type GetServerByIdWithConfigsQueryVariables = Exact<{
+  serverId: Scalars['Int']['input'];
+}>;
+
+
+export type GetServerByIdWithConfigsQuery = { __typename?: 'Query', findUniqueServer?: { __typename?: 'Server', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, rconAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null, configs?: Array<{ __typename?: 'ServerConfig', parameter: string, value: string }> | null, authToken?: { __typename?: 'ServerToken', tokenPrefix?: string | null, name?: string | null } | null } | null };
+
+export type GetModsForSelectQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetModsForSelectQuery = { __typename?: 'Query', findManyModSupported: Array<{ __typename?: 'ModSupported', code: string, name: string }> };
+
+export type CreateServerWithConfigMutationVariables = Exact<{
+  data: CreateServerInput;
+}>;
+
+
+export type CreateServerWithConfigMutation = { __typename?: 'Mutation', createServerWithConfig?: { __typename?: 'ServerOperationResult', success?: boolean | null, message?: string | null, configsCount?: number | null, server?: { __typename?: 'SafeServer', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, rconAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null } | null } | null };
+
+export type UpdateServerWithConfigMutationVariables = Exact<{
+  serverId: Scalars['Int']['input'];
+  data: UpdateServerInput;
+}>;
+
+
+export type UpdateServerWithConfigMutation = { __typename?: 'Mutation', updateServerWithConfig?: { __typename?: 'ServerOperationResult', success?: boolean | null, message?: string | null, configsCount?: number | null, server?: { __typename?: 'SafeServer', serverId?: number | null, name?: string | null, address?: string | null, port?: number | null, game?: string | null, publicAddress?: string | null, rconAddress?: string | null, statusUrl?: string | null, sortOrder?: number | null } | null } | null };
+
+export type GetServerTokensQueryVariables = Exact<{
+  includeRevoked?: InputMaybe<Scalars['Boolean']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetServerTokensQuery = { __typename?: 'Query', findManyServerToken: Array<{ __typename?: 'ServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount: number, status?: string | null, hasRconPassword?: boolean | null }> };
+
+export type GetServerTokenCountQueryVariables = Exact<{
+  includeRevoked?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type GetServerTokenCountQuery = { __typename?: 'Query', countServerToken?: number | null };
+
+export type CreateServerTokenMutationVariables = Exact<{
+  input: CreateServerTokenInput;
+}>;
+
+
+export type CreateServerTokenMutation = { __typename?: 'Mutation', createServerToken?: { __typename?: 'CreateServerTokenResult', success?: boolean | null, message?: string | null, rawToken?: string | null, token?: { __typename?: 'SafeServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount?: number | null, status?: string | null, hasRconPassword?: boolean | null } | null } | null };
+
+export type RevokeServerTokenMutationVariables = Exact<{
+  input: RevokeServerTokenInput;
+}>;
+
+
+export type RevokeServerTokenMutation = { __typename?: 'Mutation', revokeServerToken?: { __typename?: 'RevokeServerTokenResult', success?: boolean | null, message?: string | null, token?: { __typename?: 'SafeServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount?: number | null, status?: string | null, hasRconPassword?: boolean | null } | null } | null };
+
+export type GetUsersWithPaginationQueryVariables = Exact<{
+  take?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<UserOrderByWithRelationInput> | UserOrderByWithRelationInput>;
+  where?: InputMaybe<UserWhereInput>;
+}>;
+
+
+export type GetUsersWithPaginationQuery = { __typename?: 'Query', findManyUser: Array<{ __typename?: 'User', id?: string | null, name?: string | null, email?: string | null, emailVerified?: boolean | null, role?: string | null, banned?: boolean | null, banReason?: string | null, banExpires?: any | null, image?: string | null, createdAt?: any | null, updatedAt?: any | null }> };
+
+export type GetUserCountQueryVariables = Exact<{
+  where?: InputMaybe<UserWhereInput>;
+}>;
+
+
+export type GetUserCountQuery = { __typename?: 'Query', countUser: number };
+
+
 export const GetGamesWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GameOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"GameWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"realgame"}}]}}]}}]} as unknown as DocumentNode<GetGamesWithPaginationQuery, GetGamesWithPaginationQueryVariables>;
 export const GetGameCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGameCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"GameWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetGameCountQuery, GetGameCountQueryVariables>;
+export const GetGamesForSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesForSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetGamesForSelectQuery, GetGamesForSelectQueryVariables>;
 export const GetAdminPlayersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminPlayersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playerId"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"skill"}},{"kind":"Field","name":{"kind":"Name","value":"kills"}},{"kind":"Field","name":{"kind":"Name","value":"deaths"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"flag"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"lastSkillChange"}}]}}]}}]} as unknown as DocumentNode<GetAdminPlayersWithPaginationQuery, GetAdminPlayersWithPaginationQueryVariables>;
 export const GetAdminPlayerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminPlayerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetAdminPlayerCountQuery, GetAdminPlayerCountQueryVariables>;
-export const GetGamesForSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesForSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetGamesForSelectQuery, GetGamesForSelectQueryVariables>;
-export const GetModsForSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetModsForSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyModSupported"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetModsForSelectQuery, GetModsForSelectQueryVariables>;
-export const CreateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerWithConfigMutation, CreateServerWithConfigMutationVariables>;
-export const UpdateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateServerWithConfigMutation, UpdateServerWithConfigMutationVariables>;
-export const GetServersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"activePlayers"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"activeMap"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}}]} as unknown as DocumentNode<GetServersQuery, GetServersQueryVariables>;
-export const GetServersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"activePlayers"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"activeMap"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}}]} as unknown as DocumentNode<GetServersWithPaginationQuery, GetServersWithPaginationQueryVariables>;
-export const GetServerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetServerCountQuery, GetServerCountQueryVariables>;
-export const GetServerByIdWithConfigsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerByIdWithConfigs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findUniqueServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}},{"kind":"Field","name":{"kind":"Name","value":"configs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parameter"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}},{"kind":"Field","name":{"kind":"Name","value":"authToken"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetServerByIdWithConfigsQuery, GetServerByIdWithConfigsQueryVariables>;
-export const CreateServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"rawToken"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerTokenMutation, CreateServerTokenMutationVariables>;
-export const RevokeServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RevokeServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RevokeServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"revokeServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<RevokeServerTokenMutation, RevokeServerTokenMutationVariables>;
-export const GetServerTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeRevoked"},"value":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]} as unknown as DocumentNode<GetServerTokensQuery, GetServerTokensQueryVariables>;
-export const GetServerTokenCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerTokenCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeRevoked"},"value":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}}}]}]}}]} as unknown as DocumentNode<GetServerTokenCountQuery, GetServerTokenCountQueryVariables>;
-export const GetServerTokenByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerTokenById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]} as unknown as DocumentNode<GetServerTokenByIdQuery, GetServerTokenByIdQueryVariables>;
-export const GetUsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"emailVerified"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"banned"}},{"kind":"Field","name":{"kind":"Name","value":"banReason"}},{"kind":"Field","name":{"kind":"Name","value":"banExpires"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetUsersQuery, GetUsersQueryVariables>;
-export const GetUsersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUsersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UserOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"emailVerified"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"banned"}},{"kind":"Field","name":{"kind":"Name","value":"banReason"}},{"kind":"Field","name":{"kind":"Name","value":"banExpires"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetUsersWithPaginationQuery, GetUsersWithPaginationQueryVariables>;
-export const GetUserCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetUserCountQuery, GetUserCountQueryVariables>;
-export const GetGamesListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesList"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hidden"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"equals"},"value":{"kind":"StringValue","value":"0","block":false}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}}]}}]}}]} as unknown as DocumentNode<GetGamesListQuery, GetGamesListQueryVariables>;
-export const GetGeneralStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGeneralStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"}},{"kind":"Field","name":{"kind":"Name","value":"countClan"}},{"kind":"Field","name":{"kind":"Name","value":"countGame"}},{"kind":"Field","name":{"kind":"Name","value":"countServer"}},{"kind":"Field","name":{"kind":"Name","value":"getTotalKills"}},{"kind":"Field","name":{"kind":"Name","value":"findFirstEventFrag"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eventTime"},"value":{"kind":"EnumValue","value":"desc"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"eventTime"}}]}},{"kind":"Field","name":{"kind":"Name","value":"findUniqueOption"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"keyname"},"value":{"kind":"StringValue","value":"DeleteDays","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]} as unknown as DocumentNode<GetGeneralStatsQuery, GetGeneralStatsQueryVariables>;
+export const GetPublicGamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicGames"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hidden"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"equals"},"value":{"kind":"StringValue","value":"0","block":false}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"realgame"}}]}}]}}]} as unknown as DocumentNode<GetPublicGamesQuery, GetPublicGamesQueryVariables>;
 export const GetPublicPlayersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicPlayersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playerId"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"skill"}},{"kind":"Field","name":{"kind":"Name","value":"kills"}},{"kind":"Field","name":{"kind":"Name","value":"deaths"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"flag"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"lastSkillChange"}}]}}]}}]} as unknown as DocumentNode<GetPublicPlayersWithPaginationQuery, GetPublicPlayersWithPaginationQueryVariables>;
 export const GetPublicPlayerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicPlayerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetPublicPlayerCountQuery, GetPublicPlayerCountQueryVariables>;
 export const GetPublicServersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicServersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"activePlayers"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"activeMap"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}}]} as unknown as DocumentNode<GetPublicServersWithPaginationQuery, GetPublicServersWithPaginationQueryVariables>;
 export const GetPublicServerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicServerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetPublicServerCountQuery, GetPublicServerCountQueryVariables>;
+export const GetGeneralStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGeneralStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"}},{"kind":"Field","name":{"kind":"Name","value":"countClan"}},{"kind":"Field","name":{"kind":"Name","value":"countGame"}},{"kind":"Field","name":{"kind":"Name","value":"countServer"}},{"kind":"Field","name":{"kind":"Name","value":"getTotalKills"}},{"kind":"Field","name":{"kind":"Name","value":"findFirstEventFrag"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eventTime"},"value":{"kind":"EnumValue","value":"desc"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"eventTime"}}]}},{"kind":"Field","name":{"kind":"Name","value":"findUniqueOption"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"keyname"},"value":{"kind":"StringValue","value":"DeleteDays","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]} as unknown as DocumentNode<GetGeneralStatsQuery, GetGeneralStatsQueryVariables>;
+export const GetServersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"activePlayers"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"activeMap"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}}]} as unknown as DocumentNode<GetServersWithPaginationQuery, GetServersWithPaginationQueryVariables>;
+export const GetServerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetServerCountQuery, GetServerCountQueryVariables>;
+export const GetServerByIdWithConfigsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerByIdWithConfigs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findUniqueServer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}},{"kind":"Field","name":{"kind":"Name","value":"configs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parameter"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}},{"kind":"Field","name":{"kind":"Name","value":"authToken"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetServerByIdWithConfigsQuery, GetServerByIdWithConfigsQueryVariables>;
+export const GetModsForSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetModsForSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyModSupported"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetModsForSelectQuery, GetModsForSelectQueryVariables>;
+export const CreateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerWithConfigMutation, CreateServerWithConfigMutationVariables>;
+export const UpdateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateServerWithConfigMutation, UpdateServerWithConfigMutationVariables>;
+export const GetServerTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeRevoked"},"value":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]} as unknown as DocumentNode<GetServerTokensQuery, GetServerTokensQueryVariables>;
+export const GetServerTokenCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerTokenCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeRevoked"},"value":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}}}]}]}}]} as unknown as DocumentNode<GetServerTokenCountQuery, GetServerTokenCountQueryVariables>;
+export const CreateServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"rawToken"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerTokenMutation, CreateServerTokenMutationVariables>;
+export const RevokeServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RevokeServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RevokeServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"revokeServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<RevokeServerTokenMutation, RevokeServerTokenMutationVariables>;
+export const GetUsersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUsersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UserOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"emailVerified"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"banned"}},{"kind":"Field","name":{"kind":"Name","value":"banReason"}},{"kind":"Field","name":{"kind":"Name","value":"banExpires"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetUsersWithPaginationQuery, GetUsersWithPaginationQueryVariables>;
+export const GetUserCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetUserCountQuery, GetUserCountQueryVariables>;

@@ -291,6 +291,9 @@ importers:
       better-auth:
         specifier: ^1.7.10
         version: 1.7.10(@opentelemetry/api@1.9.1)(@prisma/client@7.8.0(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3))(typescript@5.9.3))(mysql2@3.15.3)(next@16.2.9(@opentelemetry/api@1.9.1)(@playwright/test@1.64.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8)
+      better-auth-steam:
+        specifier: 0.2.3
+        version: 0.2.3(better-auth@1.7.10(@opentelemetry/api@1.9.1)(@prisma/client@7.8.0(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3))(typescript@5.9.3))(mysql2@3.15.3)(next@16.2.9(@opentelemetry/api@1.9.1)(@playwright/test@1.64.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8))(zod@4.6.7)
       resend:
         specifier: ^6.12.4
         version: 6.12.4
@@ -3455,6 +3458,12 @@ packages:
     resolution: {integrity: sha512-girxaJ7WZssDOFhzCGZTDKoTa1gk6A1TbflaYTpykLJ4UU9Fz9kx1aREM8JCuoVHbL8X8T/mJg7w2oYSq72Oig==}
     engines: {node: '>=6.0.0'}
     hasBin: true
+
+  better-auth-steam@0.2.3:
+    resolution: {integrity: sha512-nRk58mpq/2MknPPT2+fC/yH4Jbb2/oX4Lbl4pcz1C8wXmaJJWC7qw31Jw2AJoR45FEwsyzcezwTzG+zf5PHi+w==}
+    peerDependencies:
+      better-auth: '>=1.6.21 <2'
+      zod: '>=4'
 
   better-auth@1.7.10:
     resolution: {integrity: sha512-Paf0X8cHKQc8jCgM3vl4AoxRicWdNf0zw8Aggn1q6aNSWCDDxSZCb6rkXa/O9cPc8idjVPK0rV/eHPHAbs07ZA==}
@@ -8939,6 +8948,11 @@ snapshots:
   balanced-match@4.0.4: {}
 
   baseline-browser-mapping@2.10.37: {}
+
+  better-auth-steam@0.2.3(better-auth@1.7.10(@opentelemetry/api@1.9.1)(@prisma/client@7.8.0(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3))(typescript@5.9.3))(mysql2@3.15.3)(next@16.2.9(@opentelemetry/api@1.9.1)(@playwright/test@1.64.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8))(zod@4.6.7):
+    dependencies:
+      better-auth: 1.7.10(@opentelemetry/api@1.9.1)(@prisma/client@7.8.0(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3))(typescript@5.9.3))(mysql2@3.15.3)(next@16.2.9(@opentelemetry/api@1.9.1)(@playwright/test@1.64.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8)
+      zod: 4.6.7
 
   better-auth@1.7.10(@opentelemetry/api@1.9.1)(@prisma/client@7.8.0(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3))(typescript@5.9.3))(mysql2@3.15.3)(next@16.2.9(@opentelemetry/api@1.9.1)(@playwright/test@1.64.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8):
     dependencies:

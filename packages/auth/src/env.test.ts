@@ -14,6 +14,7 @@ describe("parseAuthEnv", () => {
     expect(env.MAIL_FROM).toBe("noreply@hlstatsnext.com")
     expect(env.GOOGLE_CLIENT_ID).toBeUndefined()
     expect(env.RESEND_API_KEY).toBeUndefined()
+    expect(env.STEAM_API_KEY).toBeUndefined()
   })
 
   it("ignores variables outside the schema", () => {

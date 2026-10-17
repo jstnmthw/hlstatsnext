@@ -1,5 +1,6 @@
 import { db } from "@repo/db/client"
 import { betterAuth } from "better-auth"
+import { steamOpenID } from "better-auth-steam"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { admin, emailOTP } from "better-auth/plugins"
 import { getEnv } from "./env"
@@ -97,6 +98,7 @@ function buildAuth() {
         "/email-otp/send-verification-otp": { window: 60, max: 3 },
         "/email-otp/request-password-reset": { window: 60, max: 3 },
         "/forget-password/*": { window: 60, max: 3 },
+        "/steam/login": { window: 60, max: 10 },
       },
     },
     plugins: [
@@ -115,6 +117,8 @@ function buildAuth() {
           void sendOTP({ email, otp, type })
         },
       }),
+      // OpenID needs no key; the Web API key only fills in the display name and avatar.
+      steamOpenID({ apiKey: env.STEAM_API_KEY ?? "" }),
     ],
   })
 }

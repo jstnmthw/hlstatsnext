@@ -13,6 +13,7 @@ const schema = z
     MAIL_PROVIDER: z.enum(["console", "resend"]).default("console"),
     MAIL_FROM: z.string().default("noreply@hlstatsnext.com"),
     RESEND_API_KEY: z.string().optional(),
+    STEAM_API_KEY: z.string().optional(),
     ADMIN_EMAILS: z
       .string()
       .optional()

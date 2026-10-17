@@ -938,6 +938,9 @@ model User {
   banReason  String?   @map("ban_reason") @db.Text
   banExpires DateTime? @map("ban_expires")
 
+  // SteamID64, set by better-auth-steam when a Steam account is created or linked
+  steamId String? @unique @map("steam_id")
+
   sessions Session[]
   accounts Account[]
 

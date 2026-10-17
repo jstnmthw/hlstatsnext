@@ -1,15 +1,13 @@
 /**
  * Mail adapter system for sending OTP emails.
  *
- * Controlled by MAIL_PROVIDER env var:
+ * Controlled by MAIL_PROVIDER (validated in ./env):
  *   - "console" (default): Logs OTP to stdout (development)
- *   - "resend": Sends via Resend API (production)
- *
- * Environment variables:
- *   - MAIL_PROVIDER: "console" | "resend"
- *   - RESEND_API_KEY: Required when MAIL_PROVIDER=resend
- *   - MAIL_FROM: Sender address (default: "noreply@hlstatsnext.com")
+ *   - "resend": Sends via Resend API (production); RESEND_API_KEY is required,
+ *     MAIL_FROM is the sender address
  */
+
+import { getEnv } from "./env"
 
 interface SendOTPParams {
   email: string
@@ -47,18 +45,12 @@ async function sendViaConsole({ email, otp, type }: SendOTPParams): Promise<void
 }
 
 async function sendViaResend({ email, otp, type }: SendOTPParams): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    console.error("[MAIL] RESEND_API_KEY is not set — falling back to console")
-    return sendViaConsole({ email, otp, type })
-  }
-
+  const env = getEnv()
   const { Resend } = await import("resend")
-  const resend = new Resend(apiKey)
-  const from = process.env.MAIL_FROM ?? "noreply@hlstatsnext.com"
+  const resend = new Resend(env.RESEND_API_KEY)
 
   const { error } = await resend.emails.send({
-    from,
+    from: env.MAIL_FROM,
     to: email,
     subject: subjectMap[type],
     text: getBody(otp, type),
@@ -71,13 +63,10 @@ async function sendViaResend({ email, otp, type }: SendOTPParams): Promise<void>
 }
 
 export async function sendOTP(params: SendOTPParams): Promise<void> {
-  const provider = process.env.MAIL_PROVIDER ?? "console"
-
-  switch (provider) {
+  switch (getEnv().MAIL_PROVIDER) {
     case "resend":
       return sendViaResend(params)
     case "console":
-    default:
       return sendViaConsole(params)
   }
 }

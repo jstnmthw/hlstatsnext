@@ -25,11 +25,11 @@ cd hlstatsnext
 pnpm install
 
 # Copy environment files (minimum required)
-cp env.example .env
-cp packages/db/env.example packages/db/.env
-cp apps/daemon/env.example apps/daemon/.env
-cp apps/api/env.example apps/api/.env
-cp apps/web/env.example apps/web/.env
+cp .env.example .env
+cp packages/db/.env.example packages/db/.env
+cp apps/daemon/.env.example apps/daemon/.env
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env
 
 # Start infrastructure and initialize database
 docker compose up -d

@@ -1,4 +1,4 @@
-import { auth } from "@repo/auth"
+import { getAuth } from "@repo/auth/server"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 
@@ -9,7 +9,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const session = await auth.api.getSession({ headers: request.headers })
+  const session = await getAuth().api.getSession({ headers: request.headers })
 
   if (!session) {
     return NextResponse.redirect(new URL("/login", request.url))

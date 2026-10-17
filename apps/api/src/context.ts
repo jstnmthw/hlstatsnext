@@ -1,4 +1,4 @@
-import { auth, type Session } from "@repo/auth"
+import { getAuth, type Session } from "@repo/auth/server"
 import { createCryptoService, type ICryptoService } from "@repo/crypto"
 import { db } from "@repo/db/client"
 import { GraphQLError } from "graphql"
@@ -101,7 +101,7 @@ function getServices(): Services {
  * Create GraphQL context with dependency injection and session
  */
 export async function createContext({ request }: { request: Request }): Promise<Context> {
-  const session = await auth.api.getSession({ headers: request.headers })
+  const session = await getAuth().api.getSession({ headers: request.headers })
 
   return {
     prisma: db,

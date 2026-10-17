@@ -5,6 +5,7 @@ import { usePrometheus } from "@envelop/prometheus"
 import { costLimitPlugin } from "@escape.tech/graphql-armor-cost-limit"
 import { maxDepthPlugin } from "@escape.tech/graphql-armor-max-depth"
 import { useDisableIntrospection } from "@graphql-yoga/plugin-disable-introspection"
+import { getAuth } from "@repo/auth/server"
 import { createYoga } from "graphql-yoga"
 import { createServer } from "node:http"
 import { Registry, collectDefaultMetrics } from "prom-client"
@@ -19,6 +20,9 @@ const isProduction = process.env.NODE_ENV === "production"
 if (isProduction && !process.env.FRONTEND_URL) {
   throw new Error("FRONTEND_URL environment variable is required in production")
 }
+
+// Build Better Auth now so a bad environment stops the process before it serves a request.
+getAuth()
 
 const metricsEnabled = parseBooleanEnv(process.env.METRICS_ENABLED)
 

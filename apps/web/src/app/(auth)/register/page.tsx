@@ -1,4 +1,5 @@
 import { RegisterForm } from "@/features/auth/components/register-form"
+import { getEnv } from "@repo/auth/env"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -6,6 +7,6 @@ export const metadata: Metadata = {
 }
 
 export default function RegisterPage() {
-  const googleEnabled = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
+  const googleEnabled = Boolean(getEnv().GOOGLE_CLIENT_ID)
   return <RegisterForm googleEnabled={googleEnabled} />
 }

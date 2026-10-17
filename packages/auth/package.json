@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "check-types": "tsc --noEmit",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src/**/*.ts",
+    "test": "vitest run --silent"
   },
   "exports": {
     ".": "./src/index.ts",
@@ -12,7 +13,8 @@
     "./client": "./src/client.ts",
     "./session": "./src/session.ts",
     "./cookies": "./src/cookies.ts",
-    "./permissions": "./src/permissions.ts"
+    "./permissions": "./src/permissions.ts",
+    "./env": "./src/env.ts"
   },
   "dependencies": {
     "@repo/db": "workspace:*",
@@ -32,6 +34,7 @@
     "eslint": "^9.39.4",
     "next": "^16.2.9",
     "react": "^19.2.7",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.8"
   }
 }

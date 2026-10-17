@@ -1,6 +1,6 @@
 "use server"
 
-import { auth } from "@repo/auth"
+import { getAuth } from "@repo/auth/server"
 import { getSession } from "@repo/auth/session"
 import { db } from "@repo/db/client"
 import { revalidatePath } from "next/cache"
@@ -22,7 +22,7 @@ async function requirePermission(
     return { error: { success: false, message: "Authentication required." } }
   }
 
-  const hasPermission = await auth.api.userHasPermission({
+  const hasPermission = await getAuth().api.userHasPermission({
     body: { userId: session.user.id, permissions },
   })
   if (!hasPermission.success) {
@@ -51,7 +51,7 @@ export async function banUser(
     const selfError = preventSelfAction(session.user.id, userId)
     if (selfError) return selfError
 
-    await auth.api.banUser({
+    await getAuth().api.banUser({
       body: {
         userId,
         ...(banReason && { banReason }),
@@ -76,7 +76,7 @@ export async function unbanUser(userId: string): Promise<ActionResult> {
     const selfError = preventSelfAction(session.user.id, userId)
     if (selfError) return selfError
 
-    await auth.api.unbanUser({
+    await getAuth().api.unbanUser({
       body: { userId },
       headers: await headers(),
     })
@@ -123,7 +123,7 @@ export async function changeUserRole(userId: string, role: string): Promise<Acti
     const selfError = preventSelfAction(session.user.id, userId)
     if (selfError) return selfError
 
-    await auth.api.setRole({
+    await getAuth().api.setRole({
       body: { userId, role: role as "admin" | "user" },
       headers: await headers(),
     })
@@ -155,7 +155,7 @@ export async function anonymizeUser(userId: string): Promise<ActionResult> {
       },
     })
 
-    await auth.api.revokeUserSessions({
+    await getAuth().api.revokeUserSessions({
       body: { userId },
       headers: await headers(),
     })

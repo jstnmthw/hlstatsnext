@@ -17,12 +17,13 @@ Why this order and not the numbering: 0003 needs the environment schema from 000
 
 ## Phase 2: ADR 0006. Validate the environment at startup, build auth on first use
 
-- [ ] `packages/auth/src/env.ts`: a Zod schema of every variable the package reads (`BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `DATABASE_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `MAIL_PROVIDER`, `MAIL_FROM`, `RESEND_API_KEY`), parsed once by `getEnv()`. The error names every missing or invalid variable.
-- [ ] `server.ts` exports `getAuth()`, which builds the instance on first call. `mail.ts` reads through `getEnv()`.
-- [ ] Call sites move from `auth` to `getAuth()`: `apps/web/src/proxy.ts`, the three layouts, the server actions, `app/api/auth/[...all]/route.ts`, `apps/api/src/context.ts`.
-- [ ] `apps/web/src/instrumentation.ts` calls `getAuth()` in `register()`. The API calls it before `listen`.
-- [ ] Rename `apps/web/env.example` to `.env.example` and list every name; update `apps/api/.env.example`; add the auth set to `globalEnv` in `turbo.json`.
-- [ ] Checks pass.
+- [x] `packages/auth/src/env.ts`: a Zod schema of every variable the package reads (`BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `MAIL_PROVIDER`, `MAIL_FROM`, `RESEND_API_KEY`), parsed once by `getEnv()`. The error names every missing or invalid variable. `DATABASE_URL` stays with `@repo/db`, which reads and guards it itself.
+- [x] Unit tests for the schema in `packages/auth/src/env.test.ts`; vitest is added to the package the same way `@repo/crypto` has it.
+- [x] `server.ts` exports `getAuth()`, which builds the instance on first call. `mail.ts` reads through `getEnv()`.
+- [x] Call sites move from `auth` to `getAuth()`: `apps/web/src/proxy.ts`, the three layouts (through `getSession`), the server actions, `app/api/auth/[...all]/route.ts` (resolved per request so the build needs no environment), `apps/api/src/context.ts`. The login and register pages read the Google flag through `getEnv()` instead of `process.env`.
+- [x] `apps/web/src/instrumentation.ts` calls `getAuth()` in `register()`. The API calls it before `listen`.
+- [x] `apps/web/.env.example` lists every name. The repo had both `env.example` and `.env.example` in different places; it now uses `.env.example` everywhere, with the stale dotless duplicates at the root, `apps/api` and `apps/daemon` removed and the setup docs updated. `apps/api` already carries the Better Auth pair. `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` join `globalEnv` in `turbo.json`.
+- [x] Checks pass.
 
 ## Phase 3: ADR 0003. One access statement
 

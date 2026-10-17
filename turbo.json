@@ -4,6 +4,7 @@
   "globalEnv": [
     "DATABASE_URL",
     "NODE_ENV",
+    "NEXT_RUNTIME",
     "FRONTEND_URL",
     "PORT",
     "VITEST",
@@ -37,6 +38,8 @@
     "METRICS_PORT",
     "API_METRICS_PORT",
     "APP_VERSION",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
     "RESEND_API_KEY",

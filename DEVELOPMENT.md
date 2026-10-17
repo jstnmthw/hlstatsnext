@@ -27,12 +27,12 @@ cd hlstatsnext
 pnpm install
 
 # 3. Copy environment files
-cp env.example .env
-cp packages/db/env.example packages/db/.env
-cp packages/crypto/env.example packages/crypto/.env
-cp apps/daemon/env.example apps/daemon/.env
-cp apps/api/env.example apps/api/.env
-cp apps/web/env.example apps/web/.env
+cp .env.example .env
+cp packages/db/.env.example packages/db/.env
+cp packages/crypto/.env.example packages/crypto/.env
+cp apps/daemon/.env.example apps/daemon/.env
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env
 
 # 4. Generate encryption key and update .env files
 openssl rand -base64 32

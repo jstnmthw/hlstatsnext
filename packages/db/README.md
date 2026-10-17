@@ -22,7 +22,7 @@ Copy the environment template and configure your database:
 
 ```bash
 # Copy template
-cp env.example .env
+cp .env.example .env
 
 # Edit with your MySQL credentials
 DATABASE_URL="mysql://username:password@localhost:3306/hlstatsnext"

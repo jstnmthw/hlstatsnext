@@ -16,7 +16,7 @@ import {
   UpdateServerSchema,
   type ServerOperationResult,
 } from "@/lib/validators/schemas/server-schemas"
-import { auth } from "@repo/auth"
+import { getAuth } from "@repo/auth/server"
 import { getSession } from "@repo/auth/session"
 import { redirect } from "next/navigation"
 import { z } from "zod"
@@ -35,7 +35,7 @@ export async function updateServer(
       return { success: false, message: "Authentication required." }
     }
 
-    const hasPermission = await auth.api.userHasPermission({
+    const hasPermission = await getAuth().api.userHasPermission({
       body: { userId: session.user.id, permissions: { server: ["update"] } },
     })
     if (!hasPermission.success) {

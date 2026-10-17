@@ -1,5 +1,5 @@
 import { headers } from "next/headers"
-import { auth } from "./server"
+import { getAuth, type Session } from "./server"
 
 export class AuthError extends Error {
   code: string
@@ -13,14 +13,15 @@ export class AuthError extends Error {
   }
 }
 
-export type Session = NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>
+export type { Session }
 
 /**
  * Get the current session, or null if not authenticated.
  * Wraps the `headers()` call so callers don't need to import it.
  */
 export async function getSession(): Promise<Session | null> {
-  return auth.api.getSession({ headers: await headers() })
+  const requestHeaders = await headers()
+  return getAuth().api.getSession({ headers: requestHeaders })
 }
 
 /**

@@ -1,5 +1,7 @@
 export { getSessionCookie } from "better-auth/cookies"
+export { getEnv } from "./env"
+export type { AuthEnv } from "./env"
 export { ac, adminRole, statement, userRole } from "./permissions"
-export { auth } from "./server"
+export { getAuth } from "./server"
 export type { Auth, Session } from "./server"
 export { AuthError, getSession, requireAuth } from "./session"

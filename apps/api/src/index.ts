@@ -6,6 +6,7 @@ import { costLimitPlugin } from "@escape.tech/graphql-armor-cost-limit"
 import { maxDepthPlugin } from "@escape.tech/graphql-armor-max-depth"
 import { useDisableIntrospection } from "@graphql-yoga/plugin-disable-introspection"
 import { getAuth } from "@repo/auth/server"
+import { db } from "@repo/db/client"
 import { createYoga } from "graphql-yoga"
 import { createServer } from "node:http"
 import { Registry, collectDefaultMetrics } from "prom-client"
@@ -124,12 +125,33 @@ if (metricsRegistry) {
   })
 }
 
-// Graceful shutdown: close both listeners so a SIGTERM doesn't leave the
-// metrics port bound across restarts.
+// Graceful shutdown: close both listeners, then the database pool, then exit.
+// Keep-alive sockets and the Prisma pool would otherwise keep the process alive
+// after the ports are released, until the supervisor sends SIGKILL.
 function shutdown(signal: NodeJS.Signals) {
   console.log(`Received ${signal}, shutting down API server...`)
-  server.close()
-  metricsServer?.close()
+  const forceExit = setTimeout(() => {
+    console.error("Shutdown did not complete in 10s, exiting anyway")
+    process.exit(1)
+  }, 10_000)
+  forceExit.unref()
+
+  const closeListener = (listener: ReturnType<typeof createServer> | null) =>
+    new Promise<void>((resolve) => {
+      if (!listener) return resolve()
+      listener.closeAllConnections()
+      listener.close(() => resolve())
+    })
+
+  Promise.all([closeListener(server), closeListener(metricsServer)])
+    .then(() => db.$disconnect())
+    .then(
+      () => process.exit(0),
+      (error) => {
+        console.error("Error during shutdown:", error)
+        process.exit(1)
+      },
+    )
 }
 process.on("SIGTERM", shutdown)
 process.on("SIGINT", shutdown)

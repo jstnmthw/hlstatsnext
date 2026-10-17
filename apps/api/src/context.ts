@@ -2,7 +2,6 @@ import { auth, type Session } from "@repo/auth"
 import { createCryptoService, type ICryptoService } from "@repo/crypto"
 import { db } from "@repo/db/client"
 import { GraphQLError } from "graphql"
-import { AuthService } from "./modules/auth/auth.service"
 import { ServerTokenService } from "./modules/server-token/server-token.service"
 import { ServerService } from "./modules/server/server.service"
 
@@ -12,7 +11,6 @@ import { ServerService } from "./modules/server/server.service"
 interface Services {
   readonly crypto: ICryptoService
   readonly server: ServerService
-  readonly auth: AuthService
   readonly serverToken: ServerTokenService
 }
 
@@ -93,7 +91,6 @@ function getServices(): Services {
     services = {
       crypto,
       server: new ServerService(crypto),
-      auth: new AuthService(crypto),
       serverToken: new ServerTokenService(crypto),
     }
   }

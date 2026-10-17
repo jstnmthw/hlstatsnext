@@ -22,10 +22,10 @@ export function ErrorDisplay({
   state,
   pending,
 }: {
-  state: { success: boolean; message: string }
+  state: { ok: boolean; message: string }
   pending: boolean
 }) {
-  if (state.success || !state.message || pending) {
+  if (state.ok || !state.message || pending) {
     return null
   }
 

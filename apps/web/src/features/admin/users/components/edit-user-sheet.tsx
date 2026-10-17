@@ -36,7 +36,7 @@ export function EditUserSheet({
   const handleSave = () => {
     startTransition(async () => {
       const result = await updateUserName(userId, name)
-      if (result.success) {
+      if (result.ok) {
         toast.success(result.message)
         onOpenChange(false)
       } else {

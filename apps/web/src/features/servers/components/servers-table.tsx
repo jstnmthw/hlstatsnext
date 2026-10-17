@@ -1,8 +1,8 @@
 "use client"
 
 import { DataTable } from "@/features/common/components/data-table"
+import type { PublicServerItem } from "@/lib/servers"
 import {
-  PublicServerItem,
   recentServerColumns,
   recentServerTableConfig,
   serverPageColumns,

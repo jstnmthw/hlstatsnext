@@ -1,19 +1,15 @@
 "use client"
 
-import type { TokenOperationResult } from "@/features/admin/tokens/actions/create-token"
 import { createToken } from "@/features/admin/tokens/actions/create-token"
 import { ErrorDisplay, ErrorMessage, FormField } from "@/features/common/components/form"
-import type { Game } from "@repo/db/client"
+import { idleActionState } from "@/lib/actions"
+import type { GameOption } from "@/lib/games"
 import { BasicSelect, Button, Input, Label } from "@repo/ui"
 import { useActionState, useState } from "react"
 
-type GameProps = Pick<Game, "code" | "name">
-
-export function TokenCreateForm({ games }: { games: GameProps[] }) {
-  const [state, formAction, pending] = useActionState(createToken, {
-    success: true,
-    message: "",
-  } as TokenOperationResult)
+export function TokenCreateForm({ games }: { games: GameOption[] }) {
+  const [state, formAction, pending] = useActionState(createToken, idleActionState)
+  const rawToken = state.ok ? state.data?.rawToken : undefined
 
   const [copied, setCopied] = useState(false)
 
@@ -24,7 +20,7 @@ export function TokenCreateForm({ games }: { games: GameProps[] }) {
   }
 
   // Show the raw token after successful creation
-  if (state.success && state.rawToken) {
+  if (rawToken) {
     return (
       <div className="space-y-4">
         <div className="rounded-md border border-green-500/20 bg-green-500/5 p-4">
@@ -34,14 +30,9 @@ export function TokenCreateForm({ games }: { games: GameProps[] }) {
           </p>
           <div className="flex items-center gap-2">
             <code className="flex-1 rounded bg-zinc-800 px-3 py-2 font-mono text-xs break-all">
-              {state.rawToken}
+              {rawToken}
             </code>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleCopy(state.rawToken!)}
-            >
+            <Button type="button" variant="outline" size="sm" onClick={() => handleCopy(rawToken)}>
               {copied ? "Copied!" : "Copy"}
             </Button>
           </div>
@@ -52,7 +43,7 @@ export function TokenCreateForm({ games }: { games: GameProps[] }) {
             Add this to your game server&apos;s config file:
           </p>
           <code className="block rounded bg-zinc-900 px-3 py-2 font-mono text-xs">
-            hlx_token &quot;{state.rawToken}&quot;
+            hlx_token &quot;{rawToken}&quot;
           </code>
         </div>
         <Button

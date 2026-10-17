@@ -3,6 +3,7 @@ import { DataTableColumnHeader } from "@/features/common/components/data-table-c
 import { createSelectColumn } from "@/features/common/components/data-table-select-column"
 import { DataTableConfig } from "@/features/common/types/data-table"
 import { formatDate } from "@/lib/datetime-util"
+import type { UserListItem } from "@/lib/users"
 import {
   Avatar,
   AvatarFallback,
@@ -21,26 +22,10 @@ import {
 import { ColumnDef } from "@tanstack/react-table"
 import { UserRowActions } from "./user-row-actions"
 
-export type UserListItem = {
-  id?: string | null
-  name?: string | null
-  email?: string | null
-  emailVerified?: boolean | null
-  role?: string | null
-  banned?: boolean | null
-  banReason?: string | null
-  banExpires?: string | Date | null
-  image?: string | null
-  createdAt?: string | Date | null
-  updatedAt?: string | Date | null
-  __typename?: string
-}
-
 export const userTableConfig: DataTableConfig = {
   defaultSortField: "name",
   defaultSortOrder: "asc",
   defaultPageSize: 10,
-  searchFields: ["name", "email"],
   filterPlaceholder: "Filter users...",
   filters: [
     {

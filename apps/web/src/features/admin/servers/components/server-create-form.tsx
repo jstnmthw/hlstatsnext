@@ -2,15 +2,14 @@
 
 import { createServer } from "@/features/admin/servers/actions/create-server"
 import { ErrorDisplay, ErrorMessage, FormField } from "@/features/common/components/form"
-import type { Game, ModSupported } from "@repo/db/client"
+import { idleActionState } from "@/lib/actions"
+import type { GameOption } from "@/lib/games"
+import type { ModOption } from "@/lib/servers"
 import { BasicSelect, Button, Input, IPAddress, Label, Port } from "@repo/ui"
 import { useActionState } from "react"
 
-type GameProps = Pick<Game, "code" | "name">
-type ModProps = Pick<ModSupported, "code" | "name">
-
-export function ServerCreateForm({ games, mods }: { games: GameProps[]; mods: ModProps[] }) {
-  const [state, formAction, pending] = useActionState(createServer, { success: true, message: "" })
+export function ServerCreateForm({ games, mods }: { games: GameOption[]; mods: ModOption[] }) {
+  const [state, formAction, pending] = useActionState(createServer, idleActionState)
 
   return (
     <form action={formAction} className="space-y-6">

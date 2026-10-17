@@ -16,8 +16,7 @@ describe("serverPageTableConfig", () => {
     expect(serverPageTableConfig.defaultPageSize).toBe(25)
   })
 
-  it("has search configuration", () => {
-    expect(serverPageTableConfig.searchFields).toEqual(["name", "address", "game"])
+  it("has a search placeholder", () => {
     expect(serverPageTableConfig.filterPlaceholder).toBe("Search servers...")
   })
 })

@@ -1,13 +1,12 @@
 "use client"
 
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
+import type { PublicPlayerItem } from "@/lib/players"
 import { FlagIcon } from "@repo/ui"
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
-import { PublicPlayerItem } from "./player-config"
 
 export { playerPageTableConfig } from "./player-config"
-export type { PublicPlayerItem } from "./player-config"
 
 export const playerPageColumns: ColumnDef<PublicPlayerItem>[] = [
   {

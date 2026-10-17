@@ -46,7 +46,7 @@ export function ChangeRoleDialog({
   const handleSave = () => {
     startTransition(async () => {
       const result = await changeUserRole(userId, role)
-      if (result.success) {
+      if (result.ok) {
         toast.success(result.message)
         onOpenChange(false)
       } else {

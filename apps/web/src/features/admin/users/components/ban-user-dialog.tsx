@@ -77,7 +77,7 @@ export function BanUserDialog({
 
     startTransition(async () => {
       const result = await banUser(userId, finalReason || undefined, banExpiresIn)
-      if (result.success) {
+      if (result.ok) {
         toast.success(result.message)
         onOpenChange(false)
       } else {
@@ -89,7 +89,7 @@ export function BanUserDialog({
   const handleUnban = () => {
     startTransition(async () => {
       const result = await unbanUser(userId)
-      if (result.success) {
+      if (result.ok) {
         toast.success(result.message)
         onOpenChange(false)
       } else {

@@ -2,33 +2,20 @@
 
 import { updateServer } from "@/features/admin/servers/actions/update-server"
 import { ErrorDisplay, ErrorMessage, FormField } from "@/features/common/components/form"
-import type { Game, ModSupported } from "@repo/db/client"
+import { idleActionState } from "@/lib/actions"
+import type { GameOption } from "@/lib/games"
+import type { ModOption, ServerForEdit } from "@/lib/servers"
 import { BasicSelect, Button, Input, IPAddress, Label, Port } from "@repo/ui"
 import { useActionState } from "react"
 
-type GameProps = Pick<Game, "code" | "name">
-type ModProps = Pick<ModSupported, "code" | "name">
-
 interface ServerEditFormProps {
-  server: {
-    serverId: number
-    name: string
-    address: string
-    port: number
-    game: string
-    publicAddress?: string
-    rconAddress?: string
-    statusUrl?: string
-    sortOrder: number
-    mod: string
-    authToken?: { tokenPrefix: string; name: string } | null
-  }
-  games: GameProps[]
-  mods: ModProps[]
+  server: ServerForEdit
+  games: GameOption[]
+  mods: ModOption[]
 }
 
 export function ServerEditForm({ server, games, mods }: ServerEditFormProps) {
-  const [state, formAction, pending] = useActionState(updateServer, { success: true, message: "" })
+  const [state, formAction, pending] = useActionState(updateServer, idleActionState)
 
   return (
     <form action={formAction} className="space-y-6">

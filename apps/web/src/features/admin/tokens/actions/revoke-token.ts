@@ -1,41 +1,23 @@
 "use server"
 
-import { REVOKE_SERVER_TOKEN } from "@/features/admin/tokens/graphql/token-mutations"
-import { getClient } from "@/lib/apollo-client"
+import type { ActionResult } from "@/lib/actions"
+import { revokeServerToken } from "@/lib/data/tokens"
 import { requireAdmin } from "@repo/auth/session"
 import { revalidatePath } from "next/cache"
 
-export async function revokeToken(tokenId: number): Promise<{ success: boolean; message: string }> {
+export async function revokeToken(tokenId: number): Promise<ActionResult> {
   await requireAdmin()
 
   try {
-    const client = getClient()
-    const result = await client.mutate({
-      mutation: REVOKE_SERVER_TOKEN,
-      variables: {
-        input: { id: tokenId },
-      },
-    })
-
-    const data = result.data?.revokeServerToken
-    if (!data?.success) {
-      return {
-        success: false,
-        message: data?.message ?? "Failed to revoke token.",
-      }
+    const result = await revokeServerToken(tokenId)
+    if (!result.ok) {
+      return { ok: false, message: result.message ?? "Failed to revoke token." }
     }
 
     revalidatePath("/admin/tokens")
-
-    return {
-      success: true,
-      message: data.message ?? "Token revoked successfully.",
-    }
+    return { ok: true, message: result.message ?? "Token revoked successfully." }
   } catch (error) {
     console.error("Token revocation error:", error)
-    return {
-      success: false,
-      message: "An unexpected error occurred. Please try again.",
-    }
+    return { ok: false, message: "An unexpected error occurred. Please try again." }
   }
 }

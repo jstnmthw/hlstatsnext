@@ -1,10 +1,9 @@
 import { AdminHeader } from "@/features/admin/common/components/header"
-import { GET_GAMES_FOR_SELECT } from "@/features/admin/servers/graphql/game-queries"
 import { TokenCreateForm } from "@/features/admin/tokens/components/token-create-form"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { query } from "@/lib/apollo-client"
+import { listGameOptions } from "@/lib/data/games"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui"
 
 export const metadata = {
@@ -13,11 +12,7 @@ export const metadata = {
 }
 
 export default async function CreateTokenPage() {
-  const { data } = await query({
-    query: GET_GAMES_FOR_SELECT,
-  })
-
-  const games = data?.findManyGame || []
+  const games = await listGameOptions()
 
   return (
     <PageWrapper>

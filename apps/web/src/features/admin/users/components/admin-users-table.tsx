@@ -1,7 +1,8 @@
 "use client"
 
 import { DataTable } from "@/features/common/components/data-table"
-import { userColumns, UserListItem, userTableConfig } from "./user-columns"
+import type { UserListItem } from "@/lib/users"
+import { userColumns, userTableConfig } from "./user-columns"
 
 export function AdminUsersTable({
   data,

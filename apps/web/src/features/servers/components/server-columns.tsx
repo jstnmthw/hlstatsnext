@@ -1,13 +1,12 @@
 "use client"
 
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
+import type { PublicServerItem } from "@/lib/servers"
 import { Button, cn, IconPlayerPlay } from "@repo/ui"
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
-import { PublicServerItem } from "./server-config"
 
 export { recentServerTableConfig, serverPageTableConfig } from "./server-config"
-export type { PublicServerItem } from "./server-config"
 
 const isOnline = (lastEvent: string | Date | null | undefined): boolean => {
   if (!lastEvent) return false

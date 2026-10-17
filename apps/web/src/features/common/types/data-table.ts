@@ -24,7 +24,6 @@ export interface DataTableConfig {
   defaultSortField: string
   defaultSortOrder: "asc" | "desc"
   defaultPageSize: number
-  searchFields?: string[]
   filterPlaceholder?: string
   filters?: FacetedFilterDefinition[]
   toggles?: ToggleFilterDefinition[]

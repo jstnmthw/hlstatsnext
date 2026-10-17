@@ -1,7 +1,7 @@
 "use client"
 
 import { revokeToken } from "@/features/admin/tokens/actions/revoke-token"
-import { TokenListItem } from "@/features/admin/tokens/components/token-config"
+import type { TokenListItem } from "@/lib/tokens"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,7 +35,7 @@ export function TokenRowActions({ token }: TokenRowActionsProps) {
   const handleRevoke = () => {
     startTransition(async () => {
       const result = await revokeToken(token.id)
-      if (result.success) {
+      if (result.ok) {
         router.refresh()
       }
     })

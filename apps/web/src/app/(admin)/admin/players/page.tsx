@@ -2,20 +2,11 @@ import { AdminHeader } from "@/features/admin/common/components/header"
 import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 import { AdminPlayersTable } from "@/features/admin/players/components/admin-players-table"
 import { playerTableConfig } from "@/features/admin/players/components/player-columns"
-import {
-  GET_ADMIN_PLAYER_COUNT,
-  GET_ADMIN_PLAYERS_WITH_PAGINATION,
-} from "@/features/admin/players/graphql/player-queries"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import {
-  buildCountVariables,
-  buildPaginationVariables,
-  getConfigDefaults,
-  parseUrlParams,
-} from "@/features/common/graphql/pagination"
-import { query } from "@/lib/apollo-client"
+import { getConfigDefaults, parseUrlParams } from "@/features/common/graphql/pagination"
+import { listPlayers } from "@/lib/data/players"
 import { Button, IconUser } from "@repo/ui"
 import { Metadata } from "next"
 import Link from "next/link"
@@ -29,21 +20,7 @@ export default async function PlayersPage(props: AdminPageProps) {
   const searchParams = await props.searchParams
   const params = parseUrlParams(searchParams, getConfigDefaults(playerTableConfig))
 
-  const queryVariables = buildPaginationVariables(params, playerTableConfig.searchFields)
-  const countVariables = buildCountVariables(params, playerTableConfig.searchFields)
-
-  const { data } = await query({
-    query: GET_ADMIN_PLAYERS_WITH_PAGINATION,
-    variables: queryVariables,
-  })
-
-  const { data: countData } = await query({
-    query: GET_ADMIN_PLAYER_COUNT,
-    variables: countVariables,
-  })
-
-  const players = data?.findManyPlayer || []
-  const totalCount = countData?.countPlayer || 0
+  const { players, totalCount } = await listPlayers(params)
 
   return (
     <PageWrapper>

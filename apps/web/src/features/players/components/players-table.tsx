@@ -1,7 +1,8 @@
 "use client"
 
 import { DataTable } from "@/features/common/components/data-table"
-import { playerPageColumns, playerPageTableConfig, PublicPlayerItem } from "./player-columns"
+import type { PublicPlayerItem } from "@/lib/players"
+import { playerPageColumns, playerPageTableConfig } from "./player-columns"
 
 /** Full-featured table for /players — toolbar, sorting, pagination */
 export function PlayersTable({

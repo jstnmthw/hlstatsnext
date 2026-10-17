@@ -1,11 +1,10 @@
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { ServerCreateForm } from "@/features/admin/servers/components/server-create-form"
-import { GET_GAMES_FOR_SELECT } from "@/features/admin/servers/graphql/game-queries"
-import { GET_MODS_FOR_SELECT } from "@/features/admin/servers/graphql/mod-queries"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import { query } from "@/lib/apollo-client"
+import { listGameOptions } from "@/lib/data/games"
+import { listModOptions } from "@/lib/data/servers"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui"
 
 export const metadata = {
@@ -14,17 +13,7 @@ export const metadata = {
 }
 
 export default async function CreateServerPage() {
-  const [gamesResult, modsResult] = await Promise.all([
-    query({
-      query: GET_GAMES_FOR_SELECT,
-    }),
-    query({
-      query: GET_MODS_FOR_SELECT,
-    }),
-  ])
-
-  const games = gamesResult.data?.findManyGame || []
-  const mods = modsResult.data?.findManyModSupported || []
+  const [games, mods] = await Promise.all([listGameOptions(), listModOptions()])
 
   return (
     <PageWrapper>

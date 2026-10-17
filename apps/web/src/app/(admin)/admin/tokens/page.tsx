@@ -1,19 +1,12 @@
 import { AdminHeader } from "@/features/admin/common/components/header"
 import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 import { AdminTokensTable } from "@/features/admin/tokens/components/admin-tokens-table"
-import {
-  tokenTableConfig,
-  type TokenListItem,
-} from "@/features/admin/tokens/components/token-config"
-import {
-  GET_SERVER_TOKENS,
-  GET_SERVER_TOKEN_COUNT,
-} from "@/features/admin/tokens/graphql/token-queries"
+import { tokenTableConfig } from "@/features/admin/tokens/components/token-config"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
 import { getConfigDefaults, parseUrlParams } from "@/features/common/graphql/pagination"
-import { query } from "@/lib/apollo-client"
+import { listTokens } from "@/lib/data/tokens"
 import { Button, IconKey } from "@repo/ui"
 import { Metadata } from "next"
 import Link from "next/link"
@@ -31,25 +24,7 @@ export default async function TokensPage(props: AdminPageProps) {
     tokenTableConfig.filters,
   )
 
-  // Include revoked tokens based on filter
-  const includeRevoked = params.filters?.status?.includes("revoked") ?? false
-
-  const { data } = await query({
-    query: GET_SERVER_TOKENS,
-    variables: {
-      includeRevoked,
-      take: params.pageSize,
-      skip: (params.page - 1) * params.pageSize,
-    },
-  })
-
-  const { data: countData } = await query({
-    query: GET_SERVER_TOKEN_COUNT,
-    variables: { includeRevoked },
-  })
-
-  const tokens = (data?.findManyServerToken ?? []) as TokenListItem[]
-  const totalCount = countData?.countServerToken ?? 0
+  const { tokens, totalCount } = await listTokens(params)
 
   return (
     <PageWrapper>

@@ -2,19 +2,10 @@ import { Footer } from "@/features/common/components/footer"
 import { Header } from "@/features/common/components/header"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import {
-  buildCountVariables,
-  buildPaginationVariables,
-  getConfigDefaults,
-  parseUrlParams,
-} from "@/features/common/graphql/pagination"
+import { getConfigDefaults, parseUrlParams } from "@/features/common/graphql/pagination"
 import { serverPageTableConfig } from "@/features/servers/components/server-config"
 import { ServersTable } from "@/features/servers/components/servers-table"
-import {
-  GET_PUBLIC_SERVER_COUNT,
-  GET_PUBLIC_SERVERS_WITH_PAGINATION,
-} from "@/features/servers/graphql/server-queries"
-import { query } from "@/lib/apollo-client"
+import { listPublicServers } from "@/lib/data/public/servers"
 
 export const metadata = {
   title: "Servers",
@@ -40,26 +31,7 @@ export default async function ServersPage(props: ServersPageProps) {
     serverPageTableConfig.filters,
   )
 
-  const queryVariables = buildPaginationVariables(params, serverPageTableConfig.searchFields)
-
-  // Add secondary sort by name for stable ordering (e.g. 0-player servers alphabetical)
-  if (queryVariables.orderBy) {
-    queryVariables.orderBy.push({ name: "asc" })
-  }
-  const countVariables = buildCountVariables(params, serverPageTableConfig.searchFields)
-
-  const { data } = await query({
-    query: GET_PUBLIC_SERVERS_WITH_PAGINATION,
-    variables: queryVariables,
-  })
-
-  const { data: countData } = await query({
-    query: GET_PUBLIC_SERVER_COUNT,
-    variables: countVariables,
-  })
-
-  const servers = data?.findManyServer ?? []
-  const totalCount = countData?.countServer ?? 0
+  const { servers, totalCount } = await listPublicServers(params)
 
   return (
     <PageWrapper>

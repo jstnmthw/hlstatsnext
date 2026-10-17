@@ -1,18 +1,14 @@
 "use server"
 
+import type { ActionResult } from "@/lib/actions"
 import { getAuth } from "@repo/auth/server"
 import { requirePermission } from "@repo/auth/session"
 import { revalidatePath } from "next/cache"
 import { headers } from "next/headers"
 
-interface ActionResult {
-  success: boolean
-  message: string
-}
-
 function preventSelfAction(sessionUserId: string, targetUserId: string): ActionResult | null {
   if (sessionUserId === targetUserId) {
-    return { success: false, message: "You cannot perform this action on yourself." }
+    return { ok: false, message: "You cannot perform this action on yourself." }
   }
   return null
 }
@@ -38,10 +34,10 @@ export async function banUser(
     })
 
     revalidatePath("/admin/users")
-    return { success: true, message: "User has been banned." }
+    return { ok: true, message: "User has been banned." }
   } catch (e) {
     console.error("banUser error:", e)
-    return { success: false, message: "Failed to ban user." }
+    return { ok: false, message: "Failed to ban user." }
   }
 }
 
@@ -58,10 +54,10 @@ export async function unbanUser(userId: string): Promise<ActionResult> {
     })
 
     revalidatePath("/admin/users")
-    return { success: true, message: "User has been unbanned." }
+    return { ok: true, message: "User has been unbanned." }
   } catch (e) {
     console.error("unbanUser error:", e)
-    return { success: false, message: "Failed to unban user." }
+    return { ok: false, message: "Failed to unban user." }
   }
 }
 
@@ -74,7 +70,7 @@ export async function updateUserName(userId: string, name: string): Promise<Acti
   try {
     const trimmed = name.trim()
     if (!trimmed) {
-      return { success: false, message: "Name cannot be empty." }
+      return { ok: false, message: "Name cannot be empty." }
     }
 
     await getAuth().api.adminUpdateUser({
@@ -83,10 +79,10 @@ export async function updateUserName(userId: string, name: string): Promise<Acti
     })
 
     revalidatePath("/admin/users")
-    return { success: true, message: "User name updated." }
+    return { ok: true, message: "User name updated." }
   } catch (e) {
     console.error("updateUserName error:", e)
-    return { success: false, message: "Failed to update user name." }
+    return { ok: false, message: "Failed to update user name." }
   }
 }
 
@@ -103,10 +99,10 @@ export async function changeUserRole(userId: string, role: string): Promise<Acti
     })
 
     revalidatePath("/admin/users")
-    return { success: true, message: `User role changed to ${role}.` }
+    return { ok: true, message: `User role changed to ${role}.` }
   } catch (e) {
     console.error("changeUserRole error:", e)
-    return { success: false, message: "Failed to change user role." }
+    return { ok: false, message: "Failed to change user role." }
   }
 }
 
@@ -133,9 +129,9 @@ export async function anonymizeUser(userId: string): Promise<ActionResult> {
     })
 
     revalidatePath("/admin/users")
-    return { success: true, message: "User account has been anonymized." }
+    return { ok: true, message: "User account has been anonymized." }
   } catch (e) {
     console.error("anonymizeUser error:", e)
-    return { success: false, message: "Failed to anonymize user." }
+    return { ok: false, message: "Failed to anonymize user." }
   }
 }

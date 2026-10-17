@@ -1,11 +1,11 @@
 "use client"
 
-import { TokenListItem } from "@/features/admin/tokens/components/token-config"
 import { TokenRowActions } from "@/features/admin/tokens/components/token-row-actions"
 import { DataTableActionsHeader } from "@/features/common/components/data-table-actions-header"
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
 import { createSelectColumn } from "@/features/common/components/data-table-select-column"
 import { formatDate, formatHumanFriendlyDate } from "@/lib/datetime-util"
+import type { TokenListItem } from "@/lib/tokens"
 import { Badge } from "@repo/ui"
 import { ColumnDef } from "@tanstack/react-table"
 

@@ -90,8 +90,3 @@ export type UpdateServerFormData = z.infer<typeof UpdateServerSchema>
 /**
  * Common result type for server operations
  */
-export type ServerOperationResult = {
-  success: boolean
-  message: string
-  errors?: Record<string, string[]>
-}

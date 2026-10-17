@@ -3,6 +3,7 @@ import { DataTableColumnHeader } from "@/features/common/components/data-table-c
 import { createSelectColumn } from "@/features/common/components/data-table-select-column"
 import { DataTableConfig } from "@/features/common/types/data-table"
 import { formatDate } from "@/lib/datetime-util"
+import type { PlayerListItem } from "@/lib/players"
 import {
   Button,
   DropdownMenu,
@@ -16,25 +17,10 @@ import {
 } from "@repo/ui"
 import { ColumnDef } from "@tanstack/react-table"
 
-export type PlayerListItem = {
-  playerId?: number | null
-  lastName?: string | null
-  email?: string | null
-  country?: string | null
-  flag?: string | null
-  skill?: number | null
-  kills?: number | null
-  deaths?: number | null
-  lastEvent?: string | Date | null
-  lastSkillChange?: string | Date | null
-  __typename?: string
-}
-
 export const playerTableConfig: DataTableConfig = {
   defaultSortField: "lastName",
   defaultSortOrder: "asc",
   defaultPageSize: 10,
-  searchFields: ["lastName", "email"],
   filterPlaceholder: "Filter players...",
   frozenColumnsLeft: ["select"],
   frozenColumnsRight: ["actions"],

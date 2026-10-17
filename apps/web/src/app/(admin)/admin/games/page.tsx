@@ -2,20 +2,11 @@ import { AdminHeader } from "@/features/admin/common/components/header"
 import { AdminPageProps } from "@/features/admin/common/types/admin-page"
 import { AdminGamesTable } from "@/features/admin/games/components/admin-games-table"
 import { gameTableConfig } from "@/features/admin/games/components/game-columns"
-import {
-  GET_GAMES_WITH_PAGINATION,
-  GET_GAME_COUNT,
-} from "@/features/admin/games/graphql/game-queries"
 import { Footer } from "@/features/common/components/footer"
 import { MainContent } from "@/features/common/components/main-content"
 import { PageWrapper } from "@/features/common/components/page-wrapper"
-import {
-  buildCountVariables,
-  buildPaginationVariables,
-  getConfigDefaults,
-  parseUrlParams,
-} from "@/features/common/graphql/pagination"
-import { query } from "@/lib/apollo-client"
+import { getConfigDefaults, parseUrlParams } from "@/features/common/graphql/pagination"
+import { listGames } from "@/lib/data/games"
 import { Button, IconDeviceGamepad2 } from "@repo/ui"
 import { Metadata } from "next"
 import Link from "next/link"
@@ -33,22 +24,7 @@ export default async function GamesPage(props: AdminPageProps) {
     gameTableConfig.filters,
   )
 
-  // Games "hidden" is a string field ("0"/"1"), default { in: [] } works
-  const queryVariables = buildPaginationVariables(params, gameTableConfig.searchFields)
-  const countVariables = buildCountVariables(params, gameTableConfig.searchFields)
-
-  const { data } = await query({
-    query: GET_GAMES_WITH_PAGINATION,
-    variables: queryVariables,
-  })
-
-  const { data: countData } = await query({
-    query: GET_GAME_COUNT,
-    variables: countVariables,
-  })
-
-  const games = data?.findManyGame || []
-  const totalCount = countData?.countGame || 0
+  const { games, totalCount } = await listGames(params)
 
   return (
     <PageWrapper>

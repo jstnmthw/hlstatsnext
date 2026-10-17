@@ -27,7 +27,7 @@ export function DeleteUserDialog({ open, onOpenChange, userId, userName }: Delet
   const handleDelete = () => {
     startTransition(async () => {
       const result = await anonymizeUser(userId)
-      if (result.success) {
+      if (result.ok) {
         toast.success(result.message)
         onOpenChange(false)
       } else {

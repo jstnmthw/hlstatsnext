@@ -1,7 +1,7 @@
 "use server"
 
-import { CREATE_SERVER_TOKEN } from "@/features/admin/tokens/graphql/token-mutations"
-import { getClient } from "@/lib/apollo-client"
+import type { ActionResult } from "@/lib/actions"
+import { createServerToken } from "@/lib/data/tokens"
 import { requireAdmin } from "@repo/auth/session"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
@@ -13,75 +13,44 @@ const CreateTokenSchema = z.object({
   expiresAt: z.string().optional(),
 })
 
-export type TokenOperationResult = {
-  success: boolean
-  message: string
-  rawToken?: string | null
-  errors?: Record<string, string[]>
+export interface TokenCreated {
+  rawToken: string
 }
 
 export async function createToken(
-  _prevState: TokenOperationResult,
+  _prevState: ActionResult<TokenCreated>,
   formData: FormData,
-): Promise<TokenOperationResult> {
+): Promise<ActionResult<TokenCreated>> {
   await requireAdmin()
 
+  const validation = CreateTokenSchema.safeParse({
+    name: formData.get("name") as string,
+    game: formData.get("game") as string,
+    rconPassword: formData.get("rconPassword") as string,
+    expiresAt: formData.get("expiresAt") as string,
+  })
+  if (!validation.success) {
+    return {
+      ok: false,
+      message: "Validation failed",
+      errors: validation.error.flatten().fieldErrors as Record<string, string[]>,
+    }
+  }
+
   try {
-    const rawData = {
-      name: formData.get("name") as string,
-      game: formData.get("game") as string,
-      rconPassword: formData.get("rconPassword") as string,
-      expiresAt: formData.get("expiresAt") as string,
-    }
-
-    const validation = CreateTokenSchema.safeParse(rawData)
-    if (!validation.success) {
-      return {
-        success: false,
-        message: "Validation failed",
-        errors: validation.error.flatten().fieldErrors as Record<string, string[]>,
-      }
-    }
-
-    const { name, game, rconPassword, expiresAt } = validation.data
-
-    const client = getClient()
-    const result = await client.mutate({
-      mutation: CREATE_SERVER_TOKEN,
-      variables: {
-        input: {
-          name,
-          game,
-          rconPassword: rconPassword || undefined,
-          expiresAt: expiresAt || undefined,
-        },
-      },
-    })
-
-    const data = result.data?.createServerToken
-    if (!data?.success) {
-      return {
-        success: false,
-        message: data?.message ?? "Failed to create token.",
-      }
+    const result = await createServerToken(validation.data)
+    if (!result.ok || !result.rawToken) {
+      return { ok: false, message: result.message ?? "Failed to create token." }
     }
 
     revalidatePath("/admin/tokens")
-
     return {
-      success: true,
-      message: data.message ?? "Token created successfully.",
-      rawToken: data.rawToken,
+      ok: true,
+      message: result.message ?? "Token created successfully.",
+      data: { rawToken: result.rawToken },
     }
   } catch (error) {
-    if (error instanceof Error && error.message === "NEXT_REDIRECT") {
-      throw error
-    }
-
     console.error("Token creation error:", error)
-    return {
-      success: false,
-      message: "An unexpected error occurred. Please try again.",
-    }
+    return { ok: false, message: "An unexpected error occurred. Please try again." }
   }
 }

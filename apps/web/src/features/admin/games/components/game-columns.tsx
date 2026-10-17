@@ -2,7 +2,7 @@ import { DataTableActionsHeader } from "@/features/common/components/data-table-
 import { DataTableColumnHeader } from "@/features/common/components/data-table-col-header"
 import { createSelectColumn } from "@/features/common/components/data-table-select-column"
 import { DataTableConfig } from "@/features/common/types/data-table"
-import { Game } from "@repo/db/client"
+import type { GameListItem } from "@/lib/games"
 import {
   Badge,
   Button,
@@ -17,15 +17,10 @@ import {
 } from "@repo/ui"
 import { ColumnDef } from "@tanstack/react-table"
 
-export type GameListItem = Pick<Game, "code" | "name" | "hidden" | "realgame"> & {
-  __typename?: string
-}
-
 export const gameTableConfig: DataTableConfig = {
   defaultSortField: "name",
   defaultSortOrder: "asc",
   defaultPageSize: 10,
-  searchFields: ["name", "code"],
   filterPlaceholder: "Filter games...",
   filters: [
     {

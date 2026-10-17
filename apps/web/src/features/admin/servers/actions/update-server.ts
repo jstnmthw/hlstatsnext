@@ -1,91 +1,57 @@
 "use server"
 
-import { UPDATE_SERVER_WITH_CONFIG_MUTATION } from "@/features/admin/servers/graphql/server-mutations"
 import {
-  createGraphQLFailureResult,
   createUnexpectedErrorResult,
   createValidationFailureResult,
   handleUniqueConstraintError,
-  isRedirectError,
   logGraphQLErrors,
 } from "@/features/admin/servers/utils/error-handlers"
 import { extractFormDataForUpdate } from "@/features/admin/servers/utils/server-transformers"
-import { getClient } from "@/lib/apollo-client"
+import type { ActionResult } from "@/lib/actions"
+import { updateServer as updateServerRecord } from "@/lib/data/servers"
 import { logDevError } from "@/lib/dev-logger"
-import {
-  UpdateServerSchema,
-  type ServerOperationResult,
-} from "@/lib/validators/schemas/server-schemas"
+import { UpdateServerSchema } from "@/lib/validators/schemas/server-schemas"
 import { requirePermission } from "@repo/auth/session"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 
 export type UpdateServerFormData = z.infer<typeof UpdateServerSchema>
-export type UpdateServerResult = ServerOperationResult
+export type UpdateServerResult = ActionResult
 
 export async function updateServer(
-  _prevState: UpdateServerResult,
+  _prevState: ActionResult,
   formData: FormData,
-): Promise<UpdateServerResult> {
+): Promise<ActionResult> {
   await requirePermission({ server: ["update"] })
 
-  try {
-    // Extract and validate form data
-    const rawData = extractFormDataForUpdate(formData)
-    const validation = UpdateServerSchema.safeParse(rawData)
-
-    if (!validation.success) {
-      return createValidationFailureResult(validation.error.flatten().fieldErrors)
-    }
-
-    // Prepare GraphQL input for server update with config
-    const serverInput = {
-      name: validation.data.name || undefined,
-      address: validation.data.address || undefined,
-      port: validation.data.port,
-      game: validation.data.game,
-      mod: validation.data.mod || undefined,
-      publicAddress: validation.data.publicAddress || undefined,
-      rconAddress: validation.data.rconAddress || undefined,
-      statusUrl: validation.data.statusUrl || undefined,
-      rconPassword: validation.data.rconPassword || undefined,
-      sortOrder: validation.data.sortOrder,
-    }
-
-    // Execute GraphQL mutation
-    const client = getClient()
-    const result = await client.mutate({
-      mutation: UPDATE_SERVER_WITH_CONFIG_MUTATION,
-      variables: {
-        serverId: validation.data.serverId,
-        data: serverInput,
-      },
-    })
-
-    if (!result.data?.updateServerWithConfig) {
-      console.error("GraphQL mutation failed")
-      return createGraphQLFailureResult()
-    }
-
-    // Redirect to admin servers page on success
-    redirect("/admin/servers")
-  } catch (error) {
-    // Let Next.js redirect errors pass through
-    if (isRedirectError(error)) {
-      throw error
-    }
-
-    logDevError("Server update error:", error)
-
-    // Log GraphQL errors with proper formatting
-    logGraphQLErrors(error)
-
-    // Handle specific error types
-    const uniqueConstraintError = handleUniqueConstraintError(error)
-    if (uniqueConstraintError) {
-      return uniqueConstraintError
-    }
-
-    return createUnexpectedErrorResult()
+  const validation = UpdateServerSchema.safeParse(extractFormDataForUpdate(formData))
+  if (!validation.success) {
+    return createValidationFailureResult(validation.error.flatten().fieldErrors)
   }
+
+  const serverInput = {
+    name: validation.data.name || undefined,
+    address: validation.data.address || undefined,
+    port: validation.data.port,
+    game: validation.data.game,
+    mod: validation.data.mod || undefined,
+    publicAddress: validation.data.publicAddress || undefined,
+    rconAddress: validation.data.rconAddress || undefined,
+    statusUrl: validation.data.statusUrl || undefined,
+    rconPassword: validation.data.rconPassword || undefined,
+    sortOrder: validation.data.sortOrder,
+  }
+
+  try {
+    const result = await updateServerRecord(validation.data.serverId, serverInput)
+    if (!result.ok) {
+      return { ok: false, message: result.message ?? "Failed to update server. Please try again." }
+    }
+  } catch (error) {
+    logDevError("Server update error:", error)
+    logGraphQLErrors(error)
+    return handleUniqueConstraintError(error) ?? createUnexpectedErrorResult()
+  }
+
+  redirect("/admin/servers")
 }

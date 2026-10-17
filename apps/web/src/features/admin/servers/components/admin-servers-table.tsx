@@ -1,7 +1,8 @@
 "use client"
 
 import { DataTable } from "@/features/common/components/data-table"
-import { serverColumns, ServerListItem, serverTableConfig } from "./server-columns"
+import type { ServerListItem } from "@/lib/servers"
+import { serverColumns, serverTableConfig } from "./server-columns"
 
 export function AdminServersTable({
   data,

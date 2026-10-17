@@ -1,7 +1,8 @@
 "use client"
 
 import { DataTable } from "@/features/common/components/data-table"
-import { gameColumns, GameListItem, gameTableConfig } from "./game-columns"
+import type { GameListItem } from "@/lib/games"
+import { gameColumns, gameTableConfig } from "./game-columns"
 
 export function AdminGamesTable({
   data,

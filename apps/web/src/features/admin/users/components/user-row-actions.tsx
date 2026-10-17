@@ -1,6 +1,6 @@
 "use client"
 
-import { UserListItem } from "@/features/admin/users/components/user-columns"
+import type { UserListItem } from "@/lib/users"
 import {
   Button,
   DropdownMenu,

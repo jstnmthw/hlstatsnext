@@ -3,6 +3,7 @@ import { DataTableColumnHeader } from "@/features/common/components/data-table-c
 import { createSelectColumn } from "@/features/common/components/data-table-select-column"
 import { DataTableConfig } from "@/features/common/types/data-table"
 import { formatDate } from "@/lib/datetime-util"
+import type { ServerListItem } from "@/lib/servers"
 import {
   Badge,
   Button,
@@ -17,26 +18,10 @@ import {
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
 
-export type ServerListItem = {
-  serverId?: number | null
-  name?: string | null
-  address?: string | null
-  port?: number | null
-  activePlayers?: number | null
-  maxPlayers?: number | null
-  activeMap?: string | null
-  game?: string | null
-  city?: string | null
-  country?: string | null
-  lastEvent?: string | Date | null
-  __typename?: string
-}
-
 export const serverTableConfig: DataTableConfig = {
   defaultSortField: "name",
   defaultSortOrder: "asc",
   defaultPageSize: 10,
-  searchFields: ["name", "address", "game"],
   filterPlaceholder: "Filter servers...",
   filters: [
     {

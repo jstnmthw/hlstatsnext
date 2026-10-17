@@ -1,18 +1,10 @@
-import { GET_GENERAL_STATS } from "@/features/homepage/graphql/general-stats-query"
-import { query } from "@/lib/apollo-client"
+import { generalStats } from "@/lib/data/public/stats"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, cn } from "@repo/ui"
 import { ComponentProps } from "react"
 
 export async function GeneralStats({ className, ...props }: ComponentProps<"div">) {
-  const { data } = await query({ query: GET_GENERAL_STATS })
-
-  const players = data?.countPlayer ?? 0
-  const clans = data?.countClan ?? 0
-  const games = data?.countGame ?? 0
-  const servers = data?.countServer ?? 0
-  const totalKills = data?.getTotalKills ?? 0
-  const lastKillTime = data?.findFirstEventFrag?.eventTime as string | null
-  const deleteDays = data?.findUniqueOption?.value ?? "N/A"
+  const { players, clans, games, servers, totalKills, lastKillTime, deleteDays } =
+    await generalStats()
 
   return (
     <Card className={cn("overflow-hidden px-6", className)} {...props}>

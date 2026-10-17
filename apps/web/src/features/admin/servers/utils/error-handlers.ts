@@ -5,29 +5,15 @@
  * in the main server action functions and improve maintainability.
  */
 
+import type { ActionResult } from "@/lib/actions"
 import { logDevError } from "@/lib/dev-logger"
-import type { ServerOperationResult } from "@/lib/validators/schemas/server-schemas"
-
-/**
- * Checks if an error is a Next.js redirect error that should be re-thrown
- * @param error - The error to check
- * @returns true if it's a redirect error, false otherwise
- */
-export function isRedirectError(error: unknown): boolean {
-  return Boolean(
-    error &&
-    typeof error === "object" &&
-    "message" in error &&
-    (error as Error).message === "NEXT_REDIRECT",
-  )
-}
 
 /**
  * Handles Prisma unique constraint violations
  * @param error - The error to handle
- * @returns ServerOperationResult if it's a unique constraint error, null otherwise
+ * @returns ActionResult if it's a unique constraint error, null otherwise
  */
-export function handleUniqueConstraintError(error: unknown): ServerOperationResult | null {
+export function handleUniqueConstraintError(error: unknown): ActionResult | null {
   if (!(error && typeof error === "object" && "message" in error)) {
     return null
   }
@@ -42,7 +28,7 @@ export function handleUniqueConstraintError(error: unknown): ServerOperationResu
   }
 
   return {
-    success: false,
+    ok: false,
     message: "A server with this address and port already exists.",
     errors: {
       address: ["This server address and port combination is already in use"],
@@ -81,36 +67,23 @@ export function logGraphQLErrors(error: unknown): void {
 /**
  * Creates a generic validation failure result
  * @param errors - The validation errors from Zod
- * @returns Formatted ServerOperationResult
+ * @returns Formatted ActionResult
  */
-export function createValidationFailureResult(
-  errors: Record<string, string[]>,
-): ServerOperationResult {
+export function createValidationFailureResult(errors: Record<string, string[]>): ActionResult {
   return {
-    success: false,
+    ok: false,
     message: "Validation failed",
     errors,
   }
 }
 
 /**
- * Creates a generic GraphQL failure result
- * @returns ServerOperationResult for GraphQL failures
- */
-export function createGraphQLFailureResult(): ServerOperationResult {
-  return {
-    success: false,
-    message: "Failed to execute operation. Please try again.",
-  }
-}
-
-/**
  * Creates a generic unexpected error result
- * @returns ServerOperationResult for unexpected errors
+ * @returns ActionResult for unexpected errors
  */
-export function createUnexpectedErrorResult(): ServerOperationResult {
+export function createUnexpectedErrorResult(): ActionResult {
   return {
-    success: false,
+    ok: false,
     message: "An unexpected error occurred. Please try again.",
   }
 }

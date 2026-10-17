@@ -47,11 +47,11 @@ Why this order and not the numbering: 0003 needs the environment schema from 000
 
 ## Phase 5: ADR 0005. Web data modules over the GraphQL API
 
-- [ ] `apps/web/src/lib/data/<domain>.ts` modules: `import "server-only"`, a guard on the first line of every protected export, the Apollo client inside, DTOs whose types live in `lib/<domain>.ts`.
-- [ ] ESLint `no-restricted-imports`: `@/lib/apollo-client` is importable only from `src/lib/data/**` and `apollo-wrapper.tsx`.
-- [ ] Migrate one domain at a time: servers, tokens, users (admin); then games, players, servers, homepage (public, each module opening with a comment that it is public).
-- [ ] Actions become validate, guard, call a data module, `revalidatePath`, return `{ ok: true } | { ok: false, errors }`.
-- [ ] Checks pass.
+- [x] `apps/web/src/lib/data/<domain>.ts` modules: `import "server-only"`, a guard on the first line of every protected export, the Apollo client inside, DTOs whose types live in `lib/<domain>.ts`. Each module also owns its GraphQL documents, moved byte for byte so the generated client map still matches; four unused documents and the dead `GameList` component were dropped. Which columns are searchable now lives in the module, so `searchFields` left the table configs.
+- [x] ESLint `no-restricted-imports`: `@/lib/apollo-client` is importable only from `src/lib/data/**` and `apollo-wrapper.tsx`.
+- [x] Migrated: servers, tokens, users, games, players (admin, under `lib/data/`); servers, players, games, stats (public, under `lib/data/public/`, each opening with a comment that it is public).
+- [x] Actions guard first, validate, call a data module, `revalidatePath`, and return `ActionResult` from `lib/actions.ts`: `{ ok: true, message, data? } | { ok: false, message, errors? }`. Forms and dialogs read `ok`; `ErrorDisplay` and the token form follow.
+- [x] Checks pass.
 
 ## Phase 6: ADR 0008. Better Auth 1.7.10, then Steam
 

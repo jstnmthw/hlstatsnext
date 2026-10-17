@@ -35,3 +35,14 @@ export async function claimPlayersBySteamId(userId: string, steamId: string): Pr
   }
   return written
 }
+
+/**
+ * Forget the Steam identity on the user row once the Steam account is unlinked.
+ * better-auth-steam sets `user.steamId` on link but has no unlink hook, and
+ * Better Auth's own endpoints refuse to write a plugin field, so this is the one
+ * place outside Better Auth that writes the user table. Claims stay: the person
+ * proved ownership when the link was made.
+ */
+export async function forgetSteamId(userId: string): Promise<void> {
+  await db.user.update({ where: { id: userId }, data: { steamId: null } })
+}

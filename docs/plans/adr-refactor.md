@@ -1,6 +1,6 @@
 # ADR refactor: bring the code in line with records 0001 to 0009
 
-- Status: Complete as of 2026-10-18. All nine records are reflected in the code. Two schema changes (`user.steam_id`, `user_players`) must be applied to each database by hand until the `server_tokens.rcon_address` drift is resolved and `db push` can run again.
+- Status: Complete as of 2026-10-18. All nine records are reflected in the code and verified end to end on the dev stack. The `server_tokens.rcon_address` drift was dropped the same day, so `pnpm db:push` applies the schema again; other databases need `user.steam_id` and `user_players`, which `db push` creates.
 - Started: 2026-10-17
 - Order: dependency order, chosen 2026-10-17. One phase per commit; the user reviews and commits between phases.
 
@@ -72,4 +72,13 @@ Why this order and not the numbering: 0003 needs the environment schema from 000
 - [x] `UserPlayer` model mapped to `user_players`: `playerId` (primary key, so unique), `userId`, `game`, `claimedAt`; indexed by `userId`; cascades with the user. Deliberately no relation to `Player`: the daemon owns that model, and a relation would put a claim filter on the public player queries. The live database needs the table applied by hand, as with `steam_id`, because `db push` is blocked by the `server_tokens.rcon_address` drift. SQL from `prisma migrate diff`: `CREATE TABLE user_players (player_id INTEGER UNSIGNED NOT NULL, user_id VARCHAR(191) NOT NULL, game VARCHAR(32) NOT NULL, claimed_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3), INDEX user_players_user_id_idx (user_id), PRIMARY KEY (player_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;` then `ALTER TABLE user_players ADD CONSTRAINT user_players_user_id_fkey FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE;`.
 - [x] `claimPlayersBySteamId(userId, steamId)` in `packages/auth/src/claims.ts` (export `@repo/auth/claims`) looks up `player_unique_ids` by SteamID64, creates missing claims and moves claims held by another user, since a fresh Steam proof outranks an old one. It runs from a `databaseHooks.account.create.after` hook for `steam` accounts (failures are logged, never fatal to the sign-in) and from the players page, which reads the Steam account row through `listUserAccounts` rather than the stale-prone `user.steamId`.
 - [x] `UserPlayer` joins `CUSTOM_MODELS`. `modules/user-player/user-player.resolver.ts` adds `myPlayers` (`requireAuth`, returns the public `Player` object for the claimed ids) and `updateMyPlayer(playerId, data: UpdateMyPlayerInput)` (`requireAuth`, `player: ["update-own"]`, then the claim must belong to the caller), mapping the boolean inputs onto the legacy 0/1 columns. `update-own` is on both roles. The guard test covers both fields unauthenticated. The web gains `/accounts/players` (data module `lib/data/my-players.ts`, action `update-my-player.ts`, cards with the three preferences), a "My players" menu item, and `/accounts` now lands ordinary users there.
-- [x] Codegen trio run (against the dev API). Types, lint, format, unit tests and the API guard tests pass; nine Playwright scenarios pass. The tenth, the players page, needs the `user_players` table on the dev database and is the one check still outstanding as of 2026-10-18.
+- [x] Codegen trio run (against the dev API). Types, lint, format, unit tests and the API guard tests pass; nine Playwright scenarios pass. The tenth, the players page, passed on 2026-10-18 once the `user_players` table existed; the suite is ten for ten.
+
+## Follow-ups decided 2026-10-18
+
+Four loose ends from the phases above, each put to the user and resolved.
+
+- [x] Schema drift: the stale `server_tokens.rcon_address` column is dropped with `prisma db push --accept-data-loss` on the dev database, which also creates `user_players`. `pnpm db:push` is the workflow again; the by-hand SQL above is history.
+- [x] Stale `steamId`: disconnecting Steam now runs through the `disconnectAccount` server action, which unlinks through Better Auth and then calls `forgetSteamId` in `packages/auth/src/claims.ts`. That helper is the one documented exception to ADR 0003's write rule, for a column the plugin owns rather than Better Auth core. Claims stay.
+- [x] API shutdown: `shutdown()` in `apps/api/src/index.ts` closes both listeners and their connections, disconnects Prisma, then exits, with a forced exit after ten seconds.
+- [x] Playwright: `pnpm --filter web test:e2e:dev` points the suite at the running `pnpm dev` stack; `test:e2e` keeps starting its own servers.

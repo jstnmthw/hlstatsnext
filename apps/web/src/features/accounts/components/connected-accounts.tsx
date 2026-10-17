@@ -1,5 +1,6 @@
 "use client"
 
+import { disconnectAccount } from "@/features/accounts/actions/disconnect-account"
 import { authErrorMessage } from "@/features/auth/lib/auth-error-messages"
 import type { AccountOverview, LinkedAccount } from "@/lib/account"
 import { authClient } from "@repo/auth/client"
@@ -49,11 +50,16 @@ export function ConnectedAccounts({ overview, googleEnabled, errorCode }: Connec
     )
   const connectGoogle = () =>
     run(() => authClient.linkSocial({ provider: "google", callbackURL: "/accounts/settings" }))
+  // Disconnect runs on the server so a Steam unlink can also forget user.steamId.
   const disconnect = async (account: LinkedAccount) => {
-    const ok = await run(() => authClient.unlinkAccount({ accountId: account.id }))
-    if (ok) {
-      setBusy(false)
+    setBusy(true)
+    setError("")
+    const result = await disconnectAccount(account.id)
+    setBusy(false)
+    if (result.ok) {
       router.refresh()
+    } else {
+      setError(result.message)
     }
   }
 

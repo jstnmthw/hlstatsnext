@@ -14,7 +14,8 @@
     "test": "vitest run --silent",
     "test:coverage": "vitest run --coverage --silent",
     "clean": "rm -rf node_modules .next .turbo",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:dev": "PLAYWRIGHT_BASE_URL=http://localhost:3000 playwright test"
   },
   "dependencies": {
     "@apollo/client": "^4.2.3",

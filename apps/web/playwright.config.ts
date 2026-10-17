@@ -23,8 +23,8 @@ export default defineConfig({
   // Ports of their own, so a run never shares a server with `pnpm dev`. Better
   // Auth must be told the origin the browser will use, hence BETTER_AUTH_URL.
   // Readiness is probed on pages that need no API, and on the API's health query.
-  // Next allows one `next dev` per project, so while `pnpm dev` is running point
-  // the suite at it instead: PLAYWRIGHT_BASE_URL=http://localhost:3000.
+  // Next allows one `next dev` per project, so while `pnpm dev` is running use
+  // `pnpm test:e2e:dev`, which points the suite at the stack on port 3000.
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : [

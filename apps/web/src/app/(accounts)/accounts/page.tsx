@@ -6,5 +6,5 @@ import { redirect } from "next/navigation"
 // exists, so OAuth and Steam callbacks and the email form all come here.
 export default async function AccountsPage() {
   const session = await requireAuth()
-  redirect(isAdmin(session.user) ? "/admin" : "/accounts/settings")
+  redirect(isAdmin(session.user) ? "/admin" : "/accounts/players")
 }

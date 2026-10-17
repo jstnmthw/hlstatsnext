@@ -10756,6 +10756,8 @@ export type Mutation = {
   updateManyServerLoad: BatchPayload;
   updateManyTeam: BatchPayload;
   updateManyWeapon: BatchPayload;
+  /** Set the ranking, event and avatar preferences of one of your own players. */
+  updateMyPlayer?: Maybe<Player>;
   updateOneAction?: Maybe<Action>;
   updateOneAward?: Maybe<Award>;
   updateOneClan?: Maybe<Clan>;
@@ -12116,6 +12118,12 @@ export type MutationUpdateManyTeamArgs = {
 export type MutationUpdateManyWeaponArgs = {
   data: WeaponUpdateManyMutationInput;
   where?: InputMaybe<WeaponWhereInput>;
+};
+
+
+export type MutationUpdateMyPlayerArgs = {
+  data: UpdateMyPlayerInput;
+  playerId: Scalars['Int']['input'];
 };
 
 
@@ -20201,6 +20209,8 @@ export type Query = {
   getServerPlayers?: Maybe<GetServerPlayersResult>;
   getTotalKills?: Maybe<Scalars['Int']['output']>;
   health?: Maybe<HealthStatus>;
+  /** The players the signed-in user has claimed through Steam. */
+  myPlayers?: Maybe<Array<Player>>;
 };
 
 
@@ -28074,6 +28084,12 @@ export enum TransactionIsolationLevel {
   Serializable = 'Serializable'
 }
 
+export type UpdateMyPlayerInput = {
+  blockAvatar?: InputMaybe<Scalars['Boolean']['input']>;
+  displayEvents?: InputMaybe<Scalars['Boolean']['input']>;
+  hideRanking?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type UpdateServerInput = {
   address?: InputMaybe<Scalars['String']['input']>;
   game?: InputMaybe<Scalars['String']['input']>;
@@ -28129,6 +28145,7 @@ export type UserCreateInput = {
   id: Scalars['String']['input'];
   image?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
+  players?: InputMaybe<UserPlayerCreateNestedManyWithoutUserInput>;
   role?: InputMaybe<Scalars['String']['input']>;
   sessions?: InputMaybe<SessionCreateNestedManyWithoutUserInput>;
   steamId?: InputMaybe<Scalars['String']['input']>;
@@ -28156,6 +28173,12 @@ export type UserCreateNestedOneWithoutAccountsInput = {
   create?: InputMaybe<UserCreateWithoutAccountsInput>;
 };
 
+export type UserCreateNestedOneWithoutPlayersInput = {
+  connect?: InputMaybe<UserWhereUniqueInput>;
+  connectOrCreate?: InputMaybe<UserCreateOrConnectWithoutPlayersInput>;
+  create?: InputMaybe<UserCreateWithoutPlayersInput>;
+};
+
 export type UserCreateNestedOneWithoutSessionsInput = {
   connect?: InputMaybe<UserWhereUniqueInput>;
   connectOrCreate?: InputMaybe<UserCreateOrConnectWithoutSessionsInput>;
@@ -28167,12 +28190,35 @@ export type UserCreateOrConnectWithoutAccountsInput = {
   where: UserWhereUniqueInput;
 };
 
+export type UserCreateOrConnectWithoutPlayersInput = {
+  create: UserCreateWithoutPlayersInput;
+  where: UserWhereUniqueInput;
+};
+
 export type UserCreateOrConnectWithoutSessionsInput = {
   create: UserCreateWithoutSessionsInput;
   where: UserWhereUniqueInput;
 };
 
 export type UserCreateWithoutAccountsInput = {
+  banExpires?: InputMaybe<Scalars['DateTime']['input']>;
+  banReason?: InputMaybe<Scalars['String']['input']>;
+  banned?: InputMaybe<Scalars['Boolean']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  email: Scalars['String']['input'];
+  emailVerified?: InputMaybe<Scalars['Boolean']['input']>;
+  id: Scalars['String']['input'];
+  image?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  players?: InputMaybe<UserPlayerCreateNestedManyWithoutUserInput>;
+  role?: InputMaybe<Scalars['String']['input']>;
+  sessions?: InputMaybe<SessionCreateNestedManyWithoutUserInput>;
+  steamId?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type UserCreateWithoutPlayersInput = {
+  accounts?: InputMaybe<AccountCreateNestedManyWithoutUserInput>;
   banExpires?: InputMaybe<Scalars['DateTime']['input']>;
   banReason?: InputMaybe<Scalars['String']['input']>;
   banned?: InputMaybe<Scalars['Boolean']['input']>;
@@ -28199,6 +28245,7 @@ export type UserCreateWithoutSessionsInput = {
   id: Scalars['String']['input'];
   image?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
+  players?: InputMaybe<UserPlayerCreateNestedManyWithoutUserInput>;
   role?: InputMaybe<Scalars['String']['input']>;
   steamId?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -28280,10 +28327,223 @@ export type UserOrderByWithRelationInput = {
   id?: InputMaybe<SortOrder>;
   image?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
+  players?: InputMaybe<UserPlayerOrderByRelationAggregateInput>;
   role?: InputMaybe<SortOrder>;
   sessions?: InputMaybe<SessionOrderByRelationAggregateInput>;
   steamId?: InputMaybe<SortOrder>;
   updatedAt?: InputMaybe<SortOrder>;
+};
+
+export type UserPlayerAvgOrderByAggregateInput = {
+  playerId?: InputMaybe<SortOrder>;
+};
+
+export type UserPlayerCountOrderByAggregateInput = {
+  claimedAt?: InputMaybe<SortOrder>;
+  game?: InputMaybe<SortOrder>;
+  playerId?: InputMaybe<SortOrder>;
+  userId?: InputMaybe<SortOrder>;
+};
+
+export type UserPlayerCreateInput = {
+  claimedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  game: Scalars['String']['input'];
+  playerId: Scalars['Int']['input'];
+  user: UserCreateNestedOneWithoutPlayersInput;
+};
+
+export type UserPlayerCreateManyInput = {
+  claimedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  game: Scalars['String']['input'];
+  playerId: Scalars['Int']['input'];
+  userId: Scalars['String']['input'];
+};
+
+export type UserPlayerCreateManyUserInput = {
+  claimedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  game: Scalars['String']['input'];
+  playerId: Scalars['Int']['input'];
+};
+
+export type UserPlayerCreateManyUserInputEnvelope = {
+  data: Array<UserPlayerCreateManyUserInput>;
+  skipDuplicates?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type UserPlayerCreateNestedManyWithoutUserInput = {
+  connect?: InputMaybe<Array<UserPlayerWhereUniqueInput>>;
+  connectOrCreate?: InputMaybe<Array<UserPlayerCreateOrConnectWithoutUserInput>>;
+  create?: InputMaybe<Array<UserPlayerCreateWithoutUserInput>>;
+  createMany?: InputMaybe<UserPlayerCreateManyUserInputEnvelope>;
+};
+
+export type UserPlayerCreateOrConnectWithoutUserInput = {
+  create: UserPlayerCreateWithoutUserInput;
+  where: UserPlayerWhereUniqueInput;
+};
+
+export type UserPlayerCreateWithoutUserInput = {
+  claimedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  game: Scalars['String']['input'];
+  playerId: Scalars['Int']['input'];
+};
+
+export type UserPlayerListRelationFilter = {
+  every?: InputMaybe<UserPlayerWhereInput>;
+  none?: InputMaybe<UserPlayerWhereInput>;
+  some?: InputMaybe<UserPlayerWhereInput>;
+};
+
+export type UserPlayerMaxOrderByAggregateInput = {
+  claimedAt?: InputMaybe<SortOrder>;
+  game?: InputMaybe<SortOrder>;
+  playerId?: InputMaybe<SortOrder>;
+  userId?: InputMaybe<SortOrder>;
+};
+
+export type UserPlayerMinOrderByAggregateInput = {
+  claimedAt?: InputMaybe<SortOrder>;
+  game?: InputMaybe<SortOrder>;
+  playerId?: InputMaybe<SortOrder>;
+  userId?: InputMaybe<SortOrder>;
+};
+
+export type UserPlayerOrderByRelationAggregateInput = {
+  _count?: InputMaybe<SortOrder>;
+};
+
+export enum UserPlayerOrderByRelevanceFieldEnum {
+  Game = 'game',
+  UserId = 'userId'
+}
+
+export type UserPlayerOrderByRelevanceInput = {
+  fields: Array<UserPlayerOrderByRelevanceFieldEnum>;
+  search: Scalars['String']['input'];
+  sort: SortOrder;
+};
+
+export type UserPlayerOrderByWithAggregationInput = {
+  _avg?: InputMaybe<UserPlayerAvgOrderByAggregateInput>;
+  _count?: InputMaybe<UserPlayerCountOrderByAggregateInput>;
+  _max?: InputMaybe<UserPlayerMaxOrderByAggregateInput>;
+  _min?: InputMaybe<UserPlayerMinOrderByAggregateInput>;
+  _sum?: InputMaybe<UserPlayerSumOrderByAggregateInput>;
+  claimedAt?: InputMaybe<SortOrder>;
+  game?: InputMaybe<SortOrder>;
+  playerId?: InputMaybe<SortOrder>;
+  userId?: InputMaybe<SortOrder>;
+};
+
+export type UserPlayerOrderByWithRelationInput = {
+  _relevance?: InputMaybe<UserPlayerOrderByRelevanceInput>;
+  claimedAt?: InputMaybe<SortOrder>;
+  game?: InputMaybe<SortOrder>;
+  playerId?: InputMaybe<SortOrder>;
+  user?: InputMaybe<UserOrderByWithRelationInput>;
+  userId?: InputMaybe<SortOrder>;
+};
+
+export enum UserPlayerScalarFieldEnum {
+  ClaimedAt = 'claimedAt',
+  Game = 'game',
+  PlayerId = 'playerId',
+  UserId = 'userId'
+}
+
+export type UserPlayerScalarWhereInput = {
+  AND?: InputMaybe<Array<UserPlayerScalarWhereInput>>;
+  NOT?: InputMaybe<Array<UserPlayerScalarWhereInput>>;
+  OR?: InputMaybe<Array<UserPlayerScalarWhereInput>>;
+  claimedAt?: InputMaybe<DateTimeFilter>;
+  game?: InputMaybe<StringFilter>;
+  playerId?: InputMaybe<IntFilter>;
+  userId?: InputMaybe<StringFilter>;
+};
+
+export type UserPlayerScalarWhereWithAggregatesInput = {
+  AND?: InputMaybe<Array<UserPlayerScalarWhereWithAggregatesInput>>;
+  NOT?: InputMaybe<Array<UserPlayerScalarWhereWithAggregatesInput>>;
+  OR?: InputMaybe<Array<UserPlayerScalarWhereWithAggregatesInput>>;
+  claimedAt?: InputMaybe<DateTimeWithAggregatesFilter>;
+  game?: InputMaybe<StringWithAggregatesFilter>;
+  playerId?: InputMaybe<IntWithAggregatesFilter>;
+  userId?: InputMaybe<StringWithAggregatesFilter>;
+};
+
+export type UserPlayerSumOrderByAggregateInput = {
+  playerId?: InputMaybe<SortOrder>;
+};
+
+export type UserPlayerUpdateInput = {
+  claimedAt?: InputMaybe<DateTimeFieldUpdateOperationsInput>;
+  game?: InputMaybe<StringFieldUpdateOperationsInput>;
+  playerId?: InputMaybe<IntFieldUpdateOperationsInput>;
+  user?: InputMaybe<UserUpdateOneRequiredWithoutPlayersNestedInput>;
+};
+
+export type UserPlayerUpdateManyMutationInput = {
+  claimedAt?: InputMaybe<DateTimeFieldUpdateOperationsInput>;
+  game?: InputMaybe<StringFieldUpdateOperationsInput>;
+  playerId?: InputMaybe<IntFieldUpdateOperationsInput>;
+};
+
+export type UserPlayerUpdateManyWithWhereWithoutUserInput = {
+  data: UserPlayerUpdateManyMutationInput;
+  where: UserPlayerScalarWhereInput;
+};
+
+export type UserPlayerUpdateManyWithoutUserNestedInput = {
+  connect?: InputMaybe<Array<UserPlayerWhereUniqueInput>>;
+  connectOrCreate?: InputMaybe<Array<UserPlayerCreateOrConnectWithoutUserInput>>;
+  create?: InputMaybe<Array<UserPlayerCreateWithoutUserInput>>;
+  createMany?: InputMaybe<UserPlayerCreateManyUserInputEnvelope>;
+  delete?: InputMaybe<Array<UserPlayerWhereUniqueInput>>;
+  deleteMany?: InputMaybe<Array<UserPlayerScalarWhereInput>>;
+  disconnect?: InputMaybe<Array<UserPlayerWhereUniqueInput>>;
+  set?: InputMaybe<Array<UserPlayerWhereUniqueInput>>;
+  update?: InputMaybe<Array<UserPlayerUpdateWithWhereUniqueWithoutUserInput>>;
+  updateMany?: InputMaybe<Array<UserPlayerUpdateManyWithWhereWithoutUserInput>>;
+  upsert?: InputMaybe<Array<UserPlayerUpsertWithWhereUniqueWithoutUserInput>>;
+};
+
+export type UserPlayerUpdateWithWhereUniqueWithoutUserInput = {
+  data: UserPlayerUpdateWithoutUserInput;
+  where: UserPlayerWhereUniqueInput;
+};
+
+export type UserPlayerUpdateWithoutUserInput = {
+  claimedAt?: InputMaybe<DateTimeFieldUpdateOperationsInput>;
+  game?: InputMaybe<StringFieldUpdateOperationsInput>;
+  playerId?: InputMaybe<IntFieldUpdateOperationsInput>;
+};
+
+export type UserPlayerUpsertWithWhereUniqueWithoutUserInput = {
+  create: UserPlayerCreateWithoutUserInput;
+  update: UserPlayerUpdateWithoutUserInput;
+  where: UserPlayerWhereUniqueInput;
+};
+
+export type UserPlayerWhereInput = {
+  AND?: InputMaybe<Array<UserPlayerWhereInput>>;
+  NOT?: InputMaybe<Array<UserPlayerWhereInput>>;
+  OR?: InputMaybe<Array<UserPlayerWhereInput>>;
+  claimedAt?: InputMaybe<DateTimeFilter>;
+  game?: InputMaybe<StringFilter>;
+  playerId?: InputMaybe<IntFilter>;
+  user?: InputMaybe<UserWhereInput>;
+  userId?: InputMaybe<StringFilter>;
+};
+
+export type UserPlayerWhereUniqueInput = {
+  AND?: InputMaybe<Array<UserPlayerWhereInput>>;
+  NOT?: InputMaybe<Array<UserPlayerWhereInput>>;
+  OR?: InputMaybe<Array<UserPlayerWhereInput>>;
+  claimedAt?: InputMaybe<DateTimeFilter>;
+  game?: InputMaybe<StringFilter>;
+  playerId?: InputMaybe<Scalars['Int']['input']>;
+  user?: InputMaybe<UserWhereInput>;
+  userId?: InputMaybe<StringFilter>;
 };
 
 export enum UserScalarFieldEnum {
@@ -28335,6 +28595,7 @@ export type UserUpdateInput = {
   id?: InputMaybe<StringFieldUpdateOperationsInput>;
   image?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   name?: InputMaybe<StringFieldUpdateOperationsInput>;
+  players?: InputMaybe<UserPlayerUpdateManyWithoutUserNestedInput>;
   role?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   sessions?: InputMaybe<SessionUpdateManyWithoutUserNestedInput>;
   steamId?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
@@ -28364,6 +28625,14 @@ export type UserUpdateOneRequiredWithoutAccountsNestedInput = {
   upsert?: InputMaybe<UserUpsertWithoutAccountsInput>;
 };
 
+export type UserUpdateOneRequiredWithoutPlayersNestedInput = {
+  connect?: InputMaybe<UserWhereUniqueInput>;
+  connectOrCreate?: InputMaybe<UserCreateOrConnectWithoutPlayersInput>;
+  create?: InputMaybe<UserCreateWithoutPlayersInput>;
+  update?: InputMaybe<UserUpdateToOneWithWhereWithoutPlayersInput>;
+  upsert?: InputMaybe<UserUpsertWithoutPlayersInput>;
+};
+
 export type UserUpdateOneRequiredWithoutSessionsNestedInput = {
   connect?: InputMaybe<UserWhereUniqueInput>;
   connectOrCreate?: InputMaybe<UserCreateOrConnectWithoutSessionsInput>;
@@ -28377,12 +28646,35 @@ export type UserUpdateToOneWithWhereWithoutAccountsInput = {
   where?: InputMaybe<UserWhereInput>;
 };
 
+export type UserUpdateToOneWithWhereWithoutPlayersInput = {
+  data: UserUpdateWithoutPlayersInput;
+  where?: InputMaybe<UserWhereInput>;
+};
+
 export type UserUpdateToOneWithWhereWithoutSessionsInput = {
   data: UserUpdateWithoutSessionsInput;
   where?: InputMaybe<UserWhereInput>;
 };
 
 export type UserUpdateWithoutAccountsInput = {
+  banExpires?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
+  banReason?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
+  banned?: InputMaybe<NullableBoolFieldUpdateOperationsInput>;
+  createdAt?: InputMaybe<DateTimeFieldUpdateOperationsInput>;
+  email?: InputMaybe<StringFieldUpdateOperationsInput>;
+  emailVerified?: InputMaybe<BoolFieldUpdateOperationsInput>;
+  id?: InputMaybe<StringFieldUpdateOperationsInput>;
+  image?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
+  name?: InputMaybe<StringFieldUpdateOperationsInput>;
+  players?: InputMaybe<UserPlayerUpdateManyWithoutUserNestedInput>;
+  role?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
+  sessions?: InputMaybe<SessionUpdateManyWithoutUserNestedInput>;
+  steamId?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
+  updatedAt?: InputMaybe<DateTimeFieldUpdateOperationsInput>;
+};
+
+export type UserUpdateWithoutPlayersInput = {
+  accounts?: InputMaybe<AccountUpdateManyWithoutUserNestedInput>;
   banExpires?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   banReason?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   banned?: InputMaybe<NullableBoolFieldUpdateOperationsInput>;
@@ -28409,6 +28701,7 @@ export type UserUpdateWithoutSessionsInput = {
   id?: InputMaybe<StringFieldUpdateOperationsInput>;
   image?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   name?: InputMaybe<StringFieldUpdateOperationsInput>;
+  players?: InputMaybe<UserPlayerUpdateManyWithoutUserNestedInput>;
   role?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   steamId?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   updatedAt?: InputMaybe<DateTimeFieldUpdateOperationsInput>;
@@ -28417,6 +28710,12 @@ export type UserUpdateWithoutSessionsInput = {
 export type UserUpsertWithoutAccountsInput = {
   create: UserCreateWithoutAccountsInput;
   update: UserUpdateWithoutAccountsInput;
+  where?: InputMaybe<UserWhereInput>;
+};
+
+export type UserUpsertWithoutPlayersInput = {
+  create: UserCreateWithoutPlayersInput;
+  update: UserUpdateWithoutPlayersInput;
   where?: InputMaybe<UserWhereInput>;
 };
 
@@ -28440,6 +28739,7 @@ export type UserWhereInput = {
   id?: InputMaybe<StringFilter>;
   image?: InputMaybe<StringNullableFilter>;
   name?: InputMaybe<StringFilter>;
+  players?: InputMaybe<UserPlayerListRelationFilter>;
   role?: InputMaybe<StringNullableFilter>;
   sessions?: InputMaybe<SessionListRelationFilter>;
   steamId?: InputMaybe<StringNullableFilter>;
@@ -28460,6 +28760,7 @@ export type UserWhereUniqueInput = {
   id?: InputMaybe<Scalars['String']['input']>;
   image?: InputMaybe<StringNullableFilter>;
   name?: InputMaybe<StringFilter>;
+  players?: InputMaybe<UserPlayerListRelationFilter>;
   role?: InputMaybe<StringNullableFilter>;
   sessions?: InputMaybe<SessionListRelationFilter>;
   steamId?: InputMaybe<Scalars['String']['input']>;
@@ -28815,6 +29116,19 @@ export type GetGamesForSelectQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetGamesForSelectQuery = { __typename?: 'Query', findManyGame: Array<{ __typename?: 'Game', code: string, name: string }> };
 
+export type MyPlayersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyPlayersQuery = { __typename?: 'Query', myPlayers?: Array<{ __typename?: 'Player', playerId?: number | null, lastName?: string | null, game?: string | null, skill?: number | null, kills?: number | null, deaths?: number | null, lastEvent?: any | null, hideRanking?: number | null, displayEvents?: number | null, blockAvatar?: number | null }> | null };
+
+export type UpdateMyPlayerMutationVariables = Exact<{
+  playerId: Scalars['Int']['input'];
+  data: UpdateMyPlayerInput;
+}>;
+
+
+export type UpdateMyPlayerMutation = { __typename?: 'Mutation', updateMyPlayer?: { __typename?: 'Player', playerId?: number | null, hideRanking?: number | null, displayEvents?: number | null, blockAvatar?: number | null } | null };
+
 export type GetAdminPlayersWithPaginationQueryVariables = Exact<{
   take?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
@@ -28971,6 +29285,8 @@ export type GetUserCountQuery = { __typename?: 'Query', countUser: number };
 export const GetGamesWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GameOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"GameWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"realgame"}}]}}]}}]} as unknown as DocumentNode<GetGamesWithPaginationQuery, GetGamesWithPaginationQueryVariables>;
 export const GetGameCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGameCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"GameWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetGameCountQuery, GetGameCountQueryVariables>;
 export const GetGamesForSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesForSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetGamesForSelectQuery, GetGamesForSelectQueryVariables>;
+export const MyPlayersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyPlayers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myPlayers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playerId"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"skill"}},{"kind":"Field","name":{"kind":"Name","value":"kills"}},{"kind":"Field","name":{"kind":"Name","value":"deaths"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"hideRanking"}},{"kind":"Field","name":{"kind":"Name","value":"displayEvents"}},{"kind":"Field","name":{"kind":"Name","value":"blockAvatar"}}]}}]}}]} as unknown as DocumentNode<MyPlayersQuery, MyPlayersQueryVariables>;
+export const UpdateMyPlayerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateMyPlayer"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"playerId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMyPlayerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMyPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"playerId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"playerId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playerId"}},{"kind":"Field","name":{"kind":"Name","value":"hideRanking"}},{"kind":"Field","name":{"kind":"Name","value":"displayEvents"}},{"kind":"Field","name":{"kind":"Name","value":"blockAvatar"}}]}}]}}]} as unknown as DocumentNode<UpdateMyPlayerMutation, UpdateMyPlayerMutationVariables>;
 export const GetAdminPlayersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminPlayersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playerId"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"skill"}},{"kind":"Field","name":{"kind":"Name","value":"kills"}},{"kind":"Field","name":{"kind":"Name","value":"deaths"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"flag"}},{"kind":"Field","name":{"kind":"Name","value":"lastEvent"}},{"kind":"Field","name":{"kind":"Name","value":"lastSkillChange"}}]}}]}}]} as unknown as DocumentNode<GetAdminPlayersWithPaginationQuery, GetAdminPlayersWithPaginationQueryVariables>;
 export const GetAdminPlayerCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminPlayerCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countPlayer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetAdminPlayerCountQuery, GetAdminPlayerCountQueryVariables>;
 export const GetPublicGamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicGames"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hidden"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"equals"},"value":{"kind":"StringValue","value":"0","block":false}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"realgame"}}]}}]}}]} as unknown as DocumentNode<GetPublicGamesQuery, GetPublicGamesQueryVariables>;

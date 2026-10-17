@@ -14,7 +14,8 @@
     "./session": "./src/session.ts",
     "./cookies": "./src/cookies.ts",
     "./permissions": "./src/permissions.ts",
-    "./env": "./src/env.ts"
+    "./env": "./src/env.ts",
+    "./claims": "./src/claims.ts"
   },
   "dependencies": {
     "@repo/db": "workspace:*",

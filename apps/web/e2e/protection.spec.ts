@@ -66,3 +66,13 @@ test.describe("as a user, in settings", () => {
     await expect(page.getByText("Change Password", { exact: true })).toBeVisible()
   })
 })
+
+test.describe("as a user, on the players page", () => {
+  test.use({ storageState: storageStatePath.user })
+
+  test("is told to connect Steam when no Steam account is linked", async ({ page }) => {
+    const response = await page.goto("/accounts/players")
+    expect(response?.status()).toBe(200)
+    await expect(page.getByText("Connect Steam to find your players")).toBeVisible()
+  })
+})

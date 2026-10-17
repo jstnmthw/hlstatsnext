@@ -14,6 +14,7 @@ import "./modules/user/user.object"
 import "./modules/player/player.resolver"
 import "./modules/server-token/server-token.resolver"
 import "./modules/server/server.resolver"
+import "./modules/user-player/user-player.resolver"
 
 // Define the base Query and Mutation types first
 builder.queryType({})
@@ -23,7 +24,7 @@ builder.mutationType({})
 // Auth models managed by Better Auth — never expose via GraphQL
 const AUTH_MODELS = ["Session", "Account", "Verification"] as const
 // Models with fully custom resolvers that replace all auto-generated CRUD
-const CUSTOM_MODELS = ["ServerToken"] as const
+const CUSTOM_MODELS = ["ServerToken", "UserPlayer"] as const
 // Models with custom objects that strip sensitive fields (PII, credentials).
 // Public queries remain enabled — the auto-generated `*WhereInput` types are
 // post-processed by scripts/sanitize-pothos-inputs to strip filters on the

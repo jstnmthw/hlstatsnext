@@ -38,6 +38,8 @@ describe("hasPermission", () => {
     expect(hasPermission("user", { server: ["read"] })).toBe(true)
     expect(hasPermission("user", { server: ["create"] })).toBe(false)
     expect(hasPermission("user", { user: ["list"] })).toBe(false)
+    expect(hasPermission("user", { player: ["update-own"] })).toBe(true)
+    expect(hasPermission("user", { player: ["update"] })).toBe(false)
     expect(hasPermission("user", { dashboard: ["read"] })).toBe(false)
   })
 

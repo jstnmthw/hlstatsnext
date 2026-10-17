@@ -53,3 +53,19 @@ describe("requireAdminResolver", () => {
     expect(codesOf(await run(adminQuery, contextWith("superuser")))).toEqual(["FORBIDDEN"])
   })
 })
+
+describe("the claimed-player fields", () => {
+  it("answer an unauthenticated request with UNAUTHENTICATED before touching the database", async () => {
+    expect(codesOf(await run("{ myPlayers { playerId } }", contextWith(undefined, false)))).toEqual(
+      ["UNAUTHENTICATED"],
+    )
+    expect(
+      codesOf(
+        await run(
+          "mutation { updateMyPlayer(playerId: 1, data: { hideRanking: true }) { playerId } }",
+          contextWith(undefined, false),
+        ),
+      ),
+    ).toEqual(["UNAUTHENTICATED"])
+  })
+})

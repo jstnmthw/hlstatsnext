@@ -943,8 +943,25 @@ model User {
 
   sessions Session[]
   accounts Account[]
+  players  UserPlayer[]
 
   @@map("user")
+}
+
+// A player claimed by a signed-in user, proven by a Steam sign-in or link that
+// carried the SteamID64 found in player_unique_ids. No relation to Player on
+// purpose: the daemon owns that model, and a relation would expose a claim
+// filter on the public player queries.
+model UserPlayer {
+  playerId  Int      @id @map("player_id") @db.UnsignedInt
+  userId    String   @map("user_id")
+  game      String   @db.VarChar(32)
+  claimedAt DateTime @default(now()) @map("claimed_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_players")
 }
 
 model Session {

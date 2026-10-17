@@ -17,6 +17,8 @@ type Documents = {
     "\n  query GetGamesWithPagination(\n    $take: Int\n    $skip: Int\n    $orderBy: [GameOrderByWithRelationInput!]\n    $where: GameWhereInput\n  ) {\n    findManyGame(take: $take, skip: $skip, orderBy: $orderBy, where: $where) {\n      code\n      name\n      hidden\n      realgame\n    }\n  }\n": typeof types.GetGamesWithPaginationDocument,
     "\n  query GetGameCount($where: GameWhereInput) {\n    countGame(where: $where)\n  }\n": typeof types.GetGameCountDocument,
     "\n  query GetGamesForSelect {\n    findManyGame {\n      code\n      name\n    }\n  }\n": typeof types.GetGamesForSelectDocument,
+    "\n  query MyPlayers {\n    myPlayers {\n      playerId\n      lastName\n      game\n      skill\n      kills\n      deaths\n      lastEvent\n      hideRanking\n      displayEvents\n      blockAvatar\n    }\n  }\n": typeof types.MyPlayersDocument,
+    "\n  mutation UpdateMyPlayer($playerId: Int!, $data: UpdateMyPlayerInput!) {\n    updateMyPlayer(playerId: $playerId, data: $data) {\n      playerId\n      hideRanking\n      displayEvents\n      blockAvatar\n    }\n  }\n": typeof types.UpdateMyPlayerDocument,
     "\n  query GetAdminPlayersWithPagination(\n    $take: Int\n    $skip: Int\n    $orderBy: [PlayerOrderByWithRelationInput!]\n    $where: PlayerWhereInput\n  ) {\n    findManyPlayer(take: $take, skip: $skip, orderBy: $orderBy, where: $where) {\n      playerId\n      lastName\n      email\n      skill\n      kills\n      deaths\n      country\n      flag\n      lastEvent\n      lastSkillChange\n    }\n  }\n": typeof types.GetAdminPlayersWithPaginationDocument,
     "\n  query GetAdminPlayerCount($where: PlayerWhereInput) {\n    countPlayer(where: $where)\n  }\n": typeof types.GetAdminPlayerCountDocument,
     "\n  query GetPublicGames {\n    findManyGame(where: { hidden: { equals: \"0\" } }) {\n      code\n      name\n      realgame\n    }\n  }\n": typeof types.GetPublicGamesDocument,
@@ -42,6 +44,8 @@ const documents: Documents = {
     "\n  query GetGamesWithPagination(\n    $take: Int\n    $skip: Int\n    $orderBy: [GameOrderByWithRelationInput!]\n    $where: GameWhereInput\n  ) {\n    findManyGame(take: $take, skip: $skip, orderBy: $orderBy, where: $where) {\n      code\n      name\n      hidden\n      realgame\n    }\n  }\n": types.GetGamesWithPaginationDocument,
     "\n  query GetGameCount($where: GameWhereInput) {\n    countGame(where: $where)\n  }\n": types.GetGameCountDocument,
     "\n  query GetGamesForSelect {\n    findManyGame {\n      code\n      name\n    }\n  }\n": types.GetGamesForSelectDocument,
+    "\n  query MyPlayers {\n    myPlayers {\n      playerId\n      lastName\n      game\n      skill\n      kills\n      deaths\n      lastEvent\n      hideRanking\n      displayEvents\n      blockAvatar\n    }\n  }\n": types.MyPlayersDocument,
+    "\n  mutation UpdateMyPlayer($playerId: Int!, $data: UpdateMyPlayerInput!) {\n    updateMyPlayer(playerId: $playerId, data: $data) {\n      playerId\n      hideRanking\n      displayEvents\n      blockAvatar\n    }\n  }\n": types.UpdateMyPlayerDocument,
     "\n  query GetAdminPlayersWithPagination(\n    $take: Int\n    $skip: Int\n    $orderBy: [PlayerOrderByWithRelationInput!]\n    $where: PlayerWhereInput\n  ) {\n    findManyPlayer(take: $take, skip: $skip, orderBy: $orderBy, where: $where) {\n      playerId\n      lastName\n      email\n      skill\n      kills\n      deaths\n      country\n      flag\n      lastEvent\n      lastSkillChange\n    }\n  }\n": types.GetAdminPlayersWithPaginationDocument,
     "\n  query GetAdminPlayerCount($where: PlayerWhereInput) {\n    countPlayer(where: $where)\n  }\n": types.GetAdminPlayerCountDocument,
     "\n  query GetPublicGames {\n    findManyGame(where: { hidden: { equals: \"0\" } }) {\n      code\n      name\n      realgame\n    }\n  }\n": types.GetPublicGamesDocument,
@@ -90,6 +94,14 @@ export function graphql(source: "\n  query GetGameCount($where: GameWhereInput) 
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query GetGamesForSelect {\n    findManyGame {\n      code\n      name\n    }\n  }\n"): (typeof documents)["\n  query GetGamesForSelect {\n    findManyGame {\n      code\n      name\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query MyPlayers {\n    myPlayers {\n      playerId\n      lastName\n      game\n      skill\n      kills\n      deaths\n      lastEvent\n      hideRanking\n      displayEvents\n      blockAvatar\n    }\n  }\n"): (typeof documents)["\n  query MyPlayers {\n    myPlayers {\n      playerId\n      lastName\n      game\n      skill\n      kills\n      deaths\n      lastEvent\n      hideRanking\n      displayEvents\n      blockAvatar\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateMyPlayer($playerId: Int!, $data: UpdateMyPlayerInput!) {\n    updateMyPlayer(playerId: $playerId, data: $data) {\n      playerId\n      hideRanking\n      displayEvents\n      blockAvatar\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateMyPlayer($playerId: Int!, $data: UpdateMyPlayerInput!) {\n    updateMyPlayer(playerId: $playerId, data: $data) {\n      playerId\n      hideRanking\n      displayEvents\n      blockAvatar\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -3,6 +3,7 @@ import { betterAuth } from "better-auth"
 import { steamOpenID } from "better-auth-steam"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { admin, emailOTP } from "better-auth/plugins"
+import { claimPlayersBySteamId } from "./claims"
 import { getEnv } from "./env"
 import { sendOTP } from "./mail"
 import { ac, roles } from "./permissions"
@@ -69,6 +70,20 @@ function buildAuth() {
           before: async (user) => {
             if (env.ADMIN_EMAILS.includes(user.email.toLowerCase())) {
               return { data: { ...user, role: "admin" } }
+            }
+          },
+        },
+      },
+      account: {
+        create: {
+          // A Steam sign-up or link is the proof that claims players. The
+          // players page claims again later, so a failure here is logged, not fatal.
+          after: async (account) => {
+            if (account.providerId !== "steam") return
+            try {
+              await claimPlayersBySteamId(account.userId, account.accountId)
+            } catch (error) {
+              console.error("[auth] claiming players after a Steam link failed", error)
             }
           },
         },

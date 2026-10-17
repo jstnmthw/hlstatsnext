@@ -15,6 +15,7 @@ import {
   IconLogout,
   IconSettings,
   IconShield,
+  IconUser,
 } from "@repo/ui"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -62,6 +63,12 @@ export function AccountMenu({ user, isAdmin = false }: AccountMenuProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/accounts/players">
+            <IconUser data-slot="icon" />
+            My players
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/accounts/settings">
             <IconSettings data-slot="icon" />

@@ -5,7 +5,7 @@ export const statement = {
   ...defaultStatements,
   server: ["create", "read", "update", "delete"],
   game: ["read", "update"],
-  player: ["read", "update", "ban"],
+  player: ["read", "update", "ban", "update-own"],
   user: ["list", "update", "set-email", "ban", "set-role", "delete"],
   dashboard: ["read"],
 } as const
@@ -16,7 +16,7 @@ export const adminRole = ac.newRole({
   ...adminAc.statements,
   server: ["create", "read", "update", "delete"],
   game: ["read", "update"],
-  player: ["read", "update", "ban"],
+  player: ["read", "update", "ban", "update-own"],
   user: ["list", "update", "set-email", "ban", "set-role", "delete"],
   dashboard: ["read"],
 })
@@ -24,7 +24,7 @@ export const adminRole = ac.newRole({
 export const userRole = ac.newRole({
   server: ["read"],
   game: ["read"],
-  player: ["read"],
+  player: ["read", "update-own"],
   user: [],
   dashboard: [],
 })

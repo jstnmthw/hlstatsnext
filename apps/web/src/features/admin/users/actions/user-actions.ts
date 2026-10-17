@@ -1,29 +1,13 @@
 "use server"
 
-import { hasPermission, type Permissions } from "@repo/auth/permissions"
 import { getAuth } from "@repo/auth/server"
-import { getSession, type Session } from "@repo/auth/session"
+import { requirePermission } from "@repo/auth/session"
 import { revalidatePath } from "next/cache"
 import { headers } from "next/headers"
 
 interface ActionResult {
   success: boolean
   message: string
-}
-
-async function requirePermission(
-  permissions: Permissions,
-): Promise<{ session: Session; error?: never } | { error: ActionResult; session?: never }> {
-  const session = await getSession()
-  if (!session) {
-    return { error: { success: false, message: "Authentication required." } }
-  }
-
-  if (!hasPermission(session.user.role, permissions)) {
-    return { error: { success: false, message: "Insufficient permissions." } }
-  }
-
-  return { session }
 }
 
 function preventSelfAction(sessionUserId: string, targetUserId: string): ActionResult | null {
@@ -38,13 +22,12 @@ export async function banUser(
   banReason?: string,
   banExpiresIn?: number,
 ): Promise<ActionResult> {
+  const session = await requirePermission({ user: ["ban"] })
+
+  const selfError = preventSelfAction(session.user.id, userId)
+  if (selfError) return selfError
+
   try {
-    const { session, error } = await requirePermission({ user: ["ban"] })
-    if (error) return error
-
-    const selfError = preventSelfAction(session.user.id, userId)
-    if (selfError) return selfError
-
     await getAuth().api.banUser({
       body: {
         userId,
@@ -63,13 +46,12 @@ export async function banUser(
 }
 
 export async function unbanUser(userId: string): Promise<ActionResult> {
+  const session = await requirePermission({ user: ["ban"] })
+
+  const selfError = preventSelfAction(session.user.id, userId)
+  if (selfError) return selfError
+
   try {
-    const { session, error } = await requirePermission({ user: ["ban"] })
-    if (error) return error
-
-    const selfError = preventSelfAction(session.user.id, userId)
-    if (selfError) return selfError
-
     await getAuth().api.unbanUser({
       body: { userId },
       headers: await headers(),
@@ -84,13 +66,12 @@ export async function unbanUser(userId: string): Promise<ActionResult> {
 }
 
 export async function updateUserName(userId: string, name: string): Promise<ActionResult> {
+  const session = await requirePermission({ user: ["update"] })
+
+  const selfError = preventSelfAction(session.user.id, userId)
+  if (selfError) return selfError
+
   try {
-    const { session, error } = await requirePermission({ user: ["update"] })
-    if (error) return error
-
-    const selfError = preventSelfAction(session.user.id, userId)
-    if (selfError) return selfError
-
     const trimmed = name.trim()
     if (!trimmed) {
       return { success: false, message: "Name cannot be empty." }
@@ -110,13 +91,12 @@ export async function updateUserName(userId: string, name: string): Promise<Acti
 }
 
 export async function changeUserRole(userId: string, role: string): Promise<ActionResult> {
+  const session = await requirePermission({ user: ["set-role"] })
+
+  const selfError = preventSelfAction(session.user.id, userId)
+  if (selfError) return selfError
+
   try {
-    const { session, error } = await requirePermission({ user: ["set-role"] })
-    if (error) return error
-
-    const selfError = preventSelfAction(session.user.id, userId)
-    if (selfError) return selfError
-
     await getAuth().api.setRole({
       body: { userId, role: role as "admin" | "user" },
       headers: await headers(),
@@ -131,13 +111,12 @@ export async function changeUserRole(userId: string, role: string): Promise<Acti
 }
 
 export async function anonymizeUser(userId: string): Promise<ActionResult> {
+  const session = await requirePermission({ user: ["delete"] })
+
+  const selfError = preventSelfAction(session.user.id, userId)
+  if (selfError) return selfError
+
   try {
-    const { session, error } = await requirePermission({ user: ["delete"] })
-    if (error) return error
-
-    const selfError = preventSelfAction(session.user.id, userId)
-    if (selfError) return selfError
-
     // Setting `banned` through the endpoint also deletes the user's sessions.
     await getAuth().api.adminUpdateUser({
       body: {

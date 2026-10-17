@@ -16,8 +16,7 @@ import {
   UpdateServerSchema,
   type ServerOperationResult,
 } from "@/lib/validators/schemas/server-schemas"
-import { hasPermission } from "@repo/auth/permissions"
-import { getSession } from "@repo/auth/session"
+import { requirePermission } from "@repo/auth/session"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 
@@ -28,17 +27,9 @@ export async function updateServer(
   _prevState: UpdateServerResult,
   formData: FormData,
 ): Promise<UpdateServerResult> {
+  await requirePermission({ server: ["update"] })
+
   try {
-    // Auth guard
-    const session = await getSession()
-    if (!session) {
-      return { success: false, message: "Authentication required." }
-    }
-
-    if (!hasPermission(session.user.role, { server: ["update"] })) {
-      return { success: false, message: "Insufficient permissions." }
-    }
-
     // Extract and validate form data
     const rawData = extractFormDataForUpdate(formData)
     const validation = UpdateServerSchema.safeParse(rawData)

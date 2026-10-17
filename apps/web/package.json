@@ -13,7 +13,8 @@
     "graphql:codegen": "graphql-codegen --config codegen.ts",
     "test": "vitest run --silent",
     "test:coverage": "vitest run --coverage --silent",
-    "clean": "rm -rf node_modules .next .turbo"
+    "clean": "rm -rf node_modules .next .turbo",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@apollo/client": "^4.2.3",
@@ -32,6 +33,7 @@
     "@graphql-codegen/cli": "^6.3.1",
     "@graphql-codegen/client-preset": "^5.3.0",
     "@graphql-typed-document-node/core": "^3.2.0",
+    "@playwright/test": "^1.64.1",
     "@repo/db": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/tailwind-config": "workspace:*",

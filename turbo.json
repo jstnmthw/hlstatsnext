@@ -8,6 +8,8 @@
     "FRONTEND_URL",
     "PORT",
     "VITEST",
+    "CI",
+    "PLAYWRIGHT_BASE_URL",
     "LOG_LEVEL",
     "INGRESS_PORT",
     "INGRESS_HOST",

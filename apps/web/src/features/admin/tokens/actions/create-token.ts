@@ -2,7 +2,7 @@
 
 import { CREATE_SERVER_TOKEN } from "@/features/admin/tokens/graphql/token-mutations"
 import { getClient } from "@/lib/apollo-client"
-import { getSession } from "@repo/auth/session"
+import { requireAdmin } from "@repo/auth/session"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -24,12 +24,9 @@ export async function createToken(
   _prevState: TokenOperationResult,
   formData: FormData,
 ): Promise<TokenOperationResult> {
-  try {
-    const session = await getSession()
-    if (!session) {
-      return { success: false, message: "Authentication required." }
-    }
+  await requireAdmin()
 
+  try {
     const rawData = {
       name: formData.get("name") as string,
       game: formData.get("game") as string,

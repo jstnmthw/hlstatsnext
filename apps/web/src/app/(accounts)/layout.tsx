@@ -1,12 +1,7 @@
-import { getSession } from "@repo/auth/session"
-import { redirect } from "next/navigation"
+import { requireAuth } from "@repo/auth/session"
 
 export default async function AccountsLayout({ children }: { children: React.ReactNode }) {
-  const session = await getSession()
-
-  if (!session) {
-    redirect("/login")
-  }
+  await requireAuth()
 
   return <>{children}</>
 }

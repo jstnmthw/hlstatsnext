@@ -37,13 +37,13 @@ Why this order and not the numbering: 0003 needs the environment schema from 000
 
 ## Phase 4: ADR 0004. Authorization in the data layer
 
-- [ ] `packages/auth/src/session.ts`: `import "server-only"`, `getSession` wrapped in React `cache`, `headers()` awaited before the auth client is touched. `requireAuth`, `requireAdmin` (answers a non-admin with `notFound()`) and `requirePermission` live here; the copy in `user-actions.ts` is removed.
-- [ ] `proxy.ts` uses `getSessionCookie` only. Matcher: `/admin/:path*`, `/accounts/:path*`, `/login`, `/register`. It redirects by cookie presence and never reads the session.
-- [ ] `(admin)` and `(accounts)` layouts call the helpers only for chrome and redirects. `(auth)` keeps the real session read.
-- [ ] The token actions gain a first-line guard. Every action uses the shared helpers.
-- [ ] Add Playwright to `apps/web` with a protection spec: signed out lands on `/login`; a user gets 404 on `/admin`; an admin renders.
-- [ ] Add a Vitest integration config to `apps/api` (it has none) and a test that `requireAdminResolver` refuses a user-role context.
-- [ ] Checks pass.
+- [x] `packages/auth/src/session.ts`: `import "server-only"`, `getSession` wrapped in React `cache`, `headers()` awaited before the auth client is touched. `requireAuth` redirects to `/login`; `requireAdmin` and `requirePermission` answer a signed-in user without the right with `notFound()`. Guards navigate rather than throw typed errors (chosen 2026-10-17), so the unused `AuthError` class is removed along with the copy of `requirePermission` in `user-actions.ts`.
+- [x] `proxy.ts` never reads the session. Matcher: `/admin/:path*`, `/accounts/:path*`, `/login`, `/register`. Protected routes redirect on a missing session cookie (`getSessionCookie`). The sign-in pages bounce on the signed cookie cache (`getCookieCache`) rather than the bare token, because the token cookie outlives a revoked or reset session by up to seven days and would otherwise lock that visitor out of the sign-in page; the cache expires in five minutes.
+- [x] `(admin)` and `(accounts)` layouts call the helpers only for chrome and redirects. `(auth)` keeps the real session read.
+- [x] The token actions gain a first-line guard. Every action uses the shared helpers.
+- [x] Add Playwright to `apps/web` with a protection spec: signed out lands on `/login`; a user gets 404 on `/admin`; an admin renders. The run starts its own `next dev` on port 3100, creates two users through the real sign-up endpoint, and removes them afterwards. `pnpm --filter web test:e2e`.
+- [x] Add a Vitest integration config to `apps/api` (it has none) and a test that `requireAdminResolver` refuses a user-role context. It executes real operations against the built schema with `DATABASE_URL` pointed at an unreachable port, so it needs no database and cannot write to one. `pnpm --filter api test:integration`.
+- [x] Checks pass.
 
 ## Phase 5: ADR 0005. Web data modules over the GraphQL API
 

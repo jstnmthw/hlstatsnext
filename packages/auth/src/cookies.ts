@@ -1,1 +1,1 @@
-export { getSessionCookie } from "better-auth/cookies"
+export { getCookieCache, getSessionCookie } from "better-auth/cookies"

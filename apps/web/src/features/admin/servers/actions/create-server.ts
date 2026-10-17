@@ -18,8 +18,7 @@ import {
   CreateServerSchema,
   type ServerOperationResult,
 } from "@/lib/validators/schemas/server-schemas"
-import { hasPermission } from "@repo/auth/permissions"
-import { getSession } from "@repo/auth/session"
+import { requirePermission } from "@repo/auth/session"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 
@@ -30,17 +29,9 @@ export async function createServer(
   _prevState: CreateServerResult,
   formData: FormData,
 ): Promise<CreateServerResult> {
+  await requirePermission({ server: ["create"] })
+
   try {
-    // Auth guard
-    const session = await getSession()
-    if (!session) {
-      return { success: false, message: "Authentication required." }
-    }
-
-    if (!hasPermission(session.user.role, { server: ["create"] })) {
-      return { success: false, message: "Insufficient permissions." }
-    }
-
     // Extract and validate form data
     const rawData = extractFormDataForCreate(formData)
     const validation = CreateServerSchema.safeParse(rawData)

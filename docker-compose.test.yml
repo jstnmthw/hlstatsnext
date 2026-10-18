@@ -21,7 +21,7 @@ services:
     tmpfs:
       - /var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--protocol=tcp", "-uroot", "-prootpassword"]
       interval: 5s
       timeout: 5s
       retries: 10

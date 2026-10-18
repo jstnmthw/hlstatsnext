@@ -38,6 +38,8 @@ services:
     networks:
       - default
     restart: unless-stopped
+    # TCP, not the socket: the entrypoint's temporary init server answers on the socket
+    # before the user exists, so a socket ping reports healthy too early.
     healthcheck:
       test:
         [
@@ -45,7 +47,8 @@ services:
           "mysqladmin",
           "ping",
           "-h",
-          "localhost",
+          "127.0.0.1",
+          "--protocol=tcp",
           "-u",
           "root",
           "-p${DB_ROOT_PASSWORD:-root}",

@@ -29,7 +29,7 @@ export default async function AccountSettingsPage({ searchParams }: AccountSetti
     <PageWrapper>
       <Header />
       <MainContent className="container">
-        <div className="mt-8 mb-8">
+        <div className="mb-8">
           <h1 className="text-2xl font-bold tracking-tight uppercase">Account Settings</h1>
           <p className="text-muted-foreground">Manage your account settings and preferences.</p>
         </div>

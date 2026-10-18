@@ -1,58 +1,25 @@
 import { AccountMenu } from "@/features/common/components/account-menu"
 import { AppLogo } from "@/features/common/components/app-logo"
+import { SiteNav } from "@/features/common/components/site-nav"
 import { isAdmin } from "@repo/auth/permissions"
 import { getSession } from "@repo/auth/session"
-import { Button, cn } from "@repo/ui"
+import { Button, cn, IconSearch, IconUser, TextLink } from "@repo/ui"
 import Link from "next/link"
 
-const navItems = [
-  {
-    label: "Servers",
-    href: "/servers",
-  },
-  {
-    label: "Games",
-    href: "/games",
-  },
-  {
-    label: "Players",
-    href: "/players",
-  },
-]
-
-export async function Header({
-  className,
-  isFixed = false,
-}: {
-  className?: string
-  isFixed?: boolean
-}) {
+export async function Header({ className }: { className?: string }) {
   const session = await getSession()
 
   return (
-    <header
-      className={cn(
-        "w-full",
-        className,
-        isFixed && "fixed top-0 right-0 left-0 z-50 bg-background/50 backdrop-blur-sm",
-      )}
-    >
-      <div className={cn("container flex items-center justify-between py-6")}>
-        <div className="flex items-center gap-2">
-          <AppLogo />
-        </div>
-        <div className="flex items-center gap-8">
-          <nav className="flex items-center gap-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="font-semibold text-zinc-400 uppercase transition-colors hover:text-primary-bright"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+    <header className={cn("w-full border-b", className)}>
+      <div className="container flex min-h-14 flex-wrap items-center gap-4">
+        <AppLogo />
+        <SiteNav />
+        <div className="ml-auto flex items-center gap-1">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/players" aria-label="Search players">
+              <IconSearch />
+            </Link>
+          </Button>
           {session ? (
             <AccountMenu
               user={{
@@ -63,9 +30,12 @@ export async function Header({
               isAdmin={isAdmin(session.user)}
             />
           ) : (
-            <Button variant="primary" size="sm" asChild className="uppercase">
-              <Link href="/login">Sign in</Link>
-            </Button>
+            <TextLink asChild variant="nav">
+              <Link href="/login">
+                <IconUser />
+                Sign in
+              </Link>
+            </TextLink>
           )}
         </div>
       </div>

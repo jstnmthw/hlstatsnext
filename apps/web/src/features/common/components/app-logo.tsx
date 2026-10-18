@@ -1,4 +1,5 @@
-import { cn, IconSlashes } from "@repo/ui"
+import { APP_VERSION } from "@/lib/app-version"
+import { cn, IconSlashes, TextLink } from "@repo/ui"
 import Link from "next/link"
 
 export function AppLogo({
@@ -9,15 +10,20 @@ export function AppLogo({
   showVersion?: boolean
 }) {
   return (
-    <h1 className={cn(className)}>
-      <Link
-        href="/"
-        className="flex items-center gap-2 text-base font-bold tracking-tight uppercase"
-      >
+    <TextLink
+      asChild
+      variant="row"
+      className={cn("flex items-center gap-2 hover:no-underline", className)}
+    >
+      <Link href="/">
         <IconSlashes className="size-5 text-primary-bright" />
-        {process.env.NEXT_PUBLIC_APP_NAME}{" "}
-        {showVersion && <span className="text-xs text-muted-foreground">v1.0.0</span>}
+        <span className="font-bold tracking-tight uppercase">
+          {process.env.NEXT_PUBLIC_APP_NAME}
+        </span>
+        {showVersion && (
+          <span className="text-xs font-normal text-muted-foreground">v{APP_VERSION}</span>
+        )}
       </Link>
-    </h1>
+    </TextLink>
   )
 }

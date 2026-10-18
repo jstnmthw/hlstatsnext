@@ -7,5 +7,5 @@ interface MainContentProps {
 }
 
 export function MainContent({ children, fixedHeader = false, className }: MainContentProps) {
-  return <main className={cn("flex-1", fixedHeader && "pt-30", className)}>{children}</main>
+  return <main className={cn("flex-1 py-8", fixedHeader && "pt-30", className)}>{children}</main>
 }

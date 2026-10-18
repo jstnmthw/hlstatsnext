@@ -18,7 +18,7 @@ export default async function MyPlayersPage() {
     <PageWrapper>
       <Header />
       <MainContent className="container">
-        <div className="mt-8 mb-8">
+        <div className="mb-8">
           <h1 className="text-2xl font-bold tracking-tight uppercase">My Players</h1>
           <p className="text-muted-foreground">
             One player per game you have played, matched to your Steam account.

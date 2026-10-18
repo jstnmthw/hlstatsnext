@@ -31,7 +31,7 @@ export default async function UsersPage(props: AdminPageProps) {
       <AdminHeader currentPath="/admin/users" />
       <MainContent>
         <div className="container">
-          <div className="mt-8 mb-8 flex items-center justify-between">
+          <div className="mb-8 flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold tracking-tight uppercase">Manage Users</h1>
               <p className="text-muted-foreground">

@@ -30,15 +30,9 @@ export interface AccountMenuProps {
   isAdmin?: boolean
 }
 
-function getInitial(name: string | null | undefined, email: string): string {
-  if (name) {
-    return name[0]!.toUpperCase()
-  }
-  return email[0]!.toUpperCase()
-}
-
 export function AccountMenu({ user, isAdmin = false }: AccountMenuProps) {
   const router = useRouter()
+  const label = user.username || user.name || user.email
 
   const handleSignOut = async () => {
     await signOut()
@@ -48,17 +42,18 @@ export function AccountMenu({ user, isAdmin = false }: AccountMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar>
-            {user.image && <AvatarImage src={user.image} alt={user.name || "User"} />}
-            <AvatarFallback>{getInitial(user.name, user.email)}</AvatarFallback>
+        <Button variant="ghost" className="px-2.5 font-normal text-muted-foreground">
+          <Avatar size="sm" shape="square">
+            {user.image && <AvatarImage src={user.image} alt="" />}
+            <AvatarFallback>{label.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
+          {label}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium">{user.username || user.name || "User"}</p>
+            <p className="text-sm font-medium">{label}</p>
             <p className="text-muted-foreground">{user.email}</p>
           </div>
         </DropdownMenuLabel>

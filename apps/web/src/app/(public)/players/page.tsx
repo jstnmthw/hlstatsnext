@@ -40,7 +40,7 @@ export default async function PlayersPage(props: PlayersPageProps) {
     <PageWrapper>
       <Header />
       <MainContent className="container">
-        <div className="mt-8 mb-8">
+        <div className="mb-8">
           <h1 className="text-2xl font-bold tracking-tight uppercase">Players</h1>
           <p className="text-muted-foreground">Browse all ranked players</p>
         </div>

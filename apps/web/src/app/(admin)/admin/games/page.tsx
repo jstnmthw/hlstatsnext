@@ -31,7 +31,7 @@ export default async function GamesPage(props: AdminPageProps) {
       <AdminHeader currentPath="/admin/games" />
       <MainContent>
         <div className="container">
-          <div className="mt-8 mb-8 flex items-center justify-between">
+          <div className="mb-8 flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold tracking-tight uppercase">Manage Games</h1>
               <p className="text-muted-foreground">

@@ -22,6 +22,8 @@
     "db:test:reset": "turbo run db:test:reset",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
+    "docker:ps": "docker compose ps",
+    "docker:logs": "docker compose logs -f",
     "docker:obs:up": "docker compose --profile observability up -d",
     "docker:obs:down": "docker compose rm -sf prometheus grafana",
     "docker:test:up": "docker compose -f docker-compose.test.yml -p hlstatsnext-test up -d --wait",

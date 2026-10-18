@@ -42,10 +42,10 @@ Prometheus is in a container; the daemon and API typically run on the host durin
 | `METRICS_ENABLED`        | `false` | Master switch for app-side metrics. Accepts `true`/`1`/`yes`/`on` (case-insensitive). When off, the daemon's `MetricsServer` and gauge interval are never constructed, and the API skips registering the Envelop plugin and binding its metrics listener. |
 | `METRICS_PORT`           | `9091`  | Daemon metrics HTTP port. Only consulted when `METRICS_ENABLED=true`.                                                                                                                                                                                     |
 | `API_METRICS_PORT`       | `9092`  | API metrics HTTP port. Only consulted when `METRICS_ENABLED=true`.                                                                                                                                                                                        |
-| `GRAFANA_ADMIN_USER`     | `admin` | Grafana initial admin user.                                                                                                                                                                                                                               |
-| `GRAFANA_ADMIN_PASSWORD` | `admin` | Grafana initial admin password. Change in any shared environment.                                                                                                                                                                                         |
+| `GRAFANA_ADMIN_USER`     | `admin` | Grafana initial admin user. Read by Compose only, never by the apps; export it before `pnpm docker:obs:up` to override.                                                                                                                                   |
+| `GRAFANA_ADMIN_PASSWORD` | `admin` | Grafana initial admin password. Read by Compose only. Change in any shared environment.                                                                                                                                                                   |
 
-All four are declared in `turbo.json#globalEnv` so Turbo's cache invalidates correctly when they change.
+The three `METRICS_*` variables are declared in `turbo.json#globalEnv` so Turbo's cache invalidates correctly when they change. The Grafana pair is deliberately absent from that list: no Turbo task reads it.
 
 ## Production note
 

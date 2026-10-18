@@ -24,22 +24,27 @@ git clone https://github.com/jstnmthw/hlstatsnext.git
 cd hlstatsnext
 pnpm install
 
-# Copy environment files (minimum required)
-cp .env.example .env
+# Copy environment files (database and RabbitMQ values already match docker-compose.yml)
 cp packages/db/.env.example packages/db/.env
 cp apps/daemon/.env.example apps/daemon/.env
 cp apps/api/.env.example apps/api/.env
 cp apps/web/.env.example apps/web/.env
 
+# Generate the two secrets and paste each into the files that share it:
+#   ENCRYPTION_KEY:     apps/daemon/.env and apps/api/.env
+#   BETTER_AUTH_SECRET: apps/api/.env and apps/web/.env
+openssl rand -base64 32
+openssl rand -base64 32
+
 # Start infrastructure and initialize database
-docker compose up -d
+pnpm docker:up
 pnpm db:generate && pnpm db:push && pnpm db:seed
 pnpm dev
 ```
 
 **Prerequisites:** Node.js 24+, pnpm 10.x, Docker & Docker Compose
 
-> **Note:** The daemon and API require an encryption key for RCON passwords. Generate one with `openssl rand -base64 32` and add it to `apps/daemon/.env` and `apps/api/.env`. See **[INSTALLATION.md](./INSTALLATION.md)** for complete setup or **[DEVELOPMENT.md](./DEVELOPMENT.md)** for full dev environment details.
+> **Note:** Two secrets must be generated with `openssl rand -base64 32`: `ENCRYPTION_KEY` (RCON passwords at rest; the same value in `apps/daemon/.env` and `apps/api/.env`) and `BETTER_AUTH_SECRET` (sessions; the same value in `apps/api/.env` and `apps/web/.env`). The apps refuse to start without them. There is no root `.env`; the containers use the defaults in `docker-compose.yml`. See **[INSTALLATION.md](./INSTALLATION.md)** for complete setup or **[DEVELOPMENT.md](./DEVELOPMENT.md)** for full dev environment details.
 
 ## Development
 

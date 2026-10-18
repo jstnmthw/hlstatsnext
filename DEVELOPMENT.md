@@ -26,23 +26,26 @@ cd hlstatsnext
 # 2. Install dependencies
 pnpm install
 
-# 3. Copy environment files
-cp .env.example .env
+# 3. Copy environment files (database and RabbitMQ values already match docker-compose.yml)
 cp packages/db/.env.example packages/db/.env
 cp packages/crypto/.env.example packages/crypto/.env
 cp apps/daemon/.env.example apps/daemon/.env
 cp apps/api/.env.example apps/api/.env
 cp apps/web/.env.example apps/web/.env
 
-# 4. Generate encryption key and update .env files
+# 4. Generate the secrets and update .env files
 openssl rand -base64 32
 # Copy the output to ENCRYPTION_KEY in:
 #   - packages/crypto/.env
 #   - apps/daemon/.env
 #   - apps/api/.env
+openssl rand -base64 32
+# Copy the output to BETTER_AUTH_SECRET in:
+#   - apps/api/.env
+#   - apps/web/.env
 
 # 5. Start Docker services
-docker compose up -d
+pnpm docker:up
 
 # 6. Initialize database
 pnpm db:generate

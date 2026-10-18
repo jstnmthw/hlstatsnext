@@ -91,44 +91,23 @@ hlstatsnext/
 
 ## Environment Configuration
 
-### Root Environment (`.env`)
+### Infrastructure credentials (Docker Compose)
 
-Docker Compose configuration for infrastructure services.
+The containers take their credentials from the `${VAR:-default}` fallbacks in `docker-compose.yml`, and the app templates below ship with matching values, so a fresh clone connects without editing anything. There is no root `.env` file to copy.
 
-```bash
-# Docker project name
-COMPOSE_PROJECT_NAME=hlstatsnext
+| Variable                 | Default       | Used by                                                  |
+| ------------------------ | ------------- | -------------------------------------------------------- |
+| `DB_NAME`                | `hlstatsnext` | MySQL database                                           |
+| `DB_USER`                | `hlstatsnext` | MySQL user; `docker/mysql/init` grants it all privileges |
+| `DB_PASS`                | `changeme`    | MySQL user password                                      |
+| `DB_ROOT_PASSWORD`       | `root`        | MySQL root password                                      |
+| `RABBITMQ_USER`          | `hlstats`     | RabbitMQ user                                            |
+| `RABBITMQ_PASSWORD`      | `hlstats`     | RabbitMQ password                                        |
+| `RABBITMQ_VHOST`         | `hlstats`     | RabbitMQ vhost                                           |
+| `GRAFANA_ADMIN_USER`     | `admin`       | Grafana (observability profile)                          |
+| `GRAFANA_ADMIN_PASSWORD` | `admin`       | Grafana (observability profile)                          |
 
-# User/Group IDs for file permissions (match your host user)
-USER_ID=1000
-GROUP_ID=1000
-
-# Database Configuration
-DB_HOST=db
-DB_PORT=3306
-DB_NAME=hlstatsnext
-DB_USER=hlstatsnext
-DB_PASS=changeme
-DB_ROOT_PASSWORD=root
-DB_CHARSET=utf8mb4
-
-# Database Connection Pool Configuration
-DB_MAX_CONNECTIONS=10
-DB_MIN_CONNECTIONS=2
-DB_CONNECTION_TIMEOUT=30000
-DB_IDLE_TIMEOUT=300000
-DB_HEALTH_CHECK_INTERVAL=60000
-DB_MAX_RETRIES=3
-
-# RabbitMQ Configuration
-RABBITMQ_USER=hlstats
-RABBITMQ_PASSWORD=hlstats
-RABBITMQ_VHOST=hlstats
-
-# Grafana Configuration (optional)
-GRAFANA_ADMIN_USER=admin
-GRAFANA_ADMIN_PASSWORD=admin
-```
+To override one, export it before starting the stack, or point Compose at a file with `docker compose --env-file`. MySQL and RabbitMQ create their users only on the first start of an empty volume, so changing a password later requires `docker compose down -v`, which deletes the development database. Keep `DATABASE_URL` and `RABBITMQ_URL` in the app `.env` files in step. MySQL and AMQP are published on `127.0.0.1` only.
 
 ### Database Package (`packages/db/.env`)
 
@@ -174,9 +153,6 @@ INGRESS_PORT=27500
 
 # RabbitMQ Connection
 RABBITMQ_URL=amqp://hlstats:hlstats@localhost:5672/hlstats
-RABBITMQ_USER=hlstats
-RABBITMQ_PASSWORD=hlstats
-RABBITMQ_VHOST=hlstats
 
 # RCON Configuration
 RCON_ENABLED=true
@@ -271,12 +247,12 @@ pnpm docker:ps
 
 ### Available Services
 
-| Service      | Container                | Port(s)     | Description                   |
-| ------------ | ------------------------ | ----------- | ----------------------------- |
-| **db**       | hlstatsnext-dev-db       | 3306        | MySQL 8.4 database            |
-| **rabbitmq** | hlstatsnext-dev-rabbitmq | 5672, 15672 | Message queue + management UI |
+| Service      | Container                | Port(s)                         | Description                   |
+| ------------ | ------------------------ | ------------------------------- | ----------------------------- |
+| **db**       | hlstatsnext-dev-db       | 127.0.0.1:3306                  | MySQL 8.4 database            |
+| **rabbitmq** | hlstatsnext-dev-rabbitmq | 127.0.0.1:5672, 127.0.0.1:15672 | Message queue + management UI |
 
-Observability (opt-in, separate compose file): Prometheus on `:9090`, Grafana on `:3001`. Start with `pnpm docker:obs:up`.
+Observability (opt-in, the `observability` Compose profile in the same file): Prometheus on `:9090`, Grafana on `:3001`. Start with `pnpm docker:obs:up`.
 
 ### Container Commands
 
@@ -346,7 +322,7 @@ The database includes tables for:
 
 ```bash
 # Via Docker
-docker exec -it hlstatsnext-db mysql -u hlstatsnext -pchangeme hlstatsnext
+docker exec -it hlstatsnext-dev-db mysql -u hlstatsnext -pchangeme hlstatsnext
 
 # Via Prisma Studio (visual editor)
 pnpm db:studio

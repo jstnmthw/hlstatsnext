@@ -5,10 +5,15 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconCopy,
+  IconMinus,
+  IconPlus,
 } from "@tabler/icons-react"
+import { useState, type ComponentProps } from "react"
 import { fn } from "storybook/test"
 import { Button } from "./button"
 import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from "./button-group"
+import { Field, FieldContent, FieldDescription, FieldLabel } from "./field"
+import { Input } from "./input"
 
 const meta = {
   title: "Components/Button Group",
@@ -23,6 +28,52 @@ const meta = {
 export default meta
 
 type Story = StoryObj<typeof meta>
+
+function RankingWindow(props: ComponentProps<typeof ButtonGroup>) {
+  const [days, setDays] = useState(30)
+  const adjust = (delta: number) => setDays((d) => Math.min(365, Math.max(1, d + delta)))
+
+  return (
+    <Field orientation="horizontal" className="max-w-md">
+      <FieldContent>
+        <FieldLabel htmlFor="ranking-window">Ranking window</FieldLabel>
+        <FieldDescription>Days of play that count towards skill.</FieldDescription>
+      </FieldContent>
+      <ButtonGroup {...props}>
+        <Input
+          id="ranking-window"
+          value={days}
+          onChange={(event) => {
+            const next = Number(event.target.value)
+            if (Number.isInteger(next) && next >= 1 && next <= 365) setDays(next)
+          }}
+          size={3}
+          maxLength={3}
+          inputMode="numeric"
+          className="text-center tabular-nums"
+        />
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label="Fewer days"
+          onClick={() => adjust(-1)}
+          disabled={days <= 1}
+        >
+          <IconMinus />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label="More days"
+          onClick={() => adjust(1)}
+          disabled={days >= 365}
+        >
+          <IconPlus />
+        </Button>
+      </ButtonGroup>
+    </Field>
+  )
+}
 
 export const Default: Story = {
   render: (args) => (
@@ -102,4 +153,8 @@ export const Nested: Story = {
       </ButtonGroup>
     </ButtonGroup>
   ),
+}
+
+export const Stepper: Story = {
+  render: (args) => <RankingWindow {...args} />,
 }

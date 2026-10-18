@@ -12,6 +12,7 @@ import {
 import { colorSchemes } from "../lib/color-variants"
 import { Badge } from "./badge"
 import { PulseDot } from "./pulse-dot"
+import { Spinner } from "./spinner"
 
 const meta = {
   title: "Components/Badge",
@@ -99,6 +100,25 @@ export const IconOnly: Story = {
       </Badge>
       <Badge {...args} colorScheme="indigo" aria-label="Info">
         <IconInfoCircle />
+      </Badge>
+    </div>
+  ),
+}
+
+export const WithSpinner: Story = {
+  render: () => (
+    <div className="flex flex-wrap gap-2">
+      <Badge variant="secondary">
+        <Spinner />
+        Reconnecting…
+      </Badge>
+      <Badge variant="live">
+        <Spinner />
+        Syncing stats
+      </Badge>
+      <Badge variant="destructive">
+        <Spinner />
+        Retrying
       </Badge>
     </div>
   ),

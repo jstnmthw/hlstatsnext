@@ -31,6 +31,23 @@ const games = [
   { name: "Team Fortress Classic", players: "97" },
 ]
 
+const sides = ["top", "right", "bottom", "left"] as const
+
+const feed = [
+  "Hazel killed drexx with ak47 (headshot)",
+  "Mintcake planted the bomb at B",
+  "Vantablack killed Aether with awp",
+  "Round over · Counter-Terrorists win",
+  "drexx joined team Terrorists",
+  "Hazel killed Mintcake with deagle",
+]
+
+// Long enough to overflow a half-height sheet so the top and bottom sides show their scrolling.
+const events = Array.from({ length: 24 }, (_, index) => ({
+  time: `21:${String(47 - Math.floor(index / 2)).padStart(2, "0")}`,
+  text: feed[index % feed.length],
+}))
+
 export const Default: Story = {
   render: (args) => (
     <Sheet {...args}>
@@ -137,5 +154,43 @@ export const WithForm: Story = {
         </SheetFooter>
       </SheetContent>
     </Sheet>
+  ),
+}
+
+export const Sides: Story = {
+  render: (args) => (
+    <div className="flex gap-2">
+      {sides.map((side) => (
+        <Sheet key={side} {...args}>
+          <SheetTrigger asChild>
+            <Button variant="outline" className="capitalize">
+              {side}
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            side={side}
+            className={side === "top" || side === "bottom" ? "max-h-[50vh]" : undefined}
+          >
+            <SheetHeader>
+              <SheetTitle>Recent events</SheetTitle>
+              <SheetDescription>Bangkok 24/7 Dust2 · last 10 minutes</SheetDescription>
+            </SheetHeader>
+            <ol className="grid gap-1 overflow-y-auto px-4 text-sm">
+              {events.map((event, index) => (
+                <li key={index} className="flex gap-3">
+                  <span className="font-mono text-muted-foreground">{event.time}</span>
+                  <span>{event.text}</span>
+                </li>
+              ))}
+            </ol>
+            <SheetFooter>
+              <SheetClose asChild>
+                <Button variant="outline">Close</Button>
+              </SheetClose>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      ))}
+    </div>
   ),
 }

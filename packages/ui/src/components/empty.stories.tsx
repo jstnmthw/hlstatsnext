@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { IconPlus, IconServer, IconUserSearch } from "@tabler/icons-react"
 import { Button } from "./button"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "./empty"
+import { Spinner } from "./spinner"
 
 const meta = {
   title: "Components/Empty",
@@ -50,6 +51,28 @@ export const WithPrimaryAction: Story = {
         <Button>
           <IconPlus />
           Add server
+        </Button>
+      </EmptyContent>
+    </Empty>
+  ),
+}
+
+export const Loading: Story = {
+  render: (args) => (
+    <Empty {...args}>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Spinner className="size-6" />
+        </EmptyMedia>
+        <EmptyTitle>Waiting for the first events</EmptyTitle>
+        <EmptyDescription>
+          The daemon is listening for Bangkok 24/7 Dust2. Stats appear as soon as the server sends
+          its first log line.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <Button variant="ghost" size="sm">
+          Check log forwarding
         </Button>
       </EmptyContent>
     </Empty>

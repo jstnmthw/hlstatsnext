@@ -66,8 +66,8 @@ interface NavbarProps {
 
 export function Navbar({ currentPath }: NavbarProps) {
   return (
-    <nav className="flex items-center justify-between">
-      <ul className="container flex items-center gap-6 border-b">
+    <nav className="container">
+      <ul className="flex scrollbar-none items-center gap-2 overflow-x-auto border-b [&::-webkit-scrollbar]:hidden">
         {navItems.map((item) => {
           const isActive =
             item.href === "/admin"

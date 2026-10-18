@@ -13,6 +13,13 @@
 :root {
   --radius: 0;
   --ui-component-radius: 0.5rem;
+
+  /* Ladder tiers. Override these five on any ancestor to recolour every tier-aware component beneath it. */
+  --tier-recruit: #9aa39a;
+  --tier-regular: #22c55e;
+  --tier-veteran: #3d8bff;
+  --tier-elite: #b04bff;
+  --tier-legend: #ffa91a;
 }
 
 @theme inline {
@@ -53,6 +60,11 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-tier-recruit: var(--tier-recruit);
+  --color-tier-regular: var(--tier-regular);
+  --color-tier-veteran: var(--tier-veteran);
+  --color-tier-elite: var(--tier-elite);
+  --color-tier-legend: var(--tier-legend);
 
   /* Font scale - overrides Tailwind v4 defaults */
   --text-xs: 10px;

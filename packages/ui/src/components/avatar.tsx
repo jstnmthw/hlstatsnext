@@ -6,16 +6,19 @@ import { cn } from "@repo/ui/lib/utils"
 function Avatar({
   className,
   size = "default",
+  shape = "circle",
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Root> & {
-  size?: "default" | "sm" | "lg"
+  size?: "default" | "sm" | "lg" | "xl"
+  shape?: "circle" | "square"
 }) {
   return (
     <AvatarPrimitive.Root
       data-slot="avatar"
       data-size={size}
+      data-shape={shape}
       className={cn(
-        "group/avatar relative flex size-8 shrink-0 overflow-hidden rounded-full select-none data-[size=lg]:size-10 data-[size=sm]:size-6",
+        "group/avatar relative flex size-8 shrink-0 rounded-full select-none data-[shape=square]:rounded-none data-[size=lg]:size-10 data-[size=sm]:size-6 data-[size=xl]:size-18",
         className,
       )}
       {...props}
@@ -27,7 +30,10 @@ function AvatarImage({ className, ...props }: React.ComponentProps<typeof Avatar
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
-      className={cn("aspect-square size-full", className)}
+      className={cn(
+        "aspect-square size-full rounded-full group-data-[shape=square]/avatar:rounded-none",
+        className,
+      )}
       {...props}
     />
   )
@@ -41,7 +47,7 @@ function AvatarFallback({
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
       className={cn(
-        "flex size-full items-center justify-center rounded-full bg-muted text-sm text-muted-foreground group-data-[size=sm]/avatar:text-xs",
+        "flex size-full items-center justify-center rounded-full bg-muted text-sm text-muted-foreground group-data-[shape=square]/avatar:rounded-none group-data-[shape=square]/avatar:bg-secondary group-data-[shape=square]/avatar:font-bold group-data-[shape=square]/avatar:text-foreground group-data-[size=sm]/avatar:text-xs group-data-[size=xl]/avatar:text-4xl",
         className,
       )}
       {...props}
@@ -58,6 +64,7 @@ function AvatarBadge({ className, ...props }: React.ComponentProps<"span">) {
         "group-data-[size=sm]/avatar:size-2 group-data-[size=sm]/avatar:[&>svg]:hidden",
         "group-data-[size=default]/avatar:size-2.5 group-data-[size=default]/avatar:[&>svg]:size-2",
         "group-data-[size=lg]/avatar:size-3 group-data-[size=lg]/avatar:[&>svg]:size-2",
+        "group-data-[size=xl]/avatar:size-4 group-data-[size=xl]/avatar:[&>svg]:size-3",
         className,
       )}
       {...props}

@@ -4,64 +4,43 @@ import * as React from "react"
 import { getComponentStyles, type ColorScheme, type StyleVariant } from "../lib/color-variants"
 import { cn } from "../lib/utils"
 
-// Base styles that apply to all button variants
 const baseButtonStyles = [
-  // Base (removed 'border' - let variants control it explicitly)
-  "relative cursor-pointer isolate inline-flex items-baseline items-center justify-center gap-x-2 rounded-md text-base font-semibold",
-
-  // Reduce gap when there's both icon and text
+  "relative isolate inline-flex cursor-pointer items-center justify-center gap-x-2 rounded-md font-semibold whitespace-nowrap transition-colors",
   "has-[>svg+*]:gap-x-1.5",
-
-  // Focus
-  "focus:outline-none data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-blue-500",
-
-  // Disabled
-  "disabled:opacity-50 disabled:pointer-events-none",
-
-  // Icon Base Styling (Sizing/Margins handled in size variants)
-  "[&>svg]:shrink-0 [&>svg]:self-center",
-
-  // Icon colors handled per variant/scheme below
-  "forced-colors:[&>svg]:text-[ButtonText]",
+  "outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+  "disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50",
+  "[&>svg]:shrink-0 [&>svg]:self-center forced-colors:[&>svg]:text-[ButtonText]",
 ]
 
-// Solid button base styles - Explicit border control
 const solidBaseStyles = [
-  "border border-transparent", // Explicit border for solid (transparent by default)
-
-  // Structural before/after for solid buttons (backgrounds applied in colorVariants)
-  "before:absolute before:inset-0 before:-z-10 before:rounded-[inherit]",
-  "before:shadow-sm", // Shadow for solid buttons
-  "dark:before:hidden", // Hides the light-mode shadow in dark mode
-  "dark:border-white/5", // Add subtle border in dark mode for solid
-  "after:absolute after:inset-0 after:-z-10 after:rounded-[inherit]",
-  "after:shadow-[inset_0_1px_theme(colors.white/15%)]", // Inner highlight
-  "dark:after:-inset-px", // Dark mode adjustment for highlight
-  "disabled:before:shadow-none disabled:after:shadow-none", // Disabled state
+  "border border-transparent",
+  "before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:shadow-sm",
+  "dark:border-white/5 dark:before:hidden",
+  "after:absolute after:inset-0 after:-z-10 after:rounded-[inherit] after:shadow-[inset_0_1px_theme(colors.white/15%)] dark:after:-inset-px",
+  "disabled:before:shadow-none disabled:after:shadow-none",
 ]
 
-// Outline button base styles - Explicit border for visibility
-const outlineBaseStyles: string[] = [
-  "border", // Outline needs visible border (color set by color variants)
-]
+const outlineBaseStyles = ["border"]
 
-// Ghost button base styles - Explicit transparent border
-const ghostBaseStyles = [
-  "border-transparent", // No visible border for ghost (no !important needed)
-]
+const ghostBaseStyles = ["border border-transparent"]
 
-// Use types from shared color variants system
+// Token-driven looks used when no colorScheme is given; they follow the active theme instead of the OS scheme.
+const semanticStyles: Record<StyleVariant, string> = {
+  solid: "",
+  outline:
+    "border border-input bg-transparent text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground active:bg-accent/70",
+  ghost:
+    "border border-transparent bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground active:bg-accent/70",
+}
+
 type Variant = StyleVariant | "primary" | "secondary" | "destructive"
 
-// cva for base styles and sizing (Remove icon color styles)
 const buttonVariants = cva(baseButtonStyles, {
   variants: {
     variant: {
-      // Original variants (use colorScheme system)
       solid: "",
       outline: "",
       ghost: "",
-      // Semantic variants (use CSS theme variables directly)
       primary:
         "border border-transparent bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 active:bg-primary/80",
       secondary:
@@ -70,19 +49,17 @@ const buttonVariants = cva(baseButtonStyles, {
         "border border-transparent bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 active:bg-destructive/80",
     },
     size: {
-      // Regular sizes with automatic icon-only detection - now using 2px increment font scale
-      xs: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.1)-1px)] text-xs has-[>svg+*]:pl-[calc(theme(spacing.2)-1px)] has-[>svg+*]:pr-[calc(theme(spacing.3)-1px)] has-[>svg:only-child]:px-[calc(theme(spacing.1)-1px)] has-[>svg:only-child]:py-[calc(theme(spacing.1)-1px)] [&>svg]:size-4",
-      sm: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.1)-1px)] text-sm has-[>svg+*]:pl-[calc(theme(spacing.2)-1px)] has-[>svg+*]:pr-[calc(theme(spacing.3)-1px)] has-[>svg:only-child]:px-[calc(theme(spacing.2)-1.5px)] has-[>svg:only-child]:py-[calc(theme(spacing.2)-1.5px)] [&>svg]:size-4",
+      xs: "h-7 px-2 text-xs has-[>svg:only-child]:w-7 has-[>svg:only-child]:px-0 [&>svg]:size-3.5",
+      sm: "h-8 px-3 text-sm has-[>svg:only-child]:w-8 has-[>svg:only-child]:px-0 [&>svg]:size-4",
       default:
-        "px-[calc(theme(spacing.3)-2px)] py-[calc(theme(spacing.1)-1px)] text-base has-[>svg+*]:pl-[calc(theme(spacing.2)-2px)] has-[>svg+*]:pr-[calc(theme(spacing.3)-1px)] has-[>svg:only-child]:px-[calc(theme(spacing.2)-1px)] has-[>svg:only-child]:py-[calc(theme(spacing.2)-1px)] [&>svg]:size-4",
-      lg: "px-[calc(theme(spacing.4)-1px)] py-[calc(theme(spacing.2)-1px)] text-lg has-[>svg+*]:pl-[calc(theme(spacing.3)-1px)] has-[>svg+*]:pr-[calc(theme(spacing.4)-1px)] has-[>svg:only-child]:px-[calc(theme(spacing.2)-1px)] has-[>svg:only-child]:py-[calc(theme(spacing.2)-1px)] [&>svg]:size-5",
-      xl: "px-[calc(theme(spacing.5)-1px)] py-[calc(theme(spacing.3)-1px)] text-xl has-[>svg+*]:pl-[calc(theme(spacing.4)-1px)] has-[>svg+*]:pr-[calc(theme(spacing.5)-1px)] has-[>svg:only-child]:px-[calc(theme(spacing.3)-1px)] has-[>svg:only-child]:py-[calc(theme(spacing.3)-1px)] [&>svg]:size-6",
-      "icon-xs": "px-[calc(theme(spacing.1)-1px)] py-[calc(theme(spacing.1)-1px)] [&>svg]:size-4",
-      "icon-sm":
-        "px-[calc(theme(spacing.2)-1.5px)] py-[calc(theme(spacing.2)-1.5px)] [&>svg]:size-4",
-      icon: "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.2)-1px)] [&>svg]:size-5",
-      "icon-lg": "px-[calc(theme(spacing.2)-1px)] py-[calc(theme(spacing.2)-1px)] [&>svg]:size-5",
-      "icon-xl": "px-[calc(theme(spacing.3)-1px)] py-[calc(theme(spacing.3)-1px)] [&>svg]:size-6",
+        "h-9 px-4 text-base has-[>svg:only-child]:w-9 has-[>svg:only-child]:px-0 [&>svg]:size-4",
+      lg: "h-10 px-5 text-lg has-[>svg:only-child]:w-10 has-[>svg:only-child]:px-0 [&>svg]:size-5",
+      xl: "h-11 px-6 text-xl has-[>svg:only-child]:w-11 has-[>svg:only-child]:px-0 [&>svg]:size-6",
+      "icon-xs": "size-7 p-0 [&>svg]:size-3.5",
+      "icon-sm": "size-8 p-0 [&>svg]:size-4",
+      icon: "size-9 p-0 [&>svg]:size-4",
+      "icon-lg": "size-10 p-0 [&>svg]:size-5",
+      "icon-xl": "size-11 p-0 [&>svg]:size-6",
     },
   },
   defaultVariants: {
@@ -91,29 +68,21 @@ const buttonVariants = cva(baseButtonStyles, {
   },
 })
 
-// Helper function for button-specific styling
 const getButtonStyles = (variant: StyleVariant, colorScheme: ColorScheme): string[] => {
-  // Get styles from shared system
   const colorStyles = getComponentStyles(colorScheme, variant, {
     componentType: "button",
     includeIcon: true,
     includePseudoElements: true,
   })
 
-  // Combine with the base styles for the variant type
   let baseVariantStyles: string[] = []
   if (variant === "solid") {
     baseVariantStyles = solidBaseStyles
   } else if (variant === "outline") {
-    // For outline buttons, add color-specific border for non-neutral colors
     const neutralColors = ["light", "dark/white", "dark", "zinc"]
-    if (neutralColors.includes(colorScheme)) {
-      baseVariantStyles = outlineBaseStyles
-    } else {
-      // Add color-specific border for colored schemes
-      const colorBorder = `border-${colorScheme}-500`
-      baseVariantStyles = [...outlineBaseStyles, colorBorder]
-    }
+    baseVariantStyles = neutralColors.includes(colorScheme)
+      ? outlineBaseStyles
+      : [...outlineBaseStyles, `border-${colorScheme}-500`]
   } else if (variant === "ghost") {
     baseVariantStyles = ghostBaseStyles
   }
@@ -121,37 +90,46 @@ const getButtonStyles = (variant: StyleVariant, colorScheme: ColorScheme): strin
   return [...baseVariantStyles, ...colorStyles]
 }
 
-// Define the props type using the new variants
+interface ButtonStyleOptions extends VariantProps<typeof buttonVariants> {
+  colorScheme?: ColorScheme
+  className?: string
+}
+
+/**
+ * Full class list for a button look. Use it to style links or other
+ * elements as buttons without rendering `Button`.
+ */
+function buttonClassName({
+  variant = "primary",
+  size,
+  colorScheme,
+  className,
+}: ButtonStyleOptions): string {
+  const isStyleVariant = variant === "solid" || variant === "outline" || variant === "ghost"
+  const dynamicStyles = !isStyleVariant
+    ? []
+    : colorScheme || variant === "solid"
+      ? getButtonStyles(variant, colorScheme ?? "dark/white")
+      : semanticStyles[variant]
+
+  return cn(buttonVariants({ variant, size }), dynamicStyles, className)
+}
+
 interface ButtonProps
   extends
-    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color">, // Omit HTML 'color' prop
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color">,
     VariantProps<typeof buttonVariants> {
-  // Includes 'variant' and 'size' from cva
   asChild?: boolean
-  colorScheme?: ColorScheme // Add colorScheme prop
+  colorScheme?: ColorScheme
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    { className, variant = "primary", size, colorScheme = "dark/white", asChild = false, ...props },
-    ref,
-  ) => {
+  ({ className, variant = "primary", size, colorScheme, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
-
-    // Semantic variants use CSS theme variables directly; original variants use colorScheme system
-    const isSemanticVariant =
-      variant === "primary" || variant === "secondary" || variant === "destructive"
-    const dynamicStyles = isSemanticVariant
-      ? []
-      : getButtonStyles(variant as StyleVariant, colorScheme)
 
     return (
       <Comp
-        className={cn(
-          buttonVariants({ variant, size }), // Base cva styles
-          dynamicStyles, // Variant + ColorScheme specific styles
-          className, // Custom classes last for proper override precedence
-        )}
+        className={buttonClassName({ variant, size, colorScheme, className })}
         ref={ref}
         {...props}
       />
@@ -161,6 +139,5 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = "Button"
 
-// Export the Button component and the variants object (optional)
-export { Button, buttonVariants }
-export type { ButtonProps, Variant as ButtonVariant, ColorScheme } // Export relevant types
+export { Button, buttonClassName, buttonVariants }
+export type { ButtonProps, ButtonStyleOptions, Variant as ButtonVariant, ColorScheme }

@@ -1,0 +1,46 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Introduction" />
+
+# HLStatsNext UI
+
+The shared component library for HLStatsNext: dense tables of players, servers, kills and
+rankings, read by admins and players on dark screens. The interface is monospaced,
+square-cornered and terminal-green. Build on it as a console, not a marketing site.
+
+## Principles
+
+- **One face, small scale.** JetBrains Mono at 12px/20px for body. The largest stop is 34px.
+  Use the scale in Foundations / Typography and do not add sizes.
+- **Square corners.** `--radius` is 0. Cards get 4px; badges get 4px; avatars, switches and
+  pulse dots stay round. Nothing else is rounded.
+- **Terminal green is the one brand colour.** `primary` fills buttons and checked controls.
+  `primary-bright` marks what is live or gaining: online dots, link hover, active nav, upward
+  trends. `destructive` is for losses, offline and errors only.
+- **Layers by surface, not by shadow.** `background` → `card` → `popover`, separated by the
+  `border` hairline. Shadows are nearly invisible on dark ground.
+- **Numbers are data.** Figures are tabular; addresses and ports are mono at weight 500;
+  country is a 16×11 flag with the country name as its label.
+- **Terse copy.** Short factual labels in sentence case. Card titles and the wordmark are
+  uppercase. No emoji, no exclamation marks.
+
+## Using the library
+
+Import components from `@repo/ui`. Consumers compile Tailwind once:
+
+```css
+@import "tailwindcss";
+@import "@repo/ui/globals.css";
+@source "../../../../packages/ui/src";
+```
+
+`globals.css` owns the design tokens (themes under `styles/themes/`), the text scale, the
+ladder tier colours and the flag sprite classes.
+
+## What is here
+
+- **Foundations** — colour tokens, the type scale, ladder tier palettes.
+- **Components** — every primitive, shadcn-style, with the states that matter.
+- **Patterns** — the compositions the product is built from: site chrome, filter toolbars,
+  leaderboards, server and player heroes, game and award cards, the live feed, sign-in and
+  claim flows.

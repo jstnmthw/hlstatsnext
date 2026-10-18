@@ -33,7 +33,7 @@ The `@repo/ui` package serves as the central component library for HLStatsNext, 
 - **[Radix UI](https://www.radix-ui.com/)**: Low-level UI primitives
 - **[Tailwind CSS](https://tailwindcss.com/)**: Utility-first CSS framework
 - **[TypeScript](https://www.typescriptlang.org/)**: Type safety and better DX
-- **[Lucide React](https://lucide.dev/)**: Icon library
+- **[Tabler Icons](https://tabler.io/icons)**: Icon library, re-exported wholesale from `@repo/ui`
 - **[class-variance-authority](https://cva.style/)**: Component variants
 - **[clsx](https://github.com/lukeed/clsx)** & **[tailwind-merge](https://github.com/dcastil/tailwind-merge)**: Conditional classes
 
@@ -70,13 +70,18 @@ packages/ui/
 │   ├── components/          # shadcn/ui and custom components
 │   │   ├── breadcrumb.tsx   # Example shadcn component
 │   │   ├── button.tsx       # Example shadcn component
-│   │   └── ...              # Other components
+│   │   └── ...              # Other components, each with a <name>.stories.tsx
+│   ├── patterns/            # Storybook-only page compositions built from the components
+│   ├── foundations/         # Storybook-only token pages (colours, type scale, tier palettes)
 │   ├── lib/
-│   │   └── utils.ts         # Utility functions (cn, etc.)
+│   │   ├── utils.ts         # cn()
+│   │   ├── color-variants.ts# Tailwind palette colorScheme system for Button/Badge
+│   │   └── tiers.ts         # Ladder tiers, palettes, tierPaletteStyle()
 │   ├── styles/
 │   │   └── themes/          # Colour themes; theme-config.css selects the active one
 │   ├── index.ts             # Main barrel export
-│   ├── icons.ts             # Re-exported lucide-react icons
+│   ├── icons.ts             # Re-exported Tabler icons
+│   ├── Introduction.mdx     # Storybook landing page
 │   └── globals.css          # Design tokens (@theme inline), base styles, theme import
 ├── .storybook/              # Storybook config (React + Vite + Tailwind)
 ├── components.json          # shadcn/ui configuration
@@ -244,7 +249,14 @@ pnpm lint
 
 ## Storybook
 
-Components are documented and developed in [Storybook](https://storybook.js.org/) 10 (React + Vite) with the docs and accessibility addons. Stories live next to their components as `src/components/<name>.stories.tsx`.
+Components are documented and developed in [Storybook](https://storybook.js.org/) 10 (React + Vite) with the docs and accessibility addons. The sidebar has four sections:
+
+- **Introduction** — `src/Introduction.mdx`, the design principles in one page.
+- **Foundations** — `src/foundations/*.stories.tsx`: colour tokens, the type scale and the ladder tier palettes.
+- **Components** — `src/components/<name>.stories.tsx`, one file per component, next to its source.
+- **Patterns** — `src/patterns/*.stories.tsx`: the page compositions from the product designs (site chrome, filter toolbar, leaderboard, server detail, player profile, games browser, awards, home band, sign-in and claim flow). They are reference compositions, not exported components.
+
+Storybook uses the dark theme, wraps every story in a `TooltipProvider`, and serves the flag sprite from `apps/web/public/flags` so `FlagIcon` renders.
 
 ```bash
 # From the repo root
@@ -274,6 +286,38 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 ```
+
+## Component Catalogue
+
+Beyond the stock shadcn set, the library ships the pieces the product designs are built from. All of them read the theme tokens, so they follow whichever colour theme is active.
+
+| Component                                                      | Use                                                                                                     |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `Stat`, `StatLabel`, `StatValue`, `StatUnit`, `StatChange`     | Key figures. `variant="tile"` for boxed tiles, `StatGroup` lays them out as a grid, strip or inline row |
+| `Trend`                                                        | Signed change with ▲/▼/— and the gain/loss colours                                                      |
+| `Progress`, `StackedBar`, `BarList`, `Sparkbars`               | Bars: single fill, proportional segments, label·bar·value rows, compact time series                     |
+| `StatusBadge`, `TierBadge`, `Badge variant="live"`, `PulseDot` | Server status, ladder tier, live indicators                                                             |
+| `GameTag`                                                      | Square game-code tile (`CS`, `HL`, `TFC`) in five sizes                                                 |
+| `PageHeader`                                                   | Page and section headers with title, description and actions, ruled underneath                          |
+| `Callout`                                                      | Bordered CTA panel: media, content, actions; `accent`, `destructive` and `dashed` variants              |
+| `Steps`, `Step`                                                | Progress stepper for multi-step flows                                                                   |
+| `Pagination`                                                   | shadcn-style pagination with `PaginationSummary` and a button variant for client paging                 |
+| `Toggle`, `ToggleGroup`                                        | Filter chips and, with `joined`, segmented controls                                                     |
+| `Tabs`                                                         | Underline tabs                                                                                          |
+| `Collapsible`                                                  | Expandable groups (server groups, "11 more games")                                                      |
+| `FacetedFilter`                                                | Multi-select filter button with counts, search and clear, for data-table toolbars                       |
+| `Toolbar`                                                      | Filter-bar container                                                                                    |
+| `TextLink`, `linkVariants`                                     | Link looks: `default`, `row` (table rows), `muted`, `nav`; `asChild` for Next.js `Link`                 |
+| `Kbd`, `Skeleton`                                              | Keyboard hints, loading placeholders                                                                    |
+
+Ladder tiers (`recruit` → `legend`) are colour tokens: `text-tier-elite`, `bg-tier-legend`, and so on. The default palette is set in `globals.css`; `tierPaletteStyle("metals")` from `@repo/ui` returns the CSS variables for any of the ten palettes in `lib/tiers.ts`, applied to any ancestor.
+
+Notes on the shared primitives:
+
+- `Button` sizes match the designs: `default` is 36px tall, `sm` 32px, `xs` 28px. `outline` and `ghost` without a `colorScheme` are theme-token styles; pass a `colorScheme` to get the Tailwind palette versions.
+- `Badge` adds `live` and `muted` variants; `outline` without a `colorScheme` is the muted hairline badge.
+- `Table` takes `containerClassName` (for the bordered card look) and `TableHead`/`TableCell` take `numeric` for right-aligned tabular figures.
+- `Card` is bordered by default and has `size="sm"` for compact cards; `Avatar` has `shape="square"` and an `xl` size for player tiles.
 
 ## Usage in Apps
 

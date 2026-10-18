@@ -78,11 +78,6 @@
       "persistent": true
     },
     "build-storybook": {
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/apps/web/src/app/globals.css",
-        "$TURBO_ROOT$/apps/web/src/styles/**"
-      ],
       "outputs": ["storybook-static/**"]
     },
     "clean": {

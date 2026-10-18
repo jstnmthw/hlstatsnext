@@ -28,7 +28,7 @@ function ItemSeparator({ className, ...props }: React.ComponentProps<typeof Sepa
 }
 
 const itemVariants = cva(
-  "group/item flex items-center border border-transparent rounded-md transition-colors [a]:hover:bg-accent/50 [a]:transition-colors duration-100 flex-wrap outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+  "group/item flex items-center border border-transparent rounded-md transition-colors [a]:hover:bg-accent/50 [button]:hover:bg-accent/50 [a]:transition-colors flex-wrap outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] data-[active=true]:bg-secondary",
   {
     variants: {
       variant: {
@@ -37,8 +37,9 @@ const itemVariants = cva(
         muted: "bg-muted/50",
       },
       size: {
-        default: "p-4 gap-4 ",
+        default: "p-4 gap-4",
         sm: "py-3 px-4 gap-2.5",
+        xs: "py-2 px-2.5 gap-2.5",
       },
     },
     defaultVariants: {

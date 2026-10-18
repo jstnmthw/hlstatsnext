@@ -14,7 +14,7 @@ const BasicSelect = forwardRef<HTMLSelectElement, BasicSelectProps>(
           ref={ref}
           data-slot="select"
           className={cn(
-            // Base styling from kitchen sink with adjustments for select
+            // Base styling
             "h-9 w-full rounded-md border border-input bg-zinc-800 px-3 py-1 font-sans text-base shadow-sm transition-[color,box-shadow]",
             // Focus and interaction styles
             "focus-visible:border-primary focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none",

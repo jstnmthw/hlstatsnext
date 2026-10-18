@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { IconPlus, IconSearch, IconTrash, IconX } from "@tabler/icons-react"
+import { IconBell, IconPlus, IconSearch, IconTrash, IconX } from "@tabler/icons-react"
 import { fn } from "storybook/test"
 import { colorSchemes } from "../lib/color-variants"
 import { Button } from "./button"
@@ -143,6 +143,55 @@ export const Sizes: Story = {
   ),
 }
 
+export const SizesWithIcon: Story = {
+  render: (args) => (
+    <div className="flex flex-wrap items-center gap-2">
+      <Button {...args} size="xs">
+        <IconBell />
+        Extra small
+      </Button>
+      <Button {...args} size="sm">
+        <IconBell />
+        Small
+      </Button>
+      <Button {...args} size="default">
+        <IconBell />
+        Default
+      </Button>
+      <Button {...args} size="lg">
+        <IconBell />
+        Large
+      </Button>
+      <Button {...args} size="xl">
+        <IconBell />
+        Extra large
+      </Button>
+    </div>
+  ),
+}
+
+export const IconSizes: Story = {
+  render: (args) => (
+    <div className="flex flex-wrap items-center gap-2">
+      <Button {...args} size="icon-xs" aria-label="Notifications">
+        <IconBell />
+      </Button>
+      <Button {...args} size="icon-sm" aria-label="Notifications">
+        <IconBell />
+      </Button>
+      <Button {...args} size="icon" aria-label="Notifications">
+        <IconBell />
+      </Button>
+      <Button {...args} size="icon-lg" aria-label="Notifications">
+        <IconBell />
+      </Button>
+      <Button {...args} size="icon-xl" aria-label="Notifications">
+        <IconBell />
+      </Button>
+    </div>
+  ),
+}
+
 export const ColorSchemes: Story = {
   args: { variant: "solid" },
   render: (args) => (
@@ -160,12 +209,21 @@ export const ColorSchemeOutline: Story = {
   args: { variant: "outline" },
   render: (args) => (
     <div className="flex max-w-xl flex-wrap gap-2">
-      {["green", "blue", "red", "amber", "light"].map((colorScheme) => (
-        <Button
-          key={colorScheme}
-          {...args}
-          colorScheme={colorScheme as (typeof colorSchemes)[number]}
-        >
+      {colorSchemes.map((colorScheme) => (
+        <Button key={colorScheme} {...args} colorScheme={colorScheme}>
+          {colorScheme}
+        </Button>
+      ))}
+    </div>
+  ),
+}
+
+export const ColorSchemeGhost: Story = {
+  args: { variant: "ghost" },
+  render: (args) => (
+    <div className="flex max-w-xl flex-wrap gap-2">
+      {colorSchemes.map((colorScheme) => (
+        <Button key={colorScheme} {...args} colorScheme={colorScheme}>
           {colorScheme}
         </Button>
       ))}

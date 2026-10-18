@@ -122,7 +122,7 @@ Per tier:
 
 ## Observability
 
-<new Prometheus metrics in packages/observability, Grafana dashboard updates, Winston log additions.>
+<new Prometheus metrics in packages/monitoring, Grafana dashboard updates, Winston log additions.>
 
 ## Open questions
 

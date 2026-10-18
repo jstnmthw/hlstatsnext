@@ -121,9 +121,9 @@ importers:
 
   apps/daemon:
     dependencies:
-      '@repo/observability':
+      '@repo/monitoring':
         specifier: workspace:*
-        version: link:../../packages/observability
+        version: link:../../packages/monitoring
       amqplib:
         specifier: ^0.10.9
         version: 0.10.9
@@ -464,7 +464,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/observability:
+  packages/monitoring:
     dependencies:
       '@repo/db':
         specifier: workspace:*

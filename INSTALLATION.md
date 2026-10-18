@@ -74,7 +74,7 @@ hlstatsnext/
 │   ├── database/         # Prisma ORM, MySQL client, GraphQL types
 │   ├── ui/               # Shared shadcn/ui components
 │   ├── crypto/           # Encryption utilities
-│   ├── observability/    # Prometheus metrics
+│   ├── monitoring/       # Prometheus metrics
 │   ├── eslint-config/    # Shared ESLint configuration
 │   └── typescript-config/# Shared TypeScript configuration
 ├── docker/               # Docker configuration files

@@ -17,7 +17,7 @@
     "clean": "rm -rf node_modules dist .turbo"
   },
   "dependencies": {
-    "@repo/observability": "workspace:*",
+    "@repo/monitoring": "workspace:*",
     "amqplib": "^0.10.9",
     "node-cron": "^4.2.1",
     "winston": "^3.19.0",

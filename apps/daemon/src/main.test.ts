@@ -19,7 +19,7 @@ vi.mock("@/context")
 vi.mock("@/config/environment.config")
 
 const metricsServerCtor = vi.fn()
-vi.mock("@repo/observability", () => ({
+vi.mock("@repo/monitoring", () => ({
   MetricsServer: class {
     constructor(...args: unknown[]) {
       metricsServerCtor(...args)

@@ -1,5 +1,5 @@
 /**
- * @repo/observability - Shared observability utilities
+ * @repo/monitoring - Shared monitoring utilities
  *
  * Provides Prometheus metrics collection, HTTP metrics server,
  * and Prisma database query monitoring for HLStatsNext applications.

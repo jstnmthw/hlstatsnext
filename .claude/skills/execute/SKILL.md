@@ -81,7 +81,7 @@ After all phases are complete:
 import { db, Prisma } from "@repo/db/client"
 import type PrismaTypes from "@repo/db/graphql/types"
 import { builder } from "../builder"
-import { logger } from "@repo/observability"
+import { logger } from "@repo/monitoring"
 ```
 
 **Pothos resolver (auto-generated, simple case):**
@@ -105,7 +105,7 @@ builder.prismaObject("Player", {
 **Daemon module — error boundaries + winston:**
 
 ```typescript
-import { logger } from "@repo/observability"
+import { logger } from "@repo/monitoring"
 
 export class FooHandler {
   async handle(event: FooEvent): Promise<void> {

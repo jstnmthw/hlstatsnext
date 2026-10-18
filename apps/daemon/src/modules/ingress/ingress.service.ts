@@ -8,7 +8,7 @@
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { PrometheusMetricsExporter } from "@repo/observability"
+import type { PrometheusMetricsExporter } from "@repo/monitoring"
 import type { IngressDependencies } from "./ingress.dependencies"
 import type { IIngressService, IngressOptions, IngressStats } from "./ingress.types"
 import type { BaseParser } from "./parsers/base.parser"

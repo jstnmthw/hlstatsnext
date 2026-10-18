@@ -62,7 +62,7 @@ COPY apps/daemon/package.json apps/daemon/
 COPY packages/db/package.json packages/db/
 COPY packages/auth/package.json packages/auth/
 COPY packages/crypto/package.json packages/crypto/
-COPY packages/observability/package.json packages/observability/
+COPY packages/monitoring/package.json packages/monitoring/
 COPY packages/ui/package.json packages/ui/
 COPY packages/config/eslint/package.json packages/config/eslint/
 COPY packages/config/typescript/package.json packages/config/typescript/
@@ -139,7 +139,7 @@ COPY apps/daemon/package.json apps/daemon/
 COPY packages/db/package.json packages/db/
 COPY packages/auth/package.json packages/auth/
 COPY packages/crypto/package.json packages/crypto/
-COPY packages/observability/package.json packages/observability/
+COPY packages/monitoring/package.json packages/monitoring/
 COPY packages/ui/package.json packages/ui/
 COPY packages/config/eslint/package.json packages/config/eslint/
 COPY packages/config/typescript/package.json packages/config/typescript/
@@ -209,7 +209,7 @@ COPY apps/web/package.json apps/web/
 COPY packages/db/package.json packages/db/
 COPY packages/auth/package.json packages/auth/
 COPY packages/crypto/package.json packages/crypto/
-COPY packages/observability/package.json packages/observability/
+COPY packages/monitoring/package.json packages/monitoring/
 COPY packages/ui/package.json packages/ui/
 COPY packages/config/eslint/package.json packages/config/eslint/
 COPY packages/config/typescript/package.json packages/config/typescript/

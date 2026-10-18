@@ -25,7 +25,7 @@ packages/
 ├── config/{eslint,typescript}           Shared configs. Extend, do not fork.
 ├── crypto/                     AES-256-GCM for RCON passwords at rest, SHA-256 for server tokens. User passwords are hashed by Better Auth itself (scrypt), not here.
 ├── db/                         Prisma 7 + MySQL/MariaDB. Schema: prisma/schema.prisma. Exports: client, graphql/types, codegen.
-├── observability/              Prometheus client + Prisma metrics extension. Add new metrics here.
+├── monitoring/                 Prometheus client + Prisma metrics extension. Add new metrics here.
 └── ui/                         Shared React component library (shadcn/ui).
 
 plugins/
@@ -49,7 +49,7 @@ Turbo task graph essentials: `build` depends on `^build`; codegen is `turbo run 
 | RCON schedulers/timers                    | `apps/daemon/src/modules/rcon/schedulers/rcon-schedule.service.ts`                                    |
 | Server state (unbounded-collection risk)  | `apps/daemon/src/modules/server/state/server-state-manager.ts`                                        |
 | Prisma schema                             | `packages/db/prisma/schema.prisma`                                                                    |
-| Observability metrics                     | `packages/observability/`                                                                             |
+| Observability metrics                     | `packages/monitoring/`                                                                                |
 | Auth                                      | `packages/auth/` (Better Auth)                                                                        |
 | Pre-commit hook                           | `.husky/pre-commit`                                                                                   |
 | Docker stack                              | `docker-compose.yml` (scripts in root `package.json` under `docker:*`)                                |
@@ -61,7 +61,7 @@ Turbo task graph essentials: `build` depends on `^build`; codegen is `turbo run 
 - **`requireAdminResolver`** wraps auto-generated query/mutation resolvers for admin-only models. Any new admin-only model must be added to the exclusion list AND its resolvers wrapped.
 - **Better Auth sessions** are the source of truth for `ctx.user`. Don't roll new session logic — extend Better Auth.
 - **Winston logger** with `[component]` prefix. Match existing conventions.
-- **Prometheus metrics** are defined in `packages/observability/`. New metrics go there, not inline.
+- **Prometheus metrics** are defined in `packages/monitoring/`. New metrics go there, not inline.
 - **RCON credentials** are encrypted at rest via `@repo/crypto` (AES-256-GCM) using `ENCRYPTION_KEY` from env. Never log, never serialize.
 - **Yoga security plugins**: `maxDepthPlugin(7)` and `useDisableIntrospection()` (prod only) live in `apps/api/src/index.ts`. Don't remove without explicit security review.
 

@@ -12,7 +12,7 @@ import {
 import type { BaseEvent } from "@/shared/types/events"
 import { EventType } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { PrometheusMetricsExporter } from "@repo/observability"
+import type { PrometheusMetricsExporter } from "@repo/monitoring"
 import type {
   EventMessage,
   IEventPublisher,

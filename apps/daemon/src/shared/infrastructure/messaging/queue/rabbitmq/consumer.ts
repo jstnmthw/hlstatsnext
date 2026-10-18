@@ -19,7 +19,7 @@ import type {
 } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { PrometheusMetricsExporter } from "@repo/observability"
+import type { PrometheusMetricsExporter } from "@repo/monitoring"
 import { RabbitMQEventProcessor } from "./event-processor"
 
 /**

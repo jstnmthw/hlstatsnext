@@ -16,7 +16,7 @@ import type { BaseModuleEventHandler } from "@/shared/infrastructure/modules/eve
 import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { PrometheusMetricsExporter } from "@repo/observability"
+import type { PrometheusMetricsExporter } from "@repo/monitoring"
 
 /**
  * RabbitMQ Event Processor implementation that routes events through

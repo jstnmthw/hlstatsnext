@@ -28,7 +28,7 @@ import type { IRconScheduleService } from "@/modules/rcon/types/schedule.types"
 import { getUuidService } from "@/shared/infrastructure/messaging/queue/utils/message-utils"
 import type { BaseEvent } from "@/shared/types/events"
 import type { ILogger } from "@/shared/utils/logger.types"
-import { MetricsServer } from "@repo/observability"
+import { MetricsServer } from "@repo/monitoring"
 
 /**
  * Main daemon class for the HLStatsNext statistics collection system.

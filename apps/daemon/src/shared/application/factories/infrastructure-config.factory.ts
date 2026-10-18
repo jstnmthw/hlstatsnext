@@ -9,7 +9,7 @@ import { DatabaseClient } from "@/database/client"
 import Logger from "@/shared/utils/logger"
 import type { ILogger } from "@/shared/utils/logger.types"
 import { createCryptoService, type ICryptoService } from "@repo/crypto"
-import { PrometheusMetricsExporter, createPrismaWithMetrics } from "@repo/observability"
+import { PrometheusMetricsExporter, createPrismaWithMetrics } from "@repo/monitoring"
 
 export interface InfrastructureComponents {
   database: DatabaseClient

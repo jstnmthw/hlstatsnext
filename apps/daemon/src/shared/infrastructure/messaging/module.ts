@@ -8,7 +8,7 @@
 import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import type { ModuleRegistry } from "@/shared/infrastructure/modules/registry"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { PrometheusMetricsExporter } from "@repo/observability"
+import type { PrometheusMetricsExporter } from "@repo/monitoring"
 import { EventConsumer, type IEventProcessor } from "./queue/core/consumer"
 import { EventPublisher } from "./queue/core/publisher"
 import type {

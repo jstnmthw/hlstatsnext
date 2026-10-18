@@ -25,7 +25,7 @@ This means you can run the observability containers continuously without forcing
 | ------------------- | ---------------------------------------------------------------------------------------- | ----: | -------------------------------------------- |
 | Prometheus          | `docker-compose.yml` (`observability` profile) → `prom/prometheus`                       |  9090 | No (profile is itself opt-in)                |
 | Grafana             | `docker-compose.yml` (`observability` profile) → `grafana/grafana`                       |  3001 | No                                           |
-| Daemon `/metrics`   | `apps/daemon` (via `@repo/observability` `MetricsServer`)                                |  9091 | **Yes**                                      |
+| Daemon `/metrics`   | `apps/daemon` (via `@repo/monitoring` `MetricsServer`)                                   |  9091 | **Yes**                                      |
 | API `/metrics`      | `apps/api` (inline `node:http` listener; `@envelop/prometheus` + `prom-client` Registry) |  9092 | **Yes**                                      |
 | RabbitMQ `/metrics` | `rabbitmq_prometheus` broker plugin                                                      | 15692 | No (broker plugin is always on once enabled) |
 
@@ -87,7 +87,7 @@ rate(rabbitmq_channel_messages_published_total[5m])
 
 ## Why the custom Prisma extension is still in use
 
-Prisma 5+ briefly exposed `client.$metrics.prometheus()` natively. **Prisma 7 removed that API.** Until upstream restores it (or a community `@prisma/extension-metrics` lands), we keep the homegrown `createPrismaWithMetrics` extension in `packages/observability/`. It emits `database_queries_total` / `database_query_duration_seconds`, labelled by `operation` (SELECT/INSERT/UPDATE/DELETE) + `table`, and feeds the same data into the `/query-stats` endpoint (p50/p95/p99, slow + failed queries). Pool stats are not available from Prisma 7 at all — use a `mysqld_exporter` (`Threads_connected`/`Threads_running`) if you need connection-pool visibility.
+Prisma 5+ briefly exposed `client.$metrics.prometheus()` natively. **Prisma 7 removed that API.** Until upstream restores it (or a community `@prisma/extension-metrics` lands), we keep the homegrown `createPrismaWithMetrics` extension in `packages/monitoring/`. It emits `database_queries_total` / `database_query_duration_seconds`, labelled by `operation` (SELECT/INSERT/UPDATE/DELETE) + `table`, and feeds the same data into the `/query-stats` endpoint (p50/p95/p99, slow + failed queries). Pool stats are not available from Prisma 7 at all — use a `mysqld_exporter` (`Threads_connected`/`Threads_running`) if you need connection-pool visibility.
 
 > The extension previously also emitted a parallel `prisma_queries_total` / `prisma_query_duration_ms` family labelled by `model` + `action`. That was dropped — it duplicated `database_*` (model ≈ table) at higher cardinality, and no dashboard or alert consumed it. The `action`-level granularity (e.g. `findUnique` vs `count`) is no longer exported; reconstruct it from query logs if ever needed.
 

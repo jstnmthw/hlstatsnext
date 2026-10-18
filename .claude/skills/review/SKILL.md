@@ -30,7 +30,7 @@ Apply only the sections relevant to the changed files.
 - TS strict, no `any` without justification, ESM imports
 - `@repo/*` aliases used; no relative imports across app boundaries
 - Winston logger with `[component]` prefix
-- Prometheus metrics defined in `packages/observability` not inline
+- Prometheus metrics defined in `packages/monitoring` not inline
 - `ENCRYPTION_KEY`/secrets never logged or serialized
 
 ### GraphQL / Pothos (`apps/api/`)

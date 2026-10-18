@@ -1,5 +1,5 @@
 /**
- * Common types for observability package
+ * Common types for the monitoring package
  */
 
 /**

@@ -12,7 +12,7 @@
  */
 
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { PrometheusMetricsExporter } from "@repo/observability"
+import type { PrometheusMetricsExporter } from "@repo/monitoring"
 import type { ConsumeMessage, EventMessage, IQueueClient, QueueChannel } from "../core/types"
 import { safeJsonParse } from "../utils/message-utils"
 

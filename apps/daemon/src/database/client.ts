@@ -6,7 +6,7 @@
  */
 
 import { db, type PrismaClient } from "@repo/db/client"
-import type { PrismaWithMetrics } from "@repo/observability"
+import type { PrismaWithMetrics } from "@repo/monitoring"
 
 export type TransactionalPrisma = Omit<
   PrismaClient,

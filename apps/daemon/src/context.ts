@@ -22,7 +22,7 @@ import type { EventCoordinator } from "@/shared/application/event-coordinator"
 import type { IEventBus } from "@/shared/infrastructure/messaging/event-bus/event-bus.types"
 import type { IEventPublisher } from "@/shared/infrastructure/messaging/queue/core/types"
 import type { ILogger } from "@/shared/utils/logger.types"
-import type { PrometheusMetricsExporter } from "@repo/observability"
+import type { PrometheusMetricsExporter } from "@repo/monitoring"
 
 import { DatabaseClient } from "@/database/client"
 import { ActionEventHandler } from "@/modules/action/action.events"

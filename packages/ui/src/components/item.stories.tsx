@@ -29,9 +29,8 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-// Steam's stock avatar, the image unclaimed players carry in the product.
-const steamAvatar =
-  "https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg"
+// Placeholder art served from packages/ui/public; real avatars come from Steam at runtime.
+const placeholderAvatar = "/avatars/placeholder-3.svg"
 
 const servers = [
   { name: "Bangkok 24/7 Dust2", address: "203.0.113.42:27015", map: "de_dust2", players: "14/32" },
@@ -105,7 +104,7 @@ export const WithImage: Story = {
       {players.map((player) => (
         <Item key={player.name} {...args}>
           <ItemMedia variant="image">
-            <img src={steamAvatar} alt="" />
+            <img src={placeholderAvatar} alt="" />
           </ItemMedia>
           <ItemContent>
             <ItemTitle>

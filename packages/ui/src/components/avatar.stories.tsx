@@ -24,9 +24,8 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-// Steam's stock avatar, the image unclaimed players carry in the product.
-const steamAvatar =
-  "https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg"
+// Placeholder art served from packages/ui/public; real avatars come from Steam at runtime.
+const placeholderAvatar = (n: 1 | 2 | 3 | 4) => `/avatars/placeholder-${n}.svg`
 
 const sizes = ["sm", "default", "lg", "xl"] as const
 
@@ -40,7 +39,7 @@ const players = [
 export const Default: Story = {
   render: (args) => (
     <Avatar {...args}>
-      <AvatarImage src={steamAvatar} alt="Hazel" />
+      <AvatarImage src={placeholderAvatar(1)} alt="Hazel" />
       <AvatarFallback>HZ</AvatarFallback>
     </Avatar>
   ),
@@ -59,7 +58,7 @@ export const Sizes: Story = {
     <div className="flex items-end gap-3">
       {sizes.map((size) => (
         <Avatar key={size} {...args} size={size}>
-          <AvatarImage src={steamAvatar} alt="Hazel" />
+          <AvatarImage src={placeholderAvatar(1)} alt="Hazel" />
           <AvatarFallback>HZ</AvatarFallback>
         </Avatar>
       ))}
@@ -94,7 +93,7 @@ export const WithBadge: Story = {
         </AvatarBadge>
       </Avatar>
       <Avatar {...args} size="xl">
-        <AvatarImage src={steamAvatar} alt="Mintcake" />
+        <AvatarImage src={placeholderAvatar(2)} alt="Mintcake" />
         <AvatarFallback>MC</AvatarFallback>
         <AvatarBadge>
           <IconCheck />

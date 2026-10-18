@@ -15,17 +15,23 @@ import { FlagIcon } from "../components/flag-icon"
 import { GameTag } from "../components/game-tag"
 import { ItemMedia } from "../components/item"
 import { Progress } from "../components/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/select"
 import { StackedBar } from "../components/stacked-bar"
 import { Stat, StatLabel, StatValue } from "../components/stat"
 import { TextLink } from "../components/text-link"
 import { TierBadge } from "../components/tier-badge"
-import { ToggleGroup, ToggleGroupItem } from "../components/toggle-group"
 import { Trend } from "../components/trend"
+
+const playerGames: [string, string, string, string][] = [
+  ["cstrike", "CS", "Counter-Strike 1.6", "#12 · 214 h"],
+  ["valve", "HL", "Half-Life DM", "#88 · 31 h"],
+  ["dod", "DoD", "Day of Defeat", "#203 · 6 h"],
+]
 
 function PlayerHero() {
   return (
     <Card className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] items-center gap-6 py-6">
-      <CardContent className="flex items-center gap-5">
+      <CardContent className="flex min-w-0 items-center gap-5">
         <Avatar size="xl" shape="square">
           <AvatarFallback>AE</AvatarFallback>
         </Avatar>
@@ -39,29 +45,20 @@ function PlayerHero() {
           <span className="text-muted-foreground">
             Joined 2024-03-02 · last seen now on <TextLink href="#">Bangkok 24/7 Dust2</TextLink>
           </span>
-          <ToggleGroup
-            type="single"
-            defaultValue="cstrike"
-            variant="outline"
-            aria-label="Stats by game"
-            className="mt-1"
-          >
-            <ToggleGroupItem value="cstrike">
-              <GameTag code="CS" size="xs" />
-              Counter-Strike 1.6
-              <span className="text-muted-foreground">#12 · 214 h</span>
-            </ToggleGroupItem>
-            <ToggleGroupItem value="valve">
-              <GameTag code="HL" size="xs" />
-              Half-Life DM
-              <span className="text-muted-foreground">#88 · 31 h</span>
-            </ToggleGroupItem>
-            <ToggleGroupItem value="dod">
-              <GameTag code="DoD" size="xs" />
-              Day of Defeat
-              <span className="text-muted-foreground">#203 · 6 h</span>
-            </ToggleGroupItem>
-          </ToggleGroup>
+          <Select defaultValue="cstrike">
+            <SelectTrigger size="sm" aria-label="Stats by game" className="mt-1 min-w-52">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="min-w-64">
+              {playerGames.map(([value, code, name, meta]) => (
+                <SelectItem key={value} value={value}>
+                  <GameTag code={code} size="xs" />
+                  {name}
+                  <span className="ml-auto text-xs text-muted-foreground">{meta}</span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <div className="mt-1.5 flex flex-wrap gap-2">
             <Button>This is me — claim player</Button>
             <Button variant="secondary">Compare</Button>

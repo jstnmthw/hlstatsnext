@@ -7,7 +7,7 @@ const config: StorybookConfig = {
   addons: ["@storybook/addon-docs", "@storybook/addon-a11y"],
   framework: { name: "@storybook/react-vite", options: {} },
   // The flag sprite is served by the web app at /flags; mirror that here so FlagIcon renders.
-  staticDirs: [{ from: "../../../apps/web/public/flags", to: "/flags" }],
+  staticDirs: ["../public", { from: "../../../apps/web/public/flags", to: "/flags" }],
   viteFinal: (viteConfig) => mergeConfig(viteConfig, { plugins: [tailwindcss()] }),
 }
 

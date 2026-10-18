@@ -49,12 +49,11 @@ const buttonVariants = cva(baseButtonStyles, {
         "border border-transparent bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 active:bg-destructive/80",
     },
     size: {
-      xs: "h-7 px-2 text-xs has-[>svg:only-child]:w-7 has-[>svg:only-child]:px-0 [&>svg]:size-3.5",
-      sm: "h-8 px-3 text-sm has-[>svg:only-child]:w-8 has-[>svg:only-child]:px-0 [&>svg]:size-4",
-      default:
-        "h-9 px-4 text-base has-[>svg:only-child]:w-9 has-[>svg:only-child]:px-0 [&>svg]:size-4",
-      lg: "h-10 px-5 text-lg has-[>svg:only-child]:w-10 has-[>svg:only-child]:px-0 [&>svg]:size-5",
-      xl: "h-11 px-6 text-xl has-[>svg:only-child]:w-11 has-[>svg:only-child]:px-0 [&>svg]:size-6",
+      xs: "h-7 px-2 text-xs [&>svg]:size-3.5",
+      sm: "h-8 px-3 text-sm [&>svg]:size-4",
+      default: "h-9 px-4 text-base [&>svg]:size-4",
+      lg: "h-10 px-5 text-lg [&>svg]:size-5",
+      xl: "h-11 px-6 text-xl [&>svg]:size-6",
       "icon-xs": "size-7 p-0 [&>svg]:size-3.5",
       "icon-sm": "size-8 p-0 [&>svg]:size-4",
       icon: "size-9 p-0 [&>svg]:size-4",

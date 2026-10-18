@@ -102,7 +102,7 @@ export const TrailingIcon: Story = {
 export const IconOnly: Story = {
   render: (args) => (
     <div className="flex items-center gap-2">
-      <Button {...args} variant="ghost" aria-label="Search players and servers">
+      <Button {...args} variant="ghost" size="icon" aria-label="Search players and servers">
         <IconSearch />
       </Button>
       <Button {...args} variant="outline" size="icon-sm" aria-label="Delete">

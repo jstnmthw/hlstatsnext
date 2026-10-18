@@ -208,19 +208,19 @@ export function KitchenSinkContent({ className }: { className?: string }) {
               </Button>
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-4">
-              <Button variant="solid" colorScheme="blue" size="xs">
+              <Button variant="solid" colorScheme="blue" size="icon-xs">
                 <IconBell data-slot="icon" />
               </Button>
-              <Button variant="solid" colorScheme="blue" size="sm">
+              <Button variant="solid" colorScheme="blue" size="icon-sm">
                 <IconBell data-slot="icon" />
               </Button>
-              <Button variant="solid" colorScheme="blue" size="default">
+              <Button variant="solid" colorScheme="blue" size="icon">
                 <IconBell data-slot="icon" />
               </Button>
-              <Button variant="solid" colorScheme="blue" size="lg">
+              <Button variant="solid" colorScheme="blue" size="icon-lg">
                 <IconBell data-slot="icon" />
               </Button>
-              <Button variant="solid" colorScheme="blue" size="xl">
+              <Button variant="solid" colorScheme="blue" size="icon-xl">
                 <IconBell data-slot="icon" />
               </Button>
             </div>
@@ -537,7 +537,7 @@ export function KitchenSinkContent({ className }: { className?: string }) {
                   <IconStar data-slot="icon" />
                   Button with Icon
                 </Button>
-                <Button variant="ghost" colorScheme="purple">
+                <Button variant="ghost" colorScheme="purple" size="icon">
                   <IconBell data-slot="icon" />
                 </Button>
               </div>

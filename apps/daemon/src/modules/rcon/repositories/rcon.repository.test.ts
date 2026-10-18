@@ -13,8 +13,6 @@ import { RconRepository } from "./rcon.repository"
 
 function createMockCrypto(): ICryptoService {
   return {
-    hashPassword: vi.fn(),
-    verifyPassword: vi.fn(),
     encrypt: vi.fn(),
     decrypt: vi.fn().mockResolvedValue("decrypted_password"),
   }

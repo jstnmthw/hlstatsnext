@@ -33,8 +33,6 @@ interface TestIngressService {
 // Mock the crypto package for integration tests
 vi.mock("@repo/crypto", () => ({
   createCryptoService: vi.fn(() => ({
-    hashPassword: vi.fn().mockResolvedValue("hashed_password"),
-    verifyPassword: vi.fn().mockResolvedValue(true),
     encrypt: vi.fn().mockResolvedValue("encrypted_data"),
     decrypt: vi.fn().mockResolvedValue("decrypted_data"),
   })),

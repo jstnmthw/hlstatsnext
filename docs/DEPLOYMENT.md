@@ -66,7 +66,7 @@ COPY packages/observability/package.json packages/observability/
 COPY packages/ui/package.json packages/ui/
 COPY packages/config/eslint/package.json packages/config/eslint/
 COPY packages/config/typescript/package.json packages/config/typescript/
-COPY packages/node-domexception-stub/ packages/node-domexception-stub/
+COPY scripts/stubs/node-domexception/ scripts/stubs/node-domexception/
 
 RUN pnpm install --frozen-lockfile
 
@@ -143,7 +143,7 @@ COPY packages/observability/package.json packages/observability/
 COPY packages/ui/package.json packages/ui/
 COPY packages/config/eslint/package.json packages/config/eslint/
 COPY packages/config/typescript/package.json packages/config/typescript/
-COPY packages/node-domexception-stub/ packages/node-domexception-stub/
+COPY scripts/stubs/node-domexception/ scripts/stubs/node-domexception/
 
 RUN pnpm install --frozen-lockfile
 
@@ -213,7 +213,7 @@ COPY packages/observability/package.json packages/observability/
 COPY packages/ui/package.json packages/ui/
 COPY packages/config/eslint/package.json packages/config/eslint/
 COPY packages/config/typescript/package.json packages/config/typescript/
-COPY packages/node-domexception-stub/ packages/node-domexception-stub/
+COPY scripts/stubs/node-domexception/ scripts/stubs/node-domexception/
 
 RUN pnpm install --frozen-lockfile
 

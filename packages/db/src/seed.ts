@@ -2,7 +2,6 @@ import { mysqlSplitterOptions, splitQuery } from "dbgate-query-splitter"
 import fs from "fs/promises"
 import path from "path"
 import { db } from "./client"
-import { seedAdmin } from "./seeders"
 import { log, logDivider, logError, logHeader, logStep, logSuccess } from "./seeders/fake/logger"
 
 type SqlStatement = string | { text: string }
@@ -28,9 +27,6 @@ async function main() {
       }
     })
     log(`✔ ${executed} SQL statements executed`)
-
-    logStep("Seeding admin account...")
-    await seedAdmin()
 
     const duration = Math.round((Date.now() - startTime) / 1000)
 

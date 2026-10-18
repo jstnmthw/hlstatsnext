@@ -1,24 +1,18 @@
 /**
  * Crypto Service Implementation
  *
- * Unified encryption service for both user passwords and RCON passwords.
- * Uses Argon2id for password hashing and AES-256-GCM for encryption.
+ * AES-256-GCM encryption for secrets that must be read back, such as RCON
+ * passwords stored at rest.
  */
 
-import { hash, verify } from "argon2"
 import { createCipheriv, createDecipheriv, pbkdf2Sync, randomBytes } from "crypto"
-import type { CryptoConfig, EncryptedData, ICryptoService } from "./types"
-import {
-  CryptoError as CryptoErrorClass,
-  DEFAULT_CRYPTO_CONFIG,
-  CryptoErrorCode as ErrorCodes,
-} from "./types"
+import type { EncryptedData, ICryptoService } from "./types"
+import { CryptoError as CryptoErrorClass, CryptoErrorCode as ErrorCodes } from "./types"
 
 export class CryptoService implements ICryptoService {
-  private readonly config: CryptoConfig
   private readonly masterKey: Buffer
 
-  constructor(encryptionKey: string, config?: Partial<CryptoConfig>) {
+  constructor(encryptionKey: string) {
     // Validate and decode the encryption key
     try {
       this.masterKey = Buffer.from(encryptionKey, "base64")
@@ -37,70 +31,6 @@ export class CryptoService implements ICryptoService {
         ErrorCodes.INVALID_KEY,
         error,
       )
-    }
-
-    // Merge with default config
-    this.config = {
-      encryptionKey,
-      argon2: {
-        ...DEFAULT_CRYPTO_CONFIG.argon2,
-        ...config?.argon2,
-      },
-    }
-  }
-
-  /**
-   * Hash a password using Argon2id
-   */
-  async hashPassword(password: string): Promise<string> {
-    if (!password || typeof password !== "string") {
-      throw new CryptoErrorClass("Password must be a non-empty string", ErrorCodes.INVALID_INPUT)
-    }
-
-    try {
-      // Generate a unique salt using the master key as additional entropy
-      const salt = randomBytes(this.config.argon2.saltLength)
-
-      // Derive salt using master key to ensure uniqueness across instances
-      const derivedSalt = pbkdf2Sync(
-        salt,
-        this.masterKey,
-        1000,
-        this.config.argon2.saltLength,
-        "sha256",
-      )
-
-      const hashedPassword = await hash(password, {
-        type: 2, // Argon2id
-        memoryCost: this.config.argon2.memoryCost,
-        timeCost: this.config.argon2.timeCost,
-        parallelism: this.config.argon2.parallelism,
-        hashLength: this.config.argon2.hashLength,
-        salt: derivedSalt,
-      })
-
-      return hashedPassword
-    } catch (error) {
-      throw new CryptoErrorClass("Failed to hash password", ErrorCodes.HASH_FAILED, error)
-    }
-  }
-
-  /**
-   * Verify a password against its Argon2id hash
-   */
-  async verifyPassword(password: string, hash: string): Promise<boolean> {
-    if (!password || typeof password !== "string") {
-      throw new CryptoErrorClass("Password must be a non-empty string", ErrorCodes.INVALID_INPUT)
-    }
-
-    if (!hash || typeof hash !== "string") {
-      throw new CryptoErrorClass("Hash must be a non-empty string", ErrorCodes.INVALID_INPUT)
-    }
-
-    try {
-      return await verify(hash, password)
-    } catch (error) {
-      throw new CryptoErrorClass("Failed to verify password", ErrorCodes.VERIFICATION_FAILED, error)
     }
   }
 

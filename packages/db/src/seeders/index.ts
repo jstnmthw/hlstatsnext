@@ -1,4 +1,3 @@
-export { seedAdmin } from "./fake/admin"
 export { seedClans } from "./fake/clans"
 export { getSeedConfig } from "./fake/config"
 export { logDatabaseStats } from "./fake/log-stats"

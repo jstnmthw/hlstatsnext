@@ -60,49 +60,14 @@ describe("Crypto Package Index", () => {
       expect(() => createCryptoService("invalid-key")).toThrow()
     })
 
-    it("should accept custom configuration", () => {
-      const key = CryptoService.generateEncryptionKey()
-      const config = {
-        argon2: {
-          timeCost: 2,
-          memoryCost: 32768,
-          parallelism: 2,
-          hashLength: 16,
-          saltLength: 8,
-        },
-      }
+    it("should round-trip a secret with the key from the environment", async () => {
+      process.env.ENCRYPTION_KEY = CryptoService.generateEncryptionKey()
 
-      expect(() => createCryptoService(key, config)).not.toThrow()
-    })
-  })
+      const service = createCryptoService()
+      const ciphertext = await service.encrypt("rcon-password")
 
-  describe("default cryptoService export", () => {
-    it("should work with environment variable set", async () => {
-      const key = CryptoService.generateEncryptionKey()
-      const originalKey = process.env.ENCRYPTION_KEY
-      process.env.ENCRYPTION_KEY = key
-
-      try {
-        // Use the createCryptoService function directly instead of the export
-        const { createCryptoService } = await import("./index.js")
-        const cryptoService = createCryptoService()
-
-        expect(cryptoService).toBeInstanceOf(CryptoService)
-
-        // Test basic functionality
-        const password = "test123"
-        const hash = await cryptoService.hashPassword(password)
-        const isValid = await cryptoService.verifyPassword(password, hash)
-
-        expect(isValid).toBe(true)
-      } finally {
-        // Restore original env var
-        if (originalKey) {
-          process.env.ENCRYPTION_KEY = originalKey
-        } else {
-          delete process.env.ENCRYPTION_KEY
-        }
-      }
+      expect(ciphertext).not.toBe("rcon-password")
+      expect(await service.decrypt(ciphertext)).toBe("rcon-password")
     })
   })
 
@@ -114,7 +79,8 @@ describe("Crypto Package Index", () => {
       expect(exports.createCryptoService).toBeDefined()
       expect(exports.CryptoError).toBeDefined()
       expect(exports.CryptoErrorCode).toBeDefined()
-      expect(exports.DEFAULT_CRYPTO_CONFIG).toBeDefined()
+      expect(exports.generateToken).toBeDefined()
+      expect(exports.hashToken).toBeDefined()
     })
   })
 })

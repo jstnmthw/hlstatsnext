@@ -61,7 +61,7 @@ Delegate the schema-wide scan to the `graphql-security-scanner` sub-agent when s
 
 - Sessions validated server-side on every authenticated route (Next.js server components, API resolvers, daemon HTTP handlers if any)
 - No use of `localStorage` for session tokens in the web app
-- Password hashing via `@repo/crypto` (Argon2) — no SHA/MD5/bcrypt for new code
+- User passwords hashed by Better Auth (scrypt); secrets at rest encrypted via `@repo/crypto` (AES-256-GCM) — no SHA/MD5/bcrypt for new code
 - Account linking / OAuth (Steam, etc.) verifies state/nonce; redirect URIs allowlisted
 - Session cookies use `Secure`, `HttpOnly`, `SameSite=Lax` (or stricter)
 - Login/registration rate-limited at the edge or in the resolver

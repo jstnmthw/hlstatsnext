@@ -12,7 +12,7 @@ This is a **production system** with three tightly-coupled processes: the daemon
 
 ## Monorepo layout
 
-Turborepo + pnpm workspaces. Three apps and several packages under `@repo/*`:
+Turborepo + pnpm workspaces. Three apps and several packages under `@repo/*`, plus a game-server plugin outside the workspace:
 
 ```
 apps/
@@ -23,11 +23,16 @@ apps/
 packages/
 ├── auth/                       Better Auth 1.6.x wrapper. Session/Account/Verification models live here.
 ├── config/{eslint,typescript}           Shared configs. Extend, do not fork.
-├── crypto/                     Argon2 + encryption helpers. RCON passwords at rest and server-token hashing. User passwords are hashed by Better Auth itself (scrypt), not here.
+├── crypto/                     AES-256-GCM for RCON passwords at rest, SHA-256 for server tokens. User passwords are hashed by Better Auth itself (scrypt), not here.
 ├── db/                         Prisma 7 + MySQL/MariaDB. Schema: prisma/schema.prisma. Exports: client, graphql/types, codegen.
 ├── observability/              Prometheus client + Prisma metrics extension. Add new metrics here.
-├── plugins/amx/                AMX plugin management for game servers.
 └── ui/                         Shared React component library (shadcn/ui).
+
+plugins/
+└── amx/        AMX Mod X plugin (Pawn) that renders the daemon's hlx_event RCON commands in-game. Not a pnpm workspace member; compiled with the bundled amxxpc.
+
+scripts/stubs/
+└── node-domexception/  pnpm override target that silences a deprecation warning from a dev-only transitive dependency. Not a library.
 ```
 
 Turbo task graph essentials: `build` depends on `^build`; codegen is `turbo run graphql:codegen`; `db:generate` runs Prisma + Pothos type generation. See `turbo.json` for the full task definitions and the 49 globally-tracked env vars.
@@ -57,7 +62,7 @@ Turbo task graph essentials: `build` depends on `^build`; codegen is `turbo run 
 - **Better Auth sessions** are the source of truth for `ctx.user`. Don't roll new session logic — extend Better Auth.
 - **Winston logger** with `[component]` prefix. Match existing conventions.
 - **Prometheus metrics** are defined in `packages/observability/`. New metrics go there, not inline.
-- **RCON credentials** are encrypted at rest via `@repo/crypto` (Argon2) using `ENCRYPTION_KEY` from env. Never log, never serialize.
+- **RCON credentials** are encrypted at rest via `@repo/crypto` (AES-256-GCM) using `ENCRYPTION_KEY` from env. Never log, never serialize.
 - **Yoga security plugins**: `maxDepthPlugin(7)` and `useDisableIntrospection()` (prod only) live in `apps/api/src/index.ts`. Don't remove without explicit security review.
 
 ## Test tiers

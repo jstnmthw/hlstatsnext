@@ -63,7 +63,7 @@
       "msgpackr-extract"
     ],
     "overrides": {
-      "node-domexception": "file:./packages/node-domexception-stub",
+      "node-domexception": "file:./scripts/stubs/node-domexception",
       "kysely": "0.28.17"
     },
     "ignoredBuiltDependencies": [
@@ -71,7 +71,6 @@
       "@prisma/client",
       "@prisma/engines",
       "@tailwindcss/oxide",
-      "argon2",
       "esbuild",
       "prisma",
       "sharp"

@@ -1,5 +1,4 @@
 export { seedActions } from "./actions"
-export { seedAdmin } from "./admin"
 export { seedAwards } from "./awards"
 export { seedClans } from "./clans"
 export { getSeedConfig, type SeedConfig } from "./config"

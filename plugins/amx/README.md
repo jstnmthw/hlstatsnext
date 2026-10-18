@@ -25,7 +25,7 @@ An event processing plugin for AMX Mod X that handles structured commands from t
 1. **Compile the Plugin** (or use the pre-built binary from `compiled/`):
 
    ```bash
-   cd packages/plugins/amx/scripting
+   cd plugins/amx/scripting
    ./amxxpc ../src/hlstatsnext.sma -iinclude -o../compiled/hlstatsnext.amxx
    ```
 
@@ -242,21 +242,23 @@ The plugin follows a modular architecture with separate include files for differ
 
 ### Prerequisites
 
-- AMX Mod X 1.9.0+ compiler (amxxpc) — bundled in `scripting/`
-- Node.js 24.0.0+ (for monorepo package management)
-- pnpm 10.x (monorepo package manager)
+- AMX Mod X 1.9.0+ compiler (amxxpc) — bundled in `scripting/`, which is gitignored and must be present locally
+- Node.js 24.0.0+ for `scripts/generate-config.mjs`
+
+This directory is not a pnpm workspace member; nothing in the monorepo imports it, so there is no `package.json` and no turbo task. Everything is run by hand from `plugins/amx`.
 
 ### Building from Source
 
 ```bash
-# Install dependencies
-pnpm install
+# Compile the plugin
+mkdir -p compiled
+(cd scripting && ./amxxpc ../src/hlstatsnext.sma -iinclude -o../compiled/hlstatsnext.amxx)
 
-# Compile the plugin (requires amxxpc in PATH)
-pnpm run compile:local
+# Regenerate configs/hlstatsnext.cfg from the create_cvar() calls in src/
+node scripts/generate-config.mjs
 
 # Package for distribution
-pnpm run package
+tar -czf hlstatsnext-plugin.tar.gz compiled/ configs/ README.md
 ```
 
 ### Adding New Features

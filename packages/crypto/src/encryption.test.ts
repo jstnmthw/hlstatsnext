@@ -31,97 +31,6 @@ describe("CryptoService", () => {
       expect(() => new CryptoService(shortKey)).toThrow(CryptoError)
       expect(() => new CryptoService(shortKey)).toThrow("Encryption key must be 32 bytes")
     })
-
-    it("should accept custom configuration", () => {
-      const config = {
-        argon2: {
-          timeCost: 2,
-          memoryCost: 32768,
-          parallelism: 2,
-          hashLength: 16,
-          saltLength: 8,
-        },
-      }
-
-      expect(() => new CryptoService(testEncryptionKey, config)).not.toThrow()
-    })
-  })
-
-  describe("password hashing", () => {
-    describe("hashPassword", () => {
-      it("should hash a password successfully", async () => {
-        const password = "testPassword123"
-        const hash = await cryptoService.hashPassword(password)
-
-        expect(hash).toBeDefined()
-        expect(typeof hash).toBe("string")
-        expect(hash.length).toBeGreaterThan(50) // Argon2 hashes are long
-        expect(hash.startsWith("$argon2id$")).toBe(true)
-      })
-
-      it("should generate different hashes for same password", async () => {
-        const password = "testPassword123"
-        const hash1 = await cryptoService.hashPassword(password)
-        const hash2 = await cryptoService.hashPassword(password)
-
-        expect(hash1).not.toBe(hash2) // Different salts should produce different hashes
-      })
-
-      it("should throw error for empty password", async () => {
-        await expect(cryptoService.hashPassword("")).rejects.toThrow(CryptoError)
-        await expect(cryptoService.hashPassword("")).rejects.toThrow("non-empty string")
-      })
-
-      it("should throw error for non-string password", async () => {
-        // @ts-expect-error - Testing invalid input
-        await expect(cryptoService.hashPassword(null)).rejects.toThrow(CryptoError)
-        // @ts-expect-error - Testing invalid input
-        await expect(cryptoService.hashPassword(undefined)).rejects.toThrow(CryptoError)
-        // @ts-expect-error - Testing invalid input
-        await expect(cryptoService.hashPassword(123)).rejects.toThrow(CryptoError)
-      })
-    })
-
-    describe("verifyPassword", () => {
-      it("should verify correct password", async () => {
-        const password = "testPassword123"
-        const hash = await cryptoService.hashPassword(password)
-
-        const isValid = await cryptoService.verifyPassword(password, hash)
-        expect(isValid).toBe(true)
-      })
-
-      it("should reject incorrect password", async () => {
-        const password = "testPassword123"
-        const wrongPassword = "wrongPassword456"
-        const hash = await cryptoService.hashPassword(password)
-
-        const isValid = await cryptoService.verifyPassword(wrongPassword, hash)
-        expect(isValid).toBe(false)
-      })
-
-      it("should handle case-sensitive passwords", async () => {
-        const password = "TestPassword123"
-        const hash = await cryptoService.hashPassword(password)
-
-        const isValid1 = await cryptoService.verifyPassword(password, hash)
-        const isValid2 = await cryptoService.verifyPassword("testpassword123", hash)
-
-        expect(isValid1).toBe(true)
-        expect(isValid2).toBe(false)
-      })
-
-      it("should throw error for invalid inputs", async () => {
-        const hash = await cryptoService.hashPassword("test")
-
-        // @ts-expect-error - Testing invalid input
-        await expect(cryptoService.verifyPassword(null, hash)).rejects.toThrow(CryptoError)
-        // @ts-expect-error - Testing invalid input
-        await expect(cryptoService.verifyPassword("test", null)).rejects.toThrow(CryptoError)
-        await expect(cryptoService.verifyPassword("", hash)).rejects.toThrow(CryptoError)
-        await expect(cryptoService.verifyPassword("test", "")).rejects.toThrow(CryptoError)
-      })
-    })
   })
 
   describe("encryption/decryption", () => {
@@ -298,7 +207,7 @@ describe("CryptoService", () => {
   describe("error handling", () => {
     it("should provide meaningful error messages", async () => {
       try {
-        await cryptoService.hashPassword("")
+        await cryptoService.encrypt("")
       } catch (error) {
         expect(error).toBeInstanceOf(CryptoError)
         expect((error as CryptoError).code).toBe(CryptoErrorCode.INVALID_INPUT)

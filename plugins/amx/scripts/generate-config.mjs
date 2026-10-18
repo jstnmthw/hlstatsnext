@@ -2,8 +2,7 @@
 
 /**
  * Auto-generates configs/hlstatsnext.cfg from create_cvar() calls in plugin source.
- * Run via: node scripts/generate-config.mjs
- * Wired into the build: pnpm run compile
+ * Run by hand from plugins/amx after changing a cvar: node scripts/generate-config.mjs
  */
 
 import { readFileSync, writeFileSync, readdirSync, mkdirSync } from "node:fs";

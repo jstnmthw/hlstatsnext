@@ -10,20 +10,6 @@ import { vi } from "vitest"
 
 export const createMockCryptoService = (): ICryptoService => ({
   /**
-   * Mock password hashing - returns predictable hashed values for testing
-   */
-  hashPassword: vi.fn().mockImplementation(async (password: string) => {
-    return `hashed_${password}`
-  }),
-
-  /**
-   * Mock password verification - returns true for predictable combinations
-   */
-  verifyPassword: vi.fn().mockImplementation(async (password: string, hash: string) => {
-    return hash === `hashed_${password}`
-  }),
-
-  /**
    * Mock encryption - returns predictable encrypted values for testing
    */
   encrypt: vi.fn().mockImplementation(async (plaintext: string) => {

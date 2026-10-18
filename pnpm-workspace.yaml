@@ -7,7 +7,6 @@ ignoredBuiltDependencies:
   - "@prisma/client"
   - "@prisma/engines"
   - "@tailwindcss/oxide"
-  - argon2
   - esbuild
   - prisma
   - sharp

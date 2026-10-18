@@ -16,9 +16,6 @@
     ".": "./src/index.ts",
     "./types": "./src/types.ts"
   },
-  "dependencies": {
-    "argon2": "^0.44.0"
-  },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",

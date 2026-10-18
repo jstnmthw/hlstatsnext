@@ -14,6 +14,7 @@ const serverTokens = graphql(`
       tokenPrefix
       name
       game
+      rconAddress
       createdAt
       expiresAt
       revokedAt
@@ -43,6 +44,7 @@ const createServerTokenMutation = graphql(`
         tokenPrefix
         name
         game
+        rconAddress
         createdAt
         expiresAt
         revokedAt
@@ -66,6 +68,7 @@ const revokeServerTokenMutation = graphql(`
         tokenPrefix
         name
         game
+        rconAddress
         createdAt
         expiresAt
         revokedAt
@@ -120,6 +123,7 @@ export async function createServerToken(input: NewServerToken): Promise<TokenCre
         name: input.name,
         game: input.game,
         rconPassword: input.rconPassword || undefined,
+        rconAddress: input.rconAddress || undefined,
         expiresAt: input.expiresAt || undefined,
       },
     },

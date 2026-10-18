@@ -41,7 +41,7 @@ function Step({ status = "upcoming", className, children, ...props }: StepProps)
       <span data-slot="step-label" className="inline-flex items-center gap-2 font-medium">
         <span
           data-slot="step-marker"
-          className="inline-flex size-5 shrink-0 items-center justify-center border text-xs font-bold before:content-[counter(step)] data-[complete]:before:content-none"
+          className="inline-flex size-5 shrink-0 items-center justify-center border text-xs font-bold before:content-[counter(step)] data-complete:before:content-none"
           data-complete={status === "complete" ? "" : undefined}
         >
           {status === "complete" && <IconCheck className="size-3" aria-label="Done" />}

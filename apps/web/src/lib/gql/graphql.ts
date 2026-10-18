@@ -2195,6 +2195,8 @@ export type CreateServerTokenInput = {
   expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
   game: Scalars['String']['input'];
   name: Scalars['String']['input'];
+  /** Default RCON host for servers registered with this token */
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   rconPassword?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -22631,6 +22633,7 @@ export type SafeServerToken = {
   id?: Maybe<Scalars['Int']['output']>;
   lastUsedAt?: Maybe<Scalars['DateTime']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  rconAddress?: Maybe<Scalars['String']['output']>;
   revokedAt?: Maybe<Scalars['DateTime']['output']>;
   serverCount?: Maybe<Scalars['Int']['output']>;
   status?: Maybe<Scalars['String']['output']>;
@@ -25418,6 +25421,7 @@ export type ServerToken = {
   id?: Maybe<Scalars['Int']['output']>;
   lastUsedAt?: Maybe<Scalars['DateTime']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  rconAddress?: Maybe<Scalars['String']['output']>;
   revokedAt?: Maybe<Scalars['DateTime']['output']>;
   serverCount: Scalars['Int']['output'];
   servers?: Maybe<Array<Server>>;
@@ -25437,6 +25441,7 @@ export type ServerTokenCountOrderByAggregateInput = {
   id?: InputMaybe<SortOrder>;
   lastUsedAt?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
+  rconAddress?: InputMaybe<SortOrder>;
   revokedAt?: InputMaybe<SortOrder>;
   tokenPrefix?: InputMaybe<SortOrder>;
 };
@@ -25448,6 +25453,7 @@ export type ServerTokenCreateInput = {
   game?: InputMaybe<Scalars['String']['input']>;
   lastUsedAt?: InputMaybe<Scalars['DateTime']['input']>;
   name: Scalars['String']['input'];
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   revokedAt?: InputMaybe<Scalars['DateTime']['input']>;
   servers?: InputMaybe<ServerCreateNestedManyWithoutAuthTokenInput>;
   tokenPrefix: Scalars['String']['input'];
@@ -25461,6 +25467,7 @@ export type ServerTokenCreateManyInput = {
   id?: InputMaybe<Scalars['Int']['input']>;
   lastUsedAt?: InputMaybe<Scalars['DateTime']['input']>;
   name: Scalars['String']['input'];
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   revokedAt?: InputMaybe<Scalars['DateTime']['input']>;
   tokenPrefix: Scalars['String']['input'];
 };
@@ -25483,6 +25490,7 @@ export type ServerTokenCreateWithoutServersInput = {
   game?: InputMaybe<Scalars['String']['input']>;
   lastUsedAt?: InputMaybe<Scalars['DateTime']['input']>;
   name: Scalars['String']['input'];
+  rconAddress?: InputMaybe<Scalars['String']['input']>;
   revokedAt?: InputMaybe<Scalars['DateTime']['input']>;
   tokenPrefix: Scalars['String']['input'];
 };
@@ -25495,6 +25503,7 @@ export type ServerTokenMaxOrderByAggregateInput = {
   id?: InputMaybe<SortOrder>;
   lastUsedAt?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
+  rconAddress?: InputMaybe<SortOrder>;
   revokedAt?: InputMaybe<SortOrder>;
   tokenPrefix?: InputMaybe<SortOrder>;
 };
@@ -25507,6 +25516,7 @@ export type ServerTokenMinOrderByAggregateInput = {
   id?: InputMaybe<SortOrder>;
   lastUsedAt?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
+  rconAddress?: InputMaybe<SortOrder>;
   revokedAt?: InputMaybe<SortOrder>;
   tokenPrefix?: InputMaybe<SortOrder>;
 };
@@ -25520,6 +25530,7 @@ export enum ServerTokenOrderByRelevanceFieldEnum {
   CreatedBy = 'createdBy',
   Game = 'game',
   Name = 'name',
+  RconAddress = 'rconAddress',
   RconPassword = 'rconPassword',
   TokenHash = 'tokenHash',
   TokenPrefix = 'tokenPrefix'
@@ -25544,6 +25555,7 @@ export type ServerTokenOrderByWithAggregationInput = {
   id?: InputMaybe<SortOrder>;
   lastUsedAt?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
+  rconAddress?: InputMaybe<SortOrder>;
   revokedAt?: InputMaybe<SortOrder>;
   tokenPrefix?: InputMaybe<SortOrder>;
 };
@@ -25557,6 +25569,7 @@ export type ServerTokenOrderByWithRelationInput = {
   id?: InputMaybe<SortOrder>;
   lastUsedAt?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
+  rconAddress?: InputMaybe<SortOrder>;
   revokedAt?: InputMaybe<SortOrder>;
   servers?: InputMaybe<ServerOrderByRelationAggregateInput>;
   tokenPrefix?: InputMaybe<SortOrder>;
@@ -25570,6 +25583,7 @@ export enum ServerTokenScalarFieldEnum {
   Id = 'id',
   LastUsedAt = 'lastUsedAt',
   Name = 'name',
+  RconAddress = 'rconAddress',
   RconPassword = 'rconPassword',
   RevokedAt = 'revokedAt',
   TokenHash = 'tokenHash',
@@ -25587,6 +25601,7 @@ export type ServerTokenScalarWhereWithAggregatesInput = {
   id?: InputMaybe<IntWithAggregatesFilter>;
   lastUsedAt?: InputMaybe<DateTimeNullableWithAggregatesFilter>;
   name?: InputMaybe<StringWithAggregatesFilter>;
+  rconAddress?: InputMaybe<StringWithAggregatesFilter>;
   revokedAt?: InputMaybe<DateTimeNullableWithAggregatesFilter>;
   tokenPrefix?: InputMaybe<StringWithAggregatesFilter>;
 };
@@ -25602,6 +25617,7 @@ export type ServerTokenUpdateInput = {
   game?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastUsedAt?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   name?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   revokedAt?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   servers?: InputMaybe<ServerUpdateManyWithoutAuthTokenNestedInput>;
   tokenPrefix?: InputMaybe<StringFieldUpdateOperationsInput>;
@@ -25614,6 +25630,7 @@ export type ServerTokenUpdateManyMutationInput = {
   game?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastUsedAt?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   name?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   revokedAt?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   tokenPrefix?: InputMaybe<StringFieldUpdateOperationsInput>;
 };
@@ -25640,6 +25657,7 @@ export type ServerTokenUpdateWithoutServersInput = {
   game?: InputMaybe<StringFieldUpdateOperationsInput>;
   lastUsedAt?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   name?: InputMaybe<StringFieldUpdateOperationsInput>;
+  rconAddress?: InputMaybe<StringFieldUpdateOperationsInput>;
   revokedAt?: InputMaybe<NullableDateTimeFieldUpdateOperationsInput>;
   tokenPrefix?: InputMaybe<StringFieldUpdateOperationsInput>;
 };
@@ -25661,6 +25679,7 @@ export type ServerTokenWhereInput = {
   id?: InputMaybe<IntFilter>;
   lastUsedAt?: InputMaybe<DateTimeNullableFilter>;
   name?: InputMaybe<StringFilter>;
+  rconAddress?: InputMaybe<StringFilter>;
   revokedAt?: InputMaybe<DateTimeNullableFilter>;
   servers?: InputMaybe<ServerListRelationFilter>;
   tokenPrefix?: InputMaybe<StringFilter>;
@@ -25677,6 +25696,7 @@ export type ServerTokenWhereUniqueInput = {
   id?: InputMaybe<Scalars['Int']['input']>;
   lastUsedAt?: InputMaybe<DateTimeNullableFilter>;
   name?: InputMaybe<StringFilter>;
+  rconAddress?: InputMaybe<StringFilter>;
   revokedAt?: InputMaybe<DateTimeNullableFilter>;
   servers?: InputMaybe<ServerListRelationFilter>;
   tokenPrefix?: InputMaybe<StringFilter>;
@@ -29241,7 +29261,7 @@ export type GetServerTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetServerTokensQuery = { __typename?: 'Query', findManyServerToken: Array<{ __typename?: 'ServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount: number, status?: string | null, hasRconPassword?: boolean | null }> };
+export type GetServerTokensQuery = { __typename?: 'Query', findManyServerToken: Array<{ __typename?: 'ServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, rconAddress?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount: number, status?: string | null, hasRconPassword?: boolean | null }> };
 
 export type GetServerTokenCountQueryVariables = Exact<{
   includeRevoked?: InputMaybe<Scalars['Boolean']['input']>;
@@ -29255,14 +29275,14 @@ export type CreateServerTokenMutationVariables = Exact<{
 }>;
 
 
-export type CreateServerTokenMutation = { __typename?: 'Mutation', createServerToken?: { __typename?: 'CreateServerTokenResult', success?: boolean | null, message?: string | null, rawToken?: string | null, token?: { __typename?: 'SafeServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount?: number | null, status?: string | null, hasRconPassword?: boolean | null } | null } | null };
+export type CreateServerTokenMutation = { __typename?: 'Mutation', createServerToken?: { __typename?: 'CreateServerTokenResult', success?: boolean | null, message?: string | null, rawToken?: string | null, token?: { __typename?: 'SafeServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, rconAddress?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount?: number | null, status?: string | null, hasRconPassword?: boolean | null } | null } | null };
 
 export type RevokeServerTokenMutationVariables = Exact<{
   input: RevokeServerTokenInput;
 }>;
 
 
-export type RevokeServerTokenMutation = { __typename?: 'Mutation', revokeServerToken?: { __typename?: 'RevokeServerTokenResult', success?: boolean | null, message?: string | null, token?: { __typename?: 'SafeServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount?: number | null, status?: string | null, hasRconPassword?: boolean | null } | null } | null };
+export type RevokeServerTokenMutation = { __typename?: 'Mutation', revokeServerToken?: { __typename?: 'RevokeServerTokenResult', success?: boolean | null, message?: string | null, token?: { __typename?: 'SafeServerToken', id?: number | null, tokenPrefix?: string | null, name?: string | null, game?: string | null, rconAddress?: string | null, createdAt?: any | null, expiresAt?: any | null, revokedAt?: any | null, lastUsedAt?: any | null, createdBy?: string | null, serverCount?: number | null, status?: string | null, hasRconPassword?: boolean | null } | null } | null };
 
 export type GetUsersWithPaginationQueryVariables = Exact<{
   take?: InputMaybe<Scalars['Int']['input']>;
@@ -29301,9 +29321,9 @@ export const GetServerByIdWithConfigsDocument = {"kind":"Document","definitions"
 export const GetModsForSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetModsForSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyModSupported"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetModsForSelectQuery, GetModsForSelectQueryVariables>;
 export const CreateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerWithConfigMutation, CreateServerWithConfigMutationVariables>;
 export const UpdateServerWithConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateServerWithConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateServerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateServerWithConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"serverId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"serverId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"configsCount"}},{"kind":"Field","name":{"kind":"Name","value":"server"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"port"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"publicAddress"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"statusUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateServerWithConfigMutation, UpdateServerWithConfigMutationVariables>;
-export const GetServerTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeRevoked"},"value":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]} as unknown as DocumentNode<GetServerTokensQuery, GetServerTokensQueryVariables>;
+export const GetServerTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeRevoked"},"value":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]} as unknown as DocumentNode<GetServerTokensQuery, GetServerTokensQueryVariables>;
 export const GetServerTokenCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerTokenCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeRevoked"},"value":{"kind":"Variable","name":{"kind":"Name","value":"includeRevoked"}}}]}]}}]} as unknown as DocumentNode<GetServerTokenCountQuery, GetServerTokenCountQueryVariables>;
-export const CreateServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"rawToken"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerTokenMutation, CreateServerTokenMutationVariables>;
-export const RevokeServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RevokeServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RevokeServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"revokeServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<RevokeServerTokenMutation, RevokeServerTokenMutationVariables>;
+export const CreateServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"rawToken"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<CreateServerTokenMutation, CreateServerTokenMutationVariables>;
+export const RevokeServerTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RevokeServerToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RevokeServerTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"revokeServerToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"game"}},{"kind":"Field","name":{"kind":"Name","value":"rconAddress"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"revokedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"serverCount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hasRconPassword"}}]}}]}}]}}]} as unknown as DocumentNode<RevokeServerTokenMutation, RevokeServerTokenMutationVariables>;
 export const GetUsersWithPaginationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUsersWithPagination"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UserOrderByWithRelationInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"emailVerified"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"banned"}},{"kind":"Field","name":{"kind":"Name","value":"banReason"}},{"kind":"Field","name":{"kind":"Name","value":"banExpires"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetUsersWithPaginationQuery, GetUsersWithPaginationQueryVariables>;
 export const GetUserCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<GetUserCountQuery, GetUserCountQueryVariables>;

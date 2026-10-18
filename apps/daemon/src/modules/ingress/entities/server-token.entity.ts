@@ -18,6 +18,8 @@ export interface ServerTokenEntity {
   readonly rconPassword: string
   /** Game type code (e.g., "cstrike", "valve", "tf") */
   readonly game: string
+  /** Default RCON host for servers registered with this token; empty when unset */
+  readonly rconAddress: string
   readonly createdAt: Date
   readonly expiresAt: Date | null
   readonly revokedAt: Date | null

@@ -3,6 +3,7 @@ export interface TokenListItem {
   tokenPrefix: string
   name: string
   game: string
+  rconAddress: string
   createdAt: string | Date
   expiresAt?: string | Date | null
   revokedAt?: string | Date | null
@@ -18,5 +19,6 @@ export interface NewServerToken {
   name: string
   game: string
   rconPassword?: string
+  rconAddress?: string
   expiresAt?: string
 }

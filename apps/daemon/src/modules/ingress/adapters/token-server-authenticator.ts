@@ -12,7 +12,11 @@ import type { ILogger } from "@/shared/utils/logger.types"
 import { hashToken, isValidTokenFormat } from "@repo/crypto"
 import type { ServerTokenEntity, SourceCacheEntry, TokenCacheEntry } from "../entities"
 import type { ITokenRepository } from "../repositories"
-import { AuthRateLimiter, type RateLimiterConfig } from "../utils/rate-limiter"
+import {
+  AuthRateLimiter,
+  DEFAULT_RATE_LIMITER_CONFIG,
+  type RateLimiterConfig,
+} from "../utils/rate-limiter"
 
 /**
  * Result of a beacon authentication attempt.
@@ -30,13 +34,24 @@ export interface TokenAuthenticatorConfig {
   tokenCacheTtlMs: number
   /** Source cache TTL in ms (default: 300000 = 5 minutes) */
   sourceCacheTtlMs: number
-  /** Rate limiter config */
+  /** Rate limiter for failures from one UDP endpoint (ip:port) */
   rateLimiter?: Partial<RateLimiterConfig>
+  /**
+   * Rate limiter for failures from one IP across all ports. A game host runs
+   * many servers behind one address, so this ceiling must sit well above the
+   * per-endpoint one or a token rotation on a large fleet blocks the servers
+   * that were already migrated.
+   */
+  perAddressRateLimiter?: Partial<RateLimiterConfig>
 }
 
 export const DEFAULT_TOKEN_AUTHENTICATOR_CONFIG: TokenAuthenticatorConfig = {
   tokenCacheTtlMs: 60_000, // 1 minute
   sourceCacheTtlMs: 300_000, // 5 minutes
+}
+
+export const DEFAULT_PER_ADDRESS_RATE_LIMITER_CONFIG: Partial<RateLimiterConfig> = {
+  maxAttempts: DEFAULT_RATE_LIMITER_CONFIG.maxAttempts * 10,
 }
 
 /**
@@ -52,8 +67,11 @@ export class TokenServerAuthenticator {
   /** "sourceIP:sourcePort" → cached server ID mapping */
   private readonly sourceCache = new Map<string, SourceCacheEntry>()
 
-  /** Rate limiter for failed authentication attempts */
-  private readonly rateLimiter: AuthRateLimiter
+  /** Failed attempts per UDP endpoint (ip:port) */
+  private readonly endpointRateLimiter: AuthRateLimiter
+
+  /** Failed attempts per source IP across all ports (flood guard) */
+  private readonly addressRateLimiter: AuthRateLimiter
 
   /** Rate-limited log messages (messageKey → lastLogTime) */
   private readonly loggedMessages = new Map<string, number>()
@@ -69,7 +87,11 @@ export class TokenServerAuthenticator {
     config?: Partial<TokenAuthenticatorConfig>,
   ) {
     this.config = { ...DEFAULT_TOKEN_AUTHENTICATOR_CONFIG, ...config }
-    this.rateLimiter = new AuthRateLimiter(config?.rateLimiter)
+    this.endpointRateLimiter = new AuthRateLimiter(config?.rateLimiter)
+    this.addressRateLimiter = new AuthRateLimiter({
+      ...DEFAULT_PER_ADDRESS_RATE_LIMITER_CONFIG,
+      ...config?.perAddressRateLimiter,
+    })
   }
 
   /**
@@ -86,16 +108,18 @@ export class TokenServerAuthenticator {
     sourceAddress: string,
     sourcePort: number,
   ): Promise<BeaconAuthResult> {
+    const sourceKey = `${sourceAddress}:${sourcePort}`
+
     // Check rate limiting first
-    if (this.rateLimiter.isBlocked(sourceAddress)) {
-      this.logger.debug(`Rate-limited beacon from ${sourceAddress}`)
+    if (this.isRateLimited(sourceAddress, sourceKey)) {
+      this.logger.debug(`Rate-limited beacon from ${sourceKey}`)
       return { kind: "unauthorized", reason: "rate_limited" }
     }
 
     // Validate token format
     if (!isValidTokenFormat(token)) {
-      this.rateLimiter.recordFailure(sourceAddress)
-      this.logger.warn(`Invalid token format from ${sourceAddress}:${sourcePort}`)
+      this.recordFailure(sourceAddress, sourceKey)
+      this.logger.warn(`Invalid token format from ${sourceKey}`)
       return { kind: "unauthorized", reason: "invalid_format" }
     }
 
@@ -108,21 +132,16 @@ export class TokenServerAuthenticator {
     try {
       validationResult = await this.validateToken(tokenHash)
     } catch (error) {
-      this.rateLimiter.recordFailure(sourceAddress)
+      this.recordFailure(sourceAddress, sourceKey)
       this.logger.warn(
-        `Token validation error from ${sourceAddress}:${sourcePort}: ${error instanceof Error ? error.message : String(error)}`,
+        `Token validation error from ${sourceKey}: ${error instanceof Error ? error.message : String(error)}`,
       )
       return { kind: "unauthorized", reason: "validation_error" }
     }
 
     if (validationResult.kind !== "valid") {
-      const blocked = this.rateLimiter.recordFailure(sourceAddress)
-      if (blocked) {
-        this.logger.warn(`Source ${sourceAddress} blocked after repeated failures`)
-      }
-      this.logger.debug(
-        `Token validation failed from ${sourceAddress}:${sourcePort}: ${validationResult.kind}`,
-      )
+      this.recordFailure(sourceAddress, sourceKey)
+      this.logger.debug(`Token validation failed from ${sourceKey}: ${validationResult.kind}`)
       return { kind: "unauthorized", reason: validationResult.kind }
     }
 
@@ -135,7 +154,6 @@ export class TokenServerAuthenticator {
     const serverResult = await this.findOrRegisterServer(tokenEntity, sourceAddress, gamePort)
 
     // Cache the source → serverId mapping
-    const sourceKey = `${sourceAddress}:${sourcePort}`
     this.sourceCache.set(sourceKey, {
       serverId: serverResult.serverId,
       tokenId: tokenEntity.id,
@@ -181,7 +199,7 @@ export class TokenServerAuthenticator {
 
     if (!entry) {
       this.logWithRateLimit(
-        `source-unknown-${sourceAddress}`,
+        `source-unknown-${sourceKey}`,
         `Unauthenticated log packet from ${sourceKey} — no beacon received. Configure hlx_token on the game server.`,
         "warn",
       )
@@ -226,7 +244,8 @@ export class TokenServerAuthenticator {
   clearCaches(): void {
     this.tokenCache.clear()
     this.sourceCache.clear()
-    this.rateLimiter.clear()
+    this.endpointRateLimiter.clear()
+    this.addressRateLimiter.clear()
     this.loggedMessages.clear()
   }
 
@@ -270,7 +289,7 @@ export class TokenServerAuthenticator {
       }
     }
 
-    const rateLimitEntries = this.rateLimiter.sweep()
+    const rateLimitEntries = this.endpointRateLimiter.sweep() + this.addressRateLimiter.sweep()
 
     return { tokens, sources, logMessages, rateLimitEntries }
   }
@@ -336,6 +355,8 @@ export class TokenServerAuthenticator {
     | { kind: "authenticated"; serverId: number }
     | { kind: "auto_registered"; serverId: number; tokenId: number }
   > {
+    const displayHost = token.rconAddress || address
+
     // Atomic upsert using the @@unique([authTokenId, port]) constraint —
     // prevents duplicate servers when concurrent beacons arrive before either
     // commits.
@@ -349,14 +370,18 @@ export class TokenServerAuthenticator {
       // Do not overwrite address on re-beacon: the learned UDP source IP can be a
       // NAT artifact (e.g. a Docker bridge gateway) and would clobber an
       // operator-meaningful value. address is best-effort set once at create;
-      // RCON dialing uses rconAddress when set (see RconRepository).
+      // RCON dialing uses rconAddress when set (see RconRepository), which is
+      // seeded from the token's default host so a NAT'd learned address never
+      // needs a manual fix after onboarding.
       update: {},
       create: {
         address,
         port: gamePort,
-        name: `${address}:${gamePort}`,
+        name: `${displayHost}:${gamePort}`,
         game: token.game,
         rconPassword: token.rconPassword,
+        rconAddress: token.rconAddress,
+        publicAddress: token.rconAddress,
         authTokenId: token.id,
       },
       select: { serverId: true },
@@ -385,7 +410,7 @@ export class TokenServerAuthenticator {
       }
 
       this.logger.ok(
-        `Auto-registered new server: ID ${server.serverId} at ${address}:${gamePort} (game: ${token.game})`,
+        `Auto-registered new server: ID ${server.serverId} at ${address}:${gamePort} (game: ${token.game}${token.rconAddress ? `, rcon host: ${token.rconAddress}` : ""})`,
       )
 
       return {
@@ -396,6 +421,26 @@ export class TokenServerAuthenticator {
     }
 
     return { kind: "authenticated", serverId: server.serverId }
+  }
+
+  private isRateLimited(sourceAddress: string, sourceKey: string): boolean {
+    return (
+      this.endpointRateLimiter.isBlocked(sourceKey) ||
+      this.addressRateLimiter.isBlocked(sourceAddress)
+    )
+  }
+
+  /**
+   * Count a failure against both limiters. One misbehaving server trips its
+   * endpoint limiter; only a flood from many ports trips the address limiter.
+   */
+  private recordFailure(sourceAddress: string, sourceKey: string): void {
+    if (this.endpointRateLimiter.recordFailure(sourceKey)) {
+      this.logger.warn(`Source ${sourceKey} blocked after repeated failures`)
+    }
+    if (this.addressRateLimiter.recordFailure(sourceAddress)) {
+      this.logger.warn(`Address ${sourceAddress} blocked after repeated failures across ports`)
+    }
   }
 
   /**

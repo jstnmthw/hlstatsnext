@@ -31,7 +31,7 @@ function Sparkbars({
     <div
       role="img"
       data-slot="sparkbars"
-      className={cn("flex h-30 w-full items-end gap-[3px] border-b", className)}
+      className={cn("flex h-30 w-full items-end gap-0.75 border-b", className)}
       {...props}
     >
       {values.map((value, index) => (

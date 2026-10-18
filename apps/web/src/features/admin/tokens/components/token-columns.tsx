@@ -83,6 +83,16 @@ export const tokenColumns = (): ColumnDef<TokenListItem>[] => [
     ),
   },
   {
+    accessorKey: "rconAddress",
+    header: () => <DataTableColumnHeader title="RCON Host" field="rconAddress" />,
+    cell: ({ row }) =>
+      row.original.rconAddress ? (
+        <code className="font-mono text-xs">{row.original.rconAddress}</code>
+      ) : (
+        <span className="text-zinc-500">Learned</span>
+      ),
+  },
+  {
     accessorKey: "lastUsedAt",
     header: () => <DataTableColumnHeader title="Last Used" field="lastUsedAt" />,
     cell: ({ row }) => {

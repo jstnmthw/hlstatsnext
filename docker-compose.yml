@@ -1,7 +1,9 @@
 # Local development containers for hlstatsnext.
 # Usage:
-#   pnpm docker:up         - Start the core stack (db, rabbitmq, daemon)
+#   pnpm docker:up         - Start the core stack (db, rabbitmq)
 #   pnpm docker:down       - Stop the core stack
+#   pnpm docker:daemon:up  - Add the containerised daemon (opt-in, see the daemon service)
+#   pnpm docker:daemon:down - Remove just the daemon container
 #   pnpm docker:obs:up     - Add the observability stack (Prometheus + Grafana)
 #   pnpm docker:obs:down   - Remove just the observability stack
 #
@@ -85,19 +87,25 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  # Opt-in. In development the daemon runs on the host via `pnpm dev`: Docker
+  # Desktop's port proxy rewrites every game server's UDP source to the bridge
+  # gateway (172.18.0.1) and re-sources the port, which poisons the learned
+  # server address and churns the ip:port session cache. Enable this service
+  # with `pnpm docker:daemon:up` when you specifically want the container.
   daemon:
     build:
       context: .
       dockerfile: ./apps/daemon/Dockerfile
     container_name: hlstatsnext-dev-daemon
     hostname: hlstatsnext-dev-daemon
+    profiles: [daemon]
     volumes:
       - ./:/app
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - DATABASE_URL=mysql://${DB_USER:-hlstatsnext}:${DB_PASS:-changeme}@db:3306/${DB_NAME:-hlstatsnext}
       - RABBITMQ_URL=amqp://${RABBITMQ_USER:-hlstats}:${RABBITMQ_PASSWORD:-hlstats}@rabbitmq:5672/${RABBITMQ_VHOST:-hlstats}
-      - UDP_PORT=27500
+      - INGRESS_PORT=27500
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - METRICS_PORT=9091 # Metrics endpoint for Prometheus
     working_dir: /app/apps/daemon

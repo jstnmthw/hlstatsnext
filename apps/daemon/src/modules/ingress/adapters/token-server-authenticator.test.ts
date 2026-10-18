@@ -31,6 +31,7 @@ describe("TokenServerAuthenticator", () => {
     name: "Test Token",
     rconPassword: "encrypted_rcon_pwd",
     game: "cstrike",
+    rconAddress: "",
     createdAt: new Date("2026-01-01"),
     expiresAt: null,
     revokedAt: null,
@@ -139,6 +140,8 @@ describe("TokenServerAuthenticator", () => {
           name: "192.168.1.100:27015",
           game: "cstrike",
           rconPassword: "encrypted_rcon_pwd",
+          rconAddress: "",
+          publicAddress: "",
           authTokenId: 1,
         },
         select: { serverId: true },
@@ -265,6 +268,83 @@ describe("TokenServerAuthenticator", () => {
           },
         }),
       )
+    })
+
+    it("should seed rconAddress and publicAddress from the token's default host", async () => {
+      vi.mocked(mockTokenRepository.findByHash).mockResolvedValue({
+        kind: "valid",
+        token: { ...mockTokenEntity, rconAddress: "fleet.example.com" },
+      })
+      vi.mocked(mockDatabase.prisma.server.upsert).mockResolvedValue(
+        createMockServerRecord({ serverId: 100 }),
+      )
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(0)
+      vi.mocked(mockDatabase.prisma.serverConfigDefault.findMany).mockResolvedValue([])
+
+      await authenticator.handleBeacon(validToken.raw, 27015, "172.18.0.1", 54321)
+
+      expect(mockDatabase.prisma.server.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({
+            address: "172.18.0.1",
+            name: "fleet.example.com:27015",
+            rconAddress: "fleet.example.com",
+            publicAddress: "fleet.example.com",
+          }),
+        }),
+      )
+    })
+
+    it("should not block a sibling server on the same IP when one endpoint keeps failing", async () => {
+      vi.mocked(mockTokenRepository.findByHash).mockResolvedValue({ kind: "not_found" })
+
+      for (let i = 0; i < 3; i++) {
+        await authenticator.handleBeacon(validToken.raw, 27015, "192.168.1.100", 27015)
+      }
+      const blocked = await authenticator.handleBeacon(
+        validToken.raw,
+        27015,
+        "192.168.1.100",
+        27015,
+      )
+      expect(blocked).toEqual({ kind: "unauthorized", reason: "rate_limited" })
+
+      vi.mocked(mockTokenRepository.findByHash).mockResolvedValue({
+        kind: "valid",
+        token: mockTokenEntity,
+      })
+      vi.mocked(mockDatabase.prisma.server.upsert).mockResolvedValue(
+        createMockServerRecord({ serverId: 42, authTokenId: 1 }),
+      )
+      vi.mocked(mockDatabase.prisma.serverConfig.count).mockResolvedValue(5)
+
+      const sibling = await authenticator.handleBeacon(
+        validToken.raw,
+        27016,
+        "192.168.1.100",
+        27016,
+      )
+
+      expect(sibling).toEqual({ kind: "authenticated", serverId: 42 })
+    })
+
+    it("should block the whole address once failures across ports reach the per-address ceiling", async () => {
+      authenticator = new TokenServerAuthenticator(
+        mockDatabase,
+        mockTokenRepository,
+        mockLogger,
+        mockEventBus,
+        { rateLimiter: { maxAttempts: 3 }, perAddressRateLimiter: { maxAttempts: 5 } },
+      )
+      vi.mocked(mockTokenRepository.findByHash).mockResolvedValue({ kind: "not_found" })
+
+      for (let port = 1; port <= 5; port++) {
+        await authenticator.handleBeacon(validToken.raw, 27015, "203.0.113.9", 40000 + port)
+      }
+
+      const result = await authenticator.handleBeacon(validToken.raw, 27015, "203.0.113.9", 49999)
+
+      expect(result).toEqual({ kind: "unauthorized", reason: "rate_limited" })
     })
   })
 

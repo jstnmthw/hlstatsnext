@@ -24,6 +24,10 @@ const CreateServerTokenInput = builder.inputType("CreateServerTokenInput", {
     name: t.string({ required: true }),
     rconPassword: t.string({ required: false }),
     game: t.string({ required: true }),
+    rconAddress: t.string({
+      required: false,
+      description: "Default RCON host for servers registered with this token",
+    }),
     expiresAt: t.field({ type: "DateTime", required: false }),
   }),
 })
@@ -44,6 +48,7 @@ builder.prismaObject("ServerToken", {
     tokenPrefix: t.exposeString("tokenPrefix"),
     name: t.exposeString("name"),
     game: t.exposeString("game"),
+    rconAddress: t.exposeString("rconAddress"),
     createdAt: t.expose("createdAt", { type: "DateTime" }),
     expiresAt: t.expose("expiresAt", { type: "DateTime", nullable: true }),
     revokedAt: t.expose("revokedAt", { type: "DateTime", nullable: true }),
@@ -82,6 +87,7 @@ SafeServerTokenRef.implement({
     tokenPrefix: t.exposeString("tokenPrefix"),
     name: t.exposeString("name"),
     game: t.exposeString("game"),
+    rconAddress: t.exposeString("rconAddress"),
     createdAt: t.expose("createdAt", { type: "DateTime" }),
     expiresAt: t.expose("expiresAt", { type: "DateTime", nullable: true }),
     revokedAt: t.expose("revokedAt", { type: "DateTime", nullable: true }),
@@ -211,6 +217,7 @@ builder.mutationField("createServerToken", (t) =>
         name: input.name,
         rconPassword: input.rconPassword ?? undefined,
         game: input.game,
+        rconAddress: input.rconAddress ?? undefined,
         expiresAt: input.expiresAt ?? null,
         createdBy: session.user.id,
       })

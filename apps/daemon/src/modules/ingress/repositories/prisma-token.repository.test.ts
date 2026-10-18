@@ -22,6 +22,7 @@ describe("PrismaTokenRepository", () => {
     name: "Test Token",
     rconPassword: "encrypted_password",
     game: "cstrike",
+    rconAddress: "",
     createdAt: new Date("2026-01-01"),
     expiresAt: null,
     revokedAt: null,

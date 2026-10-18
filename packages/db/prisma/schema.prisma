@@ -768,6 +768,7 @@ model ServerToken {
   name         String    @db.VarChar(128)
   rconPassword String    @default("") @map("rcon_password") @db.VarChar(512) // AES-256-GCM encrypted
   game         String    @default("valve") @db.VarChar(32)
+  rconAddress  String    @default("") @map("rcon_address") @db.VarChar(255)
   createdAt    DateTime  @default(now()) @map("created_at")
   expiresAt    DateTime? @map("expires_at")
   revokedAt    DateTime? @map("revoked_at")
@@ -791,10 +792,10 @@ model Server {
   publicAddress String       @default("") @map("public_address") @db.VarChar(128)
   rconAddress   String       @default("") @map("rcon_address") @db.VarChar(255)
   statusUrl     String?      @map("status_url") @db.VarChar(255)
-  rconPassword   String       @default("") @map("rcon_password") @db.VarChar(512)
-  authTokenId    Int?         @map("token_id") @db.UnsignedInt
-  authToken      ServerToken? @relation(fields: [authTokenId], references: [id], onDelete: SetNull)
-  kills          Int          @default(0)
+  rconPassword  String       @default("") @map("rcon_password") @db.VarChar(512)
+  authTokenId   Int?         @map("token_id") @db.UnsignedInt
+  authToken     ServerToken? @relation(fields: [authTokenId], references: [id], onDelete: SetNull)
+  kills         Int          @default(0)
   players       Int          @default(0)
   rounds        Int          @default(0)
   suicides      Int          @default(0)

@@ -110,6 +110,22 @@ export function TokenCreateForm({ games }: { games: GameOption[] }) {
       </FormField>
 
       <FormField>
+        <Label htmlFor="rconAddress">RCON Address</Label>
+        <Input
+          id="rconAddress"
+          name="rconAddress"
+          placeholder="e.g. 203.0.113.10 or fleet.example.com"
+          maxLength={255}
+        />
+        <p className="text-xs text-muted-foreground">
+          Host the daemon dials for RCON on every server registered with this token. Set it when
+          your servers sit behind NAT or Docker, where the address learned from their log packets is
+          not routable. Leave empty to use the learned address.
+        </p>
+        {state.errors?.rconAddress && <ErrorMessage>{state.errors.rconAddress[0]}</ErrorMessage>}
+      </FormField>
+
+      <FormField>
         <Label htmlFor="expiresAt">Expiration Date</Label>
         <Input id="expiresAt" name="expiresAt" type="datetime-local" />
         <p className="text-xs text-muted-foreground">

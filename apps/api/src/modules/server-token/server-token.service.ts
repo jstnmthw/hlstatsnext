@@ -12,9 +12,13 @@ export interface CreateTokenInput {
   name: string
   rconPassword?: string
   game: string
+  /** Default RCON host copied to every server registered with this token */
+  rconAddress?: string
   expiresAt?: Date | null
   createdBy: string
 }
+
+const RCON_ADDRESS_RE = /^[A-Za-z0-9.\-_:[\]]{0,255}$/
 
 export interface CreateTokenResult {
   success: boolean
@@ -44,6 +48,16 @@ export class ServerTokenService {
    * Returns the raw token only once - it cannot be retrieved again.
    */
   async createToken(input: CreateTokenInput): Promise<CreateTokenResult> {
+    const rconAddress = input.rconAddress?.trim() ?? ""
+    if (!RCON_ADDRESS_RE.test(rconAddress)) {
+      return {
+        success: false,
+        message: "RCON address must be a hostname or IP address without spaces",
+        rawToken: null,
+        token: null,
+      }
+    }
+
     try {
       // Generate cryptographically secure token
       const { raw, hash, prefix } = generateToken()
@@ -62,6 +76,7 @@ export class ServerTokenService {
           name: input.name,
           rconPassword: encryptedRconPassword,
           game: input.game,
+          rconAddress,
           expiresAt: input.expiresAt ?? null,
           createdBy: input.createdBy,
         },

@@ -130,6 +130,7 @@ export class PrismaTokenRepository implements ITokenRepository {
       name: dbToken.name,
       rconPassword: dbToken.rconPassword,
       game: dbToken.game,
+      rconAddress: dbToken.rconAddress,
       createdAt: dbToken.createdAt,
       expiresAt: dbToken.expiresAt,
       revokedAt: dbToken.revokedAt,

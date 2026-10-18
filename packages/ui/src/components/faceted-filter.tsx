@@ -117,7 +117,7 @@ function FacetedFilter({
             onChange={(event) => setQuery(event.target.value)}
             placeholder={searchPlaceholder ?? (typeof title === "string" ? title : "Search")}
             aria-label={`Search ${typeof title === "string" ? title.toLowerCase() : "options"}`}
-            className="-m-1 mb-1 h-8 w-[calc(100%+--spacing(2))] border-b bg-transparent px-2 outline-none placeholder:text-muted-foreground"
+            className="-m-1 mb-1 h-8 w-[calc(100%+(--spacing(2)))] border-b bg-transparent px-2 outline-none placeholder:text-muted-foreground"
           />
         )}
         <div role="group" className="flex max-h-72 flex-col overflow-y-auto">

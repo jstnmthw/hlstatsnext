@@ -26,6 +26,8 @@
     "docker:logs": "docker compose logs -f",
     "docker:obs:up": "docker compose --profile observability up -d",
     "docker:obs:down": "docker compose rm -sf prometheus grafana",
+    "docker:daemon:up": "docker compose --profile daemon up -d daemon",
+    "docker:daemon:down": "docker compose rm -sf daemon",
     "docker:test:up": "docker compose -f docker-compose.test.yml -p hlstatsnext-test up -d --wait",
     "docker:test:down": "docker compose -f docker-compose.test.yml -p hlstatsnext-test down",
     "dev": "turbo run dev",

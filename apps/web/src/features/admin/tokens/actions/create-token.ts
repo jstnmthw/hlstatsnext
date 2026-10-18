@@ -10,6 +10,12 @@ const CreateTokenSchema = z.object({
   name: z.string().min(1, "Name is required").max(128, "Name is too long"),
   game: z.string().min(1, "Game type is required"),
   rconPassword: z.string().max(255, "RCON password is too long").optional(),
+  rconAddress: z
+    .string()
+    .trim()
+    .max(255, "RCON address is too long")
+    .regex(/^[A-Za-z0-9.\-_:[\]]*$/, "Enter a hostname or IP address")
+    .optional(),
   expiresAt: z.string().optional(),
 })
 
@@ -27,6 +33,7 @@ export async function createToken(
     name: formData.get("name") as string,
     game: formData.get("game") as string,
     rconPassword: formData.get("rconPassword") as string,
+    rconAddress: formData.get("rconAddress") as string,
     expiresAt: formData.get("expiresAt") as string,
   })
   if (!validation.success) {
